@@ -18,7 +18,7 @@
 <% form_for @organisation, "/o/#{@organisation.slug}/calendar_import" do |f| %>
   <%= f.text_area_block :calendar_import_urls %>
   <% if @organisation.calendar_import_last_synced_at %>
-    <div class="text-muted mb-0">
+    <div class="text-body-secondary mb-0">
       Last synced on <%= @organisation.calendar_import_last_synced_at.strftime('%d %b %Y %H:%M %Z') %>
       <% feeds = @organisation.calendar_import_feeds_in_url_order %>
       <% if feeds.any? %>

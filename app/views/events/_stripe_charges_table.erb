@@ -29,7 +29,7 @@
       <% if stripe_charge.account %>
         <%= partial :'accounts/account', locals: { account: stripe_charge.account, show_email: (defined?(show_emails) && show_emails) } %>
       <% else %>
-        <em class="text-muted">(deleted account)</em>
+        <em class="text-body-secondary">(deleted account)</em>
       <% end %>
     </td>
     <td>

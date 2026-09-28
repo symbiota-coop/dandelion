@@ -987,76 +987,54 @@ body.greyed #content {
   color: var(--theme-color);
 }
 
-.badge-default {
-  background: linear-gradient(135deg, #8A8A8F 0%, #8A8A8F 50%, #9b9ba0 100%) !important;
+.badge-default,
+.label-default {
+  --badge-color: #8a8a8f;
+  --badge-color-light: #9b9ba0;
 }
 
-.badge-default[href]:focus,
-.badge-default[href]:hover {
-  background: #737377;
-}
-
-.badge-primary {
-  background: linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-light) 100%) !important;
-}
-
-.badge-primary[href]:focus,
-.badge-primary[href]:hover {
-  background: var(--theme-color-hover);
+.badge-primary,
+.label-primary {
+  --badge-color: var(--theme-color);
+  --badge-color-light: var(--theme-color-light);
 }
 
 .badge-success {
-  background: linear-gradient(135deg, #4CD964 0%, #4CD964 50%, #68df7c 100%) !important;
-}
-
-.badge-success[href]:focus,
-.badge-success[href]:hover {
-  background: #45c35a;
+  --badge-color: #4CD964;
+  --badge-color-light: #68df7c;
 }
 
 .badge-info {
-  background: linear-gradient(135deg, #5AC8FA 0%, #5AC8FA 50%, #7bd3fb 100%) !important;
-}
-
-.badge-info[href]:focus,
-.badge-info[href]:hover {
-  background: #50b3e0;
+  --badge-color: #5AC8FA;
+  --badge-color-light: #7bd3fb;
 }
 
 .badge-warning {
-  background: linear-gradient(135deg, #FF9500 0%, #FF9500 50%, #ffa322 100%) !important;
+  --badge-color: #FF9500;
+  --badge-color-light: #ffa322;
 }
 
-.badge-warning[href]:focus,
-.badge-warning[href]:hover {
-  background: #e68701;
+.badge-danger,
+.label-danger {
+  --badge-color: #FF3B30;
+  --badge-color-light: #ff5b52;
 }
 
-.badge-danger {
-  background: linear-gradient(135deg, #FF3B30 0%, #FF3B30 50%, #ff5b52 100%) !important;
+.badge-yellow,
+.label-yellow {
+  --badge-color: #FFCC00;
+  --badge-color-light: #ffd322;
 }
 
-.badge-danger[href]:focus,
-.badge-danger[href]:hover {
-  background: #e4352b;
+.badge-inverse,
+.label-inverse {
+  --badge-color: #000;
+  --badge-color-light: #111111;
 }
 
-.badge-yellow {
-  background: linear-gradient(135deg, #FFCC00 0%, #FFCC00 50%, #ffd322 100%) !important;
-}
-
-.badge-yellow[href]:focus,
-.badge-yellow[href]:hover {
-  background: #e6b801;
-}
-
-.badge-inverse {
-  background: linear-gradient(135deg, #000 0%, #000 50%, #111111 100%) !important;
-}
-
-.badge-inverse[href]:focus,
-.badge-inverse[href]:hover {
-  background: #333;
+/* Coloured badges and labels are gradients from their colour to a lighter one */
+:is(.badge, .label):is(.badge-default, .label-default, .badge-primary, .label-primary, .badge-success, .badge-info, .badge-warning, .badge-danger, .label-danger, .badge-yellow, .label-yellow, .badge-inverse, .label-inverse) {
+  background: linear-gradient(135deg, var(--badge-color) 0%, var(--badge-color) 50%, var(--badge-color-light) 100%) !important;
 }
 
 .badge-outline-primary {
@@ -1741,51 +1719,6 @@ label.remove-image input {
   white-space: nowrap;
   vertical-align: baseline;
   border-radius: 0.25em;
-}
-
-.label-default {
-  background: linear-gradient(135deg, #8a8a8f 0%, #8a8a8f 50%, #9b9ba0 100%) !important;
-}
-
-.label-default[href]:focus,
-.label-default[href]:hover {
-  background: #737377;
-}
-
-.label-primary {
-  background: linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-light) 100%) !important;
-}
-
-.label-primary[href]:focus,
-.label-primary[href]:hover {
-  background: var(--theme-color-hover);
-}
-
-.label-danger {
-  background: linear-gradient(135deg, #FF3B30 0%, #FF3B30 50%, #ff5b52 100%) !important;
-}
-
-.label-danger[href]:focus,
-.label-danger[href]:hover {
-  background: #e4352b;
-}
-
-.label-yellow {
-  background: linear-gradient(135deg, #FFCC00 0%, #FFCC00 50%, #ffd322 100%) !important;
-}
-
-.label-yellow[href]:focus,
-.label-yellow[href]:hover {
-  background: #e6b801;
-}
-
-.label-inverse {
-  background: linear-gradient(135deg, #000 0%, #000 50%, #111111 100%) !important;
-}
-
-.label-inverse[href]:focus,
-.label-inverse[href]:hover {
-  background: #333;
 }
 
 .label-stripe {
@@ -2642,34 +2575,21 @@ small.form-text {
   color: #fff !important;
 }
 
-.bg-primary {
-  background: var(--theme-color) !important;
-  color: #fff !important;
-}
-
 .bg-white {
   background: #fff !important;
   color: #000 !important;
-}
-
-.text-muted {
-  color: #8A8A8F !important;
 }
 
 .text-warning {
   color: #FF9500 !important;
 }
 
-.bg-primary.text-white,
+.text-bg-primary,
 .progress-bar {
   background: linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-light) 100%) !important;
   border: none !important;
 }
 
-a.bg-primary:hover,
-a.bg-primary:focus,
-button.bg-primary:hover,
-button.bg-primary:focus,
 .bg-primary-hover {
   background-color: var(--theme-color-hover) !important
 }

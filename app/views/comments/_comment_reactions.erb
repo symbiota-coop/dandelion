@@ -15,9 +15,9 @@
         </a>
         <% } %>
       </div>
-      <div class="input-group ms-2" style="width: 8rem; height: 1.875rem;">
-        <%= text_field_tag :body, class: 'form-control form-control-sm py-0', placeholder: 'word/emoji' %>
-        <button class="btn btn-primary d-flex align-items-center justify-content-center py-0" style="height: 1.875rem" type="submit"><i class="bi bi-send-fill"></i></button>
+      <div class="input-group input-group-sm ms-2" style="width: 8rem">
+        <%= text_field_tag :body, class: 'form-control form-control-sm', placeholder: 'word/emoji' %>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-send-fill"></i></button>
       </div>
     </div>
   <% end %>

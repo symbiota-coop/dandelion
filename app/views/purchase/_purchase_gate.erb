@@ -1,6 +1,6 @@
 <% if @event.monthly_donors_only && !monthly_donor_for_event? %>
   <div class="card shadow-sm">
-    <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
+    <h3 class="card-header text-bg-primary"><%= @event.select_tickets_title || 'Select tickets' %></h3>
     <div class="card-body">
       <p class="lead mb-0">
         <% if current_account %>
@@ -18,7 +18,7 @@
   </div>
 <% elsif @event.activity && @event.activity.privacy != 'open' && !activity_member_for_event? %>
   <div class="card shadow-sm">
-    <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
+    <h3 class="card-header text-bg-primary"><%= @event.select_tickets_title || 'Select tickets' %></h3>
     <div class="card-body">
       <p class="lead mb-0">
         <% if current_account %>

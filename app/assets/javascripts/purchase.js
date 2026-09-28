@@ -285,7 +285,7 @@ $(function () {
       email: email,
       'g-recaptcha-response': recaptchaResponse
     }).done(function () {
-      $ticketTypeWaitlistButton.replaceWith($('<span class="text-muted joined-ticket-type-waitlist">Joined waitlist!</span>'))
+      $ticketTypeWaitlistButton.replaceWith($('<span class="text-body-secondary joined-ticket-type-waitlist">Joined waitlist!</span>'))
       $('#ticket-type-waitlist-modal').modal('hide')
     }).fail(function (xhr) {
       $ticketTypeWaitlistButton.prop('disabled', false)

@@ -1,6 +1,6 @@
 <a href="javascript:;" onclick="$(this).hide().next().show().find('input[type=text]').first().focus()" class="btn btn-primary mb-3">Subscribe</a>
 <div class="text-start card shadow-sm mb-3" style="display: none">
-  <div class="card-header text-white bg-primary">
+  <div class="card-header text-bg-primary">
     <h4 class="my-0">
       <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
       Get email updates from <%= instance_variable_get("@#{r}").name %>

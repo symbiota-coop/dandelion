@@ -34,7 +34,7 @@ end
 <div class="card shadow-sm <% if @event.no_discounts %>no-discounts<% end %>" id="select-tickets">
 
   <% unless @concise_ticket_form %>
-    <h3 class="card-header bg-primary text-white"><%= @event.select_tickets_title || 'Select tickets' %></h3>
+    <h3 class="card-header text-bg-primary"><%= @event.select_tickets_title || 'Select tickets' %></h3>
   <% end %>
 
   <div class="<% unless @concise_ticket_form %>card-body<% end %>">
@@ -127,7 +127,7 @@ end
 
   </div>
 
-  <h3 class="card-header bg-primary text-white <% if @concise_ticket_form %>rounded-top<% end %>">
+  <h3 class="card-header text-bg-primary <% if @concise_ticket_form %>rounded-top<% end %>">
     <% if @concise_ticket_form %>
       Register for free
     <% else %>

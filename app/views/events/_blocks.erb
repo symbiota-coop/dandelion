@@ -2,7 +2,7 @@
   <% @boosted_event.event_boost_impressions.create! %>
   <div class="mb-3">
     <div class="mb-1">
-      <small class="text-muted">Boosted by <a class="text-muted" href="/o/<%= @boosted_event.organisation.slug %>/events"><%= @boosted_event.organisation.name %></a></small>
+      <small class="text-body-secondary">Boosted by <a class="text-body-secondary" href="/o/<%= @boosted_event.organisation.slug %>/events"><%= @boosted_event.organisation.name %></a></small>
     </div>
     <%= partial :'events/block', locals: { event: @boosted_event } %>
   </div>

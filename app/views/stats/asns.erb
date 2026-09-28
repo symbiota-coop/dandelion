@@ -14,7 +14,7 @@
 </style>
 
 <h4 class="text-center">Suspicious ASNs</h4>
-<p class="text-muted text-center mb-3">
+<p class="text-body-secondary text-center mb-3">
   Last <%= pluralize(@hours, 'hour') %> &middot;
   <% Asn::DETECTION_CONFIGS.each_with_index do |config, i| %>
     <%== i.zero? ? '' : ' &middot; ' %>
@@ -82,7 +82,7 @@
       </table>
     </div>
   <% else %>
-    <p class="text-muted text-center">No ASNs above threshold in the last <%= pluralize(@hours, 'hour') %>.</p>
+    <p class="text-body-secondary text-center">No ASNs above threshold in the last <%= pluralize(@hours, 'hour') %>.</p>
   <% end %>
 
   <% if @rule %>
@@ -118,7 +118,7 @@
           </table>
         </div>
       <% else %>
-        <p class="text-muted text-center">No blocked ASNs.</p>
+        <p class="text-body-secondary text-center">No blocked ASNs.</p>
       <% end %>
     <% else %>
       <div class="alert alert-danger">Could not fetch rule from Cloudflare API.</div>

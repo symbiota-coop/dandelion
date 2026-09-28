@@ -49,7 +49,7 @@
 
           <div class="feedback-rating-panel text-center py-4 px-3 mb-4">
             <label class="feedback-question-label d-block mb-1">Your star rating</label>
-            <p class="small text-muted mb-3">Your star rating is always public and contributes towards the host's average.</p>
+            <p class="small text-body-secondary mb-3">Your star rating is always public and contributes towards the host's average.</p>
             <div class="feedback-stars rate" role="radiogroup" aria-label="Star rating">
               <% 1.upto(5) do |i| %>
                 <i class="bi bi-star-fill" data-rating="<%= i %>" aria-label="<%= i %> out of 5 stars"></i>
@@ -60,7 +60,7 @@
           <%= partial :'events/feedback_questions' %>
 
           <div class="border-top pt-4 mt-2">
-            <p class="text-muted small fw-bold text-uppercase mb-3" style="letter-spacing: 0.04em;">Privacy</p>
+            <p class="text-body-secondary small fw-bold text-uppercase mb-3" style="letter-spacing: 0.04em;">Privacy</p>
             <%= checkbox 'Allow written answers to be quoted publicly', slug: :publicly_visible, checked: true, form_group_class: 'mb-3' %>
             <%= checkbox 'Anonymise this feedback', slug: :anonymous, form_group_class: 'mb-3' %>
           </div>

@@ -82,7 +82,7 @@
           </div>
         <% end %>
       <% else %>
-        <em class="text-muted">(deleted account)</em>
+        <em class="text-body-secondary">(deleted account)</em>
       <% end %>
     </td>
     <td data-pagelet-url="/tickets/<%= ticket.id %>/ticket_type">
@@ -115,7 +115,7 @@
         </a>
       <% elsif ticket.event.started? && ticket.account %>
         <% if ticket.account.unsubscribed || ticket.account.unsubscribed_feedback %>
-          <span class="text-muted">Unsubscribed from feedback emails</span>
+          <span class="text-body-secondary">Unsubscribed from feedback emails</span>
         <% else %>
           <a data-method="post" href="/events/<%= ticket.event_id %>/resend_feedback_email/<%= ticket.account_id %>">
             <% if ticket.event.finished? %>

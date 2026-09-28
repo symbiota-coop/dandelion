@@ -11,7 +11,7 @@
 <% unless @no_ticket_groups %>
   <% tg = ticket_group_name || 'Other tickets'; if tg != @previous_ticket_group %>
   <tr>
-    <td colspan="3" style="text-transform: uppercase; font-size: 80%" class="bg-primary text-white text-center fw-bold header-font"><%= tg %></td>
+    <td colspan="3" style="text-transform: uppercase; font-size: 80%" class="text-bg-primary text-center fw-bold header-font"><%= tg %></td>
   </tr>
   <% @previous_ticket_group = ticket_group_name %>
 <% end %>
@@ -128,7 +128,7 @@
 </tr>
 
 <tr>
-  <td class="text-muted ticket-type-description border-0 pt-0" colspan="3">
+  <td class="text-body-secondary ticket-type-description border-0 pt-0" colspan="3">
     <div class="<% if !ticket_type.price && !ticket_type.range %>mt-3<% end %>">
       <% if ticket_type.public_description %>
         <%== Sanitize.fragment(Rinku.auto_link(md(ticket_type.public_description)), Sanitize::Config::DANDELION) %>

@@ -127,7 +127,7 @@
 
   var renderResults = function(query, terms, results) {
     if (!results.length) {
-      $results.html('<p class="text-muted mb-0">No matching docs for &ldquo;' + escapeHtml(query) + '&rdquo;.</p>')
+      $results.html('<p class="text-body-secondary mb-0">No matching docs for &ldquo;' + escapeHtml(query) + '&rdquo;.</p>')
       return
     }
     var html = '<p class="doc-search-count">' + results.length + (results.length === 1 ? ' result' : ' results') + ' for &ldquo;' + escapeHtml(query) + '&rdquo;</p><ul class="doc-search-list">'
@@ -158,7 +158,7 @@
     }
     var terms = parseTerms(q)
     if (terms.length) renderResults(q, terms, searchDocs(terms))
-    else $results.html('<p class="text-muted mb-0">Keep typing to search.</p>')
+    else $results.html('<p class="text-body-secondary mb-0">Keep typing to search.</p>')
     var wasSearching = $layout.hasClass('is-searching')
     $layout.addClass('is-searching')
     if (wasSearching) return

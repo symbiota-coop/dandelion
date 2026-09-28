@@ -95,7 +95,7 @@
       <% if order.account %>
         <%= partial :'accounts/account', locals: { account: order.account, show_email: ((defined?(show_emails) && show_emails) || order_email_viewer?(order)) } %>
       <% else %>
-        <em class="text-muted">(deleted account)</em>
+        <em class="text-body-secondary">(deleted account)</em>
       <% end %>
     </td>
     <% if defined?(event_name) %>
@@ -236,7 +236,7 @@
             </a>
           <% elsif order.event.started? %>
             <% if order.account.unsubscribed || order.account.unsubscribed_feedback %>
-              <span class="text-muted">Unsubscribed from feedback emails</span>
+              <span class="text-body-secondary">Unsubscribed from feedback emails</span>
             <% else %>
               <a data-method="post" href="/events/<%= order.event_id %>/resend_feedback_email/<%= order.account_id %>">
                 <% if order.event.finished? %>

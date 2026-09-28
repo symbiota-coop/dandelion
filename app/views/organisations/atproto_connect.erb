@@ -24,7 +24,7 @@
     <div class="mb-3">
       <label for="atproto_app_password"><%= Organisation.human_attribute_name(:atproto_app_password) %></label>
       <%= password_field_tag :atproto_app_password, class: 'form-control', placeholder: 'xxxx-xxxx-xxxx-xxxx', required: true %>
-      <small class="form-text text-muted">
+      <small class="form-text text-body-secondary">
         This is not your Bluesky login password.
         <a href="https://bsky.app/settings/app-passwords" target="_blank">Create an App Password</a> (the password name is unimportant)
       </small>

@@ -85,7 +85,7 @@
           <div class="mb-3">
             <label for="event_boost_start_time">Start at</label>
             <%= text_field_tag :'event_boost[start_time]', value: (@event_boost.start_time&.to_s(:db)), class: 'form-control datetimepicker', id: 'event_boost_start_time', required: true %>
-            <small class="form-text text-muted">Start time must be on the hour</small>
+            <small class="form-text text-body-secondary">Start time must be on the hour</small>
           </div>
 
           <div class="row gx-2">
@@ -99,7 +99,7 @@
                 <span class="input-group-text"><%= money_symbol(@event_boost.currency) %></span>
                 <%= number_field_tag :'event_boost[hourly_amount]', value: compact_amount_for_input(@event_boost.hourly_amount), min: @min_hourly_boost, step: 0.01, class: 'form-control', id: 'event_boost_hourly_amount', required: true %>
               </div>
-              <small class="form-text text-muted">Minimum <%= m(@min_hourly_boost, @event_boost.currency) %> per hour</small>
+              <small class="form-text text-body-secondary">Minimum <%= m(@min_hourly_boost, @event_boost.currency) %> per hour</small>
             </div>
           </div>
 
@@ -137,11 +137,11 @@
             <% tw = row[:pool_total] %>
             <% sh = row[:share] %>
             <% dc = row[:impression_count] %>
-            <tr class="<%= 'text-muted' if slot < Time.zone.now.beginning_of_hour %>">
+            <tr class="<%= 'text-body-secondary' if slot < Time.zone.now.beginning_of_hour %>">
               <td>
                 <%= slot.to_s(:date_no_double_zeros) %>
                 <br>
-                <small class="text-muted">to <%= (slot + 1.hour).to_s(:no_double_zeros) %></small>
+                <small class="text-body-secondary">to <%= (slot + 1.hour).to_s(:no_double_zeros) %></small>
               </td>
               <td class="text-end"><%= ew.format %></td>
               <td class="text-end"><%= tw.format %></td>
@@ -191,7 +191,7 @@
             <%= event_boost.start_time.to_s(:date_no_double_zeros) %>
             <% if event_boost.end_time %>
               <br>
-              <small class="text-muted">to <%= event_boost.end_time.to_s(:date_no_double_zeros) %></small>
+              <small class="text-body-secondary">to <%= event_boost.end_time.to_s(:date_no_double_zeros) %></small>
             <% end %>
           </td>
           <td><%= event_boost.hours %></td>
@@ -207,7 +207,7 @@
             <%= event_boost.created_at %>
             <% if event_boost.account %>
               <br>
-              <small class="text-muted">by <%= event_boost.account.name %></small>
+              <small class="text-body-secondary">by <%= event_boost.account.name %></small>
             <% end %>
           </td>
         </tr>

@@ -68,7 +68,7 @@
       <div class="col-sm-4 col-xl mb-3">
         <div class="card h-100">
           <div class="card-body">
-            <p class="text-muted mb-1"><%= title %></p>
+            <p class="text-body-secondary mb-1"><%= title %></p>
             <h4 class="mb-1"><%= value %></h4>
             <p class="mb-0"><small><%= detail %></small></p>
           </div>
@@ -93,7 +93,7 @@
   </div>
 
   <% if fragment.respond_to?(:updated_at) && fragment.updated_at %>
-    <p class="text-muted">
+    <p class="text-body-secondary">
       Last refreshed <%= timeago fragment.updated_at %>
     </p>
   <% end %>

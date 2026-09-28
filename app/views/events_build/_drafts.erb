@@ -23,7 +23,7 @@ end
             <a href="<%=uri%>">
               <%=draft.name%>
             </a>
-            <span class="text-muted">
+            <span class="text-body-secondary">
               saved <%= time_ago_in_words draft.created_at %> ago
             </span>
             <a href="javascript:;" onclick="var a = this; $.post('/drafts/<%=draft.id%>/destroy', function() { hideTooltips(); $(a).parent().remove(); if ($('#drafts').find('li').length == 0) { $('#drafts').remove() } })"><i class="bi bi-x-lg" data-bs-toggle="tooltip" title="Delete draft"></i></a>

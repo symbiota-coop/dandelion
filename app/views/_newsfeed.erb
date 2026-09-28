@@ -30,7 +30,7 @@
               <% end %>
             <% end %>
             <br />
-            <span style="font-size: 90%" class="text-muted"><%= timeago(notification.created_at) %></span>
+            <span style="font-size: 90%" class="text-body-secondary"><%= timeago(notification.created_at) %></span>
           </p>
           <% if notification.type == 'commented'; comment = notification.notifiable %>
             <div class="d-flex align-items-start ms-2 my-2">

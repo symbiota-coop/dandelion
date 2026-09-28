@@ -32,7 +32,7 @@
       <% if donation.account %>
         <%= partial :'accounts/account', locals: { account: donation.account, show_email: donation_email_viewer?(donation) } %>
       <% else %>
-        <em class="text-muted">(deleted account)</em>
+        <em class="text-body-secondary">(deleted account)</em>
       <% end %>
     </td>
     <td>

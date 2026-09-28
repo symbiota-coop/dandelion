@@ -5,7 +5,7 @@
   </label>
   <%= hidden_field_tag :"#{model_name}[update_tag_names]", value: true %>
   <%= select_tag :"#{model_name}[tag_names]", options: object.tag_names_for_form.map { |t| [t, t, { selected: true }] }, id: "#{model_name}_tag_names", multiple: true, size: 1, class: 'form-select' %>
-  <small class="form-text text-muted">Press comma to add a tag or enter to accept a suggestion. No need for #</small>
+  <small class="form-text text-body-secondary">Press comma to add a tag or enter to accept a suggestion. No need for #</small>
 </div>
 <script>
   $(function () {
