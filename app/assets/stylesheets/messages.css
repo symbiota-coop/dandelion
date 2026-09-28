@@ -1,6 +1,7 @@
 /*
- * Messages page (/messages): chat bubbles, conversation previews and the thread layout.
+ * Messages page (/messages): chat bubbles and the thread layout.
  * Loaded only by messages/messages.erb, after app.css.
+ * Preview hover/unread styles live in app.css — the nav dropdown also uses them.
  */
 
 .widget-chat {
@@ -95,15 +96,6 @@
   border-left-color: #00af5e;
   left: auto;
   right: -0.4375rem;
-}
-
-.message-preview:hover,
-.message-preview.active {
-  background: rgba(200, 199, 204, 0.3)
-}
-
-.message-preview.unread {
-  background: var(--color-theme-transparent) !important
 }
 
 .message-thread-layout {

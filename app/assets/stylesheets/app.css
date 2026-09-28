@@ -1728,6 +1728,19 @@ input[type=radio][disabled] + label {
 }
 
 /* ==========================================================================
+   Message previews (nav dropdown and /messages list)
+   ========================================================================== */
+
+.message-preview:hover,
+.message-preview.active {
+  background: rgba(200, 199, 204, 0.3)
+}
+
+.message-preview.unread {
+  background: var(--color-theme-transparent) !important
+}
+
+/* ==========================================================================
    Forms
    ========================================================================== */
 
