@@ -21,7 +21,7 @@
   <%= partial :'events/toggle_search_well' %>
 <% end %>
 
-<div class="search bg-light border rounded p-3 pb-lg-0 mb-3 <%='mt-3' if params[:minimal] || @carousel_buttons %>" style="<%= 'display: none;' if (params[:display].in?(['map', 'calendar'])) || (@carousel_buttons && !params[:search]) %>">
+<div class="search border rounded p-3 pb-lg-0 mb-3 <%='mt-3' if params[:minimal] || @carousel_buttons %>" style="<%= 'display: none;' if (params[:display].in?(['map', 'calendar'])) || (@carousel_buttons && !params[:search]) %>">
 
   <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
     <%= hidden_field_tag :display, value: params[:display] %>
