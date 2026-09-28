@@ -54,7 +54,7 @@
     <% end %>
     <div class="mb-3">
       <div>
-        <button type="submit" name="default" style="overflow: visible !important; height: 0 !important; width: 0 !important; margin: 0 !important; border: 0 !important; padding: 0 !important; display: block !important;" value="1"></button>
+        <button class="overflow-visible m-0 border-0 p-0" type="submit" name="default" style="height: 0 !important; width: 0 !important; display: block !important" value="1"></button>
         <button type="submit" name="preview" value="1" class="btn btn-primary mb-1">Preview</button>
         <% if @pmail.sendable? %>
           <button type="submit" name="send_test" value="1" class="btn btn-primary mb-1">Send test to <%= current_account.email %></button>

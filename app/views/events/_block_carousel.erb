@@ -1,5 +1,5 @@
 <% image_source = event.image_source(@organisation) %>
-<div style="position: relative;" class="m-1">
+<div class="m-1 position-relative">
   <% if image_source %>
     <a target="_parent" href="/e/<%= event.slug %><%= "?cohost=#{@organisation.slug}" if image_source.is_a?(Cohostship) %>"
     <% if event.carousel_text %> data-bs-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>
@@ -21,7 +21,7 @@
     <% end %>
   </span>
   <% if event.sold_out_cache %>
-    <span class="badge badge-danger" style="opacity: 0.85; border-radius: 0; position: absolute; bottom: 0; right: 0">
+    <span class="badge badge-danger position-absolute bottom-0 end-0" style="opacity: 0.85; border-radius: 0">
       <% if event.sold_out_due_to_sales_end_cache %>
         Sales ended
       <% else %>

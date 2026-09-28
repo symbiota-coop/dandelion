@@ -65,7 +65,7 @@
     <%= f.text_block :preview_text %>
 
     <% if @pmail.markdown? %>
-      <div contenteditable="true" id="pastebin" style="opacity: 0.01; width: 100%; height: 1px; overflow: hidden;"></div>
+      <div class="w-100 overflow-hidden" contenteditable="true" id="pastebin" style="opacity: 0.01; height: 1px"></div>
       <%= f.text_area_block :body %>
     <% else %>
       <%= f.wysiwyg_block :body %>

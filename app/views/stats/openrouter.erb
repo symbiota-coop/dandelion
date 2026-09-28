@@ -21,7 +21,7 @@
         <% if generation.prompt.present? %>
           <details class="mt-2">
             <summary class="text-muted small">Prompt</summary>
-            <pre class="small mt-2 mb-0" style="white-space: pre-wrap; max-height: 20rem; overflow: auto"><%= generation.prompt %></pre>
+            <pre class="small mt-2 mb-0 overflow-auto" style="white-space: pre-wrap; max-height: 20rem"><%= generation.prompt %></pre>
           </details>
         <% end %>
       </div>

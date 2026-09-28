@@ -4,18 +4,18 @@
     <h5 class="mb-1">Order #<%= index + 1 %></h5>
   <% end %>
 
-  <span style="white-space: nowrap">
+  <span class="text-nowrap">
     <a target="_blank" href="/orders/<%= order.public_id %>">View confirmation email</a>
     &middot;
   </span>
-  <span style="white-space: nowrap">
+  <span class="text-nowrap">
     <a href="/e/<%= event.slug %>?order_id=<%= order.public_id %>">Edit ticketholders</a>
     <% if order.value.nil? || order.value.zero? %>
       &middot;
     <% end %>
   </span>
   <% if order.value.nil? || order.value.zero? %>
-    <span style="white-space: nowrap">
+    <span class="text-nowrap">
       <a href="/orders/<%= order.id %>/destroy" data-confirm="Are you sure you want to cancel your RSVP?">Cancel RSVP</a>
     </span>
   <% end %>

@@ -21,7 +21,7 @@
   </td>
 </tr>
 <tr>
-  <td style="border-top: 0; vertical-align: middle">
+  <td class="border-top-0 align-middle">
     <span class="fw-bold" style="font-size: 1.2em">
       <%= ticket_type.name %>
     </span>
@@ -35,12 +35,12 @@
     <% if ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>
     <% elsif availability > 0 %>
       <% if !@event.organisation.hide_few_left && !@event.hide_few_left && (wiser_remaining = ticket_type.wiser_remaining) <= 3 %>
-        <span style="position: relative; top: -2px;" class="badge badge-secondary"><%= wiser_remaining %> left</span>
+        <span style="top: -2px" class="badge badge-secondary position-relative"><%= wiser_remaining %> left</span>
       <% end %>
     <% end %>
 
   </td>
-  <td style="font-size: 1.2em; border-top: 0; vertical-align: middle;">
+  <td class="border-top-0 align-middle" style="font-size: 1.2em">
     <% if ticket_type.range %>
       <span><%= m ticket_type.range_min, @event.currency %> - <%= m ticket_type.range_max, @event.currency %></span>
       <%= range_field_tag :"prices[#{ticket_type.id}]",
@@ -62,7 +62,7 @@
       <% end %>
 
       <div style="font-size: 0.8em" class="text-end">
-        <em class="select-a-price-first" style="white-space: nowrap;">Drag the slider</em>
+        <em class="select-a-price-first text-nowrap">Drag the slider</em>
       </div>
 
     <% elsif ticket_type.price %>
@@ -70,7 +70,7 @@
         <%= m ticket_type.price, @event.currency %>
       <% end %>
     <% else %>
-      <div style="position: relative">
+      <div class="position-relative">
         <div class="input-group">
           <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
           <%= number_field_tag :"prices[#{ticket_type.id}]", min: 0, class: 'form-control', style: 'min-width: 3em',
@@ -86,13 +86,13 @@
           <% end %>
 
         </div>
-        <div style="font-size: 0.8em; position: absolute; right: 0" class="text-end">
-          <em class="select-a-price-first" style="white-space: nowrap;">Set a price first</em>
+        <div style="font-size: 0.8em" class="text-end position-absolute end-0">
+          <em class="select-a-price-first text-nowrap">Set a price first</em>
         </div>
       </div>
     <% end %>
   </td>
-  <td style="border-top: 0; vertical-align: middle">
+  <td class="border-top-0 align-middle">
     <% if ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>
       <span class="badge badge-default">Sales closed</span>
     <% elsif availability > 0 %>
@@ -128,7 +128,7 @@
 </tr>
 
 <tr>
-  <td style="border: 0; padding-top: 0" class="text-muted ticket-type-description" colspan="3">
+  <td class="text-muted ticket-type-description border-0 pt-0" colspan="3">
     <div class="<% if !ticket_type.price && !ticket_type.range %>mt-3<% end %>">
       <% if ticket_type.public_description %>
         <%== Sanitize.fragment(Rinku.auto_link(md(ticket_type.public_description)), Sanitize::Config::DANDELION) %>
@@ -139,7 +139,7 @@
 
 <% if ticket_type.photos.exists? %>
   <tr>
-    <td colspan="3" style="border: 0">
+    <td class="border-0" colspan="3">
       <%= partial :'photos/photos', locals: { photoable: ticket_type, dimensions: '100x100#' } %>
     </td>
   </tr>

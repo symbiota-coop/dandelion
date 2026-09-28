@@ -1,4 +1,4 @@
-<td style="text-align: center; white-space: nowrap">
+<td class="text-center text-nowrap">
   <% if event.event_facilitations.exists? %>
     <% event.event_facilitations.each do |event_facilitation| %>
       <a href="/u/<%= event_facilitation.account.username %>"><%= event_facilitation.account.name %></a>

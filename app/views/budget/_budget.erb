@@ -3,7 +3,7 @@
     <h2>Projected incomings</h2>
     <table class="table">
       <tr>
-        <th style="width: 50%">Item</th>
+        <th class="w-50">Item</th>
         <th>Amount</th>
       </tr>
       <% Option.types.each { |type| %>
@@ -44,7 +44,7 @@
     <h2>Actual incomings</h2>
     <table class="table">
       <tr>
-        <th style="width: 50%"></th>
+        <th class="w-50"></th>
         <th>
           <%= m @gathering.memberships.pluck(:paid).compact.sum, @gathering.currency %>
           <a href="/g/<%= @gathering.slug %>/payments">(<%= m @gathering.processed_via_dandelion, @gathering.currency %> processed via Dandelion)</a>
@@ -56,7 +56,7 @@
     <h2>Projected outgoings</h2>
     <table class="table">
       <tr>
-        <th style="width: 50%">Team</th>
+        <th class="w-50">Team</th>
         <th>Budget</th>
         <th>Spent</th>
       </tr>
@@ -102,7 +102,7 @@
     </div>
     <table class="table">
       <tr>
-        <th style="width: 50%">Item</th>
+        <th class="w-50">Item</th>
         <th>Cost</th>
         <th>Team</th>
         <th>Paid by</th>

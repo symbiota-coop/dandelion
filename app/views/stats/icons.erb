@@ -31,7 +31,7 @@ sorted_bi_counts = bi_counts.sort_by { |key, value| -value }
     });
   });
 </script>
-<table id="icons" class="table" style="width: auto">
+<table id="icons" class="table w-auto">
   <thead>
     <tr>
       <th>Pattern</th>
@@ -41,11 +41,11 @@ sorted_bi_counts = bi_counts.sort_by { |key, value| -value }
   </thead>
   <% sorted_bi_counts.each do |key, value| %>
     <tr>
-      <td style="vertical-align: middle"><%= key %></td>
-      <td style="vertical-align: middle; font-size: 3em">
+      <td class="align-middle"><%= key %></td>
+      <td class="align-middle" style="font-size: 3em">
         <i class="bi <%= key %>"></i>
       </td>
-      <td style="vertical-align: middle"><%= value %></td>
+      <td class="align-middle"><%= value %></td>
     </tr>
   <% end %>
 </table>

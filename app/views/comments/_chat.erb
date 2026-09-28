@@ -2,7 +2,7 @@
 <div data-pagelet-url="/posts/<%= (post = commentable.posts.first).id %>/post_replies">
   <%= partial :'comments/replies', locals: { post: post } %>
 </div>
-<div class="d-flex align-items-start" style="padding: 10px 10px 0 10px; margin: 0">
+<div class="d-flex align-items-start m-0" style="padding: 10px 10px 0 10px">
   <span class="me-2">
     <%= partial :'accounts/square', locals: { account: current_account, width: '32px', klass: 'media-object' } %>
   </span>

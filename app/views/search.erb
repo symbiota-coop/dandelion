@@ -47,7 +47,7 @@
     <ul class="search-result-list mb-3">
       <% @organisations.each { |organisation| %>
       <li>
-        <div class="search-result-media" style="height: auto">
+        <div class="search-result-media h-auto">
           <% if organisation.image %>
             <a href="/o/<%= organisation.slug %>"><img src="<%= u organisation.image.thumb('400x400').url %>"<% if organisation.image_width_unmagic && organisation.image_height_unmagic %> style="aspect-ratio: <%= organisation.image_width_unmagic %> / <%= organisation.image_height_unmagic %>"<% end %>></a>
           <% else %>
@@ -70,7 +70,7 @@
       <% @gatherings.each { |gathering| %>
       <li>
         <% if gathering.image %>
-          <div class="search-result-media" style="height: auto">
+          <div class="search-result-media h-auto">
             <a href="/g/<%= gathering.slug %>"><img src="<%= u gathering.image.thumb('400x400').url %>"<% if gathering.image_width_unmagic && gathering.image_height_unmagic %> style="aspect-ratio: <%= gathering.image_width_unmagic %> / <%= gathering.image_height_unmagic %>"<% end %>></a>
           </div>
         <% end %>

@@ -94,12 +94,12 @@
         on <a <% if params[:minimal] %>target="_blank"<% end %>  href="/e/<%= event_feedback.event.slug %>"><%= event_feedback.event.name %></a>
       <% end %>
     </td>
-    <td style="white-space: nowrap;"><% if event_feedback.deleted_at%><em>Removed</em><% else %><% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %><% end %></td>
+    <td class="text-nowrap"><% if event_feedback.deleted_at%><em>Removed</em><% else %><% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %><% end %></td>
     <td><small><%= timeago event_feedback.created_at %></small></td>
   </tr>
   <% if !event_feedback.deleted_at && event_feedback.public_answers&.any? { |_, a| a.present? } %>
     <tr>
-      <td colspan="3" style="border-top: 0">
+      <td class="border-top-0" colspan="3">
         <%= partial :'event_feedbacks/event_feedback', locals: { event_feedback: event_feedback } %>
       </td>
     </tr>

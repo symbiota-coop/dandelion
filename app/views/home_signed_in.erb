@@ -17,13 +17,13 @@
 
     <div data-with-placeholder id="newsfeed" data-pagelet-url="<%= params[:tour] ? '/?tour=1' : '/'%>" data-pagelet-refresh="60" class="p-3 border rounded shadow-sm bg-white">
       <% 15.times do %>
-        <div class="flicker" style="width: 75%; background: rgba(0,0,0,0.1)">&nbsp;</div>
+        <div class="flicker w-75" style="background: rgba(0,0,0,0.1)">&nbsp;</div>
         <hr class="my-3" style="border-top-color: rgba(0,0,0,0.1)">
       <% end %>
     </div>
   </div>
   <div class="col-lg-4">
-    <div style="position: sticky; top: 3.75rem">
+    <div class="position-sticky" style="top: 3.75rem">
       <%= partial :'events/awesome' %>
       <% if current_account.following.and(:hidden => false, :date_of_birth.ne => nil).exists? %>
         <div class="card shadow-sm mt-3">

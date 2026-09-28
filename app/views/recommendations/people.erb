@@ -16,7 +16,7 @@ recommended_people = @account.recommended_people || []
     p = p + 1
     %>
     <li <% if i == 0 %> style="border-top: 0" <% end %>>
-      <div class="search-result-media" style="height: auto">
+      <div class="search-result-media h-auto">
         <%= partial :'accounts/square', locals: { account: account, style: 'display: block;' } %>
       </div>
       <div class="search-result-content">
