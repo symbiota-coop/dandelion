@@ -1,31 +1,31 @@
-<div class="form-group">
+<div class="mb-3">
   <label>Full name</label>
   <%= text_field_tag 'account[name]', class: 'form-control', disabled: true %>
 </div>
-<div class="form-group">
+<div class="mb-3">
   <label>Email</label>
   <%= email_field_tag 'account[email]', class: 'form-control', disabled: true %>
 </div>
 <% unless activity.hide_image %>
-  <div class="form-group">
+  <div class="mb-3">
     <label>Photo</label>
     <%= file_field_tag 'account[image]', class: 'form-control', disabled: true %>
   </div>
 <% end %>
 <% unless activity.hide_location %>
-  <div class="form-group">
+  <div class="mb-3">
     <label>Location</label>
     <%= text_field_tag 'account[location]', class: 'form-control', disabled: true %>
   </div>
 <% end %>
 <% unless activity.hide_date_of_birth %>
-  <div class="form-group">
+  <div class="mb-3">
     <label>Date of birth</label>
     <%= text_field_tag 'account[date_of_birth]', class: 'form-control', disabled: true %>
   </div>
 <% end %>
 <% unless activity.hide_gender %>
-  <div class="form-group">
+  <div class="mb-3">
     <label>Gender</label>
     <%= select_tag 'account[gender]', options: Account.genders, class: 'form-select', disabled: true %>
   </div>

@@ -6,7 +6,7 @@
     <%= hidden_field_tag :from_homepage, value: true %>
   <% end %>
   <% if defined?(chat) && chat %>
-    <%= f.text_block :body, placeholder: 'Write a comment...', label_class: 'd-none' %>
+    <%= f.text_block :body, placeholder: 'Write a comment...', label_class: 'd-none', container_class: 'mb-2' %>
   <% elsif defined?(reply) %>
     <%= f.text_area_block :body, placeholder: 'Write a comment...', label_class: 'd-none' %>
   <% else %>

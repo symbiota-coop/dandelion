@@ -8,11 +8,11 @@
         </div>
         <div class="modal-body">
           <input type="hidden" id="ticket-type-waitlist-ticket-type-id">
-          <div class="form-group">
+          <div class="mb-3">
             <label for="ticket-type-waitlist-name">Name</label>
             <input type="text" class="form-control" id="ticket-type-waitlist-name" value="<%= current_account.try(:name) %>" required>
           </div>
-          <div class="form-group">
+          <div class="mb-3">
             <label for="ticket-type-waitlist-email">Email</label>
             <input type="email" class="form-control" id="ticket-type-waitlist-email" value="<%= current_account.try(:email) %>" required>
           </div>

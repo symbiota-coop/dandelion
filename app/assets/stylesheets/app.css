@@ -1504,9 +1504,9 @@ select[size] {
 }
 
 /*
- * .form-group and .form-inline were dropped in Bootstrap 5. We keep them as our own classes:
- * .form-group spaces a label and its field (and is what activate-tools' blocks and our JS look for),
- * and .form-inline lays out the filter forms above lists and tables in a row.
+ * .form-inline and .form-group were dropped in Bootstrap 5. We keep them for the filter forms above
+ * lists and tables: .form-inline lays a form out in a row, and .form-group is a label and field in it.
+ * Elsewhere, fields are spaced with mb-3.
  */
 .form-group {
   margin-bottom: 1rem;

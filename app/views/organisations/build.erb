@@ -221,7 +221,7 @@
         <div role="tabpanel" class="tab-pane" id="tab-everything-else">
           <%= f.color_block :theme_color %>
           <%= partial :'quick_theme_colors', locals: { input_name: 'organisation[theme_color]' } %>
-          <div class="form-group">
+          <div class="mb-3">
             <label for="organisation_affiliate_credit_percentage"><%= Organisation.human_attribute_name(:affiliate_credit_percentage) %></label>
             <div class="input-group">
               <%= f.number_field :affiliate_credit_percentage, class: 'form-control' %>

@@ -123,7 +123,7 @@
         <% end %>
 
         <% if @event.organisation.activities.exists? || @event.organisation.local_groups.exists? %>
-          <div class="form-group">
+          <div class="mb-3">
             <label for="event_organisation" class="">
               Organisation
             </label>
@@ -260,7 +260,7 @@
           <% end %>
           <div class="evergreen-hide" style="<%= 'display:none' if @event.evergreen? %>">
             <% if @event.sent_reminders_at %>
-              <div class="form-group">
+              <div class="mb-3">
                 <label><%= Event.human_attribute_name(:reminder_hours_before) %></label>
                 <input type="text" class="form-control" disabled value="<%= "Reminder sent #{@event.sent_reminders_at}" %>">
               </div>
@@ -277,7 +277,7 @@
           <% end %>
           <div class="evergreen-hide" style="<%= 'display:none' if @event.evergreen? %>">
             <% if @event.sent_feedback_requests_at %>
-              <div class="form-group">
+              <div class="mb-3">
                 <label><%= Event.human_attribute_name(:feedback_hours_after) %></label>
                 <input type="text" class="form-control" disabled value="<%= "Feedback request sent #{@event.sent_feedback_requests_at}" %>">
               </div>

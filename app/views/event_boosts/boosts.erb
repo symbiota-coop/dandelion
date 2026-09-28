@@ -82,18 +82,18 @@
 
         <% form_tag '', class: 'mb-0', id: 'event-boost-form' do %>
           <%= hidden_field_tag :'event_boost[currency]', value: @event_boost.currency %>
-          <div class="form-group">
+          <div class="mb-3">
             <label for="event_boost_start_time">Start at</label>
             <%= text_field_tag :'event_boost[start_time]', value: (@event_boost.start_time&.to_s(:db)), class: 'form-control datetimepicker', id: 'event_boost_start_time', required: true %>
             <small class="form-text text-muted">Start time must be on the hour</small>
           </div>
 
           <div class="row gx-2">
-            <div class="form-group col-sm-6">
+            <div class="mb-3 col-sm-6">
               <label for="event_boost_hours">Hours</label>
               <%= number_field_tag :'event_boost[hours]', value: @event_boost.hours, min: 1, step: 1, class: 'form-control', id: 'event_boost_hours', required: true %>
             </div>
-            <div class="form-group col-sm-6">
+            <div class="mb-3 col-sm-6">
               <label for="event_boost_hourly_amount">Amount per hour</label>
               <div class="input-group">
                 <span class="input-group-text"><%= money_symbol(@event_boost.currency) %></span>

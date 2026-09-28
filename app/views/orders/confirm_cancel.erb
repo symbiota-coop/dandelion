@@ -3,9 +3,9 @@
   <a href="/e/<%= @event.slug %>"><%= @event.name %></a>?
 </p>
 <div class="mb-4">
-  <% form_tag "/orders/#{@order.id}/destroy", class: 'd-inline-block mb-2' do %>
+  <% form_tag "/orders/#{@order.id}/destroy", class: 'd-inline-flex gap-2 mb-2' do %>
     <%= hidden_field_tag :from_confirm, value: '1' %>
-    <a class="btn btn-outline-secondary me-1" href="/e/<%= @event.slug %>">No, keep my RSVP</a>
+    <a class="btn btn-outline-secondary" href="/e/<%= @event.slug %>">No, keep my RSVP</a>
     <button type="submit" class="btn btn-danger">Yes, cancel my RSVP</button>
   <% end %>
 </div>

@@ -366,7 +366,7 @@ $(function () {
   })
 
   if (config.imageRequiredWidth || config.imageRequiredHeight) {
-    const $small = $('#event_image').closest('.form-group').find('small')
+    const $small = $('label[for="event_image"]').parent().find('small')
     if (config.imageRequiredWidth && config.imageRequiredHeight) {
       $small.text('Required image dimensions: ' + config.imageRequiredWidth + 'px x ' + config.imageRequiredHeight + 'px')
     } else if (config.imageRequiredWidth) {
@@ -400,11 +400,12 @@ $(function () {
     $('#event_revenue_sharer_id').change(function () {
       if ($(this).val()) {
         $('#revenue-share').show()
-        $('#event_profit_share_to_organiser').val(0).closest('.form-group').hide()
+        $('#event_profit_share_to_organiser').val(0)
+        $('label[for="event_profit_share_to_organiser"]').parent().hide()
         $('#event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media, #event_profit_share_to_organisation').parent().find('.input-group-text').text('/' + (100 - $('#event_revenue_share_to_revenue_sharer').val()))
       } else {
         $('#revenue-share').hide()
-        $('#event_profit_share_to_organiser').closest('.form-group').show()
+        $('label[for="event_profit_share_to_organiser"]').parent().show()
         $('#event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media, #event_profit_share_to_organisation').parent().find('.input-group-text').text('%')
       }
     }).change()

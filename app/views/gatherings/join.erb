@@ -26,8 +26,6 @@
       <% form_for @account, "/g/#{@gathering.slug}/join", style: 'margin-top: 20px', id: 'join' do |f| %>
         <script>
           $(function () {
-            $('.form-group > div.col-lg-6').removeClass('col-lg-6').addClass('col-lg-8')
-
             <% if !current_account || @membership %>
               $('#join').submit(function () {
                 if (!grecaptcha || grecaptcha.getResponse().length == 0) {
@@ -46,7 +44,7 @@
         <% end %>
         <% @gathering.joining_questions_a.each_with_index { |q,i| %>
         <%= hidden_field_tag "questions[#{i}]", value: q %>
-        <div class="form-group">
+        <div class="mb-3">
           <label>
             <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
           </label>
