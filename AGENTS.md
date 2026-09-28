@@ -49,7 +49,7 @@ Always ask permission before running tests. Your default posture should be to su
 - Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
 - The `activate_tools` gem defines the `_block` helpers like `text_block`, `wysiwyg_block` etc. It also runs `blanks_to_nils!` on `params` so we can just do `if params[:x]` (no need for `if params[:x].present?`).
 - Do not use `.presence`
-- Stylesheets are plain CSS (no Sass). `app/assets/stylesheets/bootstrap.css` is compiled vendor CSS: never edit it; override it in `app/assets/stylesheets/app.css`, which also holds the page layout (header, sidebar, content) and component styles
+- Stylesheets are plain CSS (no Sass). `app/assets/stylesheets/bootstrap.css` is compiled vendor CSS: never edit it; override it in `app/assets/stylesheets/app.css`, which also holds the page layout (header, sidebar, content) and component styles. Styles only needed on certain pages go in their own file that only those pages load (e.g. `docs.css`, loaded by the docs views, and `messages.css`, loaded by the messages page), not in the site-wide dependencies
 - Use `badge badge-*` for counts and short statuses (Sold out, Locked, Refunded), and `label label-*` for tags, linked entities and amounts (event tags, teams, revenue figures)
 - To change Bootstrap variables, edit `app/assets/stylesheets/bootstrap.scss` and run `rake bootstrap:build` (needs Node), which regenerates `bootstrap.css`
 - `event_details.css` and `email.css` are inlined into emails, so they can't use CSS custom properties (`var(--x)`)

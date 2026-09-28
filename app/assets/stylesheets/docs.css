@@ -1,0 +1,420 @@
+/*
+ * Docs pages (/docs/*). Loaded only by docs/doc_page.erb and docs/ask.erb, after app.css.
+ * Ask boxes shared with other pages (.ask-box, .docs-deepwiki) stay in app.css.
+ */
+
+/* Docs */
+.docs-main {
+  max-width: 42rem;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  color: var(--body-text);
+}
+
+.docs-header {
+  margin-bottom: 0.75rem;
+}
+
+.docs-header-select select.form-control:not([size]):not([multiple]) {
+  font-family: var(--header-font-family);
+  font-size: 1.35rem;
+  font-weight: bold;
+  height: auto;
+  padding: 0.25rem 0.5rem;
+  margin: 0 0 0.5rem;
+}
+
+#doc-body h1,
+#doc-body h2,
+#doc-body h3,
+.docs-deepwiki-answer h1,
+.docs-deepwiki-answer h2,
+.docs-deepwiki-answer h3,
+.docs-ask h1,
+.docs-ask h2,
+.docs-ask h3 {
+  scroll-margin-top: 5.5rem;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+#doc-body h1,
+.docs-deepwiki-answer h1,
+.docs-ask h1 {
+  font-size: 1.75rem;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #ddd;
+}
+
+#doc-body h2,
+.docs-deepwiki-answer h2,
+.docs-ask h2 {
+  font-size: 1.35rem;
+  margin: 2.25rem 0 0.7rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid #ddd;
+}
+
+#doc-body h3,
+.docs-deepwiki-answer h3,
+.docs-ask h3 {
+  font-size: 1.12rem;
+  margin: 1.6rem 0 0.5rem;
+}
+
+#doc-body p,
+.docs-deepwiki-answer p {
+  margin-bottom: 1rem;
+}
+
+#doc-body ul,
+#doc-body ol,
+.docs-deepwiki-answer ul,
+.docs-deepwiki-answer ol {
+  padding-left: 1.25rem;
+  margin-bottom: 1.1rem;
+}
+
+#doc-body li,
+.docs-deepwiki-answer li {
+  margin-bottom: 0.35rem;
+}
+
+#doc-body li > ul,
+#doc-body li > ol,
+.docs-deepwiki-answer li > ul,
+.docs-deepwiki-answer li > ol {
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+#doc-body a,
+.docs-deepwiki-answer a {
+  color: var(--color-primary);
+}
+
+#doc-body a:hover, #doc-body a:focus,
+.docs-deepwiki-answer a:hover,
+.docs-deepwiki-answer a:focus {
+  color: var(--color-link-hover);
+}
+
+#doc-body p.action a,
+.docs-deepwiki-answer p.action a {
+  color: #fff;
+  text-decoration: none;
+}
+
+#doc-body img,
+.docs-deepwiki-answer img {
+  max-width: 100%;
+  height: auto;
+}
+
+#doc-body blockquote,
+.docs-deepwiki-answer blockquote {
+  font-style: normal;
+  color: var(--body-text);
+  margin: 0 0 1.1rem;
+}
+
+#doc-body .table,
+.docs-deepwiki-answer .table {
+  font-size: 0.95em;
+  margin-bottom: 0;
+}
+
+#doc-body pre,
+.docs-deepwiki-answer pre {
+  font-size: 0.85em;
+  line-height: 1.5;
+  padding: 0;
+  overflow-x: auto;
+  word-break: normal;
+  word-wrap: normal;
+  background: transparent;
+  border: 0;
+  border-radius: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+#doc-body code,
+.docs-deepwiki-answer code {
+  font-size: 0.88em;
+}
+
+.doc-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 1.25rem;
+}
+
+.doc-transcript {
+  margin: 0.5rem 0 1.25rem;
+  border: 1px solid var(--color-primary-transparent-3);
+  border-radius: 0.4rem;
+  background: var(--color-primary-transparent-1);
+  padding: 0.55rem 0.85rem;
+}
+
+.doc-transcript summary {
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  font-family: var(--header-font-family);
+}
+
+.doc-transcript[open] summary {
+  margin-bottom: 1rem;
+}
+
+.doc-transcript blockquote {
+  margin: 0;
+  font-size: 0.95em;
+  line-height: 1.45;
+}
+
+.doc-transcript blockquote p {
+  margin-bottom: 0.65rem;
+}
+
+.doc-transcript blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.doc-toc-mobile {
+  margin: 0 0 1.25rem;
+  border: 1px solid #ddd;
+  border-radius: 0.4rem;
+  padding: 0.55rem 0.85rem;
+  background: var(--bg-well);
+}
+
+.doc-toc-mobile summary {
+  cursor: pointer;
+  font-family: var(--header-font-family);
+  color: var(--body-text);
+}
+
+.doc-toc-mobile .doc-index {
+  margin-top: 0.65rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.doc-toc-mobile .doc-index-headings {
+  max-height: none;
+}
+
+.doc-index {
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.doc-index-headings,
+.doc-index-h3s {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.doc-index-select {
+  margin-bottom: 0.65rem;
+}
+
+.doc-index-headings {
+  margin: 0.15rem 0 0;
+}
+
+.doc-link {
+  display: block;
+  padding: 0.28rem 0 0.28rem 0.7rem;
+  color: var(--body-text);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+}
+
+.doc-link:hover, .doc-link:focus {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.doc-link.is-active {
+  border-left-color: var(--color-primary);
+  color: var(--body-text);
+}
+
+.doc-index-h3s .doc-link {
+  padding-left: 1.4rem;
+  font-size: 0.92em;
+  color: var(--placeholder-grey);
+}
+
+#sticky-index {
+  position: sticky;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-right: 0.75rem;
+}
+
+#sticky-index .doc-search,
+#sticky-index .doc-index-select {
+  flex-shrink: 0;
+}
+
+#sticky-index .doc-index {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+#sticky-index .doc-index-headings {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-color: #bbb transparent;
+}
+
+#sticky-index .doc-index-headings::-webkit-scrollbar {
+  width: 6px;
+}
+
+#sticky-index .doc-index-headings::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 4px;
+}
+
+.doc-search {
+  position: relative;
+  margin-bottom: 0.65rem;
+}
+
+.doc-search .bi-search {
+  position: absolute;
+  left: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--placeholder-grey);
+  pointer-events: none;
+  font-size: 0.85rem;
+}
+
+.doc-search .doc-search-input {
+  padding-left: 1.85rem;
+}
+
+.doc-search .doc-search-input:focus {
+  outline: none;
+  box-shadow: none !important;
+}
+
+#docs-layout {
+  overflow-anchor: none;
+}
+
+.docs-ask {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.docs-ask .docs-ask-status {
+  min-height: 1.5em;
+}
+
+.docs-ask .docs-ask-status-word {
+  display: inline-block;
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+.docs-ask .docs-ask-status-word.is-fading {
+  opacity: 0;
+}
+
+.docs-ask .docs-deepwiki-source {
+  margin-top: 1.5rem;
+}
+
+.docs-ask .docs-deepwiki-source p {
+  margin-bottom: 0;
+}
+
+.docs-ask .docs-deepwiki-source hr {
+  margin: 1.5rem 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-ask .docs-ask-status-word {
+    transition: none;
+  }
+}
+
+#docs-layout.is-searching .doc-index,
+#docs-layout.is-searching .doc-index-select,
+#docs-layout.is-searching .doc-toc-mobile,
+#docs-layout.is-searching #doc-body,
+#docs-layout.is-searching .docs-question {
+  display: none !important;
+}
+
+#docs-layout.is-searching #doc-search-results {
+  display: block;
+}
+
+.doc-search-results {
+  display: none;
+}
+
+.doc-search-count {
+  color: var(--placeholder-grey);
+  margin-bottom: 0.85rem;
+}
+
+.doc-search-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.doc-search-result {
+  display: block;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #ddd;
+  color: var(--body-text);
+  text-decoration: none;
+}
+
+.doc-search-result:hover, .doc-search-result:focus {
+  color: var(--body-text);
+  text-decoration: none;
+}
+
+.doc-search-result:hover .doc-search-heading, .doc-search-result:focus .doc-search-heading {
+  color: var(--color-primary);
+}
+
+.doc-search-page {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--placeholder-grey);
+  margin-bottom: 0.15rem;
+}
+
+.doc-search-heading {
+  display: block;
+  font-family: var(--header-font-family);
+  font-weight: bold;
+  font-size: 1.05rem;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.doc-search-snippet {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.9em;
+  line-height: 1.4;
+  color: var(--placeholder-grey);
+}
