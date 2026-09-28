@@ -224,11 +224,6 @@ p.action a:hover {
   border-color: var(--theme-color);
 }
 
-.radio input:checked+label:before {
-  background: var(--theme-color);
-  border-color: var(--theme-color);
-}
-
 /* Native range controls (e.g. pay-what-you-will ticket slider on purchase with minimal layout) */
 .form-control-range {
   accent-color: var(--theme-color);

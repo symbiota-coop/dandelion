@@ -23,13 +23,15 @@
 
 /* Bootstrap tweaks */
 
-h1 > span, h2 > span, h3 > span,
-.h1 > span, .h2 > span, .h3 > span {
+h1 > span,
+h2 > span,
+h3 > span {
   line-height: 1.255;
 }
 
-h4, h5, h6,
-.h4, .h5, .h6 {
+h4,
+h5,
+h6 {
   line-height: 1.33;
 }
 
@@ -509,13 +511,7 @@ h2,
 h3,
 h4,
 h5,
-h6,
-.h1,
-.h2,
-.h3,
-.h4,
-.h5,
-.h6 {
+h6 {
   font-weight: bold;
   font-family: var(--header-font-family);
   letter-spacing: -0.02em;
