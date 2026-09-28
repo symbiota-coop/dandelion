@@ -1,7 +1,6 @@
 {
   "ignore": {
     "customPatterns": [
-      "app/assets/infinite_admin/plugins/**/*",
       "app/assets/javascripts/ext/**/*",
       "**/*.svg",
       "**/*.txt",

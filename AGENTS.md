@@ -49,7 +49,7 @@ Always ask permission before running tests. Your default posture should be to su
 - Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
 - The `activate_tools` gem defines the `_block` helpers like `text_block`, `wysiwyg_block` etc. It also runs `blanks_to_nils!` on `params` so we can just do `if params[:x]` (no need for `if params[:x].present?`).
 - Do not use `.presence`
-- Stylesheets are plain CSS (no Sass). `app/assets/stylesheets/bootstrap.css` and `app/assets/infinite_admin/css/style.css` are compiled vendor CSS: never edit them; override them in `app/assets/stylesheets/app.css`
+- Stylesheets are plain CSS (no Sass). `app/assets/stylesheets/bootstrap.css` is compiled vendor CSS: never edit it; override it in `app/assets/stylesheets/app.css`. `layout.css` holds the page layout (header, sidebar, content) and component styles and can be edited directly
 - To change Bootstrap variables, edit `app/assets/stylesheets/bootstrap.scss` and run `rake bootstrap:build` (needs Node), which regenerates `bootstrap.css`
 - `event_details.css` and `email.css` are inlined into emails, so they can't use CSS custom properties (`var(--x)`)
 - Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` — no `before_action`, strong params, or `render`

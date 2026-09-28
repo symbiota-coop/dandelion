@@ -25,7 +25,7 @@
   <% end %>
 <% end %>
 
-<link rel="stylesheet" href="/infinite_admin/css/style.css?<%= @cachebuster %>">
+<link rel="stylesheet" href="/stylesheets/layout.css?<%= @cachebuster %>">
 <link rel="stylesheet" href="/stylesheets/event_details.css?<%= @cachebuster %>">
 <link rel="stylesheet" href="/stylesheets/app.css?<%= @cachebuster %>">
 
@@ -42,14 +42,7 @@
   <script>
     window.paceOptions = { ajax: { trackWebSockets: false, ignoreURLs: [/mcp\.deepwiki\.com/] }, restartOnPushState: false };
   </script>
-  <script src="/infinite_admin/plugins/loader/pace/pace.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.0/pace.min.js" defer></script>
 <% end %>
-<script src="/infinite_admin/plugins/cookie/js/js.cookie.js" defer></script>
 <script src="/javascripts/ext/popper.min.js" defer></script>
 <script src="/javascripts/ext/bootstrap.js" defer></script>
-<script src="/infinite_admin/plugins/scrollbar/slimscroll/jquery.slimscroll.min.js" defer></script>
-<script src="/infinite_admin/js/apps.js?<%= @cachebuster %>" defer></script>
-
-<script>
-  $(function () { App.init(); });
-</script>

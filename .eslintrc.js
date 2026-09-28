@@ -10,7 +10,6 @@ module.exports = {
     jquery: true
   },
   ignorePatterns: [
-    'app/assets/javascripts/ext/**/*.js',
-    'app/assets/infinite_admin/**/*.js'
+    'app/assets/javascripts/ext/**/*.js'
   ]
 }
