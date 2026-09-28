@@ -1016,11 +1016,6 @@ body.greyed #content {
    Alerts
    ========================================================================== */
 
-.alert {
-  padding: 0.625rem;
-  border: none;
-}
-
 .alert-success {
   color: var(--theme-color);
   background: linear-gradient(135deg, #E6F8EF 0%, #E6F8EF 50%, #aae7c9 100%) !important;
@@ -1069,14 +1064,9 @@ body.greyed #content {
    ========================================================================== */
 
 .badge {
-  background: #8a8a8f;
+  background: #777;
   min-width: 0.625rem;
-  padding: 0.1875rem 0.4375rem;
-  color: #fff;
   vertical-align: middle;
-  background-color: #777;
-  font-size: 0.75rem;
-  border-radius: 0.25rem
 }
 
 .btn-primary .badge {
@@ -1176,26 +1166,14 @@ body.greyed #content {
    Buttons
    ========================================================================== */
 
-.btn {
-  font-size: 0.875rem;
-}
-
 .btn:hover,
 .btn:active,
 .btn:focus {
   outline: none;
 }
 
-.btn.btn-sm {
-  padding: 0.3125rem 0.625rem;
-  font-size: 0.825rem;
-}
-
 .btn.btn-lg {
-  font-size: 1.125rem;
-  padding: 0.625rem 1rem;
   line-height: 1.3333333;
-  border-radius: 0.25rem;
 }
 
 /* Primary and danger buttons are gradients, to a lighter colour, over Bootstrap's --bs-btn-* colours */
@@ -1257,14 +1235,6 @@ body.greyed #content {
 
 .dropdown-menu {
   --bs-dropdown-link-active-bg: var(--theme-color);
-}
-
-.pagination {
-  --bs-pagination-color: var(--theme-color);
-  --bs-pagination-hover-color: var(--theme-color-hover);
-  --bs-pagination-focus-color: var(--theme-color-hover);
-  --bs-pagination-active-bg: var(--theme-color);
-  --bs-pagination-active-border-color: var(--theme-color);
 }
 
 .progress {
@@ -1705,29 +1675,9 @@ input[type=radio][disabled] + label {
    Forms
    ========================================================================== */
 
-.form-control {
-  border-color: #C8C7CC;
-  color: #000;
-  font-size: 0.825rem;
-  height: 2.125rem;
-  transition: "border-color ease-in-out .15s,box-shadow ease-in-out .15s,background ease-in-out .15s";
-  box-shadow: none;
-}
-
-.form-control:focus,
-.form-select:focus {
-  border-color: var(--theme-color);
-  outline: none;
-  box-shadow: 0 0 0 0.125rem rgba(102, 175, 233, 0.6);
-}
-
+.form-control,
 .form-select:not([size]):not([multiple]) {
-  border-color: #C8C7CC;
-  color: #000;
-  font-size: 0.825rem;
   height: 2.125rem;
-  transition: "border-color ease-in-out .15s,box-shadow ease-in-out .15s,background ease-in-out .15s";
-  box-shadow: none;
 }
 
 textarea.form-control,
@@ -1822,10 +1772,6 @@ label {
   max-width: 100%;
   margin-bottom: 0.3125rem;
   font-weight: 700;
-}
-
-hr {
-  border-color: #C8C7CC;
 }
 
 .select-placeholder {
@@ -2153,50 +2099,6 @@ mark {
    Pagination
    ========================================================================== */
 
-.pagination > .active > a,
-.pagination > .active > a:focus,
-.pagination > .active > a:hover,
-.pagination > .active > span,
-.pagination > .active > span:focus,
-.pagination > .active > span:hover {
-  background: transparent;
-  border-color: #8a8a8f;
-  color: #000;
-}
-
-.pagination > li > a,
-.pagination > li > span {
-  color: #000;
-  border-color: transparent;
-  background: transparent;
-  border-radius: 0.375rem !important;
-}
-
-.pagination > li + li > a,
-.pagination > li + li > span {
-  margin-left: 0.1875rem;
-}
-
-.pagination > li > a:focus,
-.pagination > li > a:hover,
-.pagination > li > span:focus,
-.pagination > li > span:hover {
-  color: #000;
-  background: transparent;
-  border-color: #C8C7CC;
-}
-
-.pagination > .disabled > a,
-.pagination > .disabled > a:focus,
-.pagination > .disabled > a:hover,
-.pagination > .disabled > span,
-.pagination > .disabled > span:focus,
-.pagination > .disabled > span:hover {
-  border-color: transparent;
-  background: transparent;
-  color: #8a8a8f;
-}
-
 ul.pagination {
   justify-content: center;
 }
@@ -2339,19 +2241,6 @@ table {
   font-size: 0.825rem;
 }
 
-.table td,
-.table th {
-  padding: 0.5rem;
-}
-
-.table > tbody > tr > td {
-  border-color: #e0e0e0;
-}
-
-.table-hover > tbody > tr:hover {
-  background: #efeff4;
-}
-
 .table > caption + thead > tr:first-child > td,
 .table > caption + thead > tr:first-child > th,
 .table > colgroup + thead > tr:first-child > td,
@@ -2379,14 +2268,6 @@ table {
 .table-hr td {
   border: 0 !important;
   border-bottom: 0.1rem solid #E6E5E7 !important;
-}
-
-/* ==========================================================================
-   Tooltips
-   ========================================================================== */
-
-.tooltip {
-  font-size: 0.825rem;
 }
 
 /* ==========================================================================
