@@ -106,7 +106,6 @@ $(function () {
     if (typeof $.currencySymbol !== 'undefined') {
       $row.find('.money-symbol').text($.currencySymbol($('#event_currency').val()))
     }
-    $row.find('[data-bs-toggle="tooltip"]').tooltip()
     initDatetimepickers($row)
     return $row
   }

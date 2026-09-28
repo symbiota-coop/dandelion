@@ -12,22 +12,18 @@
 </style>
 <script>
   $(function() {
+    // The labels show beside the icons on large screens, so only smaller ones need tooltips
     function handleViewOptionsTooltips() {
-      var $tooltips = $('#view-options').find('[title], [data-bs-original-title]');
-      if ($(window).width() >= 992) {
-        $tooltips.each(function() {
-          $(this).tooltip('dispose').removeAttr('data-bs-toggle');
-        });
-      } else {
-        $tooltips.each(function() {
-          if (!$(this).attr('data-bs-toggle')) {
-            $(this).attr('data-bs-toggle', 'tooltip').tooltip({
-              html: true,
-              title: $(this).attr('title')
-            });
-          }
-        });
-      }
+      var large = $(window).width() >= 992;
+      $('#view-options').find('[title], [data-bs-original-title]').each(function() {
+        if (large) {
+          var tooltip = bootstrap.Tooltip.getInstance(this);
+          if (tooltip) tooltip.dispose();
+          $(this).removeAttr('data-bs-toggle');
+        } else {
+          $(this).attr('data-bs-toggle', 'tooltip');
+        }
+      });
     }
 
     handleViewOptionsTooltips();

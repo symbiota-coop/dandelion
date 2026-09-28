@@ -1,3 +1,12 @@
+// Hide every tooltip, including any whose element a pagelet has just replaced
+function hideTooltips () {
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+    const tooltip = bootstrap.Tooltip.getInstance(el)
+    if (tooltip) tooltip.hide()
+  })
+  $('.tooltip').remove()
+}
+
 function scrollMessageThreadToBottom () {
   const thread = document.getElementById('thread-scroll')
   if (!thread) return
@@ -36,6 +45,17 @@ function initQuestionsPreview (inputSelector, previewUrl, options) {
 }
 
 $(function () {
+  // One tooltip handler for the whole page, so content loaded later needs no setup.
+  // Sidebar links have their own, which only show when the sidebar is minified (see _nav.erb)
+  new bootstrap.Tooltip(document.body, { // eslint-disable-line no-new
+    selector: '[data-bs-toggle="tooltip"]:not(#sidebar *)',
+    html: true,
+    // The title, or failing that the span after the element. Bootstrap moves title to data-bs-original-title
+    title: function (el) {
+      return $(el).attr('data-bs-original-title') || $(el).attr('title') || $(el).next('span').html()
+    }
+  })
+
   const wysiwygEditors = []
 
   function fixedHeaderHeight () {
@@ -182,15 +202,6 @@ $(function () {
       $(this.form).find('.comment-options').removeClass('d-none')
     })
 
-    $('[data-bs-toggle="tooltip"]').not('[data-tooltipd]').attr('data-tooltipd', true).tooltip({
-      html: true,
-      // Bootstrap moves title to data-bs-original-title, and passes the element rather than binding this
-      title: function (el) {
-        const title = $(el).attr('data-bs-original-title') || $(el).attr('title')
-        return title || $(el).next('span').html()
-      }
-    })
-
     $('.block').not('[data-block-hover], .infowindow .block').attr('data-block-hover', true).hover(
       function () {
         $('.block-edit', this).show()
@@ -205,7 +216,7 @@ $(function () {
     $('[data-account-username]').not('#modal [data-account-username]').not('[data-modalized]').attr('data-modalized', true).click(function () {
       $('#modal .modal-content').load('/u/' + $(this).attr('data-account-username'), function () {
         $('#modal').modal('show')
-        $('[data-tooltipd]').tooltip('hide')
+        hideTooltips()
       })
     })
 

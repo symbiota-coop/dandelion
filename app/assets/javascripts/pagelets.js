@@ -126,7 +126,7 @@ $(function () {
 
   function postLoad (pagelet) {
     setPageletLoaded(pagelet)
-    $('.tooltip').remove()
+    hideTooltips()
     pagelet.removeAttr('data-pagelet-refresh-paused')
     refreshAlsoPagelet(pagelet)
   }
@@ -202,7 +202,7 @@ $(function () {
 
     pagelet.load(href, function () {
       setPageletLoaded(pagelet)
-      $('.tooltip').remove()
+      hideTooltips()
 
       if (pagelet.attr('data-pagelet-scroll') !== 'false') {
         const headerHeight = $('#header').length ? $('#header').height() : 0
