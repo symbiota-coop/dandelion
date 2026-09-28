@@ -34,21 +34,21 @@
 </style>
 
 <div class="card shadow-sm mt-3" id="chat-card">
-  <h3 class="card-header chill font-weight-bold d-lg-none"><%= title %></h3>
+  <h3 class="card-header chill fw-bold d-lg-none"><%= title %></h3>
   <div class="card-body" id="chat-card-body">
     <div id="chat-container">
       <div class="d-none d-lg-block p-2 bg-primary text-white" style="border-radius: 0.25rem 0.25rem 0 0;">
         <a id="chat-hide" style="<%= 'display:none' if !show_chat %>"        
             class="text-white" href="javascript:;"
             onclick="$('#chat').hide();$(this).hide().next().show();$('#chat-spacer').removeClass('d-lg-block');">
-          <span class="float-right"><i class="bi bi-chevron-double-down"></i></span>
-          <span class="text-white font-weight-bold"><%= title %></span>
+          <span class="float-end"><i class="bi bi-chevron-double-down"></i></span>
+          <span class="text-white fw-bold"><%= title %></span>
         </a>
         <a id="chat-show" style="<%= 'display:none' if show_chat %>"
              class="text-white" href="javascript:;"         
              onclick="$('#chat').show();$(this).hide().prev().show();$('#chat-spacer').addClass('d-lg-block');">
-          <span class="float-right"><i class="bi bi-chevron-double-up"></i></span>
-          <span class="text-white font-weight-bold"><%= title %></span>
+          <span class="float-end"><i class="bi bi-chevron-double-up"></i></span>
+          <span class="text-white fw-bold"><%= title %></span>
         </a>
       </div>
       <div id="chat" <% if !show_chat %>style="display:none"<% end %>>

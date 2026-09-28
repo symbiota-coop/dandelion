@@ -4,7 +4,7 @@
 
   <% if @activity %>
     <% if @activity.feedback_summary %>
-      <div class="ai-well my-3 readable" data-toggle="tooltip" title="AI-generated summary ✨">
+      <div class="ai-well my-3 readable" data-bs-toggle="tooltip" title="AI-generated summary ✨">
         <%= @activity.feedback_summary %>
       </div>
     <% end %>
@@ -26,7 +26,7 @@
     <% end %>
   <% elsif @account %>
     <% if @account.feedback_summary %>
-      <div class="ai-well my-3 readable" data-toggle="tooltip" title="AI-generated summary ✨">
+      <div class="ai-well my-3 readable" data-bs-toggle="tooltip" title="AI-generated summary ✨">
         <%= @account.feedback_summary %>
       </div>
     <% end %>
@@ -48,7 +48,7 @@
     <% end %>
   <% elsif @organisation %>
     <% if @organisation.feedback_summary %>
-      <div class="ai-well my-3 readable" data-toggle="tooltip" title="AI-generated summary ✨">
+      <div class="ai-well my-3 readable" data-bs-toggle="tooltip" title="AI-generated summary ✨">
         <%= @organisation.feedback_summary %>
       </div>
     <% end %>

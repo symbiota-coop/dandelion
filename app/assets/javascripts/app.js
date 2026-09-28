@@ -182,10 +182,12 @@ $(function () {
       $(this.form).find('.comment-options').removeClass('d-none')
     })
 
-    $('[data-toggle="tooltip"]').not('[data-tooltipd]').attr('data-tooltipd', true).tooltip({
+    $('[data-bs-toggle="tooltip"]').not('[data-tooltipd]').attr('data-tooltipd', true).tooltip({
       html: true,
-      title: function () {
-        if ($(this).attr('title').length > 0) { return $(this).attr('title') } else { return $(this).next('span').html() }
+      // Bootstrap moves title to data-bs-original-title, and passes the element rather than binding this
+      title: function (el) {
+        const title = $(el).attr('data-bs-original-title') || $(el).attr('title')
+        return title || $(el).next('span').html()
       }
     })
 
@@ -203,7 +205,7 @@ $(function () {
     $('[data-account-username]').not('#modal [data-account-username]').not('[data-modalized]').attr('data-modalized', true).click(function () {
       $('#modal .modal-content').load('/u/' + $(this).attr('data-account-username'), function () {
         $('#modal').modal('show')
-        $('[data-toggle="tooltip"]').tooltip('hide')
+        $('[data-tooltipd]').tooltip('hide')
       })
     })
 
@@ -289,12 +291,13 @@ $(function () {
       const input = $(this)
       const stem = $(this).prev()
       const link = $(this).next()
-      link.attr('data-toggle', 'tooltip')
+      link.attr('data-bs-toggle', 'tooltip')
       link.attr('title', 'Click to copy')
       link.click(function () {
         navigator.clipboard.writeText(stem.text() + input.val())
+        link.tooltip('dispose')
         link.attr('title', 'Copied!')
-        link.tooltip('dispose').tooltip().tooltip('show')
+        link.tooltip().tooltip('show')
         return false
       })
       input.keydown(function () {
@@ -302,7 +305,7 @@ $(function () {
       })
     })
 
-    if (window.location.hash.startsWith('#photo-')) { $("[data-target='" + window.location.hash + "']").not('[data-photo-clicked]').attr('data-photo-clicked', true).click() }
+    if (window.location.hash.startsWith('#photo-')) { $("[data-bs-target='" + window.location.hash + "']").not('[data-photo-clicked]').attr('data-photo-clicked', true).click() }
 
     $('textarea.wysiwyg').not('[data-wysiwyg-initialized]').attr('data-wysiwyg-initialized', true).each(function () {
       const textarea = this
@@ -371,7 +374,7 @@ $(function () {
       $('div.checkbox', this).each(function () {
         const div = this
         $(div).hide()
-        const button = $('<a href="javascript:;" class="d-inline-block mb-1 mr-1"><span class="label label-outline-primary">' + $(this).find('label').text() + '</span></a>').insertAfter(this)
+        const button = $('<a href="javascript:;" class="d-inline-block mb-1 me-1"><span class="label label-outline-primary">' + $(this).find('label').text() + '</span></a>').insertAfter(this)
         if ($('input[type=checkbox]:checked', div).length > 0) { $('span', button).removeClass('label-outline-primary').addClass('label-primary') }
         $(button).click(function () {
           if ($('input[type=checkbox]:checked', div).length > 0) {
@@ -462,7 +465,7 @@ $(function () {
   function showTabFromHash () {
     const hash = window.location.hash
     if (!hash) return
-    const $link = $('a[data-toggle="tab"]').filter(function () {
+    const $link = $('a[data-bs-toggle="tab"]').filter(function () {
       return this.hash === hash
     })
     if ($link.length && !$link.hasClass('active')) {
@@ -497,7 +500,7 @@ $(function () {
     $modal.modal('show')
   })
 
-  $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+  $(document).on('shown.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
     const hash = e.target.hash
     if (hash && window.location.hash !== hash) {
       history.replaceState(null, '', hash)

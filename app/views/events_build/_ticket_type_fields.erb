@@ -3,9 +3,7 @@
 <div class="row mb-2">
   <div class="col-12 col-lg">
     <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">Name</span>
-      </div>
+      <span class="input-group-text">Name</span>
       <%= form_or_tag_field(form, :text_field, :name, class: 'form-control', required: true) %>
     </div>
   </div>
@@ -14,9 +12,7 @@
 <div class="row mb-2">
   <div class="col-12 col-lg">
     <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">Description</span>
-      </div>
+      <span class="input-group-text">Description</span>
       <%= form_or_tag_field(form, :text_field, :description, class: 'form-control') %>
     </div>
   </div>
@@ -25,32 +21,26 @@
 <div class="row mb-2">
   <div class="col-12 col-lg mb-2 mb-lg-0">
     <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text money-symbol"><%= money_symbol(currency) %></span>
-      </div>
+      <span class="input-group-text money-symbol"><%= money_symbol(currency) %></span>
       <% price_tooltip = 'Enter a price, a price range (two numbers separated by a dash) or leave blank to let the attendee pay as they feel' %>
-      <%= form_or_tag_field(form, :text_field, :price_or_range, class: 'form-control', 'data-toggle': 'tooltip', title: price_tooltip) %>
+      <%= form_or_tag_field(form, :text_field, :price_or_range, class: 'form-control', 'data-bs-toggle': 'tooltip', title: price_tooltip) %>
       <%= form_or_tag_field(form, :hidden_field, :price_or_range_submitted, value: true) %>
     </div>
   </div>
 
   <div class="col-12 col-lg mb-2 mb-lg-0">
     <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">Quantity</span>
-      </div>
+      <span class="input-group-text">Quantity</span>
       <% quantity_tooltip = 'Total number of tickets of this type you want to issue' %>
-      <%= form_or_tag_field(form, :number_field, :quantity, class: 'form-control', 'data-toggle': 'tooltip', title: quantity_tooltip, required: true) %>
+      <%= form_or_tag_field(form, :number_field, :quantity, class: 'form-control', 'data-bs-toggle': 'tooltip', title: quantity_tooltip, required: true) %>
     </div>
   </div>
 
   <div class="col-12 col-lg">
     <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">Slots</span>
-      </div>
+      <span class="input-group-text">Slots</span>
       <% slots_tooltip = 'How many places each of these tickets takes from the event and ticket group capacity. Use 0 for add-ons like meals, or 2 for a couples ticket. Default: 1' %>
-      <% slots_options = { class: 'form-control', min: 0, step: 1, 'data-toggle': 'tooltip', title: slots_tooltip } %>
+      <% slots_options = { class: 'form-control', min: 0, step: 1, 'data-bs-toggle': 'tooltip', title: slots_tooltip } %>
       <% slots_options[:value] = 1 unless form %>
       <%= form_or_tag_field(form, :number_field, :slots, **slots_options) %>
     </div>
@@ -61,12 +51,10 @@
   <div class="row mb-2">
     <div class="col-12 col-lg">
       <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text">
-            <span class="mr-1">Min. monthly donation</span>
-            <span class="money-symbol"><%= money_symbol(currency) %></span>
-          </span>
-        </div>
+        <span class="input-group-text">
+          <span class="me-1">Min. monthly donation</span>
+          <span class="money-symbol"><%= money_symbol(currency) %></span>
+        </span>
         <%= form_or_tag_field(form, :number_field, :minimum_monthly_donation, class: 'form-control', step: 'any') %>
       </div>
     </div>
@@ -77,19 +65,15 @@
   <% if persisted_ticket_groups.length > 0 %>
     <div class="col-12 col-lg mb-2">
       <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text">Group</span>
-        </div>
-        <%= form_or_tag_field(form, :select, :ticket_group_id, options: [''] + persisted_ticket_groups.map { |ticket_group| [ticket_group.name, ticket_group.id] }, class: 'form-control') %>
+        <span class="input-group-text">Group</span>
+        <%= form_or_tag_field(form, :select, :ticket_group_id, options: [''] + persisted_ticket_groups.map { |ticket_group| [ticket_group.name, ticket_group.id] }, class: 'form-select') %>
       </div>
     </div>
   <% end %>
 
   <div class="col-12 col-lg mb-2">
     <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">Sales end</span>
-      </div>
+      <span class="input-group-text">Sales end</span>
       <% sales_end_value = form.object.sales_end&.strftime('%Y-%m-%d %H:%M') if form %>
       <%= form_or_tag_field(form, :text_field, :sales_end, class: 'form-control datetimepicker', value: sales_end_value) %>
     </div>
@@ -97,25 +81,19 @@
 
   <div class="col col-lg mb-2">
     <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">Limit per order</span>
-      </div>
+      <span class="input-group-text">Limit per order</span>
       <% max_quantity_tooltip = 'Maximum number of tickets of this type someone can purchase in a single order. (Entering 0 makes the ticket type appear sold out)' %>
-      <%= form_or_tag_field(form, :number_field, :max_quantity_per_transaction, class: 'form-control', 'data-toggle': 'tooltip', title: max_quantity_tooltip, min: 0) %>
+      <%= form_or_tag_field(form, :number_field, :max_quantity_per_transaction, class: 'form-control', 'data-bs-toggle': 'tooltip', title: max_quantity_tooltip, min: 0) %>
     </div>
   </div>
 
   <div class="col-auto col-lg-auto mb-2">
     <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">Secret?</span>
-      </div>
+      <span class="input-group-text">Secret?</span>
       <% secret_tooltip = 'Allow only people with the link to this ticket type to purchase' %>
-      <%= form_or_tag_field(form, :check_box, :hidden, value: '1', checked: false, onclick: "$(this).tooltip('hide')", 'data-toggle': 'tooltip', title: secret_tooltip, class: 'form-control secret-ticket-checkbox') %>
+      <%= form_or_tag_field(form, :check_box, :hidden, value: '1', checked: false, onclick: "$(this).tooltip('hide')", 'data-bs-toggle': 'tooltip', title: secret_tooltip, class: 'form-control secret-ticket-checkbox') %>
       <% if form && form.object.hidden? %>
-        <div class="input-group-append">
-          <a target="_blank" data-toggle="tooltip" title="Link to secret ticket type" class="input-group-text text-dark" href="/events/<%= @event.id %>?ticket_type_id=<%= form.object.public_id %>"><i class="bi bi-box-arrow-up-right"></i></a>
-        </div>
+        <a target="_blank" data-bs-toggle="tooltip" title="Link to secret ticket type" class="input-group-text text-dark" href="/events/<%= @event.id %>?ticket_type_id=<%= form.object.public_id %>"><i class="bi bi-box-arrow-up-right"></i></a>
       <% end %>
     </div>
   </div>

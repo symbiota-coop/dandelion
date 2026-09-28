@@ -27,7 +27,7 @@
 <a class="btn btn-primary mb-3" href="javascript:;" onclick="$(this).hide().next().show().find('input[name=email]').focus()"><i class="bi bi-plus-lg"></i> Add a follower</a>
 <div style="display: none" class="mb-3">
   <% form_tag "#{resource_path}/add_follower", class: 'form-inline' do %>
-    <%= email_field_tag :email, class: 'form-control mr-1', placeholder: 'Email' %>
+    <%= email_field_tag :email, class: 'form-control me-1', placeholder: 'Email' %>
     <%= submit_tag 'Add follower', class: 'mt-1 mt-sm-0 btn btn-primary' %>
   <% end %>
 </div>

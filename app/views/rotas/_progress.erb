@@ -4,7 +4,7 @@ t = (rota.roles.count*rota.rslots.count) - rota.shifts.and(:account => nil).coun
 %>
 <% w = t > 0 ? 100*s/t : 0 %>
 <a href="/g/<%=rota.gathering.slug%>/rotas/<%=rota.id%>">
-  <div class="progress my-3"  data-toggle="tooltip" title="<%=s%>/<%=pluralize(t,'shift')%> filled" >
+  <div class="progress my-3"  data-bs-toggle="tooltip" title="<%=s%>/<%=pluralize(t,'shift')%> filled" >
     <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
       <%=s%>/<%=t%>
     </div>

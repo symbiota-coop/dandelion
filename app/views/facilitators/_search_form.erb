@@ -17,7 +17,7 @@
   <% form_tag '/facilitators', method: 'get', class: 'submitOnChange searchForm mb-3', id: 'facilitators-search-form' do %>
     <%= hidden_field_tag :display, value: params[:display] %>
     <%= hidden_field_tag :order, value: params[:order] %>
-    <div class="form-row align-items-end">
+    <div class="row gx-2 align-items-end">
       <div class="form-group col-12 col-sm-auto">
         <label>Search facilitators</label>
         <%= text_field_tag :q, class: 'form-control', value: params[:q] %>

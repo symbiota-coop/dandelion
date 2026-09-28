@@ -16,7 +16,7 @@
       $('#slug-replace-stripe-webhook').text('<%= ENV['BASE_URI'] %>/g/' + $('#gathering_slug').val() + '/stripe_webhook');
     }).keyup();
 
-    $('#gathering-build-nav a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+    $('#gathering-build-nav a[data-bs-toggle="tab"]').on('show.bs.tab', function (e) {
       var form = $('#gathering-build-nav').closest('form')[0]
         if (form.reportValidity()) {
           // continue
@@ -27,7 +27,7 @@
         }
     });
 
-    $('#gathering-build-nav a[data-toggle="tab"]').on('shown.bs.tab', function () {
+    $('#gathering-build-nav a[data-bs-toggle="tab"]').on('shown.bs.tab', function () {
       window.scrollTo(0, 0)
     })
 
@@ -122,11 +122,11 @@
 <% form_for @gathering, @gathering.new_record? ? '/g/new' : "/g/#{@edit_slug || @gathering.slug}/edit", multipart: true do |f| %>
   <div class="nav-wrapper">
     <ul id="gathering-build-nav" class="nav nav-tabs" role="tablist">
-      <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab-basics" role="tab" data-toggle="tab">Basics</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-joining" role="tab" data-toggle="tab">Joining</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-welcome" role="tab" data-toggle="tab">Welcome</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-payments" role="tab" data-toggle="tab">Payments</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-features" role="tab" data-toggle="tab">Features</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab-basics" role="tab" data-bs-toggle="tab">Basics</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-joining" role="tab" data-bs-toggle="tab">Joining</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-welcome" role="tab" data-bs-toggle="tab">Welcome</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-payments" role="tab" data-bs-toggle="tab">Payments</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-features" role="tab" data-bs-toggle="tab">Features</a></li>
     </ul>
   </div>
   <div class="container">
@@ -265,7 +265,7 @@
       </div>
     </div>
     <% if @gathering.persisted? %>
-      <div class="ml-3">
+      <div class="ms-3">
         <%= f.submit_block destroy_url: "/g/#{@gathering.slug}/destroy" %>
       </div>
     <% end %>

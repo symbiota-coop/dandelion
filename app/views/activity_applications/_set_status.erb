@@ -6,5 +6,5 @@
   <% end %>
 </big>
 <% form_tag "/activities/#{@activity.id}/activity_applications/#{@activity_application.id}/set_status", class: 'form-inline mt-1', style: 'display: inline' do %>
-  <%= select_tag :status, class: 'form-control mt-1 mt-lg-0', options: [''] + ActivityApplication.statuses, onchange: '$(this.form).submit()' %>
+  <%= select_tag :status, class: 'form-select mt-1 mt-lg-0', options: [''] + ActivityApplication.statuses, onchange: '$(this.form).submit()' %>
 <% end %>

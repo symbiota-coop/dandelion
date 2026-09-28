@@ -5,7 +5,7 @@
 <% else %>
   <% form_tag "/messages/#{@account.id}/send", id: 'compose', class: 'mt-3' do %>
     <div class="ask-box">
-      <label class="sr-only" for="message-body">Type a message</label>
+      <label class="visually-hidden" for="message-body">Type a message</label>
       <%= text_area_tag :body, id: 'message-body', placeholder: 'Type a message...', class: 'form-control autosize', rows: 1 %>
       <div class="ask-box-actions">
         <button class="btn btn-primary btn-sm" type="submit" aria-label="Send">

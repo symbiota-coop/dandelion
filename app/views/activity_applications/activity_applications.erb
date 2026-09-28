@@ -3,7 +3,7 @@
 
   <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
     <%= hidden_field_tag :order, value: params[:order] %>
-    <div class="form-row align-items-end">
+    <div class="row gx-2 align-items-end">
       <div class="form-group col-12 col-sm-auto">
         <label>Applications between</label>
         <%= text_field_tag :from, class: 'form-control datepicker mx-1', value: (@from.to_fs(:db_local) if @from) %>
@@ -18,16 +18,16 @@
       </div>
       <div class="form-group col-12 col-sm-auto">
         <label>Gender</label>
-        <%= select_tag :gender, class: 'form-control', selected: @gender, options: %w[All Woman Man Other] %>
+        <%= select_tag :gender, class: 'form-select', selected: @gender, options: %w[All Woman Man Other] %>
       </div>
       <div class="form-group col-12 col-sm-auto">
         <label>Status</label>
-        <%= select_tag :status, class: 'form-control', selected: @status, options: ActivityApplication.statuses.map { |s| ["#{s} (#{@activity.activity_applications.and(status: s).count})", s] } + [["All (#{@activity.activity_applications.count})", 'All']] %>
+        <%= select_tag :status, class: 'form-select', selected: @status, options: ActivityApplication.statuses.map { |s| ["#{s} (#{@activity.activity_applications.and(status: s).count})", s] } + [["All (#{@activity.activity_applications.count})", 'All']] %>
       </div>
       <% if @activity.activity_applications.and(:statused_by.ne => nil).exists? %>
         <div class="form-group col-12 col-sm-auto">
           <label>Processed by</label>
-          <%= select_tag :statused_by, class: 'form-control', selected: params[:statused_by], options: [''] + @activity.activity_applications.pluck(:statused_by).compact.uniq.map { |account_id| ["#{Account.find(account_id).name} (#{@activity.activity_applications.and(statused_by: account_id).count})", account_id] } %>
+          <%= select_tag :statused_by, class: 'form-select', selected: params[:statused_by], options: [''] + @activity.activity_applications.pluck(:statused_by).compact.uniq.map { |account_id| ["#{Account.find(account_id).name} (#{@activity.activity_applications.and(statused_by: account_id).count})", account_id] } %>
         </div>
       <% end %>
       <div class="form-group col-12 col-sm-auto">
@@ -39,7 +39,7 @@
         <%= number_field_tag :max_word_count, class: 'form-control', value: params[:max_word_count] %>
       </div>
     </div>
-    <div class="form-row align-items-end mt-1">
+    <div class="row gx-2 align-items-end mt-1">
       <%= checkbox 'Photo', form_group_class: 'col-12 col-sm-auto' %>
       <%= checkbox 'Location', form_group_class: 'col-12 col-sm-auto' %>
       <div class="form-group col-12 col-sm-auto">
@@ -53,8 +53,8 @@
     <%= hidden_field_tag k, value: v %>
     <% } %>
     <%= hidden_field_tag :search, value: 1 %>
-    <label class="mr-sm-2">Sort by</label>
-    <%= select_tag :order, options: { 'Application date' => 'created_at', 'Word count' => 'word_count' }, selected: params[:order], class: 'form-control' %>
+    <label class="me-sm-2">Sort by</label>
+    <%= select_tag :order, options: { 'Application date' => 'created_at', 'Word count' => 'word_count' }, selected: params[:order], class: 'form-select' %>
   <% end %>
 
 </div>
@@ -92,7 +92,7 @@
   <tr>
     <td>
       <a href="/activities/<%= @activity.id %>/activity_applications/<%= activity_application.id %>">
-        <img data-toggle="tooltip" title="<%= account.name %>" style="width: 100px;" src="<%= u account.image_thumb_or_gravatar_url %>">
+        <img data-bs-toggle="tooltip" title="<%= account.name %>" style="width: 100px;" src="<%= u account.image_thumb_or_gravatar_url %>">
       </a>
       <br>
       <a href="/activities/<%= @activity.id %>/activity_applications/<%= activity_application.id %>">

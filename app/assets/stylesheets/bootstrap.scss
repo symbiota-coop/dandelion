@@ -1,12 +1,34 @@
-// Source for bootstrap.css: Bootstrap 4.6.2 with Dandelion's variables.
+// Source for bootstrap.css: Bootstrap 5.3.8 with Dandelion's variables.
 // After editing, run `rake bootstrap:build` (needs Node) and commit bootstrap.css.
 // Anything that isn't a Bootstrap variable belongs in app.css.
 
 $blue: #00af5e;
-$gray-800: #212529;
-$badge-font-size: 75%;
 $font-family-sans-serif: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 $font-weight-normal: 500;
 $lead-font-weight: inherit;
+
+// Keep Bootstrap 4's look and behaviour where Bootstrap 5 changed the defaults
+$min-contrast-ratio: 2.5; // white text on the primary green
+$link-decoration: none;
+$link-hover-decoration: underline;
+$grid-gutter-width: 30px;
+$container-max-widths: (sm: 540px, md: 720px, lg: 960px, xl: 1140px, xxl: 1140px);
+$border-radius: .25rem;
+$border-radius-sm: .2rem;
+$border-radius-lg: .3rem;
+$card-spacer-y: 1.25rem;
+$card-spacer-x: 1.25rem;
+$card-cap-padding-y: .75rem;
+$card-cap-padding-x: 1.25rem;
+$table-bg: transparent;
+$table-cell-padding-y: .75rem;
+$table-cell-padding-x: .75rem;
+$table-cell-padding-y-sm: .3rem;
+$table-cell-padding-x-sm: .3rem;
+$hr-opacity: 1;
+$input-group-addon-bg: #e9ecef;
+$input-group-addon-color: #495057;
+$enable-smooth-scroll: false;
+$enable-rfs: false;
 
 @import "bootstrap/scss/bootstrap";

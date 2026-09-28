@@ -1,12 +1,12 @@
 <% if @organisation %>
   <% if @organisation == event.organisation && event.featured? %>
-    <span class="badge badge-yellow mr-1">Featured</span>
+    <span class="badge badge-yellow me-1">Featured</span>
   <% elsif event.cohostships.any? { |cohostship| cohostship.organisation == @organisation && cohostship.featured? } %>
-    <span class="badge badge-yellow mr-1">Featured</span>
+    <span class="badge badge-yellow me-1">Featured</span>
   <% end %>
 <% end %>
 <% if event.sold_out_cache %>
-  <span class="badge badge-danger mr-1">
+  <span class="badge badge-danger me-1">
     <% if event.sold_out_due_to_sales_end_cache %>
       Sales ended
     <% else %>
@@ -15,5 +15,5 @@
   </span>
 <% end %>
 <% if event.locked? %>
-  <span class="badge badge-default mr-1">Locked</span>
+  <span class="badge badge-default me-1">Locked</span>
 <% end %>

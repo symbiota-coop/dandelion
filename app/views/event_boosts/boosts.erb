@@ -88,7 +88,7 @@
             <small class="form-text text-muted">Start time must be on the hour</small>
           </div>
 
-          <div class="form-row">
+          <div class="row gx-2">
             <div class="form-group col-sm-6">
               <label for="event_boost_hours">Hours</label>
               <%= number_field_tag :'event_boost[hours]', value: @event_boost.hours, min: 1, step: 1, class: 'form-control', id: 'event_boost_hours', required: true %>
@@ -96,9 +96,7 @@
             <div class="form-group col-sm-6">
               <label for="event_boost_hourly_amount">Amount per hour</label>
               <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text"><%= money_symbol(@event_boost.currency) %></span>
-                </div>
+                <span class="input-group-text"><%= money_symbol(@event_boost.currency) %></span>
                 <%= number_field_tag :'event_boost[hourly_amount]', value: compact_amount_for_input(@event_boost.hourly_amount), min: @min_hourly_boost, step: 0.01, class: 'form-control', id: 'event_boost_hourly_amount', required: true %>
               </div>
               <small class="form-text text-muted">Minimum <%= m(@min_hourly_boost, @event_boost.currency) %> per hour</small>
@@ -125,10 +123,10 @@
       <thead>
         <tr>
           <th>Hour</th>
-          <th class="text-right">Boost</th>
-          <th class="text-right">Pool total</th>
-          <th class="text-right"><span data-toggle="tooltip" title="Corresponds to the probability of the event being shown in the boost slot at the top of the unfiltered public events listing">Share <i class="bi bi-info-circle"></i></span></th>
-          <th class="text-right"><span data-toggle="tooltip" title="How many times this event was actually shown in the boost slot">Impressions <i class="bi bi-info-circle"></i></span></th>
+          <th class="text-end">Boost</th>
+          <th class="text-end">Pool total</th>
+          <th class="text-end"><span data-bs-toggle="tooltip" title="Corresponds to the probability of the event being shown in the boost slot at the top of the unfiltered public events listing">Share <i class="bi bi-info-circle"></i></span></th>
+          <th class="text-end"><span data-bs-toggle="tooltip" title="How many times this event was actually shown in the boost slot">Impressions <i class="bi bi-info-circle"></i></span></th>
         </tr>
       </thead>
       <tbody>
@@ -145,16 +143,16 @@
                 <br>
                 <small class="text-muted">to <%= (slot + 1.hour).to_s(:no_double_zeros) %></small>
               </td>
-              <td class="text-right"><%= ew.format %></td>
-              <td class="text-right"><%= tw.format %></td>
-              <td class="text-right">
+              <td class="text-end"><%= ew.format %></td>
+              <td class="text-end"><%= tw.format %></td>
+              <td class="text-end">
                 <% if !tw.zero? %>
                   <%= number_to_percentage(sh * 100, precision: 0) %>
                 <% else %>
                   —
                 <% end %>
               </td>
-              <td class="text-right"><%= dc %></td>
+              <td class="text-end"><%= dc %></td>
             </tr>
           <% end %>
         <% else %>

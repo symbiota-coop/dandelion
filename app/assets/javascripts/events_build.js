@@ -106,7 +106,7 @@ $(function () {
     if (typeof $.currencySymbol !== 'undefined') {
       $row.find('.money-symbol').text($.currencySymbol($('#event_currency').val()))
     }
-    $row.find('[data-toggle="tooltip"]').tooltip()
+    $row.find('[data-bs-toggle="tooltip"]').tooltip()
     initDatetimepickers($row)
     return $row
   }
@@ -252,7 +252,7 @@ $(function () {
   })
 
   // Validate on tab change and keep textareas sized
-  $('#event-build-nav a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+  $('#event-build-nav a[data-bs-toggle="tab"]').on('show.bs.tab', function (e) {
     setTimeout(function () {
       if (typeof autosize === 'undefined') return
       ;['#event_questions', '#event_feedback_questions', '#event_terms_and_conditions'].forEach(function (sel) {
@@ -271,7 +271,7 @@ $(function () {
     }
   })
 
-  $('#event-build-nav a[data-toggle="tab"]').on('shown.bs.tab', function () {
+  $('#event-build-nav a[data-bs-toggle="tab"]').on('shown.bs.tab', function () {
     window.scrollTo(0, 0)
   })
 
@@ -418,7 +418,7 @@ $(function () {
 
     $('#event_revenue_share_to_revenue_sharer, #event_profit_share_to_organiser, #event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media, #event_profit_share_to_organisation')
       .wrap('<div class="input-group" style="width: 10em"></div>')
-      .after('<div class="input-group-append"><span class="input-group-text">%</span></div>')
+      .after('<span class="input-group-text">%</span>')
       .change(function () {
         const sum = $.map($('#event_revenue_share_to_revenue_sharer, #event_profit_share_to_organiser, #event_profit_share_to_coordinator, #event_profit_share_to_category_steward, #event_profit_share_to_social_media'), function (el) {
           return parseInt($(el).val()) || 0

@@ -20,11 +20,9 @@
     <h5 class="card-title">Your referral link</h5>
     <div class="input-group">
       <input type="text" class="form-control" id="organisation-referrer-link" value="<%= referral_link %>" readonly>
-      <div class="input-group-append">
-        <button class="btn btn-outline-secondary copy-referrer-link" type="button" data-url="<%= referral_link %>">
-          <i class="bi bi-clipboard"></i> Copy
-        </button>
-      </div>
+      <button class="btn btn-outline-secondary copy-referrer-link" type="button" data-url="<%= referral_link %>">
+        <i class="bi bi-clipboard"></i> Copy
+      </button>
     </div>
     <div class="mt-3">
       <%= partial :share, locals: { share_url: referral_link } %>

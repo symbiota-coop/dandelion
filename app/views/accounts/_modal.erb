@@ -3,9 +3,7 @@
     <a class="text-dark" href="/u/<%= @account.username %>"><%= @account.name %></a>
     <small class="text-muted">@<%= @account.username %></small>
   </h3>
-  <button type="button" class="close" data-dismiss="modal">
-    <span>&times;</span>
-  </button>
+  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 <div class="modal-body">
   <%= partial :'accounts/top', locals: { account: @account, modal: true } %>

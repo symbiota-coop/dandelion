@@ -37,13 +37,13 @@
     <% end %>
   <% end %>
   <li class="d-none d-md-inline">
-    <a href="/wheel-of-the-year.html" target="_blank" class="navbar-text text-white almanac-moon" title="<%= almanac_tooltip %>" data-toggle="tooltip">
+    <a href="/wheel-of-the-year.html" target="_blank" class="navbar-text text-white almanac-moon" title="<%= almanac_tooltip %>" data-bs-toggle="tooltip">
       <%= Almanac.moon_icon %>
     </a>
   </li>
   <% if current_account %>
     <li class="d-none d-md-inline">
-      <a href="/referrals" class="navbar-text text-white" title="Rewards for getting organisations to start using Dandelion" data-toggle="tooltip">
+      <a href="/referrals" class="navbar-text text-white" title="Rewards for getting organisations to start using Dandelion" data-bs-toggle="tooltip">
         <i class="bi bi-trophy"></i>
       </a>
     </li>
@@ -53,13 +53,13 @@
       </a>
     </li>
     <li class="dropdown">
-      <a id="notifications-a" href="javascript:;" data-toggle="dropdown" data-mobile-modal="Notifications" data-check-url="/checked_notifications" class="dropdown-toggle navbar-icon">
+      <a id="notifications-a" href="javascript:;" data-bs-toggle="dropdown" data-mobile-modal="Notifications" data-check-url="/checked_notifications" class="dropdown-toggle navbar-icon">
         <i class="bi bi-bell"></i>
       </a>
       <div id="notifications" data-pagelet-url="/notifications" data-pagelet-refresh="60"></div>
     </li>
     <li class="dropdown">
-      <a id="messages-a" href="javascript:;" data-toggle="dropdown" data-mobile-modal="Messages" data-check-url="/checked_messages" class="dropdown-toggle navbar-icon">
+      <a id="messages-a" href="javascript:;" data-bs-toggle="dropdown" data-mobile-modal="Messages" data-check-url="/checked_messages" class="dropdown-toggle navbar-icon">
         <i class="bi bi-chat-left"></i>
       </a>
       <div id="messages" data-pagelet-url="/messages" data-pagelet-refresh="60">
@@ -67,8 +67,8 @@
       </div>
     </li>
     <li class="d-none d-md-inline dropdown">
-      <a href="javascript:;" data-toggle="dropdown">
-        <span class="navbar-user-img online float-left">
+      <a href="javascript:;" data-bs-toggle="dropdown">
+        <span class="navbar-user-img online float-start">
           <img src="<%= u current_account.image_thumb_or_gravatar_url %>">
         </span>
         <span class="d-none d-md-inline"><%= current_account.name %> <b class="caret"></b></span>

@@ -14,7 +14,7 @@
 
 <% if (organisations = Organisation.and(:id.in => @account.organisationships.and(:hide_membership => false).pluck(:organisation_id))).exists? %>
   <% if viewable?(@account, :organisations, viewer_in_network: viewer_in_network) %>
-    <div class="mt-5 row justify-content-between no-gutters">
+    <div class="mt-5 row justify-content-between g-0">
       <div class="col">
         <h2>Organisations</h2>
       </div>
@@ -30,7 +30,7 @@
 
 <% if (local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(:hide_membership => false).pluck(:local_group_id))).exists? %>
   <% if viewable?(@account, :local_groups, viewer_in_network: viewer_in_network) %>
-    <div class="mt-5 row justify-content-between no-gutters">
+    <div class="mt-5 row justify-content-between g-0">
       <div class="col">
         <h2>Local groups</h2>
       </div>
@@ -46,7 +46,7 @@
 
 <% if (activities = Activity.and(:id.in => @account.activityships.and(:hide_membership => false).pluck(:activity_id))).exists? %>
   <% if viewable?(@account, :activities, viewer_in_network: viewer_in_network) %>
-    <div class="mt-5 row justify-content-between no-gutters">
+    <div class="mt-5 row justify-content-between g-0">
       <div class="col">
         <h2>Activities</h2>
       </div>
@@ -62,7 +62,7 @@
 
 <% if (gatherings = Gathering.and(:id.in => @account.memberships.pluck(:gathering_id)).and(listed: true).and(:privacy.ne => 'secret')).exists? %>
   <% if viewable?(@account, :gatherings, viewer_in_network: viewer_in_network) %>
-    <div class="mt-5 row justify-content-between no-gutters">
+    <div class="mt-5 row justify-content-between g-0">
       <div class="col">
         <h2>Gatherings</h2>
       </div>
@@ -78,7 +78,7 @@
 
 <% if @account.follows_as_follower.exists? %>
   <% if viewable?(@account, :following, viewer_in_network: viewer_in_network) %>
-    <div class="mt-5 row justify-content-between no-gutters">
+    <div class="mt-5 row justify-content-between g-0">
       <div class="col">
         <h2>Following</h2>
       </div>
@@ -94,7 +94,7 @@
 
 <% if @account.follows_as_followee.exists? %>
   <% if viewable?(@account, :followers, viewer_in_network: viewer_in_network) %>
-    <div class="mt-5 row justify-content-between no-gutters">
+    <div class="mt-5 row justify-content-between g-0">
       <div class="col">
         <h2>Followers</h2>
       </div>

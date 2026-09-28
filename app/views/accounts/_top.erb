@@ -5,7 +5,7 @@
   <div class="col-12 col-sm">
     <% if defined?(modal) %>
     <% else %>
-      <div class="mb-2 text-center text-lg-left">
+      <div class="mb-2 text-center text-lg-start">
         <h1 class="my-0 d-inline">
           <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
           <br class="d-block d-lg-none" />
@@ -38,7 +38,7 @@ var temp = $('<input>');
     <% if defined?(modal) %>
     <% else %>
       <% if account.bio %>
-        <div class="row justify-content-between no-gutters">
+        <div class="row justify-content-between g-0">
           <div class="col wysiwyg links-blank readable">
             <%== Sanitize.fragment(Rinku.auto_link(account.bio), Sanitize::Config::DANDELION) %>
           </div>

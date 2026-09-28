@@ -25,9 +25,7 @@ Dandelion::App.helpers do
         <td style="min-width: 8em">
           <strong>#{label}</strong>
           <div class="input-group" style="margin: 5px 0">
-            <div class="input-group-prepend">
-              <span class="input-group-text">#{money_symbol(@event.currency)}</span>
-            </div>
+            <span class="input-group-text">#{money_symbol(@event.currency)}</span>
             #{input}
           </div>
         </td>
@@ -39,7 +37,7 @@ Dandelion::App.helpers do
     return '' unless condition
 
     style = visible ? '' : 'display: none'
-    btn_class = outline ? 'btn btn-outline-primary btn-block mb-1' : 'btn btn-primary btn-block mb-1'
+    btn_class = outline ? 'btn btn-outline-primary w-100 mb-1' : 'btn btn-primary w-100 mb-1'
     hidden_input = hidden_field_tag :payment_method, value: method, disabled: true
     label = ERB::Util.html_escape(label)
     method = ERB::Util.html_escape(method)

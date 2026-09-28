@@ -1,18 +1,18 @@
 <script>
   $(function () {
 
-    // On body, bounded by the window: inside the sidebar's scroll container they get clipped, or flip left over the icon and flicker
-    $('#sidebar ul.nav li a[data-toggle]').tooltip({ container: 'body', boundary: 'window' }).tooltip($('#page-container').hasClass('page-sidebar-minified') ? 'enable' : 'disable')
+    // On body: inside the sidebar's scroll container they get clipped, or flip left over the icon and flicker
+    $('#sidebar ul.nav li a[data-bs-toggle]').tooltip({ container: 'body' }).tooltip($('#page-container').hasClass('page-sidebar-minified') ? 'enable' : 'disable')
 
     if ($(window).width() < 992)
-      $('#sidebar ul.nav li a[data-toggle]').tooltip('disable')
+      $('#sidebar ul.nav li a[data-bs-toggle]').tooltip('disable')
   })
 </script>
 <ul class="nav">
   <% if current_account %>
     <li class="d-md-none has-sub">
       <a href="javascript:;">
-        <b class="caret caret-right float-right"></b>
+        <b class="caret caret-right float-end"></b>
         <i class="bi bi-person-fill"></i>
         <span><%= current_account.name %></span>
       </a>
@@ -20,40 +20,40 @@
     </li>
   <% end %>
   <li class="<%= 'active' if request.path == '/' %>">
-    <a href="/" data-toggle="tooltip" title="Home" data-placement="right">
+    <a href="/" data-bs-toggle="tooltip" title="Home" data-bs-placement="right">
       <i class="bi bi-house"></i>
       <span class="nav-link-text">Home</span>
     </a>
   </li>
   <li class="<%= 'active' if request.path == '/daily' %>">
-    <a href="/daily" data-toggle="tooltip" title="Dandelion Daily" data-placement="right">
+    <a href="/daily" data-bs-toggle="tooltip" title="Dandelion Daily" data-bs-placement="right">
       <i class="bi bi-newspaper"></i>
       <span class="nav-link-text">Dandelion Daily</span>
     </a>
   </li>
   <% if !current_account %>
     <li class="d-lg-none">
-      <a href="/accounts/new" data-toggle="tooltip" title="Sign up" data-placement="right">
+      <a href="/accounts/new" data-bs-toggle="tooltip" title="Sign up" data-bs-placement="right">
         <i class="bi bi-person-fill-add"></i>
         <span class="nav-link-text">Sign up</span>
       </a>
     </li>
     <li class="d-lg-none">
-      <a href="/accounts/sign_in" data-toggle="tooltip" title="Sign in" data-placement="right">
+      <a href="/accounts/sign_in" data-bs-toggle="tooltip" title="Sign in" data-bs-placement="right">
         <i class="bi bi-box-arrow-in-right"></i>
         <span class="nav-link-text">Sign in</span>
       </a>
     </li>
   <% end %>
   <li class="<%= 'active' if ['/events', '/e/'].any? { |path| request.path.starts_with?(path) } %>">
-    <a href="/events" data-toggle="tooltip" title="Events" data-placement="right">
+    <a href="/events" data-bs-toggle="tooltip" title="Events" data-bs-placement="right">
       <i class="bi bi-calendar-event"></i>
       <span class="nav-link-text">Events</span>
     </a>
   </li>
   <% if !current_account || current_account.organisationships.count > 20 %>
     <li class="<%= 'active' if request.path == '/organisations' %>">
-      <a href="/organisations" data-toggle="tooltip" title="Organisations" data-placement="right">
+      <a href="/organisations" data-bs-toggle="tooltip" title="Organisations" data-bs-placement="right">
         <i class="bi bi-flag-fill"></i>
         <span class="nav-link-text">Organisations</span>
       </a>
@@ -61,7 +61,7 @@
   <% else %>
     <li class="has-sub <%= 'active' if ['/organisations', '/o/'].any? { |path| request.path.starts_with?(path) } %>">
       <a href="javascript:;">
-        <b class="caret caret-right float-right"></b>
+        <b class="caret caret-right float-end"></b>
         <i class="bi bi-flag-fill"></i>
         <span>Organisations</span>
       </a>
@@ -79,14 +79,14 @@
     </li>
   <% end %>
   <li class="<%= 'active' if request.path == '/facilitators' %>">
-    <a href="/facilitators" data-toggle="tooltip" title="Facilitators" data-placement="right">
+    <a href="/facilitators" data-bs-toggle="tooltip" title="Facilitators" data-bs-placement="right">
       <i class="bi bi-person-circle"></i>
       <span class="nav-link-text">Facilitators</span>
     </a>
   </li>
   <% if !current_account %>
     <li class="<%= 'active' if ['/gatherings', '/g/'].any? { |path| request.path.starts_with?(path) } %>">
-      <a href="/gatherings" data-toggle="tooltip" title="Gatherings" data-placement="right">
+      <a href="/gatherings" data-bs-toggle="tooltip" title="Gatherings" data-bs-placement="right">
         <i class="bi bi-moon-fill"></i>
         <span class="nav-link-text">Gatherings</span>
       </a>
@@ -94,7 +94,7 @@
   <% else %>
     <li class="has-sub <%= 'active' if ['/gatherings', '/g/'].any? { |path| request.path.starts_with?(path) } %>">
       <a href="javascript:;">
-        <b class="caret caret-right float-right"></b>
+        <b class="caret caret-right float-end"></b>
         <i class="bi bi-moon-fill"></i>
         <span>Gatherings</span>
       </a>
@@ -111,33 +111,33 @@
     </li>
   <% end %>
   <li class="<%= 'active' if request.path == '/books' || request.path == '/films' %>">
-    <a href="/books" data-toggle="tooltip" title="Library" data-placement="right">
+    <a href="/books" data-bs-toggle="tooltip" title="Library" data-bs-placement="right">
       <i class="bi bi-book"></i>
       <span class="nav-link-text">Library</span>
     </a>
   </li>
   <li class="<%= 'active' if request.path.starts_with?('/docs') %>">
-    <a href="/docs" data-toggle="tooltip" title="How to use Dandelion" data-placement="right">
+    <a href="/docs" data-bs-toggle="tooltip" title="How to use Dandelion" data-bs-placement="right">
       <i class="bi bi-question-circle-fill"></i>
       <span class="nav-link-text">How to use Dandelion</span>
     </a>
   </li>
   <li class="<%= 'active' if request.path == '/contact' %>">
     <a
-      href="/contact" data-toggle="tooltip" title="Contact us" data-placement="right">
+      href="/contact" data-bs-toggle="tooltip" title="Contact us" data-bs-placement="right">
       <i class="bi bi-envelope-fill"></i>
       <span class="nav-link-text">Contact us</span>
     </a>
   </li>
   <li class="<%= 'active' if request.path == '/code' %>">
     <a
-      href="/code" data-toggle="tooltip" title="Updates" data-placement="right">
+      href="/code" data-bs-toggle="tooltip" title="Updates" data-bs-placement="right">
       <i class="bi bi-code-slash"></i>
       <span class="nav-link-text">Updates</span>
     </a>
   </li>
   <li class="<%= 'active' if request.path == '/donate' %>">
-    <a href="/donate" data-toggle="tooltip" title="Donate" data-placement="right">
+    <a href="/donate" data-bs-toggle="tooltip" title="Donate" data-bs-placement="right">
       <i class="bi bi-cash-coin"></i>
       <span class="nav-link-text">Donate</span>
     </a>

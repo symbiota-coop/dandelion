@@ -12,7 +12,7 @@
     <thead>
       <tr>
         <th>File</th>
-        <th class="text-right">Size</th>
+        <th class="text-end">Size</th>
         <th>Modified</th>
       </tr>
     </thead>
@@ -22,7 +22,7 @@
           <td>
             <code><%= file[:path] %></code>
           </td>
-          <td class="text-right" data-order="<%= file[:size] %>">
+          <td class="text-end" data-order="<%= file[:size] %>">
             <% if file[:size] < 1024 %>
               <%= file[:size] %> B
             <% elsif file[:size] < 1024 * 1024 %>

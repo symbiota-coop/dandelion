@@ -9,7 +9,7 @@
 <% unless activity.hide_image %>
   <div class="form-group">
     <label>Photo</label>
-    <%= file_field_tag 'account[image]', class: 'form-control-file', disabled: true %>
+    <%= file_field_tag 'account[image]', class: 'form-control', disabled: true %>
   </div>
 <% end %>
 <% unless activity.hide_location %>
@@ -27,7 +27,7 @@
 <% unless activity.hide_gender %>
   <div class="form-group">
     <label>Gender</label>
-    <%= select_tag 'account[gender]', options: Account.genders, class: 'form-control', disabled: true %>
+    <%= select_tag 'account[gender]', options: Account.genders, class: 'form-select', disabled: true %>
   </div>
 <% end %>
 <%= partial :'questions/questions', locals: { questions: questions, preview: true } %>

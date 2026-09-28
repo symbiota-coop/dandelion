@@ -103,12 +103,12 @@
         <a href="/e/<%= order.event.slug %>"><%= order.event.name %></a>
         <div style="white-space: nowrap">
           <% if order.event.start_time %>
-            <span data-toggle="tooltip" title="<%= d = (order.event.start_time.to_date - Date.today).to_i; distance_of_time_in_words(order.event.start_time.to_date, Date.today) %> to go" class="text-primary">
+            <span data-bs-toggle="tooltip" title="<%= d = (order.event.start_time.to_date - Date.today).to_i; distance_of_time_in_words(order.event.start_time.to_date, Date.today) %> to go" class="text-primary">
               <% [d, 28].min.times do |i| %>
                 <% if i == 27 && d > 28 %>
-                  <i class="bi bi-plus-square-fill mr-1"></i>
+                  <i class="bi bi-plus-square-fill me-1"></i>
                 <% else %>
-                  <i class="bi bi-square-fill mr-1"></i>
+                  <i class="bi bi-square-fill me-1"></i>
                 <% end %>
                 <% if (i + 1) % 7 == 0 %><br>
                 <% end %>
@@ -134,7 +134,7 @@
       </td>
     <% end %>
     <td data-sort="<%= order.value %>">
-      <abbr data-toggle="tooltip" title="<%= order.original_description %>">
+      <abbr data-bs-toggle="tooltip" title="<%= order.original_description %>">
         <%= m (order.value || 0), order.currency %>
       </abbr>
       <% if order.application_fee_amount && !order.application_fee_paid_to_dandelion %>
@@ -152,27 +152,27 @@
         <span class="label label-default"><%= m order.credit_applied, order.currency %> credit applied</span>
       <% end %>
       <% if order.fixed_discount_applied %>
-        <span data-toggle="tooltip" title="<%= order.discount_code&.code %>" class="label label-default"><%= m order.fixed_discount_applied, order.currency %> discount applied</span>
+        <span data-bs-toggle="tooltip" title="<%= order.discount_code&.code %>" class="label label-default"><%= m order.fixed_discount_applied, order.currency %> discount applied</span>
       <% end %>
       <% if order.percentage_discount %>
-        <span data-toggle="tooltip" class="label label-default mr-1" title="<%= "#{order.percentage_discount}%" %> discount code applied<% if order.discount_code %>: <%=order.discount_code.code%><% end %>">
+        <span data-bs-toggle="tooltip" class="label label-default me-1" title="<%= "#{order.percentage_discount}%" %> discount code applied<% if order.discount_code %>: <%=order.discount_code.code%><% end %>">
           <%= "#{order.percentage_discount}%" %>
         </span>
       <% end %>
       <% if order.percentage_discount_monthly_donor %>
-        <span data-toggle="tooltip" class="label label-default mr-1" title="<%= "#{order.percentage_discount_monthly_donor}%" %> monthly donor discount applied">
+        <span data-bs-toggle="tooltip" class="label label-default me-1" title="<%= "#{order.percentage_discount_monthly_donor}%" %> monthly donor discount applied">
           <%= "#{order.percentage_discount_monthly_donor}%" %>
         </span>
       <% end %>
       <%= partial :'events/payment_badge', locals: { record: order } %>
       <% if order.incomplete? %>
         <% if order.deleted? %>
-          <i data-toggle="tooltip" title="Timed out" class="bi bi-exclamation-triangle-fill"></i>
+          <i data-bs-toggle="tooltip" title="Timed out" class="bi bi-exclamation-triangle-fill"></i>
         <% else %>
-          <i data-toggle="tooltip" title="This person is in the process of completing the order. If they don't complete it soon, the order will be removed." class="bi bi-spin bi-arrow-repeat"></i>
+          <i data-bs-toggle="tooltip" title="This person is in the process of completing the order. If they don't complete it soon, the order will be removed." class="bi bi-spin bi-arrow-repeat"></i>
         <% end %>
       <% elsif order.deleted? %>
-        <i data-toggle="tooltip" title="Deleted" class="bi bi-trash"></i>
+        <i data-bs-toggle="tooltip" title="Deleted" class="bi bi-trash"></i>
       <% end %>
     </td>
     <% if defined?(donation_to_dandelion) %>

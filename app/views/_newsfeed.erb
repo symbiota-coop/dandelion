@@ -4,9 +4,9 @@
   <ul class="list-unstyled">
     <% notifications.each_with_index { |notification,i| %>
     <li>
-      <div class="media">
+      <div class="d-flex align-items-start">
         <span class="newsfeed-icon d-inline-flex align-items-center justify-content-center flex-shrink-0 rounded-circle"><i class="bi <%= notification.icon %>"></i></span>
-        <div class="media-body ml-2">
+        <div class="flex-grow-1 ms-2">
           <p class="my-0 mb-1">
             <a class="text-dark" href="<%= notification.link[1] %>">
               <%= notification.sentence %>
@@ -17,11 +17,11 @@
               <% end %>
             </a>
             <% if notification.type.to_sym == :applied; mapplication = notification.notifiable %>
-              <span class="float-right badge badge-<%= mapplication.label %>"><%= mapplication.status.capitalize %></span>
+              <span class="float-end badge badge-<%= mapplication.label %>"><%= mapplication.status.capitalize %></span>
             <% end %>
             <% if notification.type.to_sym == :left_feedback; event_feedback = notification.notifiable %>
               <% if event_feedback.event %>
-                <a href="/e/<%= event_feedback.event.slug %>" class="float-md-right">
+                <a href="/e/<%= event_feedback.event.slug %>" class="float-md-end">
                   <br class="d-md-none">
                   <% if event_feedback.rating %>
                     <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
@@ -33,9 +33,9 @@
             <span style="font-size: 90%" class="text-muted"><%= timeago(notification.created_at) %></span>
           </p>
           <% if notification.type == 'commented'; comment = notification.notifiable %>
-            <div class="media ml-2 my-2">
+            <div class="d-flex align-items-start ms-2 my-2">
               <%= partial :'accounts/square', locals: { account: notification.notifiable.account, style: 'display: block; width: 32px' } %>
-              <div class="media-body ml-2">
+              <div class="flex-grow-1 ms-2">
                 <%= partial :'comments/body', locals: { comment: comment } %>
                 <div data-pagelet-url="/comments/<%= comment.id %>/reactions" class="mt-3">
                   <%= partial :'comments/comment_reactions', locals: { comment: comment } %>

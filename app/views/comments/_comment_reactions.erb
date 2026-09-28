@@ -1,5 +1,5 @@
 <% if !comment.comment_reactions.find_by(account: current_account) %>
-  <a data-toggle="tooltip" title="React" class="btn btn-sm btn-outline-primary" href="javascript:;" onclick="$(this).tooltip('hide').hide().next().css('display', 'inline-flex')">
+  <a data-bs-toggle="tooltip" title="React" class="btn btn-sm btn-outline-primary" href="javascript:;" onclick="$(this).tooltip('hide').hide().next().css('display', 'inline-flex')">
     <i class="bi bi-heart-fill"></i>
   </a>
   <% form_tag "/comments/#{comment.id}/react", class: 'form-inline', style: 'display: none;' do %>
@@ -15,11 +15,9 @@
         </a>
         <% } %>
       </div>
-      <div class="input-group ml-2" style="width: 8rem; height: 1.875rem;">
+      <div class="input-group ms-2" style="width: 8rem; height: 1.875rem;">
         <%= text_field_tag :body, class: 'form-control form-control-sm py-0', placeholder: 'word/emoji' %>
-        <div class="input-group-append" style="height: 1.875rem">
-          <button class="btn btn-primary d-flex align-items-center justify-content-center py-0" style="height: 1.875rem" type="submit"><i class="bi bi-send-fill"></i></button>
-        </div>
+        <button class="btn btn-primary d-flex align-items-center justify-content-center py-0" style="height: 1.875rem" type="submit"><i class="bi bi-send-fill"></i></button>
       </div>
     </div>
   <% end %>
@@ -28,7 +26,7 @@
   <% all_reactions = comment.comment_reactions.includes(:account); reactions_by_body = all_reactions.group_by(&:body) %>
   <% reactions_by_body.each { |body, comment_reactions| %>
   <% c = 'd-inline-block border rounded p-1 text-dark' %>
-  <a data-toggle="tooltip" style="text-decoration: none; background: white" <% if comment_reactions.find { |r| r.account_id == current_account.id } %> class="pagelet-trigger border-primary <%= c %>" href="/comments/<%= comment.id %>/unreact" onclick="$(this).tooltip('hide')" <% else %> class="<%= c %> border-light" <% end %>>
+  <a data-bs-toggle="tooltip" style="text-decoration: none; background: white" <% if comment_reactions.find { |r| r.account_id == current_account.id } %> class="pagelet-trigger border-primary <%= c %>" href="/comments/<%= comment.id %>/unreact" onclick="$(this).tooltip('hide')" <% else %> class="<%= c %> border-light" <% end %>>
     <% if body == "💚" %>
       <i class="text-primary bi bi-heart-fill"></i>
 <% else %>

@@ -49,21 +49,19 @@
         <% end %>
 
         <% form_tag '', class: 'form-inline mb-3', id: 'pay-form' do %>
-          <div class="form-group mb-1 mr-1">
+          <div class="form-group mb-1 me-1">
             <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><%=money_symbol(currency) %></span>
-              </div>
+              <span class="input-group-text"><%=money_symbol(currency) %></span>
               <%= hidden_field_tag :currency, value: currency %>
               <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: (balance if balance > Money.new(1 * 100, 'GBP')) %>
             </div>
           </div>
-          <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ml-0 mr-1" style="height: 2.125rem">
+          <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ms-0 me-1" style="height: 2.125rem">
             Contribute via card
             <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
           </button>
           <% if (rt = internal_redirect_uri(params[:return_to])&.to_s) %>
-            <a class="btn btn-outline-secondary mb-1 mr-1" style="height: 2.125rem" href="<%= rt.include?('?') ? "#{rt}&contribution_skipped=1" : "#{rt}?contribution_skipped=1" %>">Not now</a>
+            <a class="btn btn-outline-secondary mb-1 me-1" style="height: 2.125rem" href="<%= rt.include?('?') ? "#{rt}&contribution_skipped=1" : "#{rt}?contribution_skipped=1" %>">Not now</a>
           <% end %>
           <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
         <% end %>

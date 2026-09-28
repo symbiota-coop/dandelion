@@ -4,7 +4,7 @@
     <tr>
       <td>Email</td>
       <td>
-        <div class="row justify-content-between no-gutters">
+        <div class="row justify-content-between g-0">
           <div class="col">
             <a target="_blank" href="mailto:<%= account.email %>"><%= account.email %></a>
           </div>
@@ -21,7 +21,7 @@
     <tr>
       <td>Phone</td>
       <td>
-        <div class="row justify-content-between no-gutters">
+        <div class="row justify-content-between g-0">
           <div class="col">
             <a target="_blank" href="tel:<%= account.phone %>"><%= account.phone %></a>
           </div>
@@ -38,7 +38,7 @@
     <tr>
       <td>Website</td>
       <td>
-        <div class="row justify-content-between no-gutters">
+        <div class="row justify-content-between g-0">
           <div class="col">
             <a target="_blank" href="<%= account.website %>"><%= account.website %></a>
           </div>
@@ -55,7 +55,7 @@
     <tr>
       <td>Age</td>
       <td>
-        <div class="row justify-content-between no-gutters">
+        <div class="row justify-content-between g-0">
           <div class="col">
             <%= account.age %>
           </div>
@@ -71,7 +71,7 @@
       <tr>
         <td>Birthday</td>
         <td>
-          <div class="row justify-content-between no-gutters">
+          <div class="row justify-content-between g-0">
             <div class="col">
               <% d = account.days_until_next_birthday %>
               <span class="<%='highlight' if d == 0%>">
@@ -87,7 +87,7 @@
     <tr>
       <td>Gender</td>
       <td>
-        <div class="row justify-content-between no-gutters">
+        <div class="row justify-content-between g-0">
           <div class="col">
             <%= account.gender %>
           </div>
@@ -104,7 +104,7 @@
     <tr>
       <td>Location</td>
       <td>
-        <div class="row justify-content-between no-gutters">
+        <div class="row justify-content-between g-0">
           <div class="col">
             <%= account.location %>
           </div>
@@ -121,7 +121,7 @@
     <tr>
       <td>Last active</td>
       <td>
-        <div class="row justify-content-between no-gutters">
+        <div class="row justify-content-between g-0">
           <div class="col">
             <%= time_ago_in_words account.last_active %> ago
           </div>

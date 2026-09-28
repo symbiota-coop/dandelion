@@ -1,9 +1,7 @@
 <% form_tag '', class: 'form-inline no-trigger', id: 'pay-form' do %>
-  <div class="form-group mb-1 mr-1">
+  <div class="form-group mb-1 me-1">
     <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text"><%= money_symbol(@gathering.currency) %></span>
-      </div>
+      <span class="input-group-text"><%= money_symbol(@gathering.currency) %></span>
       <% if @gathering.enable_partial_payments %>
         <%= number_field_tag :amount, value: (amount if defined?(amount)), style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount' %>
       <% else %>
@@ -14,7 +12,7 @@
   </div>
   <% GatheringPaymentMethod.all.each do |pm| %>
     <% next unless pm.available?(@gathering) %>
-    <button data-payment-method="<%= pm.name %>" type="submit" class="btn btn-light mb-1 ml-0 mr-1" style="height: 2.125rem">
+    <button data-payment-method="<%= pm.name %>" type="submit" class="btn btn-light mb-1 ms-0 me-1" style="height: 2.125rem">
       <span><%= pm.button_label(@gathering) %></span>
       <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
     </button>

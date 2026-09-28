@@ -12,7 +12,7 @@
         <th>Op</th>
         <th>Description</th>
         <th>File</th>
-        <th class="text-right">Line</th>
+        <th class="text-end">Line</th>
       </tr>
     </thead>
     <tbody>
@@ -29,7 +29,7 @@
             <% end %>
           </td>
           <td><code><%= span[:file] %></code></td>
-          <td class="text-right" data-order="<%= span[:line] %>"><%= span[:line] %></td>
+          <td class="text-end" data-order="<%= span[:line] %>"><%= span[:line] %></td>
         </tr>
       <% end %>
     </tbody>

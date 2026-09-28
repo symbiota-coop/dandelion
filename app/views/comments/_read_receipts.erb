@@ -1,5 +1,5 @@
 <% if comment.read_receipts.exists? %>
-  <a href="javascript:;" class="subtle" data-toggle="tooltip"><%= pluralize(comment.read_receipts.count, 'person') %> read this</a>
+  <a href="javascript:;" class="subtle" data-bs-toggle="tooltip"><%= pluralize(comment.read_receipts.count, 'person') %> read this</a>
   <span style="display: none">
     <%== comment.read_receipts(true).map { |read_receipt| Sanitize.fragment(read_receipt.account.name) }.join('<br />') %>
   </span>

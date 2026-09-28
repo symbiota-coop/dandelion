@@ -7,7 +7,7 @@
           'Last 90 days' => '90'
         },
         selected: @period,
-        class: 'form-control form-control-sm',
+        class: 'form-select form-select-sm',
         onchange: 'this.form.submit()' %>
 <% end %>
 
@@ -21,18 +21,18 @@
       <thead>
         <tr>
           <th>Provider</th>
-          <th class="text-right">Delivered</th>
-          <th class="text-right">Bounce</th>
-          <th class="text-right">Delivered %</th>
+          <th class="text-end">Delivered</th>
+          <th class="text-end">Bounce</th>
+          <th class="text-end">Delivered %</th>
         </tr>
       </thead>
       <tbody>
         <% @stats[:by_provider].each do |row| %>
           <tr class="<%= 'table-warning' if row[:delivered_rate_f] && row[:delivered_rate_f] < MailgunDeliveryStats::ALERT_THRESHOLD %>">
             <td><code><%= row[:label] %></code></td>
-            <td class="text-right"><%= row[:delivered_count] %></td>
-            <td class="text-right"><%= row[:bounced_count] %></td>
-            <td class="text-right"><%= MailgunDeliveryStats.format_pct(row[:delivered_rate_f]) %></td>
+            <td class="text-end"><%= row[:delivered_count] %></td>
+            <td class="text-end"><%= row[:bounced_count] %></td>
+            <td class="text-end"><%= MailgunDeliveryStats.format_pct(row[:delivered_rate_f]) %></td>
           </tr>
         <% end %>
       </tbody>

@@ -1,9 +1,7 @@
 <% if @organisation && @organisation.monthly_donations_enabled? && (!organisationship.monthly_donation_method || organisationship.monthly_donation_method == 'Other') %>
   <% form_tag "/organisationships/#{organisationship.id}/monthly_donation", class: 'form-inline' do %>
     <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text"><%=money_symbol @organisation.currency%></span>
-      </div>
+      <span class="input-group-text"><%=money_symbol @organisation.currency%></span>
       <%= text_field_tag :amount, class: 'form-control', value: organisationship.monthly_donation_amount, onchange: '$(this.form).submit()' %>
     </div>
   <% end %>

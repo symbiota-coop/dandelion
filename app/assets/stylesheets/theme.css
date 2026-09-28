@@ -96,7 +96,7 @@ a.text-primary:focus {
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active,
-.show>.btn-primary.dropdown-toggle {
+.btn-primary.dropdown-toggle.show {
   background: var(--theme-color-dark) !important;
 }
 
@@ -121,7 +121,7 @@ a.text-primary:focus {
 .btn-outline-primary:active,
 .btn-outline-primary:not(:disabled):not(.disabled):active,
 .btn-outline-primary:not(:disabled):not(.disabled).active,
-.show>.btn-outline-primary.dropdown-toggle {
+.btn-outline-primary.dropdown-toggle.show {
   color: white !important;
   border-color: var(--theme-color) !important;
   background: var(--theme-color) !important;
@@ -211,11 +211,18 @@ p.action a:hover {
  * =============================================================================
  */
 
-.form-control {
+.form-control,
+.form-select {
   box-shadow: none !important;
 }
 
-.form-control:focus {
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--theme-color);
+}
+
+.form-check-input:checked {
+  background-color: var(--theme-color);
   border-color: var(--theme-color);
 }
 
@@ -226,7 +233,7 @@ p.action a:hover {
 }
 
 /* Native range controls (e.g. pay-what-you-will ticket slider on purchase with minimal layout) */
-.form-control-range {
+.form-range {
   accent-color: var(--theme-color);
 }
 

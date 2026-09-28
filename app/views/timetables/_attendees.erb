@@ -1,6 +1,6 @@
 <% image = tactivity.image %>
 <% if tactivity.attendances.exists? %>
-  <span class="<% if image %>text-white<% else %>text-dark<% end %>" data-toggle="tooltip" title="<%= tactivity.attendances.map { |attendance| attendance.account.name }.join('<br />') %>">
+  <span class="<% if image %>text-white<% else %>text-dark<% end %>" data-bs-toggle="tooltip" title="<%= tactivity.attendances.map { |attendance| attendance.account.name }.join('<br />') %>">
     <% if tactivity.attendances.find_by(account: current_account) %>
       <% if tactivity.attendances.count == 1 %>
         You're interested

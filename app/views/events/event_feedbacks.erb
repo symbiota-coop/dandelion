@@ -13,7 +13,7 @@
 %>
 <% if show_feedback_report %>
   <% stash = Stash.find_by(key: "/events/#{@event.id}/feedback_report") %>
-  <div style="font-size: 0.9rem" data-toggle="tooltip" title="AI-generated ✨" <% unless stash %>data-with-placeholder data-pagelet-url="/events/<%= @event.id %>/feedback_report"<% end %>>
+  <div style="font-size: 0.9rem" data-bs-toggle="tooltip" title="AI-generated ✨" <% unless stash %>data-with-placeholder data-pagelet-url="/events/<%= @event.id %>/feedback_report"<% end %>>
     <% if stash %>
       <%== stash.value %>
     <% else %>

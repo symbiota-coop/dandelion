@@ -7,7 +7,7 @@
     <% if via %>
       <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
       <div class="alert alert-success d-flex align-items-start">
-        <i class="bi bi-stars mr-3 mt-1" style="font-size: 1.75rem; opacity: 0.85"></i>
+        <i class="bi bi-stars me-3 mt-1" style="font-size: 1.75rem; opacity: 0.85"></i>
         <div>
           <p class="lead mb-2">
             Thanks for your interest in <%= instance_variable_get("@#{r}").name %>!
@@ -21,7 +21,7 @@
     <% elsif @account.sign_ins_count == 1 %>
 
       <div class="alert alert-success d-flex align-items-start">
-        <i class="bi bi-stars mr-3 mt-1" style="font-size: 1.75rem; opacity: 0.85"></i>
+        <i class="bi bi-stars me-3 mt-1" style="font-size: 1.75rem; opacity: 0.85"></i>
         <div>
           <% if params[:sign_in_token] %>
             <p class="lead mb-2">
@@ -110,9 +110,9 @@
       <script>
         $(function() {
           var label = $('label[for=account_dietary_requirements]').css('display', 'block');
-          $(label).wrapInner('<div class="row justify-content-between no-gutters"><div class="col ml-2"></div></div>')
+          $(label).wrapInner('<div class="row justify-content-between g-0"><div class="col ms-2"></div></div>')
           $('.row', label).append('<div class="col-auto"></div>')
-          $('.col-auto', label).append('<span class="font-weight-normal">Only visible to people in your gatherings</span>')
+          $('.col-auto', label).append('<span class="fw-normal">Only visible to people in your gatherings</span>')
         })
       </script>
       <%= f.wysiwyg_block :dietary_requirements %>
@@ -132,7 +132,7 @@
       $('[data-privacy]').each(function () {
         var dropdown = this;
         $('label[for=account_' + $(this).attr('data-privacy') + ']').css('display', 'block').each(function () {
-          $(this).wrapInner('<div class="row justify-content-between no-gutters"><div class="col ml-2"></div></div>')
+          $(this).wrapInner('<div class="row justify-content-between g-0"><div class="col ms-2"></div></div>')
           $('.row', this).append('<div class="col-auto"></div>')
           $('.col-auto', this).append(dropdown)
         })
@@ -140,7 +140,7 @@
     })
   </script>
 
-  <p class="mt-3 text-lg-right">
+  <p class="mt-3 text-lg-end">
     Your account ID: <%= @account.id %>
     <% if @account.api_key %>
       <br />

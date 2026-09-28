@@ -52,7 +52,7 @@
     autosize($('#organisation_minimal_head')[0])
     autosize($('#organisation_terms_and_conditions')[0])
 
-    $('#organisation-build-nav a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+    $('#organisation-build-nav a[data-bs-toggle="tab"]').on('show.bs.tab', function (e) {
       var form = $('#organisation-build-nav').closest('form')[0]
         if (form.reportValidity()) {
           // continue
@@ -63,7 +63,7 @@
         }
     });
 
-    $('#organisation-build-nav a[data-toggle="tab"]').on('shown.bs.tab', function () {
+    $('#organisation-build-nav a[data-bs-toggle="tab"]').on('shown.bs.tab', function () {
       window.scrollTo(0, 0)
     })
 
@@ -82,14 +82,14 @@
   <% if @organisation.persisted? %>
     <div class="nav-wrapper">
       <ul id="organisation-build-nav" class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab-basics" role="tab" data-toggle="tab">Basics</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-payments" role="tab" data-toggle="tab">Payments</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-emails" role="tab" data-toggle="tab">Emails</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-mailgun" role="tab" data-toggle="tab">Mailgun</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-analytics" role="tab" data-toggle="tab">Analytics</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-everything-else" role="tab" data-toggle="tab">Everything else</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab-basics" role="tab" data-bs-toggle="tab">Basics</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-payments" role="tab" data-bs-toggle="tab">Payments</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-emails" role="tab" data-bs-toggle="tab">Emails</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-mailgun" role="tab" data-bs-toggle="tab">Mailgun</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-analytics" role="tab" data-bs-toggle="tab">Analytics</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-everything-else" role="tab" data-bs-toggle="tab">Everything else</a></li>
         <% if Padrino.env == :development || @organisation.experimental? %>
-          <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-experimental" role="tab" data-toggle="tab">Experimental</a></li>
+          <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-experimental" role="tab" data-bs-toggle="tab">Experimental</a></li>
         <% end %>
       </ul>
     </div>
@@ -98,7 +98,7 @@
 
     <% if @organisation.new_record? && current_account.organisations(true).empty? %>
       <div class="alert alert-success d-flex align-items-start">
-        <i class="bi bi-flag-fill mr-3 mt-1" style="font-size: 1.75rem; opacity: 0.85"></i>
+        <i class="bi bi-flag-fill me-3 mt-1" style="font-size: 1.75rem; opacity: 0.85"></i>
         <div>
           <p class="lead mb-2">
             Let's create your first organisation!
@@ -158,7 +158,7 @@
                 if (filled) return
                 card.hide()
                 $('#payment-setup-links').append(
-                  $('<a href="javascript:;" class="d-inline-block mr-3 mb-1">').text('Set up ' + card.find('h4').text()).click(function () {
+                  $('<a href="javascript:;" class="d-inline-block me-3 mb-1">').text('Set up ' + card.find('h4').text()).click(function () {
                     card.show()
                     $(window).scrollTop(card.offset().top - $('#header').height() - 36)
                     $(this).remove()
@@ -225,9 +225,7 @@
             <label for="organisation_affiliate_credit_percentage"><%= Organisation.human_attribute_name(:affiliate_credit_percentage) %></label>
             <div class="input-group">
               <%= f.number_field :affiliate_credit_percentage, class: 'form-control' %>
-              <div class="input-group-append">
-                <span class="input-group-text">%</span>
-              </div>
+              <span class="input-group-text">%</span>
             </div>
             <small class="form-text text-muted"><%= Organisation.edit_hints[:affiliate_credit_percentage] %></small>
           </div>
@@ -261,7 +259,7 @@
         <% end %>
       <% end %>
     </div>
-    <div class="ml-3">
+    <div class="ms-3">
       <%= f.submit_block button_text: (@organisation.persisted? ? 'Update organisation' : 'Save and continue') %>
     </div>
   </div>

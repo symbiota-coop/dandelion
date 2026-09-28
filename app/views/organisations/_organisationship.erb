@@ -29,7 +29,7 @@
 
   <% else %>
     <div class="dropdown d-inline-block">
-      <button class="btn mb-1 <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-toggle="dropdown">
+      <button class="btn mb-1 <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-bs-toggle="dropdown">
         <%== text %>
       </button>
       <div class="dropdown-menu">

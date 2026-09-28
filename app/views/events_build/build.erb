@@ -6,7 +6,7 @@
 
 <% if params[:new_org] && !params[:draft_id] %>
   <div class="alert alert-success mt-3 d-flex align-items-start">
-    <i class="bi bi-calendar-event mr-3 mt-1" style="font-size: 1.75rem; opacity: 0.85"></i>
+    <i class="bi bi-calendar-event me-3 mt-1" style="font-size: 1.75rem; opacity: 0.85"></i>
     <div>
       <p class="lead mb-2">
         Now let's create an event under your new organisation.
@@ -82,19 +82,19 @@
   <% end %>
   <div class="nav-wrapper">
     <ul id="event-build-nav" class="nav nav-tabs" role="tablist">
-      <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab-basics" role="tab" data-toggle="tab">Basics</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-description" role="tab" data-toggle="tab">Description and confirmation</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-tickets" role="tab" data-toggle="tab">Tickets</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-questions" role="tab" data-toggle="tab">Questions</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-donations" role="tab" data-toggle="tab">Donations</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-appearance" role="tab" data-toggle="tab">Appearance <i class="bi bi-palette"></i></a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-emails" role="tab" data-toggle="tab">Emails</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-everything-else" role="tab" data-toggle="tab">Everything else</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab-basics" role="tab" data-bs-toggle="tab">Basics</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-description" role="tab" data-bs-toggle="tab">Description and confirmation</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-tickets" role="tab" data-bs-toggle="tab">Tickets</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-questions" role="tab" data-bs-toggle="tab">Questions</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-donations" role="tab" data-bs-toggle="tab">Donations</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-appearance" role="tab" data-bs-toggle="tab">Appearance <i class="bi bi-palette"></i></a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-emails" role="tab" data-bs-toggle="tab">Emails</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-everything-else" role="tab" data-bs-toggle="tab">Everything else</a></li>
       <% if @event.persisted? && @event.start_time && @event.past? %>
-        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-recording" role="tab" data-toggle="tab">Recording</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-recording" role="tab" data-bs-toggle="tab">Recording</a></li>
       <% end %>
       <% if @event.organisation.stripe_client_id %>
-        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-revenue" role="tab" data-toggle="tab">Revenue</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-revenue" role="tab" data-bs-toggle="tab">Revenue</a></li>
       <% end %>
     </ul>
   </div>
@@ -180,10 +180,10 @@
             </div>
           </div>
           <div class="col-lg-6">
-            <fieldset class="ml-lg-5 border p-3 rounded mb-3">
+            <fieldset class="ms-lg-5 border p-3 rounded mb-3">
               <legend class="w-auto px-2" style="font-size: 1rem">
                 Preview
-                <span id="feedback-questions-spinner" style="display: none;" class="ml-1">
+                <span id="feedback-questions-spinner" style="display: none;" class="ms-1">
                   <i class="bi bi-spin bi-slash-lg"></i>
                 </span>
               </legend>
@@ -379,7 +379,7 @@
       <% end %>
     </div>
     <% if @event.persisted? && !@event.deleted? %>
-      <div class="ml-3">
+      <div class="ms-3">
         <%= f.submit_block %>
       </div>
     <% end %>

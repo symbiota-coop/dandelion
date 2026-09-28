@@ -1051,8 +1051,8 @@ body.greyed #content {
   color: #e2342a;
 }
 
-.alert button.close {
-  font-size: 1rem
+.alert-dismissible .btn-close {
+  padding: 0.875rem;
 }
 
 /* ==========================================================================
@@ -1228,7 +1228,7 @@ fieldset[disabled] .btn-primary:hover,
 
 .btn-primary:not([disabled]):not(.disabled).active,
 .btn-primary:not([disabled]):not(.disabled):active,
-.show > .btn-primary.dropdown-toggle {
+.btn-primary.dropdown-toggle.show {
   background: linear-gradient(135deg, #00a257 0%, #00a257 50%, #00c469 100%);
   border-color: #00a257;
   box-shadow: 0 0 0 0.2rem fade(#00af5e, 50%);
@@ -1274,7 +1274,7 @@ fieldset[disabled] .btn-danger:hover,
 
 .btn-danger:not([disabled]):not(.disabled).active,
 .btn-danger:not([disabled]):not(.disabled):active,
-.show > .btn-danger.dropdown-toggle {
+.btn-danger.dropdown-toggle.show {
   background: linear-gradient(135deg, #e4352b 0%, #e4352b 50%, #e85249 100%);
   border-color: #e4352b;
   box-shadow: 0 0 0 0.2rem fade(#FF3B30, 50%);
@@ -1478,17 +1478,6 @@ input[type=radio][disabled] + label {
    Input groups
    ========================================================================== */
 
-.input-group-addon {
-  line-height: 1.3333;
-  font-size: 0.875rem;
-}
-
-.has-error .input-group-addon {
-  background: #ffe8e7;
-  border-color: #e2342a;
-  color: #e2342a;
-}
-
 /* ==========================================================================
    Dropdowns
    ========================================================================== */
@@ -1539,7 +1528,7 @@ input[type=radio][disabled] + label {
   border-bottom-color: rgba(0, 0, 0, 0.1);
 }
 
-.dropdown.show .dropdown-menu {
+.dropdown .dropdown-menu.show {
   display: block;
   margin-top: 0.625rem !important;
   overflow: initial;
@@ -1730,13 +1719,14 @@ input[type=radio][disabled] + label {
   box-shadow: none;
 }
 
-.form-control:focus {
+.form-control:focus,
+.form-select:focus {
   border-color: #00af5e;
   outline: none;
   box-shadow: 0 0 0 0.125rem rgba(102, 175, 233, 0.6);
 }
 
-select.form-control:not([size]):not([multiple]) {
+.form-select:not([size]):not([multiple]) {
   border-color: #C8C7CC;
   color: #000;
   font-size: 0.825rem;
@@ -1752,16 +1742,80 @@ select[size] {
 }
 
 .form-control-sm,
-select.form-control-sm:not([size]):not([multiple]) {
+.form-select-sm:not([size]):not([multiple]) {
   height: 1.875rem;
   line-height: 1.875rem;
+}
+
+/*
+ * .form-group and .form-inline were dropped in Bootstrap 5. We keep them as our own classes:
+ * .form-group spaces a label and its field (and is what activate-tools' blocks and our JS look for),
+ * and .form-inline lays out the filter forms above lists and tables in a row.
+ */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-inline {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+}
+
+.form-inline .form-check {
+  width: 100%;
+}
+
+@media (min-width: 576px) {
+  .form-inline label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+  }
+
+  .form-inline .form-group {
+    display: flex;
+    flex: 0 0 auto;
+    flex-flow: row wrap;
+    align-items: center;
+    margin-bottom: 0;
+  }
+
+  .form-inline .form-control,
+  .form-inline .form-select {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle;
+  }
+
+  .form-inline .input-group {
+    width: auto;
+  }
+
+  .form-inline .form-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    padding-left: 0;
+  }
+
+  .form-inline .form-check-input {
+    position: relative;
+    flex-shrink: 0;
+    margin-top: 0;
+    margin-right: 0.25rem;
+    margin-left: 0;
+  }
 }
 
 @media (min-width: 768px) {
   .form-inline .form-group + .form-group {
     margin-left: 0.625rem;
   }
-  .form-inline label + .form-control {
+  .form-inline label + .form-control,
+  .form-inline label + .form-select {
     margin-left: 0.3125rem;
   }
   .form-inline .form-group + .btn {
@@ -1793,6 +1847,10 @@ hr {
   }
 }
 
+.form-text {
+  display: block;
+}
+
 label .form-text {
   font-weight: 500
 }
@@ -1804,11 +1862,6 @@ textarea[id=comment_body] {
 
 textarea[id=verdict_reason] {
   height: 6em;
-}
-
-.input-group-prepend,
-.input-group-append {
-  height: 2.125rem
 }
 
 .form-control.datetimepicker[readonly] {
@@ -2011,26 +2064,13 @@ mark {
   background: #FFCC00;
 }
 
-.media + .media {
-  margin-top: 0.9375rem;
-}
-
 /* ==========================================================================
    Modals
    ========================================================================== */
 
-.close {
-  text-shadow: none;
-}
-
 .modal .modal-content {
   box-shadow: none;
   border: none;
-}
-
-.modal-header .close {
-  margin: 0;
-  padding: 0;
 }
 
 @media (min-width: 768px) {
@@ -2202,12 +2242,12 @@ ul.pagination {
   background-color: var(--color-primary-transparent-3);
 }
 
-.row.block.no-gutters.align-items-stretch {
+.row.block.g-0.align-items-stretch {
   margin: 0
 }
 
 @media(min-width: 992px) {
-  .row.block.no-gutters.align-items-stretch {
+  .row.block.g-0.align-items-stretch {
     background: var(--bg-well);
     border-radius: 0.25rem;
   }
@@ -2232,8 +2272,8 @@ ul.pagination {
   border-radius: 0;
 }
 
-.no-gutters>.col,
-.no-gutters>[class*=col-] {
+.g-0>.col,
+.g-0>[class*=col-] {
   padding-right: 0 !important;
   padding-left: 0 !important;
 }
@@ -3056,21 +3096,13 @@ button.bg-warning:focus {
    Select2
    ========================================================================== */
 
-.select2-container--bootstrap4 .select2-selection--single .select2-selection__placeholder {
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__placeholder {
   font-weight: 400
 }
 
-.select2-container--bootstrap4 .select2-selection__clear {
-  line-height: .65em;
-  margin-top: .8em;
-}
-
-.select2-container--bootstrap4 .select2-selection--multiple .select2-selection__choice {
-  margin-top: calc(.375rem - 1px)
-}
-
-.select2-container--bootstrap4 .select2-selection {
-  border-color: #C8C7CC
+.select2-container--bootstrap-5 .select2-selection {
+  border-color: #C8C7CC;
+  font-size: 0.825rem;
 }
 
 .select2-choices {

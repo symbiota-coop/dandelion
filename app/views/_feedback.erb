@@ -6,7 +6,7 @@
     <% else %>
       <% form_tag '/feedback' do %>
         <div class="ask-box">
-          <label class="sr-only" for="feedback-textarea">Give us feedback on Dandelion</label>
+          <label class="visually-hidden" for="feedback-textarea">Give us feedback on Dandelion</label>
           <%= text_area_tag :feedback, id: 'feedback-textarea', class: 'form-control autosize', rows: 1, placeholder: 'Send your thoughts, praise, suggestions or report an issue', required: true %>
           <div class="ask-box-actions">
             <button type="submit" class="btn btn-primary btn-sm" aria-label="Send feedback">

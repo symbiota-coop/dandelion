@@ -1,5 +1,5 @@
 <% image_source = event.image_source(@organisation) %>
-<div class="row block no-gutters align-items-stretch <% if event.locked? %>event-locked<% end %>" style="<% if admin? && event.hidden_from_homepage? %>opacity: 0.3<% end %>">
+<div class="row block g-0 align-items-stretch <% if event.locked? %>event-locked<% end %>" style="<% if admin? && event.hidden_from_homepage? %>opacity: 0.3<% end %>">
   <% if image_source %>
     <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white">
       <a target="_parent" href="/e/<%= event.slug %><%= "?cohost=#{@organisation.slug}" if image_source.is_a?(Cohostship) %>"><%= blurred_image_tag(image_source.image, width: image_source.image_width_unmagic, height: image_source.image_height_unmagic) %></a>
@@ -10,7 +10,7 @@
       <tr>
         <td style="vertical-align: top">
           <div class="row justify-content-between">
-            <div class="col ml-1 p-lg-3">
+            <div class="col ms-1 p-lg-3">
               <%= partial :'events/block_main', locals: { event: event } %>
               <% if @organisation && event.carousel_text %>
                 <div class="p-1" style="font-size: 0.9rem; color: #777" class="mb-0"><%= event.carousel_text %></div>

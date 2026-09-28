@@ -29,7 +29,7 @@
           ['https://www.instagram.com/dandelion.events_/', 'instagram', 'Instagram'],
           ['https://github.com/symbiota-coop/dandelion', 'github', 'Github']
         ].each do |url, icon, label| %>
-          <a href="<%= url %>" target="_blank" class="mr-3" data-toggle="tooltip" title="<%= label %>" aria-label="<%= label %>">
+          <a href="<%= url %>" target="_blank" class="me-3" data-bs-toggle="tooltip" title="<%= label %>" aria-label="<%= label %>">
             <i class="bi bi-<%= icon %>"></i>
           </a>
         <% end %>

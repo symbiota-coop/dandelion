@@ -1,5 +1,5 @@
-<a style="text-decoration: none" href="javascript:;" data-toggle="modal" data-target="#photo-<%= photo.id %>">
-  <img class="mb-1 mr-1" src="<%= u photo.image.thumb(defined?(dimensions) ? dimensions : '200x200#').url %>">
+<a style="text-decoration: none" href="javascript:;" data-bs-toggle="modal" data-bs-target="#photo-<%= photo.id %>">
+  <img class="mb-1 me-1" src="<%= u photo.image.thumb(defined?(dimensions) ? dimensions : '200x200#').url %>">
 </a>
 <div class="modal fade" id="photo-<%= photo.id %>" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
@@ -8,7 +8,7 @@
         <%= blurred_image_tag(photo.image, full_size: '1920x1920', css_class: 'w-100') %>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         <% if current_account && photo.account_id == current_account.id %>
           <a class="btn btn-danger" data-confirm="Are you sure you want to delete this image?" href="/photos/<%= photo.id %>/destroy">Delete</a>
         <% end %>

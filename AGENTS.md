@@ -51,7 +51,8 @@ Always ask permission before running tests. Your default posture should be to su
 - Do not use `.presence`
 - Stylesheets are plain CSS (no Sass). `app/assets/stylesheets/bootstrap.css` is compiled vendor CSS: never edit it; override it in `app/assets/stylesheets/app.css`, which also holds the page layout (header, sidebar, content) and component styles. Styles only needed on certain pages go in their own file that only those pages load (e.g. `docs.css`, loaded by the docs views, and `messages.css`, loaded by the messages page), not in the site-wide dependencies
 - Use `badge badge-*` for counts and short statuses (Sold out, Locked, Refunded), and `label label-*` for tags, linked entities and amounts (event tags, teams, revenue figures)
-- To change Bootstrap variables, edit `app/assets/stylesheets/bootstrap.scss` and run `rake bootstrap:build` (needs Node), which regenerates `bootstrap.css`
+- The UI is Bootstrap 5 with jQuery, so Bootstrap's jQuery plugins still work (`$(el).tooltip()`, `$('#modal').modal('show')`). Use `data-bs-*` attributes (`data-bs-toggle="tooltip"`), logical spacing and alignment (`ms-*`, `me-*`, `text-end`, `float-start`) and `form-select` on selects. `.form-group` and `.form-inline` were dropped from Bootstrap 5 but are kept as our own classes in `app.css`, as are `badge-*` and `label-*`
+- To change Bootstrap variables, edit `app/assets/stylesheets/bootstrap.scss` and run `rake bootstrap:build` (needs Node), which regenerates `bootstrap.css` and `app/assets/javascripts/ext/bootstrap.bundle.min.js`
 - `event_details.css` and `email.css` are inlined into emails, so they can't use CSS custom properties (`var(--x)`)
 - Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` — no `before_action`, strong params, or `render`
 

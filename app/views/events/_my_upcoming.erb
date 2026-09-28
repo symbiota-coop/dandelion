@@ -3,9 +3,9 @@
   <table class="table table-borderless">
     <% current_account.upcoming_events.each { |event| %>
     <tr>
-      <td class="pr-2" style="width: 1px">
+      <td class="pe-2" style="width: 1px">
 
-        <a href="/e/<%= event.slug %>" style="font-size: 1.1em" class="event-detail calendar-date mt-1" data-toggle="tooltip" title="in <%=distance_of_time_in_words event.start_time - Time.now %>">
+        <a href="/e/<%= event.slug %>" style="font-size: 1.1em" class="event-detail calendar-date mt-1" data-bs-toggle="tooltip" title="in <%=distance_of_time_in_words event.start_time - Time.now %>">
           <span class="month">
             <span class="month-text">
               <%= event.start_time.strftime('%b') %>

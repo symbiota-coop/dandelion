@@ -3,7 +3,7 @@
 <% else %>
   <% form_tag '/docs/question' do %>
     <div class="ask-box">
-      <label class="sr-only" for="question-textarea">How can we help?</label>
+      <label class="visually-hidden" for="question-textarea">How can we help?</label>
       <%= text_area_tag :question, id: 'question-textarea', class: 'form-control autosize', rows: 1, placeholder: 'How can we help?', required: true %>
       <div class="ask-box-actions">
         <button type="submit" class="btn btn-primary btn-sm" aria-label="Send">

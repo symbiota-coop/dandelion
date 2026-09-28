@@ -22,7 +22,7 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_inc
         <div class="mb-4">
 
           <% image_source = event.image_source(@organisation) %>
-          <div class="row block no-gutters align-items-stretch <% if event.locked? %>event-locked<% end %>">
+          <div class="row block g-0 align-items-stretch <% if event.locked? %>event-locked<% end %>">
             <% if image_source %>
               <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white">
                 <a target="_parent" href="/e/<%= event.slug %><%= "?cohost=#{@organisation.slug}" if image_source.is_a?(Cohostship) %>"><%= blurred_image_tag(image_source.image, width: image_source.image_width_unmagic, height: image_source.image_height_unmagic) %></a>
@@ -33,7 +33,7 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_inc
                 <tr>
                   <td style="vertical-align: top">
                     <div class="row justify-content-between">
-                      <div class="col ml-1 p-lg-3">
+                      <div class="col ms-1 p-lg-3">
                         <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
 
                         <% people_accounts = Account.and(:id.in => people.map(&:first)) %>
@@ -41,12 +41,12 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_inc
                         <% private_count = private_account_ids.count %>
                         <% private_events_count = people.select { |k, _v| private_account_ids.include?(k.to_s) }.sum { |_k, v| v.count } %>
                         <% public_count = people_accounts.count - private_count %>
-                        <li><i data-toggle="tooltip" title="People" class="bi bi-person-fill"></i>
+                        <li><i data-bs-toggle="tooltip" title="People" class="bi bi-person-fill"></i>
                           <% people.each { |k,v| account = people_accounts.find { |a| a.id.to_s == k.to_s }; next unless account;
                           next if account.private?
                           %>
                           <a href="/u/<%=account.username%>"><%=account.name%></a>,
-                          <span data-toggle="tooltip">
+                          <span data-bs-toggle="tooltip">
                             <%=pluralize v.count, 'event'%> in common
                           </span>
                           <span class="d-none">

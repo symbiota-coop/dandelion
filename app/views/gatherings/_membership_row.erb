@@ -77,9 +77,7 @@
         <% end %>
         <% form_tag "/memberships/#{membership.id}/paid", style: ('display:none' if membership.paid) do %>
           <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><%= money_symbol(@gathering.currency) %></span>
-            </div>
+            <span class="input-group-text"><%= money_symbol(@gathering.currency) %></span>
             <%= number_field_tag :paid, class: 'form-control', style: 'width: 6em', value: membership.paid, onblur: '$(this.form).submit()' %>
           </div>
         <% end %>
@@ -95,7 +93,7 @@
     <%= partial :'rotas/shift_summary', locals: {membership: membership} %>
 
     <% if @gathering.enable_shift_worth %>
-      <span data-toggle="tooltip" title="<%= sprintf('%g', membership.shift_points) %>/<%= pluralize(membership.shift_points_required ? sprintf('%g', membership.shift_points_required) : '?', 'shift point') %>">
+      <span data-bs-toggle="tooltip" title="<%= sprintf('%g', membership.shift_points) %>/<%= pluralize(membership.shift_points_required ? sprintf('%g', membership.shift_points_required) : '?', 'shift point') %>">
         <% if @membership.admin? %>
           <%= sprintf('%g', membership.shift_points) %>/<a href="javascript:;" onclick="$(this).hide().next().css('display', 'inline').find('input').focus()"><%= membership.shift_points_required ? sprintf('%g', membership.shift_points_required) : '?' %></a>
           <% form_tag "/memberships/#{membership.id}/shift_points_required", class: 'form-inline', style: 'display:none' do %>

@@ -1,14 +1,15 @@
 namespace :bootstrap do
-  desc 'Compile app/assets/stylesheets/bootstrap.scss to bootstrap.css (needs Node)'
+  desc 'Compile app/assets/stylesheets/bootstrap.scss to bootstrap.css and copy in bootstrap.bundle.min.js (needs Node)'
   task :build do
     require 'tmpdir'
 
     stylesheets_dir = File.expand_path('../app/assets/stylesheets', __dir__)
+    javascripts_dir = File.expand_path('../app/assets/javascripts/ext', __dir__)
     abort 'rake bootstrap:build needs Node (npm)' unless system('npm --version', out: File::NULL)
 
     Dir.mktmpdir do |dir|
-      puts 'Installing Bootstrap 4.6.2 and Dart Sass...'
-      system('npm', 'install', '--prefix', dir, '--no-save', '--silent', 'bootstrap@4.6.2', 'sass@1.105.0', exception: true)
+      puts 'Installing Bootstrap 5.3.8 and Dart Sass...'
+      system('npm', 'install', '--prefix', dir, '--no-save', '--silent', 'bootstrap@5.3.8', 'sass@1.105.0', exception: true)
 
       puts 'Compiling bootstrap.scss...'
       css_file = File.join(dir, 'bootstrap.css')
@@ -34,6 +35,11 @@ namespace :bootstrap do
       CSS
       File.write(File.join(stylesheets_dir, 'bootstrap.css'), header + css)
       puts 'Wrote app/assets/stylesheets/bootstrap.css'
+
+      # The bundle includes Popper; drop the source map comment, as we don't serve the map
+      js = File.read(File.join(dir, 'node_modules', 'bootstrap', 'dist', 'js', 'bootstrap.bundle.min.js'), encoding: 'UTF-8')
+      File.write(File.join(javascripts_dir, 'bootstrap.bundle.min.js'), js.sub(%r{\n//# sourceMappingURL=.*\z}, "\n"))
+      puts 'Wrote app/assets/javascripts/ext/bootstrap.bundle.min.js'
     end
   end
 end

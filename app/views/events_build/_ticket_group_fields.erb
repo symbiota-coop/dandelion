@@ -1,19 +1,15 @@
 <div class="row mb-2">
   <div class="col-12 col-lg mb-2 mb-lg-0">
     <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">Name</span>
-      </div>
+      <span class="input-group-text">Name</span>
       <%= form_or_tag_field(form, :text_field, :name, class: 'form-control', required: true) %>
     </div>
   </div>
   <div class="col-12 col-lg mb-2">
     <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">Capacity</span>
-      </div>
+      <span class="input-group-text">Capacity</span>
       <% ticket_group_capacity_tooltip = 'Places in this group. Each ticket type can take a different number of slots' %>
-      <%= form_or_tag_field(form, :number_field, :capacity, class: 'form-control', required: true, 'data-toggle': 'tooltip', title: ticket_group_capacity_tooltip) %>
+      <%= form_or_tag_field(form, :number_field, :capacity, class: 'form-control', required: true, 'data-bs-toggle': 'tooltip', title: ticket_group_capacity_tooltip) %>
     </div>
   </div>
 </div>

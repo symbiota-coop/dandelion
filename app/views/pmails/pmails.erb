@@ -25,10 +25,10 @@
   <div class="search border rounded p-3 pb-lg-0 mb-3 mt-3">
     <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
       <%= hidden_field_tag :order, value: params[:order] %>
-      <div class="form-row align-items-end">
+      <div class="row gx-2 align-items-end">
         <div class="form-group col-12 col-sm-auto">
           <label>To</label>
-          <%= select_tag :to, class: 'form-control', selected: params[:to], options: [
+          <%= select_tag :to, class: 'form-select', selected: params[:to], options: [
             [],
             ["Everyone in #{@organisation.name}", 'everyone'],
             ['Monthly donors', 'monthly_donors'],
@@ -84,7 +84,7 @@
         </td>
         <td>
           <% if pmail.sent_at %>
-            <a class="btn btn-primary mr-1 mb-1" href="<%= edit_url %>">
+            <a class="btn btn-primary me-1 mb-1" href="<%= edit_url %>">
               <i class="bi bi-check-lg"></i> Sent
             </a>
             <div class="mt-1">
@@ -94,7 +94,7 @@
               Sent at <%= pmail.sent_at %>
             </div>
           <% elsif pmail.requested_send_at %>
-            <a class="btn btn-secondary mr-1 mb-1" href="<%= edit_url %>">
+            <a class="btn btn-secondary me-1 mb-1" href="<%= edit_url %>">
               <i class="bi bi-spin bi-slash-lg"></i> Sending
             </a>
             <div class="mt-1">

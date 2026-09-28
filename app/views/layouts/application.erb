@@ -61,7 +61,7 @@
         <!-- END scrollbar -->
         <!-- BEGIN sidebar-minify-btn -->
         <a onclick="$.post('/sidebar', {minified: $('#page-container').hasClass('page-sidebar-minified') ? false : true});
-            $('#sidebar ul.nav li a[data-toggle]').tooltip($('#page-container').hasClass('page-sidebar-minified') ? 'disable' : 'enable')
+            $('#sidebar ul.nav li a[data-bs-toggle]').tooltip($('#page-container').hasClass('page-sidebar-minified') ? 'disable' : 'enable')
            " href="#" class="sidebar-minify-btn" data-click="sidebar-minify"><i class="bi bi-arrow-left"></i></a>
         <!-- END sidebar-minify-btn -->
       </div>
@@ -93,9 +93,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h3 class="modal-title"></h3>
-            <button type="button" class="close" data-dismiss="modal">
-              <span>&times;</span>
-            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body p-0"></div>
         </div>

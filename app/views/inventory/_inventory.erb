@@ -37,7 +37,7 @@
         <a href="javascript:;" onclick="$(this).hide().next().show()"><%= inventory_item.responsible.name %></a>
       <% end %>
       <% form_tag "/g/#{@gathering.slug}/inventory_items/#{inventory_item.id}/provided", style: ('display:none' if inventory_item.responsible) do %>
-        <%= select_tag :responsible_id, class: 'form-control', options: [''] + @gathering.members.order('name asc').map { |account| [account.name, account.id] }, selected: inventory_item.responsible.try(:id), onchange: '$(this.form).submit()' %>
+        <%= select_tag :responsible_id, class: 'form-select', options: [''] + @gathering.members.order('name asc').map { |account| [account.name, account.id] }, selected: inventory_item.responsible.try(:id), onchange: '$(this.form).submit()' %>
       <% end %>
     </td>
   </tr>

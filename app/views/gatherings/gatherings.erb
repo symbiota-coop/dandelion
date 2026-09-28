@@ -29,7 +29,7 @@
 
   <div class="col-12 col-sm">
 
-    <ul class="pl-0 mb-3 d-flex align-items-center">
+    <ul class="ps-0 mb-3 d-flex align-items-center">
       <li class="list-inline-item">
         <label class="mb-0">View as</label>
       </li>
@@ -50,8 +50,8 @@
           <%= hidden_field_tag k, value: v %>
         <% end %>
         <%= hidden_field_tag :search, value: 1 %>
-        <label class="mr-sm-2">Sort by</label>
-        <%= select_tag :order, options: { 'Most recently created' => 'created_at', 'Most members' => 'membership_count' }, selected: params[:order], class: 'form-control' %>
+        <label class="me-sm-2">Sort by</label>
+        <%= select_tag :order, options: { 'Most recently created' => 'created_at', 'Most members' => 'membership_count' }, selected: params[:order], class: 'form-select' %>
       <% end %>
     </div>
   <% end %>

@@ -2,7 +2,7 @@
 <% terms_url = @event.terms_and_conditions_url_for_purchase %>
 <% require_check_box = @event.terms_and_conditions_check_box_for_purchase %>
 <% if terms %>
-  <p class="mb-1 font-weight-bold">Terms and conditions</p>
+  <p class="mb-1 fw-bold">Terms and conditions</p>
   <textarea class="form-control mb-2" style="height: 8em" readonly><%=terms%></textarea>
   <% if require_check_box %>
     <div class="checkbox-inline mb-1">

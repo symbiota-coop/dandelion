@@ -1,6 +1,6 @@
 <% if @pmail.persisted? %>
   <% if @pmail.sent_at %>
-    <div class="row no-gutters justify-content-between">
+    <div class="row g-0 justify-content-between">
       <div class="col">
         <p class="lead">
           Sending completed at <%= @pmail.sent_at %>.
@@ -29,7 +29,7 @@
       %>
           <% @pmail.metrics['rates'].each do |name, value| %>
             <tr>
-              <td style="width: 1px; white-space: nowrap;" data-toggle="tooltip" title="<%= tooltip_descriptions[name.downcase] || name.humanize %>">
+              <td style="width: 1px; white-space: nowrap;" data-bs-toggle="tooltip" title="<%= tooltip_descriptions[name.downcase] || name.humanize %>">
                 <%= name.humanize %>
                 <i class="bi bi-info-circle"></i>
               </td>

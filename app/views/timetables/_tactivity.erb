@@ -8,7 +8,7 @@
      <% if image %>background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('<%= image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>
      ">
   <div style="position: absolute; bottom: 10px; left: 10px; color: white">
-    <h3 style="margin-top: 0; margin-bottom: 0; position: relative" data-toggle="tooltip">
+    <h3 style="margin-top: 0; margin-bottom: 0; position: relative" data-bs-toggle="tooltip">
       <a class="<% if image %>text-white<% else %>text-dark<% end %>" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>"><%= tactivity.name %></a>
     </h3>
     <span style="display: none"><%= tactivity.description.truncate(150) if tactivity.description %></span>
@@ -22,7 +22,7 @@
   </div>
   <div style="position: absolute; right: 10px; bottom: 10px;" class="text-white">
     <% if tactivity.comments.exists? %>
-      <a class="<% if image %>text-white<% else %>text-dark<% end %>" data-toggle="tooltip" title="<%= pluralize(tactivity.comments.count, 'comment') %>" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>"><i class="bi bi-chat-left-text"></i> <%= tactivity.comments.count %></a>
+      <a class="<% if image %>text-white<% else %>text-dark<% end %>" data-bs-toggle="tooltip" title="<%= pluralize(tactivity.comments.count, 'comment') %>" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>"><i class="bi bi-chat-left-text"></i> <%= tactivity.comments.count %></a>
       &middot;
     <% end %>
     <% if tactivity.space_id and (@membership.admin? or tactivity.timetable.scheduling_by_all) %>

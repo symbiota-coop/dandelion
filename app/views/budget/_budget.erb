@@ -73,9 +73,7 @@
           <% end %>
           <% form_tag "/teams/#{team.id}/budget", style: ('display:none' if team.budget) do %>
             <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><%= money_symbol(@gathering.currency) %></span>
-              </div>
+              <span class="input-group-text"><%= money_symbol(@gathering.currency) %></span>
               <%= number_field_tag :budget, class: 'form-control', style: 'width: 6em', value: team.budget, onblur: '$(this.form).submit()' %>
             </div>
           <% end %>

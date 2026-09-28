@@ -70,7 +70,7 @@
   <% get_tickets_fixed_bottom_style = 'class="fixed-bottom bg-white p-3 w-100 d-block d-md-none" style="z-index: 1019; box-shadow: 0px -2px 4px 0px rgba(0,0,0,0.3);"' %>
   <% if @event.purchase_url %>
     <div id="get-tickets-fixed-bottom" <%== get_tickets_fixed_bottom_style %>>
-      <a target="_blank" href="<%=@event.purchase_url%>" class="btn btn-primary btn-block"><%= @event.rsvp_button_text || "Book via #{URI(@event.purchase_url).host.gsub('www.','')}" %></a>
+      <a target="_blank" href="<%=@event.purchase_url%>" class="btn btn-primary w-100"><%= @event.rsvp_button_text || "Book via #{URI(@event.purchase_url).host.gsub('www.','')}" %></a>
     </div>
     <style>
       @media(max-width: 767px) { #content { padding-bottom: 5.5rem } }
@@ -80,7 +80,7 @@
     <div id="get-tickets-fixed-bottom" <%== get_tickets_fixed_bottom_style %>>
       <a href="javascript:;" onclick="$(this).parent().hide();
             $(window).scrollTop($('#purchase').offset()['top'] - $('#header').height() - 17)
-           " class="btn btn-primary btn-block"><%= @event.sold_out? && @event.ticket_type_waitlists_available? ? 'Join waitlist' : 'Get tickets' %></a>
+           " class="btn btn-primary w-100"><%= @event.sold_out? && @event.ticket_type_waitlists_available? ? 'Join waitlist' : 'Get tickets' %></a>
     </div>
     <script>
       $(function () {
@@ -111,9 +111,9 @@
         n = events.count
      end %>
 
-      <div class="row no-gutters">
+      <div class="row g-0">
         <div class="col">
-          <h1 class="ml-2 mb-0">
+          <h1 class="ms-2 mb-0">
             <%= @event.name %>
             <% if n > 1 %>
               <span class="badge badge-primary"><%= pluralize(n, 'dates') %></span>
@@ -121,7 +121,7 @@
           </h1>
         </div>
         <div class="col-auto">
-          <div class="d-inline ml-3 mr-2" style="font-size: 1.5em;" data-pagelet-url="/events/<%=@event.id%>/star">
+          <div class="d-inline ms-3 me-2" style="font-size: 1.5em;" data-pagelet-url="/events/<%=@event.id%>/star">
             <%= partial :'events/star', locals: {event: @event} %>
           </div>
         </div>

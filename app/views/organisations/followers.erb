@@ -4,7 +4,7 @@
 <div class="search border rounded p-3 pb-lg-0 mb-3">
 
   <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-0 mb-lg-3' do %>
-    <div class="form-row align-items-end">
+    <div class="row gx-2 align-items-end">
       <div class="form-group col-12 col-sm-auto">
         <label>Search people</label>
         <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
@@ -34,7 +34,7 @@
 
 <div class="mb-3">
   <% form_tag "/o/#{@organisation.slug}/add_follower", class: 'form-inline', style: 'display: none', id: 'add-follower-form' do %>
-    <%= email_field_tag :email, class: 'form-control mr-1', placeholder: 'Email' %>
+    <%= email_field_tag :email, class: 'form-control me-1', placeholder: 'Email' %>
     <%= submit_tag 'Add follower', class: 'mt-1 mt-sm-0 btn btn-primary' %>
   <% end %>
 

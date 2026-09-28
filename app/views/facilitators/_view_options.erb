@@ -13,15 +13,15 @@
 <script>
   $(function() {
     function handleViewOptionsTooltips() {
-      var $tooltips = $('#view-options [title]');
+      var $tooltips = $('#view-options').find('[title], [data-bs-original-title]');
       if ($(window).width() >= 992) {
         $tooltips.each(function() {
-          $(this).tooltip('dispose').removeAttr('data-toggle');
+          $(this).tooltip('dispose').removeAttr('data-bs-toggle');
         });
       } else {
         $tooltips.each(function() {
-          if (!$(this).attr('data-toggle')) {
-            $(this).attr('data-toggle', 'tooltip').tooltip({
+          if (!$(this).attr('data-bs-toggle')) {
+            $(this).attr('data-bs-toggle', 'tooltip').tooltip({
               html: true,
               title: $(this).attr('title')
             });
@@ -44,13 +44,13 @@
 
   <div class="col-12 col-lg-auto">
 
-    <ul class="pl-0 mb-3 d-flex align-items-center">
+    <ul class="ps-0 mb-3 d-flex align-items-center">
       <li class="list-inline-item">
         <label class="mb-0">View as</label>
       </li>
       <% view_options.each do |opt| %>
         <li class="list-inline-item">
-          <a data-toggle="tooltip" title="<%= opt[:label] %> view" class="btn <%= 'btn-outline-primary' if opt[:active] %>" href="<%= view_url(opt[:key], path: (path if defined?(path))) %>">
+          <a data-bs-toggle="tooltip" title="<%= opt[:label] %> view" class="btn <%= 'btn-outline-primary' if opt[:active] %>" href="<%= view_url(opt[:key], path: (path if defined?(path))) %>">
             <i class="bi <%= opt[:icon] %>"></i> <span class="d-none d-lg-inline"><%= opt[:label] %></span>
           </a>
         </li>
