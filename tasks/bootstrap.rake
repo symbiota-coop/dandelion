@@ -1,5 +1,5 @@
 namespace :bootstrap do
-  desc 'Compile app/assets/stylesheets/bootstrap.scss to bootstrap.css and copy in bootstrap.bundle.min.js (needs Node)'
+  desc 'Compile app/assets/stylesheets/bootstrap5.scss to bootstrap5.css and copy in bootstrap.bundle.min.js (needs Node)'
   task :build do
     require 'tmpdir'
 
@@ -11,10 +11,10 @@ namespace :bootstrap do
       puts 'Installing Bootstrap 5.3.8 and Dart Sass...'
       system('npm', 'install', '--prefix', dir, '--no-save', '--silent', 'bootstrap@5.3.8', 'sass@1.105.0', exception: true)
 
-      puts 'Compiling bootstrap.scss...'
-      css_file = File.join(dir, 'bootstrap.css')
+      puts 'Compiling bootstrap5.scss...'
+      css_file = File.join(dir, 'bootstrap5.css')
       system(File.join(dir, 'node_modules', '.bin', 'sass'), '--no-source-map', '--quiet-deps', '--silence-deprecation=import',
-             "--load-path=#{File.join(dir, 'node_modules')}", File.join(stylesheets_dir, 'bootstrap.scss'), css_file, exception: true)
+             "--load-path=#{File.join(dir, 'node_modules')}", File.join(stylesheets_dir, 'bootstrap5.scss'), css_file, exception: true)
       css = File.read(css_file, encoding: 'UTF-8')
 
       # Keep the output ASCII (no @charset) with colours as hex and integer rgba, as Ruby Sass wrote them
@@ -25,16 +25,16 @@ namespace :bootstrap do
       css = css.gsub(/rgba\(([\d.]+%?), ([\d.]+%?), ([\d.]+%?), ([\d.]+)\)/) do
         "rgba(#{channels.call(Regexp.last_match).join(', ')}, #{Regexp.last_match(4)})"
       end
-      abort "bootstrap.css has non-ASCII characters: #{css.chars.reject(&:ascii_only?).uniq.join}" unless css.ascii_only?
+      abort "bootstrap5.css has non-ASCII characters: #{css.chars.reject(&:ascii_only?).uniq.join}" unless css.ascii_only?
 
       header = <<~CSS
         /*
-         * Compiled from bootstrap.scss by `rake bootstrap:build`. Don't edit this file:
-         * change Bootstrap variables in bootstrap.scss, and override Bootstrap in app.css.
+         * Compiled from bootstrap5.scss by `rake bootstrap:build`. Don't edit this file:
+         * change Bootstrap variables in bootstrap5.scss, and override Bootstrap in app.css.
          */
       CSS
-      File.write(File.join(stylesheets_dir, 'bootstrap.css'), header + css)
-      puts 'Wrote app/assets/stylesheets/bootstrap.css'
+      File.write(File.join(stylesheets_dir, 'bootstrap5.css'), header + css)
+      puts 'Wrote app/assets/stylesheets/bootstrap5.css'
 
       # The bundle includes Popper; drop the source map comment, as we don't serve the map
       js = File.read(File.join(dir, 'node_modules', 'bootstrap', 'dist', 'js', 'bootstrap.bundle.min.js'), encoding: 'UTF-8')
