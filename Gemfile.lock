@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: https://github.com/stephenreid321/activate-admin.git
-  revision: c9a8fa6b9ae7a89e48270fd8370b0dfb6a6d2c32
+  revision: ccbf7c6d37c16c8c1d55c8592e0751702971b8be
   specs:
-    activate-admin (0.0.30)
+    activate-admin (0.0.31)
       activate-tools (>= 0.0.34)
       erubi
       padrino
@@ -25,9 +25,9 @@ GIT
 
 GIT
   remote: https://github.com/stephenreid321/activate-tools.git
-  revision: fb94a1d9bed8bc0f2f973ed8477d916be59e6a6f
+  revision: 3279d179cafae11a4f8a2377026ff31daa8c0008
   specs:
-    activate-tools (0.0.36)
+    activate-tools (0.0.37)
       padrino
 
 GEM
