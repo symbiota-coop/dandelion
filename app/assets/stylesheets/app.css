@@ -1497,7 +1497,8 @@ select[size] {
   align-items: center;
 }
 
-.form-inline .form-check {
+/* Inline checks (the rows of filter checkboxes) stay side by side on phones */
+.form-inline .form-check:not(.form-check-inline) {
   width: 100%;
 }
 
