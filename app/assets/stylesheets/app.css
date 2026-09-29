@@ -1536,6 +1536,11 @@ select[size] {
     padding-left: 0;
   }
 
+  /* The form group already has the bottom margin, so a checkbox in one would sit above centre */
+  .form-inline .form-group > .form-check {
+    margin-bottom: 0;
+  }
+
   .form-inline .form-check-input {
     position: relative;
     flex-shrink: 0;
