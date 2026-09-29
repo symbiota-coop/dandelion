@@ -11,7 +11,8 @@ $lead-font-weight: inherit;
 $min-contrast-ratio: 2.5; // white text on the primary green
 $link-decoration: none;
 $link-hover-decoration: underline;
-$grid-gutter-width: 30px;
+$grid-gutter-width: .75rem;
+$container-padding-x: 30px; // the whole gutter, so containers keep 15px padding
 $container-max-widths: (sm: 540px, md: 720px, lg: 960px, xl: 1140px);
 $border-radius: .25rem;
 $border-radius-sm: .2rem;

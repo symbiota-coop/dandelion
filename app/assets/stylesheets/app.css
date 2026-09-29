@@ -1834,16 +1834,6 @@ ul.pagination {
   box-shadow: none;
 }
 
-.row {
-  margin-left: -0.375rem;
-  margin-right: -0.375rem;
-}
-
-.row > [class*=col-] {
-  padding-left: 0.375rem;
-  padding-right: 0.375rem;
-}
-
 .progress {
   background-color: rgba(var(--theme-color-rgb), 0.3);
 }
@@ -1876,12 +1866,6 @@ ul.pagination {
 
 .progress-bar {
   border-radius: 0;
-}
-
-.g-0>.col,
-.g-0>[class*=col-] {
-  padding-right: 0 !important;
-  padding-left: 0 !important;
 }
 
 /* ==========================================================================

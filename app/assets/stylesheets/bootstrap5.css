@@ -720,7 +720,7 @@ progress {
 }
 
 .row {
-  --bs-gutter-x: 30px;
+  --bs-gutter-x: 0.75rem;
   --bs-gutter-y: 0;
   display: flex;
   flex-wrap: wrap;
@@ -4252,7 +4252,7 @@ textarea.form-control-lg {
   --bs-card-color: ;
   --bs-card-bg: var(--bs-body-bg);
   --bs-card-img-overlay-padding: 1rem;
-  --bs-card-group-margin: 15px;
+  --bs-card-group-margin: 0.375rem;
   position: relative;
   display: flex;
   flex-direction: column;
