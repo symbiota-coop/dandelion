@@ -1551,29 +1551,12 @@ ul.pagination {
   border-bottom-width: 0;
 }
 
-table {
-  border-spacing: 0;
-}
-
 .table {
   font-size: 0.825rem;
 }
 
-.table > caption + thead > tr:first-child > td,
-.table > caption + thead > tr:first-child > th,
-.table > colgroup + thead > tr:first-child > td,
-.table > colgroup + thead > tr:first-child > th,
-.table > thead:first-child > tr:first-child > td,
-.table > thead:first-child > tr:first-child > th {
-  border-top: none;
-}
-
 .table-striped > thead > tr > th {
   border-bottom: none;
-}
-
-.table-striped > tbody > tr:nth-of-type(odd) {
-  background: var(--grey-93);
 }
 
 .table-hr td:first-child {
