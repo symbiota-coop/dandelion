@@ -1,14 +1,37 @@
 $(function () {
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 
+  const desktop = window.matchMedia('(min-width: 768px)')
+
+  // Minified only applies on desktop; on mobile the sidebar is a full-width offcanvas
   function sidebarMinified () {
-    return $('#page-container').hasClass('page-sidebar-minified')
+    return desktop.matches && $('#page-container').hasClass('page-sidebar-minified')
   }
 
-  // Sidebar submenus are Bootstrap collapses: one open at a time, and none while minified (they float out on hover instead)
-  $('#sidebar').on('show.bs.collapse', '.sub-menu', function (e) {
-    if (sidebarMinified()) return e.preventDefault()
+  // Sidebar submenus are Bootstrap collapses, one open at a time
+  $('#sidebar').on('show.bs.collapse', '.sub-menu', function () {
     $('#sidebar .sub-menu.show').not(this).collapse('hide')
+  })
+
+  // While minified, a group's link toggles a Bootstrap dropdown to its right instead, filled from its submenu
+  const $groupLinks = $('#sidebar .nav > li.has-sub > a')
+  $groupLinks.closest('li').addClass('dropend').append('<ul class="dropdown-menu dropdown-menu-dark sidebar-dropdown"></ul>')
+  // Fixed, so the menu isn't clipped by the sidebar's scroll container
+  $groupLinks.attr('data-bs-popper-config', '{"strategy":"fixed"}')
+
+  function syncGroupToggles () {
+    $groupLinks.each(function () {
+      const dropdown = bootstrap.Dropdown.getInstance(this)
+      if (dropdown) dropdown.dispose()
+    })
+    $groupLinks.attr('data-bs-toggle', sidebarMinified() ? 'dropdown' : 'collapse')
+  }
+  syncGroupToggles()
+  desktop.addEventListener('change', syncGroupToggles)
+
+  $('#sidebar').on('show.bs.dropdown', 'li.has-sub', function () {
+    const $li = $(this)
+    $li.children('.sidebar-dropdown').html($li.children('.sub-menu').html()).find('a').addClass('dropdown-item')
   })
 
   // On mobile the sidebar is a Bootstrap offcanvas, and the menu button turns into a cross while it's open
@@ -20,6 +43,7 @@ $(function () {
   $('[data-click="sidebar-minify"]').click(function (e) {
     e.preventDefault()
     $('#page-container').toggleClass('page-sidebar-minified')
+    syncGroupToggles()
   })
 
   // Remember sidebar scroll position
@@ -33,51 +57,4 @@ $(function () {
       }
     })
   }
-
-  // Floating submenus when the sidebar is minified
-  let floatSubMenuTimeout
-  let targetFloatMenu
-
-  function removeFloatSubMenuLater () {
-    floatSubMenuTimeout = setTimeout(function () {
-      $('.float-sub-menu').remove()
-      targetFloatMenu = null
-    }, 250)
-  }
-
-  function positionFloatSubMenu (menu, top, height) {
-    if ($(window).height() - top > height) {
-      menu.css({ top: top, bottom: 'auto', overflow: 'initial' })
-    } else {
-      menu.css({ top: 'auto', bottom: 0, overflow: 'scroll' })
-    }
-  }
-
-  $(document).on('mouseover', '.float-sub-menu', function () {
-    clearTimeout(floatSubMenuTimeout)
-  })
-  $(document).on('mouseout', '.float-sub-menu', removeFloatSubMenuLater)
-
-  $('.sidebar .nav > li.has-sub > a').hover(function () {
-    if (!sidebarMinified()) return
-    clearTimeout(floatSubMenuTimeout)
-    if (targetFloatMenu === this) return
-    targetFloatMenu = this
-
-    const subMenu = $(this).closest('li').find('.sub-menu').first()
-    const html = subMenu.html()
-    if (!html) {
-      $('.float-sub-menu').remove()
-      targetFloatMenu = null
-      return
-    }
-
-    const top = $(this).offset().top - $(window).scrollTop()
-    let menu = $('.float-sub-menu')
-    if (!menu.length) {
-      menu = $('<ul class="float-sub-menu"></ul>').appendTo('body')
-    }
-    menu.html(html).attr('data-offset-top', top).css({ left: $('#sidebar').outerWidth(), right: 'auto' })
-    positionFloatSubMenu(menu, top, subMenu.height() + 20)
-  }, removeFloatSubMenuLater)
 })
