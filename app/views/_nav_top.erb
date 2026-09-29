@@ -6,7 +6,7 @@
   </script>
   <style>
     @media (max-width: 991px) {
-      ul.nav.navbar-nav.navbar-right {
+      #header .navbar-nav {
         display: none;
       }
       #page-container {
@@ -26,48 +26,48 @@
   @media(min-width: 992px) { #docs-li { display: list-item } }
   .almanac-moon { filter: grayscale(1); font-size: 1.3em; }
 </style>
-<ul class="nav navbar-nav navbar-right">
+<ul class="navbar-nav ms-auto">
   <% if current_account %>
     <% if admin? && request.path == '/' && (contribution_data = MonthlyContributionsCalculator.contribution_data) %>
-      <li class="d-none d-lg-inline">
-        <a href="javascript:;" class="navbar-text text-white opacity-50" style="cursor: default">
+      <li class="nav-item d-none d-lg-inline">
+        <a href="javascript:;" class="nav-link opacity-50" style="cursor: default">
           <%= contribution_data[:current].format(no_cents: true) %> (<%= m contribution_data[:projected], contribution_data[:currency] %>)
         </a>
       </li>
     <% end %>
   <% end %>
-  <li class="d-none d-md-inline">
-    <a href="/wheel-of-the-year.html" target="_blank" class="navbar-text text-white almanac-moon" title="<%= almanac_tooltip %>" data-bs-toggle="tooltip">
+  <li class="nav-item d-none d-md-inline">
+    <a href="/wheel-of-the-year.html" target="_blank" class="nav-link almanac-moon" title="<%= almanac_tooltip %>" data-bs-toggle="tooltip">
       <%= Almanac.moon_icon %>
     </a>
   </li>
   <% if current_account %>
-    <li class="d-none d-md-inline">
-      <a href="/referrals" class="navbar-text text-white" title="Rewards for getting organisations to start using Dandelion" data-bs-toggle="tooltip">
+    <li class="nav-item d-none d-md-inline">
+      <a href="/referrals" class="nav-link" title="Rewards for getting organisations to start using Dandelion" data-bs-toggle="tooltip">
         <i class="bi bi-trophy"></i>
       </a>
     </li>
-    <li>
-      <a href="javascript:;" data-toggle="search-bar" class="navbar-icon">
+    <li class="nav-item">
+      <a href="javascript:;" data-toggle="search-bar" class="nav-link navbar-icon">
         <i class="bi bi-search"></i>
       </a>
     </li>
-    <li class="dropdown">
-      <a id="notifications-a" href="javascript:;" data-bs-toggle="dropdown" data-mobile-modal="Notifications" data-check-url="/checked_notifications" class="dropdown-toggle navbar-icon">
+    <li class="nav-item dropdown">
+      <a id="notifications-a" href="javascript:;" data-bs-toggle="dropdown" data-mobile-modal="Notifications" data-check-url="/checked_notifications" class="nav-link navbar-icon">
         <i class="bi bi-bell"></i>
       </a>
       <div id="notifications" data-pagelet-url="/notifications" data-pagelet-refresh="60"></div>
     </li>
-    <li class="dropdown">
-      <a id="messages-a" href="javascript:;" data-bs-toggle="dropdown" data-mobile-modal="Messages" data-check-url="/checked_messages" class="dropdown-toggle navbar-icon">
+    <li class="nav-item dropdown">
+      <a id="messages-a" href="javascript:;" data-bs-toggle="dropdown" data-mobile-modal="Messages" data-check-url="/checked_messages" class="nav-link navbar-icon">
         <i class="bi bi-chat-left"></i>
       </a>
       <div id="messages" data-pagelet-url="/messages" data-pagelet-refresh="60">
         <%= cp(:'messages/dropdown', key: "/messages?account_id=#{current_account.id}", expires: 1.minute.from_now) %>
       </div>
     </li>
-    <li class="d-none d-md-inline dropdown">
-      <a href="javascript:;" data-bs-toggle="dropdown">
+    <li class="nav-item d-none d-md-inline dropdown">
+      <a href="javascript:;" class="nav-link" data-bs-toggle="dropdown">
         <span class="navbar-user-img online float-start">
           <img src="<%= u current_account.image_thumb_or_gravatar_url %>">
         </span>
@@ -76,18 +76,18 @@
       <%= partial :nav_profile, locals: { ul_class: 'dropdown-menu' } %>
     </li>
   <% else %>
-    <li>
-      <a href="javascript:;" data-toggle="search-bar" class="navbar-icon">
+    <li class="nav-item">
+      <a href="javascript:;" data-toggle="search-bar" class="nav-link navbar-icon">
         <i class="bi bi-search"></i>
       </a>
     </li>
-    <li>
-      <a href="/accounts/new">
+    <li class="nav-item">
+      <a href="/accounts/new" class="nav-link">
         Sign up
       </a>
     </li>
-    <li>
-      <a href="/accounts/sign_in">
+    <li class="nav-item">
+      <a href="/accounts/sign_in" class="nav-link">
         Sign in
       </a>
     </li>

@@ -133,91 +133,57 @@
    Header
    ========================================================================== */
 
+/* Bootstrap 5's navbar navbar-expand navbar-dark: brand, a toggler for the sidebar on mobile, and navbar-nav */
 .header.navbar {
-  border: none;
+  --bs-navbar-padding-x: 0;
+  --bs-navbar-padding-y: 0;
+  --bs-navbar-color: #fff;
+  --bs-navbar-hover-color: #fff;
+  --bs-navbar-active-color: #fff;
+  --bs-navbar-nav-link-padding-x: 0.75rem;
+  --bs-navbar-brand-padding-y: 0.75rem;
+  --bs-navbar-brand-margin-end: 0;
   min-height: 2.8125rem;
-  height: 2.8125rem;
   position: fixed;
   left: 0;
   right: 0;
   top: 0;
   z-index: 1020;
-  padding: 0;
-  border-radius: 0;
   box-shadow: 0 0.125rem 2.5rem 0 rgba(0, 0, 0, 0.08);
 }
 
-.navbar-nav {
-  flex-direction: row;
+.header .container-fluid {
+  padding-left: 0;
+  padding-right: 0;
 }
 
-.navbar-inverse .navbar-nav > li > a:focus,
-.navbar-inverse .navbar-nav > li > a:hover {
-  background: none;
-}
-
-@media (max-width: 767px) {
-  .header.navbar {
-    height: auto;
-  }
-  .navbar > .container,
-  .navbar > .container-fluid {
-    display: block;
-  }
-  .container-fluid > .navbar-header,
-  .container > .navbar-header {
-    margin-right: -0.9375rem;
-    margin-left: -0.9375rem;
-    display: block;
-    z-index: 10;
-  }
-}
-
-.navbar .navbar-brand {
-  display: inline-block;
-  color: #fff;
+.header .navbar-brand {
+  width: 14.375rem;
+  height: 2.75rem;
+  padding-left: 0.9375rem;
+  padding-right: 0.9375rem;
   font-size: 1rem;
   line-height: 1.25rem;
-  width: 14.375rem;
-  padding: 0.75rem 0.9375rem;
-  height: 2.75rem;
 }
 
-.navbar.navbar-inverse .navbar-brand,
-.navbar.navbar-inverse .navbar-nav > li > a {
-  color: #fff;
+.header .nav-link {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  line-height: 1.25rem;
+  min-height: 2.8125rem;
 }
 
-.navbar-right .dropdown-menu {
-  left: auto;
-  right: 50%;
-  margin-left: 0;
-  margin-right: -5rem;
-}
-
-.navbar-right .dropdown-menu.dropdown-lg {
-  margin-right: -9.375rem;
-}
-
-@media (min-width: 768px) {
-  .navbar > .container .navbar-brand,
-  .navbar > .container-fluid .navbar-brand {
-    margin-left: -0.9375rem;
-  }
-}
-
-.navbar .navbar-icon {
+.header .navbar-icon {
   min-width: 2.625rem;
   font-size: 1.125rem;
-  color: #fff;
 }
 
-.navbar .navbar-icon i {
+.header .navbar-icon i {
   display: block;
   line-height: 1.3125rem;
 }
 
-.navbar .navbar-user-img {
+.header .navbar-user-img {
   height: 1.75rem;
   width: 1.75rem;
   margin-top: -0.25rem;
@@ -227,33 +193,21 @@
   border-radius: 1.75rem;
 }
 
-.navbar .navbar-user-img i {
-  display: block;
-  text-align: center;
-  height: 1.75rem;
-  width: 1.75rem;
-  font-size: 1.5rem;
-  line-height: 2.375rem;
-  background: rgba(255, 255, 255, 0.35);
-  color: rgba(255, 255, 255, 0.35);
-  border-radius: 1.75rem;
-}
-
-.navbar .navbar-user-img + span {
+.header .navbar-user-img + span {
   margin-left: 0.5rem;
 }
 
-.navbar .navbar-user-img img {
+.header .navbar-user-img img {
   max-width: 100%;
   max-height: 100%;
   display: block;
 }
 
-.navbar .with-label {
+.header .with-label {
   position: relative;
 }
 
-.navbar .with-label:before {
+.header .with-label:before {
   content: "";
   position: absolute;
   top: 0.75rem;
@@ -264,10 +218,40 @@
   z-index: 10;
 }
 
-.navbar-nav > li > a {
-  padding: 0.75rem;
-  line-height: 1.25rem;
-  min-height: 2.8125rem;
+/* The header's dropdowns hang centred under their link, with an arrow pointing up at it */
+.header .dropdown-menu {
+  left: 50%;
+  right: auto;
+  margin-left: -5rem;
+}
+
+.header .dropdown-menu.dropdown-lg {
+  margin-left: -9.375rem;
+}
+
+.header .dropdown-menu:before,
+.header .dropdown-menu:after {
+  left: 50%;
+  margin-left: -0.625rem;
+}
+
+/* On mobile the brand and toggler share the top row, and the icons spread across a second row */
+@media (max-width: 767.98px) {
+  .header .container-fluid {
+    flex-wrap: wrap;
+  }
+  /* navbar-expand hides the toggler; we want it until the sidebar shows (d-md-none) */
+  .header .navbar-toggler {
+    display: block;
+  }
+  .header .navbar-nav {
+    width: 100%;
+    justify-content: space-around;
+  }
+  .header .with-label:before {
+    right: 50%;
+    margin-right: -0.5rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -308,7 +292,7 @@
   background: linear-gradient(45deg, #222 0%, #222 66%, var(--color-highlight-1) 100%) !important;
 }
 
-.navbar [data-pagelet-url] .bi-spin {
+.header [data-pagelet-url] .bi-spin {
   display: none
 }
 
@@ -419,69 +403,39 @@
 }
 
 /* ==========================================================================
-   Navbar toggle and mobile header
+   Navbar toggler: two bars that turn into a cross while the sidebar is open
    ========================================================================== */
 
-.navbar-toggle,
-.navbar-toggle:hover,
-.navbar-toggle:focus,
-.navbar-toggle:active {
-  position: relative;
-  float: right;
+.header .navbar-toggler {
   border: none;
-  background: none !important;
-  margin: 0;
-  padding: 1.125rem 0.9375rem !important;
-  outline: 0;
+  padding: 1.125rem 0.9375rem;
+  box-shadow: none;
 }
 
-.navbar-toggle .icon-bar {
+.header .navbar-toggler .icon-bar {
   display: block;
   width: 1.5rem;
   height: 2px;
   border-radius: 1px;
+  background-color: #fff;
   transition: all 0.2s linear;
 }
 
-.navbar-toggle .icon-bar + .icon-bar {
+.header .navbar-toggler .icon-bar + .icon-bar {
   margin-top: 0.25rem;
 }
 
-.navbar-toggle.active .icon-bar {
+.header .navbar-toggler.active .icon-bar {
   width: 1.25rem;
   position: relative;
   top: 0.1875rem;
   transform: rotate(45deg);
 }
 
-.navbar-toggle.active .icon-bar + .icon-bar {
+.header .navbar-toggler.active .icon-bar + .icon-bar {
   top: auto;
   bottom: 0.1875rem;
   transform: rotate(-45deg);
-}
-
-.navbar-inverse .navbar-toggle {
-  border-color: #333;
-}
-
-.navbar-inverse .navbar-toggle .icon-bar {
-  background-color: #fff;
-}
-
-@media (min-width: 768px) {
-  .navbar-nav > li {
-    float: left;
-  }
-  .navbar-toggle {
-    display: none;
-  }
-}
-
-@media (min-width: 768px) {
-  .navbar-right {
-    float: right !important;
-    margin-right: -0.75rem;
-  }
 }
 
 @media (max-width: 768px) {
@@ -493,37 +447,6 @@
   }
   .header-search-bar .right-icon {
     right: 0 !important;
-  }
-}
-
-@media (max-width: 767px) {
-  .header.navbar-inverse .navbar-xs-justified {
-    background: transparent;
-  }
-  .navbar-xs-justified {
-    margin: 0 -0.9375rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    background: #fff;
-  }
-  .navbar-xs-justified .nav.navbar-nav {
-    display: table;
-    width: 100%;
-    margin: 0;
-  }
-  .navbar-xs-justified .nav.navbar-nav > li {
-    display: table-cell;
-    width: 25%;
-    text-align: center;
-    vertical-align: top;
-  }
-  .navbar .with-label:before {
-    right: 50%;
-    margin-right: -0.5rem;
-  }
-  body .navbar .navbar-user-img {
-    float: none !important;
-    margin: -0.25rem auto;
-    display: block;
   }
 }
 
@@ -1191,24 +1114,6 @@ body.greyed #content {
   overflow: hidden;
 }
 
-.navbar .dropdown-menu {
-  left: 50%;
-  margin-left: -5rem;
-}
-
-.navbar .dropdown-menu:before,
-.navbar .dropdown-menu:after {
-  left: 50%;
-  margin-left: -0.625rem;
-}
-
-.navbar .dropdown-menu.dropdown-lg {
-  margin-left: -9.375rem;
-}
-
-.navbar-nav > li > .dropdown-menu {
-  border-radius: 0.5rem;
-}
 
 .dropdown-header {
   border-bottom: 1px solid #e8e8e8;
@@ -1225,7 +1130,6 @@ body.greyed #content {
   border-radius: 0 0 0.5rem 0.5rem;
 }
 
-.navbar-nav .dropdown-menu {
   position: absolute;
 }
 
@@ -2204,17 +2108,13 @@ table.dataTable.table-sm>thead>tr>th {
    ========================================================================== */
 
 .sidebar .nav-link.active,
-.navbar .with-label:before,
+.header .with-label:before,
 .pace .pace-progress {
   color: #fff !important;
   background: linear-gradient(135deg, #fd7514 0%, #efe707 100%) !important;
 }
 
-.navbar-xs-justified {
-  border: 0 !important
-}
-
-.navbar .with-label:before,
+.header .with-label:before,
 .pace .pace-progress {
   border-radius: 5px;
 }

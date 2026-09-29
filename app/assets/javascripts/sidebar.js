@@ -13,7 +13,7 @@ $(function () {
 
   // On mobile the sidebar is a Bootstrap offcanvas, and the menu button turns into a cross while it's open
   $('#sidebar').on('show.bs.offcanvas hide.bs.offcanvas', function (e) {
-    $('.navbar-toggle').toggleClass('active', e.type === 'show')
+    $('.navbar-toggler').toggleClass('active', e.type === 'show')
   })
 
   // Sidebar minify
