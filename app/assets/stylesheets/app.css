@@ -1068,20 +1068,14 @@ body.greyed #content {
   z-index: 9999
 }
 
-.dropdown-menu > li > a {
-  padding: 0.1875rem 0.9375rem;
-  display: block;
-  clear: both;
-  line-height: 1.42857143;
-  color: #333;
-  white-space: nowrap;
-}
-
-.dropdown-menu > li > a:focus,
-.dropdown-menu > li > a:hover {
-  color: #262626;
-  text-decoration: none;
-  background-color: #f5f5f5;
+/* Items are Bootstrap's dropdown-item, restyled through its variables */
+.dropdown-menu {
+  --bs-dropdown-font-size: 0.825rem;
+  --bs-dropdown-item-padding-x: 0.9375rem;
+  --bs-dropdown-item-padding-y: 0.1875rem;
+  --bs-dropdown-link-color: #333;
+  --bs-dropdown-link-hover-color: #262626;
+  --bs-dropdown-link-hover-bg: #f5f5f5;
 }
 
 .dropdown-menu.dropdown-lg {
@@ -1130,9 +1124,6 @@ body.greyed #content {
   border-radius: 0 0 0.5rem 0.5rem;
 }
 
-  position: absolute;
-}
-
 .nav-dropdown-modal .modal-content {
   overflow: hidden;
 }
@@ -1164,7 +1155,6 @@ body.greyed #content {
    ========================================================================== */
 
 .dropdown-menu > li.notification a {
-  display: block;
   padding: 0.625rem 0 0.625rem 0.9375rem !important;
 }
 

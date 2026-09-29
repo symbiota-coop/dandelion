@@ -73,7 +73,7 @@
         </span>
         <span class="d-none d-md-inline"><%= current_account.name %> <b class="caret"></b></span>
       </a>
-      <%= partial :nav_profile, locals: { ul_class: 'dropdown-menu' } %>
+      <%= partial :nav_profile, locals: { ul_class: 'dropdown-menu', a_class: 'dropdown-item' } %>
     </li>
   <% else %>
     <li class="nav-item">
