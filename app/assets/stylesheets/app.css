@@ -1098,31 +1098,22 @@ body.greyed #content {
   overflow: hidden;
 }
 
-.notification-list .notification-icon {
-  flex-shrink: 0;
-  width: 1.125rem;
-  line-height: 1.25rem;
-  text-align: center;
-}
-
-.notification-list .notification-info {
+/* Shared by the newsfeed and the notifications dropdown (_notification_summary.erb) */
+.notification-info {
   min-width: 0;
 }
 
-.notification-list .notification-title {
-  margin: 0 0 0.125rem;
-  font-size: 0.825rem;
-  font-weight: 500;
+.notification-title {
+  margin-bottom: 0.25rem;
 }
 
-.notification-list .notification-desc {
-  margin: 0;
-  font-size: 0.759rem;
+.notification-time {
+  font-size: 90%;
 }
 
-.notification-list .notification-time {
-  font-size: 0.693rem;
-  color: #999;
+/* In the dropdown the icon and text are smaller than in the newsfeed */
+.notification-list .newsfeed-icon {
+  font-size: 0.8rem;
 }
 
 /* ==========================================================================
