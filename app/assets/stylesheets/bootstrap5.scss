@@ -49,6 +49,12 @@ $form-check-input-width: 1.3em;
 $form-check-input-border: 1px solid #C8C7CC;
 $form-check-input-border-radius: .25rem;
 $form-check-margin-bottom: .5rem;
+// Label-less switches, a little bigger than Bootstrap's, with a white, shadowed knob whether off, focused or on
+$form-switch-width: 2.625rem;
+$form-switch-padding-start: 0;
+$form-switch-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3.3' cy='.35' fill='rgba(0,0,0,.35)'/%3e%3ccircle r='3.3' fill='%23fff'/%3e%3c/svg%3e");
+$form-switch-focus-bg-image: $form-switch-bg-image;
+$form-switch-checked-bg-image: $form-switch-bg-image;
 $btn-font-size: .875rem;
 $btn-padding-y-sm: .3125rem;
 $btn-padding-x-sm: .625rem;
