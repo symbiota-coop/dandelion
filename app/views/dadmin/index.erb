@@ -5,8 +5,8 @@
 
 <%= partial :'dadmin/search' %>
 
-<nav class="navbar justify-content-between px-0">
-  <span class="navbar-text">
+<div class="d-flex flex-wrap align-items-center gap-2 my-3">
+  <span class="text-body-secondary">
     <%== page_entries_info(@resources, model: model.to_s) %>
     <a class="btn btn-sm btn-primary ms-2" target="_blank" href="<%= url(:dadmin, :index, params.merge(format: :csv)) %>"><i class="bi bi-download"></i> CSV</a>
   </span>
@@ -18,7 +18,7 @@
       <button class="btn btn-secondary"><i class="bi bi-search"></i></button>
     </div>
   </form>
-</nav>
+</div>
 
 <% if @resources.selector.any? %>
   <div class="card mb-3">
