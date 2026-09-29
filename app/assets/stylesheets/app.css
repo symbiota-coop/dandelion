@@ -1065,14 +1065,16 @@ body.greyed #content {
   border-radius: 0 0 0.5rem 0.5rem;
 }
 
-.nav-dropdown-modal .modal-content {
-  overflow: hidden;
+/* The mobile bottom sheet: as tall as its list, up to most of the screen */
+.nav-dropdown-sheet {
+  --bs-offcanvas-height: auto;
+  max-height: 80vh;
+  border-radius: 0.75rem 0.75rem 0 0;
 }
 
-.nav-dropdown-modal .dropdown-menu {
+.nav-dropdown-sheet .dropdown-menu {
   display: block;
   position: static;
-  float: none;
   width: auto;
   margin: 0 !important;
   border: 0;
@@ -1080,15 +1082,9 @@ body.greyed #content {
   border-radius: 0;
 }
 
-.nav-dropdown-modal .dropdown-menu:before, .nav-dropdown-modal .dropdown-menu:after {
+.nav-dropdown-sheet .dropdown-menu:before,
+.nav-dropdown-sheet .dropdown-menu:after {
   display: none;
-}
-
-@media (max-width: 767px) {
-  .nav-dropdown-modal .modal-dialog {
-    margin: 0.5rem;
-    max-width: none
-  }
 }
 
 /* ==========================================================================

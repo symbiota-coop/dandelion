@@ -76,16 +76,13 @@
     </div>
     <!-- /.modal -->
 
-    <div class="modal fade nav-dropdown-modal" tabindex="-1" role="dialog" id="nav-dropdown-modal">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3 class="modal-title"></h3>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body p-0"></div>
-        </div>
+    <!-- On mobile the notifications and messages dropdowns open in this bottom sheet instead -->
+    <div class="offcanvas offcanvas-bottom nav-dropdown-sheet" tabindex="-1" id="nav-dropdown-sheet" aria-labelledby="nav-dropdown-sheet-title">
+      <div class="offcanvas-header">
+        <h3 class="offcanvas-title" id="nav-dropdown-sheet-title"></h3>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
+      <div class="offcanvas-body p-0"></div>
     </div>
 
   </body>

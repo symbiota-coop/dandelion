@@ -494,17 +494,17 @@ $(function () {
 
     const $source = $toggle.siblings('[data-pagelet-url]')
     const $list = $source.children('ul').clone()
-    const $modal = $('#nav-dropdown-modal')
-    const $body = $modal.find('.modal-body')
+    const $sheet = $('#nav-dropdown-sheet')
+    const $body = $sheet.find('.offcanvas-body')
 
-    $modal.find('.modal-title').text(title)
+    $sheet.find('.offcanvas-title').text(title)
     if ($list.length) {
       $body.empty().append($list)
     } else {
       $body.html('<div class="text-center p-4"><i class="bi bi-spin bi-slash-lg"></i></div>')
         .load($source.attr('data-pagelet-url'))
     }
-    $modal.modal('show')
+    bootstrap.Offcanvas.getOrCreateInstance($sheet[0]).show()
   })
 
   $(document).on('shown.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
