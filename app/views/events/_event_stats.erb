@@ -83,7 +83,10 @@
   </script>
 <% end %>
 
-<table id="event_stats" class="table <% if @event %> table-responsive <% else %> table-striped table-hover <% end %> table-sm" style="font-size: 0.9em">
+<% if @event %>
+  <%== '<div class="table-responsive">' %>
+<% end %>
+<table id="event_stats" class="table <% unless @event %> table-striped table-hover <% end %> table-sm" style="font-size: 0.9em">
   <thead>
     <tr>
       <th>Name</th>
@@ -154,3 +157,6 @@
     </tfoot>
   <% end %>
 </table>
+<% if @event %>
+  <%== '</div>' %>
+<% end %>
