@@ -14,7 +14,7 @@
       <a class="nav-link d-flex align-items-center gap-2" href="#sidebar-account" data-bs-toggle="collapse" role="button" aria-expanded="false">
         <i class="bi bi-person-fill"></i>
         <span class="flex-grow-1"><%= current_account.name %></span>
-        <b class="caret caret-right"></b>
+        <i class="bi bi-chevron-down caret"></i>
       </a>
       <%= partial :nav_profile, locals: { ul_class: 'sub-menu list-unstyled collapse', ul_id: 'sidebar-account' } %>
     </li>
@@ -64,7 +64,7 @@
       <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if active %>" href="#sidebar-organisations" data-bs-toggle="collapse" role="button" aria-expanded="<%= active %>">
         <i class="bi bi-flag-fill"></i>
         <span class="flex-grow-1">Organisations</span>
-        <b class="caret caret-right"></b>
+        <i class="bi bi-chevron-down caret"></i>
       </a>
       <%= ul_nav ([
             ['Create an organisation', '/o/new'],
@@ -99,7 +99,7 @@
       <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if active %>" href="#sidebar-gatherings" data-bs-toggle="collapse" role="button" aria-expanded="<%= active %>">
         <i class="bi bi-moon-fill"></i>
         <span class="flex-grow-1">Gatherings</span>
-        <b class="caret caret-right"></b>
+        <i class="bi bi-chevron-down caret"></i>
       </a>
       <%= ul_nav ([
             ['Create a gathering', '/g/new'],
