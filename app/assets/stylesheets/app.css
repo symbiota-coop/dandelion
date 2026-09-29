@@ -54,10 +54,6 @@
   --color-highlight-1-light-3: #f3ecff;
   --color-paper: #FFFAF3;
   --color-superlight: #F9F8FA;
-  --bg-well: #F5F5F5;
-  --body-text: #212529;
-  --placeholder-grey: #6c757d;
-  --calendar-grey: #6c757d;
   --body-font-family: "Plus Jakarta Sans", sans-serif;
   --header-font-family: "Hanken Grotesk", "Plus Jakarta Sans", sans-serif;
   --body-font-size: 0.825rem;
@@ -1234,7 +1230,7 @@ label {
 }
 
 .select-placeholder {
-  color: var(--placeholder-grey) !important;
+  color: var(--bs-secondary) !important;
 }
 
 .invalid-feedback {
@@ -1481,7 +1477,7 @@ ul.pagination {
 
 @media(min-width: 992px) {
   .row.block.g-0.align-items-stretch {
-    background: var(--bg-well);
+    background: var(--bs-tertiary-bg);
     border-radius: 0.25rem;
   }
 }
@@ -1951,7 +1947,7 @@ table.dataTable.table-sm>thead>tr>th {
 }
 
 .search {
-  background: var(--bg-well);
+  background: var(--bs-tertiary-bg);
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 }
 
@@ -2559,19 +2555,19 @@ label.remove-image {
 
 .fc-button {
   background-color: transparent !important;
-  border-color: var(--calendar-grey) !important;
-  color: var(--calendar-grey) !important;
+  border-color: var(--bs-secondary) !important;
+  color: var(--bs-secondary) !important;
 }
 
 .fc-button:hover {
-  background-color: var(--calendar-grey) !important;
-  border-color: var(--calendar-grey) !important;
+  background-color: var(--bs-secondary) !important;
+  border-color: var(--bs-secondary) !important;
   color: white !important;
 }
 
 .fc-button-active {
-  background-color: var(--calendar-grey) !important;
-  border-color: var(--calendar-grey) !important;
+  background-color: var(--bs-secondary) !important;
+  border-color: var(--bs-secondary) !important;
   color: white !important;
 }
 
@@ -2767,7 +2763,7 @@ div.wysiwyg img {
   letter-spacing: normal !important;
   font-size: 1rem !important;
   line-height: 1.5;
-  color: var(--body-text);
+  color: var(--bs-body-color);
 }
 
 .ck.ck-editor .ck.ck-editor__top .ck-sticky-panel .ck-sticky-panel__content_sticky {
@@ -3030,7 +3026,7 @@ td .tactivity-accept {
 }
 
 .shorturl+a {
-  color: var(--body-text)
+  color: var(--bs-body-color)
 }
 
 @media print {
@@ -3166,6 +3162,6 @@ p.action a:hover {
    ========================================================================== */
 
 a.home-feedback {
-  color: var(--body-text);
+  color: var(--bs-body-color);
   text-decoration: none;
 }

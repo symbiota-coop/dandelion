@@ -8,7 +8,7 @@
   max-width: 42rem;
   font-size: 1.05rem;
   line-height: 1.45;
-  color: var(--body-text);
+  color: var(--bs-body-color);
 }
 
 .docs-header {
@@ -115,7 +115,7 @@
 #doc-body blockquote,
 .docs-deepwiki-answer blockquote {
   font-style: normal;
-  color: var(--body-text);
+  color: var(--bs-body-color);
   margin: 0 0 1.1rem;
 }
 
@@ -187,13 +187,13 @@
   border: 1px solid #ddd;
   border-radius: 0.4rem;
   padding: 0.55rem 0.85rem;
-  background: var(--bg-well);
+  background: var(--bs-tertiary-bg);
 }
 
 .doc-toc-mobile summary {
   cursor: pointer;
   font-family: var(--header-font-family);
-  color: var(--body-text);
+  color: var(--bs-body-color);
 }
 
 .doc-toc-mobile .doc-index {
@@ -229,7 +229,7 @@
 .doc-link {
   display: block;
   padding: 0.28rem 0 0.28rem 0.7rem;
-  color: var(--body-text);
+  color: var(--bs-body-color);
   text-decoration: none;
   border-left: 2px solid transparent;
 }
@@ -241,13 +241,13 @@
 
 .doc-link.is-active {
   border-left-color: var(--theme-color);
-  color: var(--body-text);
+  color: var(--bs-body-color);
 }
 
 .doc-index-h3s .doc-link {
   padding-left: 1.4rem;
   font-size: 0.92em;
-  color: var(--placeholder-grey);
+  color: var(--bs-secondary);
 }
 
 #sticky-index {
@@ -296,7 +296,7 @@
   left: 0.6rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--placeholder-grey);
+  color: var(--bs-secondary);
   pointer-events: none;
   font-size: 0.85rem;
 }
@@ -368,7 +368,7 @@
 }
 
 .doc-search-count {
-  color: var(--placeholder-grey);
+  color: var(--bs-secondary);
   margin-bottom: 0.85rem;
 }
 
@@ -382,12 +382,12 @@
   display: block;
   padding: 0.75rem 0;
   border-bottom: 1px solid #ddd;
-  color: var(--body-text);
+  color: var(--bs-body-color);
   text-decoration: none;
 }
 
 .doc-search-result:hover, .doc-search-result:focus {
-  color: var(--body-text);
+  color: var(--bs-body-color);
   text-decoration: none;
 }
 
@@ -398,7 +398,7 @@
 .doc-search-page {
   display: block;
   font-size: 0.75rem;
-  color: var(--placeholder-grey);
+  color: var(--bs-secondary);
   margin-bottom: 0.15rem;
 }
 
@@ -416,5 +416,5 @@
   margin-top: 0.25rem;
   font-size: 0.9em;
   line-height: 1.4;
-  color: var(--placeholder-grey);
+  color: var(--bs-secondary);
 }
