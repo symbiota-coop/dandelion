@@ -2628,7 +2628,24 @@ button.bg-warning:focus {
 
 .select2-container--bootstrap-5 .select2-selection {
   border-color: #C8C7CC;
+}
+
+/* Match .form-control's font, which the theme sets to 1rem/400 */
+.select2-container--bootstrap-5 .select2-selection,
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice,
+.select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field,
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option {
   font-size: 0.825rem;
+  font-weight: 500;
+}
+
+/* The theme hard-codes Bootstrap's blue focus glow; use the theme colour and no glow, as when open it joins the dropdown */
+.select2-container--bootstrap-5.select2-container--focus .select2-selection,
+.select2-container--bootstrap-5.select2-container--open .select2-selection,
+.select2-container--bootstrap-5 .select2-dropdown,
+.select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field:focus {
+  border-color: var(--theme-color);
+  box-shadow: none;
 }
 
 .select2-choices {
