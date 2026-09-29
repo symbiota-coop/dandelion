@@ -2001,50 +2001,48 @@ body .table > tfoot > tr > th {
   border-bottom: none;
 }
 
-body table.dataTable thead .sorting:before,
-body table.dataTable thead .sorting_asc:before,
-body table.dataTable thead .sorting_desc:before {
+/* Selectors match DataTables' own (table.dataTable thead>tr>th.sorting) plus body, so these win */
+body table.dataTable > thead > tr > th.sorting:before,
+body table.dataTable > thead > tr > th.sorting_asc:before,
+body table.dataTable > thead > tr > th.sorting_desc:before {
   content: "" !important;
 }
 
-body table.dataTable thead .sorting:after,
-body table.dataTable thead .sorting_asc:after,
-body table.dataTable thead .sorting_desc:after {
+body table.dataTable > thead > tr > th.sorting:after,
+body table.dataTable > thead > tr > th.sorting_asc:after,
+body table.dataTable > thead > tr > th.sorting_desc:after {
   position: absolute;
+  top: auto;
   bottom: 0.5rem;
   right: 0.5rem;
   display: block;
   font-family: "bootstrap-icons";
+  font-size: inherit;
+  line-height: inherit;
   opacity: 0.5;
 }
 
-body table.dataTable thead .sorting:after {
+body table.dataTable > thead > tr > th.sorting:after {
   opacity: 0;
 }
 
-body table.dataTable thead .sorting:hover:after,
-body table.dataTable thead .sorting:focus:after,
-body table.dataTable thead .sorting:active:after {
+body table.dataTable > thead > tr > th.sorting:hover:after,
+body table.dataTable > thead > tr > th.sorting:focus:after,
+body table.dataTable > thead > tr > th.sorting:active:after {
   opacity: 0.5;
 }
 
-body table.dataTable thead .sorting_asc:after,
-body table.dataTable thead .sorting_desc:after,
-body table.dataTable thead .sorting_asc:hover:after,
-body table.dataTable thead .sorting_asc:focus:after,
-body table.dataTable thead .sorting_asc:active:after,
-body table.dataTable thead .sorting_desc:hover:after,
-body table.dataTable thead .sorting_desc:focus:after,
-body table.dataTable thead .sorting_desc:active:after {
+body table.dataTable > thead > tr > th.sorting_asc:after,
+body table.dataTable > thead > tr > th.sorting_desc:after {
   opacity: 1 !important;
 }
 
-body table.dataTable thead .sorting:after,
-body table.dataTable thead .sorting_desc:after {
+body table.dataTable > thead > tr > th.sorting:after,
+body table.dataTable > thead > tr > th.sorting_desc:after {
   content: "\f238";
 }
 
-body table.dataTable thead .sorting_asc:after {
+body table.dataTable > thead > tr > th.sorting_asc:after {
   content: "\f22c";
 }
 
