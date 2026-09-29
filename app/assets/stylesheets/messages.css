@@ -40,8 +40,8 @@
 }
 
 .widget-chat-message {
-  background: #eae9ef;
-  color: #000;
+  background: var(--grey-92);
+  color: var(--bs-black);
   padding: 0.375rem 0.625rem;
   position: relative;
   display: inline-block;
@@ -65,7 +65,7 @@
 .widget-chat-status {
   font-size: 0.5625rem;
   font-weight: 500;
-  color: #8a8a8f;
+  color: var(--grey-54);
   line-height: 1rem;
 }
 
@@ -75,14 +75,14 @@
 
 .reply .widget-chat-message {
   background: var(--theme-color);
-  color: #fff;
+  color: var(--bs-white);
 }
 
 .widget-chat-message.last:before {
   content: "";
   border: 0.3125rem solid transparent;
-  border-bottom-color: #eae9ef;
-  border-right-color: #eae9ef;
+  border-bottom-color: var(--grey-92);
+  border-right-color: var(--grey-92);
   position: absolute;
   left: -0.25rem;
   bottom: 0.1875rem;
