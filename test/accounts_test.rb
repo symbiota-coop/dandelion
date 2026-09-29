@@ -510,12 +510,24 @@ class AccountsTest < ActiveSupport::TestCase
   test 'siwe request phase renders a message bound to this site' do
     clear_cookies
     get '/auth/ethereum'
+    follow_redirect!
     template = siwe_template_from(last_response)
 
     assert_includes template, "127.0.0.1:#{ENV['PORT']} wants you to sign in with your Ethereum account:"
     assert_includes template, "URI: #{ENV['BASE_URI']}/auth/ethereum/callback"
     assert_match(/^Nonce: [A-Za-z0-9]{17}$/, template)
     assert_includes template, 'Expiration Time:'
+  end
+
+  test 'siwe page sends a reload back for a fresh nonce' do
+    clear_cookies
+    get '/auth/ethereum'
+    follow_redirect!
+    assert last_response.ok?
+
+    get '/accounts/ethereum'
+    assert last_response.redirect?
+    assert_equal '/auth/ethereum', URI(last_response.location).path
   end
 
   test 'siwe signs in an account whose wallet is linked, matching the address case-insensitively' do
@@ -597,7 +609,7 @@ class AccountsTest < ActiveSupport::TestCase
 
   def siwe_template_from(response)
     assert response.ok?
-    match = response.body.match(/id="siwe_template" name="siwe_template" value="([^"]*)"/)
+    match = response.body.match(/id="siwe_template" value="([^"]*)"/)
     assert match, 'siwe_template input not found'
     CGI.unescapeHTML(match[1])
   end
@@ -605,6 +617,7 @@ class AccountsTest < ActiveSupport::TestCase
   def siwe_start_and_sign(key)
     clear_cookies
     get '/auth/ethereum'
+    follow_redirect!
     message = siwe_template_from(last_response).sub(OmniAuth::Strategies::Ethereum::ADDRESS_PLACEHOLDER, siwe_address(key).downcase)
     [message, siwe_sign(key, message)]
   end

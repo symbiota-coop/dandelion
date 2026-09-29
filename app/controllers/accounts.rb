@@ -38,7 +38,8 @@ Dandelion::App.controller do
   end
 
   get '/accounts/ethereum' do
-    @siwe_template = session[OmniAuth::Strategies::Ethereum::TEMPLATE_SESSION_KEY]
+    # Taken, not read, so a reload or Back goes through /auth/ethereum for a fresh nonce rather than signing a spent or expired one
+    @siwe_template = session.delete(OmniAuth::Strategies::Ethereum::TEMPLATE_SESSION_KEY)
     redirect '/auth/ethereum' unless @siwe_template
     @title = 'Sign in with Ethereum'
     @body_class = 'gradient'
