@@ -1,0 +1,185 @@
+/* DataTables: our overrides of its Bootstrap 5 styles. Loaded on every page (see _dependencies.erb), after app.css */
+
+/* ==========================================================================
+   DataTables
+   ========================================================================== */
+
+body table.dataTable {
+  margin: 0.625rem 0 !important;
+}
+
+body div.dataTables_wrapper div.dataTables_length select {
+  width: auto;
+  margin: 0 0.3125rem;
+}
+
+body table.dataTable > thead > tr > th:focus,
+body table.dataTable > thead > tr > th:active {
+  outline: none;
+}
+
+/* Selectors match DataTables' own (table.dataTable thead>tr>th.sorting) plus body, so these win */
+body table.dataTable > thead > tr > th.sorting:before,
+body table.dataTable > thead > tr > th.sorting_asc:before,
+body table.dataTable > thead > tr > th.sorting_desc:before {
+  content: "" !important;
+}
+
+body table.dataTable > thead > tr > th.sorting:after,
+body table.dataTable > thead > tr > th.sorting_asc:after,
+body table.dataTable > thead > tr > th.sorting_desc:after {
+  position: absolute;
+  top: auto;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  display: block;
+  font-family: "bootstrap-icons";
+  font-size: inherit;
+  line-height: inherit;
+  opacity: 0.5;
+}
+
+body table.dataTable > thead > tr > th.sorting:after {
+  opacity: 0;
+}
+
+body table.dataTable > thead > tr > th.sorting:hover:after,
+body table.dataTable > thead > tr > th.sorting:focus:after,
+body table.dataTable > thead > tr > th.sorting:active:after {
+  opacity: 0.5;
+}
+
+body table.dataTable > thead > tr > th.sorting_asc:after,
+body table.dataTable > thead > tr > th.sorting_desc:after {
+  opacity: 1 !important;
+}
+
+body table.dataTable > thead > tr > th.sorting:after,
+body table.dataTable > thead > tr > th.sorting_desc:after {
+  content: "\f238";
+}
+
+body table.dataTable > thead > tr > th.sorting_asc:after {
+  content: "\f22c";
+}
+
+body table.dataTable th.focus,
+table.dataTable td.focus {
+  outline: 0.125rem solid var(--theme-color);
+}
+
+body table.dataTable.collapsed {
+  border-right: none;
+}
+
+body table.dataTable.collapsed td.child {
+  border: none;
+}
+
+body table.dataTable.dtr-inline.collapsed > tbody > tr.child > td:before {
+  content: none !important;
+  display: none;
+}
+
+body table.dataTable td.child .dtr-details,
+body table.dataTable td.child .dtr-details td {
+  border: none;
+}
+
+body table.dataTable td.child .dtr-details td:first-child {
+  width: 1%;
+  white-space: nowrap;
+  padding-right: 1em;
+  font-weight: bold;
+}
+
+body table.dataTable td.child .dtr-details tr,
+body table.dataTable td.child .dtr-details tr:nth-of-type(odd) {
+  background-color: var(--bs-body-bg);
+}
+
+@media (min-width: 768px) {
+  body table.dataTable .control {
+    display: none;
+  }
+  body #event_feedbacks:not(.dataTable) th:first-child,
+  body #event_feedbacks:not(.dataTable) tbody > tr > td:first-child {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  body #event_feedbacks a[data-account-username] {
+    display: none;
+  }
+  body table.dataTable th.control,
+  body table.dataTable td.control {
+    width: 1.875rem;
+    min-width: 1.875rem;
+    max-width: 1.875rem;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+body table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before,
+body table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child:before {
+  content: "\f285";
+  border: none;
+  font-family: "bootstrap-icons";
+  font-size: 1.125rem;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: none;
+  box-shadow: none;
+  color: var(--bs-emphasis-color);
+  top: 0.5rem;
+  width: 1.875rem;
+  text-align: center;
+  left: 0;
+}
+
+body table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td:first-child:before,
+body table.dataTable.dtr-inline.collapsed > tbody > tr.parent > th:first-child:before {
+  content: "\f282";
+  border: none;
+  font-family: "bootstrap-icons";
+  font-size: 1.125rem;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: none;
+  box-shadow: none;
+  color: var(--bs-emphasis-color);
+  top: 0.5rem;
+  width: 1.875rem;
+  text-align: center;
+  left: 0;
+}
+
+body table.dataTable tbody > tr.selected,
+body table.dataTable tbody > tr > .selected {
+  background-color: var(--theme-color);
+  outline: 0.125rem solid var(--theme-color);
+  outline-offset: -1px;
+}
+
+body table.dataTable tbody > tr.selected td,
+body table.dataTable tbody > tr > .selected {
+  border-color: var(--theme-color);
+}
+
+table.dataTable.table-sm>thead>tr>th {
+  background: white
+}
+
+@media screen and (max-width: 767px) {
+  div.dataTables_wrapper div.dataTables_filter {
+    text-align: left;
+  }
+}
