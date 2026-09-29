@@ -1321,36 +1321,10 @@ input[type="datetime-local"]::-webkit-date-and-time-value {
   }
 }
 
-.secret-ticket-checkbox::after {
-  content: '';
-  width: 0.45rem;
-  height: 0.9rem;
-  border-right: 0.18rem solid var(--bs-white);
-  border-bottom: 0.18rem solid var(--bs-white);
-  transform: rotate(45deg) scale(0);
-  transform-origin: center;
-  transition: transform 0.12s ease-out;
-  margin-top: -0.06rem;
-}
 
-.secret-ticket-checkbox:checked {
-  background: var(--theme-color);
-  border-color: var(--theme-color);
-}
 
-.secret-ticket-checkbox:checked::after {
-  transform: rotate(45deg) scale(1);
-}
 
-.secret-ticket-checkbox:focus {
-  border-color: var(--bs-border-color);
-  box-shadow: none;
-}
 
-.secret-ticket-checkbox:checked:focus {
-  border-color: var(--theme-color);
-  box-shadow: 0 0 0 0.2rem rgba(var(--theme-color-rgb), 0.25);
-}
 
 label.remove-file input,
 label.remove-image input {
@@ -2126,23 +2100,6 @@ input.flatpickr-mobile {
   margin-right: 0.25rem
 }
 
-.secret-ticket-checkbox {
-  flex: 0 0 2.1rem !important;
-  min-width: 2.1rem;
-  max-width: 2.1rem;
-  margin: 0;
-  background: var(--bs-body-bg);
-  border-color: var(--bs-border-color);
-  appearance: none;
-  -webkit-appearance: none;
-  position: relative;
-  display: inline-grid;
-  place-content: center;
-  cursor: pointer;
-  border-left: 0;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
 
 label.remove-file,
 label.remove-image {
