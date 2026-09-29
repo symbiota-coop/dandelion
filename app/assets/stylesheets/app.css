@@ -2659,13 +2659,71 @@ button.bg-warning:focus {
   font-weight: 500;
 }
 
-/* The theme hard-codes Bootstrap's blue focus glow; use the theme colour and no glow, as when open it joins the dropdown */
+/* The theme hard-codes Bootstrap's blue focus glow; use the same theme-coloured glow as .form-control (see $input-focus-box-shadow) */
 .select2-container--bootstrap-5.select2-container--focus .select2-selection,
 .select2-container--bootstrap-5.select2-container--open .select2-selection,
-.select2-container--bootstrap-5 .select2-dropdown,
 .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field:focus {
   border-color: var(--theme-color);
-  box-shadow: none;
+  box-shadow: 0 0 0 .125rem rgba(var(--theme-color-rgb), .6);
+}
+
+.select2-container--bootstrap-5 .select2-dropdown {
+  border-color: var(--theme-color);
+  box-shadow: 0 0 0 .125rem rgba(var(--theme-color-rgb), .6);
+}
+
+/* Type on the same row as the tags, not on a row of its own below them */
+.select2-container--bootstrap-5 .select2-selection--multiple {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .375rem;
+}
+
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered {
+  display: contents;
+}
+
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-search {
+  flex: 1 1 5em;
+  width: auto;
+}
+
+/* With tags, slimmer tags and even padding keep the box about as tall as other fields (typing into an empty box keeps the text inset) */
+.select2-container--bootstrap-5 .select2-selection--multiple:has(.select2-selection__choice) {
+  padding: .25rem .75rem .25rem .25rem;
+}
+
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
+  padding-top: .1em;
+  padding-bottom: .1em;
+}
+
+/* Spaced by the gap above instead */
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
+  margin: 0;
+}
+
+/* Selected options, which the theme hard-codes Bootstrap blue */
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--selected,
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option[aria-selected=true]:not(.select2-results__option--highlighted) {
+  background-color: var(--theme-color);
+}
+
+/* The theme fades the box's glow in, but the dropdown appears at once, so the two would glow out of step */
+.select2-container--bootstrap-5 .select2-selection {
+  transition: none;
+}
+
+/* When open, the box and dropdown glow as one shape: clip each glow where they meet */
+.select2-container--bootstrap-5.select2-container--open.select2-container--below .select2-selection,
+.select2-container--bootstrap-5 .select2-dropdown--above {
+  clip-path: inset(-1rem -1rem 0 -1rem);
+}
+
+.select2-container--bootstrap-5.select2-container--open.select2-container--above .select2-selection,
+.select2-container--bootstrap-5 .select2-dropdown--below {
+  clip-path: inset(0 -1rem -1rem -1rem);
 }
 
 .select2-choices {
