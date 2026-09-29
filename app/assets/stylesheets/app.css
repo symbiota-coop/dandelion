@@ -2420,8 +2420,9 @@ a {
   transition: color 0.2s cubic-bezier(0.3, 0.5, 0.6, 1);
 }
 
-a:focus,
-a:hover {
+/* Not .btn: Bootstrap 5 buttons have no :focus colour, so this would turn a clicked <a class="btn"> the link colour */
+a:not(.btn):focus,
+a:not(.btn):hover {
   color: var(--theme-color-hover);
   outline: none;
 }
