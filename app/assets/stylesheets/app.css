@@ -2555,7 +2555,7 @@ blockquote p {
 
 small.form-text {
   font-size: 0.85rem;
-  color: #C7C7CC;
+  color: var(--bs-secondary-color);
 }
 
 /* ==========================================================================
