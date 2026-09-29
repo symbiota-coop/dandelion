@@ -2855,6 +2855,7 @@ label.remove-image {
   border: 0;
   background: transparent;
   resize: none;
+  min-height: 0;
   box-shadow: none !important;
   font-size: var(--body-font-size);
   line-height: 1.5;
