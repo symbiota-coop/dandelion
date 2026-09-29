@@ -23,19 +23,16 @@
           </button>
           <%= partial :nav_top %>
         </div>
-        <!-- BEGIN header-search-bar -->
-        <div class="header-search-bar">
-          <form action="/search" name="search_bar_form">
-            <div class="mb-3">
-              <div class="left-icon"><i class="bi bi-search"></i></div>
-              <input name="q" type="text" class="form-control" id="header-search">
-              <a href="javascript:;" data-dismiss="search-bar" class="right-icon"><i class="bi bi-x-lg"></i></a>
-            </div>
-          </form>
-        </div>
-        <!-- END header-search-bar -->
       </nav>
       <!-- END #header -->
+      <!-- Header search: an offcanvas that slides down over the header -->
+      <div id="header-search-bar" class="header-search-bar offcanvas offcanvas-top" tabindex="-1" data-bs-scroll="true" aria-label="Search">
+        <form action="/search" name="search_bar_form">
+          <div class="left-icon"><i class="bi bi-search"></i></div>
+          <input name="q" type="text" class="form-control" id="header-search" aria-label="Search">
+          <a href="javascript:;" data-bs-dismiss="offcanvas" class="right-icon" aria-label="Close"><i class="bi bi-x-lg"></i></a>
+        </form>
+      </div>
       <!-- BEGIN #sidebar -->
       <div id="sidebar" class="sidebar sidebar-inverse offcanvas-md offcanvas-start" tabindex="-1" data-bs-backdrop="false" data-bs-scroll="true">
         <!-- BEGIN scrollbar -->

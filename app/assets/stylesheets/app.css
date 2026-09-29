@@ -301,35 +301,26 @@
    ========================================================================== */
 
 .header-search-bar {
-  position: absolute;
-  left: 0;
-  top: -2.75rem;
-  right: 0;
-  height: 2.75rem;
-  overflow: hidden;
+  --bs-offcanvas-height: 2.8125rem;
+  --bs-offcanvas-bg: #333;
+  --bs-offcanvas-border-width: 0;
   padding: 0 17.125rem;
-  background: #333;
-  display: none;
-  z-index: 10;
 }
 
-.header-search-bar.active {
-  top: 0;
-  display: block;
-  animation: searchBarActive 0.2s;
+/* Darker than Bootstrap's default backdrop. The sidebar's offcanvas has no backdrop, so this is only the search's */
+.offcanvas-backdrop.show {
+  opacity: 0.9;
 }
 
-.header-search-bar.inactive {
-  top: -2.75rem;
-  display: block;
-  animation: searchBarInactive 0.2s;
+.header-search-bar form {
+  position: relative;
+  height: 100%;
 }
 
 .header-search-bar .form-control {
   border: none;
   height: 2.8125rem;
   padding: 0;
-  line-height: 2.75rem;
   background: #333;
   color: #fff;
   font-size: 0.875rem;
@@ -337,69 +328,23 @@
   box-shadow: none;
 }
 
-.header-search-bar .form-control:focus {
-  box-shadow: none;
-}
-
 .header-search-bar .left-icon,
-.header-search-bar .left-icon a,
-.header-search-bar .right-icon,
-.header-search-bar .right-icon a {
+.header-search-bar .right-icon {
   width: 2.75rem;
-  height: 2.75rem;
+  height: 2.8125rem;
   font-size: 1.125rem;
-  line-height: 2.75rem;
+  line-height: 2.8125rem;
   text-align: center;
   position: absolute;
   top: 0;
-  left: 0;
-  display: block;
+  left: -2.75rem;
   color: #ccc;
   text-decoration: none;
 }
 
-.header-search-bar .left-icon {
-  left: 14.375rem;
-}
-
 .header-search-bar .right-icon {
   left: auto;
-  right: 14.375rem;
-}
-
-.header-search-bar .left-icon i:before,
-.header-search-bar .right-icon i:before {
-  display: block;
-  line-height: 2.75rem;
-}
-
-.search-bar-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: none;
-  background: rgba(0, 0, 0, 0.9);
-  z-index: 1000;
-}
-
-@keyframes searchBarActive {
-  from {
-    top: -2.75rem;
-  }
-  to {
-    top: 0px;
-  }
-}
-
-@keyframes searchBarInactive {
-  from {
-    top: 0px;
-  }
-  to {
-    top: -2.75rem;
-  }
+  right: -2.75rem;
 }
 
 /* ==========================================================================
@@ -440,13 +385,7 @@
 
 @media (max-width: 768px) {
   .header-search-bar {
-    padding: 0 2.75rem !important;
-  }
-  .header-search-bar .left-icon {
-    left: 0 !important;
-  }
-  .header-search-bar .right-icon {
-    right: 0 !important;
+    padding: 0 2.75rem;
   }
 }
 
@@ -1708,7 +1647,7 @@ table {
 }
 
 .search-bar-autocomplete.ui-autocomplete {
-  z-index: 1020;
+  z-index: 1050;
 }
 
 .ui-menu .ui-menu-item a,

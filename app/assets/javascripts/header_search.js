@@ -10,25 +10,11 @@ function renderSearchAutocompleteItem (ul, item) { // eslint-disable-line no-unu
 }
 
 $(function () {
-  $(document).on('click', '[data-toggle="search-bar"]', function (e) {
-    e.preventDefault()
-    $('.header-search-bar').addClass('active')
-    $('body').append('<a href="javascript:;" data-dismiss="search-bar" id="search-bar-backdrop" class="search-bar-backdrop"></a>')
-    $('#search-bar-backdrop').fadeIn(200)
-    setTimeout(function () {
-      $('#header-search').focus()
-    }, 200)
-  })
-
-  $(document).on('click', '[data-dismiss="search-bar"]', function (e) {
-    e.preventDefault()
-    $('.header-search-bar').addClass('inactive')
-    setTimeout(function () {
-      $('.header-search-bar').removeClass('active inactive')
-    }, 200)
-    $('#search-bar-backdrop').fadeOut(function () {
-      $(this).remove()
-    })
+  // The search bar is a Bootstrap offcanvas: focus the field once it has slid in
+  $('#header-search-bar').on('shown.bs.offcanvas', function () {
+    $('#header-search').trigger('focus')
+  }).on('hide.bs.offcanvas', function () {
+    $('#header-search').autocomplete('close')
   })
 
   $('#header-search').autocomplete({
