@@ -390,24 +390,10 @@
    ========================================================================== */
 
 .sidebar {
-  background: #fff;
   width: 14.375rem;
   position: absolute;
   left: 0;
   top: 2.8125rem;
-}
-
-.sidebar:before {
-  content: "";
-  position: fixed;
-  top: 2.8125rem;
-  bottom: 0;
-  background: #fff;
-  width: 14.375rem;
-}
-
-.page-sidebar-minified .sidebar:before {
-  width: 3.75rem;
 }
 
 .page-sidebar-fixed .sidebar {
@@ -426,8 +412,6 @@
   --bs-nav-pills-link-active-color: #fff;
   padding: 0 0.5em;
   flex-wrap: nowrap;
-  /* Paint above .sidebar:before, which draws the sidebar's background */
-  position: relative;
 }
 
 .sidebar .nav-link {
@@ -474,11 +458,9 @@
 }
 
 .sidebar.sidebar-inverse {
-  background: #222;
-}
-
-.sidebar.sidebar-inverse:before {
-  background: #222;
+  --bs-offcanvas-bg: #222;
+  /* offcanvas-md makes the sidebar transparent from md up (with !important), so restate it */
+  background-color: #222 !important;
 }
 
 .sidebar hr {
