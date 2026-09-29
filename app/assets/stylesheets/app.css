@@ -2422,8 +2422,8 @@ a {
 }
 
 /* Not .btn: Bootstrap 5 buttons have no :focus colour, so this would turn a clicked <a class="btn"> the link colour */
-a:not(.btn):focus,
-a:not(.btn):hover {
+a:where(:not(.btn)):focus,
+a:where(:not(.btn)):hover {
   color: var(--theme-color-hover);
   outline: none;
 }
