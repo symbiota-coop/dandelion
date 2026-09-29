@@ -89,8 +89,9 @@
           <% else %>
             <%= resource.send(fieldname) %>
           <% end %>
-        <% elsif fieldname.to_s.ends_with?('_url') %>
-          <a href="<%= resource.send(fieldname) %>"><%= resource.send(fieldname) %></a>
+        <% elsif fieldname.to_s.ends_with?('_url') && resource.send(fieldname).to_s.match?(%r{\Ahttps?://}i) %>
+          <%# Only link web addresses: a javascript: URL here would run in the admin's session %>
+          <a href="<%= resource.send(fieldname) %>" target="_blank" rel="noopener"><%= resource.send(fieldname) %></a>
         <% elsif resource.send(fieldname).is_a? Time or resource.send(fieldname).is_a? Date %>
           <%= resource.send(fieldname) %>
         <% elsif options[:type] == :check_box %>
