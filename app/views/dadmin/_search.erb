@@ -9,11 +9,13 @@
 <% form_tag url(:dadmin, :index, model: model.to_s), method: 'get', id: 'search' do %>
   <div>
     <div id="criteria"></div>
-    <a class="btn btn-secondary" href="javascript:;" id="addCriterion">
-      <i class="bi bi-plus-square"></i> Add criteria
-    </a>
-    <%= select_tag :all_any, class: 'form-select d-inline-block', options: [['all the above', 'all'], ['any of the above', 'any']], selected: params[:all_any] %>
-    <%= submit_tag 'Search', class: 'btn btn-primary' %>
+    <div class="d-flex gap-1">
+      <a class="btn btn-secondary" href="javascript:;" id="addCriterion">
+        <i class="bi bi-plus-square"></i> Add criteria
+      </a>
+      <%= select_tag :all_any, class: 'form-select h-auto', options: [['all the above', 'all'], ['any of the above', 'any']], selected: params[:all_any] %>
+      <%= submit_tag 'Search', class: 'btn btn-primary' %>
+    </div>
   </div>
 <% end %>
 
