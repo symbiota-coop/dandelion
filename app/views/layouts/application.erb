@@ -11,7 +11,7 @@
         <%= partial :alert %>
       <% end %>
       <!-- BEGIN #header -->
-      <nav id="header" class="header navbar navbar-expand navbar-dark">
+      <nav id="header" class="header navbar navbar-expand navbar-dark fixed-top">
         <div class="container-fluid">
           <a href="/" class="navbar-brand">
             <img class="position-relative" style="max-height: 1.75rem; top: -0.25rem" src="/images/logos/white-on-transparent.png">
@@ -37,7 +37,7 @@
       </nav>
       <!-- END #header -->
       <!-- BEGIN #sidebar -->
-      <div id="sidebar" class="sidebar sidebar-inverse offcanvas-md offcanvas-start" tabindex="-1" data-bs-backdrop="false">
+      <div id="sidebar" class="sidebar sidebar-inverse offcanvas-md offcanvas-start" tabindex="-1" data-bs-backdrop="false" data-bs-scroll="true">
         <!-- BEGIN scrollbar -->
         <div class="sidebar-scroll">
           <%= partial :nav %>

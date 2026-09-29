@@ -491,6 +491,8 @@
   --bs-nav-pills-link-active-color: #fff;
   padding: 0 0.5em;
   flex-wrap: nowrap;
+  /* Paint above .sidebar:before, which draws the sidebar's background */
+  position: relative;
 }
 
 .sidebar .nav-link {
@@ -1561,6 +1563,11 @@ div.block-title .label {
   background: #EFEFF4;
 }
 
+/* No focus ring on nav links: their focus background already shows where focus is */
+.nav-link:focus-visible {
+  box-shadow: none;
+}
+
 /* ==========================================================================
    Pagination
    ========================================================================== */
@@ -2342,6 +2349,7 @@ button.bg-warning:focus {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
   scrollbar-width: none;
 }
 
