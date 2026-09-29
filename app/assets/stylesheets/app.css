@@ -2327,6 +2327,22 @@ table.dataTable.table-sm>thead>tr>th {
   border-radius: 0.25rem;
 }
 
+/* In a search form's row, as tall as the Search button beside it (.btn: 1.5 line height at .875rem plus .375rem padding; .btn-primary has no border) */
+.searchForm .row > .form-group > .form-check-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  height: calc(1.5 * 0.875rem + 0.75rem);
+  padding: 0 0.5rem 0 0.3rem;
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.searchForm .row > .form-group > .form-check-inline .form-check-input,
+.searchForm .row > .form-group > .form-check-inline .form-check-label {
+  margin: 0;
+}
+
 .search .form-check-inline:has(:checked) {
   box-shadow: inset 0 0 0 1px var(--theme-color);
 }
