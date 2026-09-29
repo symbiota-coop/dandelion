@@ -77,14 +77,14 @@ end
             <% @no_ticket_groups = @event.ticket_types.all? { |ticket_type| !ticket_type.ticket_group } %>
             <% @previous_ticket_group = 'Other tickets' %>
 
-            <% @event.ticket_types.order('order asc, price desc').each_with_index { |ticket_type,i| %>
+            <% @event.ticket_types.order('order asc, price desc').each { |ticket_type| %>
             <% next if ticket_type.hidden && params[:ticket_type_id] != ticket_type.public_id; %>
             <% next if discount_code && discount_code.filter && !discount_code.filter.downcase.split(',').map(&:strip).any? { |filter| ticket_type.name.downcase.include?(filter) } %>
             <% ticket_type_availability = ticket_type.number_of_tickets_available_in_single_purchase %>
             <% ticket_type_sales_closed = ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>
             <% ticket_type_waitlistable = @event.allow_ticket_type_waitlists? && ticket_type_availability <= 0 && !ticket_type_sales_closed %>
             <% next if @event.hide_unavailable_tickets? && !ticket_type_waitlistable && (ticket_type_availability <= 0 || ticket_type_sales_closed) %>
-            <%= partial :'purchase/ticket_type', locals: { ticket_type: ticket_type, no_border_top: (i == 0) } %>
+            <%= partial :'purchase/ticket_type', locals: { ticket_type: ticket_type } %>
             <% } %>
 
             <%= partial :'purchase/discounts', locals: { discount_code: discount_code } %>
