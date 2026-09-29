@@ -1429,15 +1429,6 @@ ul.pagination {
    Misc components (spin, collapse, progress, row)
    ========================================================================== */
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 .progress {
   background-color: rgba(var(--theme-color-rgb), 0.3);
 }
