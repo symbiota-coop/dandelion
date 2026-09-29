@@ -1,14 +1,14 @@
 development:
   clients:
     default:
-      database: <%= File.basename(PADRINO_ROOT) %>_development
+      database: dandelion_development
       hosts:
         - localhost:27017
 
 test:
   clients:
     default:
-      database: <%= File.basename(PADRINO_ROOT) %>_test
+      database: dandelion_test
       hosts:
         - localhost:27017
 
