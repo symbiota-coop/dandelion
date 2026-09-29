@@ -8,63 +8,63 @@
       $('#sidebar ul.nav li a[data-bs-toggle="tooltip"]').tooltip('disable')
   })
 </script>
-<ul class="nav">
+<ul class="nav nav-pills flex-column">
   <% if current_account %>
-    <li class="d-md-none has-sub">
-      <a href="#sidebar-account" data-bs-toggle="collapse" role="button" aria-expanded="false">
-        <b class="caret caret-right float-end"></b>
+    <li class="nav-item has-sub d-md-none">
+      <a class="nav-link d-flex align-items-center gap-2" href="#sidebar-account" data-bs-toggle="collapse" role="button" aria-expanded="false">
         <i class="bi bi-person-fill"></i>
-        <span><%= current_account.name %></span>
+        <span class="flex-grow-1"><%= current_account.name %></span>
+        <b class="caret caret-right"></b>
       </a>
-      <%= partial :nav_profile, locals: { ul_class: 'sub-menu collapse', ul_id: 'sidebar-account' } %>
+      <%= partial :nav_profile, locals: { ul_class: 'sub-menu list-unstyled collapse', ul_id: 'sidebar-account' } %>
     </li>
   <% end %>
-  <li class="<%= 'active' if request.path == '/' %>">
-    <a href="/" data-bs-toggle="tooltip" title="Home" data-bs-placement="right">
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if request.path == '/' %>" href="/" data-bs-toggle="tooltip" title="Home" data-bs-placement="right">
       <i class="bi bi-house"></i>
-      <span class="nav-link-text">Home</span>
+      <span>Home</span>
     </a>
   </li>
-  <li class="<%= 'active' if request.path == '/daily' %>">
-    <a href="/daily" data-bs-toggle="tooltip" title="Dandelion Daily" data-bs-placement="right">
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if request.path == '/daily' %>" href="/daily" data-bs-toggle="tooltip" title="Dandelion Daily" data-bs-placement="right">
       <i class="bi bi-newspaper"></i>
-      <span class="nav-link-text">Dandelion Daily</span>
+      <span>Dandelion Daily</span>
     </a>
   </li>
   <% if !current_account %>
-    <li class="d-lg-none">
-      <a href="/accounts/new" data-bs-toggle="tooltip" title="Sign up" data-bs-placement="right">
+    <li class="nav-item d-lg-none">
+      <a class="nav-link d-flex align-items-center gap-2" href="/accounts/new" data-bs-toggle="tooltip" title="Sign up" data-bs-placement="right">
         <i class="bi bi-person-fill-add"></i>
-        <span class="nav-link-text">Sign up</span>
+        <span>Sign up</span>
       </a>
     </li>
-    <li class="d-lg-none">
-      <a href="/accounts/sign_in" data-bs-toggle="tooltip" title="Sign in" data-bs-placement="right">
+    <li class="nav-item d-lg-none">
+      <a class="nav-link d-flex align-items-center gap-2" href="/accounts/sign_in" data-bs-toggle="tooltip" title="Sign in" data-bs-placement="right">
         <i class="bi bi-box-arrow-in-right"></i>
-        <span class="nav-link-text">Sign in</span>
+        <span>Sign in</span>
       </a>
     </li>
   <% end %>
-  <li class="<%= 'active' if ['/events', '/e/'].any? { |path| request.path.starts_with?(path) } %>">
-    <a href="/events" data-bs-toggle="tooltip" title="Events" data-bs-placement="right">
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if ['/events', '/e/'].any? { |path| request.path.starts_with?(path) } %>" href="/events" data-bs-toggle="tooltip" title="Events" data-bs-placement="right">
       <i class="bi bi-calendar-event"></i>
-      <span class="nav-link-text">Events</span>
+      <span>Events</span>
     </a>
   </li>
   <% if !current_account || current_account.organisationships.count > 20 %>
-    <li class="<%= 'active' if request.path == '/organisations' %>">
-      <a href="/organisations" data-bs-toggle="tooltip" title="Organisations" data-bs-placement="right">
+    <li class="nav-item">
+      <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if request.path == '/organisations' %>" href="/organisations" data-bs-toggle="tooltip" title="Organisations" data-bs-placement="right">
         <i class="bi bi-flag-fill"></i>
-        <span class="nav-link-text">Organisations</span>
+        <span>Organisations</span>
       </a>
     </li>
   <% else %>
     <% active = ['/organisations', '/o/'].any? { |path| request.path.starts_with?(path) } %>
-    <li class="has-sub <%= 'active' if active %>">
-      <a href="#sidebar-organisations" data-bs-toggle="collapse" role="button" aria-expanded="<%= active %>">
-        <b class="caret caret-right float-end"></b>
+    <li class="nav-item has-sub">
+      <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if active %>" href="#sidebar-organisations" data-bs-toggle="collapse" role="button" aria-expanded="<%= active %>">
         <i class="bi bi-flag-fill"></i>
-        <span>Organisations</span>
+        <span class="flex-grow-1">Organisations</span>
+        <b class="caret caret-right"></b>
       </a>
       <%= ul_nav ([
             ['Create an organisation', '/o/new'],
@@ -72,7 +72,7 @@
           ] +
         Organisation.and(:id.in => current_account.organisationships.pluck(:organisation_id) + (@organisation && @organisation.persisted? ? [@organisation.id] : [])).sort_by(&:name).map { |organisation| [organisation.name, "/o/#{organisation.slug}"] }
                  ),
-                 ul_class: "sub-menu collapse #{'show' if active}",
+                 ul_class: "sub-menu list-unstyled collapse #{'show' if active}",
                  ul_id: 'sidebar-organisations',
                  li_class: '',
                  li_active_class: 'active',
@@ -80,33 +80,33 @@
                  a_active_class: '' %>
     </li>
   <% end %>
-  <li class="<%= 'active' if request.path == '/facilitators' %>">
-    <a href="/facilitators" data-bs-toggle="tooltip" title="Facilitators" data-bs-placement="right">
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if request.path == '/facilitators' %>" href="/facilitators" data-bs-toggle="tooltip" title="Facilitators" data-bs-placement="right">
       <i class="bi bi-person-circle"></i>
-      <span class="nav-link-text">Facilitators</span>
+      <span>Facilitators</span>
     </a>
   </li>
   <% if !current_account %>
-    <li class="<%= 'active' if ['/gatherings', '/g/'].any? { |path| request.path.starts_with?(path) } %>">
-      <a href="/gatherings" data-bs-toggle="tooltip" title="Gatherings" data-bs-placement="right">
+    <li class="nav-item">
+      <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if ['/gatherings', '/g/'].any? { |path| request.path.starts_with?(path) } %>" href="/gatherings" data-bs-toggle="tooltip" title="Gatherings" data-bs-placement="right">
         <i class="bi bi-moon-fill"></i>
-        <span class="nav-link-text">Gatherings</span>
+        <span>Gatherings</span>
       </a>
     </li>
   <% else %>
     <% active = ['/gatherings', '/g/'].any? { |path| request.path.starts_with?(path) } %>
-    <li class="has-sub <%= 'active' if active %>">
-      <a href="#sidebar-gatherings" data-bs-toggle="collapse" role="button" aria-expanded="<%= active %>">
-        <b class="caret caret-right float-end"></b>
+    <li class="nav-item has-sub">
+      <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if active %>" href="#sidebar-gatherings" data-bs-toggle="collapse" role="button" aria-expanded="<%= active %>">
         <i class="bi bi-moon-fill"></i>
-        <span>Gatherings</span>
+        <span class="flex-grow-1">Gatherings</span>
+        <b class="caret caret-right"></b>
       </a>
       <%= ul_nav ([
             ['Create a gathering', '/g/new'],
             ['All gatherings', '/gatherings']
           ] +
         current_account.memberships.includes(:gathering).select { |membership| membership.gathering == @gathering or !membership.hide_from_sidebar }.sort_by { |membership| membership.gathering.name }.map { |membership| [membership.gathering.name, "/g/#{membership.gathering.slug}"] }),
-                 ul_class: "sub-menu collapse #{'show' if active}",
+                 ul_class: "sub-menu list-unstyled collapse #{'show' if active}",
                  ul_id: 'sidebar-gatherings',
                  li_class: '',
                  li_active_class: 'active',
@@ -114,36 +114,34 @@
                  a_active_class: '' %>
     </li>
   <% end %>
-  <li class="<%= 'active' if request.path == '/books' || request.path == '/films' %>">
-    <a href="/books" data-bs-toggle="tooltip" title="Library" data-bs-placement="right">
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if request.path == '/books' || request.path == '/films' %>" href="/books" data-bs-toggle="tooltip" title="Library" data-bs-placement="right">
       <i class="bi bi-book"></i>
-      <span class="nav-link-text">Library</span>
+      <span>Library</span>
     </a>
   </li>
-  <li class="<%= 'active' if request.path.starts_with?('/docs') %>">
-    <a href="/docs" data-bs-toggle="tooltip" title="How to use Dandelion" data-bs-placement="right">
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if request.path.starts_with?('/docs') %>" href="/docs" data-bs-toggle="tooltip" title="How to use Dandelion" data-bs-placement="right">
       <i class="bi bi-question-circle-fill"></i>
-      <span class="nav-link-text">How to use Dandelion</span>
+      <span>How to use Dandelion</span>
     </a>
   </li>
-  <li class="<%= 'active' if request.path == '/contact' %>">
-    <a
-      href="/contact" data-bs-toggle="tooltip" title="Contact us" data-bs-placement="right">
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if request.path == '/contact' %>" href="/contact" data-bs-toggle="tooltip" title="Contact us" data-bs-placement="right">
       <i class="bi bi-envelope-fill"></i>
-      <span class="nav-link-text">Contact us</span>
+      <span>Contact us</span>
     </a>
   </li>
-  <li class="<%= 'active' if request.path == '/code' %>">
-    <a
-      href="/code" data-bs-toggle="tooltip" title="Updates" data-bs-placement="right">
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if request.path == '/code' %>" href="/code" data-bs-toggle="tooltip" title="Updates" data-bs-placement="right">
       <i class="bi bi-code-slash"></i>
-      <span class="nav-link-text">Updates</span>
+      <span>Updates</span>
     </a>
   </li>
-  <li class="<%= 'active' if request.path == '/donate' %>">
-    <a href="/donate" data-bs-toggle="tooltip" title="Donate" data-bs-placement="right">
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if request.path == '/donate' %>" href="/donate" data-bs-toggle="tooltip" title="Donate" data-bs-placement="right">
       <i class="bi bi-cash-coin"></i>
-      <span class="nav-link-text">Donate</span>
+      <span>Donate</span>
     </a>
   </li>
   <% if admin? %>

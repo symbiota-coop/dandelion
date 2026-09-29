@@ -557,73 +557,60 @@
   bottom: 0;
 }
 
+/* The menu is Bootstrap's nav nav-pills flex-column, restyled through its variables */
 .sidebar .nav {
-  list-style-type: none;
-  margin: 0;
-  display: block;
-  position: relative;
+  --bs-nav-link-padding-x: 0.75rem;
+  --bs-nav-link-padding-y: 0.5rem;
+  --bs-nav-link-font-size: 0.875rem;
+  --bs-nav-link-color: #fff;
+  --bs-nav-link-hover-color: #fff;
+  --bs-nav-pills-border-radius: 5px;
+  --bs-nav-pills-link-active-color: #fff;
   padding: 0 0.5em;
+  flex-wrap: nowrap;
 }
 
-.sidebar .nav > li.active > a i {
+.sidebar .nav-link {
+  line-height: 1.3rem;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link:focus,
+.sidebar .nav-link[aria-expanded="true"] {
+  background: #000;
+}
+
+.sidebar .nav-link i {
+  opacity: 0.35;
+  flex-shrink: 0;
+  width: 1.1875rem;
+  font-size: 1.1875rem;
+  line-height: 1.1875rem;
+  text-align: center;
+}
+
+.sidebar .nav-link.active i {
   opacity: 1;
 }
 
-.sidebar .nav > li > a i {
-  float: left;
-  text-align: center;
-  margin-right: 0.5rem;
-  opacity: 0.35;
-  width: 1.1875rem;
-  height: 1.1875rem;
-  font-size: 1.1875rem;
-  line-height: 1.1875rem;
-}
-
-.sidebar .nav > li > a .notification {
-  font-size: 0.5625rem;
-  font-weight: bold;
-  color: #555;
-  border: 1px solid #ccc;
-  padding: 0.125rem 0.1875rem;
-  margin-left: 0.3125;
-  border-radius: 0.1875rem;
-}
-
-.sidebar .nav > li.has-sub .sub-menu {
-  list-style-type: none;
-  margin: 0;
+.sidebar .sub-menu {
+  margin: 0 0 0 2.5625rem;
   padding: 0.3125rem 0;
-}
-
-.sidebar .nav li.has-sub .sub-menu > li > a {
-  color: #999;
-  display: block;
-  padding-right: 0.9375rem;
-  line-height: 1.25rem;
-}
-
-.sidebar .nav > li.has-sub > .sub-menu {
-  margin-left: 2.5625rem;
   font-size: 0.825rem;
 }
 
-.sidebar .nav > li.has-sub .sub-menu > li.active > a,
-.sidebar .nav > li.has-sub .sub-menu > li > a:hover,
-.sidebar .nav > li.has-sub .sub-menu > li > a:focus,
-.sidebar .nav > li.has-sub .sub-menu > li > a:active {
-  color: #000;
+.sidebar .sub-menu a {
+  display: block;
+  padding: 0.3125rem 0.9375rem 0.3125rem 0;
+  line-height: 1.25rem;
+  color: #999;
   text-decoration: none;
 }
 
-.sidebar .nav > li > a:hover,
-.sidebar .nav > li > a:focus {
-  background: rgba(0, 0, 0, 0.075);
-}
-
-.sidebar.sidebar-inverse .nav > li > a:hover,
-.sidebar.sidebar-inverse .nav > li > a:focus {
-  background: #000;
+.sidebar .sub-menu li.active > a,
+.sidebar .sub-menu a:hover,
+.sidebar .sub-menu a:focus {
+  color: #fff;
 }
 
 .sidebar.sidebar-inverse {
@@ -634,45 +621,9 @@
   background: #222;
 }
 
-.sidebar.sidebar-inverse .nav .nav-divider {
-  background: #333;
-}
-
-.sidebar.sidebar-inverse .nav > li.active > a .notification {
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.5);
-}
-
-.sidebar.sidebar-inverse .nav > li > a {
-  color: #fff;
-}
-
-.sidebar.sidebar-inverse .nav > li > a .notification {
-  color: #ccc;
-  border-color: #999;
-}
-
-.sidebar.sidebar-inverse .nav > li.active > a,
-.sidebar.sidebar-inverse .nav > li.active > a:hover,
-.sidebar.sidebar-inverse .nav > li.active > a:focus,
-.sidebar.sidebar-inverse .nav > li.active > a:active {
-  background: rgba(255, 255, 255, 0.25);
-  color: #fff;
-}
-
-.sidebar.sidebar-inverse .nav > li > a[aria-expanded="true"],
-.sidebar.sidebar-inverse .nav > li > a:hover,
-.sidebar.sidebar-inverse .nav > li > a:focus,
-.sidebar.sidebar-inverse .nav > li > a:active {
-  background: #000;
-}
-
-.sidebar.sidebar-inverse .nav > li.has-sub .sub-menu > li.active > a,
-.sidebar.sidebar-inverse .nav > li.has-sub .sub-menu > li > a:hover,
-.sidebar.sidebar-inverse .nav > li.has-sub .sub-menu > li > a:focus,
-.sidebar.sidebar-inverse .nav > li.has-sub .sub-menu > li > a:active {
-  color: #fff;
-  text-decoration: none;
+.sidebar hr {
+  border-color: #333;
+  opacity: 1;
 }
 
 #sidebar {
@@ -687,11 +638,6 @@
 
 .page-sidebar-minified #git-badge {
   display: none
-}
-
-.sidebar .nav li.has-sub .sub-menu > li > a {
-  padding-top: 0.3125rem;
-  padding-bottom: 0.3125rem;
 }
 
 /* ==========================================================================
@@ -730,39 +676,17 @@
     overflow: visible !important;
     z-index: 1020;
   }
-  .page-sidebar-minified .sidebar .nav > li a span {
+  .page-sidebar-minified .sidebar .nav-link {
+    justify-content: center;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+  .page-sidebar-minified .sidebar .nav-link span,
+  .page-sidebar-minified .sidebar .nav-link .caret {
     display: none;
   }
-  .page-sidebar-minified .sidebar .nav > li a i {
-    float: none;
-    width: auto;
-    display: block;
-    margin: 0;
-    height: 1.25rem;
-  }
-  .page-sidebar-minified .sidebar .nav > li a .caret {
-    position: absolute;
-    right: 0.4375rem;
-    top: 0.3125rem;
-  }
-  .page-sidebar-minified .sidebar .nav > li.has-sub .sub-menu {
-    position: absolute;
-    left: 100%;
-    width: 14.375rem;
-    top: 0;
-    background: rgba(0, 0, 0, 0.8);
-    margin: 0;
-    padding: 0.625rem 0;
-    display: block;
-    visibility: hidden;
-  }
-  .page-sidebar-minified .sidebar li.has-sub:hover > .sub-menu,
-  .page-sidebar-minified .sidebar li.has-sub:focus > .sub-menu,
-  .page-sidebar-minified .sidebar li.has-sub:active > .sub-menu {
-    display: block;
-  }
-  .page-sidebar-minified .sidebar .nav > li.has-sub .sub-menu > li > a {
-    padding-left: 0.9375rem;
+  .page-sidebar-minified .sidebar .sub-menu {
+    display: none;
   }
   .page-sidebar-minified .content {
     margin-left: 3.75rem;
@@ -1733,13 +1657,6 @@ div.block-title .label {
   font-size: 0.875rem;
 }
 
-.nav .nav-divider {
-  height: 1px;
-  margin: 0.5625rem 0;
-  overflow: hidden;
-  background: #ccc;
-}
-
 .nav > li > a {
   position: relative;
   display: block;
@@ -2287,12 +2204,7 @@ table.dataTable.table-sm>thead>tr>th {
    Sidebar active item
    ========================================================================== */
 
-.sidebar .nav > li.active > a,
-.sidebar .nav > li.active > a:hover,
-.sidebar .nav > li.active > a:focus,
-.sidebar.sidebar-inverse .nav > li.active > a,
-.sidebar.sidebar-inverse .nav > li.active > a:hover,
-.sidebar.sidebar-inverse .nav > li.active > a:focus,
+.sidebar .nav-link.active,
 .navbar .with-label:before,
 .pace .pace-progress {
   color: #fff !important;
@@ -2303,16 +2215,6 @@ table.dataTable.table-sm>thead>tr>th {
   border: 0 !important
 }
 
-.sidebar .nav>li.active>a,
-.sidebar .nav>li.active>a:hover,
-.sidebar .nav>li.active>a:focus,
-.sidebar.sidebar-inverse .nav>li.active>a,
-.sidebar.sidebar-inverse .nav>li.active>a:hover,
-.sidebar.sidebar-inverse .nav>li.active>a:focus,
-.sidebar.sidebar-inverse .nav>li>a[aria-expanded="true"],
-.sidebar.sidebar-inverse .nav>li>a:hover,
-.sidebar.sidebar-inverse .nav>li>a:focus,
-.sidebar.sidebar-inverse .nav>li>a:active,
 .navbar .with-label:before,
 .pace .pace-progress {
   border-radius: 5px;
@@ -2747,38 +2649,9 @@ ul.map-event li {
   border-color: #adb5bd !important;
 }
 
-/* ==========================================================================
-   Sidebar (overrides)
-   ========================================================================== */
-
-.sidebar .nav > li > a {
-  font-size: 0.875rem;
-  padding: 0.5rem 0.75rem;
-  line-height: 1.3rem;
-}
-
-@media(max-width: 767px) {
-  .sidebar .nav li>a {
-    padding-top: 0.625rem;
-    padding-bottom: 0.625rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .page-sidebar-minified .sidebar .nav>li>a {
-    padding: 0.5rem 0.25rem;
-    display: flex;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .page-sidebar-minified .sidebar .nav>li>a i {
-    display: block;
-    margin: 0 auto;
-  }
-
-  .page-sidebar-minified .sidebar .nav>li>a .caret {
-    display: none;
+@media (max-width: 767px) {
+  .sidebar .nav-link {
+    --bs-nav-link-padding-y: 0.625rem;
   }
 }
 

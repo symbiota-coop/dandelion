@@ -1,14 +1,14 @@
-<li class="nav-divider"></li>
-<li id="git-badge">
-  <a target="_blank" href="https://github.com/symbiota-coop/dandelion/actions">
+<li><hr class="my-2"></li>
+<li class="nav-item" id="git-badge">
+  <a class="nav-link" target="_blank" href="https://github.com/symbiota-coop/dandelion/actions">
     <img src="https://github.com/symbiota-coop/dandelion/actions/workflows/ruby.yml/badge.svg">
   </a>
 </li>
 <% if (commit = ENV['RENDER_GIT_COMMIT']) %>
-  <li>
-    <a target="_blank" href="https://github.com/symbiota-coop/dandelion/commit/<%= commit %>" data-bs-toggle="tooltip" title="Running commit <%= commit[0..6] %>" data-bs-placement="right">
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center gap-2" target="_blank" href="https://github.com/symbiota-coop/dandelion/commit/<%= commit %>" data-bs-toggle="tooltip" title="Running commit <%= commit[0..6] %>" data-bs-placement="right">
       <i class="bi bi-git"></i>
-      <span class="nav-link-text"><span class="badge badge-secondary" style="background: #444"><%= commit[0..6] %></span></span>
+      <span><span class="badge badge-secondary" style="background: #444"><%= commit[0..6] %></span></span>
     </a>
   </li>
 <% end %>
@@ -32,10 +32,10 @@
   ['Delivery', 'delivery', 'envelope-check'],
   ['OpenRouter', 'openrouter', 'robot']
 ].each do |title, path, icon| %>
-  <li class="<%= 'active' if request.path == "/stats/#{path}" %>">
-    <a href="/stats/<%= path %>" data-bs-toggle="tooltip" title="<%= title %>" data-bs-placement="right">
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if request.path == "/stats/#{path}" %>" href="/stats/<%= path %>" data-bs-toggle="tooltip" title="<%= title %>" data-bs-placement="right">
       <i class="bi bi-<%= icon %>"></i>
-      <span class="nav-link-text"><%= title %></span>
+      <span><%= title %></span>
     </a>
   </li>
 <% end %>
@@ -45,10 +45,10 @@
   ['Cloudflare', ENV['NAV_CLOUDFLARE_URL'], 'cloud'],
   ['Mailgun', 'https://app.eu.mailgun.com/mg/sending/domains', 'envelope-fill']
 ].each do |title, url, icon| %>
-  <li>
-    <a href="<%= url %>" target="_blank" data-bs-toggle="tooltip" title="<%= title %>" data-bs-placement="right">
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center gap-2" href="<%= url %>" target="_blank" data-bs-toggle="tooltip" title="<%= title %>" data-bs-placement="right">
       <i class="bi bi-<%= icon %>"></i>
-      <span class="nav-link-text"><%= title %></span>
+      <span><%= title %></span>
     </a>
   </li>
 <% end %>
