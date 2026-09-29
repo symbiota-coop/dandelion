@@ -323,7 +323,7 @@ $(function () {
       const checkboxes = $('.checkbox-group-item-' + groupIndex[1])
       checkboxes.on('change', function () {
         if (checkboxes.is(':checked')) {
-          checkboxGroup.removeClass('has-error')
+          checkboxes.removeClass('is-invalid')
         }
       })
     }
@@ -374,7 +374,7 @@ $(function () {
 
       if (!checkboxes.is(':checked')) {
         showPurchaseAlert('Please select at least one option for: ' + questionLabel)
-        checkboxGroup.addClass('has-error')
+        checkboxes.addClass('is-invalid')
         checkboxes.first().focus()
         halt = true
       }

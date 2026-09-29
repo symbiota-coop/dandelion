@@ -75,7 +75,6 @@
   --color-red-light: #ff5b52;
   --color-red-hover: #e85249;
   --color-red-dark: #e2342a;
-  --color-red-darker: #b92a21;
   --color-red-tint: #ffe8e7;
   --color-red-tint-strong: #ff9f9a;
   --color-orange: #FF9500;
@@ -984,23 +983,6 @@ body.greyed #content {
   cursor: pointer;
 }
 
-.has-error .form-check-label {
-  color: var(--color-red-dark);
-}
-
-.has-error .form-check-input:not(:checked) {
-  border-color: var(--color-red-dark);
-}
-
-.has-error .form-control {
-  border-color: var(--color-red-dark);
-  box-shadow: none;
-}
-
-.has-error .form-control:focus {
-  border-color: var(--color-red-darker);
-  box-shadow: 0 0 0 0.125rem rgba(226, 52, 42, 0.35);
-}
 
 /* ==========================================================================
    Dropdowns

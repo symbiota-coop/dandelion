@@ -110,10 +110,16 @@ Dandelion::App.helpers do
     URI::Parser.new.escape(url) if url
   end
 
+  # Fields whose errors are recorded against other attributes
+  FORM_FIELD_ERROR_ATTRIBUTES = { price_or_range: %i[price range_min range_max] }.freeze
+
   def form_or_tag_field(form, type, field_name, **options)
     if defined?(form) && form
       # For check_box, strip value/checked options as form builder handles these via model
       options = options.except(:value, :checked) if type == :check_box
+      # Mark fields with errors the Bootstrap 5 way
+      error_attributes = FORM_FIELD_ERROR_ATTRIBUTES.fetch(field_name, [field_name])
+      options[:class] = "#{options[:class]} is-invalid".strip if error_attributes.any? { |attribute| form.object.errors[attribute].any? }
       form.send(type, field_name, **options)
     else
       send("#{type}_tag", nil, **options, 'data-field': field_name.to_s)

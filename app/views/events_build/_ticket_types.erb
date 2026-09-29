@@ -39,7 +39,7 @@
   <div>
     <div id="ticket_types">
       <% f.fields_for :ticket_types, f.object.ticket_types.sort_by(&:order) do |o| %>
-        <div class="ticket_type bg-light shadow-sm pt-3 pb-0 ps-3 pe-5 mb-3 <%= 'has-error' if o.object.invalid? %>">
+        <div class="ticket_type bg-light shadow-sm pt-3 pb-0 ps-3 pe-5 mb-3">
           <span class="ticket-type-grip" title="Drag to reorder"><i class="bi bi-grip-vertical"></i></span>
           <%= partial 'events_build/ticket_type_fields', locals: { form: o, currency: f.object.currency, show_donation_field: show_donation_field, persisted_ticket_groups: persisted_ticket_groups } %>
 
