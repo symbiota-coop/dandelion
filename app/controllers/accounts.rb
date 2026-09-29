@@ -37,6 +37,14 @@ Dandelion::App.controller do
     erb :'accounts/sign_in'
   end
 
+  get '/accounts/ethereum' do
+    @siwe_template = session[OmniAuth::Strategies::Ethereum::TEMPLATE_SESSION_KEY]
+    redirect '/auth/ethereum' unless @siwe_template
+    @title = 'Sign in with Ethereum'
+    @body_class = 'gradient'
+    erb :'accounts/ethereum'
+  end
+
   get '/accounts/sign_in_code' do
     @body_class = 'gradient'
     not_found unless params[:account_id]

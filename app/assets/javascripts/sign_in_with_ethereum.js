@@ -1,10 +1,6 @@
 $(function () {
-  document.title = 'Sign in with Ethereum'
-  const $heading = $('<h1 style="text-align: center; display: block !important" class="mt-5"></h1>')
-  $('form').before('<div style="height: 50vh; background-size: cover; background-position: center center; background-image: url(/images/ethereum.webp)"></div>', $heading)
-  $heading.text('Sign in with Ethereum')
-
-  const form = document.querySelector('form')
+  const $heading = $('#siwe-status')
+  const form = document.getElementById('siwe-form')
   const template = document.getElementById('siwe_template')
 
   function toHex (str) {
@@ -41,15 +37,15 @@ $(function () {
 
   discoverProvider().then(function (provider) {
     if (!provider) {
-      $heading.html('No wallet found.<br /><a style="color: #2E63EF" href="https://zerion.io/download">Install Zerion Wallet</a>')
+      $heading.html('No wallet found.<br /><a href="https://zerion.io/download">Install Zerion Wallet</a>')
       return
     }
-    $('button').on('click', function (e) {
+    $('#siwe-form button').on('click', function (e) {
       e.preventDefault()
       signIn(provider).catch(function () {
-        $heading.html('Signature request was cancelled.<br /><a style="color: #2E63EF" href="javascript:;" onclick="$(\'button\').click()">Try again</a>')
+        $heading.html('Signature request was cancelled.<br /><a href="javascript:;" onclick="$(\'#siwe-form button\').click()">Try again</a>')
       })
     })
-    $('button').click()
+    $('#siwe-form button').click()
   })
 })

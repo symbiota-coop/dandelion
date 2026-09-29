@@ -1,0 +1,18 @@
+<div class="row justify-content-center">
+  <div class="col col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-img-top" style="height: 40vh; background: url(/images/ethereum.webp) center / cover"></div>
+      <div class="card-body text-center">
+        <h2 id="siwe-status">Sign in with Ethereum</h2>
+        <form action="/auth/ethereum/callback" method="post" id="siwe-form">
+          <input type="hidden" id="siwe_template" value="<%= Rack::Utils.escape_html(@siwe_template) %>" data-placeholder="<%= OmniAuth::Strategies::Ethereum::ADDRESS_PLACEHOLDER %>">
+          <input type="hidden" id="siwe_message" name="siwe_message">
+          <input type="hidden" id="siwe_signature" name="siwe_signature">
+          <button type="submit" class="btn btn-primary">Sign in</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/javascripts/sign_in_with_ethereum.js?<%= @cachebuster %>"></script>

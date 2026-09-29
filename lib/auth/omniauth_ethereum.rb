@@ -1,7 +1,7 @@
 # Sign-In with Ethereum (EIP-4361) via siwe-rb.
 #
-# The request phase issues a single-use nonce (kept in the session) and renders an
-# EIP-4361 message template bound to this site's domain and callback URI. The browser
+# The request phase issues a single-use nonce (kept in the session) and hands the app's
+# /accounts/ethereum page an EIP-4361 message template bound to this site's domain and callback URI. The browser
 # substitutes the wallet address, signs the message with personal_sign and POSTs the
 # message and signature back. The callback phase parses the message and verifies the
 # signature, domain, URI, chain ID, expiry and nonce, so a captured signature cannot be
@@ -18,19 +18,15 @@ module OmniAuth
       option :expiry, 5 * 60
 
       SESSION_KEY = 'omniauth.siwe_nonce'.freeze
+      TEMPLATE_SESSION_KEY = 'omniauth.siwe_template'.freeze
       ADDRESS_PLACEHOLDER = '0x0000000000000000000000000000000000000000'.freeze
 
       def request_phase
         nonce = Siwe.generate_nonce
         session[SESSION_KEY] = nonce
 
-        form = OmniAuth::Form.new(title: options.title, url: callback_path)
-        form.html(%(<span class="custom_title">#{h(options.title)}</span>))
-        form.html(%(<input type="hidden" id="siwe_template" name="siwe_template" value="#{h(message_template(nonce))}" data-placeholder="#{ADDRESS_PLACEHOLDER}" />))
-        form.html(%(<input type="hidden" id="siwe_message" name="siwe_message" />))
-        form.html(%(<input type="hidden" id="siwe_signature" name="siwe_signature" />))
-        form.button 'Sign In'
-        form.to_response
+        session[TEMPLATE_SESSION_KEY] = message_template(nonce)
+        redirect '/accounts/ethereum'
       end
 
       def callback_phase
@@ -86,10 +82,6 @@ module OmniAuth
 
       def callback_uri
         "#{base_uri.scheme}://#{domain}#{callback_path}"
-      end
-
-      def h(str)
-        Rack::Utils.escape_html(str)
       end
     end
   end
