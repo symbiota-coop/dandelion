@@ -32,7 +32,8 @@
               if (!$data.text().trim() && !$data.find('[data-pagelet-url], img, a, button').length) return '';
               return '<tr><td>' + col.title + '</td><td>' + col.data + '</td></tr>';
             }).join('');
-            return rows ? $('<table class="table table-sm mb-0 dtr-details"/>').append(rows) : false;
+            // In a tbody, as Bootstrap 5 styles cells through .table > tbody > tr > td
+            return rows ? $('<table class="table table-sm mb-0 dtr-details"><tbody>' + rows + '</tbody></table>') : false;
           }
         }
       }
