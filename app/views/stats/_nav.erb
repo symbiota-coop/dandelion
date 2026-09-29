@@ -39,6 +39,12 @@
     </a>
   </li>
 <% end %>
+<li class="nav-item">
+  <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if request.path.start_with?('/dadmin') %>" href="/dadmin" data-bs-toggle="tooltip" title="Admin" data-bs-placement="right">
+    <i class="bi bi-database-gear"></i>
+    <span>Admin</span>
+  </a>
+</li>
 <% [
   ['Sentry', ENV['NAV_SENTRY_URL'], 'lightning-fill'],
   ['MongoDB', ENV['NAV_MONGODB_URL'], 'database'],

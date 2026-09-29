@@ -13,23 +13,6 @@ GIT
       pdf-core (~> 0.10.0)
       ttfunk (~> 1.8)
 
-GIT
-  remote: https://github.com/stephenreid321/activate-admin.git
-  revision: ccbf7c6d37c16c8c1d55c8592e0751702971b8be
-  specs:
-    activate-admin (0.0.31)
-      activate-tools (>= 0.0.34)
-      erubi
-      padrino
-      will_paginate
-
-GIT
-  remote: https://github.com/stephenreid321/activate-tools.git
-  revision: c09ef581aade0e5b1c35131b7eb3a5002fdc5f90
-  specs:
-    activate-tools (0.0.38)
-      padrino
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -543,8 +526,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activate-admin!
-  activate-tools!
   activemodel
   activesupport
   addressable

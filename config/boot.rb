@@ -12,6 +12,8 @@ require 'open-uri'
 require 'active_support/time'
 require 'active_support/security_utils'
 require 'will_paginate/array'
+require 'will_paginate/mongoid'
+require 'csv'
 Bundler.require(:default, RACK_ENV)
 
 Mongoid.load!("#{PADRINO_ROOT}/config/mongoid.yml")

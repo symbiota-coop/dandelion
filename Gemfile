@@ -9,11 +9,6 @@ gem 'rack'
 gem 'rake'
 gem 'sinatra'
 
-# Admin
-gem 'activate-admin', github: 'stephenreid321/activate-admin'
-gem 'activate-tools', github: 'stephenreid321/activate-tools'
-gem 'will_paginate', github: 'mislav/will_paginate'
-
 # Data storage
 gem 'activemodel'
 gem 'delayed_job_mongoid'
@@ -22,6 +17,7 @@ gem 'dragonfly-s3_data_store'
 gem 'mongoid'
 gem 'mongoid_paranoia'
 gem 'redis'
+gem 'will_paginate', github: 'mislav/will_paginate'
 gem 'zstd-ruby'
 
 # Authentication

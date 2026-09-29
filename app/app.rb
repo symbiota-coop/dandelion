@@ -3,8 +3,8 @@ module Dandelion
     register Padrino::Rendering
     register Padrino::Helpers
     register WillPaginate::Sinatra
-    helpers Activate::ParamHelpers
-    helpers Activate::NavigationHelpers
+    helpers ParamHelpers
+    helpers NavigationHelpers
 
     use Sentry::Rack::CaptureExceptions
 
@@ -41,7 +41,7 @@ module Dandelion
     }
 
     set :public_folder, Padrino.root('app', 'assets')
-    set :default_builder, 'ActivateFormBuilder'
+    set :default_builder, 'BootstrapFormBuilder'
     set :protection, except: :frame_options
 
     before do
