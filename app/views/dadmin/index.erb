@@ -8,7 +8,7 @@
 <nav class="navbar justify-content-between px-0">
   <span class="navbar-text">
     <%== page_entries_info(@resources, model: model.to_s) %>
-    <a class="btn btn-secondary" title="Download results as csv" target="_blank" href="<%= url(:dadmin, :index, params.merge(format: :csv)) %>"><i class="bi bi-download"></i></a>
+    <a class="btn btn-sm btn-primary ms-2" target="_blank" href="<%= url(:dadmin, :index, params.merge(format: :csv)) %>"><i class="bi bi-download"></i> CSV</a>
   </span>
   <form class="d-flex ms-auto">
     <%= hidden_field_tag :o, value: @o %>
