@@ -1,22 +1,22 @@
 <% network_notifications = current_account.network_notifications %>
 
-<ul class="dropdown-menu dropdown-lg no-padding">
-  <% network_notifications.order('created_at desc').limit(5).each_with_index { |notification,i| %>
-  <li class="notification">
-    <a class="dropdown-item" href="<%= notification.link[1] %>">
-      <div class="notification-icon text-dark"><i class="bi <%= notification.icon %>"></i></div>
-      <div class="notification-info">
-        <h4 class="notification-title"><%= notification.sentence %></h4>
-        <p class="notification-desc">
-          <%= notification.circle.name %>
-          <span class="notification-time"><%= timeago(notification.created_at) %></span>
-        </p>
-      </div>
-    </a>
-  </li>
-  <% } %>
-  <li><a class="dropdown-item text-center" href="/">All notifications <i class="bi bi-arrow-right"></i></a></li>
-</ul>
+<div class="dropdown-menu dropdown-lg p-0">
+  <div class="list-group list-group-flush notification-list">
+    <% network_notifications.order('created_at desc').limit(5).each do |notification| %>
+      <a class="list-group-item list-group-item-action d-flex gap-2" href="<%= notification.link[1] %>">
+        <i class="bi <%= notification.icon %> notification-icon"></i>
+        <div class="notification-info">
+          <h4 class="notification-title"><%= notification.sentence %></h4>
+          <p class="notification-desc">
+            <%= notification.circle.name %>
+            <span class="notification-time"><%= timeago(notification.created_at) %></span>
+          </p>
+        </div>
+      </a>
+    <% end %>
+    <a class="list-group-item list-group-item-action text-center" href="/">All notifications <i class="bi bi-arrow-right"></i></a>
+  </div>
+</div>
 <% if current_account.unread_notifications?(network_notifications) %>
   <script>
     $(function () {

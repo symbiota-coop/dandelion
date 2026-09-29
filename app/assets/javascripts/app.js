@@ -493,7 +493,7 @@ $(function () {
     e.preventDefault()
 
     const $source = $toggle.siblings('[data-pagelet-url]')
-    const $list = $source.children('ul').clone()
+    const $list = $source.children('.dropdown-menu').clone()
     const $sheet = $('#nav-dropdown-sheet')
     const $body = $sheet.find('.offcanvas-body')
 
