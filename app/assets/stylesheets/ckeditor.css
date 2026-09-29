@@ -1,0 +1,143 @@
+/* CKEditor and the rich text it produces: the editor itself, and images, figures and quotes in rendered content.
+   Loaded on every page (see _dependencies.erb), after app.css */
+
+.ck-heading_paragraph_lead {
+  font-size: 0.85rem !important
+}
+
+.ck-heading_paragraph_small {
+  font-size: 90% !important
+}
+
+div.wysiwyg img {
+  max-width: 100%
+}
+
+/*
+ * Event description images on small viewports:
+ * - Figures without inline width: do not stretch small images (max-width only).
+ * - Figures with inline width (CKEditor): use full column width; img fills the figure.
+ * CKEditor stores width on <figure class="image"> (inline style), not only on <img>
+ */
+@media (max-width: 767px) {
+
+  div.wysiwyg.readable figure.image,
+  #tab-description .ck-content figure.image {
+    max-width: 100% !important;
+  }
+
+  div.wysiwyg.readable img,
+  #tab-description .ck-content img {
+    max-width: 100% !important;
+    height: auto;
+  }
+
+  /* Inline width on figure (e.g. width: 75% / 400px) spans the text column on mobile */
+  div.wysiwyg.readable figure.image[style*="width:"],
+  #tab-description .ck-content figure.image[style*="width:"] {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  div.wysiwyg.readable figure.image[style*="width:"] img,
+  #tab-description .ck-content figure.image[style*="width:"] img {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto;
+  }
+}
+
+/* Event build (description tab): WYSIWYG editables match live .wysiwyg.readable typography beside admin sidebar. */
+#tab-description .ck.ck-editor .ck.ck-editor__editable.ck-content {
+  font-family: var(--body-font-family) !important;
+  letter-spacing: normal !important;
+  font-size: 1rem !important;
+  line-height: 1.5;
+  color: var(--bs-body-color);
+}
+
+.ck.ck-editor .ck.ck-editor__top .ck-sticky-panel .ck-sticky-panel__content_sticky {
+  z-index: 999;
+  background-color: var(--ck-color-toolbar-background, var(--bs-white));
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.ck-content .image {
+  margin: 0 !important
+}
+
+div.wysiwyg figcaption {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  text-align: center
+}
+
+.ck-content blockquote,
+blockquote {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  border-left: 0.25rem solid rgba(var(--theme-color-rgb), 0.33) !important;
+  padding-left: 1rem;
+  font-style: italic;
+}
+
+@media(min-width: 576px) {
+  .slick-container .slick-item:nth-child(2) {
+    display: block;
+  }
+}
+
+@media(min-width: 992px) {
+  .slick-container .slick-item:nth-child(3) {
+    display: block;
+  }
+}
+
+.ck-progress-bar {
+  height: 100% !important;
+  width: 100% !important;
+  background: var(--bs-white) !important;
+  animation-name: opacity;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+
+figure.image,
+.ck-content .image {
+  margin-bottom: 1em !important
+}
+
+figure.table figure.image {
+  margin-bottom: 0 !important;
+}
+
+.ck-content .image-style-align-left,
+.image-style-align-left {
+  float: none !important;
+  margin-right: auto !important;
+  text-align: left !important;
+}
+
+.ck-content .image-style-align-right,
+.image-style-align-right {
+  float: none !important;
+  margin-left: auto !important;
+  text-align: right !important;
+}
+
+.ck-content .image-style-align-center,
+.image-style-align-center {
+  float: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+}
+
+.ck-editor th,
+.ck-editor td {
+  border: 1px solid var(--grey-73) !important;
+}
+
+blockquote p {
+  margin-bottom: 0.5rem;
+}

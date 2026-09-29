@@ -151,6 +151,6 @@
 }
 
 li.reply .widget-chat-message a {
-  color: white;
+  color: var(--bs-white);
   text-decoration: underline
 }

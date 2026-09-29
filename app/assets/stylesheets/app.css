@@ -672,7 +672,7 @@ body.gradient #content {
 .gradient {
   background:
     linear-gradient(135deg, var(--color-highlight-1-light-3) 0%, var(--color-paper) 50%),
-    linear-gradient(to bottom, transparent 80%, white 100%);
+    linear-gradient(to bottom, transparent 80%, var(--bs-white) 100%);
   background-blend-mode: lighten;
 }
 
@@ -694,7 +694,7 @@ body.greyed #content {
 }
 
 #content {
-  background: white
+  background: var(--bs-white)
 }
 
 #content .dropdown-menu .bi {
@@ -927,13 +927,13 @@ body.greyed #content {
 }
 
 .btn-secondary:focus {
-  color: white
+  color: var(--bs-white)
 }
 
 .btn-signal {
   background-color: var(--color-signal);
   border-color: var(--color-signal);
-  color: white;
+  color: var(--bs-white);
 }
 
 .btn-signal:hover,
@@ -941,7 +941,7 @@ body.greyed #content {
 .btn-signal:active {
   background-color: var(--color-signal-dark) !important;
   border-color: var(--color-signal-dark) !important;
-  color: white !important;
+  color: var(--bs-white) !important;
   box-shadow: 0 0 0 0.2rem rgba(59, 69, 254, 0.25) !important;
 }
 
@@ -1280,7 +1280,7 @@ textarea[id=verdict_reason] {
 }
 
 .form-control.datetimepicker[readonly] {
-  background: white
+  background: var(--bs-white)
 }
 
 /*
@@ -1787,7 +1787,7 @@ a.ui-menu-item-wrapper {
 }
 
 .search .form-check-inline {
-  background-color: white;
+  background-color: var(--bs-white);
   padding: 0.3rem 0.3rem 0.2rem calc(1.8em + 0.3rem);
   border-radius: 0.25rem;
 }
@@ -1866,7 +1866,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-size: 0.825rem;
   line-height: 1.45;
-  background: white
+  background: var(--bs-white)
 }
 
 #page-container {
@@ -1986,7 +1986,7 @@ mark,
 }
 
 body[contenteditable] {
-  background: white
+  background: var(--bs-white)
 }
 
 .subtle {
@@ -2002,10 +2002,6 @@ h4.block-title,
 div.block-title,
 div.block-title h4 {
   font-size: 1.66rem
-}
-
-blockquote p {
-  margin-bottom: 0.5rem;
 }
 
 small.form-text {
@@ -2115,14 +2111,14 @@ ul.map-event li {
 }
 
 .map-icon-label .bi {
-  color: white;
+  color: var(--bs-white);
   font-size: 20px !important;
   position: relative;
   top: -18px
 }
 
 .map-icon-label .map-icon {
-  color: white;
+  color: var(--bs-white);
   font-size: 22px !important;
   position: relative;
   top: -4px
@@ -2130,6 +2126,16 @@ ul.map-event li {
 
 .infowindow .row {
   margin: 0
+}
+
+div.block-title.map-event {
+  margin-bottom: 0.5rem !important;
+}
+
+div.block-title.map-event h4 {
+  font-size: 1.1rem !important;
+  display: inline-block !important;
+  margin-bottom: 0 !important;
 }
 
 /* ==========================================================================
@@ -2296,13 +2302,13 @@ label.remove-image {
 .fc-button:hover {
   background-color: var(--bs-secondary) !important;
   border-color: var(--bs-secondary) !important;
-  color: white !important;
+  color: var(--bs-white) !important;
 }
 
 .fc-button-active {
   background-color: var(--bs-secondary) !important;
   border-color: var(--bs-secondary) !important;
-  color: white !important;
+  color: var(--bs-white) !important;
 }
 
 /* ==========================================================================
@@ -2360,7 +2366,7 @@ a.ui-button:active,
 }
 
 #carousel-buttons-container {
-  background: white;
+  background: var(--bs-white);
 }
 
 table.event-details td {
@@ -2377,7 +2383,7 @@ table.event-details td {
 }
 
 .event-detail.calendar-date:hover {
-  color: white !important;
+  color: var(--bs-white) !important;
   text-decoration: none !important;
 }
 
@@ -2394,7 +2400,7 @@ table.event-details td {
    ========================================================================== */
 
 .card-header.chill {
-  background: white !important;
+  background: var(--bs-white) !important;
   color: var(--bs-body-color) !important;
   border: none !important;
   position: relative;
@@ -2424,18 +2430,8 @@ table.event-details td {
 }
 
 /* ==========================================================================
-   Rich text (CKEditor)
+   Carousels (Slick)
    ========================================================================== */
-
-div.block-title.map-event {
-  margin-bottom: 0.5rem !important;
-}
-
-div.block-title.map-event h4 {
-  font-size: 1.1rem !important;
-  display: inline-block !important;
-  margin-bottom: 0 !important;
-}
 
 .slick-placeholder h2 {
   color: var(--bs-secondary-bg);
@@ -2443,86 +2439,6 @@ div.block-title.map-event h4 {
 
 .slick-placeholder img {
   background: var(--bs-secondary-bg);
-}
-
-.ck-heading_paragraph_lead {
-  font-size: 0.85rem !important
-}
-
-.ck-heading_paragraph_small {
-  font-size: 90% !important
-}
-
-div.wysiwyg img {
-  max-width: 100%
-}
-
-/*
- * Event description images on small viewports:
- * - Figures without inline width: do not stretch small images (max-width only).
- * - Figures with inline width (CKEditor): use full column width; img fills the figure.
- * CKEditor stores width on <figure class="image"> (inline style), not only on <img>
- */
-@media (max-width: 767px) {
-
-  div.wysiwyg.readable figure.image,
-  #tab-description .ck-content figure.image {
-    max-width: 100% !important;
-  }
-
-  div.wysiwyg.readable img,
-  #tab-description .ck-content img {
-    max-width: 100% !important;
-    height: auto;
-  }
-
-  /* Inline width on figure (e.g. width: 75% / 400px) spans the text column on mobile */
-  div.wysiwyg.readable figure.image[style*="width:"],
-  #tab-description .ck-content figure.image[style*="width:"] {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  div.wysiwyg.readable figure.image[style*="width:"] img,
-  #tab-description .ck-content figure.image[style*="width:"] img {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto;
-  }
-}
-
-/* Event build (description tab): WYSIWYG editables match live .wysiwyg.readable typography beside admin sidebar. */
-#tab-description .ck.ck-editor .ck.ck-editor__editable.ck-content {
-  font-family: var(--body-font-family) !important;
-  letter-spacing: normal !important;
-  font-size: 1rem !important;
-  line-height: 1.5;
-  color: var(--bs-body-color);
-}
-
-.ck.ck-editor .ck.ck-editor__top .ck-sticky-panel .ck-sticky-panel__content_sticky {
-  z-index: 999;
-  background-color: var(--ck-color-toolbar-background, var(--bs-white));
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-}
-
-.ck-content .image {
-  margin: 0 !important
-}
-
-div.wysiwyg figcaption {
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-  text-align: center
-}
-
-.ck-content blockquote,
-blockquote {
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  border-left: 0.25rem solid rgba(var(--theme-color-rgb), 0.33) !important;
-  padding-left: 1rem;
-  font-style: italic;
 }
 
 .slick-container .slick-responsive {
@@ -2537,18 +2453,6 @@ blockquote {
 
 .slick-container .slick-item:nth-child(1) {
   display: block;
-}
-
-@media(min-width: 576px) {
-  .slick-container .slick-item:nth-child(2) {
-    display: block;
-  }
-}
-
-@media(min-width: 992px) {
-  .slick-container .slick-item:nth-child(3) {
-    display: block;
-  }
 }
 
 .slick-container .slick-responsive.slick-initialized .slick-item {
@@ -2584,66 +2488,21 @@ blockquote {
 .slick-next:hover,
 .slick-prev:focus,
 .slick-prev:hover {
-  color: black;
-  background: white;
+  color: var(--bs-black);
+  background: var(--bs-white);
   opacity: 0.75;
 }
 
 .slick-prev,
 .slick-next {
   border-radius: 50% !important;
-  background: white;
+  background: var(--bs-white);
   font-size: 40px;
   width: 40px;
   height: 40px;
   z-index: 2;
-  color: black;
+  color: var(--bs-black);
   opacity: 0.5;
-}
-
-.ck-progress-bar {
-  height: 100% !important;
-  width: 100% !important;
-  background: white !important;
-  animation-name: opacity;
-  animation-duration: 2s;
-  animation-iteration-count: infinite;
-}
-
-figure.image,
-.ck-content .image {
-  margin-bottom: 1em !important
-}
-
-figure.table figure.image {
-  margin-bottom: 0 !important;
-}
-
-.ck-content .image-style-align-left,
-.image-style-align-left {
-  float: none !important;
-  margin-right: auto !important;
-  text-align: left !important;
-}
-
-.ck-content .image-style-align-right,
-.image-style-align-right {
-  float: none !important;
-  margin-left: auto !important;
-  text-align: right !important;
-}
-
-.ck-content .image-style-align-center,
-.image-style-align-center {
-  float: none !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  text-align: center !important;
-}
-
-.ck-editor th,
-.ck-editor td {
-  border: 1px solid var(--grey-73) !important;
 }
 
 /* ==========================================================================
@@ -2830,7 +2689,7 @@ p.action {
 p.action a {
   display: inline-block;
   background: var(--theme-color) !important;
-  color: white;
+  color: var(--bs-white);
   text-decoration: none;
   padding: 10px;
   border-radius: 5px
@@ -2879,7 +2738,7 @@ p.action a:hover {
 .tactivity a,
 .tactivity span {
   font-size: 0.8rem;
-  color: white
+  color: var(--bs-white)
 }
 
 /* ==========================================================================

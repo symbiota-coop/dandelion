@@ -175,7 +175,7 @@ body table.dataTable tbody > tr > .selected {
 }
 
 table.dataTable.table-sm>thead>tr>th {
-  background: white
+  background: var(--bs-white)
 }
 
 @media screen and (max-width: 767px) {
