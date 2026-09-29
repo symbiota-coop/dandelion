@@ -3,6 +3,11 @@
 // Anything that isn't a Bootstrap variable belongs in app.css.
 
 $blue: #00af5e;
+// Status colours: bg-*, text-*, btn-*, alert-* and friends all follow these
+$success: #4CD964;
+$info: #5AC8FA;
+$warning: #FF9500;
+$danger: #FF3B30;
 $font-family-sans-serif: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 $font-weight-normal: 500;
 $lead-font-weight: inherit;

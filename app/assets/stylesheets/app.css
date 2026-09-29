@@ -705,39 +705,40 @@ body.greyed #content {
    Alerts
    ========================================================================== */
 
+/* Alerts are gradients from a tint of their colour to a stronger one, over Bootstrap's --bs-alert-* colours */
 .alert-success {
-  color: var(--theme-color);
-  background: linear-gradient(135deg, var(--color-green-tint) 0%, var(--color-green-tint) 50%, var(--color-green-tint-strong) 100%) !important;
-}
-
-.alert-success.alert-dismissable {
-  border: 1px solid var(--theme-color);
+  --bs-alert-color: var(--theme-color);
+  --bs-alert-bg: var(--color-green-tint);
+  --bs-alert-border-color: var(--theme-color);
+  --bs-alert-link-color: var(--theme-color);
+  --alert-bg-end: var(--color-green-tint-strong);
 }
 
 .alert-warning {
-  color: var(--color-orange-darker);
-  background: linear-gradient(135deg, var(--color-orange-tint) 0%, var(--color-orange-tint) 50%, var(--color-orange-tint-strong) 100%) !important;
-}
-
-.alert-warning.alert-dismissable {
-  border-color: var(--color-orange);
-}
-
-.alert-warning a {
-  color: var(--color-orange-dark);
+  --bs-alert-color: var(--color-orange-darker);
+  --bs-alert-bg: var(--color-orange-tint);
+  --bs-alert-border-color: var(--color-orange);
+  --bs-alert-link-color: var(--color-orange-dark);
+  --alert-bg-end: var(--color-orange-tint-strong);
 }
 
 .alert-danger {
-  color: var(--color-red-dark);
-  background: linear-gradient(135deg, var(--color-red-tint) 0%, var(--color-red-tint) 50%, var(--color-red-tint-strong) 100%) !important;
+  --bs-alert-color: var(--color-red-dark);
+  --bs-alert-bg: var(--color-red-tint);
+  --bs-alert-border-color: var(--color-red);
+  --bs-alert-link-color: var(--color-red-dark);
+  --alert-bg-end: var(--color-red-tint-strong);
 }
 
-.alert-danger.alert-dismissable {
-  border-color: var(--color-red);
+.alert-success,
+.alert-warning,
+.alert-danger {
+  background-image: linear-gradient(135deg, var(--bs-alert-bg) 0%, var(--bs-alert-bg) 50%, var(--alert-bg-end) 100%);
 }
 
-.alert-danger a {
-  color: var(--color-red-dark);
+/* Success flashes have a border ($alert-border-width is 0) */
+.alert-success.alert-dismissable {
+  border: 1px solid var(--bs-alert-border-color);
 }
 
 .alert-dismissible .btn-close {
@@ -855,15 +856,10 @@ body.greyed #content {
 }
 
 .btn-danger {
-  --bs-btn-bg: var(--color-red);
-  --bs-btn-border-color: var(--color-red);
   --bs-btn-hover-bg: var(--color-red-dark);
   --bs-btn-hover-border-color: var(--color-red-dark);
   --bs-btn-active-bg: var(--color-red-dark);
   --bs-btn-active-border-color: var(--color-red-dark);
-  --bs-btn-disabled-bg: var(--color-red);
-  --bs-btn-disabled-border-color: var(--color-red);
-  --bs-btn-focus-shadow-rgb: 255, 59, 48;
   --btn-gradient-end: var(--color-red-light);
   --btn-hover-gradient-end: var(--color-red-hover);
 }
@@ -2009,28 +2005,9 @@ small.form-text {
    Utilities
    ========================================================================== */
 
-.bg-danger {
-  background: var(--color-red) !important;
-  color: var(--bs-white) !important;
-}
-
-.bg-warning {
-  background: var(--color-orange) !important;
-  color: var(--bs-white) !important;
-}
-
-.bg-success {
-  background: var(--color-green) !important;
-  color: var(--bs-white) !important;
-}
-
 .bg-white {
   background: var(--bs-white) !important;
   color: var(--bs-black) !important;
-}
-
-.text-warning {
-  color: var(--color-orange) !important;
 }
 
 .text-bg-primary,
@@ -2041,13 +2018,6 @@ small.form-text {
 
 .bg-primary-hover {
   background-color: var(--theme-color-hover) !important
-}
-
-a.bg-warning:hover,
-a.bg-warning:focus,
-button.bg-warning:hover,
-button.bg-warning:focus {
-  background-color: var(--color-orange) !important
 }
 
 /* ==========================================================================
@@ -2742,6 +2712,7 @@ p.action a:hover {
    ========================================================================== */
 
 .alert a {
+  color: var(--bs-alert-link-color);
   font-weight: bold;
   text-decoration: underline
 }
