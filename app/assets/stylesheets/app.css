@@ -1007,9 +1007,6 @@ body.greyed #content {
   --bs-dropdown-font-size: 0.825rem;
   --bs-dropdown-item-padding-x: 0.9375rem;
   --bs-dropdown-item-padding-y: 0.1875rem;
-  --bs-dropdown-link-color: #333;
-  --bs-dropdown-link-hover-color: #262626;
-  --bs-dropdown-link-hover-bg: #f5f5f5;
 }
 
 .dropdown-menu.dropdown-lg {
@@ -1023,7 +1020,7 @@ body.greyed #content {
   top: -1.25rem;
   left: 1.25rem;
   border: 0.625rem solid transparent;
-  border-bottom-color: #fff;
+  border-bottom-color: var(--bs-dropdown-bg);
 }
 
 .dropdown-menu:before {
@@ -1044,9 +1041,9 @@ body.greyed #content {
 
 
 .dropdown-header {
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid var(--bs-border-color);
   font-size: 0.825rem;
-  color: #000;
+  color: var(--bs-emphasis-color);
   padding: 0.625rem 0.9375rem;
 }
 
@@ -1088,8 +1085,7 @@ body.greyed #content {
 .notification-list {
   --bs-list-group-item-padding-x: 0.9375rem;
   --bs-list-group-item-padding-y: 0.625rem;
-  --bs-list-group-action-color: #333;
-  --bs-list-group-action-hover-color: #262626;
+  --bs-list-group-action-color: var(--bs-body-color);
   border-radius: inherit;
   overflow: hidden;
 }
@@ -1350,7 +1346,7 @@ input[type="datetime-local"]::-webkit-date-and-time-value {
 }
 
 .secret-ticket-checkbox:focus {
-  border-color: #ced4da;
+  border-color: var(--bs-border-color);
   box-shadow: none;
 }
 
@@ -1427,7 +1423,7 @@ div.block-title .label {
 }
 
 .nav-tabs > li > a:hover {
-  border-color: #EFEFF4 #EFEFF4 #dadade;
+  border-color: var(--bs-secondary-bg) var(--bs-secondary-bg) var(--bs-border-color);
 }
 
 .nav {
@@ -1442,7 +1438,7 @@ div.block-title .label {
 
 .nav > li > a:focus,
 .nav > li > a:hover {
-  background: #EFEFF4;
+  background: var(--bs-secondary-bg);
 }
 
 /* No focus ring on nav links: their focus background already shows where focus is */
@@ -1522,8 +1518,8 @@ ul.pagination {
 }
 
 .form-switch .form-check-input:not(:checked) {
-  background-color: #EFEFF4;
-  border-color: #EFEFF4;
+  background-color: var(--bs-secondary-bg);
+  border-color: var(--bs-secondary-bg);
 }
 
 /* ==========================================================================
@@ -1610,8 +1606,8 @@ table {
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active {
   border: none;
-  background: #EFEFF4;
-  color: #000;
+  background: var(--bs-secondary-bg);
+  color: var(--bs-emphasis-color);
 }
 
 .ui-menu .ui-menu-item a.ui-state-focus,
@@ -1725,7 +1721,7 @@ body table.dataTable td.child .dtr-details td:first-child {
 
 body table.dataTable td.child .dtr-details tr,
 body table.dataTable td.child .dtr-details tr:nth-of-type(odd) {
-  background-color: #fff;
+  background-color: var(--bs-body-bg);
 }
 
 @media (min-width: 768px) {
@@ -1765,7 +1761,7 @@ body table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child:before {
   -moz-osx-font-smoothing: grayscale;
   background: none;
   box-shadow: none;
-  color: #000;
+  color: var(--bs-emphasis-color);
   top: 0.5rem;
   width: 1.875rem;
   text-align: center;
@@ -1785,7 +1781,7 @@ body table.dataTable.dtr-inline.collapsed > tbody > tr.parent > th:first-child:b
   -moz-osx-font-smoothing: grayscale;
   background: none;
   box-shadow: none;
-  color: #000;
+  color: var(--bs-emphasis-color);
   top: 0.5rem;
   width: 1.875rem;
   text-align: center;
@@ -1861,7 +1857,7 @@ table.dataTable.table-sm>thead>tr>th {
 .search-tab > li a {
   display: block;
   padding: 0.625rem;
-  color: #666;
+  color: var(--bs-secondary-color);
   text-decoration: none;
   margin-bottom: -1px;
   border-bottom: 1px solid transparent;
@@ -1870,19 +1866,19 @@ table.dataTable.table-sm>thead>tr>th {
 
 .search-tab > li a:hover,
 .search-tab > li a:focus {
-  border-bottom-color: #000;
+  border-bottom-color: var(--bs-emphasis-color);
 }
 
 .search-tab > li.active a {
-  color: #000;
-  border-bottom-color: #000;
+  color: var(--bs-emphasis-color);
+  border-bottom-color: var(--bs-emphasis-color);
 }
 
 .search-result-list {
   list-style-type: none;
   margin: -1px 0 0;
   padding: 0;
-  color: #333;
+  color: var(--bs-body-color);
 }
 
 .search-result-list > li {
@@ -1929,7 +1925,7 @@ table.dataTable.table-sm>thead>tr>th {
 }
 
 .search-result-list h3 a {
-  color: #000;
+  color: var(--bs-emphasis-color);
 }
 
 @media (max-width: 767px) {
@@ -1979,7 +1975,7 @@ table.dataTable.table-sm>thead>tr>th {
 
 .search-result-list>li {
   border-top: 0;
-  border-bottom: 2px solid #ddd
+  border-bottom: 2px solid var(--bs-border-color)
 }
 
 /* ==========================================================================
@@ -2155,7 +2151,7 @@ body[contenteditable] {
 }
 
 .subtle {
-  color: #8a8a8f !important
+  color: var(--bs-secondary-color) !important
 }
 
 .subtle.active,
@@ -2460,8 +2456,8 @@ input.flatpickr-mobile {
   min-width: 2.1rem;
   max-width: 2.1rem;
   margin: 0;
-  background: #fff;
-  border-color: #ced4da;
+  background: var(--bs-body-bg);
+  border-color: var(--bs-border-color);
   appearance: none;
   -webkit-appearance: none;
   position: relative;
@@ -2486,7 +2482,7 @@ label.remove-image {
 .ask-box {
   display: flex;
   align-items: flex-end;
-  border: 1px solid #ddd;
+  border: 1px solid var(--bs-border-color);
   border-radius: 0.5rem;
   padding: 0.2rem;
 }
@@ -2605,7 +2601,7 @@ a.text-primary:focus {
 
 a.ui-menu-item-wrapper:focus,
 a.ui-menu-item-wrapper:hover {
-  color: #333
+  color: var(--bs-body-color)
 }
 
 .ui-state-active,
@@ -2661,7 +2657,7 @@ table.event-details td {
 
 .card-header.chill {
   background: white !important;
-  color: #212529 !important;
+  color: var(--bs-body-color) !important;
   border: none !important;
   position: relative;
 }
@@ -2704,11 +2700,11 @@ div.block-title.map-event h4 {
 }
 
 .slick-placeholder h2 {
-  color: #E8E8E8;
+  color: var(--bs-secondary-bg);
 }
 
 .slick-placeholder img {
-  background: #E8E8E8;
+  background: var(--bs-secondary-bg);
 }
 
 .ck-heading_paragraph_lead {
@@ -2951,7 +2947,7 @@ td .tactivity-accept {
   max-width: 64rem;
   margin: 0 auto;
   padding: 1rem;
-  background: #fff;
+  background: var(--bs-body-bg);
   border: 1px solid #d8dde3;
   border-radius: 5px;
   box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.16);
