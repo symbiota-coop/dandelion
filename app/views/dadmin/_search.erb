@@ -6,7 +6,7 @@
   #search select[name="all_any"] { width: 12em !important }
 </style>
 
-<% form_tag url(:dadmin, :index, model: model.to_s), method: 'get', id: 'search' do %>
+<% form_tag url(:dadmin, :index, model: @model.to_s), method: 'get', id: 'search' do %>
   <div>
     <div id="criteria"></div>
     <div class="d-flex gap-1">
@@ -22,8 +22,8 @@
 <script>
   $(function () {
 
-    <% fields = admin_fields(model)
-   fields = Hash[fields.select { |fieldname, options| (persisted_field?(model, fieldname) and queryable.include?(options[:type])) or options[:type] == :collection }.map do |fieldname, options|
+    <% fields = admin_fields(@model)
+   fields = Hash[fields.select { |fieldname, options| (persisted_field?(@model, fieldname) and queryable.include?(options[:type])) or options[:type] == :collection }.map do |fieldname, options|
                    [fieldname, options[:type] == :collection ? (submodel = options[:class_name].constantize; admin_fields(submodel).select { |fieldname, options| (persisted_field?(submodel, fieldname) and queryable.include?(options[:type])) }) : options]
                  end] %>
     var fields = <%== fields.to_json %>

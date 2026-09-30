@@ -1,10 +1,4 @@
 Dandelion::App.helpers do
-  def model
-    allowed = AppModels.all.map(&:to_s)
-    redirect('/') unless allowed.include?(params[:model])
-    params[:model].constantize
-  end
-
   def admin_fields(model)
     admin_fields = model.admin_fields
     admin_fields[:created_at] = { type: :datetime, edit: false } if persisted_field?(model, :created_at)

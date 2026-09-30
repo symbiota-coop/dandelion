@@ -4,6 +4,10 @@ class OperatorNotSupported < StandardError; end
 Dandelion::App.controller :dadmin do
   before do
     admins_only!
+    if params[:model]
+      redirect('/') unless AppModels.all.map(&:to_s).include?(params[:model])
+      @model = params[:model].constantize
+    end
   end
 
   get :home, map: '/dadmin' do
@@ -11,26 +15,26 @@ Dandelion::App.controller :dadmin do
   end
 
   get :index, map: '/dadmin/index/:model', provides: %i[html json csv] do
-    if persisted_field?(model, :created_at)
+    if persisted_field?(@model, :created_at)
       @o = :created_at
       @d = :desc
     end
-    if model.respond_to?(:filter_options)
-      @o = model.filter_options[:o]
-      @d = model.filter_options[:d]
+    if @model.respond_to?(:filter_options)
+      @o = @model.filter_options[:o]
+      @d = @model.filter_options[:d]
     end
     @id = params[:id] if params[:id]
     @q = params[:q] if params[:q]
     @o = params[:o].to_sym if params[:o]
     @d = params[:d].to_sym if params[:d]
-    @resources = model.all
+    @resources = @model.all
     @resources = @resources.where(id: @id) if @id
 
     if @q
       query = []
-      admin_fields(model).each do |fieldname, options|
+      admin_fields(@model).each do |fieldname, options|
         if options[:type] === :lookup
-          assoc_name = assoc_name(model, fieldname)
+          assoc_name = assoc_name(@model, fieldname)
           assoc_model = assoc_name.constantize
           assoc_fields = admin_fields(assoc_model)
           assoc_fieldname = lookup_method(assoc_model)
@@ -45,7 +49,7 @@ Dandelion::App.controller :dadmin do
               query << { fieldname.to_sym.in => assoc_model.where(assoc_fieldname => @q).pluck(:id) }
             end
           end
-        elsif persisted_field?(model, fieldname)
+        elsif persisted_field?(@model, fieldname)
           if matchable_regex.include?(options[:type])
             query << { fieldname => /#{Regexp.escape(@q)}/i }
           elsif matchable_number.include?(options[:type]) && (begin
@@ -66,11 +70,11 @@ Dandelion::App.controller :dadmin do
         q = nil if q == 'nil'
         b = params[:qb][i].to_sym
         if !fieldname.include?('.')
-          collection_model = model
+          collection_model = @model
           collection_key = :id
         else
           collection, fieldname = fieldname.split('.')
-          collection_assoc = assoc(model, collection, relationship: :has_many)
+          collection_assoc = assoc(@model, collection, relationship: :has_many)
           collection_model = collection_assoc.class_name.constantize
           collection_key = collection_assoc.inverse_foreign_key.to_sym
         end
@@ -167,7 +171,7 @@ Dandelion::App.controller :dadmin do
     case content_type
     when :html
       @resources = @resources.paginate(page: params[:page], per_page: 25)
-      instance_variable_set("@#{model.to_s.underscore.gsub('/', '_').pluralize}", @resources)
+      instance_variable_set("@#{@model.to_s.underscore.gsub('/', '_').pluralize}", @resources)
       erb :'dadmin/index'
     when :json
       {
@@ -177,13 +181,13 @@ Dandelion::App.controller :dadmin do
                  end
       }.to_json
     when :csv
-      fields = admin_fields(model).select { |_fieldname, options| options[:index] }
+      fields = admin_fields(@model).select { |_fieldname, options| options[:index] }
       CSV.generate do |csv|
         csv << fields.keys
         @resources.each do |resource|
           csv << fields.map do |fieldname, options|
             if (options[:type] === :lookup) && resource.send(fieldname)
-              assoc_name = assoc_name(model, fieldname)
+              assoc_name = assoc_name(@model, fieldname)
               "#{r = assoc_name.constantize.find(resource.send(fieldname)); r ? r.send(lookup_method(assoc_name.constantize)) : resource.send(fieldname)} (id:#{resource.send(fieldname)})"
             elsif %i[date datetime].include?(options[:type])
               resource.send(fieldname).try(:iso8601)
@@ -197,51 +201,51 @@ Dandelion::App.controller :dadmin do
   end
 
   get :new, map: '/dadmin/new/:model' do
-    @resource = model.new
-    instance_variable_set("@#{model.to_s.underscore.gsub('/', '_')}", @resource)
+    @resource = @model.new
+    instance_variable_set("@#{@model.to_s.underscore.gsub('/', '_')}", @resource)
     erb :'dadmin/build'
   end
 
   post :new, map: '/dadmin/new/:model' do
-    @resource = model.new(params[model.to_s.underscore.gsub('/', '_')])
-    instance_variable_set("@#{model.to_s.underscore.gsub('/', '_')}", @resource)
+    @resource = @model.new(params[@model.to_s.underscore.gsub('/', '_')])
+    instance_variable_set("@#{@model.to_s.underscore.gsub('/', '_')}", @resource)
     if @resource.save
-      flash[:notice] = "<strong>Awesome!</strong> The #{human_model_name(model).downcase} was created successfully."
-      params[:popup] ? refreshParent : redirect(url(:dadmin, :index, model: model.to_s))
+      flash[:notice] = "<strong>Awesome!</strong> The #{human_model_name(@model).downcase} was created successfully."
+      params[:popup] ? refreshParent : redirect(url(:dadmin, :index, model: @model.to_s))
     else
       flash.now[:error] =
-        "<strong>Oops.</strong> Some errors prevented the #{human_model_name(model).downcase} from being saved."
+        "<strong>Oops.</strong> Some errors prevented the #{human_model_name(@model).downcase} from being saved."
       erb :'dadmin/build'
     end
   end
 
   get :edit, map: '/dadmin/edit/:model/:id' do
-    @resource = model.find(params[:id])
-    instance_variable_set("@#{model.to_s.underscore.gsub('/', '_')}", @resource)
+    @resource = @model.find(params[:id])
+    instance_variable_set("@#{@model.to_s.underscore.gsub('/', '_')}", @resource)
     erb :'dadmin/build'
   end
 
   post :edit, map: '/dadmin/edit/:model/:id' do
-    @resource = model.find(params[:id])
-    instance_variable_set("@#{model.to_s.underscore.gsub('/', '_')}", @resource)
-    if @resource.update_attributes(params[model.to_s.underscore.gsub('/', '_')])
+    @resource = @model.find(params[:id])
+    instance_variable_set("@#{@model.to_s.underscore.gsub('/', '_')}", @resource)
+    if @resource.update_attributes(params[@model.to_s.underscore.gsub('/', '_')])
       flash[:notice] =
-        "<strong>Sweet!</strong> The #{human_model_name(model).downcase} was updated successfully."
-      params[:popup] ? refreshParent : redirect(url(:dadmin, :edit, model: model.to_s, id: @resource.id))
+        "<strong>Sweet!</strong> The #{human_model_name(@model).downcase} was updated successfully."
+      params[:popup] ? refreshParent : redirect(url(:dadmin, :edit, model: @model.to_s, id: @resource.id))
     else
       flash.now[:error] =
-        "<strong>Oops.</strong> Some errors prevented the #{human_model_name(model).downcase} from being saved."
+        "<strong>Oops.</strong> Some errors prevented the #{human_model_name(@model).downcase} from being saved."
       erb :'dadmin/build'
     end
   end
 
   post :destroy, map: '/dadmin/destroy/:model/:id' do
-    resource = model.find(params[:id])
+    resource = @model.find(params[:id])
     if resource.destroy
-      flash[:notice] = "<strong>Boom!</strong> The #{human_model_name(model).downcase} was deleted."
+      flash[:notice] = "<strong>Boom!</strong> The #{human_model_name(@model).downcase} was deleted."
     else
-      flash[:error] = "<strong>Darn!</strong> The #{human_model_name(model).downcase} couldn't be deleted."
+      flash[:error] = "<strong>Darn!</strong> The #{human_model_name(@model).downcase} couldn't be deleted."
     end
-    params[:popup] ? refreshParent : redirect(url(:dadmin, :index, model: model.to_s))
+    params[:popup] ? refreshParent : redirect(url(:dadmin, :index, model: @model.to_s))
   end
 end
