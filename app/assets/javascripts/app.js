@@ -501,7 +501,7 @@ $(function () {
         if ($(this).hasClass('dropdown-divider')) return $list.append('<hr class="my-1">')
         const $item = $(this).clone()
         if ($item.hasClass('dropdown-header')) {
-          $item.attr('class', 'list-group-item small text-muted fw-bold')
+          $item.attr('class', 'list-group-item small text-muted fw-bold mb-0')
         } else {
           $item.removeClass('dropdown-item').addClass('list-group-item list-group-item-action')
         }

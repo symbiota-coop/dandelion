@@ -1,59 +1,60 @@
-<p class="mb-1 fs-6"><%= @gathering.name %></p>
-<style>
-  #gathering-nav .label-danger { background: rgba(255,60,47,1) }
-</style>
-<div id="gathering-nav" class="mb-3 bg-dark p-1 rounded">
+<% base = "/g/#{gathering.slug}" %>
+<% pending_applications = gathering.mapplications.pending.count %>
+<% owed = membership.owes_contribution? %>
+<% pay_badge = ->(colour) { %(<span class="contribution-label badge #{owed ? 'badge-danger' : colour}" data-colour="#{colour}">#{m (membership.paid or 0), gathering.currency}/#{m membership.requested_contribution, gathering.currency}</span>) } %>
+<%# Pills on desktop, and on mobile the same pill-and-sheet nav as organisations and events %>
+<div id="gathering-nav" class="mb-3 bg-dark p-1 rounded d-none d-md-block">
   <%= ul_nav [
-        ['Home', "/g/#{gathering.slug}"],
-        (['Settings', "/g/#{gathering.slug}/edit"] if membership.admin),
-        [%(Members <span class="badge badge-inverse">#{gathering.member_limit ? %(#{gathering.memberships.count}/#{gathering.member_limit}) : gathering.memberships.count}</span>), "/g/#{gathering.slug}/members"],
-        ([%(Applications #{%(<span class="badge badge-inverse">#{gathering.mapplications.pending.count}</span>) if gathering.mapplications.pending.count.positive?}), "/g/#{gathering.slug}/applications"] if (gathering.privacy == 'closed') || gathering.mapplications.and(:status.ne => 'accepted').count.positive?),
-        ([
-          %(
-            #{@gathering.choose_and_pay_label || 'Choose & Pay'}
-          <span class="contribution-label label label-inverse
-          #{'label-danger' if @membership.requested_contribution and @membership.requested_contribution > 0 and (!@membership.paid or (@membership.paid < @membership.requested_contribution))}
-          ">#{m (@membership.paid or 0), @gathering.currency}/#{m @membership.requested_contribution, @gathering.currency}</span>
-          ), "/g/#{gathering.slug}/options"] if gathering.enable_contributions),
-        (if gathering.enable_teams
-           ['Teams',
-            (
-              [['Overview', "/g/#{gathering.slug}/teams"], ['Create a team', "/g/#{gathering.slug}/teams/new"]] +
-              gathering.teams(true).order('name asc').map do |team|
-                [%(
-              #&nbsp;#{team.name}
-              ), "/g/#{gathering.slug}/teams/#{team.id}"]
-              end
-            )]
-         end),
-        (if gathering.enable_timetables
-           ['Timetables',
-            (
-              gathering.timetables(true).map { |timetable| [timetable.name, "/g/#{gathering.slug}/timetables/#{timetable.id}"] } + (membership.admin? ? [['Create a timetable', "/g/#{gathering.slug}/timetables/new"]] : [])
-            )]
-         end),
-        (if gathering.enable_rotas
-           ['Shifts',
-            (
-              (gathering.rotas.count > 1 ? [['Overview', "/g/#{gathering.slug}/rotas"]] : []) + gathering.rotas(true).map { |rota| [rota.name, "/g/#{gathering.slug}/rotas/#{rota.id}"] } + (membership.admin? ? [['Create a rota', "/g/#{gathering.slug}/rotas/new"]] : [])
-            )]
-         end),
-        (['Inventory', "/g/#{gathering.slug}/inventory"] if gathering.enable_inventory),
-        (['Budget', "/g/#{gathering.slug}/budget"] if gathering.enable_budget)
+        [%(<span class="fw-semibold">#{ERB::Util.html_escape(gathering.name)}</span>), base],
+        (['Settings', "#{base}/edit"] if membership.admin),
+        [%(Members <span class="badge badge-inverse">#{gathering.member_limit ? "#{gathering.memberships.count}/#{gathering.member_limit}" : gathering.memberships.count}</span>), "#{base}/members"],
+        ([%(Applications #{%(<span class="badge badge-inverse">#{pending_applications}</span>) if pending_applications.positive?}), "#{base}/applications"] if (gathering.privacy == 'closed') || gathering.mapplications.and(:status.ne => 'accepted').exists?),
+        ([%(#{gathering.choose_and_pay_label || 'Choose & Pay'} #{pay_badge.('badge-inverse')}), "#{base}/options"] if gathering.enable_contributions),
+        (['Teams', [['Overview', "#{base}/teams"], ['Create a team', "#{base}/teams/new"]] + gathering.teams(true).order('name asc').map { |team| ["#&nbsp;#{team.name}", "#{base}/teams/#{team.id}"] }] if gathering.enable_teams),
+        (['Timetables', gathering.timetables(true).map { |timetable| [timetable.name, "#{base}/timetables/#{timetable.id}"] } + (membership.admin? ? [['Create a timetable', "#{base}/timetables/new"]] : [])] if gathering.enable_timetables),
+        (['Shifts', (gathering.rotas.count > 1 ? [['Overview', "#{base}/rotas"]] : []) + gathering.rotas(true).map { |rota| [rota.name, "#{base}/rotas/#{rota.id}"] } + (membership.admin? ? [['Create a rota', "#{base}/rotas/new"]] : [])] if gathering.enable_rotas),
+        (['Inventory', "#{base}/inventory"] if gathering.enable_inventory),
+        (['Budget', "#{base}/budget"] if gathering.enable_budget)
       ].compact,
              ul_class: 'nav nav-pills',
              li_class: 'nav-item',
              li_active_class: nil,
-             a_class: 'nav-link text-white',
+             a_class: 'nav-link text-white d-flex align-items-center gap-1',
              a_active_class: 'active',
              ul_id: nil,
              subnav_li_class: 'nav-item dropdown',
              subnav_data_toggle: 'dropdown',
-             subnav_a_class: 'nav-link dropdown-toggle text-white',
-             subnav_caret: '<i class="bi bi-chevron-down caret float-end ms-1"></i>',
+             subnav_a_class: 'nav-link dropdown-toggle text-white d-flex align-items-center gap-1',
+             subnav_caret: '<i class="bi bi-chevron-down caret"></i>',
              subnav_ul_class: 'dropdown-menu',
              subnav_li2_class: '',
              subnav_a2_class: 'dropdown-item',
              generate_subnav_href_and_ul: false %>
   <span class="clearfix"></span>
+</div>
+<div class="nav-crumbs mb-3 d-md-none">
+  <%= dropdown_nav [
+        ['<i class="bi bi-house-fill"></i> Home', base],
+        (['<i class="bi bi-gear-fill"></i> Settings', "#{base}/edit"] if membership.admin),
+        [%(<i class="bi bi-people-fill"></i> Members <span class="badge badge-primary">#{gathering.member_limit ? "#{gathering.memberships.count}/#{gathering.member_limit}" : gathering.memberships.count}</span>), "#{base}/members"],
+        ([%(<i class="bi bi-person-plus-fill"></i> Applications #{%(<span class="badge badge-primary">#{pending_applications}</span>) if pending_applications.positive?}), "#{base}/applications"] if (gathering.privacy == 'closed') || gathering.mapplications.and(:status.ne => 'accepted').exists?),
+        ([%(<i class="bi bi-wallet2"></i> #{gathering.choose_and_pay_label || 'Choose & Pay'} #{pay_badge.('badge-primary')}), "#{base}/options"] if gathering.enable_contributions),
+        (['<i class="bi bi-box-seam-fill"></i> Inventory', "#{base}/inventory"] if gathering.enable_inventory),
+        (['<i class="bi bi-cash-stack"></i> Budget', "#{base}/budget"] if gathering.enable_budget),
+        *(if gathering.enable_teams
+            [[], ['Teams'], ['Overview', "#{base}/teams"], ['Create a team', "#{base}/teams/new"]] +
+              gathering.teams(true).order('name asc').map { |team| ["#&nbsp;#{team.name}", "#{base}/teams/#{team.id}"] }
+          end),
+        *(if gathering.enable_timetables
+            [[], ['Timetables']] +
+              gathering.timetables(true).map { |timetable| [timetable.name, "#{base}/timetables/#{timetable.id}"] } +
+              (membership.admin? ? [['Create a timetable', "#{base}/timetables/new"]] : [])
+          end),
+        *(if gathering.enable_rotas
+            [[], ['Shifts']] +
+              (gathering.rotas.count > 1 ? [['Overview', "#{base}/rotas"]] : []) +
+              gathering.rotas(true).map { |rota| [rota.name, "#{base}/rotas/#{rota.id}"] } +
+              (membership.admin? ? [['Create a rota', "#{base}/rotas/new"]] : [])
+          end)
+      ].compact, button_text: ERB::Util.html_escape(gathering.name), container_class: 'btn-group mb-1' %>
 </div>

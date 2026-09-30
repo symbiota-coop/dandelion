@@ -1110,6 +1110,11 @@ body.greyed #content {
   padding: 0.625rem 0.9375rem;
 }
 
+/* Nav menus already separate sections with dividers, so their headers need no line of their own */
+.nav-crumbs .dropdown-header {
+  border-bottom: 0;
+}
+
 .dropdown-menu > li:first-child {
   border-radius: 0.5rem 0.5rem 0 0;
 }
@@ -2278,21 +2283,19 @@ div.block-title.map-event h4 {
    Gatherings
    ========================================================================== */
 
-#gathering-nav ul li a {
+#gathering-nav .nav-link,
+#gathering-nav .dropdown-item {
   font-size: 0.75rem
 }
 
 #gathering-nav .nav-link {
-  padding: 0.33rem 0.66rem
+  padding: 0.4rem 0.8rem
 }
 
-#gathering-nav .nav>li>a:focus,
-#gathering-nav .nav>li>a:hover {
-  background: var(--bs-black)
-}
-
-#gathering-nav .nav-pills .nav-link.active,
-#gathering-nav .nav-pills .show>.nav-link {
+#gathering-nav .nav > li > a:focus,
+#gathering-nav .nav > li > a:hover,
+#gathering-nav .nav-link.active,
+#gathering-nav .show > .nav-link {
   background: var(--bs-black)
 }
 
