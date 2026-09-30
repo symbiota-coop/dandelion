@@ -6,7 +6,16 @@
       <th></th>
     </tr>
   </thead>
-  <% AppModels.all.each { |model| %>
-    <%= partial :'dadmin/home_row', locals: { model: model } %>
-  <% } %>
+  <% AppModels.all.each do |model| %>
+    <tr>
+      <td><a href="<%= url(:dadmin, :index, model: model.to_s) %>"><%= model.model_name.human.pluralize %></a></td>
+      <td><%= model.respond_to?(:estimated_count) && model.unscoped.context.is_a?(Mongoid::Contextual::Mongo) ? model.unscoped.estimated_count : model.count %></td>
+      <td>
+        <div class="d-flex gap-1">
+          <a href="<%= url(:dadmin, :index, model: model.to_s) %>" class="btn btn-secondary"><i class="bi bi-list"></i> List</a>
+          <a href="<%= url(:dadmin, :new, model: model.to_s) %>" class="btn btn-primary"><i class="bi bi-pencil"></i> New</a>
+        </div>
+      </td>
+    </tr>
+  <% end %>
 </table>

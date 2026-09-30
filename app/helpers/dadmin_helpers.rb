@@ -17,7 +17,7 @@ Dandelion::App.helpers do
                             options[:class_name] = dadmin_assoc(model, fieldname, relationship: case options[:type]
                                                                                          when :lookup then :belongs_to
                                                                                          when :collection then :has_many
-                                                                                         end).class_name
+                                                                                                end).class_name
                           end
                           [fieldname, options]
                         end]
@@ -111,6 +111,19 @@ Dandelion::App.helpers do
     return unless ids
 
     { :id.send(operator == :nin ? :nin : :in) => ids }
+  end
+
+  # The fields the index's criteria can search, with each has-many collection's own searchable fields under its name
+  def dadmin_search_fields(model)
+    searchable = ->(m, fieldname, options) { dadmin_persisted_field?(m, fieldname) && DADMIN_QUERYABLE_TYPES.include?(options[:type]) }
+    dadmin_fields(model).filter_map do |fieldname, options|
+      if options[:type] == :collection
+        submodel = options[:class_name].constantize
+        [fieldname, dadmin_fields(submodel).select { |f, o| searchable.(submodel, f, o) }]
+      elsif searchable.(model, fieldname, options)
+        [fieldname, options]
+      end
+    end.to_h
   end
 
   # The record a lookup field points to, or nil

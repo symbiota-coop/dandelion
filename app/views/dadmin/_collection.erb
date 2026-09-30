@@ -1,0 +1,15 @@
+<% assoc = dadmin_assoc(@model, fieldname, relationship: :has_many)
+   records = @resource.send(fieldname)
+   count = records.count
+   foreign_key = "#{(assoc.inverse_of.try(:class_name) || @model.to_s).underscore}_id"
+   noun = fieldname.to_s.singularize.humanize.downcase %>
+<ul class="list-unstyled">
+  <% records.limit(10).each do |record| %>
+    <li><a class="popup" href="<%= url(:dadmin, :edit, popup: true, model: assoc.class_name, id: record.id) %>"><%= record.send(dadmin_lookup_method(assoc.class_name.constantize)) %></a></li>
+  <% end %>
+  <% if count > 10 %>
+    <li>⋮</li>
+    <li><a href="<%= url(:dadmin, :index, model: assoc.class_name, 'qk[]': foreign_key, 'qb[]': 'in', 'qv[]': @resource.id, all_any: 'all') %>">See all <%= pluralize(count, noun) %></a></li>
+  <% end %>
+  <li><a class="btn btn-secondary popup" href="<%= url(:dadmin, :new, popup: true, model: assoc.class_name, foreign_key => @resource.id) %>"><i class="bi bi-plus"></i> New <%= noun %></a></li>
+</ul>

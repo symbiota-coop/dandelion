@@ -41,6 +41,7 @@ Dandelion::App.controller :dadmin do
     end
 
     @resources = @resources.order_by(@o => @d) if @o && @d
+    @index_fields = dadmin_fields(@model).select { |_fieldname, options| options[:index] }
     case content_type
     when :html
       @resources = @resources.paginate(page: params[:page], per_page: 25)
@@ -52,11 +53,10 @@ Dandelion::App.controller :dadmin do
         end
       }.to_json
     when :csv
-      fields = dadmin_fields(@model).select { |_fieldname, options| options[:index] }
       CSV.generate do |csv|
-        csv << fields.keys
+        csv << @index_fields.keys
         @resources.each do |resource|
-          csv << fields.map do |fieldname, options|
+          csv << @index_fields.map do |fieldname, options|
             if options[:type] == :lookup && (id = resource.send(fieldname))
               record = dadmin_lookup_record(@model, fieldname, resource)
               "#{record ? record.send(dadmin_lookup_method(record.class)) : id} (id:#{id})"
@@ -73,6 +73,10 @@ Dandelion::App.controller :dadmin do
 
   get :new, map: '/dadmin/new/:model' do
     @resource = @model.new
+    # Links to new records can prefill lookups, as in ?event_id=...
+    dadmin_fields(@model).each do |fieldname, options|
+      @resource.send("#{fieldname}=", params[fieldname]) if options[:type] == :lookup && params[fieldname]
+    end
     erb :'dadmin/build'
   end
 

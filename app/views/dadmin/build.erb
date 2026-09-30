@@ -1,7 +1,6 @@
-
 <div class="d-flex align-items-center gap-2 mb-3">
   <h1 class="mb-0"><%= @resource.new_record? ? "New #{@model_name}" : "Edit #{@model_name}" %></h1>
-  <% unless params[:popup] %><a href="<%= url(:dadmin, :index, model: @model.to_s) %>" class="btn btn-secondary"><i class="bi bi-list-ul"></i>&nbsp;All <%= @model_name.pluralize %></a><% end %>
+  <% unless params[:popup] %><a href="<%= url(:dadmin, :index, model: @model.to_s) %>" class="btn btn-secondary"><i class="bi bi-list-ul"></i> All <%= @model_name.pluralize %></a><% end %>
 </div>
 
 <div class="col-sm-8 mx-auto">
@@ -9,28 +8,27 @@
 
     <%= hidden_field_tag :popup, value: true if params[:popup] %>
 
-    <% dadmin_fields(@model).select { |_fieldname, options| options[:edit] }.each { |fieldname, options| %>
-      <% unless @resource.new_record? and options[:type] == :collection %>
-        <% case options[:type]; when :collection; assoc = dadmin_assoc(@model, fieldname, relationship: :has_many) %>
-          <%= content = '<ul class="list-unstyled">'
-              @resource.send(fieldname).limit(l = 10).each do |x|
-                content << %(<li><a class="popup" href="#{url(:dadmin, :edit, popup: true, model: assoc.class_name, id: x.id)}">#{ERB::Util.html_escape(x.send(dadmin_lookup_method(assoc.class_name.constantize)))}</a></li>)
-              end
-              if @resource.send(fieldname).count > l
-                content << '<li>⋮</li>'
-                content << %(<li><a href="#{url(:dadmin, :index, model: assoc.class_name, 'qk[]': "#{(assoc.inverse_of.try(:class_name) || @model.to_s).underscore}_id", 'qb[]': 'in', 'qv[]': @resource.id, 'all_any': 'all')}">See all #{pluralize(@resource.send(fieldname).count, fieldname.to_s.singularize.humanize.downcase)}</a>)
-              end
-              content << %(<li><a class="btn btn-secondary popup" href="#{url(:dadmin, :new, popup: true, model: assoc.class_name, "#{(assoc.inverse_of.try(:class_name) || @model.to_s).underscore}_id": @resource.id)}"><i class="bi bi-plus"></i> New #{fieldname.to_s.singularize.humanize.downcase}</a></li>)
-              content << '</ul>'
-              f.block_layout(fieldname, content, tip: options[@resource.new_record? ? :new_tip : :edit_tip], hint: options[@resource.new_record? ? :new_hint : :edit_hint]) %>
-        <% when :lookup %>
-          <% @resource.send("#{fieldname}=", params[fieldname]) unless @resource.send(fieldname) %>
-          <%= f.send("#{options[:type]}_block", fieldname, lookup_url: url(:dadmin, :index, model: dadmin_assoc(@model, fieldname).class_name, format: :json), placeholder: "Search #{fieldname.to_s.humanize.downcase.pluralize}", selected_link: (%(<a class="popup" href="#{url(:dadmin, :edit, model: dadmin_assoc(@model, fieldname).class_name, id: @resource.send(fieldname), popup: true)}">View record</a>) if @resource.send(fieldname)), tip: options[@resource.new_record? ? :new_tip : :edit_tip], hint: options[@resource.new_record? ? :new_hint : :edit_hint]) %>
-        <% else %>
-          <%= f.send("#{options[:type]}_block", fieldname, tip: options[@resource.new_record? ? :new_tip : :edit_tip], hint: options[@resource.new_record? ? :new_hint : :edit_hint], disabled: options[:disabled]) %>
-        <% end %>
+    <% tip_key, hint_key = @resource.new_record? ? %i[new_tip new_hint] : %i[edit_tip edit_hint] %>
+    <% dadmin_fields(@model).each do |fieldname, options| %>
+      <% next unless options[:edit] %>
+      <% next if @resource.new_record? && options[:type] == :collection %>
+      <% tip = options[tip_key]
+         hint = options[hint_key] %>
+      <% case options[:type] %>
+      <% when :collection %>
+        <%= f.block_layout(fieldname, partial(:'dadmin/collection', locals: { fieldname: fieldname }), tip: tip, hint: hint) %>
+      <% when :lookup %>
+        <% lookup_model = dadmin_assoc(@model, fieldname).class_name
+           id = @resource.send(fieldname) %>
+        <%= f.lookup_block(fieldname,
+                           lookup_url: url(:dadmin, :index, model: lookup_model, format: :json),
+                           placeholder: "Search #{fieldname.to_s.humanize.downcase.pluralize}",
+                           selected_link: (%(<a class="popup" href="#{url(:dadmin, :edit, model: lookup_model, id: id, popup: true)}">View record</a>) if id),
+                           tip: tip, hint: hint) %>
+      <% else %>
+        <%= f.send("#{options[:type]}_block", fieldname, tip: tip, hint: hint, disabled: options[:disabled]) %>
       <% end %>
-    <% } %>
+    <% end %>
 
     <%= f.submit_block(destroy_url: (url(:dadmin, :destroy, popup: params[:popup], model: @model.to_s, id: @resource.id) if @resource.persisted?)) %>
 

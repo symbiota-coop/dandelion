@@ -1,11 +1,3 @@
-<style>
-  #search .form-control,
-  #search .form-select,
-  #search .select2-container { width: 20em !important }
-  #search .criterion .search-equality { width: 6em !important }
-  #search select[name="all_any"] { width: 12em !important }
-</style>
-
 <% form_tag url(:dadmin, :index, model: @model.to_s), method: 'get', id: 'search' do %>
   <div>
     <div id="criteria"></div>
@@ -13,7 +5,7 @@
       <a class="btn btn-secondary" href="javascript:;" id="addCriterion">
         <i class="bi bi-plus-square"></i> Add criteria
       </a>
-      <%= select_tag :all_any, class: 'form-select h-auto', options: [['all the above', 'all'], ['any of the above', 'any']], selected: params[:all_any] %>
+      <%= select_tag :all_any, class: 'form-select h-auto w-auto', options: [['all the above', 'all'], ['any of the above', 'any']], selected: params[:all_any] %>
       <%= submit_tag 'Search', class: 'btn btn-primary' %>
     </div>
   </div>
@@ -22,18 +14,14 @@
 <script>
   $(function () {
 
-    <% fields = dadmin_fields(@model)
-   fields = Hash[fields.select { |fieldname, options| (dadmin_persisted_field?(@model, fieldname) and DADMIN_QUERYABLE_TYPES.include?(options[:type])) or options[:type] == :collection }.map do |fieldname, options|
-                   [fieldname, options[:type] == :collection ? (submodel = options[:class_name].constantize; dadmin_fields(submodel).select { |fieldname, options| (dadmin_persisted_field?(submodel, fieldname) and DADMIN_QUERYABLE_TYPES.include?(options[:type])) }) : options]
-                 end] %>
-    var fields = <%== fields.to_json %>
+    var fields = <%== dadmin_search_fields(@model).to_json %>
 
-    var textInput = '<input name="qv[]" class="form-control d-inline-block me-1" type="text">'
+    var textInput = '<input name="qv[]" class="form-control" type="text" style="width: 20em">'
     function addCriterion(selected, bValue, inputValue) {
-      var criterion = $('<div class="criterion mb-2"></div>')
+      var criterion = $('<div class="criterion d-flex align-items-center gap-1 mb-2"></div>')
 
-      var select = $('<select name="qk[]" class="form-select d-inline-block me-1"><option></option></select>')
-      var equality = $('<select name="qb[]" class="form-select d-inline-block me-1 search-equality"><option value="in">is</option><option value="nin">is not</option><option value="gt">&gt;</option><option value="gte">&gt;=</option><option value="lt">&lt;</option><option value="lte">&lt;=</option></select>')
+      var select = $('<select name="qk[]" class="form-select" style="width: 20em"><option></option></select>')
+      var equality = $('<select name="qb[]" class="form-select" style="width: 6em"><option value="in">is</option><option value="nin">is not</option><option value="gt">&gt;</option><option value="gte">&gt;=</option><option value="lt">&lt;</option><option value="lte">&lt;=</option></select>')
       var input = $(textInput)
       var cross = $('<i class="bi bi-x"></i>')
 
@@ -50,7 +38,7 @@
         var fieldName = parts[0] && (parts.length === 1 ? parts[0] : parts[1])
 
         if (fieldOpts && fieldOpts.class_name) {
-          var lookupSelect = $('<select name="qv[]" class="form-select d-inline-block me-1"></select>')
+          var lookupSelect = $('<select name="qv[]" class="form-select" style="width: 20em"></select>')
           lookupSelect.append($('<option value=""></option>'))
           if (valToUse) lookupSelect.append($('<option></option>').attr('value', valToUse).prop('selected', true).text('Loading...'))
           if (valueEl.hasClass('select2-hidden-accessible')) {
@@ -99,9 +87,9 @@
       addCriterion(null, 'in', null)
     })
 
-    <% params[:qk].each_with_index { |fieldname,i| %>
-      addCriterion(<%== params[:qk][i].to_json %>, <%== params[:qb][i].to_json %>, <%== params[:qv][i].to_json %>)
-    <% } if params[:qk] %>
+    <% Array(params[:qk]).each_with_index do |fieldname, i| %>
+      addCriterion(<%== fieldname.to_json %>, <%== params[:qb][i].to_json %>, <%== params[:qv][i].to_json %>)
+    <% end %>
 
   })
 </script>
