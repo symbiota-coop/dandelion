@@ -3,8 +3,6 @@
  * Order: variables and fonts, the page shell (header, sidebar, content), components,
  * then app features (docs, events, maps and so on). The layout and component sections
  * were originally derived from the Infinite Admin theme.
- * "(overrides)" sections hold rules that must stay after rules further up the file,
- * so they could not be moved into the section they override without changing the cascade.
  */
 
 /* ==========================================================================
@@ -712,6 +710,17 @@ body.greyed #content {
 /* ==========================================================================
    Alerts
    ========================================================================== */
+
+/* Links in alerts keep the alert's link colour on hover and focus, via --link-hover-color in Base */
+.alert {
+  --link-hover-color: var(--bs-alert-link-color);
+}
+
+.alert a {
+  color: var(--bs-alert-link-color);
+  font-weight: bold;
+  text-decoration: underline
+}
 
 /* Alerts are gradients from a tint of their colour to a stronger one, over Bootstrap's --bs-alert-* colours */
 .alert-success {
@@ -1897,7 +1906,7 @@ a {
 /* Not .btn: Bootstrap 5 buttons have no :focus colour, so this would turn a clicked <a class="btn"> the link colour */
 a:where(:not(.btn)):focus,
 a:where(:not(.btn)):hover {
-  color: var(--theme-color-hover);
+  color: var(--link-hover-color, var(--theme-color-hover));
   outline: none;
 }
 
@@ -2620,17 +2629,6 @@ p.action a:hover {
 .tactivity span {
   font-size: 0.8rem;
   color: var(--bs-white)
-}
-
-/* ==========================================================================
-   Alerts (overrides)
-   ========================================================================== */
-
-/* After a:where(:not(.btn)):hover in Base, so links in alerts keep the alert's link colour on hover and focus */
-.alert a {
-  color: var(--bs-alert-link-color);
-  font-weight: bold;
-  text-decoration: underline
 }
 
 /* ==========================================================================
