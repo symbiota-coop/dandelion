@@ -44,8 +44,8 @@
 
       $(document).ajaxStop(function() {
         if (!$('#event_stats').hasClass('dataTable')) {
-          var table = $('#event_stats').dataTable({
-            bInfo: false,
+          var table = $('#event_stats').DataTable({
+            info: false,
             paging: false,
             order: [[dateIndex, "asc"]],
             searching: false

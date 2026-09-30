@@ -12,8 +12,8 @@
     if (!$table.length || $table.hasClass('dataTable') || $(window).width() > 767) return;
 
     var dateIndex = $table.find('th[data-col-name="date"]').index();
-    var table = $table.dataTable({
-      bInfo: false,
+    var table = $table.DataTable({
+      info: false,
       paging: false,
       order: dateIndex >= 0 ? [[dateIndex, 'desc']] : [],
       searching: false,
@@ -48,6 +48,80 @@
     });
   });
 </script>
+
+<style>
+  /* DataTables only runs on phones: hide its control column on wider screens, and usernames on phones */
+  @media (min-width: 768px) {
+    #event_feedbacks:not(.dataTable) th:first-child,
+    #event_feedbacks:not(.dataTable) tbody > tr > td:first-child {
+      display: none;
+    }
+  }
+
+  @media (max-width: 767px) {
+    #event_feedbacks a[data-account-username] {
+      display: none;
+    }
+    #event_feedbacks th.control,
+    #event_feedbacks td.control {
+      width: 1.875rem;
+      min-width: 1.875rem;
+      max-width: 1.875rem;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  /* Bootstrap chevrons in place of Responsive's expand icon */
+  #event_feedbacks.dtr-inline.collapsed > tbody > tr > td.dtr-control:before {
+    content: "\f285";
+    border: none;
+    font-family: "bootstrap-icons";
+    font-size: 1.125rem;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: none;
+    box-shadow: none;
+    color: var(--bs-emphasis-color);
+    margin: 0;
+    width: 1.875rem;
+    text-align: center;
+  }
+
+  #event_feedbacks.dtr-inline.collapsed > tbody > tr.dtr-expanded > td.dtr-control:before {
+    content: "\f282";
+  }
+
+  /* Expanded rows: borderless, with bold labels */
+  #event_feedbacks.collapsed {
+    border-right: none;
+  }
+
+  #event_feedbacks.dtr-inline.collapsed > tbody > tr.child > td:before {
+    content: none !important;
+    display: none;
+  }
+
+  #event_feedbacks td.child,
+  #event_feedbacks td.child .dtr-details,
+  #event_feedbacks td.child .dtr-details td {
+    border: none;
+  }
+
+  #event_feedbacks td.child .dtr-details td:first-child {
+    width: 1%;
+    white-space: nowrap;
+    padding-right: 1em;
+    font-weight: bold;
+  }
+
+  #event_feedbacks td.child .dtr-details tr {
+    background-color: var(--bs-body-bg);
+  }
+</style>
 
 <table id="event_feedbacks" class="table">
   <thead>

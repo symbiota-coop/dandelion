@@ -44,7 +44,7 @@
   <script>
     $(function () {
       var colIndex = $("#summary th").toArray().indexOf($("th[data-col-name='created_at']")[0])
-      $('#summary').dataTable({bInfo: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
+      $('#summary').DataTable({info: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
     })
   </script>
   <table class="table" id="summary">

@@ -42,8 +42,8 @@
 
       $(document).ajaxStop(function() {
         if (!$('#orders').hasClass('dataTable')) {
-          $('#orders').dataTable({
-            bInfo: false,
+          $('#orders').DataTable({
+            info: false,
             paging: false,
             searching: false,
             order: [[colIndex, "desc"]]

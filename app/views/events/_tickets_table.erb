@@ -40,7 +40,7 @@
 
     $(document).ajaxStop(function() {
       if (!$('#tickets').hasClass('dataTable')) {
-        $('#tickets').dataTable({bInfo: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
+        $('#tickets').DataTable({info: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
       }
     })
   })

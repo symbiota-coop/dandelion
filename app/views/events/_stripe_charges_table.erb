@@ -6,7 +6,7 @@
 <script>
   $(function () {
     var colIndex = $("#stripe-charges th").toArray().indexOf($("th[data-col-name='created-at']")[0])
-    $('#stripe-charges').dataTable({bInfo: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
+    $('#stripe-charges').DataTable({info: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
   })
 </script>
 <table class="table" id="stripe-charges">
