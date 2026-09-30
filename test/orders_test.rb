@@ -445,4 +445,25 @@ class OrdersTest < ActiveSupport::TestCase
     assert_nil order.reload.completing_at
     refute order.payment_completed?
   end
+
+  test 'free orders with a donation to Dandelion get a receipt PDF' do
+    create_complete_order_with_ticket
+    @order.set(application_fee_paid_to_dandelion: true)
+    refute @order.donation_receipt?
+
+    @order.donations.create!(account: @attendee, event: @event, amount: 10)
+    assert @order.donation_receipt?
+    assert @order.donation_receipt_pdf.render.start_with?('%PDF')
+
+    @order.set(application_fee_paid_to_dandelion: false)
+    refute @order.donation_receipt?
+  end
+
+  test 'paid orders with a donation to Dandelion do not get a receipt PDF' do
+    create_complete_order
+    @order.set(application_fee_paid_to_dandelion: true)
+    @order.tickets.create!(event: @event, account: @attendee, ticket_type: @event.ticket_types.first, price: 5)
+    @order.donations.create!(account: @attendee, event: @event, amount: 10)
+    refute @order.donation_receipt?
+  end
 end

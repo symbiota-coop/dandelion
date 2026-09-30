@@ -97,6 +97,16 @@ module OrderNotifications
       batch_message.add_attachment tickets_pdf_file, tickets_pdf_filename
     end
 
+    donation_receipt_file = nil
+    donation_receipt_filename = nil
+    if donation_receipt?
+      donation_receipt_filename = "donation-receipt-#{order.id}.pdf"
+      donation_receipt_file = File.new(donation_receipt_filename, 'w+')
+      donation_receipt_file.write order.donation_receipt_pdf.render
+      donation_receipt_file.rewind
+      batch_message.add_attachment donation_receipt_file, donation_receipt_filename
+    end
+
     ics_files = []
     unless event.evergreen?
       if event.event_sessions.empty?
@@ -130,6 +140,10 @@ module OrderNotifications
     if tickets_pdf_file && tickets_pdf_filename
       tickets_pdf_file.close
       File.delete(tickets_pdf_filename)
+    end
+    if donation_receipt_file && donation_receipt_filename
+      donation_receipt_file.close
+      File.delete(donation_receipt_filename)
     end
     ics_files.each do |f, fn|
       f.close

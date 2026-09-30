@@ -336,6 +336,49 @@ class Order
     end
   end
 
+  def donation_receipt?
+    application_fee_paid_to_dandelion && donations.exists? && discounted_ticket_revenue.zero?
+  end
+
+  def donation_receipt_pdf
+    order = self
+    Prawn::Document.new(page_size: 'A4', margin: 56) do |pdf|
+      pdf.font_families.update('PlusJakartaSans' => {
+                                 normal: "#{Padrino.root}/app/assets/fonts/PlusJakartaSans/ttf/PlusJakartaSans-Regular.ttf",
+                                 bold: "#{Padrino.root}/app/assets/fonts/PlusJakartaSans/ttf/PlusJakartaSans-Bold.ttf"
+                               })
+      pdf.font 'PlusJakartaSans'
+      pdf.text 'Dandelion', size: 22, style: :bold
+      pdf.text 'Symbiota Ltd', size: 10
+      pdf.text '3rd Floor, 86-90 Paul Street, London EC2A 4NE, United Kingdom', size: 10
+      pdf.text 'Company number 09603539 · dandelion.events', size: 10
+      pdf.move_down 30
+      pdf.text 'DONATION RECEIPT', size: 16, style: :bold
+      pdf.move_down 6
+      pdf.stroke_horizontal_rule
+      pdf.move_down 16
+      pdf.table([
+                  ['Receipt no.', order.id.to_s],
+                  ['Date of payment', order.created_at.strftime('%-d %B %Y')],
+                  ['Received from', "#{order.account.name}\n#{order.account.email}"],
+                  ['Payment reference', order.payment_intent || order.id.to_s]
+                ], cell_style: { borders: [], size: 10, padding: [3, 12, 3, 0] }, column_widths: [130]) { column(0).font_style = :bold }
+      pdf.move_down 24
+      rows = [%w[Description Amount]]
+      order.donations.each do |donation|
+        rows << ["Donation to Dandelion\nMade with an order for #{order.event.name} (#{ENV['BASE_URI']}/e/#{order.event.slug})", Money.new(donation.amount * 100, order.currency).format]
+      end
+      rows << ['Total received', order.donation_revenue.format]
+      pdf.table(rows, width: pdf.bounds.width, column_widths: { 1 => 100 }, cell_style: { size: 10, padding: 8, border_color: 'BBBBBB' }) do
+        row(0).font_style = :bold
+        row(0).background_color = 'EEEEEE'
+        row(-1).font_style = :bold
+        column(1).align = :right
+      end
+      pdf.bounding_box([0, 20], width: pdf.bounds.width) { pdf.text 'Thank you for supporting Dandelion.', size: 10, align: :center, style: :bold }
+    end
+  end
+
   def tickets_pdf_logo_source
     default_logo = "#{Padrino.root}/app/assets/images/logos/black-on-transparent-trim.png"
     return default_logo unless event.organisation.send_ticket_emails_from_organisation && event.organisation.image

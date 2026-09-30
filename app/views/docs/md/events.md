@@ -108,6 +108,8 @@ First, [add a tax rate on Stripe](https://dashboard.stripe.com/tax-rates) (for t
 
 To enable automated receipts for Stripe payments, toggle 'Successful payments' on in your [customer emails settings](https://dashboard.stripe.com/settings/emails).
 
+When a free order includes a donation to Dandelion, Dandelion attaches its own donation receipt to the ticket email.
+
 ## Taking payments with Open Collective
 
 If your organisation has an [Open Collective](https://opencollective.com/) account, you can accept payments through it:
