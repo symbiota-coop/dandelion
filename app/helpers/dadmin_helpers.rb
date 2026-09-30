@@ -1,10 +1,6 @@
 Dandelion::App.helpers do
-  def models
-    AppModels.all
-  end
-
   def model
-    allowed = models.map(&:to_s)
+    allowed = AppModels.all.map(&:to_s)
     redirect('/') unless allowed.include?(params[:model])
     params[:model].constantize
   end

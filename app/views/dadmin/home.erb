@@ -6,7 +6,7 @@
       <th></th>
     </tr>
   </thead>
-  <% models.sort_by(&:to_s).each { |model| %>
+  <% AppModels.all.each { |model| %>
     <%= partial :'dadmin/home_row', locals: { model: model } %>
   <% } %>
 </table>
