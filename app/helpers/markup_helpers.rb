@@ -154,12 +154,15 @@ Dandelion::App.helpers do
     color = Chroma.paint(hex)
     rgb = color.rgb
     light = color.lighten(6.66)
+    hover = color.darken(2.5)
+    hover_rgb = hover.rgb
     <<~CSS.strip
       :root {
         --theme-color: #{color.to_hex};
         --theme-color-rgb: #{rgb.r.round}, #{rgb.g.round}, #{rgb.b.round};
         --theme-color-light: #{light.to_hex};
-        --theme-color-hover: #{color.darken(2.5).to_hex};
+        --theme-color-hover: #{hover.to_hex};
+        --theme-color-hover-rgb: #{hover_rgb.r.round}, #{hover_rgb.g.round}, #{hover_rgb.b.round};
         --theme-color-hover-light: #{light.darken(2.5).to_hex};
         --theme-color-dark: #{color.darken(6.66).to_hex};
         --theme-color-darker: #{color.darken(10).to_hex};

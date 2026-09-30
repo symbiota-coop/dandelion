@@ -38,6 +38,7 @@
   --theme-color-rgb: 0, 175, 94;
   --theme-color-light: #00d170;
   --theme-color-hover: #00a257;
+  --theme-color-hover-rgb: 0, 162, 87;
   --theme-color-hover-light: #00c469;
   --theme-color-dark: #008d4c;
   --theme-color-darker: #007c43;
@@ -46,6 +47,8 @@
   --bs-primary-rgb: var(--theme-color-rgb);
   --bs-link-color: var(--theme-color);
   --bs-link-color-rgb: var(--theme-color-rgb);
+  --bs-link-hover-color: var(--theme-color-hover);
+  --bs-link-hover-color-rgb: var(--theme-color-hover-rgb);
   --bs-focus-ring-color: rgba(var(--theme-color-rgb), 0.25);
   --color-theme-transparent: rgba(251, 174, 59, 0.5);
   --color-highlight-1: #4400B9;
@@ -899,6 +902,20 @@ body.greyed #content {
 .form-check-input:checked {
   background-color: var(--theme-color);
   border-color: var(--theme-color);
+}
+
+.form-range::-webkit-slider-thumb,
+.form-range::-webkit-slider-thumb:active {
+  background-color: var(--theme-color);
+}
+
+.form-range::-moz-range-thumb,
+.form-range::-moz-range-thumb:active {
+  background-color: var(--theme-color);
+}
+
+.btn-close {
+  --bs-btn-close-focus-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
 }
 
 .comment-grey .btn-outline-light,
