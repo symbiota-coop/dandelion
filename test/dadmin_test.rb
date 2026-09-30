@@ -114,7 +114,7 @@ class DadminTest < ActiveSupport::TestCase
     assert_includes rows.first, 'name'
     assert_includes rows.first, 'event_id'
     exported = rows.find { |row| row.include?('Exported') }
-    assert exported.any? { |cell| cell.to_s.include?("(id:#{@event.id})") }
+    assert(exported.any? { |cell| cell.to_s.include?("(id:#{@event.id})") })
   end
 
   test 'new records can have lookups prefilled from the URL' do
