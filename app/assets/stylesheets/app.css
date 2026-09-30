@@ -1105,6 +1105,7 @@ body.greyed #content {
 
 .nav-dropdown-sheet .list-group {
   --bs-list-group-action-color: var(--bs-body-color);
+  --bs-list-group-border-width: 0;
 }
 
 /* ==========================================================================

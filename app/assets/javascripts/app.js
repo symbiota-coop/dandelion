@@ -497,7 +497,8 @@ $(function () {
     // Plain dropdown menus (dropdown_nav, ul_nav) become a list group of their items and headers
     if (!$source.length) {
       $list = $('<div class="list-group list-group-flush"></div>')
-      $toggle.siblings('.dropdown-menu').find('.dropdown-item, .dropdown-header').each(function () {
+      $toggle.siblings('.dropdown-menu').find('.dropdown-item, .dropdown-header, .dropdown-divider').each(function () {
+        if ($(this).hasClass('dropdown-divider')) return $list.append('<hr class="my-1">')
         const $item = $(this).clone()
         if ($item.hasClass('dropdown-header')) {
           $item.attr('class', 'list-group-item small text-muted fw-bold')
