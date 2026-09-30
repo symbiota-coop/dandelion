@@ -1300,9 +1300,22 @@ input[type="datetime-local"]::-webkit-date-and-time-value {
   min-height: 1.5em;
 }
 
+input[type="date"].form-control,
+input[type="datetime-local"].form-control,
+input.flatpickr-mobile {
+  display: block;
+  width: 100%;
+  min-width: 100%;
+  box-sizing: border-box;
+}
+
 .searchForm .form-group,
 .searchForm .form-check {
   margin-bottom: 0.25rem;
+  margin-right: 0.25rem
+}
+
+.searchForm label {
   margin-right: 0.25rem
 }
 
@@ -1345,10 +1358,11 @@ input[type="datetime-local"]::-webkit-date-and-time-value {
   }
 }
 
-
-
-
-
+label.remove-file,
+label.remove-image {
+  margin-top: 0.3125rem;
+  font-weight: normal
+}
 
 label.remove-file input,
 label.remove-image input {
@@ -1358,6 +1372,10 @@ label.remove-image input {
 
 .input-group {
   flex-wrap: nowrap;
+}
+
+.add-block label {
+  display: none
 }
 
 /* ==========================================================================
@@ -1439,6 +1457,39 @@ div.block-title .label {
 /* No focus ring on nav links: their focus background already shows where focus is */
 .nav-link:focus-visible {
   box-shadow: none;
+}
+
+@media(max-width: 767px) {
+  .nav-wrapper .nav-tabs {
+    border-bottom: 0;
+    flex-wrap: nowrap;
+  }
+
+  .nav-wrapper .nav-link {
+    white-space: nowrap;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .nav-wrapper {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: scroll;
+    overflow-y: hidden;
+  }
+
+  .nav-wrapper::-webkit-scrollbar {
+    height: 6px;
+    display: block;
+  }
+
+  .nav-wrapper::-webkit-scrollbar-track {
+    background: var(--grey-93);
+  }
+
+  .nav-wrapper::-webkit-scrollbar-thumb {
+    background: var(--bs-gray-500);
+    border-radius: 4px;
+  }
 }
 
 /* ==========================================================================
@@ -1597,6 +1648,20 @@ body .table > tfoot > tr > th {
 a.ui-menu-item-wrapper {
   display: block;
   text-decoration: none
+}
+
+a.ui-menu-item-wrapper:focus,
+a.ui-menu-item-wrapper:hover {
+  color: var(--bs-body-color)
+}
+
+.ui-state-active,
+.ui-widget-content .ui-state-active,
+.ui-widget-header .ui-state-active,
+a.ui-button:active,
+.ui-button:active,
+.ui-button.ui-state-active:hover {
+  font-weight: inherit
 }
 
 /* ==========================================================================
@@ -1840,6 +1905,11 @@ a:where(:not(.btn)):hover {
   outline: none;
 }
 
+a.text-primary:hover,
+a.text-primary:focus {
+  color: var(--theme-color-hover) !important
+}
+
 h1,
 h2,
 h3,
@@ -1957,6 +2027,25 @@ div.block-title h4 {
 small.form-text {
   font-size: 0.85rem;
   color: var(--bs-secondary-color);
+}
+
+.readable {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.read-more-toggle {
+  font-size: 82.5%
+}
+
+.ui-widget,
+.regular,
+.introjs-tooltipReferenceLayer,
+.introjs-tooltipReferenceLayer *,
+.gm-style,
+.notification-list {
+  font-family: var(--body-font-family);
+  letter-spacing: normal;
 }
 
 /* ==========================================================================
@@ -2099,34 +2188,6 @@ div.block-title.map-event h4 {
 }
 
 /* ==========================================================================
-   Forms (overrides)
-   ========================================================================== */
-
-.add-block label {
-  display: none
-}
-
-input[type="date"].form-control,
-input[type="datetime-local"].form-control,
-input.flatpickr-mobile {
-  display: block;
-  width: 100%;
-  min-width: 100%;
-  box-sizing: border-box;
-}
-
-.searchForm label {
-  margin-right: 0.25rem
-}
-
-
-label.remove-file,
-label.remove-image {
-  margin-top: 0.3125rem;
-  font-weight: normal
-}
-
-/* ==========================================================================
    Ask boxes (docs, contact page, messages)
    ========================================================================== */
 
@@ -2156,43 +2217,6 @@ label.remove-image {
 }
 
 /* ==========================================================================
-   Nav tabs and pills (overrides)
-   ========================================================================== */
-
-@media(max-width: 767px) {
-  .nav-wrapper .nav-tabs {
-    border-bottom: 0;
-    flex-wrap: nowrap;
-  }
-
-  .nav-wrapper .nav-link {
-    white-space: nowrap;
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-  }
-
-  .nav-wrapper {
-    -webkit-overflow-scrolling: touch;
-    overflow-x: scroll;
-    overflow-y: hidden;
-  }
-
-  .nav-wrapper::-webkit-scrollbar {
-    height: 6px;
-    display: block;
-  }
-
-  .nav-wrapper::-webkit-scrollbar-track {
-    background: var(--grey-93);
-  }
-
-  .nav-wrapper::-webkit-scrollbar-thumb {
-    background: var(--bs-gray-500);
-    border-radius: 4px;
-  }
-}
-
-/* ==========================================================================
    Calendar
    ========================================================================== */
 
@@ -2216,52 +2240,6 @@ label.remove-image {
   background-color: var(--bs-secondary) !important;
   border-color: var(--bs-secondary) !important;
   color: var(--bs-white) !important;
-}
-
-/* ==========================================================================
-   Base: html, body and typography (overrides)
-   ========================================================================== */
-
-.ui-widget,
-.regular,
-.introjs-tooltipReferenceLayer,
-.introjs-tooltipReferenceLayer *,
-.gm-style,
-.notification-list {
-  font-family: var(--body-font-family);
-  letter-spacing: normal;
-}
-
-.readable {
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-.read-more-toggle {
-  font-size: 82.5%
-}
-
-a.text-primary:hover,
-a.text-primary:focus {
-  color: var(--theme-color-hover) !important
-}
-
-/* ==========================================================================
-   jQuery UI autocomplete (overrides)
-   ========================================================================== */
-
-a.ui-menu-item-wrapper:focus,
-a.ui-menu-item-wrapper:hover {
-  color: var(--bs-body-color)
-}
-
-.ui-state-active,
-.ui-widget-content .ui-state-active,
-.ui-widget-header .ui-state-active,
-a.ui-button:active,
-.ui-button:active,
-.ui-button.ui-state-active:hover {
-  font-weight: inherit
 }
 
 /* ==========================================================================
@@ -2652,6 +2630,7 @@ p.action a:hover {
    Alerts (overrides)
    ========================================================================== */
 
+/* After a:where(:not(.btn)):hover in Base, so links in alerts keep the alert's link colour on hover and focus */
 .alert a {
   color: var(--bs-alert-link-color);
   font-weight: bold;
