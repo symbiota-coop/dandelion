@@ -1701,6 +1701,11 @@ ul.pagination {
   --dt-header-cell_vertical-align: bottom;
 }
 
+/* DataTables still nudges table-sm sort icons right: .25rem, which now pulls them over the label */
+table.dataTable.table-sm > thead > tr > th[class*="dt-order"] .dt-column-order {
+  right: auto;
+}
+
 /* No line under a table's last row: Bootstrap 5 draws each row's line below it, Bootstrap 4 drew them above */
 .table > tbody:last-child > tr:last-child > * {
   border-bottom-width: 0;
