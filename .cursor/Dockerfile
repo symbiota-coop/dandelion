@@ -18,5 +18,8 @@ RUN useradd --create-home --shell /bin/bash cursor && \
     mkdir -p /data/db && \
     chown -R cursor:cursor /data/db /usr/local/bundle
 
+# Login shells source /etc/profile, which resets PATH, so put gem executables back on it
+RUN echo 'export PATH=/usr/local/bundle/bin:$PATH' > /etc/profile.d/bundle.sh
+
 WORKDIR /home/cursor
 USER cursor

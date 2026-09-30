@@ -2,19 +2,8 @@
 set -euo pipefail
 
 BUNDLER_VERSION="$(grep -A1 '^BUNDLED WITH' Gemfile.lock | tail -1 | tr -d ' ')"
-BUNDLE_BIN="${BUNDLE_PATH:-/usr/local/bundle}/bin"
 gem list -i bundler -v "$BUNDLER_VERSION" >/dev/null || gem install bundler -v "$BUNDLER_VERSION"
 command -v foreman >/dev/null || gem install foreman
-
-# Login shells source /etc/profile and drop the image PATH, so GEM bin is invisible
-# unless we also put the executables on /usr/local/bin (as the old Dockerfile did).
-if [ -d "$BUNDLE_BIN" ]; then
-  for exe in bundle bundler foreman; do
-    if [ -x "$BUNDLE_BIN/$exe" ]; then
-      sudo ln -sfn "$BUNDLE_BIN/$exe" "/usr/local/bin/$exe"
-    fi
-  done
-fi
 
 bundle config set build.nokogiri "--use-system-libraries"
 
