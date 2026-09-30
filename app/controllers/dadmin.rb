@@ -3,7 +3,7 @@ Dandelion::App.controller :dadmin do
   before do
     admins_only!
     if params[:model]
-      redirect('/') unless AppModels.all.map(&:to_s).include?(params[:model])
+      redirect(url(:dadmin, :home)) unless AppModels.all.map(&:to_s).include?(params[:model])
       @model = params[:model].constantize
       @model_name = @model.model_name.human.downcase
     end
