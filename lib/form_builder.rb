@@ -129,7 +129,7 @@ module Padrino
           content = select(fieldname,
                            class: "form-select #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
                                                            'is-invalid'
-                                                         end} lookup",
+                                                 end} lookup",
                            options: options,
                            selected: value,
                            'data-lookup-url': lookup_url,
@@ -220,7 +220,7 @@ module Padrino
             has_error = !error_message_on(fieldname.to_s.gsub('_id', '')).blank?
             unless has_error
               url = object.send(fieldname).url
-              src = begin; URI.encode(url).gsub('(', '%28').gsub(')', '%29'); rescue StandardError; url; end
+              src = URI::Parser.new.escape(url).gsub('(', '%28').gsub(')', '%29')
               content << %(
             <div style="margin-bottom: 1em">
               <a target="_blank" href="#{url}"><img style="max-height: 200px" src="#{src}"></a>
@@ -259,7 +259,7 @@ module Padrino
         def date_block(fieldname, placeholder: nil, required: false, disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
           content = text_field(fieldname, class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
                                                                    'is-invalid'
-                                                                 end} datepicker", required: (r = required || model_required(fieldname)), disabled: disabled, placeholder: placeholder, value: (if v = object.send(fieldname)
+                                                                 end} datepicker", required: (r = required || model_required(fieldname)), disabled: disabled, placeholder: placeholder, value: (if (v = object.send(fieldname))
                                                                                                                                                                                                   v.strftime('%Y-%m-%d')
                                                                                                                                                                                                 end))
           block_layout(fieldname, content, tip: tip, hint: hint, container_class: container_class,
@@ -269,12 +269,12 @@ module Padrino
         def datetime_block(fieldname, placeholder: nil, required: false, disabled: false, data: {}, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
         content = text_field(fieldname, class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
                                                                  'is-invalid'
-                                                               end} datetimepicker", required: (r = required || model_required(fieldname)), disabled: disabled, placeholder: placeholder, value: (if v = object.send(fieldname)
+                                                               end} datetimepicker", required: (r = required || model_required(fieldname)), disabled: disabled, placeholder: placeholder, value: (if (v = object.send(fieldname))
                                                                                                                                                                                                     v.strftime('%Y-%m-%d %H:%M')
                                                                                                                                                                                                   end), data: data)
         block_layout(fieldname, content, tip: tip, hint: hint, container_class: container_class,
                                          label_class: label_class, div_class: div_class, required: r)
-      end
+        end
 
         # Geopicker
 
@@ -284,9 +284,9 @@ module Padrino
           content << @template.hidden_field_tag("#{model.to_s.underscore}[#{fieldname}][lat]",
                                                 class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
                                                                          'is-invalid'
-                                                                       end}", required: (r = required || model_required(fieldname)), disabled: disabled, value: (if object.send(fieldname)
+                                                                       end}", required: (required || model_required(fieldname)), disabled: disabled, value: (if object.send(fieldname)
                                                                                                                                                                    object.send(fieldname)[1]
-                                                                                                                                                                 end))
+                                                                                                                                                             end))
           content << ' '
           content << @template.hidden_field_tag("#{model.to_s.underscore}[#{fieldname}][lng]",
                                                 class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
@@ -327,7 +327,7 @@ module Padrino
             number_field(fieldname,
               class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
                               'is-invalid'
-                            end}",
+                                     end}",
               step: 'any',
               required: (r = required || model_required(fieldname)),
               disabled: disabled,
@@ -345,7 +345,7 @@ module Padrino
             number_field(fieldname,
               class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
                                                         'is-invalid'
-                                                      end}",
+                                     end}",
               step: 'any',
               required: (r = required || model_required(fieldname)),
               disabled: disabled,

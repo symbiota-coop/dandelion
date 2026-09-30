@@ -43,7 +43,8 @@ Dandelion::App.controller :dadmin do
             if DADMIN_MATCHABLE_TYPES[:regex].include?(assoc_options[:type])
               query << { fieldname.to_sym.in => assoc_model.where(assoc_fieldname => /#{Regexp.escape(@q)}/i).pluck(:id) }
             elsif DADMIN_MATCHABLE_TYPES[:number].include?(assoc_options[:type]) && (begin
- Float(@q) && true; rescue StandardError; false; end)
+ Float(@q) && true; rescue StandardError; false; 
+            end)
               query << { fieldname.to_sym.in => assoc_model.where(assoc_fieldname => @q).pluck(:id) }
             elsif DADMIN_MATCHABLE_TYPES[:id].include?(assoc_options[:type])
               query << { fieldname.to_sym.in => assoc_model.where(assoc_fieldname => @q).pluck(:id) }
@@ -53,7 +54,8 @@ Dandelion::App.controller :dadmin do
           if DADMIN_MATCHABLE_TYPES[:regex].include?(options[:type])
             query << { fieldname => /#{Regexp.escape(@q)}/i }
           elsif DADMIN_MATCHABLE_TYPES[:number].include?(options[:type]) && (begin
- Float(@q) && true; rescue StandardError; false; end)
+ Float(@q) && true; rescue StandardError; false; 
+          end)
             query << { fieldname => @q }
           elsif DADMIN_MATCHABLE_TYPES[:id].include?(options[:type])
             query << { fieldname => @q }
@@ -107,7 +109,8 @@ Dandelion::App.controller :dadmin do
               raise OperatorNotSupported
             end
           elsif DADMIN_MATCHABLE_TYPES[:number].include?(options[:type]) && (begin
- Float(q) && true; rescue StandardError; false; end || q.nil?)
+ Float(q) && true; rescue StandardError; false; 
+          end || q.nil?)
             case b
             when :in
               query << { :id.in => collection_model.where(fieldname => q).pluck(collection_key) }
@@ -128,7 +131,7 @@ Dandelion::App.controller :dadmin do
                             when 'true', '1' then true
                             when 'false', '0', '' then false
                             else false
-                            end
+                             end
             case b
             when :in
               query << { :id.in => collection_model.where(fieldname => checkbox_value).pluck(collection_key) }

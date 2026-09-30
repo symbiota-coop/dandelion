@@ -1,3 +1,6 @@
+# Fields whose errors are recorded against other attributes (see form_or_tag_field)
+FORM_FIELD_ERROR_ATTRIBUTES = { price_or_range: %i[price range_min range_max] }.freeze
+
 Dandelion::App.helpers do
   def wrap_doc_tables(doc)
     doc.css('table').each do |table|
@@ -109,9 +112,6 @@ Dandelion::App.helpers do
   def u(url)
     URI::Parser.new.escape(url) if url
   end
-
-  # Fields whose errors are recorded against other attributes
-  FORM_FIELD_ERROR_ATTRIBUTES = { price_or_range: %i[price range_min range_max] }.freeze
 
   def form_or_tag_field(form, type, field_name, **options)
     if defined?(form) && form
