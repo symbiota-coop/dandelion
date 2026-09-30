@@ -3,7 +3,6 @@ class OperatorNotSupported < StandardError; end
 
 Dandelion::App.controller :dadmin do
   before do
-    halt 403 if ENV['PERMITTED_IPS'] && (Padrino.env == :production) && !ENV['PERMITTED_IPS'].split(',').include?(request.ip)
     admins_only!
   end
 

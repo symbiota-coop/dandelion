@@ -1,15 +1,9 @@
 Dandelion::App.helpers do
   def models
-    if ENV['ADMIN_MODELS']
-      (ENV['ADMIN_MODELS'].split(',').map do |x|
-         x.constantize
-       end)
-    else
-      (Dir.entries("#{PADRINO_ROOT}/models").select do |filename|
-         filename.ends_with?('.rb')
-       end.map do |filename|
-         filename.split('.rb').first.camelize.constantize
-       end)
+    Dir.entries("#{PADRINO_ROOT}/models").select do |filename|
+      filename.ends_with?('.rb')
+    end.map do |filename|
+      filename.split('.rb').first.camelize.constantize
     end
   end
 

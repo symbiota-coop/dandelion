@@ -6,13 +6,7 @@
       <th></th>
     </tr>
   </thead>
-  <% (featured_models = (ENV['FEATURED_MODELS'] ? ENV['FEATURED_MODELS'].split(',').map(&:constantize) : [])).each { |model| %>
-    <%= partial :'dadmin/home_row', locals: { model: model } %>
-  <% } %>
-  <% if ENV['FEATURED_MODELS'] %>
-    <tr><td style="background: white" colspan="4"><hr></td></tr>
-  <% end %>
-  <% (models - featured_models).sort_by(&:to_s).each { |model| %>
+  <% models.sort_by(&:to_s).each { |model| %>
     <%= partial :'dadmin/home_row', locals: { model: model } %>
   <% } %>
 </table>
