@@ -174,7 +174,6 @@ Dandelion::App.controller :dadmin do
     case content_type
     when :html
       @resources = @resources.paginate(page: params[:page], per_page: 25)
-      instance_variable_set("@#{@model.to_s.underscore.gsub('/', '_').pluralize}", @resources)
       erb :'dadmin/index'
     when :json
       {
@@ -205,13 +204,11 @@ Dandelion::App.controller :dadmin do
 
   get :new, map: '/dadmin/new/:model' do
     @resource = @model.new
-    instance_variable_set("@#{@model.to_s.underscore.gsub('/', '_')}", @resource)
     erb :'dadmin/build'
   end
 
   post :new, map: '/dadmin/new/:model' do
     @resource = @model.new(params[@model.to_s.underscore.gsub('/', '_')])
-    instance_variable_set("@#{@model.to_s.underscore.gsub('/', '_')}", @resource)
     if @resource.save
       flash[:notice] = "<strong>Awesome!</strong> The #{@model.model_name.human.downcase} was created successfully."
       params[:popup] ? refreshParent : redirect(url(:dadmin, :index, model: @model.to_s))
@@ -224,13 +221,11 @@ Dandelion::App.controller :dadmin do
 
   get :edit, map: '/dadmin/edit/:model/:id' do
     @resource = @model.find(params[:id])
-    instance_variable_set("@#{@model.to_s.underscore.gsub('/', '_')}", @resource)
     erb :'dadmin/build'
   end
 
   post :edit, map: '/dadmin/edit/:model/:id' do
     @resource = @model.find(params[:id])
-    instance_variable_set("@#{@model.to_s.underscore.gsub('/', '_')}", @resource)
     if @resource.update_attributes(params[@model.to_s.underscore.gsub('/', '_')])
       flash[:notice] =
         "<strong>Sweet!</strong> The #{@model.model_name.human.downcase} was updated successfully."

@@ -5,7 +5,7 @@
 </div>
 
 <div class="col-sm-8 mx-auto">
-  <% form_for @model.to_s.underscore.gsub('/', '_').to_sym, (@resource.new_record? ? url(:dadmin, :new, model: @model.to_s) : url(:dadmin, :edit, model: @model.to_s, id: @resource.id)), multipart: true do |f| %>
+  <% form_for @resource, (@resource.new_record? ? url(:dadmin, :new, model: @model.to_s) : url(:dadmin, :edit, model: @model.to_s, id: @resource.id)), multipart: true do |f| %>
 
     <%= hidden_field_tag :popup, value: true if params[:popup] %>
 
