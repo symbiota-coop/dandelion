@@ -105,7 +105,7 @@ module Padrino
 
         # Selects and checkboxes
 
-        def check_box_block(fieldname, required: false, disabled: false, tip: nil, hint: nil, container_class: 'form-check', label_class: 'form-check-label', div_class: nil)
+        def check_box_block(fieldname, required: false, disabled: false, tip: nil, hint: nil, container_class: 'form-check form-switch', label_class: 'form-check-label', div_class: nil)
           content = check_box(fieldname,
                               class: "form-check-input #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
                                                            'is-invalid'
