@@ -512,18 +512,38 @@ $(function () {
         $list.append($item)
       })
     }
-    const $sheet = $('#nav-dropdown-sheet')
-    const $body = $sheet.find('.offcanvas-body')
-
-    $sheet.find('.offcanvas-title').text(title)
+    const $body = showSheet(title)
     if ($list.length) {
-      $body.empty().append($list)
+      $body.append($list)
     } else {
       $body.html('<div class="text-center p-4"><i class="bi bi-spin bi-slash-lg"></i></div>')
         .load($source.attr('data-pagelet-url'))
     }
-    bootstrap.Offcanvas.getOrCreateInstance($sheet[0]).show()
   })
+
+  // The event stats row as a list of its columns, since the table is far wider than a phone
+  $(document).on('click', '[data-stats-sheet]', function () {
+    const $table = $($(this).attr('data-stats-sheet'))
+    const $cells = $table.find('tbody tr').first().children()
+    const $list = $('<div class="list-group list-group-flush"></div>')
+    $table.find('thead tr').first().children().each(function (i) {
+      const label = $(this).text().trim()
+      const $cell = $cells.eq(i)
+      if (i === 0 || !label || $(this).css('display') === 'none') return
+      const $value = $('<span class="text-end"></span>').append($cell.contents().clone())
+      $value.find('img').remove()
+      $list.append($('<div class="list-group-item d-flex justify-content-between align-items-start gap-3"></div>')
+        .append($('<span class="text-muted"></span>').text(label), $value))
+    })
+    showSheet('Stats').append($list)
+  })
+
+  function showSheet (title) {
+    const $sheet = $('#nav-dropdown-sheet')
+    $sheet.find('.offcanvas-title').text(title)
+    bootstrap.Offcanvas.getOrCreateInstance($sheet[0]).show()
+    return $sheet.find('.offcanvas-body').empty()
+  }
 
   $(document).on('shown.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
     const hash = e.target.hash
