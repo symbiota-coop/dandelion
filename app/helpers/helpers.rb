@@ -1,3 +1,5 @@
+CACHEBUST_DIGESTS = {}
+
 Dandelion::App.helpers do
   def back(fragment = nil)
     uri = internal_redirect_uri(request.referer) || URI.parse('/')
@@ -217,5 +219,15 @@ Dandelion::App.helpers do
 
     flash[:error] = "You've already left feedback on that event"
     redirect "/o/#{@event.organisation.slug}/events"
+  end
+
+  def cachebust(path)
+    file = File.join(settings.public_folder, path)
+    return path unless File.exist?(file)
+
+    mtime = File.mtime(file)
+    cached = CACHEBUST_DIGESTS[path]
+    cached = CACHEBUST_DIGESTS[path] = [mtime, Digest::MD5.file(file).hexdigest[0..7]] unless cached && cached[0] == mtime
+    "#{path}?#{cached[1]}"
   end
 end

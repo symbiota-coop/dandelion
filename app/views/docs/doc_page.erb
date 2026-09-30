@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="/stylesheets/docs.css?<%= @cachebuster %>">
+<link rel="stylesheet" href="<%= cachebust('/stylesheets/docs.css') %>">
 <script type="application/json" id="doc-search-index">
   <%== @doc_search_index.to_json %>
 </script>
@@ -43,4 +43,4 @@
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script src="/javascripts/docs.js?<%= @cachebuster %>"></script>
+<script src="<%= cachebust('/javascripts/docs.js') %>"></script>

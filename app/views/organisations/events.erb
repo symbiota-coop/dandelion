@@ -1,5 +1,5 @@
 <% if params[:minimal] %>
-  <script src="/javascripts/sticky_carousel_buttons.js?<%= @cachebuster %>"></script>
+  <script src="<%= cachebust('/javascripts/sticky_carousel_buttons.js') %>"></script>
 <% end %>
 
 <% unless params[:minimal] %>

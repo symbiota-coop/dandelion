@@ -62,7 +62,7 @@
 <script type="application/json" id="events-build-config">
   <%== events_build_config.to_json %>
 </script>
-<script src="/javascripts/events_build.js?<%= @cachebuster %>"></script>
+<script src="<%= cachebust('/javascripts/events_build.js') %>"></script>
 
 <%= partial :'events_build/drafts' %>
 

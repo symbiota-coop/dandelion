@@ -14,7 +14,7 @@
     <% files.split(' ').each do |f| %>
       <% url = path.nil? ? "#{base_url}#{f}" : "#{base_url}#{path}/#{f}" %>
       <% ext = f.split('.').last.to_sym %>
-      <% url += "?#{@cachebuster}" if base_url == '/javascripts/' %>
+      <% url = cachebust(url) if base_url == '/javascripts/' %>
       <% case ext %>
       <% when :js %>
         <script src="<%= url %>" defer></script>
@@ -25,11 +25,11 @@
   <% end %>
 <% end %>
 
-<link rel="stylesheet" href="/stylesheets/event_details.css?<%= @cachebuster %>">
-<link rel="stylesheet" href="/stylesheets/app.css?<%= @cachebuster %>">
-<link rel="stylesheet" href="/stylesheets/datatables.css?<%= @cachebuster %>">
-<link rel="stylesheet" href="/stylesheets/select2.css?<%= @cachebuster %>">
-<link rel="stylesheet" href="/stylesheets/ckeditor.css?<%= @cachebuster %>">
+<link rel="stylesheet" href="<%= cachebust('/stylesheets/event_details.css') %>">
+<link rel="stylesheet" href="<%= cachebust('/stylesheets/app.css') %>">
+<link rel="stylesheet" href="<%= cachebust('/stylesheets/datatables.css') %>">
+<link rel="stylesheet" href="<%= cachebust('/stylesheets/select2.css') %>">
+<link rel="stylesheet" href="<%= cachebust('/stylesheets/ckeditor.css') %>">
 
 <% [
      'https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha',
