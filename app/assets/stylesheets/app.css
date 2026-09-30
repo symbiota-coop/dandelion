@@ -2370,6 +2370,11 @@ div.block-title.map-event h4 {
   background: var(--bs-white);
 }
 
+#carousel-buttons-container .btn {
+  --bs-btn-padding-y: 0.25rem;
+  --bs-btn-padding-x: 0.5rem;
+}
+
 table.event-details td {
   font-size: 1.25em
 }
