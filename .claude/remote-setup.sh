@@ -48,6 +48,16 @@ if [ "$(ruby -e 'print RUBY_VERSION' 2>/dev/null || true)" != "$RUBY_VERSION" ];
   export PATH="$RUBY_PREFIX/bin:$PATH"
 fi
 
+# Chromium ignores the system CA store, so trust the agent proxy's CA in its NSS store, or every CDN request fails
+PROXY_CA=/root/.ccr/agent-proxy-ca.crt
+if [ -f "$PROXY_CA" ]; then
+  command -v certutil >/dev/null || { apt-get update -qq && apt-get install -y -qq --no-install-recommends libnss3-tools; } >/dev/null
+  mkdir -p "$HOME/.pki/nssdb"
+  [ -f "$HOME/.pki/nssdb/cert9.db" ] || certutil -d "sql:$HOME/.pki/nssdb" -N --empty-password
+  certutil -d "sql:$HOME/.pki/nssdb" -L -n ccr-agent-proxy >/dev/null 2>&1 \
+    || certutil -d "sql:$HOME/.pki/nssdb" -A -t "C,," -n ccr-agent-proxy -i "$PROXY_CA"
+fi
+
 gem list -i bundler -v "$BUNDLER_VERSION" >/dev/null || gem install bundler -v "$BUNDLER_VERSION"
 command -v foreman >/dev/null || gem install foreman
 

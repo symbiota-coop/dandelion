@@ -25,7 +25,9 @@ Capybara.register_driver :cuprite do |app|
   options[:process_timeout] = 30
   options[:window_size] = [1280, 720]
   options[:headless] = true
-  options[:browser_options] = { 'no-sandbox' => nil } if Process.uid.zero? # Chromium won't start as root (e.g. cloud agent containers) otherwise
+  options[:browser_options] = {}
+  options[:browser_options]['no-sandbox'] = nil if Process.uid.zero? # Chromium won't start as root (e.g. cloud agent containers) otherwise
+  options[:browser_options]['proxy-server'] = ENV['HTTPS_PROXY'] if ENV['HTTPS_PROXY'] # Chromium ignores HTTPS_PROXY, so CDN requests fail behind an agent proxy
   Capybara::Cuprite::Driver.new(app, options)
 end
 Capybara.javascript_driver = :cuprite
