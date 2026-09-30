@@ -3,7 +3,7 @@ description: Read the shared daily bug review prompt into a step output
 
 inputs:
   title_prefix:
-    description: Issue title prefix (e.g. "[Claude] " or "[Cursor] ")
+    description: Issue title prefix (e.g. "[Claude] ", "[Cursor] " or "[Codex] ")
     required: true
   git_log_cmd:
     description: git log command that lists commits in the review window

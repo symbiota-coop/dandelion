@@ -1,0 +1,102 @@
+name: Daily Bug Review (Codex)
+
+concurrency:
+  group: daily-bug-review-codex
+  cancel-in-progress: true
+
+env:
+  CODEX_MODEL: gpt-6-sol
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  bug-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: read
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup
+        id: setup
+        uses: ./.github/actions/bug-review-setup
+
+      - name: Load prompt
+        if: steps.setup.outputs.has_commits == 'true'
+        id: prompt
+        uses: ./.github/actions/bug-review-prompt
+        with:
+          title_prefix: '[Codex] '
+          git_log_cmd: ${{ steps.setup.outputs.git_log_cmd }}
+          review_window: ${{ steps.setup.outputs.review_window }}
+
+      - name: Install Codex CLI
+        if: steps.setup.outputs.has_commits == 'true'
+        run: npm install -g @openai/codex
+
+      - name: Restore Codex login
+        if: steps.setup.outputs.has_commits == 'true'
+        env:
+          CODEX_AUTH_JSON: ${{ secrets.CODEX_AUTH_JSON }}
+        run: |
+          mkdir -p ~/.codex
+          printf '%s' "$CODEX_AUTH_JSON" > ~/.codex/auth.json
+          chmod 600 ~/.codex/auth.json
+
+      - name: Run bug review
+        if: steps.setup.outputs.has_commits == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PROMPT_TEXT: ${{ steps.prompt.outputs.text }}
+        run: |
+          codex_result="$(mktemp)"
+          codex_err="$(mktemp)"
+
+          set +e
+          codex exec --dangerously-bypass-approvals-and-sandbox \
+            --model "$CODEX_MODEL" \
+            --output-last-message "$codex_result" \
+            "$PROMPT_TEXT" \
+            2> >(tee "$codex_err" >&2)
+          codex_status=$?
+          set -e
+
+          {
+            echo "## Codex Report"
+            echo
+
+            if [ -s "$codex_result" ]; then
+              echo "### Final Result"
+              echo
+              cat "$codex_result"
+            else
+              echo "Codex did not return a final result."
+            fi
+
+            if [ "$codex_status" -ne 0 ]; then
+              echo
+              echo "### Exit Status"
+              echo
+              echo "\`codex\` exited with status \`$codex_status\`."
+
+              if [ -s "$codex_err" ]; then
+                echo
+                echo "### Error Output"
+                echo
+                echo '```text'
+                tail -n 120 "$codex_err"
+                echo '```'
+              fi
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit "$codex_status"
