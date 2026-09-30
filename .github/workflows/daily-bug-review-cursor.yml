@@ -12,7 +12,6 @@ on:
 jobs:
   bug-review:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     permissions:
       actions: read
       contents: read
