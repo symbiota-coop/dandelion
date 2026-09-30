@@ -9,12 +9,12 @@
 
     <%= hidden_field_tag :popup, value: true if params[:popup] %>
 
-    <% admin_fields(@model).select { |_fieldname, options| options[:edit] }.each { |fieldname, options| %>
+    <% dadmin_fields(@model).select { |_fieldname, options| options[:edit] }.each { |fieldname, options| %>
       <% unless @resource.new_record? and options[:type] == :collection %>
-        <% case options[:type]; when :collection; assoc = assoc(@model, fieldname, relationship: :has_many) %>
+        <% case options[:type]; when :collection; assoc = dadmin_assoc(@model, fieldname, relationship: :has_many) %>
           <%= content = '<ul class="list-unstyled">'
               @resource.send(fieldname).limit(l = 10).each do |x|
-                content << %(<li><a class="popup" href="#{url(:dadmin, :edit, popup: true, model: assoc.class_name, id: x.id)}">#{ERB::Util.html_escape(x.send(lookup_method(assoc.class_name.constantize)))}</a></li>)
+                content << %(<li><a class="popup" href="#{url(:dadmin, :edit, popup: true, model: assoc.class_name, id: x.id)}">#{ERB::Util.html_escape(x.send(dadmin_lookup_method(assoc.class_name.constantize)))}</a></li>)
               end
               if @resource.send(fieldname).count > l
                 content << '<li>⋮</li>'
@@ -25,7 +25,7 @@
               f.block_layout(fieldname, content, tip: options[@resource.new_record? ? :new_tip : :edit_tip], hint: options[@resource.new_record? ? :new_hint : :edit_hint]) %>
         <% when :lookup %>
           <% @resource.send("#{fieldname}=", params[fieldname]) unless @resource.send(fieldname) %>
-          <%= f.send("#{options[:type]}_block", fieldname, lookup_url: url(:dadmin, :index, model: assoc(@model, fieldname).class_name, format: :json), placeholder: "Search #{fieldname.to_s.humanize.downcase.pluralize}", selected_link: (%(<a class="popup" href="#{url(:dadmin, :edit, model: assoc(@model, fieldname).class_name, id: @resource.send(fieldname), popup: true)}">View record</a>) if @resource.send(fieldname)), tip: options[@resource.new_record? ? :new_tip : :edit_tip], hint: options[@resource.new_record? ? :new_hint : :edit_hint]) %>
+          <%= f.send("#{options[:type]}_block", fieldname, lookup_url: url(:dadmin, :index, model: dadmin_assoc(@model, fieldname).class_name, format: :json), placeholder: "Search #{fieldname.to_s.humanize.downcase.pluralize}", selected_link: (%(<a class="popup" href="#{url(:dadmin, :edit, model: dadmin_assoc(@model, fieldname).class_name, id: @resource.send(fieldname), popup: true)}">View record</a>) if @resource.send(fieldname)), tip: options[@resource.new_record? ? :new_tip : :edit_tip], hint: options[@resource.new_record? ? :new_hint : :edit_hint]) %>
         <% else %>
           <%= f.send("#{options[:type]}_block", fieldname, tip: options[@resource.new_record? ? :new_tip : :edit_tip], hint: options[@resource.new_record? ? :new_hint : :edit_hint], disabled: options[:disabled]) %>
         <% end %>

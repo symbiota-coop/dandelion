@@ -3,10 +3,10 @@ DADMIN_MATCHABLE_TYPES = { regex: %i[text text_area email url slug select], numb
 DADMIN_QUERYABLE_TYPES = (DADMIN_MATCHABLE_TYPES.values.flatten + %i[lookup check_box date datetime]).freeze
 
 Dandelion::App.helpers do
-  def admin_fields(model)
+  def dadmin_fields(model)
     admin_fields = model.admin_fields
-    admin_fields[:created_at] = { type: :datetime, edit: false } if persisted_field?(model, :created_at)
-    admin_fields[:updated_at] = { type: :datetime, edit: false } if persisted_field?(model, :updated_at)
+    admin_fields[:created_at] = { type: :datetime, edit: false } if dadmin_persisted_field?(model, :created_at)
+    admin_fields[:updated_at] = { type: :datetime, edit: false } if dadmin_persisted_field?(model, :updated_at)
     admin_fields = Hash[admin_fields.map do |fieldname, options|
                           options = { type: options } if options.is_a?(Symbol)
                           options[:index] = true if !options.keys.include?(:index) && DADMIN_QUERYABLE_TYPES.include?(options[:type])
@@ -14,7 +14,7 @@ Dandelion::App.helpers do
                           options[:disabled] = true if fieldname == :id
                           if %i[lookup
                                 collection].include?(options[:type])
-                            options[:class_name] = assoc(model, fieldname, relationship: case options[:type]
+                            options[:class_name] = dadmin_assoc(model, fieldname, relationship: case options[:type]
                                                                                          when :lookup then :belongs_to
                                                                                          when :collection then :has_many
                                                                                          end).class_name
@@ -27,7 +27,7 @@ Dandelion::App.helpers do
     admin_fields
   end
 
-  def assoc(model, fieldname, relationship: :belongs_to)
+  def dadmin_assoc(model, fieldname, relationship: :belongs_to)
     case relationship
     when :belongs_to
       model.reflect_on_all_associations(:belongs_to).find { |assoc| assoc.foreign_key == fieldname.to_s }
@@ -36,11 +36,11 @@ Dandelion::App.helpers do
     end
   end
 
-  def lookup_method(model)
-    admin_fields(model).find { |_fieldname, options| options[:lookup] }.first
+  def dadmin_lookup_method(model)
+    dadmin_fields(model).find { |_fieldname, options| options[:lookup] }.first
   end
 
-  def persisted_field?(model, fieldname)
+  def dadmin_persisted_field?(model, fieldname)
     fieldname.to_s == 'id' || model.fields[fieldname.to_s]
   end
 
@@ -57,15 +57,15 @@ Dandelion::App.helpers do
 
   # Conditions for the index's text search, one per field it can match, to be ORed
   def dadmin_text_search(model, q)
-    admin_fields(model).filter_map do |fieldname, options|
+    dadmin_fields(model).filter_map do |fieldname, options|
       if options[:type] == :lookup
-        assoc_model = assoc(model, fieldname).class_name.constantize
-        assoc_fieldname = lookup_method(assoc_model)
-        next unless persisted_field?(assoc_model, assoc_fieldname)
+        assoc_model = dadmin_assoc(model, fieldname).class_name.constantize
+        assoc_fieldname = dadmin_lookup_method(assoc_model)
+        next unless dadmin_persisted_field?(assoc_model, assoc_fieldname)
 
-        condition = dadmin_match(assoc_fieldname, admin_fields(assoc_model)[assoc_fieldname][:type], q)
+        condition = dadmin_match(assoc_fieldname, dadmin_fields(assoc_model)[assoc_fieldname][:type], q)
         { fieldname.to_sym.in => assoc_model.and(condition).pluck(:id) } if condition
-      elsif persisted_field?(model, fieldname)
+      elsif dadmin_persisted_field?(model, fieldname)
         dadmin_match(fieldname, options[:type], q)
       end
     end
@@ -76,16 +76,16 @@ Dandelion::App.helpers do
   def dadmin_criterion(model, fieldname, operator, value)
     if fieldname.include?('.')
       collection, fieldname = fieldname.split('.', 2)
-      collection_assoc = assoc(model, collection, relationship: :has_many) or return
+      collection_assoc = dadmin_assoc(model, collection, relationship: :has_many) or return
       collection_model = collection_assoc.class_name.constantize
       key = collection_assoc.foreign_key.to_sym
     else
       collection_model = model
       key = :id
     end
-    options = admin_fields(collection_model)[fieldname.to_sym] or return
+    options = dadmin_fields(collection_model)[fieldname.to_sym] or return
     type = options[:type]
-    return unless type == :lookup || persisted_field?(collection_model, fieldname)
+    return unless type == :lookup || dadmin_persisted_field?(collection_model, fieldname)
 
     value = nil if value == 'nil'
     ranged = false
@@ -116,7 +116,7 @@ Dandelion::App.helpers do
   # The record a lookup field points to, or nil
   def dadmin_lookup_record(model, fieldname, resource)
     id = resource.send(fieldname) or return
-    assoc(model, fieldname).class_name.constantize.find(id)
+    dadmin_assoc(model, fieldname).class_name.constantize.find(id)
   end
 
   # After saving or deleting: back to url, or in a popup, reload the page that opened it and close

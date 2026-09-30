@@ -52,7 +52,7 @@
   <thead>
     <tr>
       <th style="width: 70px"></th>
-      <% admin_fields(@model).select { |_fieldname, options| options[:index] }.each { |fieldname, options| %>
+      <% dadmin_fields(@model).select { |_fieldname, options| options[:index] }.each { |fieldname, options| %>
       <th data-fieldname="<%= fieldname %>">
         <%= @model.human_attribute_name(fieldname) %>
 
@@ -64,7 +64,7 @@
               <i class="bi bi-caret-up"></i>
             <% end %>
           </a>
-        <% elsif persisted_field?(@model, fieldname) %>
+        <% elsif dadmin_persisted_field?(@model, fieldname) %>
           <a title="Order by <%= fieldname %>" href="javascript:;" class="od odn">
             <i class="bi bi-caret-right"></i>
           </a>
@@ -81,11 +81,11 @@
       <td>
         <a href="<%= url(:dadmin, :edit, model: @model.to_s, id: resource.id) %>" class="btn btn-secondary" title="View/Edit" aria-label="View/Edit"><i class="bi bi-pencil"></i></a>
       </td>
-      <% admin_fields(@model).select { |_fieldname, options| options[:index] }.each { |fieldname, options| %>
+      <% dadmin_fields(@model).select { |_fieldname, options| options[:index] }.each { |fieldname, options| %>
       <td>
         <% if options[:type] == :lookup && resource.send(fieldname) %>
           <% if (record = dadmin_lookup_record(@model, fieldname, resource)) %>
-            <a href="<%= url(:dadmin, :edit, model: record.class.to_s, id: record.id) %>"><%= record.send(lookup_method(record.class)) %></a>
+            <a href="<%= url(:dadmin, :edit, model: record.class.to_s, id: record.id) %>"><%= record.send(dadmin_lookup_method(record.class)) %></a>
           <% else %>
             <%= resource.send(fieldname) %>
           <% end %>

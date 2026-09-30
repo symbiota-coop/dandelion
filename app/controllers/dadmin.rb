@@ -14,7 +14,7 @@ Dandelion::App.controller :dadmin do
   end
 
   get :index, map: '/dadmin/index/:model', provides: %i[html json csv] do
-    @o, @d = :created_at, :desc if persisted_field?(@model, :created_at)
+    @o, @d = :created_at, :desc if dadmin_persisted_field?(@model, :created_at)
     @o, @d = @model.filter_options.values_at(:o, :d) if @model.respond_to?(:filter_options)
     @o = params[:o].to_sym if params[:o]
     @d = params[:d].to_sym if params[:d]
@@ -48,18 +48,18 @@ Dandelion::App.controller :dadmin do
     when :json
       {
         results: @resources.map do |resource|
-          { id: resource.id.to_s, text: "#{resource.send(lookup_method(resource.class))} (id:#{resource.id})" }
+          { id: resource.id.to_s, text: "#{resource.send(dadmin_lookup_method(resource.class))} (id:#{resource.id})" }
         end
       }.to_json
     when :csv
-      fields = admin_fields(@model).select { |_fieldname, options| options[:index] }
+      fields = dadmin_fields(@model).select { |_fieldname, options| options[:index] }
       CSV.generate do |csv|
         csv << fields.keys
         @resources.each do |resource|
           csv << fields.map do |fieldname, options|
             if options[:type] == :lookup && (id = resource.send(fieldname))
               record = dadmin_lookup_record(@model, fieldname, resource)
-              "#{record ? record.send(lookup_method(record.class)) : id} (id:#{id})"
+              "#{record ? record.send(dadmin_lookup_method(record.class)) : id} (id:#{id})"
             elsif %i[date datetime].include?(options[:type])
               resource.send(fieldname).try(:iso8601)
             else
