@@ -1032,17 +1032,13 @@ body.greyed #content {
   float: none;
   right: auto;
   margin-top: 0;
-  font-size: 0.825rem;
+  --bs-dropdown-font-size: 0.825rem;
   border-radius: 0.5rem;
   box-shadow: 0 0.125rem 0.375rem 1px rgba(0, 0, 0, 0.1);
   z-index: 9999
 }
 
 /* Items are Bootstrap's dropdown-item, restyled through its variables. Other dropdowns (dropdown_nav etc) keep Bootstrap's roomier item padding */
-.dropdown-menu {
-  --bs-dropdown-font-size: 0.825rem;
-}
-
 .navbar .dropdown-menu {
   --bs-dropdown-item-padding-x: 0.9375rem;
   --bs-dropdown-item-padding-y: 0.1875rem;
