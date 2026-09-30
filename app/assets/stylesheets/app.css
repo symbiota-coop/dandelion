@@ -1103,6 +1103,10 @@ body.greyed #content {
   border-radius: 0.75rem 0.75rem 0 0;
 }
 
+.nav-dropdown-sheet .list-group {
+  --bs-list-group-action-color: var(--bs-body-color);
+}
+
 /* ==========================================================================
    Dropdown notifications
    ========================================================================== */
