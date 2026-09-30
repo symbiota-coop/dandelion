@@ -6,8 +6,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-RUBY_VERSION=3.4.7
-BUNDLER_VERSION=2.4.19
+RUBY_VERSION="$(sed -nE "s/^ruby '([^']+)'.*/\1/p" Gemfile)"
 
 # Prefer the Playwright Chromium preinstalled in the image; Ubuntu's apt chromium is a snap stub
 find_browser() {
@@ -57,9 +56,6 @@ if [ -f "$PROXY_CA" ]; then
   certutil -d "sql:$HOME/.pki/nssdb" -L -n ccr-agent-proxy >/dev/null 2>&1 \
     || certutil -d "sql:$HOME/.pki/nssdb" -A -t "C,," -n ccr-agent-proxy -i "$PROXY_CA"
 fi
-
-gem list -i bundler -v "$BUNDLER_VERSION" >/dev/null || gem install bundler -v "$BUNDLER_VERSION"
-command -v foreman >/dev/null || gem install foreman
 
 # Persist to the agent's shell, which doesn't inherit this script's environment
 if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
