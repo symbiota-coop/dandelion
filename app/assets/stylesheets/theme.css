@@ -42,6 +42,15 @@
   color: var(--theme-color-darker);
 }
 
+/* Flash toasts, tinted like the success alerts above */
+.toast-success {
+  --bs-toast-color: var(--theme-color-darker);
+  --bs-toast-bg: rgba(var(--theme-color-rgb), 0.1);
+  --bs-toast-border-color: var(--theme-color-darker);
+  --toast-bg-end: rgba(var(--theme-color-rgb), 0.25);
+  background-color: #fff;
+}
+
 .ai-well {
   background: linear-gradient(135deg,
       rgba(var(--theme-color-rgb), 0.175) 0%,
