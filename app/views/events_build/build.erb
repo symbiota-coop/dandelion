@@ -297,6 +297,17 @@
           </div>
         <% end %>
       </div>
+      <div role="tabpanel" class="tab-pane" id="tab-integrations">
+        <%= f.text_block :facebook_pixel_id %>
+        <%= f.text_block :google_ads_conversion_id %>
+        <%= f.text_block :google_ads_conversion_label %>
+        <%= f.check_box_block :google_ads_enhanced_conversions %>
+        <%= f.text_block :oc_slug %>
+        <%= f.text_block :tax_rate_id %>
+        <% if @event.organisation.gocardless_instalments || @event.gocardless_instalment_count %>
+          <%= f.number_block :gocardless_instalment_count %>
+        <% end %>
+      </div>
       <div role="tabpanel" class="tab-pane" id="tab-everything-else">
         <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/e/" %>
         <%= f.url_block :redirect_url %>
@@ -334,17 +345,6 @@
 
         <% if !@event.organisation.stripe_client_id && @event.new_record? %>
           <%= f.submit_block %>
-        <% end %>
-      </div>
-      <div role="tabpanel" class="tab-pane" id="tab-integrations">
-        <%= f.text_block :facebook_pixel_id %>
-        <%= f.text_block :google_ads_conversion_id %>
-        <%= f.text_block :google_ads_conversion_label %>
-        <%= f.check_box_block :google_ads_enhanced_conversions %>
-        <%= f.text_block :oc_slug %>
-        <%= f.text_block :tax_rate_id %>
-        <% if @event.organisation.gocardless_instalments || @event.gocardless_instalment_count %>
-          <%= f.number_block :gocardless_instalment_count %>
         <% end %>
       </div>
       <% if @event.persisted? && @event.start_time && @event.past? %>
