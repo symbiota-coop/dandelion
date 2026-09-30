@@ -49,12 +49,14 @@ Always ask permission before running tests. Your default posture should be to su
 - Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
 - `lib/form_builder.rb` defines the `_block` helpers like `text_block`, `wysiwyg_block` etc. `lib/param_helpers.rb` runs `blanks_to_nils!` on `params` so we can just do `if params[:x]` (no need for `if params[:x].present?`).
 - Do not use `.presence`
-- Stylesheets are plain CSS (no Sass). `app/assets/stylesheets/bootstrap5.css` is compiled vendor CSS: never edit it; override it in `app/assets/stylesheets/app.css`, which also holds the page layout (header, sidebar, content) and component styles. Styles only needed on certain pages go in their own file that only those pages load (e.g. `docs.css`, loaded by the docs views, and `messages.css`, loaded by the messages page), not in the site-wide dependencies
-- Use `badge badge-*` for counts and short statuses (Sold out, Locked, Refunded), and `label label-*` for tags, linked entities and amounts (event tags, teams, revenue figures)
-- The UI is Bootstrap 5 with jQuery, so Bootstrap's jQuery plugins still work (`$(el).tooltip()`, `$('#modal').modal('show')`). Use `data-bs-*` attributes (`data-bs-toggle="tooltip"`), logical spacing and alignment (`ms-*`, `me-*`, `text-end`, `float-start`) and `form-select` on selects. Space fields with `mb-3` (activate-tools' blocks do); `.form-inline` and `.form-group` were dropped from Bootstrap 5 but are kept in `app.css` for the filter forms above lists and tables. `badge-*` and `label-*` are our own classes too
-- To change Bootstrap variables, edit `app/assets/stylesheets/bootstrap5.scss` and run `rake bootstrap:build` (needs Node), which regenerates `bootstrap5.css` and `app/assets/javascripts/ext/bootstrap.bundle.min.js`
-- `event_details.css` and `email.css` are inlined into emails, so they can't use CSS custom properties (`var(--x)`)
 - Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` — no `before_action`, strong params, or `render`
+
+## Design
+
+- Stylesheets are plain CSS. Never edit `bootstrap5.css` (compiled vendor CSS): override Bootstrap in `app.css`, or change its variables in `bootstrap5.scss` and run `rake bootstrap:build` (needs Node). Page-specific styles go in their own file loaded only by those pages (e.g. `docs.css`, `messages.css`)
+- Bootstrap 5 with jQuery: use `data-bs-*` attributes, logical spacing/alignment (`ms-*`, `me-*`, `text-end`, `float-start`), `form-select` on selects and `mb-3` between fields. `.form-inline` and `.form-group` are kept in `app.css` for filter forms
+- Use `badge badge-*` for counts and short statuses (Sold out, Locked), and `label label-*` for tags, linked entities and amounts
+- `event_details.css` and `email.css` are inlined into emails, so they can't use CSS custom properties (`var(--x)`)
 
 ## Dependencies
 
