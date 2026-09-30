@@ -1182,18 +1182,17 @@ body.greyed #content {
 
   .nav-crumbs > .btn-group {
     flex-shrink: 0;
-    max-width: 12rem;
-  }
-
-  .nav-crumbs > .btn-group:last-child {
-    max-width: 14rem;
   }
 
   .nav-crumbs .btn {
-    max-width: 100%;
+    max-width: 12rem;
     padding: 0.625rem 1rem;
     font-size: 0.9rem;
     white-space: nowrap;
+  }
+
+  .nav-crumbs > .btn-group:last-child .btn {
+    max-width: 14rem;
   }
 
   .nav-crumbs .dropdown-nav-name {
