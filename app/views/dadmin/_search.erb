@@ -23,8 +23,8 @@
   $(function () {
 
     <% fields = admin_fields(@model)
-   fields = Hash[fields.select { |fieldname, options| (persisted_field?(@model, fieldname) and queryable.include?(options[:type])) or options[:type] == :collection }.map do |fieldname, options|
-                   [fieldname, options[:type] == :collection ? (submodel = options[:class_name].constantize; admin_fields(submodel).select { |fieldname, options| (persisted_field?(submodel, fieldname) and queryable.include?(options[:type])) }) : options]
+   fields = Hash[fields.select { |fieldname, options| (persisted_field?(@model, fieldname) and DADMIN_QUERYABLE_TYPES.include?(options[:type])) or options[:type] == :collection }.map do |fieldname, options|
+                   [fieldname, options[:type] == :collection ? (submodel = options[:class_name].constantize; admin_fields(submodel).select { |fieldname, options| (persisted_field?(submodel, fieldname) and DADMIN_QUERYABLE_TYPES.include?(options[:type])) }) : options]
                  end] %>
     var fields = <%== fields.to_json %>
 

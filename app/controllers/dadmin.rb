@@ -34,28 +34,28 @@ Dandelion::App.controller :dadmin do
       query = []
       admin_fields(@model).each do |fieldname, options|
         if options[:type] === :lookup
-          assoc_name = assoc_name(@model, fieldname)
+          assoc_name = assoc(@model, fieldname).class_name
           assoc_model = assoc_name.constantize
           assoc_fields = admin_fields(assoc_model)
           assoc_fieldname = lookup_method(assoc_model)
           assoc_options = assoc_fields[assoc_fieldname]
           if persisted_field?(assoc_model, assoc_fieldname)
-            if matchable_regex.include?(assoc_options[:type])
+            if DADMIN_MATCHABLE_TYPES[:regex].include?(assoc_options[:type])
               query << { fieldname.to_sym.in => assoc_model.where(assoc_fieldname => /#{Regexp.escape(@q)}/i).pluck(:id) }
-            elsif matchable_number.include?(assoc_options[:type]) && (begin
+            elsif DADMIN_MATCHABLE_TYPES[:number].include?(assoc_options[:type]) && (begin
  Float(@q) && true; rescue StandardError; false; end)
               query << { fieldname.to_sym.in => assoc_model.where(assoc_fieldname => @q).pluck(:id) }
-            elsif matchable_id.include?(assoc_options[:type])
+            elsif DADMIN_MATCHABLE_TYPES[:id].include?(assoc_options[:type])
               query << { fieldname.to_sym.in => assoc_model.where(assoc_fieldname => @q).pluck(:id) }
             end
           end
         elsif persisted_field?(@model, fieldname)
-          if matchable_regex.include?(options[:type])
+          if DADMIN_MATCHABLE_TYPES[:regex].include?(options[:type])
             query << { fieldname => /#{Regexp.escape(@q)}/i }
-          elsif matchable_number.include?(options[:type]) && (begin
+          elsif DADMIN_MATCHABLE_TYPES[:number].include?(options[:type]) && (begin
  Float(@q) && true; rescue StandardError; false; end)
             query << { fieldname => @q }
-          elsif matchable_id.include?(options[:type])
+          elsif DADMIN_MATCHABLE_TYPES[:id].include?(options[:type])
             query << { fieldname => @q }
           end
         end
@@ -89,7 +89,7 @@ Dandelion::App.controller :dadmin do
             raise OperatorNotSupported
           end
         elsif persisted_field?(collection_model, fieldname)
-          if matchable_regex.include?(options[:type])
+          if DADMIN_MATCHABLE_TYPES[:regex].include?(options[:type])
             case b
             when :in
               if q.nil?
@@ -106,7 +106,7 @@ Dandelion::App.controller :dadmin do
             when :gt, :gte, :lt, :lte
               raise OperatorNotSupported
             end
-          elsif matchable_number.include?(options[:type]) && (begin
+          elsif DADMIN_MATCHABLE_TYPES[:number].include?(options[:type]) && (begin
  Float(q) && true; rescue StandardError; false; end || q.nil?)
             case b
             when :in
@@ -116,7 +116,7 @@ Dandelion::App.controller :dadmin do
             when :gt, :gte, :lt, :lte
               query << { :id.in => collection_model.where(fieldname.to_sym.send(b) => q).pluck(collection_key) }
             end
-          elsif matchable_id.include?(options[:type])
+          elsif DADMIN_MATCHABLE_TYPES[:id].include?(options[:type])
             case b
             when :in
               query << { :id.in => collection_model.where(fieldname => q).pluck(collection_key) }
@@ -187,7 +187,7 @@ Dandelion::App.controller :dadmin do
         @resources.each do |resource|
           csv << fields.map do |fieldname, options|
             if (options[:type] === :lookup) && resource.send(fieldname)
-              assoc_name = assoc_name(@model, fieldname)
+              assoc_name = assoc(@model, fieldname).class_name
               "#{r = assoc_name.constantize.find(resource.send(fieldname)); r ? r.send(lookup_method(assoc_name.constantize)) : resource.send(fieldname)} (id:#{resource.send(fieldname)})"
             elsif %i[date datetime].include?(options[:type])
               resource.send(fieldname).try(:iso8601)
@@ -210,11 +210,11 @@ Dandelion::App.controller :dadmin do
     @resource = @model.new(params[@model.to_s.underscore.gsub('/', '_')])
     instance_variable_set("@#{@model.to_s.underscore.gsub('/', '_')}", @resource)
     if @resource.save
-      flash[:notice] = "<strong>Awesome!</strong> The #{human_model_name(@model).downcase} was created successfully."
+      flash[:notice] = "<strong>Awesome!</strong> The #{@model.model_name.human.downcase} was created successfully."
       params[:popup] ? refreshParent : redirect(url(:dadmin, :index, model: @model.to_s))
     else
       flash.now[:error] =
-        "<strong>Oops.</strong> Some errors prevented the #{human_model_name(@model).downcase} from being saved."
+        "<strong>Oops.</strong> Some errors prevented the #{@model.model_name.human.downcase} from being saved."
       erb :'dadmin/build'
     end
   end
@@ -230,11 +230,11 @@ Dandelion::App.controller :dadmin do
     instance_variable_set("@#{@model.to_s.underscore.gsub('/', '_')}", @resource)
     if @resource.update_attributes(params[@model.to_s.underscore.gsub('/', '_')])
       flash[:notice] =
-        "<strong>Sweet!</strong> The #{human_model_name(@model).downcase} was updated successfully."
+        "<strong>Sweet!</strong> The #{@model.model_name.human.downcase} was updated successfully."
       params[:popup] ? refreshParent : redirect(url(:dadmin, :edit, model: @model.to_s, id: @resource.id))
     else
       flash.now[:error] =
-        "<strong>Oops.</strong> Some errors prevented the #{human_model_name(@model).downcase} from being saved."
+        "<strong>Oops.</strong> Some errors prevented the #{@model.model_name.human.downcase} from being saved."
       erb :'dadmin/build'
     end
   end
@@ -242,9 +242,9 @@ Dandelion::App.controller :dadmin do
   post :destroy, map: '/dadmin/destroy/:model/:id' do
     resource = @model.find(params[:id])
     if resource.destroy
-      flash[:notice] = "<strong>Boom!</strong> The #{human_model_name(@model).downcase} was deleted."
+      flash[:notice] = "<strong>Boom!</strong> The #{@model.model_name.human.downcase} was deleted."
     else
-      flash[:error] = "<strong>Darn!</strong> The #{human_model_name(@model).downcase} couldn't be deleted."
+      flash[:error] = "<strong>Darn!</strong> The #{@model.model_name.human.downcase} couldn't be deleted."
     end
     params[:popup] ? refreshParent : redirect(url(:dadmin, :index, model: @model.to_s))
   end
