@@ -1,33 +1,25 @@
-<% unless @hide_alert %>
-  <style>
-    #alert-wrap {
-      position: absolute;
-    z-index: 9999;
-    top: 0;
-    left: 50%;
-    width: 90%;
-    margin-left: -45%;
-    <% if event_admin? %>
-      display: none;
-    <% end %>
-    }
-    @media(min-width: 992px) {
-      #alert-wrap { width: 50%; margin-left: -25% }
-    }
-  </style>
-  <div id="alert-wrap" class="mt-3">
-    <div class="container">
-      <%= partial :flash %>
-    </div>
+<% if !@hide_alert && (flash[:error] || flash[:warning] || flash[:notice]) %>
+  <div class="toast-container flash-toasts position-fixed top-0 start-50 translate-middle-x p-3">
+    <% { error: 'danger', warning: 'warning', notice: 'success' }.each { |k,v| %>
+      <% if flash[k] %>
+        <div class="toast toast-<%= v %> fade show" role="<%= k == :notice ? 'status' : 'alert' %>" aria-live="<%= k == :notice ? 'polite' : 'assertive' %>" aria-atomic="true" data-bs-delay="<%= k == :notice ? 3000 : 6000 %>">
+          <div class="d-flex">
+            <div class="toast-body">
+              <%== Sanitize.fragment(flash[k], Sanitize::Config::DANDELION) %>
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      <% end %>
+    <% } %>
   </div>
   <script>
-    $(function () {
-      <% if event_admin? %>
-        $("#alert-wrap").fadeIn(500);
-      <% end %>
-      window.setTimeout(function () {
-        $("#alert-wrap .alert").alert('close');
-      }, 3000);
-    });
+    // Toasts are rendered already shown, as Bootstrap only loads after the other deferred scripts
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.flash-toasts .toast').forEach(function (el) {
+        var toast = bootstrap.Toast.getOrCreateInstance(el)
+        setTimeout(function () { toast.hide() }, el.dataset.bsDelay)
+      })
+    })
   </script>
 <% end %>

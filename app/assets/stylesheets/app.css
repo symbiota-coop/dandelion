@@ -318,6 +318,11 @@
     view-transition-name: sidebar;
   }
 
+  /* Otherwise flash toasts sit under the header until the transition ends */
+  .flash-toasts {
+    view-transition-name: flash-toasts;
+  }
+
   ::view-transition-old(header),
   ::view-transition-new(header),
   ::view-transition-old(sidebar),
@@ -746,6 +751,39 @@ body.greyed #content {
 
 .alert-dismissible .btn-close {
   padding: 0.875rem;
+}
+
+/* Toasts use the same colours and gradients as alerts */
+.toast-success {
+  --bs-toast-color: var(--theme-color);
+  --bs-toast-bg: var(--color-green-tint);
+  --bs-toast-border-color: var(--theme-color);
+  --toast-bg-end: var(--color-green-tint-strong);
+}
+
+.toast-warning {
+  --bs-toast-color: var(--color-orange-darker);
+  --bs-toast-bg: var(--color-orange-tint);
+  --bs-toast-border-width: 0;
+  --toast-bg-end: var(--color-orange-tint-strong);
+}
+
+.toast-danger {
+  --bs-toast-color: var(--color-red-dark);
+  --bs-toast-bg: var(--color-red-tint);
+  --bs-toast-border-width: 0;
+  --toast-bg-end: var(--color-red-tint-strong);
+}
+
+.toast-success,
+.toast-warning,
+.toast-danger {
+  background-image: linear-gradient(135deg, var(--bs-toast-bg) 0%, var(--bs-toast-bg) 50%, var(--toast-bg-end) 100%);
+}
+
+.flash-toasts .toast {
+  width: max-content;
+  max-width: min(90vw, 40rem);
 }
 
 /* ==========================================================================
