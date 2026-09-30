@@ -73,5 +73,5 @@ bash script/agent-env/start-services.sh
 # Keep Puma running like Cursor's web terminal, detached so the hook can finish
 if ! (exec 3<>/dev/tcp/127.0.0.1/3000) 2>/dev/null && ! pgrep -f 'foreman: main' >/dev/null; then
   mkdir -p log
-  setsid nohup foreman start -e .env web >> log/web.log 2>&1 < /dev/null &
+  PATH="/usr/local/bundle/bin:$PATH" setsid nohup foreman start -e .env web >> log/web.log 2>&1 < /dev/null &
 fi

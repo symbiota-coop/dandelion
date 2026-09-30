@@ -10,7 +10,7 @@
   "terminals": [
     {
       "name": "web",
-      "command": "foreman start -e .env web",
+      "command": "PATH=\"/usr/local/bundle/bin:$PATH\" foreman start -e .env web",
       "description": "Dandelion Puma on port 3000"
     }
   ],
