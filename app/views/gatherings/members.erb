@@ -23,7 +23,7 @@
       <% @gathering.check_box_scopes.each_with_index { |el,i| k,t,r = *el %>
       <div class="form-check form-check-inline ms-3 mb-2">
         <%= check_box_tag k, value: true, checked: params[k], onclick: 'this.form.submit()', id: k, class: 'form-check-input' %>
-        <label class="form-check-label" for="<%= k %>" style="font-weight: 500">
+        <label class="form-check-label fw-medium" for="<%= k %>">
           <%= t %>&nbsp;<strong><%= r.count %></strong>
         </label>
       </div>

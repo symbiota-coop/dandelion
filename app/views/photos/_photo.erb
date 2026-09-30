@@ -1,4 +1,4 @@
-<a style="text-decoration: none" href="javascript:;" data-bs-toggle="modal" data-bs-target="#photo-<%= photo.id %>">
+<a class="text-decoration-none" href="javascript:;" data-bs-toggle="modal" data-bs-target="#photo-<%= photo.id %>">
   <img class="mb-1 me-1" src="<%= u photo.image.thumb(defined?(dimensions) ? dimensions : '200x200#').url %>">
 </a>
 <div class="modal fade" id="photo-<%= photo.id %>" tabindex="-1" role="dialog">

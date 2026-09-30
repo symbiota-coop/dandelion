@@ -16,7 +16,7 @@
         </div>
       </div>
 
-      <div class="input-group" style="margin: 5px 0">
+      <div class="input-group my-1">
         <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
         <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: params[:donation_amount]%>
         <%= hidden_field_tag :donation_via_modal, id: 'donation_via_modal', value: 0 %>
@@ -67,7 +67,7 @@
           <%= "(minimum #{m @event.minimum_donation, @event.currency})" if @event.minimum_donation && @event.minimum_donation > 0 %>
         </strong>
       <% end %>
-      <div class="input-group" style="margin: 5px 0">
+      <div class="input-group my-1">
         <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
         <% if @event.minimum_donation %>
           <script>

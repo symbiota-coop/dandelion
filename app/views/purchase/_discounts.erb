@@ -67,14 +67,14 @@
     <td>
       <strong>Apply a code</strong>
       <% if discount_code %>
-        <div class="input-group" style="margin: 5px 0">
+        <div class="input-group my-1">
           <%= text_field_tag :discount_code_display, id: 'discount_code_display', class: 'form-control', style: 'width: 5em', disabled: true, value: params[:discount_code].upcase %>
           <%= hidden_field_tag :discount_code_id, id: 'discount_code_id', value: discount_code.id %>
           <button class="btn btn-outline-secondary" type="button" onclick="applyDiscountCode(null)">Remove</button>
         </div>
         <% if discount_code.percentage_discount %>
           <strong>Discount applied</strong>
-          <div class="input-group" style="margin: 5px 0">
+          <div class="input-group my-1">
             <%= number_field_tag :percentage_discount, id: 'percentage_discount', class: 'form-control', style: 'width: 5em', disabled: true, value: discount_code.percentage_discount %>
             <span class="py-0 input-group-text">%</span>
           </div>
@@ -85,7 +85,7 @@
             <p class="mb-0">The code you entered is not valid</p>
           </div>
         <% end %>
-        <div class="input-group" style="margin: 5px 0">
+        <div class="input-group my-1">
           <%= text_field_tag :discount_code, id: 'discount_code', class: 'form-control', style: 'width: 5em' %>
           <button class="btn btn-outline-secondary" style="padding: 0 0.75rem" type="button" onclick="applyDiscountCode($('#discount_code').val())">Apply</button>
         <% end %>
@@ -107,7 +107,7 @@
       <td></td>
       <td>
         <strong><%= organisationship_for_discount.organisation_tier.name %> discount</strong>
-        <div class="input-group" style="margin: 5px 0">
+        <div class="input-group my-1">
           <%= number_field_tag :discount, id: 'discount', class: 'form-control', style: 'width: 5em', disabled: true, value: organisationship_for_discount.monthly_donor_discount %>
           <span class="py-0 input-group-text">%</span>
         </div>

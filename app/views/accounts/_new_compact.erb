@@ -40,7 +40,7 @@
       <%= email_field_tag :'account[email]', class: 'form-control me-1 mb-1', required: true, placeholder: 'Email' %>
       <%= text_field_tag :'account[postcode]', class: 'form-control me-1 mb-1', placeholder: 'Postcode' %>
       <%= select_tag :'account[country]', class: 'me-1', placeholder: 'Country', options: (['',''] + Account.countries), selected: visitor_country_name %>
-      <div class="g-recaptcha" style="margin-bottom: 4px" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+      <div class="g-recaptcha mb-1" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
       <%= submit_tag 'Subscribe', class: 'btn d-block d-lg-inline btn-primary mb-1' %>
     <% end %>
   </div>

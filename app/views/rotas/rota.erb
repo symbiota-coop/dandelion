@@ -15,7 +15,7 @@
 </a>
 
 <% if @rota.description %>
-  <div style="margin: 15px 0">
+  <div class="my-3">
     <div class="wysiwyg">
       <%== Sanitize.fragment(@rota.description, Sanitize::Config::DANDELION) %>
     </div>
@@ -50,7 +50,7 @@
 
     })
   </script>
-  <div style="margin-top: 10px">
+  <div class="mt-2">
     <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="bi bi-arrow-left-right"></i> Reorder</a>
     <div style="display: none" class="tactivity-form">
       <h3>Reorder roles</h3>

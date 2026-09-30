@@ -47,7 +47,7 @@
   <td>
     <% @gathering.events.each { |event| %>
     <% event.tickets.complete.and(account: account).each { |ticket| %>
-    <a href="/events/<%=event.id%>/tickets" class="text-white label label-primary mb-1 d-inline-block" style="text-decoration: none"><i class="bi bi-ticket-detailed-fill"></i> <%= (ticket.ticket_type.name + ', ') if ticket.ticket_type%><%= event.name %></a>
+    <a href="/events/<%=event.id%>/tickets" class="text-white label label-primary mb-1 d-inline-block text-decoration-none"><i class="bi bi-ticket-detailed-fill"></i> <%= (ticket.ticket_type.name + ', ') if ticket.ticket_type%><%= event.name %></a>
     <% } %>
     <% } %>
   </td>

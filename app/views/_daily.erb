@@ -32,7 +32,7 @@ render_article("Trending events", "Create a two-paragraph summary of these trend
         <% book = library_books.sample %>
         <% if book %>
           <a href="/books/<%= book[:slug] %>">
-            <img style="max-width: 100%" src="/books/<%= book[:slug] %>.jpg">
+            <img class="mw-100" src="/books/<%= book[:slug] %>.jpg">
           </a>
         <% end %>
       </div>
@@ -45,7 +45,7 @@ render_article("Trending events", "Create a two-paragraph summary of these trend
         <% film = library_films.sample %>
         <% if film %>
           <a href="<%= film[:url] %>">
-            <img style="max-width: 100%" src="/films/<%= film[:slug] %>.jpg">
+            <img class="mw-100" src="/films/<%= film[:slug] %>.jpg">
           </a>
         <% end %>
       </div>
@@ -66,7 +66,7 @@ render_article("Trending events", "Create a two-paragraph summary of these trend
           ).sample
         end
         %>
-        <a style="text-decoration: none" href="javascript:;" data-account-username="<%= account.username %>">
+        <a class="text-decoration-none" href="javascript:;" data-account-username="<%= account.username %>">
           <img class="w-100 <%= 'private' if account.private? %>" src="<%= u account.image_thumb_or_gravatar_url %>">
           <h4 class="mt-2">
             <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>

@@ -2,7 +2,7 @@
   <a href="/events/<%= event.id %>/tickets">
     <%= checked_in %>/<%=event.tickets.complete.count %>
   </a>
-  <a class="d-block" style="text-decoration: none" href="/events/<%= event.id %>/tickets">
+  <a class="d-block text-decoration-none" href="/events/<%= event.id %>/tickets">
     <div class="progress" data-bs-toggle="tooltip" title="<%= checked_in %>/<%= event.tickets.complete.count %> tickets sold">
       <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
         <% if defined?(full_width) %>

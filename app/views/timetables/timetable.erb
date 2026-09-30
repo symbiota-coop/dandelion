@@ -8,13 +8,13 @@
   </a>
 <% end %>
 <% if @timetable.description %>
-  <div style="margin: 15px 0">
+  <div class="my-3">
     <div class="wysiwyg">
       <%== Sanitize.fragment(@timetable.description, Sanitize::Config::DANDELION) %>
     </div>
   </div>
 <% end %>
-<div style="margin: 15px 0">
+<div class="my-3">
   <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="bi bi-plus-lg"></i> Propose an activity</a>
   <div style="display: none" class="tactivity-form">
     <%= partial :'timetables/tactivity_form', locals: { timetable: @timetable } %>

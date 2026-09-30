@@ -3,7 +3,7 @@
     <div class="card-body">
       You owe <%= m (@membership.requested_contribution - @membership.paid), @gathering.currency %>.
       (You've paid <%= m (@membership.paid or 0), @gathering.currency %> of a requested contribution of <%= m @membership.requested_contribution, @gathering.currency %>.)
-      <div style="margin-top: 10px">
+      <div class="mt-2">
         <%= partial :'gatherings/pay', locals: { amount: (@membership.requested_contribution - @membership.paid) } %>
       </div>
     </div>

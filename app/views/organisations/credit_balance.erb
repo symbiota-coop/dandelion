@@ -16,14 +16,14 @@
 </p>
 <% if organisation_admin? %>
   <% form_tag "/organisationships/#{@organisationship.id}/credit/plus", class: 'form-inline mb-3', id: 'plus-credit', style: 'display: none' do %>
-    <i style="margin-right: 5px" class="bi bi-plus-square-fill"></i>
+    <i class="bi bi-plus-square-fill me-1"></i>
     <div class="input-group">
       <span class="input-group-text"><%= money_symbol(@organisation.currency) %></span>
       <%= number_field_tag :amount, class: 'form-control', style: 'width: 6em' %>
     </div>
   <% end %>
   <% form_tag "/organisationships/#{@organisationship.id}/credit/minus", class: 'form-inline mb-3', id: 'minus-credit', style: 'display: none' do %>
-    <i style="margin-right: 5px" class="bi bi-dash-square-fill"></i>
+    <i class="bi bi-dash-square-fill me-1"></i>
     <div class="input-group">
       <span class="input-group-text"><%= money_symbol(@organisation.currency) %></span>
       <%= number_field_tag :amount, class: 'form-control', style: 'width: 6em' %>
