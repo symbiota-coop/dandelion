@@ -25,9 +25,9 @@
     <% headers.each do |header| %>
       <div class="article">
         <h2 class="article-title"><%= header %></h2>
-        <div class="article-content">
+        <div class="article-content placeholder-glow">
           <% 10.times do %>
-            <div class="flicker mb-3" style="width: <%= rand(10..90) %>%; background: rgba(0,0,0,0.1)">&nbsp;</div>
+            <span class="placeholder d-block mb-3" style="width: <%= rand(10..90) %>%"></span>
           <% end %>
         </div>
       </div>

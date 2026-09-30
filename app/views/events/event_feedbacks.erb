@@ -17,9 +17,11 @@
     <% if stash %>
       <%== stash.value %>
     <% else %>
-      <% 5.times do %>
-        <div class="flicker mb-3" style="width: <%= rand(10..90) %>%; background: rgba(0,0,0,0.1)">&nbsp;</div>
-      <% end %>
+      <div class="placeholder-glow">
+        <% 5.times do %>
+          <span class="placeholder d-block mb-3" style="width: <%= rand(10..90) %>%"></span>
+        <% end %>
+      </div>
     <% end %>
   </div>
 <% end %>

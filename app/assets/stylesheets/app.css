@@ -2482,10 +2482,6 @@ table.event-details td {
    Carousels (Slick)
    ========================================================================== */
 
-.slick-placeholder h2 {
-  color: var(--bs-secondary-bg);
-}
-
 .slick-placeholder img {
   background: var(--bs-secondary-bg);
 }
@@ -2719,22 +2715,9 @@ img.private:hover {
   }
 }
 
-@keyframes flickerAnimation {
-  0% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.5;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-.flicker {
-  animation: flickerAnimation 2s infinite;
+/* Lighter than Bootstrap's 0.5; placeholder-glow pulses between this and 0.2 */
+.placeholder {
+  opacity: 0.1;
 }
 
 p.action {

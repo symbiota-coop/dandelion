@@ -4,9 +4,11 @@
 
 <% if current_account.event_feedbacks_as_facilitator.and(:created_at.gte => 1.year.ago, :answers.ne => nil).exists? %>
   <div data-with-placeholder data-pagelet-url="/event_feedbacks/report" data-bs-toggle="tooltip" title="AI-generated ✨">
-    <% 10.times do %>
-      <div class="flicker mb-3" style="width: <%= rand(10..90) %>%; background: rgba(0,0,0,0.1)">&nbsp;</div>
-    <% end %>
+    <div class="placeholder-glow">
+      <% 10.times do %>
+        <span class="placeholder d-block mb-3" style="width: <%= rand(10..90) %>%"></span>
+      <% end %>
+    </div>
   </div>
 <% else %>
   <div>

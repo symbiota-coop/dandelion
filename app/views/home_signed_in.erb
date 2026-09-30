@@ -16,10 +16,12 @@
     </div>
 
     <div data-with-placeholder id="newsfeed" data-pagelet-url="<%= params[:tour] ? '/?tour=1' : '/'%>" data-pagelet-refresh="60" class="p-3 border rounded shadow-sm bg-white">
-      <% 15.times do %>
-        <div class="flicker w-75" style="background: rgba(0,0,0,0.1)">&nbsp;</div>
-        <hr class="my-3" style="border-top-color: rgba(0,0,0,0.1)">
-      <% end %>
+      <div class="placeholder-glow">
+        <% 15.times do %>
+          <span class="placeholder d-block w-75"></span>
+          <hr class="my-3" style="border-top-color: rgba(0,0,0,0.1)">
+        <% end %>
+      </div>
     </div>
   </div>
   <div class="col-lg-4">
