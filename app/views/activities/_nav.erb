@@ -19,6 +19,6 @@
       ].compact, button_text: %(#{activity.name}), container_class: 'btn-group mb-1' %>
   <% unless defined?(inline) %>
     <%== '</div>' %>
-    <script>(el => { el.scrollLeft = el.scrollWidth })(document.currentScript.previousElementSibling)</script>
+    <%= nav_crumbs_scroll_script %>
   <% end %>
 <% end %>

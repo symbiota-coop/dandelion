@@ -17,6 +17,6 @@
       ].compact, button_text: %(#{local_group.name}), container_class: "btn-group mb-1#{' nav-crumbs-sibling' if defined?(beside_activity) && beside_activity}" %>
   <% unless defined?(inline) %>
     <%== '</div>' %>
-    <script>(el => { el.scrollLeft = el.scrollWidth })(document.currentScript.previousElementSibling)</script>
+    <%= nav_crumbs_scroll_script %>
   <% end %>
 <% end %>
