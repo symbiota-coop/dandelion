@@ -12,7 +12,7 @@ $(function () {
   // Bootstrap's collapse, so clicking again mid-slide reverses it at once (Bootstrap ignores clicks until it's done)
   function slideSubMenu ($menu, open) {
     $menu.data('open', open).siblings('a').attr('aria-expanded', open)
-    $menu.stop()[open ? 'slideDown' : 'slideUp'](open ? 350 : 200, function () {
+    $menu.stop()[open ? 'slideDown' : 'slideUp'](350, function () {
       // Hand back to the collapse/show classes, which the minified sidebar's CSS relies on, dropping the
       // inline sizes an interrupted slide leaves behind
       $menu.toggleClass('show', open).removeAttr('style')
