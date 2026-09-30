@@ -4,51 +4,55 @@
 <% end %>
 
 <% if event_admin? %>
-  <% if event.organisation %>
-    <%= partial :'organisations/nav', locals: { organisation: event.organisation, inline: true } %>
-  <% end %>
+  <div class="nav-crumbs">
+    <% if event.organisation %>
+      <%= partial :'organisations/nav', locals: { organisation: event.organisation, inline: true } %>
+    <% end %>
+    <% if event.persisted? %>
+      <% if event.activity %>
+        <%= partial :'activities/nav', locals: { activity: event.activity, hide_organisation_nav: true, inline: true } %>
+      <% end %>
+      <% if event.local_group %>
+        <%= partial :'local_groups/nav', locals: { local_group: event.local_group, hide_organisation_nav: true, inline: true } %>
+      <% end %>
+      <% if event.deleted? %>
+        <%= dropdown_nav [
+            ['View deleted event', "/e/#{event.slug}/edit"],
+            ([%(Orders <span class="badge badge-primary">#{event.orders.deleted.complete.count}</span>), "/events/#{event.id}/orders"] if event.orders.deleted.complete.count.positive?),          
+            ([%(Tickets <span class="badge badge-primary">#{event.tickets.deleted.complete.count}</span>), "/events/#{event.id}/tickets"] if event.ticket_types.count.positive? || event.tickets.deleted.complete.count.positive?),
+            ([%(Donations <span class="badge badge-primary">#{event.donations.deleted.complete.count}</span>), "/events/#{event.id}/donations"] if event.donations.deleted.complete.count.positive?),          
+          ].compact, button_text: %(#{event.name}), container_class: 'btn-group mb-1' %>
+      <% else %>
+        <%= dropdown_nav [
+            ['View event', "/e/#{event.slug}"],
+            ['Edit event', "/e/#{event.slug}/edit"],
+            ['Delete event', "/events/#{event.id}/delete"],
+            ['Duplicate event', "/events/#{event.id}/duplicate", { 'data-method' => 'post', 'data-confirm' => 'Are you sure you want to duplicate the event?' }],
+            ['Discount codes' + (event.discount_codes.count.positive? ? " <span class='badge badge-primary'>#{event.discount_codes.count}</span>" : ''), "/events/#{event.id}/discount_codes"],
+            ([%(Orders <span class="badge badge-primary">#{event.orders.count}</span>), "/events/#{event.id}/orders"] if event.orders.count.positive?),
+            ([%(Tickets <span class="badge badge-primary">#{event.tickets.count}</span>), "/events/#{event.id}/tickets"] if event.ticket_types.count.positive? || event.tickets.count.positive?),
+            ([%(Donations <span class="badge badge-primary">#{event.donations.count}</span>), "/events/#{event.id}/donations"] if event.donations.count.positive?),
+            ['Boosts' + (event.event_boosts.count.positive? ? " <span class='badge badge-primary'>#{event.event_boosts.count}</span>" : ''), "/events/#{event.id}/boosts"],
+            ([%(Payments <span class="badge badge-primary">#{event.rpayments.count}</span>), "/events/#{event.id}/rpayments"] if event.organisation.stripe_client_id),
+            ([%(Waitlist <span class="badge badge-primary">#{event.waitships.count}</span>), "/events/#{event.id}/waitlist"] if event.waitships.count.positive?),
+            (if event.allow_ticket_type_waitlists?
+                 ticket_type_waitship_count = TicketTypeWaitship.and(:ticket_type_id.in => event.ticket_type_ids).count
+                 [%(Ticket type waitlists <span class="badge badge-primary">#{ticket_type_waitship_count}</span>), "/events/#{event.id}/ticket_type_waitlists"] if ticket_type_waitship_count.positive?
+               end),
+            ([%(Feedback <span class="badge badge-primary">#{event.event_feedbacks.count}</span>), "/events/#{event.id}/feedback"] if event.event_feedbacks.count.positive?),
+            (['Ticket type photos', "/events/#{event.id}/ticket_types"] if event.ticket_types.exists?),
+            (['Co-host settings', "/events/#{event.id}/cohosts"] if event.cohostships.count.positive?),          
+            (['Preview confirmation email', "/events/#{event.id}/ticket_email"] if event.ticket_types.count.positive?),
+            (['Preview reminder email', "/events/#{event.id}/reminder_email"] if event.ticket_types.count.positive? && !event.evergreen?),
+            (['Preview feedback request email', "/events/#{event.id}/feedback_request_email"] if event.ticket_types.count.positive? && !event.evergreen?),
+            ['Audience stats', "/events/#{event.id}/stats"],
+            ([%(Check-in scanner), "/e/#{event.slug}/check_in"] if event.ticket_types.count.positive? || event.tickets.count.positive?),
+            ['Mailer', "/events/#{event.id}/pmails"]
+          ].compact, button_text: %(#{event.name}), container_class: 'btn-group mb-1' %>
+      <% end %>
+    <% end %>
+  </div>
   <% if event.persisted? %>
-    <% if event.activity %>
-      <%= partial :'activities/nav', locals: { activity: event.activity, hide_organisation_nav: true, inline: true } %>
-    <% end %>
-    <% if event.local_group %>
-      <%= partial :'local_groups/nav', locals: { local_group: event.local_group, hide_organisation_nav: true, inline: true } %>
-    <% end %>
-    <% if event.deleted? %>
-      <%= dropdown_nav [
-          ['View deleted event', "/e/#{event.slug}/edit"],
-          ([%(Orders <span class="badge badge-primary">#{event.orders.deleted.complete.count}</span>), "/events/#{event.id}/orders"] if event.orders.deleted.complete.count.positive?),          
-          ([%(Tickets <span class="badge badge-primary">#{event.tickets.deleted.complete.count}</span>), "/events/#{event.id}/tickets"] if event.ticket_types.count.positive? || event.tickets.deleted.complete.count.positive?),
-          ([%(Donations <span class="badge badge-primary">#{event.donations.deleted.complete.count}</span>), "/events/#{event.id}/donations"] if event.donations.deleted.complete.count.positive?),          
-        ].compact, button_text: %(#{event.name} <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
-    <% else %>
-      <%= dropdown_nav [
-          ['View event', "/e/#{event.slug}"],
-          ['Edit event', "/e/#{event.slug}/edit"],
-          ['Delete event', "/events/#{event.id}/delete"],
-          ['Duplicate event', "/events/#{event.id}/duplicate", { 'data-method' => 'post', 'data-confirm' => 'Are you sure you want to duplicate the event?' }],
-          ['Discount codes' + (event.discount_codes.count.positive? ? " <span class='badge badge-primary'>#{event.discount_codes.count}</span>" : ''), "/events/#{event.id}/discount_codes"],
-          ([%(Orders <span class="badge badge-primary">#{event.orders.count}</span>), "/events/#{event.id}/orders"] if event.orders.count.positive?),
-          ([%(Tickets <span class="badge badge-primary">#{event.tickets.count}</span>), "/events/#{event.id}/tickets"] if event.ticket_types.count.positive? || event.tickets.count.positive?),
-          ([%(Donations <span class="badge badge-primary">#{event.donations.count}</span>), "/events/#{event.id}/donations"] if event.donations.count.positive?),
-          ['Boosts' + (event.event_boosts.count.positive? ? " <span class='badge badge-primary'>#{event.event_boosts.count}</span>" : ''), "/events/#{event.id}/boosts"],
-          ([%(Payments <span class="badge badge-primary">#{event.rpayments.count}</span>), "/events/#{event.id}/rpayments"] if event.organisation.stripe_client_id),
-          ([%(Waitlist <span class="badge badge-primary">#{event.waitships.count}</span>), "/events/#{event.id}/waitlist"] if event.waitships.count.positive?),
-          (if event.allow_ticket_type_waitlists?
-               ticket_type_waitship_count = TicketTypeWaitship.and(:ticket_type_id.in => event.ticket_type_ids).count
-               [%(Ticket type waitlists <span class="badge badge-primary">#{ticket_type_waitship_count}</span>), "/events/#{event.id}/ticket_type_waitlists"] if ticket_type_waitship_count.positive?
-             end),
-          ([%(Feedback <span class="badge badge-primary">#{event.event_feedbacks.count}</span>), "/events/#{event.id}/feedback"] if event.event_feedbacks.count.positive?),
-          (['Ticket type photos', "/events/#{event.id}/ticket_types"] if event.ticket_types.exists?),
-          (['Co-host settings', "/events/#{event.id}/cohosts"] if event.cohostships.count.positive?),          
-          (['Preview confirmation email', "/events/#{event.id}/ticket_email"] if event.ticket_types.count.positive?),
-          (['Preview reminder email', "/events/#{event.id}/reminder_email"] if event.ticket_types.count.positive? && !event.evergreen?),
-          (['Preview feedback request email', "/events/#{event.id}/feedback_request_email"] if event.ticket_types.count.positive? && !event.evergreen?),
-          ['Audience stats', "/events/#{event.id}/stats"],
-          ([%(Check-in scanner), "/e/#{event.slug}/check_in"] if event.ticket_types.count.positive? || event.tickets.count.positive?),
-          ['Mailer', "/events/#{event.id}/pmails"]
-        ].compact, button_text: %(#{event.name} <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
-    <% end %>
     <style>
       #event_stats thead th { border-top: none }
     </style>

@@ -254,7 +254,7 @@
       <% if order.deleted? %>
         <%= dropdown_nav [
         ['Restore and complete', "/events/#{order.event_id}/orders/#{order.id}/restore_and_complete", { 'data-method' => 'post' }],
-      ].compact, button_text: %(Actions <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
+      ].compact, button_text: %(Actions), container_class: 'btn-group mb-1' %>
       <% else %>
         <%= dropdown_nav [
         ['Link to order confirmation', "/orders/#{order.public_id}"],
@@ -262,7 +262,7 @@
         ['Transfer to another event', "/orders/#{order.id}/transfer"],
         (['Remove and refund order', "/events/#{order.event.id}/orders/#{order.id}/refund_and_destroy"] if order.refundable?),
         ['Remove order', "/events/#{order.event.id}/orders/#{order.id}/destroy"],
-      ].compact, button_text: %(Actions <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
+      ].compact, button_text: %(Actions), container_class: 'btn-group mb-1' %>
       <% end %>
     </td>
   </tr>

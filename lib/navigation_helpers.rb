@@ -11,7 +11,7 @@ module NavigationHelpers
 
     s = ''
     s << %(<div class="#{container_class}" id="#{container_id}">)
-    s << %(<button class="#{button_class}" type="button" id="#{button_id}" data-bs-toggle="dropdown" data-mobile-modal="#{mobile_modal_title(button_text)}">#{button_text}</button>)
+    s << %(<button class="#{button_class}" type="button" id="#{button_id}" data-bs-toggle="dropdown" data-mobile-modal="#{mobile_modal_title(button_text)}"><span class="dropdown-nav-name">#{button_text}</span> <i class="bi bi-caret-down-fill"></i></button>)
     s << %(<div class="#{menu_class}">)
     items.each do |item|
       name, path, attrs = item

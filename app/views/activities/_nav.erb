@@ -1,6 +1,6 @@
 <% if activity.persisted? && activity_admin?(activity) %>
   <% unless defined?(inline) %>
-    <%== '<div class="mb-3">' %>
+    <%== '<div class="nav-crumbs mb-3">' %>
   <% end %>
   <% if organisation_admin?(activity.organisation) && !defined?(hide_organisation_nav) %>
     <%= partial :'organisations/nav', locals: { organisation: activity.organisation, inline: true } %>
@@ -16,7 +16,7 @@
         ['Audience stats', "/activities/#{activity.id}/stats"],
         ['Feedback', "/activities/#{activity.id}/feedback"],
         ['Mailer', "/activities/#{activity.id}/pmails"]
-      ].compact, button_text: %(#{activity.name} <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
+      ].compact, button_text: %(#{activity.name}), container_class: 'btn-group mb-1' %>
   <% unless defined?(inline) %>
     <%== '</div>' %>
   <% end %>

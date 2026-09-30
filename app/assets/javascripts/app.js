@@ -485,6 +485,11 @@ $(function () {
     $.post($(this).attr('data-check-url'))
   })
 
+  // Start the mobile nav row scrolled to its last (current) item
+  $('.nav-crumbs').each(function () {
+    this.scrollLeft = this.scrollWidth
+  })
+
   $(document).on('show.bs.dropdown', '[data-mobile-modal]', function (e) {
     const $toggle = $(this)
     const title = $toggle.attr('data-mobile-modal')

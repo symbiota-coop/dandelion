@@ -5,7 +5,7 @@
 <% if organisation.persisted? %>
   <% if organisation_admin?(organisation) %>
     <% unless defined?(inline) %>
-      <%== '<div class="mb-3">' %>
+      <%== '<div class="nav-crumbs mb-3">' %>
     <% end %>
     <%= dropdown_nav [
         ['<i class="bi bi-flag-fill"></i> View organisation', "/o/#{organisation.slug}"],
@@ -32,13 +32,13 @@
         ['Contribute', "/o/#{organisation.slug}/contribute"],
         [],
         ['Delete organisation', "/o/#{organisation.slug}/delete"]
-      ].compact, button_text: %(#{organisation.name} <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
+      ].compact, button_text: %(#{organisation.name}), container_class: 'btn-group mb-1' %>
     <% unless defined?(inline) %>
       <%== '</div>' %>
     <% end %>
   <% elsif current_account && organisation.organisationships.find_by(account: current_account, event_manager: true) %>
     <% unless defined?(inline) %>
-      <%== '<div class="mb-3">' %>
+      <%== '<div class="nav-crumbs mb-3">' %>
     <% end %>
     <%= dropdown_nav [
         ['<i class="bi bi-flag-fill"></i> View organisation', "/o/#{organisation.slug}"],
@@ -46,7 +46,7 @@
         ['<i class="bi bi-calendar-event"></i>  Events', "/o/#{organisation.slug}/events"],
         ['<i class="bi bi-bar-chart-line-fill"></i> Event stats', "/o/#{organisation.slug}/events/stats"],
         ['<i class="bi bi-plus-square-fill"></i>  Create an event', "/events/new?organisation_id=#{organisation.id}"]
-      ].compact, button_text: %(#{organisation.name} <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
+      ].compact, button_text: %(#{organisation.name}), container_class: 'btn-group mb-1' %>
     <% unless defined?(inline) %>
       <%== '</div>' %>
     <% end %>

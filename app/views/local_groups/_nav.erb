@@ -1,6 +1,6 @@
 <% if local_group.persisted? && local_group_admin?(local_group) %>
   <% unless defined?(inline) %>
-    <%== '<div class="mb-3">' %>
+    <%== '<div class="nav-crumbs mb-3">' %>
   <% end %>
   <% if organisation_admin?(local_group.organisation) && !defined?(hide_organisation_nav) %>
     <%= partial :'organisations/nav', locals: { organisation: local_group.organisation, inline: true } %>
@@ -14,7 +14,7 @@
         ['Audience stats', "/local_groups/#{local_group.id}/stats"],
         ['Feedback', "/local_groups/#{local_group.id}/feedback"],
         ['Mailer', "/local_groups/#{local_group.id}/pmails"]
-      ].compact, button_text: %(#{local_group.name} <i class="bi bi-caret-down-fill"></i>), container_class: 'btn-group mb-1' %>
+      ].compact, button_text: %(#{local_group.name}), container_class: 'btn-group mb-1' %>
   <% unless defined?(inline) %>
     <%== '</div>' %>
   <% end %>
