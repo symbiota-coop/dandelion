@@ -119,6 +119,16 @@ class DadminTest < ActiveSupport::TestCase
     assert_includes last_response.body, "/dadmin/new/Follow?popup=true&amp;followee_id=#{admin.id}"
   end
 
+  test 'every has-many is keyed by a field on the other model, so related lists filter' do
+    unkeyed = AppModels.all.flat_map do |model|
+      model.reflect_on_all_associations(:has_many).reject { |assoc| assoc.options[:as] }.filter_map do |assoc|
+        foreign_key = assoc.foreign_key.to_s
+        "#{model}.#{assoc.name}" if foreign_key == '_id' || !assoc.klass.fields.key?(foreign_key)
+      end
+    end
+    assert_empty unkeyed
+  end
+
   test 'a record whose stored image is missing can still be edited in development' do
     sign_in_as_admin
     create_organisation
