@@ -277,7 +277,6 @@ module Padrino
                                          label_class: label_class, div_class: div_class, required: r)
         end
 
-        # Geopicker
 
         def geopicker_block(fieldname, required: false, disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
           content = ''
@@ -300,7 +299,6 @@ module Padrino
                                            label_class: label_class, div_class: div_class, required: r)
         end
 
-        # Submission
 
         def submit_block(button_text: nil, destroy_url: nil, container_class: nil, div_class: nil, disabled: false)
           button_text ||= object.new_record? ? "Create #{model.to_s.underscore.humanize.downcase}" : "Update #{model.to_s.underscore.humanize.downcase}"
@@ -320,7 +318,6 @@ module Padrino
           content.html_safe
         end
 
-        # Currency
 
         def currency_block(fieldname, money_symbol: '$', placeholder: nil, required: false, disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
           content = %(<div class="input-group">
@@ -339,7 +336,6 @@ module Padrino
                                            label_class: label_class, div_class: div_class, required: r)
         end
 
-        # Percentage
 
         def percentage_block(fieldname, placeholder: nil, required: false, disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
           content = %(<div class="input-group">) +
@@ -359,7 +355,6 @@ module Padrino
                                            label_class: label_class, div_class: div_class, required: r)
         end         
 
-        # Block layout
 
         def block_layout(fieldname, content, tip: nil, hint: nil, container_class: nil, label_class: nil, div_class: nil, required: nil)
           tip = if tip

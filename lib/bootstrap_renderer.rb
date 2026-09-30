@@ -1,7 +1,6 @@
 module WillPaginate
   module ViewHelpers
 
-    # WillPaginate link renderer for Twitter Bootstrap
     class BootstrapRenderer < WillPaginate::Sinatra::LinkRenderer
       protected
 

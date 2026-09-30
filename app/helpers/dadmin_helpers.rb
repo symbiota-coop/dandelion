@@ -128,7 +128,6 @@ Dandelion::App.helpers do
     end.to_h
   end
 
-  # The record a lookup field points to, or nil
   def dadmin_lookup_record(model, fieldname, resource)
     id = resource.send(fieldname) or return
     dadmin_assoc(model, fieldname).class_name.constantize.find(id)
