@@ -66,8 +66,8 @@
                 $('tfoot th').eq(index).html(sum);
             });
           })
-          $('#event_stats').DataTable().columns(eventStatsZeroColumns()).visible(false)
-          $('#event_stats').DataTable().draw();
+          table.columns(eventStatsZeroColumns()).visible(false)
+          table.draw();
         }
       })
 
