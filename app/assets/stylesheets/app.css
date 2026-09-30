@@ -942,6 +942,27 @@ body.greyed #content {
   --bs-nav-pills-link-active-bg: var(--theme-color);
 }
 
+.list-group {
+  --bs-list-group-active-bg: var(--theme-color);
+  --bs-list-group-active-border-color: var(--theme-color);
+}
+
+.progress {
+  --bs-progress-bar-bg: var(--theme-color);
+}
+
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+}
+
+.pagination {
+  --bs-pagination-focus-box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+}
+
+.accordion {
+  --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+}
+
 .form-check-input:checked {
   background-color: var(--theme-color);
   border-color: var(--theme-color);
@@ -1044,6 +1065,7 @@ body.greyed #content {
   z-index: 9999
 }
 
+
 /* Items are Bootstrap's dropdown-item, restyled through its variables. Other dropdowns (dropdown_nav etc) keep Bootstrap's roomier item padding */
 .navbar .dropdown-menu {
   --bs-dropdown-item-padding-x: 0.9375rem;
@@ -1097,9 +1119,9 @@ body.greyed #content {
 }
 
 /* The mobile bottom sheet: as tall as its list, up to most of the screen */
-.nav-dropdown-sheet {
+.offcanvas.nav-dropdown-sheet {
   --bs-offcanvas-height: auto;
-  max-height: 80vh;
+  max-height: 80dvh;
   border-radius: 0.75rem 0.75rem 0 0;
 }
 
