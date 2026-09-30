@@ -55,6 +55,7 @@ Always ask permission before running tests. Your default posture should be to su
 
 - Stylesheets are plain CSS. Never edit `bootstrap5.css` (compiled vendor CSS): override Bootstrap in `app.css`, or change its variables in `bootstrap5.scss` and run `rake bootstrap:build` (needs Node). Page-specific styles go in their own file loaded only by those pages (e.g. `docs.css`, `messages.css`)
 - Bootstrap 5 with jQuery: use `data-bs-*` attributes, logical spacing/alignment (`ms-*`, `me-*`, `text-end`, `float-start`), `form-select` on selects and `mb-3` between fields. `.form-inline` and `.form-group` are kept in `app.css` for filter forms
+- To show and hide elements from JS, start them hidden with `style="display: none"` and use jQuery `.show()` / `.hide()` / `.toggle()`, not `d-none` with `addClass` / `removeClass`. Bootstrap's `d-*` classes are `!important`, so they override `.hide()` and `.show()` on the same element. Keep `d-none d-md-block` and friends for purely responsive hiding
 - Use `badge badge-*` for counts and short statuses (Sold out, Locked), and `label label-*` for tags, linked entities and amounts
 - `event_details.css` and `email.css` are inlined into emails, so they can't use CSS custom properties (`var(--x)`)
 
