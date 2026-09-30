@@ -1700,8 +1700,9 @@ ul.pagination {
   border-bottom-width: 0;
 }
 
-/* A row of border-top-0 cells continues the row above, with no line between */
-.table tr:has(+ tr > .border-top-0) > * {
+/* A row of border-top-0 or border-0 cells continues the row above, with no line between */
+.table tr:has(+ tr > .border-top-0) > *,
+.table tr:has(+ tr > .border-0) > * {
   border-bottom-width: 0;
 }
 
