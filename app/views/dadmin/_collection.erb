@@ -1,7 +1,7 @@
 <% assoc = dadmin_assoc(@model, fieldname, relationship: :has_many)
    records = @resource.send(fieldname)
    count = records.count
-   foreign_key = "#{(assoc.inverse_of.try(:class_name) || @model.to_s).underscore}_id"
+   foreign_key = assoc.foreign_key
    noun = fieldname.to_s.singularize.humanize.downcase %>
 <ul class="list-unstyled">
   <% records.limit(10).each do |record| %>

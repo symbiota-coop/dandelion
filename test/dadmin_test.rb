@@ -104,6 +104,31 @@ class DadminTest < ActiveSupport::TestCase
     assert_equal 1, ids.length
   end
 
+  test 'an invalid date in a criterion is ignored rather than matching nothing' do
+    sign_in_as_admin
+    create_event
+    ids = result_ids('/dadmin/index/Event.json', 'qk' => %w[start_time], 'qb' => %w[in], 'qv' => ['not a date'], 'all_any' => 'all')
+    assert_equal [@event.id.to_s], ids
+  end
+
+  test "a record's related lists link by the association's own foreign key" do
+    admin = sign_in_as_admin
+    get "/dadmin/edit/Account/#{admin.id}"
+    assert last_response.ok?
+    assert_includes last_response.body, "/dadmin/new/Event?popup=true&amp;coordinator_id=#{admin.id}"
+    assert_includes last_response.body, "/dadmin/new/Follow?popup=true&amp;followee_id=#{admin.id}"
+  end
+
+  test 'a record whose stored image is missing can still be edited in development' do
+    sign_in_as_admin
+    create_organisation
+    @organisation.set(image_uid: '2026/01/01/missing.png')
+    # In development only, dragonfly_config.rb gives a missing file no url rather than raising
+    Padrino.stub(:env, :development) { get "/dadmin/edit/Organisation/#{@organisation.id}" }
+    assert last_response.ok?
+    assert_includes last_response.body, 'name="organisation[image]"'
+  end
+
   test 'the list exports as CSV with lookups labelled' do
     sign_in_as_admin
     create_event

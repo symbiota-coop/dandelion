@@ -71,7 +71,7 @@ module Padrino
           content = %(<span class="stem">#{stem}</span>) + text_field(fieldname,
                                                                       class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
                                                                                                'is-invalid'
-                                                                                             end} shorturl", required: (r = required || model_required(fieldname)), disabled: disabled, placeholder: placeholder) + (object.persisted? && object.send(fieldname) ? %(<a href="javascript:;"><i class="fa fa-link"></i></a>) : '')
+                                                                                             end} shorturl", required: (r = required || model_required(fieldname)), disabled: disabled, placeholder: placeholder) + (object.persisted? && object.send(fieldname) ? %(<a href="javascript:;"><i class="bi bi-link-45deg"></i></a>) : '')
           block_layout(fieldname, content, tip: tip, hint: hint, container_class: container_class,
                                            label_class: label_class, div_class: div_class, required: r)
         end
@@ -197,7 +197,7 @@ module Padrino
           else
             content << %(
               <div>
-                <i class="fa fa-download"></i> <a target="_blank" href="#{ERB::Util.html_escape(object.send(fieldname).url)}">#{ERB::Util.html_escape(object.send(fieldname).name)}</a>
+                <i class="bi bi-download"></i> <a target="_blank" href="#{ERB::Util.html_escape(object.send(fieldname).url)}">#{ERB::Util.html_escape(object.send(fieldname).name)}</a>
               </div>
               <div>
                 #{file_field(fieldname, class: 'form-control', required: (r = required || model_required(fieldname)),
@@ -218,8 +218,9 @@ module Padrino
             content << file_field(fieldname, class: 'form-control')
           else
             has_error = !error_message_on(fieldname.to_s.gsub('_id', '')).blank?
-            unless has_error
-              url = object.send(fieldname).url
+            url = object.send(fieldname).url
+            # No url when the stored file is missing, as in development without the uploads
+            if !has_error && url
               src = URI::Parser.new.escape(url).gsub('(', '%28').gsub(')', '%29')
               content << %(
             <div style="margin-bottom: 1em">
@@ -370,7 +371,7 @@ module Padrino
                 end
           tip_html = if tip
                        "
-            <i id=\"tip-#{fieldname}\" class=\"fa fa-question-circle\" title=\"#{tip}\"></i>
+            <i id=\"tip-#{fieldname}\" class=\"bi bi-question-circle\" title=\"#{tip}\"></i>
             <script>
               $(function() {
                 $('#tip-#{fieldname}').tooltip({placement: 'right'});

@@ -98,7 +98,9 @@ Dandelion::App.helpers do
     elsif type == :check_box
       value = %w[true 1].include?(value.to_s.downcase)
     elsif %i[date datetime].include?(type)
+      # Date.parse raises on nonsense and Time.zone.parse returns nil: either way, skip the criterion
       value = (type == :date ? Date.parse(value) : Time.zone.parse(value)) rescue return
+      return unless value
       ranged = true
     elsif !(type == :lookup || DADMIN_MATCHABLE_TYPES[:id].include?(type))
       return
