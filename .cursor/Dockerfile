@@ -12,6 +12,9 @@ RUN find /usr/local/lib/ruby/gems -name "*.gemspec" -size 0 -delete
 COPY script/agent-env/system-deps.sh /tmp/system-deps.sh
 RUN bash /tmp/system-deps.sh && rm /tmp/system-deps.sh
 
+# Login shells source /etc/profile, which resets PATH, so put gem executables back on it
+RUN echo 'export PATH=/usr/local/bundle/bin:$PATH' > /etc/profile.d/bundle.sh
+
 RUN useradd --create-home --shell /bin/bash cursor && \
     echo "cursor ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/cursor && \
     chmod 0440 /etc/sudoers.d/cursor && \
