@@ -19,7 +19,7 @@
         .searchForm .form-check { margin-top: 0 }
       }
     </style>
-    <div class="w-100 d-flex flex-wrap mt-3 mb-1" style="font-size: 13px;">
+    <div class="w-100 d-flex flex-wrap mt-3 mb-1">
       <% @gathering.check_box_scopes.each_with_index { |el,i| k,t,r = *el %>
       <div class="form-check form-check-inline ms-3 mb-2">
         <%= check_box_tag k, value: true, checked: params[k], onclick: 'this.form.submit()', id: k, class: 'form-check-input' %>
