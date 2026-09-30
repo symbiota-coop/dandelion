@@ -39,9 +39,11 @@
           <%= pluralize(@membership.invitations_remaining <= 0 ? 0 : @membership.invitations_remaining, 'invitation') %> remaining
         <% end %>
         <div style="display:none" id="add-member">
-          <% form_tag "/g/#{@gathering.slug}/add_member", class: 'form-inline' do %>
-            <%= email_field_tag :email, class: 'form-control me-1', placeholder: 'Email' %>
-            <%= submit_tag 'Add member', class: 'btn btn-primary' %>
+          <% form_tag "/g/#{@gathering.slug}/add_member" do %>
+            <div class="input-group d-inline-flex w-auto">
+              <%= email_field_tag :email, class: 'form-control', placeholder: 'Email', 'aria-label': 'Email' %>
+              <%= submit_tag 'Add member', class: 'btn btn-primary' %>
+            </div>
           <% end %>
         </div>
       <% end %>

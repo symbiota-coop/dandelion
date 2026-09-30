@@ -22,14 +22,16 @@
 
           <% form_tag '/auth/account/callback', class: 'mb-3' do %>
             <div class="mb-1">
-              <label class="visually-hidden">Email</label>
+              <label class="visually-hidden" for="email">Email</label>
               <%= email_field_tag :email, id: 'email', class: 'form-control', placeholder: 'Email' %>
             </div>
-            <div class="mb-1">
-              <label class="visually-hidden">Password</label>
+            <div class="mb-3">
+              <label class="visually-hidden" for="password">Password</label>
               <%= password_field_tag :password, id: 'password', class: 'form-control', placeholder: 'Password' %>
             </div>
-            <button class="btn btn-primary" type="submit">Sign in</button>
+            <div class="d-grid">
+              <button class="btn btn-primary" type="submit">Sign in</button>
+            </div>
           <% end %>
 
           <p class="mb-0">
@@ -46,11 +48,10 @@
         </div>
         <div id="t2" style="display: none">
           <% form_tag '/accounts/sign_in_code' do %>
-            <div class="mb-1">
-              <label class="visually-hidden">Email</label>
-              <%= email_field_tag :email, class: 'form-control', placeholder: 'Email' %>
+            <div class="input-group">
+              <%= email_field_tag :email, id: 'sign-in-code-email', class: 'form-control', placeholder: 'Email', 'aria-label': 'Email' %>
+              <button class="btn btn-primary" type="submit">Get code</button>
             </div>
-            <button class="btn btn-primary" type="submit">Submit</button>
           <% end %>
         </div>
       </div>
