@@ -56,6 +56,9 @@
     <style>
       #event_stats thead th { border-top: none }
     </style>
-    <%= partial :'events/event_stats', locals: { events: Event.unscoped.and(:id.in => [event.id]), organisation: (params[:cohost] && Organisation.find_by(slug: params[:cohost])) || event.organisation } %>
+    <a class="d-md-none d-inline-block mb-3" href="javascript:;" onclick="$(this).next().removeClass('d-none'); $(this).remove()"><i class="bi bi-bar-chart-line"></i> Show stats</a>
+    <div class="d-none d-md-block">
+      <%= partial :'events/event_stats', locals: { events: Event.unscoped.and(:id.in => [event.id]), organisation: (params[:cohost] && Organisation.find_by(slug: params[:cohost])) || event.organisation } %>
+    </div>
   <% end %>
 <% end %>
