@@ -4,9 +4,7 @@
   edge_opacity_scale = 10
   color = '#00AF5E'
 
-  models = Dir.entries("#{PADRINO_ROOT}/models")
-    .select { |filename| filename.ends_with?('.rb') }
-    .map { |filename| filename.split('.rb').first.camelize.constantize }
+  models = AppModels.all
 
   elements = []
 

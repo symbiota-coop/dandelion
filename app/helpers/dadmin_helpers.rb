@@ -1,10 +1,6 @@
 Dandelion::App.helpers do
   def models
-    Dir.entries("#{PADRINO_ROOT}/models").select do |filename|
-      filename.ends_with?('.rb')
-    end.map do |filename|
-      filename.split('.rb').first.camelize.constantize
-    end
+    AppModels.all
   end
 
   def model
