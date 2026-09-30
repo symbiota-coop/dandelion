@@ -44,6 +44,13 @@ function initQuestionsPreview (inputSelector, previewUrl, options) {
   load()
 }
 
+// Keep DataTables 1.x ordering: clicking a column header toggles asc/desc (2+ adds a third, unordered, click),
+// and rows with equal values keep the server's order when descending (2+ reverses them)
+if ($.fn.dataTable) {
+  $.fn.dataTable.defaults.column.orderSequence = ['asc', 'desc']
+  $.fn.dataTable.defaults.orderDescReverse = false
+}
+
 $(function () {
   // One tooltip handler for the whole page, so content loaded later needs no setup.
   // Sidebar links have their own, which only show when the sidebar is minified (see _nav.erb)
