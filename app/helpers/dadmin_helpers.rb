@@ -44,13 +44,86 @@ Dandelion::App.helpers do
     fieldname.to_s == 'id' || model.fields[fieldname.to_s]
   end
 
-  def refresh_parent
-    '
-      <script>
-      window.opener.location.reload(false);
-      window.close();
-      </script>
-    '
+  # The condition for text search q matching a field of this type, or nil if it can't
+  def dadmin_match(fieldname, type, q)
+    if DADMIN_MATCHABLE_TYPES[:regex].include?(type)
+      { fieldname => /#{Regexp.escape(q)}/i }
+    elsif DADMIN_MATCHABLE_TYPES[:number].include?(type)
+      { fieldname => q } if Float(q, exception: false)
+    elsif DADMIN_MATCHABLE_TYPES[:id].include?(type)
+      { fieldname => q }
+    end
+  end
+
+  # Conditions for the index's text search, one per field it can match, to be ORed
+  def dadmin_text_search(model, q)
+    admin_fields(model).filter_map do |fieldname, options|
+      if options[:type] == :lookup
+        assoc_model = assoc(model, fieldname).class_name.constantize
+        assoc_fieldname = lookup_method(assoc_model)
+        next unless persisted_field?(assoc_model, assoc_fieldname)
+
+        condition = dadmin_match(assoc_fieldname, admin_fields(assoc_model)[assoc_fieldname][:type], q)
+        { fieldname.to_sym.in => assoc_model.and(condition).pluck(:id) } if condition
+      elsif persisted_field?(model, fieldname)
+        dadmin_match(fieldname, options[:type], q)
+      end
+    end
+  end
+
+  # One of the index's search criteria as a condition on the model's ids, or nil if it can't be applied.
+  # fieldname can be a has-many collection's field, as collection.field
+  def dadmin_criterion(model, fieldname, operator, value)
+    if fieldname.include?('.')
+      collection, fieldname = fieldname.split('.', 2)
+      collection_assoc = assoc(model, collection, relationship: :has_many) or return
+      collection_model = collection_assoc.class_name.constantize
+      key = collection_assoc.foreign_key.to_sym
+    else
+      collection_model = model
+      key = :id
+    end
+    options = admin_fields(collection_model)[fieldname.to_sym] or return
+    type = options[:type]
+    return unless type == :lookup || persisted_field?(collection_model, fieldname)
+
+    value = nil if value == 'nil'
+    ranged = false
+    if DADMIN_MATCHABLE_TYPES[:regex].include?(type)
+      value = /#{Regexp.escape(value)}/i if value
+    elsif DADMIN_MATCHABLE_TYPES[:number].include?(type)
+      return unless value.nil? || Float(value, exception: false)
+
+      ranged = true
+    elsif type == :check_box
+      value = %w[true 1].include?(value.to_s.downcase)
+    elsif %i[date datetime].include?(type)
+      value = (type == :date ? Date.parse(value) : Time.zone.parse(value)) rescue return
+      ranged = true
+    elsif !(type == :lookup || DADMIN_MATCHABLE_TYPES[:id].include?(type))
+      return
+    end
+
+    ids = case operator
+          when :in, :nin then collection_model.and(fieldname => value).pluck(key)
+          when :gt, :gte, :lt, :lte then collection_model.and(fieldname.to_sym.send(operator) => value).pluck(key) if ranged
+          end
+    return unless ids
+
+    { :id.send(operator == :nin ? :nin : :in) => ids }
+  end
+
+  # The record a lookup field points to, or nil
+  def dadmin_lookup_record(model, fieldname, resource)
+    id = resource.send(fieldname) or return
+    assoc(model, fieldname).class_name.constantize.find(id)
+  end
+
+  # After saving or deleting: back to url, or in a popup, reload the page that opened it and close
+  def dadmin_done(url)
+    return redirect(url) unless params[:popup]
+
+    '<script>window.opener.location.reload(false); window.close();</script>'
   end
 
 end

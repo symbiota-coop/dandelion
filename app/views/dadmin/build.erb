@@ -1,7 +1,7 @@
 
 <div class="d-flex align-items-center gap-2 mb-3">
-  <h1 class="mb-0"><%= @resource.new_record? ? "New #{@model.model_name.human.downcase}" : "Edit #{@model.model_name.human.downcase}" %></h1>
-  <% unless params[:popup] %><a href="<%= url(:dadmin, :index, model: @model.to_s) %>" class="btn btn-secondary"><i class="bi bi-list-ul"></i>&nbsp;All <%= @model.model_name.human.downcase.pluralize %></a><% end %>
+  <h1 class="mb-0"><%= @resource.new_record? ? "New #{@model_name}" : "Edit #{@model_name}" %></h1>
+  <% unless params[:popup] %><a href="<%= url(:dadmin, :index, model: @model.to_s) %>" class="btn btn-secondary"><i class="bi bi-list-ul"></i>&nbsp;All <%= @model_name.pluralize %></a><% end %>
 </div>
 
 <div class="col-sm-8 mx-auto">
