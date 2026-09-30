@@ -98,6 +98,10 @@ Dandelion::App.helpers do
     foreign_keys = model.relations.values.grep(Mongoid::Association::Referenced::BelongsTo).flat_map do |rel|
       [rel.name, rel.foreign_key, (rel.inverse_type if rel.polymorphic?)].compact.map(&:to_s)
     end
+    # has_many/has_one/embeds relations get name= and <name>_ids= setters that re-parent the given children
+    foreign_keys += model.relations.values.reject { |rel| rel.is_a?(Mongoid::Association::Referenced::BelongsTo) }.flat_map do |rel|
+      [rel.name, "#{rel.name.to_s.singularize}_ids"].map(&:to_s)
+    end
     params.reject! { |k, _| foreign_keys.include?(k.to_s) && !allowed.include?(k.to_s) }
     if model.respond_to?(:permitted_attributes)
       permitted = model.permitted_attributes.map(&:to_s)
