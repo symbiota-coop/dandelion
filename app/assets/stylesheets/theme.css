@@ -42,7 +42,6 @@
   color: var(--theme-color-darker);
 }
 
-/* Flash toasts, tinted like the success alerts above */
 .toast-success {
   --bs-toast-color: var(--theme-color-darker);
   --bs-toast-bg: rgba(var(--theme-color-rgb), 0.1);

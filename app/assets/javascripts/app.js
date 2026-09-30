@@ -485,7 +485,6 @@ $(function () {
     $.post($(this).attr('data-check-url'))
   })
 
-  // Start the mobile nav row scrolled to its last (current) item
   $('.nav-crumbs').each(function () {
     this.scrollLeft = this.scrollWidth
   })

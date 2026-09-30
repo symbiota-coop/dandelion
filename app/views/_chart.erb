@@ -2,7 +2,6 @@
   <canvas id="canvas-<%=r = SecureRandom.uuid%>"></canvas>
   <script>
     $(function() {
-      // The page's theme colour (theme.css), so the bars match it
       const themeRgb = getComputedStyle(document.documentElement).getPropertyValue('--theme-color-rgb').trim()
 
       Chart.register(ChartDataLabels);

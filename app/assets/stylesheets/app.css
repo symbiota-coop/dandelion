@@ -1168,7 +1168,6 @@ body.greyed #content {
   font-size: 0.65rem;
 }
 
-/* On mobile, one line that scrolls, with long names cut short */
 @media (max-width: 767.98px) {
   .nav-crumbs {
     flex-wrap: nowrap;
