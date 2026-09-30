@@ -18,7 +18,7 @@
   </div>
   <% if tab == 'upcoming' %>
     <div class="col-auto pb-2">
-      <a data-bs-toggle="tooltip" title="iCal feed" style="font-size: 1rem" class="text-primary" id="ical" target="_blank" href="/events/my.ics?ics_key=<%=current_account.ensure_ics_key!%>">
+      <a data-bs-toggle="tooltip" title="iCal feed" class="text-primary fs-6" id="ical" target="_blank" href="/events/my.ics?ics_key=<%=current_account.ensure_ics_key!%>">
         <i class="bi bi-rss-fill"></i>
       </a>
     </div>

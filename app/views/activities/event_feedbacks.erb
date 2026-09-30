@@ -1,6 +1,6 @@
 <%= partial :'activities/nav', locals: { activity: @activity } %>
 <% if average_rating = @event_feedbacks.average_rating %>
-  <p style="font-size: 2em">
+  <p class="fs-xxl">
     <%= average_rating %><small class="text-body-secondary">/5 from <%= pluralize @activity.event_feedbacks.rated.count, 'rating' %></small>
     <% average_rating.round.times do %><i class="bi bi-star-fill"></i><% end %>
   </p>

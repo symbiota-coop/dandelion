@@ -11,7 +11,7 @@
 <% unless @no_ticket_groups %>
   <% tg = ticket_group_name || 'Other tickets'; if tg != @previous_ticket_group %>
   <tr>
-    <td colspan="3" style="font-size: 80%" class="text-bg-primary text-center fw-bold header-font text-uppercase"><%= tg %></td>
+    <td colspan="3" class="text-bg-primary text-center fw-bold header-font text-uppercase fs-sm"><%= tg %></td>
   </tr>
   <% @previous_ticket_group = ticket_group_name %>
 <% end %>
@@ -22,7 +22,7 @@
 </tr>
 <tr>
   <td class="border-top-0 align-middle">
-    <span class="fw-bold" style="font-size: 1.2em">
+    <span class="fw-bold fs-lg">
       <%= ticket_type.name %>
     </span>
     <% if ticket_type.hidden %>
@@ -40,7 +40,7 @@
     <% end %>
 
   </td>
-  <td class="border-top-0 align-middle" style="font-size: 1.2em">
+  <td class="border-top-0 align-middle fs-lg">
     <% if ticket_type.range %>
       <span><%= m ticket_type.range_min, @event.currency %> - <%= m ticket_type.range_max, @event.currency %></span>
       <%= range_field_tag :"prices[#{ticket_type.id}]",
@@ -61,7 +61,7 @@
         </script>
       <% end %>
 
-      <div style="font-size: 0.8em" class="text-end">
+      <div class="text-end fs-sm">
         <em class="select-a-price-first text-nowrap">Drag the slider</em>
       </div>
 
@@ -86,7 +86,7 @@
           <% end %>
 
         </div>
-        <div style="font-size: 0.8em" class="text-end position-absolute end-0">
+        <div class="text-end position-absolute end-0 fs-sm">
           <em class="select-a-price-first text-nowrap">Set a price first</em>
         </div>
       </div>

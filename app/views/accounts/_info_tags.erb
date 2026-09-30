@@ -2,12 +2,12 @@
   <% if current_account == account %>
     <a href="/events/my?tab=past" class="d-inline-block mt-1 mt-lg-0 label label-primary text-white">Attended <%= pluralize(e,'event') %></a>
   <% else %>
-    <small class="d-inline-block mt-1 mt-lg-0 label label-primary">Attended <%= pluralize(e,'event') %></small>
+    <span class="d-inline-block mt-1 mt-lg-0 label label-primary fs-sm">Attended <%= pluralize(e,'event') %></span>
   <% end %>
 <% end %>
 <% if (e = Event.past.and(:id.in => account.event_facilitations.pluck(:event_id)).count) > 0 %>
-  <small class="d-inline-block mt-1 mt-lg-0 label label-primary">Facilitated <%= pluralize(e,'event') %></small>
+  <span class="d-inline-block mt-1 mt-lg-0 label label-primary fs-sm">Facilitated <%= pluralize(e,'event') %></span>
 <% end %>
 <% if current_account && (follow = Follow.find_by(follower: account, followee: current_account)) %>
-  <small class="d-inline-block mt-1 mt-lg-0 label label-primary"><%= follow.unsubscribed ? 'Follows you' : 'Follows and subscribes to you' %></small>
+  <span class="d-inline-block mt-1 mt-lg-0 label label-primary fs-sm"><%= follow.unsubscribed ? 'Follows you' : 'Follows and subscribes to you' %></span>
 <% end %>

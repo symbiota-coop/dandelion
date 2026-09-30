@@ -109,7 +109,7 @@
           </h1>
         </div>
         <div class="col-auto">
-          <div class="d-inline ms-3 me-2" style="font-size: 1.5em;" data-pagelet-url="/events/<%=@event.id%>/star">
+          <div class="d-inline ms-3 me-2 fs-xl" data-pagelet-url="/events/<%=@event.id%>/star">
             <%= partial :'events/star', locals: {event: @event} %>
           </div>
         </div>
@@ -117,7 +117,7 @@
 
       <%= partial :'events/details', locals: { n: n, events: events } %>
 
-      <div style="font-size: 1.1em" class="mb-3">
+      <div class="mb-3 fs-lg">
         <%= partial :'events/tag_labels', locals: { event: @event, show_more: true, show_more_limit: 5 } %>
       </div>
 

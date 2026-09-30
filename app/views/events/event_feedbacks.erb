@@ -1,7 +1,7 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
 <% if average_rating = @event_feedbacks.average_rating %>
-  <p style="font-size: 2em">
+  <p class="fs-xxl">
     <%= average_rating %><small class="text-body-secondary">/5 from <%= pluralize @event.event_feedbacks.rated.count, 'rating' %></small>
     <% average_rating.round.times do %><i class="bi bi-star-fill"></i><% end %>
   </p>
@@ -13,7 +13,7 @@
 %>
 <% if show_feedback_report %>
   <% stash = Stash.find_by(key: "/events/#{@event.id}/feedback_report") %>
-  <div style="font-size: 0.9rem" data-bs-toggle="tooltip" title="AI-generated ✨" <% unless stash %>data-with-placeholder data-pagelet-url="/events/<%= @event.id %>/feedback_report"<% end %>>
+  <div data-bs-toggle="tooltip" title="AI-generated ✨" <% unless stash %>data-with-placeholder data-pagelet-url="/events/<%= @event.id %>/feedback_report"<% end %>>
     <% if stash %>
       <%== stash.value %>
     <% else %>

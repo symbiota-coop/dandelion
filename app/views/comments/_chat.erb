@@ -10,7 +10,7 @@
     <%= partial :'comments/comment_form', locals: { comment: post.comments.build(commentable_type: post.commentable_type, commentable_id: post.commentable_id), chat: true } %>
   </div>
 </div>
-<div style="padding-left: 1em; padding-bottom: 1em; font-size: 90%">
+<div class="fs-sm" style="padding-left: 1em; padding-bottom: 1em">
   <% if (subscription = post.subscriptions.find_by(account: current_account)) %>
     <a class="pagelet-trigger" href="/subscriptions/<%= subscription.id %>/unsubscribe">Email notifications on</a>
   <% else %>

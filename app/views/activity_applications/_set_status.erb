@@ -1,10 +1,10 @@
-<big>
+<span class="fs-lg">
   <%= partial :'activity_applications/status', locals: { status: @activity_application.status } %>
   <% if @activity_application.statused_by %>
     by <%= @activity_application.statused_by.name %>
     on <%= @activity_application.statused_at %>
   <% end %>
-</big>
+</span>
 <% form_tag "/activities/#{@activity.id}/activity_applications/#{@activity_application.id}/set_status", class: 'form-inline mt-1', style: 'display: inline' do %>
   <%= select_tag :status, class: 'form-select mt-1 mt-lg-0', options: [''] + ActivityApplication.statuses, onchange: '$(this.form).submit()' %>
 <% end %>

@@ -1,4 +1,4 @@
-<span style="font-size: 90%">
+<span class="fs-sm">
   <% if @event.tickets.complete.and(account: current_account).all? { |ticket| ticket.subscribed_discussion } %>
     <a href="/events/<%= @event.id %>/unsubscribe_discussion" class="pagelet-trigger">Email notifications on</a>
   <% else %>

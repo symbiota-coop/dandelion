@@ -71,7 +71,7 @@
         <%= hidden_field_tag :search, value: 1 %>
         <label class="me-sm-2">Sort by</label>
         <%= select_tag :order, options: { 'Event date' => 'date', 'Most recently created' => 'created_at', 'Random' => 'random', 'Trending' => 'trending'}, selected: (params[:order] || @events_search_order), class: 'form-select' %>
-        <a data-bs-toggle="tooltip" title="iCal feed" style="font-size: 1rem" class="text-primary mt-2 mt-sm-0 ms-sm-3" id="ical" target="_blank" href="<%= defined?(path) && path ? path : request.path.chomp('/') %>.ics?<%= view_base_params.to_query %>">
+        <a data-bs-toggle="tooltip" title="iCal feed" class="text-primary mt-2 mt-sm-0 ms-sm-3 fs-6" id="ical" target="_blank" href="<%= defined?(path) && path ? path : request.path.chomp('/') %>.ics?<%= view_base_params.to_query %>">
           <i class="bi bi-rss-fill"></i>
         </a>
       <% end %>

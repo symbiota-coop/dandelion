@@ -2166,6 +2166,27 @@ small.form-text {
   font-size: 82.5%
 }
 
+/* Font sizes relative to the surrounding text, in place of inline font-size and <big> */
+.fs-xs {
+  font-size: 0.75em
+}
+
+.fs-sm {
+  font-size: 0.875em
+}
+
+.fs-lg {
+  font-size: 1.2em
+}
+
+.fs-xl {
+  font-size: 1.5em
+}
+
+.fs-xxl {
+  font-size: 2em
+}
+
 .ui-widget,
 .regular,
 .introjs-tooltipReferenceLayer,
