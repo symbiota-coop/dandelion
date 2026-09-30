@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://cdn.iframe.ly">
 <link rel="preconnect" href="https://maps.googleapis.com">
 
-<link href="/stylesheets/bootstrap5.css" rel="stylesheet">
+<link href="<%= cachebust('/stylesheets/bootstrap5.css') %>" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <% FRONTEND_DEPENDENCIES.each do |base_url, libs| %>
@@ -46,4 +46,4 @@
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.0/pace.min.js" defer></script>
 <% end %>
-<script src="/javascripts/ext/bootstrap.bundle.min.js" defer></script>
+<script src="<%= cachebust('/javascripts/ext/bootstrap.bundle.min.js') %>" defer></script>

@@ -1,5 +1,3 @@
-CACHEBUST_DIGESTS = {}
-
 Dandelion::App.helpers do
   def back(fragment = nil)
     uri = internal_redirect_uri(request.referer) || URI.parse('/')
@@ -222,6 +220,9 @@ Dandelion::App.helpers do
   end
 
   def cachebust(path)
+    # Files don't change after a production deploy, so skip the mtime check there
+    return "#{path}?#{CACHEBUST_DIGESTS[path][1]}" if Padrino.env == :production && CACHEBUST_DIGESTS[path]
+
     file = File.join(settings.public_folder, path)
     return path unless File.exist?(file)
 

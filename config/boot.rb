@@ -3,6 +3,8 @@ RACK_ENV = ENV['RACK_ENV'] ||= 'development' unless defined?(RACK_ENV)
 PADRINO_ROOT = File.expand_path('..', __dir__) unless defined?(PADRINO_ROOT)
 EMAIL_REGEX = /\A[^@\s]+@[^@\s]+\.[^@\s]+\z/
 MAP_POINTS_LIMIT = 1000
+CACHEBUST_DIGESTS = {}
+LIBRARY_CACHE = {}
 ADJECTIVES = %w[soulful regenerative metamodern participatory conscious transformative holistic ethical].freeze
 
 # Load our dependencies

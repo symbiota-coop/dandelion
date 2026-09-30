@@ -1,5 +1,3 @@
-LIBRARY_CACHE = {}
-
 Dandelion::App.helpers do
   def library_csv(name)
     require 'csv'
