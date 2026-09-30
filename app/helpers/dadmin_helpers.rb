@@ -44,7 +44,7 @@ Dandelion::App.helpers do
     fieldname.to_s == 'id' || model.fields[fieldname.to_s]
   end
 
-  def refreshParent
+  def refresh_parent
     '
       <script>
       window.opener.location.reload(false);

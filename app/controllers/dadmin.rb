@@ -211,7 +211,7 @@ Dandelion::App.controller :dadmin do
     @resource = @model.new(params[@model.to_s.underscore.gsub('/', '_')])
     if @resource.save
       flash[:notice] = "<strong>Awesome!</strong> The #{@model.model_name.human.downcase} was created successfully."
-      params[:popup] ? refreshParent : redirect(url(:dadmin, :index, model: @model.to_s))
+      params[:popup] ? refresh_parent : redirect(url(:dadmin, :index, model: @model.to_s))
     else
       flash.now[:error] =
         "<strong>Oops.</strong> Some errors prevented the #{@model.model_name.human.downcase} from being saved."
@@ -229,7 +229,7 @@ Dandelion::App.controller :dadmin do
     if @resource.update_attributes(params[@model.to_s.underscore.gsub('/', '_')])
       flash[:notice] =
         "<strong>Sweet!</strong> The #{@model.model_name.human.downcase} was updated successfully."
-      params[:popup] ? refreshParent : redirect(url(:dadmin, :edit, model: @model.to_s, id: @resource.id))
+      params[:popup] ? refresh_parent : redirect(url(:dadmin, :edit, model: @model.to_s, id: @resource.id))
     else
       flash.now[:error] =
         "<strong>Oops.</strong> Some errors prevented the #{@model.model_name.human.downcase} from being saved."
@@ -244,6 +244,6 @@ Dandelion::App.controller :dadmin do
     else
       flash[:error] = "<strong>Darn!</strong> The #{@model.model_name.human.downcase} couldn't be deleted."
     end
-    params[:popup] ? refreshParent : redirect(url(:dadmin, :index, model: @model.to_s))
+    params[:popup] ? refresh_parent : redirect(url(:dadmin, :index, model: @model.to_s))
   end
 end
