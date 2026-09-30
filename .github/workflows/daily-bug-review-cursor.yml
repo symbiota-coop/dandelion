@@ -4,9 +4,6 @@ concurrency:
   group: daily-bug-review-cursor
   cancel-in-progress: true
 
-env:
-  CURSOR_MODEL: grok-4.7-xhigh
-
 on:
   schedule:
     - cron: '0 4 * * *'
@@ -25,6 +22,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Load models
+        run: grep -E "^[A-Z_]+=" .github/models.env >> "$GITHUB_ENV"
 
       - name: Setup
         id: setup
