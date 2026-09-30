@@ -1191,7 +1191,7 @@ body.greyed #content {
 
   .nav-crumbs .btn {
     max-width: 100%;
-    padding: 0.25rem 0.625rem;
+    padding: 0.625rem 1rem;
     font-size: 0.9rem;
     white-space: nowrap;
   }
