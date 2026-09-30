@@ -8,9 +8,28 @@ $(function () {
     return desktop.matches && $('#page-container').hasClass('page-sidebar-minified')
   }
 
-  // Sidebar submenus are Bootstrap collapses, one open at a time
-  $('#sidebar').on('show.bs.collapse', '.sub-menu', function () {
-    $('#sidebar .sub-menu.show').not(this).collapse('hide')
+  // Expanded, a group's link slides its submenu open or shut, one open at a time. jQuery's slide rather than
+  // Bootstrap's collapse, so clicking again mid-slide reverses it at once (Bootstrap ignores clicks until it's done)
+  function slideSubMenu ($menu, open) {
+    $menu.data('open', open).siblings('a').attr('aria-expanded', open)
+    $menu.stop()[open ? 'slideDown' : 'slideUp'](350, function () {
+      // Hand back to the collapse/show classes, which the minified sidebar's CSS relies on, dropping the
+      // inline sizes an interrupted slide leaves behind
+      $menu.toggleClass('show', open).removeAttr('style')
+    })
+  }
+
+  $('#sidebar').on('click', '.nav > li.has-sub > a', function (e) {
+    if (sidebarMinified()) return // a Bootstrap dropdown then
+    e.preventDefault()
+    const $menu = $(this).siblings('.sub-menu')
+    const open = !($menu.data('open') ?? $menu.hasClass('show'))
+    if (open) {
+      $('#sidebar .nav > li.has-sub > .sub-menu').not($menu).each(function () {
+        if ($(this).data('open') ?? $(this).hasClass('show')) slideSubMenu($(this), false)
+      })
+    }
+    slideSubMenu($menu, open)
   })
 
   // While minified, a group's link toggles a Bootstrap dropdown to its right instead, filled from its submenu
@@ -24,7 +43,11 @@ $(function () {
       const dropdown = bootstrap.Dropdown.getInstance(this)
       if (dropdown) dropdown.dispose()
     })
-    $groupLinks.attr('data-bs-toggle', sidebarMinified() ? 'dropdown' : 'collapse')
+    if (sidebarMinified()) {
+      $groupLinks.attr('data-bs-toggle', 'dropdown')
+    } else {
+      $groupLinks.removeAttr('data-bs-toggle')
+    }
   }
   syncGroupToggles()
   desktop.addEventListener('change', syncGroupToggles)

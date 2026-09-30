@@ -11,7 +11,7 @@
 <ul class="nav nav-pills flex-column">
   <% if current_account %>
     <li class="nav-item has-sub d-md-none">
-      <a class="nav-link d-flex align-items-center gap-2" href="#sidebar-account" data-bs-toggle="collapse" role="button" aria-expanded="false">
+      <a class="nav-link d-flex align-items-center gap-2" href="#sidebar-account" role="button" aria-expanded="false">
         <i class="bi bi-person-fill"></i>
         <span class="flex-grow-1"><%= current_account.name %></span>
         <i class="bi bi-chevron-down caret"></i>
@@ -61,7 +61,7 @@
   <% else %>
     <% active = ['/organisations', '/o/'].any? { |path| request.path.starts_with?(path) } %>
     <li class="nav-item has-sub">
-      <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if active %>" href="#sidebar-organisations" data-bs-toggle="collapse" role="button" aria-expanded="<%= active %>">
+      <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if active %>" href="#sidebar-organisations" role="button" aria-expanded="<%= active %>">
         <i class="bi bi-flag-fill"></i>
         <span class="flex-grow-1">Organisations</span>
         <i class="bi bi-chevron-down caret"></i>
@@ -96,7 +96,7 @@
   <% else %>
     <% active = ['/gatherings', '/g/'].any? { |path| request.path.starts_with?(path) } %>
     <li class="nav-item has-sub">
-      <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if active %>" href="#sidebar-gatherings" data-bs-toggle="collapse" role="button" aria-expanded="<%= active %>">
+      <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if active %>" href="#sidebar-gatherings" role="button" aria-expanded="<%= active %>">
         <i class="bi bi-moon-fill"></i>
         <span class="flex-grow-1">Gatherings</span>
         <i class="bi bi-chevron-down caret"></i>
