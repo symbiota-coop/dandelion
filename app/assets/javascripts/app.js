@@ -44,6 +44,13 @@ function initQuestionsPreview (inputSelector, previewUrl, options) {
   load()
 }
 
+// Leave column alignment to our templates (text-end), rather than DataTables right-aligning numbers and dates
+if (window.DataTable) {
+  ['num', 'num-fmt', 'html-num', 'html-num-fmt', 'date'].forEach(function (type) {
+    DataTable.type(type, 'className', '')
+  })
+}
+
 $(function () {
   // One tooltip handler for the whole page, so content loaded later needs no setup.
   // Sidebar links have their own, which only show when the sidebar is minified (see _nav.erb)
