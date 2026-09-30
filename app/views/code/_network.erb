@@ -4,11 +4,9 @@
   edge_opacity_scale = 10
   color = '#00AF5E'
 
-  models = AppModels.all
-
   elements = []
 
-  models.each do |model|
+  AppModels.all.each do |model|
     w = model.fields.count +
       model.reflect_on_all_associations(:belongs_to).count +
       model.reflect_on_all_associations(:has_one).count
