@@ -13,7 +13,7 @@
         <%= partial :'activities/nav', locals: { activity: event.activity, hide_organisation_nav: true, inline: true } %>
       <% end %>
       <% if event.local_group %>
-        <%= partial :'local_groups/nav', locals: { local_group: event.local_group, hide_organisation_nav: true, inline: true } %>
+        <%= partial :'local_groups/nav', locals: { local_group: event.local_group, hide_organisation_nav: true, inline: true, beside_activity: event.activity.present? } %>
       <% end %>
       <% if event.deleted? %>
         <%= dropdown_nav [

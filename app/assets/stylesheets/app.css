@@ -1140,6 +1140,14 @@ body.greyed #content {
   align-self: center;
 }
 
+/* An event's local group sits beside its activity, not inside it */
+.nav-crumbs > .btn-group + .btn-group.nav-crumbs-sibling::before {
+  content: "\00B7";
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
 /* Through the button variables, so hover, pressed and open keep theme-coloured text on a tint rather than Bootstrap's white on solid */
 .nav-crumbs .btn {
   --bs-btn-bg: rgba(var(--theme-color-rgb), 0.1);
