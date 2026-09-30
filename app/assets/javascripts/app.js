@@ -485,15 +485,28 @@ $(function () {
     $.post($(this).attr('data-check-url'))
   })
 
-  $(document).on('show.bs.dropdown', '.dropdown', function (e) {
-    const $toggle = $(e.relatedTarget)
+  $(document).on('show.bs.dropdown', '[data-mobile-modal]', function (e) {
+    const $toggle = $(this)
     const title = $toggle.attr('data-mobile-modal')
     if (!title || $(window).width() >= 768) return
 
     e.preventDefault()
 
     const $source = $toggle.siblings('[data-pagelet-url]')
-    const $list = $source.children('.list-group').clone()
+    let $list = $source.children('.list-group').clone()
+    // Plain dropdown menus (dropdown_nav, ul_nav) become a list group of their items and headers
+    if (!$source.length) {
+      $list = $('<div class="list-group list-group-flush"></div>')
+      $toggle.siblings('.dropdown-menu').find('.dropdown-item, .dropdown-header').each(function () {
+        const $item = $(this).clone()
+        if ($item.hasClass('dropdown-header')) {
+          $item.attr('class', 'list-group-item small text-muted fw-bold')
+        } else {
+          $item.removeClass('dropdown-item').addClass('list-group-item list-group-item-action')
+        }
+        $list.append($item)
+      })
+    }
     const $sheet = $('#nav-dropdown-sheet')
     const $body = $sheet.find('.offcanvas-body')
 
