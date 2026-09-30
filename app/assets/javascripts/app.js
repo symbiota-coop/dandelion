@@ -527,7 +527,16 @@ $(function () {
       const $cell = $cells.eq(i)
       if (i === 0 || !label || $(this).css('display') === 'none') return
       const $value = $('<span class="text-end"></span>').append($cell.contents().clone())
-      $value.find('img').remove()
+      // Drop avatars along with their now-empty links, then any line breaks that led into the text
+      $value.find('img').each(function () {
+        const $parent = $(this).parent()
+        $(this).remove()
+        if ($parent.is('a') && !$parent.children().length && !$parent.text().trim()) $parent.remove()
+      })
+      let first
+      while ((first = $value[0].firstChild) && (first.nodeName === 'BR' || (first.nodeType === 3 && !first.textContent.trim()))) {
+        first.remove()
+      }
       $list.append($('<div class="list-group-item d-flex justify-content-between align-items-start gap-3"></div>')
         .append($('<span class="text-muted"></span>').text(label), $value))
     })
