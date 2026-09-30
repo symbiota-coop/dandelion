@@ -47,7 +47,7 @@ While you are creating an event, Dandelion autosaves a draft. If you leave and c
 
 After someone books, they see a thank you page on Dandelion (unless you've set a redirect URL under **Everything else**). Under **Appearance**, you can add **Thank you text** to show a custom message on that page—for example a welcome note or a link to a community group. Leave it blank to keep the default thank you page.
 
-Meta and Google Ads purchase conversions also fire on this page (see [Organisations](/docs/organisations#analytics)). You can also set a pixel or Google Ads conversion on an individual event under **Everything else**; if both organisation and event values are set and different, events are sent to both.
+Meta and Google Ads purchase conversions also fire on this page (see [Organisations](/docs/organisations#analytics)). You can also set a pixel or Google Ads conversion on an individual event under **Integrations**; if both organisation and event values are set and different, events are sent to both.
 
 ## Let attendees choose how much to pay
 
@@ -92,7 +92,7 @@ You can collect ticket payments as a fixed number of monthly Direct Debit instal
 
 1. In your organisation settings under Payments, click **Set up GoCardless**, add an access token and webhook secret, then check **Enable Instalments**.
 2. Set the webhook to send **billing request** events. Include **payments** as well if you also use Instant Bank Pay.
-3. Edit the event and, under Everything else, set **GoCardless instalments** to the number of monthly payments (2–24). This field appears once instalments are enabled on the organisation.
+3. Edit the event and, under Integrations, set **GoCardless instalments** to the number of monthly payments (2–24). This field appears once instalments are enabled on the organisation.
 
 At checkout, buyers see a **Pay in X instalments** button on GBP and EUR events. They need a bank account in the event currency (a UK account for GBP, a Eurozone account for EUR). Tickets are emailed when the payment schedule is set up (i.e. straight away/not at the final instalment). You can refund collected instalments from the GoCardless dashboard. Note that Dandelion does not cancel orders if later instalments fail — you need to remove orders with unpaid instalments yourself. If a ticket paid this way is later resold, Dandelion emails you that a refund is required (see [Ticket resales](#ticket-resales)).
 
@@ -102,7 +102,7 @@ Alternatively, you can create a secret ticket type with a quantity equal to the 
 
 ## Including sales taxes (VAT/MOMS)
 
-First, [add a tax rate on Stripe](https://dashboard.stripe.com/tax-rates) (for the UK, VAT/20%/Inclusive; for Sweden, VAT/25%/Inclusive – leave Region blank to apply to all purchases). Then copy the tax rate ID, and enter it in your event settings under Everything else (or in your organisation settings under Everything else to apply to all events in the organisation).
+First, [add a tax rate on Stripe](https://dashboard.stripe.com/tax-rates) (for the UK, VAT/20%/Inclusive; for Sweden, VAT/25%/Inclusive – leave Region blank to apply to all purchases). Then copy the tax rate ID, and enter it in your event settings under Integrations (or in your organisation settings under Everything else to apply to all events in the organisation).
 
 ## Sending payment receipts
 
@@ -114,7 +114,7 @@ If your organisation has an [Open Collective](https://opencollective.com/) accou
 
 1. Go to the Payments tab in your organisation's settings, click **Set up Open Collective**, and enter your Open Collective organisation slug (e.g. if your Open Collective URL is `https://opencollective.com/mystica`, the slug is `mystica`)
 2. Create an event on Open Collective under your organisation
-3. Edit your Dandelion event and enter the Open Collective event slug under Everything else
+3. Edit your Dandelion event and enter the Open Collective event slug under Integrations
 
 Ticket buyers will then see a 'Pay with Open Collective' option at checkout. Dandelion only confirms the booking once Open Collective marks the contribution as paid.
 

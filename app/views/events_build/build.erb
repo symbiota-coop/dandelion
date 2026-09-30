@@ -89,6 +89,7 @@
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-donations" role="tab" data-bs-toggle="tab">Donations</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-appearance" role="tab" data-bs-toggle="tab">Appearance <i class="bi bi-palette"></i></a></li>
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-emails" role="tab" data-bs-toggle="tab">Emails</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-integrations" role="tab" data-bs-toggle="tab">Integrations</a></li>
       <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-everything-else" role="tab" data-bs-toggle="tab">Everything else</a></li>
       <% if @event.persisted? && @event.start_time && @event.past? %>
         <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-recording" role="tab" data-bs-toggle="tab">Recording</a></li>
@@ -301,15 +302,6 @@
         <%= f.url_block :redirect_url %>
         <%= f.url_block :purchase_url %>
         <%= f.text_block :match_phrase %>
-        <%= f.text_block :facebook_pixel_id %>
-        <%= f.text_block :google_ads_conversion_id %>
-        <%= f.text_block :google_ads_conversion_label %>
-        <%= f.check_box_block :google_ads_enhanced_conversions %>
-        <%= f.text_block :oc_slug %>
-        <%= f.text_block :tax_rate_id %>
-        <% if @event.organisation.gocardless_instalments || @event.gocardless_instalment_count %>
-          <%= f.number_block :gocardless_instalment_count %>
-        <% end %>
         <% if current_account.memberships.and(admin: true).exists? %>
           <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
         <% end %>
@@ -342,6 +334,17 @@
 
         <% if !@event.organisation.stripe_client_id && @event.new_record? %>
           <%= f.submit_block %>
+        <% end %>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tab-integrations">
+        <%= f.text_block :facebook_pixel_id %>
+        <%= f.text_block :google_ads_conversion_id %>
+        <%= f.text_block :google_ads_conversion_label %>
+        <%= f.check_box_block :google_ads_enhanced_conversions %>
+        <%= f.text_block :oc_slug %>
+        <%= f.text_block :tax_rate_id %>
+        <% if @event.organisation.gocardless_instalments || @event.gocardless_instalment_count %>
+          <%= f.number_block :gocardless_instalment_count %>
         <% end %>
       </div>
       <% if @event.persisted? && @event.start_time && @event.past? %>
