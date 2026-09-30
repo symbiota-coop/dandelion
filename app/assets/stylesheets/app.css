@@ -933,10 +933,6 @@ body.greyed #content {
   --bs-nav-pills-link-active-bg: var(--theme-color);
 }
 
-.dropdown-menu {
-  --bs-dropdown-link-active-bg: var(--theme-color);
-}
-
 .form-check-input:checked {
   background-color: var(--theme-color);
   border-color: var(--theme-color);
@@ -1033,6 +1029,7 @@ body.greyed #content {
   right: auto;
   margin-top: 0;
   --bs-dropdown-font-size: 0.825rem;
+  --bs-dropdown-link-active-bg: var(--theme-color);
   border-radius: 0.5rem;
   box-shadow: 0 0.125rem 0.375rem 1px rgba(0, 0, 0, 0.1);
   z-index: 9999
