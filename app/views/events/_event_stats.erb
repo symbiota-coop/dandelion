@@ -16,10 +16,16 @@
     $(window).scroll(function() {
       var $table = $('#event_stats');
       if (!$table.length) return;
-      var hide = $table.offset().left - $(window).scrollLeft() < $('#sidebar').outerWidth();
+      // Below md the sidebar is an offcanvas for the mobile nav, so leave it alone
+      var desktop = window.matchMedia('(min-width: 768px)').matches;
+      var hide = desktop && $table.offset().left - $(window).scrollLeft() < $('#sidebar').outerWidth();
       if (hide === sidebarHidden) return;
       sidebarHidden = hide;
-      $('#sidebar').stop(true, true)[hide ? 'fadeOut' : 'fadeIn'](150);
+      var $sidebar = $('#sidebar').stop(true, true);
+      if (hide) $sidebar.fadeOut(150);
+      // Clear fadeIn's inline display, which would otherwise hold the mobile offcanvas open
+      else if (desktop) $sidebar.fadeIn(150, function() { $sidebar.css('display', '') });
+      else $sidebar.css('display', '');
     });
   });
 </script>
