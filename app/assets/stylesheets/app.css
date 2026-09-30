@@ -1174,15 +1174,24 @@ body.greyed #content {
 }
 
 @media (max-width: 767.98px) {
+  /* Right to left so it starts scrolled to the end (the current item), with order putting the items back left to right and safe flex-end keeping a short row on the left */
   .nav-crumbs {
     flex-wrap: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
+    direction: rtl;
+    justify-content: safe flex-end;
   }
 
   .nav-crumbs > .btn-group {
     flex-shrink: 0;
+    direction: ltr;
   }
+
+  .nav-crumbs > :nth-last-child(2) { order: 2; }
+  .nav-crumbs > :nth-last-child(3) { order: 3; }
+  .nav-crumbs > :nth-last-child(4) { order: 4; }
+  .nav-crumbs > :nth-last-child(5) { order: 5; }
 
   .nav-crumbs .btn {
     max-width: 12rem;

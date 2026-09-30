@@ -81,10 +81,6 @@ module NavigationHelpers
     s.html_safe
   end
 
-  def nav_crumbs_scroll_script
-    '<script>(el => { el.scrollLeft = el.scrollWidth })(document.currentScript.previousElementSibling)</script>'.html_safe
-  end
-
   # The title of the bottom sheet a dropdown opens as on mobile: the toggle's text without its HTML
   def mobile_modal_title(html)
     ERB::Util.html_escape(CGI.unescapeHTML(Sanitize.fragment(html)).squish)
