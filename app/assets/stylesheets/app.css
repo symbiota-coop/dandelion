@@ -1042,21 +1042,6 @@ body.greyed #content {
   border-radius: 0.75rem 0.75rem 0 0;
 }
 
-.nav-dropdown-sheet .dropdown-menu {
-  display: block;
-  position: static;
-  width: auto;
-  margin: 0 !important;
-  border: 0;
-  box-shadow: none;
-  border-radius: 0;
-}
-
-.nav-dropdown-sheet .dropdown-menu:before,
-.nav-dropdown-sheet .dropdown-menu:after {
-  display: none;
-}
-
 /* ==========================================================================
    Dropdown notifications
    ========================================================================== */

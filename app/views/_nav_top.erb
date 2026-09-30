@@ -56,13 +56,14 @@
       <a id="notifications-a" href="javascript:;" data-bs-toggle="dropdown" data-mobile-modal="Notifications" data-check-url="/checked_notifications" class="nav-link navbar-icon">
         <i class="bi bi-bell"></i>
       </a>
-      <div id="notifications" data-pagelet-url="/notifications" data-pagelet-refresh="60"></div>
+      <%# The pagelet is the menu itself, so the element Bootstrap's Dropdown remembers survives each refresh %>
+      <div id="notifications" class="dropdown-menu dropdown-lg p-0" data-pagelet-url="/notifications" data-pagelet-refresh="60"></div>
     </li>
     <li class="nav-item dropdown">
       <a id="messages-a" href="javascript:;" data-bs-toggle="dropdown" data-mobile-modal="Messages" data-check-url="/checked_messages" class="nav-link navbar-icon">
         <i class="bi bi-chat-left"></i>
       </a>
-      <div id="messages" data-pagelet-url="/messages" data-pagelet-refresh="60">
+      <div id="messages" class="dropdown-menu dropdown-lg p-0" data-pagelet-url="/messages" data-pagelet-refresh="60">
         <%= cp(:'messages/dropdown', key: "/messages?account_id=#{current_account.id}", expires: 1.minute.from_now) %>
       </div>
     </li>

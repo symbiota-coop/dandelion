@@ -1,12 +1,10 @@
-<div class="dropdown-menu dropdown-lg p-0">
-  <div class="list-group list-group-flush notification-list">
-    <% current_account.conversations(limit: 5).each do |message| %>
-      <div class="list-group-item">
-        <%= partial :'messages/preview', locals: { message: message } %>
-      </div>
-    <% end %>
-    <a class="list-group-item list-group-item-action text-center" href="/messages">All messages <i class="bi bi-arrow-right"></i></a>
-  </div>
+<div class="list-group list-group-flush notification-list">
+  <% current_account.conversations(limit: 5).each do |message| %>
+    <div class="list-group-item">
+      <%= partial :'messages/preview', locals: { message: message } %>
+    </div>
+  <% end %>
+  <a class="list-group-item list-group-item-action text-center" href="/messages">All messages <i class="bi bi-arrow-right"></i></a>
 </div>
 <% if current_account.unchecked_messages? %>
   <script>
