@@ -577,6 +577,7 @@
   #sidebar {
     --bs-offcanvas-width: 100%;
     --bs-offcanvas-zindex: 1020;
+    --bs-offcanvas-transition: transform 0.15s ease-in-out;
     top: 2.75rem;
     border-right: 0;
   }
