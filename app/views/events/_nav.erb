@@ -53,6 +53,11 @@
       <% end %>
     <% end %>
   </div>
+  <% if defined?(notes) && notes %>
+    <div data-pagelet-url="/events/<%= event.id %>/notes" class="mb-3">
+      <%= partial :'events/notes' %>
+    </div>
+  <% end %>
   <% if event.persisted? %>
     <style>
       #event_stats thead th { border-top: none }

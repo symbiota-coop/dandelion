@@ -1,10 +1,7 @@
-<%= partial :'events/nav', locals: { event: @event } %>
+<%= partial :'events/nav', locals: { event: @event, notes: true } %>
 
 <% if event_admin? %>
   <%= partial :'events/locked' %>
-  <div data-pagelet-url="/events/<%= @event.id %>/notes" class="mb-3">
-    <%= partial :'events/notes' %>
-  </div>
 <% else %>
   <style>
     #event-image { margin-top: -0.9375rem }
