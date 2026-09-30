@@ -16,12 +16,12 @@
     <span class="d-inline-block mb-1" style="font-size: 0.9rem">Popular locations:</span>
     <span class="popular-locations-container">
       <% popular_locations.each_with_index do |location, index| %>
-        <span class="location-item <%= 'd-none' if index >= show_more_limit %>">
+        <span class="location-item"<% if index >= show_more_limit %> style="display: none"<% end %>>
           <a class="label d-inline-block mb-1 <% if @location && @location == location %> label-primary text-white <% else %> label-outline-primary <% end %>" style="font-size: 0.9rem; font-weight: 500" href="/locations/<%= location.name %>"><%= location.name %></a>
         </span>
       <% end %>
       <% if popular_locations.size > show_more_limit %>
-        <a href="javascript:;" onclick="$(this).closest('.popular-locations-container').find('.location-item').removeClass('d-none'); $(this).remove();">
+        <a href="javascript:;" onclick="$(this).closest('.popular-locations-container').find('.location-item').show(); $(this).remove();">
           <i class="bi bi-three-dots"></i>
         </a>
       <% end %>

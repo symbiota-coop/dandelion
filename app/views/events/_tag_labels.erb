@@ -3,7 +3,7 @@
 
 <span class="tag-container">
   <% tags_to_display.each_with_index do |event_tag, index| %>
-    <span class="tag-item <%= 'd-none' if defined?(show_more) && index >= show_more_limit %>">
+    <span class="tag-item"<% if defined?(show_more) && index >= show_more_limit %> style="display: none"<% end %>>
       <% if @organisation %>
         <a <% if event.ai_tagged? %> data-bs-toggle="tooltip" title="AI generated"<% end %> href="/o/<%= @organisation.slug %>/events?event_tag_id=<%= event_tag.id %><%= '&minimal=1' if params[:minimal] %>" class="text-white label <%= event.ai_tagged? ? 'label-primary' : 'label-primary' %> d-inline-block mb-1"><% if event.ai_tagged? %><i class="bi bi-stars"></i> <% end %><%== Sanitize.fragment(event_tag.name) %></a>
       <% else %>
@@ -13,7 +13,7 @@
   <% end %>
 
   <% if defined?(show_more) && event_tags.count > show_more_limit %>
-    <a href="javascript:;" onclick="$(this).closest('.tag-container').find('.tag-item').removeClass('d-none'); $(this).remove();">
+    <a href="javascript:;" onclick="$(this).closest('.tag-container').find('.tag-item').show(); $(this).remove();">
       <i class="bi bi-three-dots"></i>
     </a>
   <% end %>

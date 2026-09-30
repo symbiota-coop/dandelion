@@ -287,8 +287,8 @@
     tickTimer = null
     timeoutTimer = null
     stopVerbs()
-    if (done) $('#deepwiki-source').removeClass('d-none')
-    $('#deepwiki-ask').removeClass('d-none')
+    if (done) $('#deepwiki-source').show()
+    $('#deepwiki-ask').show()
   }
 
   function ask () {

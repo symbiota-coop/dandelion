@@ -17,7 +17,7 @@
     <% end %>
     <%= f.text_area_block :body, placeholder: (defined?(placeholder) ? placeholder : 'Write a comment... (optional)'), label_class: 'd-none' %>
   <% end %>
-  <div class="comment-options <% unless @show_buttons %> d-none <% end %> ">
+  <div class="comment-options"<% unless @show_buttons %> style="display: none"<% end %>>
     <% unless defined?(chat) %>
       <p class="text-body-secondary" style="margin-top: -1em">
         Add files, photos and polls after posting

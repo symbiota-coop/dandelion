@@ -5,13 +5,13 @@
 
   <span class="tag-container">
     <% event_tag_names_to_display.each_with_index do |event_tag_name, index| %>
-      <span class="tag-item <%= 'd-none' if index >= show_more_limit %>">
+      <span class="tag-item"<% if index >= show_more_limit %> style="display: none"<% end %>>
         <span class="text-white label label-primary d-inline-block mb-1"><%== Sanitize.fragment(event_tag_name) %></span>
       </span>
     <% end %>
 
     <% if event_tag_names_to_display.count > show_more_limit %>
-      <a href="javascript:;" onclick="$(this).closest('.tag-container').find('.tag-item').removeClass('d-none'); $(this).remove();">
+      <a href="javascript:;" onclick="$(this).closest('.tag-container').find('.tag-item').show(); $(this).remove();">
         <i class="bi bi-three-dots"></i>
       </a>
     <% end %>

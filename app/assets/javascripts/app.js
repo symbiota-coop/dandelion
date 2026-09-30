@@ -199,7 +199,7 @@ $(function () {
     })
 
     $('[id=comment_subject], [id=comment_body]').not('[data-show-comment-options-on-focus]').attr('data-show-comment-options-on-focus', true).focus(function () {
-      $(this.form).find('.comment-options').removeClass('d-none')
+      $(this.form).find('.comment-options').show()
     })
 
     $('.block').not('[data-block-hover], .infowindow .block').attr('data-block-hover', true).hover(

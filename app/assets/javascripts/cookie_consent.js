@@ -71,7 +71,7 @@ function initCookieConsent () {
   }
 
   function removeBanner () {
-    $('#cookie-consent').addClass('d-none')
+    $('#cookie-consent').hide()
   }
 
   function showBanner (settingsOpen) {
@@ -81,11 +81,11 @@ function initCookieConsent () {
 
     banner.find('[data-cookie-choice="analytics"]').prop('checked', !!consent.analytics)
     banner.find('[data-cookie-choice="marketing"]').prop('checked', !!consent.marketing)
-    banner.find('.cookie-consent__settings').toggleClass('d-none', !settingsOpen)
-    banner.find('[data-cookie-action="reject"]').toggleClass('d-none', settingsOpen)
-    banner.find('[data-cookie-action="customize"]').toggleClass('d-none', settingsOpen)
-    banner.find('[data-cookie-action="save"]').toggleClass('d-none', !settingsOpen)
-    banner.removeClass('d-none')
+    banner.find('.cookie-consent__settings').toggle(settingsOpen)
+    banner.find('[data-cookie-action="reject"]').toggle(!settingsOpen)
+    banner.find('[data-cookie-action="customize"]').toggle(!settingsOpen)
+    banner.find('[data-cookie-action="save"]').toggle(settingsOpen)
+    banner.show()
     if (settingsOpen) banner.find('[data-cookie-choice="analytics"]').focus()
   }
 

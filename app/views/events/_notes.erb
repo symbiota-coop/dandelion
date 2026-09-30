@@ -1,6 +1,6 @@
 <% unless @event.notes %>
-  <a href="javascript:;" onclick="$(this).next().removeClass('d-none').find('textarea').focus(); $(this).remove()"><i class="bi bi-plus-lg"></i> Private note</a>
+  <a href="javascript:;" onclick="$(this).next().show().find('textarea').focus(); $(this).remove()"><i class="bi bi-plus-lg"></i> Private note</a>
 <% end %>
-<% form_tag "/events/#{@event.id}/notes", class: ('d-none' unless @event.notes) do %>
+<% form_tag "/events/#{@event.id}/notes", style: ('display: none' unless @event.notes) do %>
   <%= text_area_tag :notes, placeholder: 'Private notes (visible to event admins only)', class: 'autosize form-control shadow-sm', onchange: '$(this.form).submit()', value: @event.notes %>
 <% end %>
