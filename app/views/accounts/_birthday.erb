@@ -1,7 +1,7 @@
 <% d = account.days_until_next_birthday %>
 <div class="row mb-2">
   <div class="col-auto">
-    <%= partial :'accounts/square', locals: { account: account, width: '32px', klass: 'media-object' } %>
+    <%= partial :'accounts/square', locals: { account: account, width: '32px' } %>
   </div>
   <div class="col">
     <a href="/u/<%=account.username%>"><%= account.name %></a>

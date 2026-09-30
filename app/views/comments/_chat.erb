@@ -4,7 +4,7 @@
 </div>
 <div class="d-flex align-items-start m-0" style="padding: 10px 10px 0 10px">
   <span class="me-2">
-    <%= partial :'accounts/square', locals: { account: current_account, width: '32px', klass: 'media-object' } %>
+    <%= partial :'accounts/square', locals: { account: current_account, width: '32px' } %>
   </span>
   <div class="flex-grow-1">
     <%= partial :'comments/comment_form', locals: { comment: post.comments.build(commentable_type: post.commentable_type, commentable_id: post.commentable_id), chat: true } %>

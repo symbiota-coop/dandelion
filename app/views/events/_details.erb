@@ -97,9 +97,13 @@
             var $clicked = $(this);
 
             navigator.clipboard.writeText(textToCopy).then(function() {
-              $clicked.attr('data-bs-original-title', 'Copied!').tooltip('show');
+              var tooltip = bootstrap.Tooltip.getOrCreateInstance($clicked[0]);
+              var title = $clicked.attr('data-bs-original-title');
+              tooltip.setContent({ '.tooltip-inner': 'Copied!' });
+              tooltip.show();
               setTimeout(function() {
-                $clicked.attr('data-bs-original-title', 'Click to copy').tooltip('hide');
+                tooltip.hide();
+                tooltip.setContent({ '.tooltip-inner': title });
               }, 2000);
             });
           });
