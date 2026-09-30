@@ -2,6 +2,8 @@
   <canvas id="canvas-<%=r = SecureRandom.uuid%>"></canvas>
   <script>
     $(function() {
+      // The page's theme colour (theme.css), so the bars match it
+      const themeRgb = getComputedStyle(document.documentElement).getPropertyValue('--theme-color-rgb').trim()
 
       Chart.register(ChartDataLabels);
       Chart.defaults.set('plugins.datalabels', {
@@ -67,13 +69,13 @@
         labels: <%== data.keys.to_json %>,
         datasets: [
           {
-            backgroundColor: 'rgba(0, 175, 94, 1)',
-            borderColor: 'rgba(0, 175, 94, 1)',
+            backgroundColor: `rgba(${themeRgb}, 1)`,
+            borderColor: `rgba(${themeRgb}, 1)`,
             data: <%== data.values.to_json %>
           },
           {
-            backgroundColor: 'rgba(0, 175, 94, 0.5)',
-            borderColor: 'rgba(0, 175, 94, 0.5)',
+            backgroundColor: `rgba(${themeRgb}, 0.5)`,
+            borderColor: `rgba(${themeRgb}, 0.5)`,
             data: <%== data.size.times.map { |i| i == data.size - 1 ? (defined?(projection) ? projection : nil) : nil }.to_json %>
           }
         ],
