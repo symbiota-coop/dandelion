@@ -165,8 +165,6 @@ module OrganisationFields
         collect_phone: 'Request the phone number of ticket buyers at checkout',
         referrer_id: 'Credit someone for referring you to Dandelion',
         minimal_head: 'Custom CSS/JS to include in the &lt;head&gt; when embedding your events page',
-        welcome_body: 'Use [sign_in_link] to include a link that signs the recipient in to Dandelion',
-        monthly_donation_welcome_body: 'Use [sign_in_link] to include a link that signs the recipient in to Dandelion',
         allow_event_submissions: 'When enabled, any signed-in user can submit an event. Submissions are initially visible only to admins, who receive an email notification.'
       }.merge(email_hints).merge(payment_hints).merge(analytics_hints)
     end

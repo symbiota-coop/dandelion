@@ -169,7 +169,7 @@ class Organisationship
     content = %(
     #{header}
     <div class="main">
-      #{welcome_rich_text(organisation.welcome_body)}
+      #{EmailHelper.rich_text(organisation.welcome_body)}
     </div>)
     batch_message.from organisation.welcome_from
     batch_message.subject EmailHelper.strip_recipient_secrets(organisation.welcome_subject)
@@ -179,12 +179,6 @@ class Organisationship
 
     batch_message.finalize if organisation.mailgun_api_key
     set(sent_welcome: true)
-  end
-
-  # [sign_in_link] is expanded after rich_text strips %recipient.token%, so the token only ever goes to a Dandelion URL
-  def welcome_rich_text(html)
-    EmailHelper.rich_text(html).to_s
-               .gsub('[sign_in_link]', %(<a href="#{ENV['BASE_URI']}/o/#{organisation.slug}?sign_in_token=%recipient.token%">Sign in to Dandelion</a>))
   end
 
   def monthly_donation_welcome_body
@@ -229,7 +223,7 @@ class Organisationship
     content = %(
     #{header}
     <div class="main">
-      #{welcome_rich_text(monthly_donation_welcome_body)}
+      #{EmailHelper.rich_text(monthly_donation_welcome_body)}
     </div>)
     batch_message.from organisation.monthly_donation_welcome_from
     batch_message.subject EmailHelper.strip_recipient_secrets(organisation.monthly_donation_welcome_subject)

