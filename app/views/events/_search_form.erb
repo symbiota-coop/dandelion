@@ -10,7 +10,7 @@
 
 
 <% unless params[:search] %>
-  <div class="mb-3">
+  <div class="mb-3 popular-locations">
     <% popular_locations = Location.order('events_count desc').to_a %>
     <% show_more_limit = @location ? popular_locations.size : 10 %>
     <span class="d-inline-block mb-1">Popular locations:</span>

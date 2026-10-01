@@ -1523,6 +1523,15 @@ label.remove-image input {
   border-radius: 0.25em;
 }
 
+/* Location labels match the text beside them rather than shrinking to 85% */
+.popular-locations {
+  font-size: 0.9rem
+}
+
+.popular-locations .label {
+  font-size: 1em
+}
+
 .label-stripe {
   background: var(--color-stripe)
 }
