@@ -2724,9 +2724,17 @@ img.private:hover {
   }
 }
 
-/* Lighter than Bootstrap's 0.5; placeholder-glow pulses between this and 0.2 */
+/* Match the pre-Bootstrap 5 flicker: a faint grey a full line high, fading from opacity 1 to 0.5 */
 .placeholder {
-  opacity: 0.1;
+  background-color: rgba(0, 0, 0, 0.1);
+  opacity: 1;
+  min-height: 1lh;
+}
+
+@keyframes placeholder-glow {
+  50% {
+    opacity: 0.5;
+  }
 }
 
 p.action {
