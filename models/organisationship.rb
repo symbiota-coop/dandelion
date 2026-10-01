@@ -178,7 +178,7 @@ class Organisationship
     batch_message.subject organisation.welcome_subject
     batch_message.body_html EmailHelper.html(content: welcome_email_content(organisation.welcome_body))
 
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
+    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'id' => account.id.to_s })
 
     batch_message.finalize if organisation.mailgun_api_key
     set(sent_welcome: true)
@@ -216,7 +216,7 @@ class Organisationship
     batch_message.subject organisation.monthly_donation_welcome_subject
     batch_message.body_html EmailHelper.html(content: welcome_email_content(monthly_donation_welcome_body))
 
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s, 'username' => account.username })
+    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'id' => account.id.to_s, 'username' => account.username })
 
     batch_message.finalize if organisation.mailgun_api_key
     set(sent_monthly_donation_welcome: true)
