@@ -2491,7 +2491,8 @@ table.event-details td {
    Carousels (Slick)
    ========================================================================== */
 
-.slick-placeholder img {
+.slick-placeholder img,
+.slick-placeholder .placeholder {
   background: var(--bs-secondary-bg);
 }
 
