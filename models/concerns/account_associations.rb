@@ -258,9 +258,16 @@ module AccountAssociations
     organisationship
   end
 
-  def associate_with_activity!(activity)
+  def associate_with_activity!(activity, force: false)
     activity.organisation.organisationships.find_or_create_by(account: self).set_unsubscribed!(false)
-    activity.activityships.find_or_create_by(account: self).set(unsubscribed: false)
+    resubscribe_to_activity!(activity, force: force)
+  end
+
+  # Only open activities can be joined without an admin
+  def resubscribe_to_activity!(activity, force: false)
+    activityship = activity.activityships.find_by(account: self)
+    activityship ||= activity.activityships.create(account: self) if force || activity.privacy == 'open'
+    activityship&.set(unsubscribed: false)
   end
 
   def associate_with_local_group!(local_group)
@@ -270,7 +277,7 @@ module AccountAssociations
 
   def associate_with_event!(event)
     event.organisation.organisationships.find_or_create_by(account: self).set_unsubscribed!(false)
-    event.activity.activityships.find_or_create_by(account: self).set(unsubscribed: false) if event.activity
+    resubscribe_to_activity!(event.activity) if event.activity
     event.local_group.local_groupships.find_or_create_by(account: self).set(unsubscribed: false) if event.local_group
   end
 end
