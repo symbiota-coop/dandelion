@@ -137,13 +137,13 @@ class Gathering
 </p>)
   end
 
-  # Filled in after rich_text: sign_in_details is Dandelion's own %recipient.token% link, and the name is made
-  # untrusted itself. sign_in_details goes first so a name can't add one
+  # Filled in after rich_text: sign_in_details is Dandelion's own %recipient.token% link. It goes first so a name
+  # can't add one
   def welcome_email_html(sign_in_details)
     EmailHelper.html(content: welcome_email || welcome_email_default) do |content|
       EmailHelper.rich_text(content)
                  .gsub('[sign_in_details]', sign_in_details)
-                 .gsub('[gathering_name]', EmailHelper.untrusted(ERB::Util.html_escape(name)))
+                 .gsub('[gathering_name]', EmailHelper.h(name))
     end
   end
 

@@ -46,11 +46,8 @@
     <div class="container">
       <div class="main">
         <% if pmail.markdown? %>
-          <%== EmailHelper.untrusted(
-                Sanitize.fragment(
-                  Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(hard_wrap: true), autolink: true, tables: true).render(pmail.body),
-                  Sanitize::Config::DANDELION
-                )
+          <%== EmailHelper.rich_text(
+                Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(hard_wrap: true), autolink: true, tables: true).render(pmail.body)
               ) %>
         <% else %>
           <%== EmailHelper.rich_text(pmail.body) %>

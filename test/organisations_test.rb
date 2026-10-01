@@ -100,6 +100,21 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal false, victim.organisationships.find_by(organisation: @organisation).unsubscribed
   end
 
+  test 'organisation welcome email website link cannot carry a sign-in token' do
+    create_organisation
+    @organisation.set(website: 'https://attacker.example/?t=%recipient.token%')
+    organisationship = FactoryBot.create(:account).organisationships.create!(organisation: @organisation)
+
+    @organisation.stub(:image, Struct.new(:url).new('https://example.com/logo.png')) do
+      organisationship.stub(:organisation, @organisation) do
+        html = organisationship.welcome_email_content('<p>Welcome</p>')
+
+        assert_includes html, 'https://attacker.example/?t='
+        refute_includes html, '%recipient.token%'
+      end
+    end
+  end
+
   test 'organisation unsubscribe via token is two-click' do
     create_organisation
     account = FactoryBot.create(:account, email: 'unsub@example.com')

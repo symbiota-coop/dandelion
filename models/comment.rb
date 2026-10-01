@@ -45,7 +45,7 @@ class Comment
   def body_with_additions
     return unless body
 
-    b = EmailHelper.untrusted(ERB::Util.html_escape(body))
+    b = EmailHelper.h(body)
     b = b.gsub("\n", '<br />')
     b.gsub(/\[@((?:[\w\s'-.]|&#39;)+)\]\(@(\w+)\)/, "<a href=\"#{ENV['BASE_URI']}/u/\\2\">\\1</a>").html_safe
   end

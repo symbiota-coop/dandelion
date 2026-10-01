@@ -146,6 +146,25 @@ class Organisationship
     send_monthly_donation_welcome if monthly_donation_method && !sent_monthly_donation_welcome
   end
 
+  def welcome_email_content(body)
+    header = if organisation.image
+               %(
+      <div style="text-align: center">
+          <a href="#{EmailHelper.h(organisation.website || "#{ENV['BASE_URI']}/o/#{organisation.slug}")}">
+            <img src="#{organisation.image.url}" style="max-width: 100px; padding-top: 16px">
+          </a>
+      </div>
+    )
+             else
+               ''
+             end
+    %(
+    #{header}
+    <div class="main">
+      #{EmailHelper.rich_text(body)}
+    </div>)
+  end
+
   def send_welcome(force: false)
     return unless organisation.mailgun_api_key
     return if sent_welcome && !force
@@ -155,25 +174,9 @@ class Organisationship
     batch_message = Mailgun::BatchMessage.new(mg_client, organisation.mailgun_domain)
 
     account = self.account
-    header = if organisation.image
-               %(
-      <div style="text-align: center">
-          <a href="#{ERB::Util.html_escape(organisation.website || "#{ENV['BASE_URI']}/o/#{organisation.slug}")}">
-            <img src="#{organisation.image.url}" style="max-width: 100px; padding-top: 16px">
-          </a>
-      </div>
-    )
-             else
-               ''
-             end
-    content = %(
-    #{header}
-    <div class="main">
-      #{EmailHelper.rich_text(organisation.welcome_body)}
-    </div>)
     batch_message.from organisation.welcome_from
-    batch_message.subject EmailHelper.untrusted(organisation.welcome_subject)
-    batch_message.body_html EmailHelper.html(content: content)
+    batch_message.subject organisation.welcome_subject
+    batch_message.body_html EmailHelper.html(content: welcome_email_content(organisation.welcome_body))
 
     batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
 
@@ -209,25 +212,9 @@ class Organisationship
     batch_message = Mailgun::BatchMessage.new(mg_client, organisation.mailgun_domain)
 
     account = self.account
-    header = if organisation.image
-               %(
-      <div style="text-align: center">
-          <a href="#{ERB::Util.html_escape(organisation.website || "#{ENV['BASE_URI']}/o/#{organisation.slug}")}">
-            <img src="#{organisation.image.url}" style="max-width: 100px; padding-top: 16px">
-          </a>
-      </div>
-    )
-             else
-               ''
-             end
-    content = %(
-    #{header}
-    <div class="main">
-      #{EmailHelper.rich_text(monthly_donation_welcome_body)}
-    </div>)
     batch_message.from organisation.monthly_donation_welcome_from
-    batch_message.subject EmailHelper.untrusted(organisation.monthly_donation_welcome_subject)
-    batch_message.body_html EmailHelper.html(content: content)
+    batch_message.subject organisation.monthly_donation_welcome_subject
+    batch_message.body_html EmailHelper.html(content: welcome_email_content(monthly_donation_welcome_body))
 
     batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s, 'username' => account.username })
 

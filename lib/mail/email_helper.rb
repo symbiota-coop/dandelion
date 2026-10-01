@@ -47,6 +47,11 @@ module EmailHelper
     end
   end
 
+  # Plain text from anyone other than Dandelion (names, comments, websites) going into email HTML
+  def self.h(text)
+    untrusted(ERB::Util.html_escape(text)).html_safe
+  end
+
   # A %recipient.x% value, e.g. a name: zero-width non-joiners on both sides of every % so it can neither open nor
   # close a variable with the text or values around it ('% recipient.token%' gives a firstname of '%' and a lastname
   # of 'recipient.token%'). Tokens, ids and Dandelion's own strings have no % so are unchanged
@@ -85,7 +90,7 @@ module EmailHelper
     html.gsub(%r{<oembed url="https://(?:youtu\.be/|www\.youtube\.com/watch\?v=)(\w+)"></oembed>}) do
       video_id = ::Regexp.last_match(1)
       begin
-        title = untrusted(ERB::Util.html_escape(Yt::Video.new(id: video_id).title))
+        title = h(Yt::Video.new(id: video_id).title)
         %(<div><a href="https://www.youtube.com/watch?v=#{video_id}"><img src="#{ENV['BASE_URI']}/youtube_thumb/#{video_id}"></a><span>#{title}</span></div>)
       rescue Yt::Errors::NoItems
         %(<div><a href="https://www.youtube.com/watch?v=#{video_id}">link to private YouTube video</a></div>)
@@ -110,7 +115,7 @@ module EmailHelper
     end
 
     def h(text)
-      EmailHelper.untrusted(ERB::Util.html_escape(text)).html_safe
+      EmailHelper.h(text)
     end
 
     def nl2br(text)
