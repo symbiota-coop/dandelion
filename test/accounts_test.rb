@@ -218,7 +218,7 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'signing up with activity_id' do
     create_organisation
-    activity = FactoryBot.create(:activity, organisation: @organisation)
+    activity = FactoryBot.create(:activity, organisation: @organisation, privacy: 'open')
     account = FactoryBot.build_stubbed(:account)
 
     visit "/accounts/new?activity_id=#{activity.id}"
@@ -285,7 +285,7 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'existing account with activity_id' do
     create_organisation
-    activity = FactoryBot.create(:activity, organisation: @organisation)
+    activity = FactoryBot.create(:activity, organisation: @organisation, privacy: 'open')
     existing_account = FactoryBot.create(:account)
 
     visit "/accounts/new?activity_id=#{activity.id}"
@@ -294,6 +294,18 @@ class AccountsTest < ActiveSupport::TestCase
     assert page.has_content?("OK, you're on the list!")
     assert_associated(activity, existing_account, :activityships)
     assert_associated(@organisation, existing_account, :organisationships)
+  end
+
+  test 'signing up with the activity_id of a closed activity does not join it' do
+    create_organisation
+    activity = FactoryBot.create(:activity, organisation: @organisation, privacy: 'closed')
+    account = FactoryBot.build_stubbed(:account)
+
+    visit "/accounts/new?activity_id=#{activity.id}"
+    fill_signup_form(account)
+
+    created_account = Account.find_by(email: account.email.downcase)
+    assert_nil activity.activityships.find_by(account: created_account)
   end
 
   test 'existing account with local_group_id' do
