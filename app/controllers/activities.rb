@@ -167,8 +167,9 @@ Dandelion::App.controller do
   post '/activities/:id/unsubscribe' do
     sign_in_required!
     @activity = Activity.find(params[:id]) || not_found
-    @activityship = current_account.activityships.find_by(activity: @activity) || current_account.activityships.create(activity: @activity)
-    @activityship.set(unsubscribed: true)
+    if (@activityship = current_account.activityships.find_by(activity: @activity))
+      @activityship.set(unsubscribed: true)
+    end
     flash[:notice] = "You were unsubscribed from #{@activity.name}."
     redirect '/accounts/subscriptions'
   end
