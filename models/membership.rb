@@ -80,13 +80,7 @@ class Membership
 
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "You're now a member of #{gathering.name}"
-    batch_message.body_html(
-      EmailHelper.html(content: gathering.welcome_email || gathering.welcome_email_default) do |content|
-        EmailHelper.rich_text(content)
-                   .gsub('%gathering.name%', ERB::Util.html_escape(gathering.name))
-                   .gsub('%sign_in_details%', sign_in_details)
-      end
-    )
+    batch_message.body_html gathering.welcome_email_html(sign_in_details)
 
     batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
 

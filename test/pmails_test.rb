@@ -313,12 +313,29 @@ class PmailsTest < ActiveSupport::TestCase
     Tempfile.create(['email', '.erb']) do |file|
       file.write('<p><%= name %></p><p><%== raw %></p>')
       file.flush
-      context = EmailHelper::TemplateContext.new(name: 'Hi %recipient.firstname% 50%20', raw: '%recipient.firstname%')
+      context = EmailHelper::TemplateContext.new(name: 'Hi %recipient.firstname% %recipient.token% 50%20', raw: '%recipient.token%')
       html = EmailHelper.render_erb(file.path, context)
 
-      assert_includes html, "<p>Hi %\u200Crecipient.firstname%\u200C 50%20</p>"
-      assert_includes html, '<p>%recipient.firstname%</p>'
+      assert_includes html, "<p>Hi %recipient.firstname% %\u200Crecipient.token% 50%20</p>"
+      assert_includes html, '<p>%recipient.token%</p>'
     end
+  end
+
+  test 'untrusted keeps public recipient variables working and disables every other one' do
+    assert_equal '%recipient.firstname% %recipient.id%', EmailHelper.untrusted('%recipient.firstname% %recipient.id%')
+    assert_equal "%\u200Crecipient.new_secret%", EmailHelper.untrusted('%recipient.new_secret%')
+    assert_equal "%\u200Crecipient.firstname%\u200Crecipient.token%", EmailHelper.untrusted('%recipient.firstname%recipient.token%')
+    assert_equal "%\u200Crecipient.unsubscribe_url%", EmailHelper.untrusted('%recipient.unsubscribe_url%')
+    assert_equal "%\u200Cunsubscribe_url% %\u200C_x%", EmailHelper.untrusted('%unsubscribe_url% %_x%')
+    assert_equal "%\u200Crecipient.token%", EmailHelper.untrusted(EmailHelper.untrusted('%recipient.token%'))
+    assert_equal "%%\u200Crecipient.lastname%%", EmailHelper.untrusted('%%recipient.lastname%%')
+    assert_equal "%\u200Crecipient.username%\u200Crecipient%recipient.fullname%", EmailHelper.untrusted('%recipient.username%recipient%recipient.fullname%')
+    assert_equal 'Hi %recipient.firstname%, 50% off', EmailHelper.untrusted('Hi %recipient.firstname%, 50% off')
+    assert_equal "Ada \u200C%\u200C recipient.token\u200C%\u200C", EmailHelper.recipient_value(EmailHelper.recipient_value('Ada % recipient.token%'))
+    html = EmailHelper.rich_text('<figure class="image" style="width: 50%;"><img src="https://example.com/a.png"></figure><p style="width:25%">50% off</p>')
+    assert_includes html, 'width: 50%;'
+    assert_includes html, 'width:25%'
+    assert_includes html, '50% off'
   end
 
   test 'pmail can exclude a cohosted event' do

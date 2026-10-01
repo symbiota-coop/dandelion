@@ -1,17 +1,33 @@
 module EmailHelper
   MICROSOFT_DOMAINS = %w[hotmail msn outlook live].freeze
-  RECIPIENT_SECRET = /%recipient\.(?:token|org_unsubscribe_token|feedback_token|cancel_rsvp_url)%/i
+  # Mailgun fills %recipient.x% into a batch message wherever it appears. Variables on this list are harmless if
+  # untrusted text uses them (organisers write "Dear %recipient.firstname%"); every other variable, including
+  # tokens and anything added later, only works when it comes from Dandelion's own templates and code
+  PUBLIC_RECIPIENT_VARIABLES = %w[firstname lastname fullname username id view_or_activate event_when ticket_or_tickets tickets_are description_elements].freeze
+  PUBLIC_NAMES = "(?:#{PUBLIC_RECIPIENT_VARIABLES.join('|')})%".freeze
+  # Tested against Mailgun (Oct 2026): in the body a value that is itself a variable is filled in too, and the
+  # subject is rescanned, so text and values that join into %recipient.token% are filled in there. Joining needs a %
+  # followed by r once values are in. Values can't supply a % (recipient_value), so it would have to be the text's
+  # right before a public variable ('%%recipient.lastname%' with a lastname of 'recipient.token'), hence not preceded
+  # by %, or the variable's own closing % ('%recipient.username%recipient%recipient.fullname%' with a fullname of
+  # '.token'), hence not followed by a letter
+  PUBLIC_RECIPIENT_VARIABLE = /(?<!%)%recipient\.#{PUBLIC_NAMES}(?![A-Za-z_])/i
+  OTHER_RECIPIENT_VARIABLE = /%recipient\.(?!#{PUBLIC_NAMES})\w+%/i
 
-  def self.strip_recipient_secrets(text)
+  # The one way to make text from anyone other than Dandelion safe to put in an email: names, subjects, organiser
+  # rich text, comments. Run it before adding Dandelion's own %recipient.token% links, never after.
+  # Puts a zero-width non-joiner after each % that could open a variable (followed by a letter or _), unless it's a
+  # %XX URL escape or opens a public variable, so Mailgun can't substitute it. CSS like width: 50%; is untouched. Premailer/Nokogiri decode &#37; back to %, so HTML-escaping alone isn't enough.
+  # strip: true deletes non-public variables instead, for values that are stored rather than sent (e.g. names);
+  # it repeats so '%recipient.tok%recipient.token%en%' can't reassemble
+  def self.untrusted(text, strip: false)
     s = text.to_s
-    s = s.gsub(RECIPIENT_SECRET, '') while s.match?(RECIPIENT_SECRET)
-    s
-  end
-
-  # Mailgun substitutes %recipient.x% anywhere in a batch message, and Premailer/Nokogiri decode &#37; back to %,
-  # so user text gets a zero-width non-joiner after each % that isn't a %XX URL escape
-  def self.defuse_recipient_variables(text)
-    text.to_s.gsub(/%(?![0-9A-Fa-f]{2})/, "%\u200C")
+    if strip
+      s = s.gsub(OTHER_RECIPIENT_VARIABLE, '') while s.match?(OTHER_RECIPIENT_VARIABLE)
+      s
+    else
+      s.gsub(/#{PUBLIC_RECIPIENT_VARIABLE}|%(?=[A-Za-z_])(?![0-9A-Fa-f]{2})/) { |m| m == '%' ? "%\u200C" : m }
+    end
   end
 
   # ::SafeBuffer is Padrino::SafeBuffer when Padrino loads before ActiveSupport's output_safety (as it currently does),
@@ -22,20 +38,41 @@ module EmailHelper
 
     def html_escape_interpolated_argument(arg)
       escaped = super
-      arg.html_safe? ? escaped : EmailHelper.defuse_recipient_variables(escaped)
+      arg.html_safe? ? escaped : EmailHelper.untrusted(escaped)
     end
 
     def implicit_html_escape_interpolated_argument(arg)
       escaped = super
-      arg.html_safe? ? escaped : EmailHelper.defuse_recipient_variables(escaped)
+      arg.html_safe? ? escaped : EmailHelper.untrusted(escaped)
     end
   end
 
-  # Organiser/user rich text (CKEditor HTML) for emails: sanitized, stripped of recipient secrets, email-friendly markup
+  # A %recipient.x% value, e.g. a name: zero-width non-joiners on both sides of every % so it can neither open nor
+  # close a variable with the text or values around it ('% recipient.token%' gives a firstname of '%' and a lastname
+  # of 'recipient.token%'). Tokens, ids and Dandelion's own strings have no % so are unchanged
+  def self.recipient_value(value)
+    value.to_s.gsub(/\u200C?%\u200C?/, "\u200C%\u200C")
+  end
+
+  # Every sender's Mailgun recipient variables and subject pass through here. Subjects interpolate names and
+  # organiser text, and no subject needs a non-public variable
+  module RecipientVariables
+    def add_recipient(recipient_type, address, variables = nil)
+      variables = variables.transform_values { |value| value.is_a?(String) ? EmailHelper.recipient_value(value) : value } if variables.is_a?(Hash)
+      super
+    end
+
+    def subject(subj = nil)
+      super(subj && EmailHelper.untrusted(subj))
+    end
+  end
+  Mailgun::BatchMessage.prepend(RecipientVariables)
+
+  # Organiser/user rich text (CKEditor HTML) for emails: sanitized, made untrusted, email-friendly markup
   def self.rich_text(html)
     return html unless html
 
-    html = strip_recipient_secrets(Sanitize.fragment(html, Sanitize::Config::DANDELION))
+    html = untrusted(Sanitize.fragment(html, Sanitize::Config::DANDELION))
     replace_youtube_oembeds(html)
       .gsub(/<figure([^>]*)>/, '<div\1>')
       .gsub('</figure>', '</div>')
@@ -48,7 +85,7 @@ module EmailHelper
     html.gsub(%r{<oembed url="https://(?:youtu\.be/|www\.youtube\.com/watch\?v=)(\w+)"></oembed>}) do
       video_id = ::Regexp.last_match(1)
       begin
-        title = ERB::Util.html_escape(strip_recipient_secrets(Yt::Video.new(id: video_id).title))
+        title = untrusted(ERB::Util.html_escape(Yt::Video.new(id: video_id).title))
         %(<div><a href="https://www.youtube.com/watch?v=#{video_id}"><img src="#{ENV['BASE_URI']}/youtube_thumb/#{video_id}"></a><span>#{title}</span></div>)
       rescue Yt::Errors::NoItems
         %(<div><a href="https://www.youtube.com/watch?v=#{video_id}">link to private YouTube video</a></div>)
@@ -73,7 +110,7 @@ module EmailHelper
     end
 
     def h(text)
-      EmailHelper.defuse_recipient_variables(ERB::Util.html_escape(text)).html_safe
+      EmailHelper.untrusted(ERB::Util.html_escape(text)).html_safe
     end
 
     def nl2br(text)

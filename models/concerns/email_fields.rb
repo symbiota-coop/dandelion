@@ -41,7 +41,7 @@ module EmailFields
     if plain_text
       # plain_text output is used as a subject, which Mailgun fills %recipient.x% into and a reply can carry back to the organiser
       # include_link_tags: false, otherwise Premailer reads <link href> paths off disk (e.g. /dev/zero)
-      EmailHelper.strip_recipient_secrets(
+      EmailHelper.untrusted(
         Premailer.new(html, with_html_string: true, adapter: 'nokogiri', input_encoding: 'UTF-8', include_link_tags: false)
                  .to_plain_text
                  .squish
@@ -70,7 +70,8 @@ module EmailFields
       values['description_elements'] = ''
     end
 
-    values
+    # EmailHelper::RecipientVariables does this for Mailgun; this covers replace_recipient_variables (previews) too
+    values.transform_values { |value| EmailHelper.recipient_value(value) }
   end
 
   included do

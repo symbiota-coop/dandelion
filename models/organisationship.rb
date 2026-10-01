@@ -172,7 +172,7 @@ class Organisationship
       #{EmailHelper.rich_text(organisation.welcome_body)}
     </div>)
     batch_message.from organisation.welcome_from
-    batch_message.subject EmailHelper.strip_recipient_secrets(organisation.welcome_subject)
+    batch_message.subject EmailHelper.untrusted(organisation.welcome_subject)
     batch_message.body_html EmailHelper.html(content: content)
 
     batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
@@ -226,7 +226,7 @@ class Organisationship
       #{EmailHelper.rich_text(monthly_donation_welcome_body)}
     </div>)
     batch_message.from organisation.monthly_donation_welcome_from
-    batch_message.subject EmailHelper.strip_recipient_secrets(organisation.monthly_donation_welcome_subject)
+    batch_message.subject EmailHelper.untrusted(organisation.monthly_donation_welcome_subject)
     batch_message.body_html EmailHelper.html(content: content)
 
     batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s, 'username' => account.username })
