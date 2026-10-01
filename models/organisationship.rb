@@ -158,7 +158,7 @@ class Organisationship
     header = if organisation.image
                %(
       <div style="text-align: center">
-          <a href="#{organisation.website || "#{ENV['BASE_URI']}/o/#{organisation.slug}"}">
+          <a href="#{ERB::Util.html_escape(organisation.website || "#{ENV['BASE_URI']}/o/#{organisation.slug}")}">
             <img src="#{organisation.image.url}" style="max-width: 100px; padding-top: 16px">
           </a>
       </div>
@@ -169,16 +169,22 @@ class Organisationship
     content = %(
     #{header}
     <div class="main">
-      #{EmailHelper.replace_youtube_oembeds(organisation.welcome_body)}
+      #{welcome_rich_text(organisation.welcome_body)}
     </div>)
     batch_message.from organisation.welcome_from
-    batch_message.subject organisation.welcome_subject
+    batch_message.subject EmailHelper.strip_recipient_secrets(organisation.welcome_subject)
     batch_message.body_html EmailHelper.html(content: content)
 
     batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
 
     batch_message.finalize if organisation.mailgun_api_key
     set(sent_welcome: true)
+  end
+
+  # [sign_in_link] is expanded after rich_text strips %recipient.token%, so the token only ever goes to a Dandelion URL
+  def welcome_rich_text(html)
+    EmailHelper.rich_text(html).to_s
+               .gsub('[sign_in_link]', %(<a href="#{ENV['BASE_URI']}/o/#{organisation.slug}?sign_in_token=%recipient.token%">Sign in to Dandelion</a>))
   end
 
   def monthly_donation_welcome_body
@@ -212,7 +218,7 @@ class Organisationship
     header = if organisation.image
                %(
       <div style="text-align: center">
-          <a href="#{organisation.website || "#{ENV['BASE_URI']}/o/#{organisation.slug}"}">
+          <a href="#{ERB::Util.html_escape(organisation.website || "#{ENV['BASE_URI']}/o/#{organisation.slug}")}">
             <img src="#{organisation.image.url}" style="max-width: 100px; padding-top: 16px">
           </a>
       </div>
@@ -223,10 +229,10 @@ class Organisationship
     content = %(
     #{header}
     <div class="main">
-      #{EmailHelper.replace_youtube_oembeds(monthly_donation_welcome_body)}
+      #{welcome_rich_text(monthly_donation_welcome_body)}
     </div>)
     batch_message.from organisation.monthly_donation_welcome_from
-    batch_message.subject organisation.monthly_donation_welcome_subject
+    batch_message.subject EmailHelper.strip_recipient_secrets(organisation.monthly_donation_welcome_subject)
     batch_message.body_html EmailHelper.html(content: content)
 
     batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s, 'username' => account.username })

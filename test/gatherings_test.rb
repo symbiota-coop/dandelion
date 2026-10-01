@@ -237,7 +237,7 @@ class GatheringsTest < ActiveSupport::TestCase
     refute_includes @gathering.name, '%recipient'
     sign_in_details = %(<a href="#{ENV['BASE_URI']}/g/#{@gathering.slug}?sign_in_token=%recipient.token%">Sign in</a>)
     html = EmailHelper.html(content: @gathering.welcome_email) do |content|
-      EmailHelper.replace_youtube_oembeds(content)
+      EmailHelper.rich_text(content)
                  .gsub('%gathering.name%', ERB::Util.html_escape(@gathering.name))
                  .gsub('%sign_in_details%', sign_in_details)
     end

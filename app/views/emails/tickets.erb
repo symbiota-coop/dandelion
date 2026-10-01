@@ -15,7 +15,7 @@
 
   <% end %>
 
-  <%= EmailHelper.replace_youtube_oembeds(
+  <%= EmailHelper.rich_text(
         EmailFields.replace_magic_tags(
           ((event.recording? ? event.recording_email_greeting : event.ticket_email_greeting) || (event.recording? ? event.organisation.recording_email_greeting : event.organisation.ticket_email_greeting))
           .then { |html| event.evergreen? ? html.gsub(/,\s*\[event_when\]\s+\[at_event_location_if_not_online\]/, '') : html }
@@ -29,18 +29,18 @@
   <% if event.recording? %>
     <% if event.extra_info_for_recording_email %>
       <hr>
-      <%= EmailHelper.replace_youtube_oembeds(event.extra_info_for_recording_email) %>
+      <%= EmailHelper.rich_text(event.extra_info_for_recording_email) %>
     <% end %>
   <% else %>
     <% if event.extra_info_for_ticket_email %>
       <hr>
-      <%= EmailHelper.replace_youtube_oembeds(event.extra_info_for_ticket_email) %>
+      <%= EmailHelper.rich_text(event.extra_info_for_ticket_email) %>
     <% end %>
   <% end %>
   <% if !event.hide_organisation_footer %>
     <% if event.organisation.extra_info_for_ticket_email %>
       <hr>
-      <%= EmailHelper.replace_youtube_oembeds(event.organisation.extra_info_for_ticket_email) %>
+      <%= EmailHelper.rich_text(event.organisation.extra_info_for_ticket_email) %>
     <% end %>
     <% if !event.evergreen? && !event.recording? && event.organisation.show_ticketholder_link_in_ticket_emails %>
       <p>

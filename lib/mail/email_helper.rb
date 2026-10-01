@@ -31,25 +31,29 @@ module EmailHelper
     end
   end
 
-  def self.replace_youtube_oembeds(html)
+  # Organiser/user rich text (CKEditor HTML) for emails: sanitized, stripped of recipient secrets, email-friendly markup
+  def self.rich_text(html)
     return html unless html
 
     html = strip_recipient_secrets(Sanitize.fragment(html, Sanitize::Config::DANDELION))
-    html
-      .gsub(%r{<oembed url="https://(?:youtu\.be/|www\.youtube\.com/watch\?v=)(\w+)"></oembed>}) do
-        video_id = ::Regexp.last_match(1)
-        begin
-          title = ERB::Util.html_escape(strip_recipient_secrets(Yt::Video.new(id: video_id).title))
-          %(<div><a href="https://www.youtube.com/watch?v=#{video_id}"><img src="#{ENV['BASE_URI']}/youtube_thumb/#{video_id}"></a><span>#{title}</span></div>)
-        rescue Yt::Errors::NoItems
-          %(<div><a href="https://www.youtube.com/watch?v=#{video_id}">link to private YouTube video</a></div>)
-        end
-      end
+    replace_youtube_oembeds(html)
       .gsub(/<figure([^>]*)>/, '<div\1>')
       .gsub('</figure>', '</div>')
       .gsub(/<figcaption([^>]*)>/, '<span\1>')
       .gsub('</figcaption>', '</span>')
       .html_safe
+  end
+
+  def self.replace_youtube_oembeds(html)
+    html.gsub(%r{<oembed url="https://(?:youtu\.be/|www\.youtube\.com/watch\?v=)(\w+)"></oembed>}) do
+      video_id = ::Regexp.last_match(1)
+      begin
+        title = ERB::Util.html_escape(strip_recipient_secrets(Yt::Video.new(id: video_id).title))
+        %(<div><a href="https://www.youtube.com/watch?v=#{video_id}"><img src="#{ENV['BASE_URI']}/youtube_thumb/#{video_id}"></a><span>#{title}</span></div>)
+      rescue Yt::Errors::NoItems
+        %(<div><a href="https://www.youtube.com/watch?v=#{video_id}">link to private YouTube video</a></div>)
+      end
+    end
   end
 
   def self.mailgun_host(email, default_host)
