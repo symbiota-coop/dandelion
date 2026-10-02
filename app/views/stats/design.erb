@@ -4,27 +4,21 @@
    flag_class = 'badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle'
    flags = ->(*numbers) { numbers.map { |n| %(<a href="#i-#{n}" class="#{flag_class}">I-#{n}</a>) }.join }
 
-   severity_classes = { 'High' => 'text-danger', 'Medium' => 'text-warning-emphasis', 'Low' => 'text-body-secondary', 'Fixed' => 'text-primary' }
+   severity_classes = { 'High' => 'text-danger', 'Medium' => 'text-warning-emphasis', 'Low' => 'text-body-secondary' }
    issues = [
-     ['Fixed', 'Two greens mean "success"', 'Alerts and toasts used the theme green #00af5e, while btn-success, badge-success, text-success and bg-success used $success #4CD964, and --color-green-tint was a tint of the theme green rather than of --color-green.', "Applied: $success is now #00af5e, app.css points --bs-success and --bs-success-rgb at the theme colour, badge-success uses --theme-color, the tints are renamed --theme-color-tint and --theme-color-tint-strong, and --color-green is gone. Success follows each organisation's theme.", 'bootstrap5.scss $success · app.css :root, .badge-success'],
-     ['Fixed', 'Success alert text failed contrast on the default theme', '#00af5e on #E6F8EF was about 2.6:1, while theme.css used --theme-color-darker for themed pages. White text on primary buttons is about 2.9:1 ($min-contrast-ratio was lowered to 2.5 to allow it).', 'Applied: alerts and toasts use --theme-800 text on every page. Buttons still use white text; --theme-on-500 could replace clamp_color.', 'app.css .alert-primary, .toast-primary · bootstrap5.scss $min-contrast-ratio'],
-     ['Medium', 'Default and themed pages diverge with the same colour', 'theme.css restyles .ai-well and calendar events: the AI well is purple by default and a theme tint when themed; calendar events are purple by default and theme-coloured when themed. (Alerts and toasts no longer differ: their tints come from the ramp.)', 'Move the remaining theme.css rules into app.css so there is one behaviour, or document that the purple is intentional only for the unthemed site.', 'theme.css · app.css .ai-well, #calendar a.fc-event'],
-     ['Fixed', 'Colours outside the palette', 'The palette comment said every colour came from it, but the CSS, views and JS also hard-coded greys, overlays, chart, map, payment and marketing colours.', 'Applied: every colour is a token in app.css or a Bootstrap variable, and charts, maps and canvas read them with cssColor(). Emails, the theme-color meta tag and the icon SVGs keep literal colours, as they cannot read CSS.', 'app.css :root · app.js cssColor'],
-     ['Fixed', 'Two grey families with near-duplicates', 'Cool iOS greys (#8A8A8F, #C8C7CC, #EAE9EF, #EFEFF4) were mixed with neutral greys (#777, #999, #bbb, #ddd, #eee), with near-identical steps.', 'Applied: the --grey-* tokens are gone; everything uses the closest of Bootstrap\'s --bs-gray-100 to 900.', 'app.css'],
-     ['Fixed', '--color-theme-transparent was orange', 'It was rgba(251,174,59,.5), unrelated to the theme colour, and only used for unread message backgrounds.', 'Applied: the token is gone and unread messages use rgba(var(--theme-color-rgb), .15).', 'app.css :root, .message-preview.unread'],
-     ['Medium', 'Too many accent colours and active states', 'Besides the theme colour there is purple #4400B9 (header, AI), an orange-to-yellow gradient (sidebar active, notification dot, load bar), a rainbow gradient, signal blue and Stripe purple. The sidebar active item uses the orange gradient while every other active state (pills, list groups, dropdown items, checks) uses the theme colour.', 'Decide which accent marks "active" and use it everywhere; restrict purple to AI features.', 'app.css .sidebar .nav-link.active, #header, --gradient-*'],
-     ['Medium', 'Type scale has no clear steps', 'Small sizes include .693, .75, .8, .825, .85, .875 and .9rem plus 82.5%, 85% and 90%. h1 (34px) and h2 (31.9px) differ by 2px; .block-title (1.66rem) sits between h2 and h3. h6 equals body size. small.form-text is .85rem, larger than the body text it supports.', 'Reduce to a 6–7 step scale (for example .75, .825, .875, 1, 1.125, 1.4, 2rem) and alias .block-title to one of them.', 'app.css Base section'],
-     ['Low', 'Duplicate and dead declarations', 'Body size is set three times (--body-font-size, body, $input-font-size) and body hardcodes the font stack rather than using --body-font-family. Heading weight is set to 500, then overridden to bold later in the same file. Two identical spin keyframes (pace-spinner, spin); @keyframes opacity appears unused.', 'Keep one source per value and delete the overridden rules.', 'app.css'],
-     ['Medium', 'Font loading', 'Hanken Grotesk is fetched from rawcdn.githack.com, a mirror not intended for production. Plus Jakarta Sans comes from Google Fonts even though the files ship in assets/fonts/PlusJakartaSans. Emails use a system stack, so they share neither typeface.', 'Self-host both fonts from assets/fonts.', 'app.css @font-face · layouts/_head.erb · email.css'],
-     ['Low', 'Radius values', 'Ten values in use: 0, .2rem, .25rem, .25em, .3rem, 5px, .375rem, .5rem, .75rem, 999px. 5px and .25rem are near-duplicates. Dropdowns are .5rem but the jQuery UI autocomplete, also a menu, has radius 0.', 'Settle on sm/md/lg/pill (.25, .5, .75rem, 999px) and give the autocomplete the dropdown treatment.', 'bootstrap5.scss · app.css .ui-autocomplete, .sidebar .nav'],
-     ['Low', 'No elevation scale', 'Five unrelated shadows. The autocomplete shadow is three times darker than the dropdown shadow.', 'Define two or three shadow tokens and reuse them.', 'app.css .dropdown-menu, .ui-autocomplete, .cookie-consent, .header.navbar'],
-     ['Low', 'Three focus ring styles', 'Inputs: 2px at 60%. Checks, pagination, accordion, close: .25rem at 25%. btn-signal: .2rem with its own colour. Nav links have none.', 'Use one ring (e.g. 2px at 60%) via --bs-focus-ring-*.', 'bootstrap5.scss $input-focus-box-shadow · app.css'],
-     ['Low', 'Badges and labels are parallel systems', '.label is a legacy Bootstrap 3 component with different size and padding (85%, .2em .6em) and only some variants (no label-warning).', 'Migrate .label usages to .badge and remove .label.', 'app.css Labels section'],
-     ['Low', 'Button treatments vary', 'Primary and danger are gradients; secondary and warning are flat. btn-signal forces its hover with !important. p.action a is a separate CTA style (10px padding, 5px radius).', 'Apply the gradient pattern to all solid variants or none; express btn-signal through --bs-btn-* variables.', 'app.css Buttons, p.action'],
-     ['Low', 'Breakpoints written four ways', "max-width 767px, 767.98px and 768px are all used, plus min-width 767px for the sidebar z-index. The search bar's max-width: 768px overlaps min-width: 768px rules at exactly 768px.", "Use Bootstrap's 767.98px / 768px pair everywhere.", 'app.css media queries'],
-     ['Low', 'Mixed px and rem', 'The file converts most values to rem, but 5px radii, 15px insets, 7.5px slick padding, 16px newsfeed icons, 20–22px map icons and 36/40px controls remain. Because the root scales to 19 and 21px, these shrink relative to everything else on large screens.', 'Convert remaining px to rem.', 'app.css'],
-     ['Low', "Browser theme colour doesn't match the header", 'meta theme-color is #ffffff while the header is #222, so mobile browser chrome shows a white bar above a dark header.', 'Set theme-color to #222222.', 'layouts/_head.erb'],
-     ['Fixed', 'Calendar buttons used Bootstrap grey', '.fc-button used --bs-secondary (#6c757d), a grey that appeared nowhere else.', 'Applied: the app now uses Bootstrap\'s greys throughout, so #6c757d (--bs-gray-600) is the standard secondary grey.', 'app.css .fc-button']
+     [3, 'Medium', 'Default and themed pages diverge with the same colour', 'theme.css restyles .ai-well and calendar events: the AI well is purple by default and a theme tint when themed; calendar events are purple by default and theme-coloured when themed. (Alerts and toasts no longer differ: their tints come from the ramp.)', 'Move the remaining theme.css rules into app.css so there is one behaviour, or document that the purple is intentional only for the unthemed site.', 'theme.css · app.css .ai-well, #calendar a.fc-event'],
+     [7, 'Medium', 'Too many accent colours and active states', 'Besides the theme colour there is purple #4400B9 (header, AI), an orange-to-yellow gradient (sidebar active, notification dot, load bar), a rainbow gradient, signal blue and Stripe purple. The sidebar active item uses the orange gradient while every other active state (pills, list groups, dropdown items, checks) uses the theme colour.', 'Decide which accent marks "active" and use it everywhere; restrict purple to AI features.', 'app.css .sidebar .nav-link.active, #header, --gradient-*'],
+     [8, 'Medium', 'Type scale has no clear steps', 'Small sizes include .693, .75, .8, .825, .85, .875 and .9rem plus 82.5%, 85% and 90%. h1 (34px) and h2 (31.9px) differ by 2px; .block-title (1.66rem) sits between h2 and h3. h6 equals body size. small.form-text is .85rem, larger than the body text it supports.', 'Reduce to a 6–7 step scale (for example .75, .825, .875, 1, 1.125, 1.4, 2rem) and alias .block-title to one of them.', 'app.css Base section'],
+     [9, 'Low', 'Duplicate and dead declarations', 'Body size is set three times (--body-font-size, body, $input-font-size) and body hardcodes the font stack rather than using --body-font-family. Heading weight is set to 500, then overridden to bold later in the same file. Two identical spin keyframes (pace-spinner, spin); @keyframes opacity appears unused.', 'Keep one source per value and delete the overridden rules.', 'app.css'],
+     [10, 'Medium', 'Font loading', 'Hanken Grotesk is fetched from rawcdn.githack.com, a mirror not intended for production. Plus Jakarta Sans comes from Google Fonts even though the files ship in assets/fonts/PlusJakartaSans. Emails use a system stack, so they share neither typeface.', 'Self-host both fonts from assets/fonts.', 'app.css @font-face · layouts/_head.erb · email.css'],
+     [11, 'Low', 'Radius values', 'Ten values in use: 0, .2rem, .25rem, .25em, .3rem, 5px, .375rem, .5rem, .75rem, 999px. 5px and .25rem are near-duplicates. Dropdowns are .5rem but the jQuery UI autocomplete, also a menu, has radius 0.', 'Settle on sm/md/lg/pill (.25, .5, .75rem, 999px) and give the autocomplete the dropdown treatment.', 'bootstrap5.scss · app.css .ui-autocomplete, .sidebar .nav'],
+     [12, 'Low', 'No elevation scale', 'Five unrelated shadows. The autocomplete shadow is three times darker than the dropdown shadow.', 'Define two or three shadow tokens and reuse them.', 'app.css .dropdown-menu, .ui-autocomplete, .cookie-consent, .header.navbar'],
+     [13, 'Low', 'Three focus ring styles', 'Inputs: 2px at 60%. Checks, pagination, accordion, close: .25rem at 25%. btn-signal: .2rem with its own colour. Nav links have none.', 'Use one ring (e.g. 2px at 60%) via --bs-focus-ring-*.', 'bootstrap5.scss $input-focus-box-shadow · app.css'],
+     [14, 'Low', 'Badges and labels are parallel systems', '.label is a legacy Bootstrap 3 component with different size and padding (85%, .2em .6em) and only some variants (no label-warning).', 'Migrate .label usages to .badge and remove .label.', 'app.css Labels section'],
+     [15, 'Low', 'Button treatments vary', 'Primary and danger are gradients; secondary and warning are flat. btn-signal forces its hover with !important. p.action a is a separate CTA style (10px padding, 5px radius).', 'Apply the gradient pattern to all solid variants or none; express btn-signal through --bs-btn-* variables.', 'app.css Buttons, p.action'],
+     [16, 'Low', 'Breakpoints written four ways', "max-width 767px, 767.98px and 768px are all used, plus min-width 767px for the sidebar z-index. The search bar's max-width: 768px overlaps min-width: 768px rules at exactly 768px.", "Use Bootstrap's 767.98px / 768px pair everywhere.", 'app.css media queries'],
+     [17, 'Low', 'Mixed px and rem', 'The file converts most values to rem, but 5px radii, 15px insets, 7.5px slick padding, 16px newsfeed icons, 20–22px map icons and 36/40px controls remain. Because the root scales to 19 and 21px, these shrink relative to everything else on large screens.', 'Convert remaining px to rem.', 'app.css'],
+     [18, 'Low', "Browser theme colour doesn't match the header", 'meta theme-color is #ffffff while the header is #222, so mobile browser chrome shows a white bar above a dark header.', 'Set theme-color to #222222.', 'layouts/_head.erb']
    ]
 
    # Run through clamp_color as /theme.css does, so a colour too light for white text is darkened
@@ -57,7 +51,6 @@
       <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">Theme and status</h3>
         <span class="text-body-secondary">Three ramps, each generated from one value with <code>oklch()</code>. Components use the 500, 400 as the gradient end, 600 for hover, 50 to 200 for alert and toast backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints.</span>
-        <%== flags.call(1) %>
       </div>
       <% [
            ['theme', 'Primary and success · follows each organisation\'s theme', %w[50 100 200 400 500 600 700 800], { '50' => 'alert and toast background', '200' => 'gradient end', '400' => 'button gradient end', '600' => 'hover', '800' => 'text on tints' }],
@@ -87,7 +80,7 @@
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">Accents and surfaces</h3>
-        <%== flags.call(6, 7) %>
+        <%== flags.call(7) %>
       </div>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
@@ -451,7 +444,7 @@
       <div class="col-lg-6 d-flex flex-column gap-3">
         <div class="d-flex align-items-baseline flex-wrap gap-2">
           <h3 class="m-0">Alerts</h3>
-          <%== flags.call(2, 3) %>
+          <%== flags.call(3) %>
         </div>
         <div>
           <div class="alert fade show alert-primary alert-dismissible">Your ticket is booked. <a href="#components">View order</a><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
@@ -464,7 +457,7 @@
       <div class="col-lg-6 d-flex flex-column gap-3">
         <div class="d-flex align-items-baseline flex-wrap gap-2">
           <h3 class="m-0">Toasts</h3>
-          <%== flags.call(2, 3) %>
+          <%== flags.call(3) %>
         </div>
         <div class="d-flex flex-column align-items-start gap-2">
           <% [['primary', 'Your ticket is booked.'], ['warning', 'Only 3 tickets left.'], ['danger', 'Payment failed.']].each do |variant, message| %>
@@ -631,14 +624,14 @@
     <div class="d-flex flex-column gap-1 border-top border-2 border-dark pt-3">
       <div class="font-monospace small text-body-secondary fw-bold">07</div>
       <h2 class="m-0">Inconsistencies</h2>
-      <p class="m-0 text-body-secondary" style="max-width: 680px">Found while reading the stylesheets and layouts. Each has a suggested fix. Those marked Fixed have been applied.</p>
+      <p class="m-0 text-body-secondary" style="max-width: 680px">Found while reading the stylesheets and layouts. Each has a suggested fix.</p>
     </div>
 
     <div>
-      <% issues.each_with_index do |(severity, title, body, fix, where), i| %>
-        <div class="d-flex gap-3 py-3 border-top" id="i-<%= i + 1 %>" style="scroll-margin-top: 4rem">
+      <% issues.each do |number, severity, title, body, fix, where| %>
+        <div class="d-flex gap-3 py-3 border-top" id="i-<%= number %>" style="scroll-margin-top: 4rem">
           <div class="flex-shrink-0 d-flex flex-column gap-1 align-items-start" style="width: 3.5rem">
-            <span class="<%= flag_class %>">I-<%= i + 1 %></span>
+            <span class="<%= flag_class %>">I-<%= number %></span>
             <span class="fw-bold small <%= severity_classes[severity] %>"><%= severity %></span>
           </div>
           <div class="d-flex flex-column gap-1">
