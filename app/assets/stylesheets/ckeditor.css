@@ -59,7 +59,7 @@ div.wysiwyg img {
 .ck.ck-editor .ck.ck-editor__top .ck-sticky-panel .ck-sticky-panel__content_sticky {
   z-index: 999;
   background-color: var(--ck-color-toolbar-background, var(--bs-white));
-  box-shadow: 0 2px 4px rgba(var(--bs-black-rgb), 0.08);
+  box-shadow: var(--bs-box-shadow-sm);
 }
 
 .ck-content .image {

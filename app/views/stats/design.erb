@@ -10,7 +10,6 @@
      [7, 'Medium', 'Too many accent colours and active states', 'Besides the theme colour there is purple #4400B9 (header, AI), an orange-to-yellow gradient (sidebar active, notification dot, load bar), a rainbow gradient, signal blue and Stripe purple. The sidebar active item uses the orange gradient while every other active state (pills, list groups, dropdown items, checks) uses the theme colour.', 'Decide which accent marks "active" and use it everywhere; restrict purple to AI features.', 'app.css .sidebar .nav-link.active, #header, --gradient-*'],
      [8, 'Medium', 'Type scale has no clear steps', 'Small sizes include .693, .75, .8, .825, .85, .875 and .9rem plus 82.5%, 85% and 90%. h1 (34px) and h2 (31.9px) differ by 2px; .block-title (1.66rem) sits between h2 and h3. h6 equals body size. small.form-text is .85rem, larger than the body text it supports.', 'Reduce to a 6–7 step scale (for example .75, .825, .875, 1, 1.125, 1.4, 2rem) and alias .block-title to one of them.', 'app.css Base section'],
      [11, 'Low', 'Radius values', 'Ten values in use: 0, .2rem, .25rem, .25em, .3rem, 5px, .375rem, .5rem, .75rem, 999px. 5px and .25rem are near-duplicates. Dropdowns are .5rem but the jQuery UI autocomplete, also a menu, has radius 0.', 'Settle on sm/md/lg/pill (.25, .5, .75rem, 999px) and give the autocomplete the dropdown treatment.', 'bootstrap5.scss · app.css .ui-autocomplete, .sidebar .nav'],
-     [12, 'Low', 'No elevation scale', 'Five unrelated shadows. The autocomplete shadow is three times darker than the dropdown shadow.', 'Define two or three shadow tokens and reuse them.', 'app.css .dropdown-menu, .ui-autocomplete, .cookie-consent, .header.navbar'],
      [13, 'Low', 'Three focus ring styles', 'Inputs: 2px at 60%. Checks, pagination, accordion, close: .25rem at 25%. btn-signal: .2rem with its own colour. Nav links have none.', 'Use one ring (e.g. 2px at 60%) via --bs-focus-ring-*.', 'bootstrap5.scss $input-focus-box-shadow · app.css'],
      [14, 'Low', 'Badges and labels are parallel systems', '.label is a legacy Bootstrap 3 component with different size and padding (85%, .2em .6em) and only some variants (no label-warning).', 'Migrate .label usages to .badge and remove .label.', 'app.css Labels section'],
      [15, 'Low', 'Button treatments vary', 'Primary and danger are gradients; secondary and warning are flat. btn-signal forces its hover with !important. p.action a is a separate CTA style (10px padding, 5px radius).', 'Apply the gradient pattern to all solid variants or none; express btn-signal through --bs-btn-* variables.', 'app.css Buttons, p.action'],
@@ -304,23 +303,22 @@
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">Elevation</h3>
-        <%== flags.call(12) %>
+        <span class="text-body-secondary">Bootstrap's three shadows, used through its variables or the <code>shadow-sm</code>, <code>shadow</code> and <code>shadow-lg</code> classes.</span>
       </div>
       <div class="bg-body-tertiary rounded p-4">
         <div class="row g-4">
           <% [
-               ['shadow-sm', 'Cards, newsfeed, search', 'rounded shadow-sm', nil],
-               ['Dropdown', '0 .125rem .375rem 1px / .1', '', 'border-radius: .5rem; border: 1px solid rgba(0, 0, 0, .05); box-shadow: 0 .125rem .375rem 1px rgba(0, 0, 0, .1)'],
-               ['Autocomplete', '0 .125rem .375rem / .3', '', 'box-shadow: 0 .125rem .375rem rgba(0, 0, 0, .3)'],
-               ['Cookie banner', '0 .5rem 1.5rem / .16', 'border', 'border-radius: 5px; box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .16)'],
-               ['Header', '0 .125rem 2.5rem / .08', '', 'box-shadow: 0 .125rem 2.5rem rgba(0, 0, 0, .08)']
-             ].each do |title, note, classes, style| %>
-            <div class="col-6 col-md-4 col-xl">
-              <div class="bg-white p-3 small h-100 <%= classes %>" style="<%= style %>"><b><%= title %></b><br><%= note %></div>
+               ['--bs-box-shadow-sm', 'Resting surfaces: header, search, cards, editor toolbar'],
+               ['--bs-box-shadow', 'Floating: dropdowns, autocomplete, cookie banner, chat, hover lift'],
+               ['--bs-box-shadow-lg', 'Not used yet']
+             ].each do |name, note| %>
+            <div class="col-md-4">
+              <div class="bg-white rounded p-3 small h-100" style="box-shadow: var(<%= name %>)"><b><%= name %></b><br><%= note %></div>
             </div>
           <% end %>
         </div>
       </div>
+      <div class="small text-body-secondary">The mobile event page's fixed tickets bar keeps its own upward shadow.</div>
     </div>
 
     <div class="d-flex flex-column gap-2">
