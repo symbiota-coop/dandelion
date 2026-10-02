@@ -65,8 +65,8 @@
   --color-paypal: #003087;
   --color-gocardless: #1C1B18;
   --color-gocardless-text: #F1F252;
-  --color-opencollective: var(--bs-gray-600);
-  --color-evm: var(--bs-gray-600);
+  --color-opencollective: #1869F5;
+  --color-evm: #627EEA; /* Ethereum */
   --color-search-highlight: #FDFFAA;
   --color-yellow: #FFCC00;
   --color-yellow-light: #ffd322;
