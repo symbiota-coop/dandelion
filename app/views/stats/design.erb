@@ -14,8 +14,7 @@
      [13, 'Low', 'Three focus ring styles', 'Inputs: 2px at 60%. Checks, pagination, accordion, close: .25rem at 25%. btn-signal: .2rem with its own colour. Nav links have none.', 'Use one ring (e.g. 2px at 60%) via --bs-focus-ring-*.', 'bootstrap5.scss $input-focus-box-shadow · app.css'],
      [14, 'Low', 'Badges and labels are parallel systems', '.label is a legacy Bootstrap 3 component with different size and padding (85%, .2em .6em) and only some variants (no label-warning).', 'Migrate .label usages to .badge and remove .label.', 'app.css Labels section'],
      [15, 'Low', 'Button treatments vary', 'Primary and danger are gradients; secondary and warning are flat. btn-signal forces its hover with !important. p.action a is a separate CTA style (10px padding, 5px radius).', 'Apply the gradient pattern to all solid variants or none; express btn-signal through --bs-btn-* variables.', 'app.css Buttons, p.action'],
-     [17, 'Low', 'Mixed px and rem', 'The file converts most values to rem, but 5px radii, 15px insets, 7.5px slick padding, 16px newsfeed icons, 20–22px map icons and 36/40px controls remain. Because the root scales to 19 and 21px, these shrink relative to everything else on large screens.', 'Convert remaining px to rem.', 'app.css'],
-     [18, 'Low', "Browser theme colour doesn't match the header", 'meta theme-color is #ffffff while the header is #222, so mobile browser chrome shows a white bar above a dark header.', 'Set theme-color to #222222.', 'layouts/_head.erb']
+     [17, 'Low', 'Mixed px and rem', 'The file converts most values to rem, but 5px radii, 15px insets, 7.5px slick padding, 16px newsfeed icons, 20–22px map icons and 36/40px controls remain. Because the root scales to 19 and 21px, these shrink relative to everything else on large screens.', 'Convert remaining px to rem.', 'app.css']
    ]
 
    # Run through clamp_color as /theme.css does, so a colour too light for white text is darkened
