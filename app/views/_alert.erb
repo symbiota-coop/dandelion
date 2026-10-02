@@ -1,6 +1,6 @@
 <% if !@hide_alert && (flash[:error] || flash[:warning] || flash[:notice]) %>
   <div class="toast-container flash-toasts position-fixed top-0 start-50 translate-middle-x p-3">
-    <% { error: 'danger', warning: 'warning', notice: 'success' }.each { |k,v| %>
+    <% { error: 'danger', warning: 'warning', notice: 'primary' }.each { |k,v| %>
       <% if flash[k] %>
         <div class="toast toast-<%= v %> fade show" role="<%= k == :notice ? 'status' : 'alert' %>" aria-live="<%= k == :notice ? 'polite' : 'assertive' %>" aria-atomic="true" data-bs-delay="<%= k == :notice ? 3000 : 6000 %>">
           <div class="d-flex">

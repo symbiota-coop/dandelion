@@ -64,7 +64,7 @@
             to the event (we won't use these details for anything else):</strong></p>
         <div class="mb-3">
           <% @order.tickets.each_with_index { |ticket,i| %>
-          <div class="alert alert-success ticket">
+          <div class="alert alert-primary ticket">
             <h4 class="mb-2">
               <i class="bi bi-ticket-detailed-fill"></i>
               <%=ticket.ticket_type.try(:name)%>

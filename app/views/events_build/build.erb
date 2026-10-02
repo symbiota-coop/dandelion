@@ -5,7 +5,7 @@
 </style>
 
 <% if params[:new_org] && !params[:draft_id] %>
-  <div class="alert alert-success mt-3 d-flex align-items-start">
+  <div class="alert alert-primary mt-3 d-flex align-items-start">
     <i class="bi bi-calendar-event me-3 mt-1 fs-3" style="opacity: 0.85"></i>
     <div>
       <p class="lead mb-2">
@@ -202,7 +202,7 @@
             </p>
           </div>
         <% elsif @event.organisation.stripe_connect? %>
-          <div class="alert alert-success">
+          <div class="alert alert-primary">
             <p class="mb-0">
               For as long as your organisation meets the <strong><a target="_blank" href="/o/<%=@event.organisation.slug%>/contribute">suggested contribution</a></strong> of 1% of ticket sales, we'll apply the settings below and pass on donations to your organisation. <strong><a target="_blank" href="/docs/events#about-the-suggested-donation">Read more</a></strong>
             </p>
@@ -237,7 +237,7 @@
         <%= f.check_box_block :blank_price_for_free_tickets %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab-emails">
-        <div class="alert alert-success">
+        <div class="alert alert-primary">
           <p class="mb-0">
             Leaving a field blank will mean the email uses the value from the <a target="_blank" href="/o/<%=@event.organisation.slug%>/edit#tab-emails">organisation's email settings</a> instead.
           </p>

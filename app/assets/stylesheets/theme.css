@@ -28,7 +28,7 @@
   background: rgba(var(--theme-color-rgb), 0.3);
 }
 
-.alert.alert-success {
+.alert.alert-primary {
   background-color: #fff !important;
   background-image: linear-gradient(135deg,
       rgba(var(--theme-color-rgb), 0.1) 0%,
@@ -37,11 +37,11 @@
   color: var(--theme-color-darker);
 }
 
-.alert.alert-success a {
+.alert.alert-primary a {
   color: var(--theme-color-darker);
 }
 
-.toast-success {
+.toast-primary {
   --bs-toast-color: var(--theme-color-darker);
   --bs-toast-bg: rgba(var(--theme-color-rgb), 0.1);
   --bs-toast-border-color: var(--theme-color-darker);

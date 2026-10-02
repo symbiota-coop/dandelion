@@ -6,7 +6,7 @@
   <% if via || @account.sign_ins_count == 1 %>
     <% if via %>
       <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
-      <div class="alert alert-success d-flex align-items-start">
+      <div class="alert alert-primary d-flex align-items-start">
         <i class="bi bi-stars me-3 mt-1 fs-3" style="opacity: 0.85"></i>
         <div>
           <p class="lead mb-2">
@@ -20,7 +20,7 @@
       <% break; end; } %>
     <% elsif @account.sign_ins_count == 1 %>
 
-      <div class="alert alert-success d-flex align-items-start">
+      <div class="alert alert-primary d-flex align-items-start">
         <i class="bi bi-stars me-3 mt-1 fs-3" style="opacity: 0.85"></i>
         <div>
           <% if params[:sign_in_token] %>

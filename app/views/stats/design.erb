@@ -7,8 +7,8 @@
    severity_classes = { 'High' => 'text-danger', 'Medium' => 'text-warning-emphasis', 'Low' => 'text-body-secondary', 'Fixed' => 'text-primary' }
    issues = [
      ['Fixed', 'Two greens mean "success"', 'Alerts and toasts used the theme green #00af5e, while btn-success, badge-success, text-success and bg-success used $success #4CD964, and --color-green-tint was a tint of the theme green rather than of --color-green.', "Applied: $success is now #00af5e, app.css points --bs-success and --bs-success-rgb at the theme colour, badge-success uses --theme-color, the tints are renamed --theme-color-tint and --theme-color-tint-strong, and --color-green is gone. Success follows each organisation's theme.", 'bootstrap5.scss $success · app.css :root, .badge-success'],
-     ['High', 'Success alert text fails contrast on the default theme', '#00af5e on #E6F8EF is about 2.6:1. theme.css already uses --theme-color-darker (#007c43, about 4.8:1) for themed pages, but the default green page keeps the light text. White text on primary buttons is about 2.9:1 ($min-contrast-ratio was lowered to 2.5 to allow it).', 'Use --theme-color-darker for alert and toast text in app.css, matching theme.css.', 'app.css .alert-success, .toast-success · bootstrap5.scss $min-contrast-ratio'],
-     ['Medium', 'Default and themed pages diverge with the same colour', 'theme.css restyles alert-success, toast-success, .ai-well and calendar events. A page themed #00af5e looks different from the unthemed default: the AI well is purple by default and green when themed; calendar events are purple by default and theme-coloured when themed.', 'Move the theme.css rules into app.css so there is one behaviour, or document that the purple is intentional only for the unthemed site.', 'theme.css · app.css .ai-well, #calendar a.fc-event'],
+     ['High', 'Success alert text fails contrast on the default theme', '#00af5e on #E6F8EF is about 2.6:1. theme.css already uses --theme-color-darker (#007c43, about 4.8:1) for themed pages, but the default green page keeps the light text. White text on primary buttons is about 2.9:1 ($min-contrast-ratio was lowered to 2.5 to allow it).', 'Use --theme-color-darker for alert and toast text in app.css, matching theme.css.', 'app.css .alert-primary, .toast-primary · bootstrap5.scss $min-contrast-ratio'],
+     ['Medium', 'Default and themed pages diverge with the same colour', 'theme.css restyles alert-primary, toast-primary, .ai-well and calendar events. A page themed #00af5e looks different from the unthemed default: the AI well is purple by default and green when themed; calendar events are purple by default and theme-coloured when themed.', 'Move the theme.css rules into app.css so there is one behaviour, or document that the purple is intentional only for the unthemed site.', 'theme.css · app.css .ai-well, #calendar a.fc-event'],
      ['Medium', 'Colours outside the palette', 'The palette comment says every colour comes from it, but the CSS also uses #e0e0e0 (table border), #eee (striped), #F5F5F5 and #EFEFF4 (Bootstrap secondary/tertiary bg), #e9ecef and #495057 (input addon), rgba(200,199,204,.3) (message hover), Bootstrap --bs-gray-500 and --bs-secondary #6c757d (comments, calendar buttons). _block.erb hardcodes #212529 inline.', 'Map each to a --grey-* token, and add the two Bootstrap backgrounds to the grey scale.', 'bootstrap5.scss · app.css .fc-button, .comment-grey, .message-preview · _block.erb'],
      ['Medium', 'Two grey families with near-duplicates', 'Cool iOS greys (#8A8A8F, #C8C7CC, #EAE9EF, #EFEFF4) are mixed with neutral greys (#777, #999, #bbb, #ddd, #eee). grey-92 and grey-93 are visually identical. .badge defaults to grey-47 while .badge-default uses grey-54.', 'Choose one temperature and collapse to about 8 steps.', 'app.css :root, .badge'],
      ['Low', '--color-theme-transparent is orange', 'It is rgba(251,174,59,.5), unrelated to the theme colour. It is only used for unread message backgrounds.', 'Rename to --color-unread, or derive it from --theme-color-rgb.', 'app.css :root, .message-preview.unread'],
@@ -409,7 +409,7 @@
           <%== flags.call(2, 3) %>
         </div>
         <div>
-          <div class="alert fade show alert-success alert-dismissible">Your ticket is booked. <a href="#components">View order</a><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+          <div class="alert fade show alert-primary alert-dismissible">Your ticket is booked. <a href="#components">View order</a><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
           <div class="alert alert-warning">Only 3 tickets left. <a href="#components">Book now</a></div>
           <div class="alert alert-danger">Payment failed. <a href="#components">Try again</a></div>
           <div class="font-monospace small text-body-secondary">Inline, in the page. Padding .625rem, no border. Links bold and underlined in the alert's link colour. Flashes render as alerts only on pages that set @hide_alert.</div>
@@ -422,7 +422,7 @@
           <%== flags.call(2, 3) %>
         </div>
         <div class="d-flex flex-column align-items-start gap-2">
-          <% [['success', 'Your ticket is booked.'], ['warning', 'Only 3 tickets left.'], ['danger', 'Payment failed.']].each do |variant, message| %>
+          <% [['primary', 'Your ticket is booked.'], ['warning', 'Only 3 tickets left.'], ['danger', 'Payment failed.']].each do |variant, message| %>
             <div class="toast toast-<%= variant %> show w-auto">
               <div class="d-flex">
                 <div class="toast-body"><%= message %></div>
@@ -558,7 +558,7 @@
               <%= dropdown_nav [['Edit', '#theming']], button_text: 'Crumb' %>
             </div>
           </div>
-          <div class="alert alert-success mb-0">Saved. Text 2.6:1</div>
+          <div class="alert alert-primary mb-0">Saved. Text 2.6:1</div>
           <div class="ai-well">AI well: purple</div>
         </div>
       </div>

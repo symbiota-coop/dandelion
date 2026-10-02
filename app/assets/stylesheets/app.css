@@ -724,7 +724,7 @@ body.greyed #content {
 }
 
 /* Alerts are gradients from a tint of their colour to a stronger one, over Bootstrap's --bs-alert-* colours */
-.alert-success {
+.alert-primary {
   --bs-alert-color: var(--theme-color);
   --bs-alert-bg: var(--theme-color-tint);
   --bs-alert-link-color: var(--theme-color);
@@ -745,7 +745,7 @@ body.greyed #content {
   --alert-bg-end: var(--color-red-tint-strong);
 }
 
-.alert-success,
+.alert-primary,
 .alert-warning,
 .alert-danger {
   background-image: linear-gradient(135deg, var(--bs-alert-bg) 0%, var(--bs-alert-bg) 50%, var(--alert-bg-end) 100%);
@@ -756,7 +756,7 @@ body.greyed #content {
 }
 
 /* Toasts use the same colours and gradients as alerts, plus a border in their text colour (alerts have none: $alert-border-width is 0) */
-.toast-success {
+.toast-primary {
   --bs-toast-color: var(--theme-color);
   --bs-toast-bg: var(--theme-color-tint);
   --bs-toast-border-color: var(--theme-color);
@@ -777,7 +777,7 @@ body.greyed #content {
   --toast-bg-end: var(--color-red-tint-strong);
 }
 
-.toast-success,
+.toast-primary,
 .toast-warning,
 .toast-danger {
   background-image: linear-gradient(135deg, var(--bs-toast-bg) 0%, var(--bs-toast-bg) 50%, var(--toast-bg-end) 100%);

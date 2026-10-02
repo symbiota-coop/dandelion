@@ -42,7 +42,7 @@ end
     <% unless @concise_ticket_form %>
       <% if @event.past? %>
         <% if @event.recording? %>
-          <div class="alert alert-success">
+          <div class="alert alert-primary">
             <p class="mb-0">Access a recording of this event that started on <%=@event.start_time.to_date%> 🍿</p>
           </div>
         <% elsif !@event.show_after_start_time? %>

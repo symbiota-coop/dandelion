@@ -97,7 +97,7 @@
   <div class="container">
 
     <% if @organisation.new_record? && current_account.organisations(true).empty? %>
-      <div class="alert alert-success d-flex align-items-start">
+      <div class="alert alert-primary d-flex align-items-start">
         <i class="bi bi-flag-fill me-3 mt-1 fs-3" style="opacity: 0.85"></i>
         <div>
           <p class="lead mb-2">
@@ -129,7 +129,7 @@
       <% if @organisation.persisted? %>
         <div role="tabpanel" class="tab-pane" id="tab-payments">
           <% if params[:created] %>
-            <div class="alert alert-success">
+            <div class="alert alert-primary">
               <p class="m-0">To accept payments, now add details for Stripe or another payment processor.</p>
             </div>
           <% else %>

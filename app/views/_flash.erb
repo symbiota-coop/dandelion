@@ -1,4 +1,4 @@
-<% { error: 'alert-danger', warning: 'alert-warning', notice: 'alert-success' }.each { |k,v| %>
+<% { error: 'alert-danger', warning: 'alert-warning', notice: 'alert-primary' }.each { |k,v| %>
 <% if flash[k] %>
   <div class="alert fade show <%= v %><%= ' alert-dismissible' unless @hide_alert %>">
     <%== Sanitize.fragment(flash[k], Sanitize::Config::DANDELION) %>
