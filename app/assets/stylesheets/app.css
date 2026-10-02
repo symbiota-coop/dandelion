@@ -89,8 +89,6 @@
   --color-orange-darker: #ca7702;
   --color-orange-tint: #fff5e6;
   --color-orange-tint-strong: #ffd69a;
-  --color-blue: #5AC8FA;
-  --color-blue-light: #7bd3fb;
   --color-yellow: #FFCC00;
   --color-yellow-light: #ffd322;
   --color-signal: #3B45FE;
@@ -814,11 +812,6 @@ body.greyed #content {
   --badge-color-light: var(--theme-color-light);
 }
 
-.badge-info {
-  --badge-color: var(--color-blue);
-  --badge-color-light: var(--color-blue-light);
-}
-
 .badge-warning {
   --badge-color: var(--color-orange);
   --badge-color-light: var(--color-orange-light);
@@ -843,7 +836,7 @@ body.greyed #content {
 }
 
 /* Coloured badges and labels are gradients from their colour to a lighter one */
-:is(.badge, .label):is(.badge-default, .label-default, .badge-primary, .label-primary, .badge-info, .badge-warning, .badge-danger, .label-danger, .badge-yellow, .label-yellow, .badge-inverse, .label-inverse) {
+:is(.badge, .label):is(.badge-default, .label-default, .badge-primary, .label-primary, .badge-warning, .badge-danger, .label-danger, .badge-yellow, .label-yellow, .badge-inverse, .label-inverse) {
   background: linear-gradient(135deg, var(--badge-color) 0%, var(--badge-color) 50%, var(--badge-color-light) 100%) !important;
 }
 
