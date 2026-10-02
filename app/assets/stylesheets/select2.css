@@ -26,12 +26,12 @@
 .select2-container--bootstrap-5.select2-container--open .select2-selection,
 .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field:focus {
   border-color: var(--theme-color);
-  box-shadow: 0 0 0 2px rgba(var(--theme-color-rgb), .6);
+  box-shadow: 0 0 0 2px oklch(from var(--theme-500) l c h / .6);
 }
 
 .select2-container--bootstrap-5 .select2-dropdown {
   border-color: var(--theme-color);
-  box-shadow: 0 0 0 2px rgba(var(--theme-color-rgb), .6);
+  box-shadow: 0 0 0 2px oklch(from var(--theme-500) l c h / .6);
 }
 
 /* Type on the same row as the tags, not on a row of its own below them */

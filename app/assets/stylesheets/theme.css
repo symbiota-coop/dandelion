@@ -1,18 +1,12 @@
 /*
  * Served by /theme.css, which replaces this :root block with the requested theme colour
- * (see theme_css_variables in app/helpers/markup_helpers.rb). app.css and Bootstrap read these
- * variables, so most things follow the theme without rules here: this file only holds the places
- * where a themed page looks different from the default green one.
+ * (see theme_css_variables in app/helpers/markup_helpers.rb). app.css derives the rest of the theme
+ * ramp from --theme-500, so most things follow the theme without rules here: this file only holds the
+ * places where a themed page deliberately looks different from the default green one.
  */
 :root {
-  --theme-color: #00af5e;
-  --theme-color-rgb: 0, 175, 94;
-  --theme-color-light: #00d170;
-  --theme-color-hover: #00a257;
-  --theme-color-hover-rgb: 0, 162, 87;
-  --theme-color-hover-light: #00c469;
-  --theme-color-dark: #008d4c;
-  --theme-color-darker: #007c43;
+  --theme-500: #00af5e;
+  --theme-500-rgb: 0, 175, 94;
 }
 
 #calendar a.fc-event {
@@ -21,39 +15,18 @@
 
 .event-detail,
 .event-detail.calendar-date .month {
-  border-color: rgba(var(--theme-color-rgb), 0.5);
+  border-color: oklch(from var(--theme-500) l c h / 0.5);
 }
 
 .event-detail.calendar-date .month {
-  background: rgba(var(--theme-color-rgb), 0.3);
-}
-
-.alert.alert-primary {
-  background-color: #fff !important;
-  background-image: linear-gradient(135deg,
-      rgba(var(--theme-color-rgb), 0.1) 0%,
-      rgba(var(--theme-color-rgb), 0.1) 50%,
-      rgba(var(--theme-color-rgb), 0.25) 100%) !important;
-  color: var(--theme-color-darker);
-}
-
-.alert.alert-primary a {
-  color: var(--theme-color-darker);
-}
-
-.toast-primary {
-  --bs-toast-color: var(--theme-color-darker);
-  --bs-toast-bg: rgba(var(--theme-color-rgb), 0.1);
-  --bs-toast-border-color: var(--theme-color-darker);
-  --toast-bg-end: rgba(var(--theme-color-rgb), 0.25);
-  background-color: #fff;
+  background: oklch(from var(--theme-500) l c h / 0.3);
 }
 
 .ai-well {
   background: linear-gradient(135deg,
-      rgba(var(--theme-color-rgb), 0.175) 0%,
-      rgba(var(--theme-color-rgb), 0.175) 50%,
-      rgba(var(--theme-color-rgb), 0.325) 100%) !important;
+      oklch(from var(--theme-500) l c h / 0.175) 0%,
+      oklch(from var(--theme-500) l c h / 0.175) 50%,
+      oklch(from var(--theme-500) l c h / 0.325) 100%) !important;
   padding: 1rem;
   border-radius: 0.5rem;
 }

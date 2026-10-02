@@ -7,8 +7,8 @@
    severity_classes = { 'High' => 'text-danger', 'Medium' => 'text-warning-emphasis', 'Low' => 'text-body-secondary', 'Fixed' => 'text-primary' }
    issues = [
      ['Fixed', 'Two greens mean "success"', 'Alerts and toasts used the theme green #00af5e, while btn-success, badge-success, text-success and bg-success used $success #4CD964, and --color-green-tint was a tint of the theme green rather than of --color-green.', "Applied: $success is now #00af5e, app.css points --bs-success and --bs-success-rgb at the theme colour, badge-success uses --theme-color, the tints are renamed --theme-color-tint and --theme-color-tint-strong, and --color-green is gone. Success follows each organisation's theme.", 'bootstrap5.scss $success · app.css :root, .badge-success'],
-     ['High', 'Success alert text fails contrast on the default theme', '#00af5e on #E6F8EF is about 2.6:1. theme.css already uses --theme-color-darker (#007c43, about 4.8:1) for themed pages, but the default green page keeps the light text. White text on primary buttons is about 2.9:1 ($min-contrast-ratio was lowered to 2.5 to allow it).', 'Use --theme-color-darker for alert and toast text in app.css, matching theme.css.', 'app.css .alert-primary, .toast-primary · bootstrap5.scss $min-contrast-ratio'],
-     ['Medium', 'Default and themed pages diverge with the same colour', 'theme.css restyles alert-primary, toast-primary, .ai-well and calendar events. A page themed #00af5e looks different from the unthemed default: the AI well is purple by default and green when themed; calendar events are purple by default and theme-coloured when themed.', 'Move the theme.css rules into app.css so there is one behaviour, or document that the purple is intentional only for the unthemed site.', 'theme.css · app.css .ai-well, #calendar a.fc-event'],
+     ['Fixed', 'Success alert text failed contrast on the default theme', '#00af5e on #E6F8EF was about 2.6:1, while theme.css used --theme-color-darker for themed pages. White text on primary buttons is about 2.9:1 ($min-contrast-ratio was lowered to 2.5 to allow it).', 'Applied: alerts and toasts use --theme-800 text on every page. Buttons still use white text; --theme-on-500 could replace clamp_color.', 'app.css .alert-primary, .toast-primary · bootstrap5.scss $min-contrast-ratio'],
+     ['Medium', 'Default and themed pages diverge with the same colour', 'theme.css restyles .ai-well and calendar events: the AI well is purple by default and a theme tint when themed; calendar events are purple by default and theme-coloured when themed. (Alerts and toasts no longer differ: their tints come from the ramp.)', 'Move the remaining theme.css rules into app.css so there is one behaviour, or document that the purple is intentional only for the unthemed site.', 'theme.css · app.css .ai-well, #calendar a.fc-event'],
      ['Medium', 'Colours outside the palette', 'The palette comment says every colour comes from it, but the CSS also uses #e0e0e0 (table border), #eee (striped), #F5F5F5 and #EFEFF4 (Bootstrap secondary/tertiary bg), #e9ecef and #495057 (input addon), rgba(200,199,204,.3) (message hover), Bootstrap --bs-gray-500 and --bs-secondary #6c757d (comments, calendar buttons). _block.erb hardcodes #212529 inline.', 'Map each to a --grey-* token, and add the two Bootstrap backgrounds to the grey scale.', 'bootstrap5.scss · app.css .fc-button, .comment-grey, .message-preview · _block.erb'],
      ['Medium', 'Two grey families with near-duplicates', 'Cool iOS greys (#8A8A8F, #C8C7CC, #EAE9EF, #EFEFF4) are mixed with neutral greys (#777, #999, #bbb, #ddd, #eee). grey-92 and grey-93 are visually identical. .badge defaults to grey-47 while .badge-default uses grey-54.', 'Choose one temperature and collapse to about 8 steps.', 'app.css :root, .badge'],
      ['Fixed', '--color-theme-transparent was orange', 'It was rgba(251,174,59,.5), unrelated to the theme colour, and only used for unread message backgrounds.', 'Applied: the token is gone and unread messages use rgba(var(--theme-color-rgb), .15).', 'app.css :root, .message-preview.unread'],
@@ -55,39 +55,45 @@
 
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Theme colour</h3>
-        <span class="text-body-secondary">Primary. Replaced per organisation and event by <code>/theme.css</code>; Bootstrap's <code>--bs-primary</code> and link colours follow it.</span>
+        <h3 class="m-0">Ramps</h3>
+        <span class="text-body-secondary">Each generated from one value with <code>oklch()</code>. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints.</span>
       </div>
-      <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-6">
-        <% [
-             ['--theme-color', nil],
-             ['--theme-color-light', 'gradient end'],
-             ['--theme-color-hover', nil],
-             ['--theme-color-hover-light', nil],
-             ['--theme-color-dark', nil],
-             ['--theme-color-darker', 'text on tints']
-           ].each do |name, note| %>
-          <div class="col">
-            <div class="rounded mb-1" style="height: 88px; background: var(<%= name %>)"></div>
-            <div class="fw-bold text-break"><%= name %></div>
-            <div class="font-monospace small text-body-secondary"><%== css_var.call(name) %><%= " · #{note}" if note %></div>
+      <% [
+           ['theme', %w[50 100 200 400 500 600 700 800], { '50' => 'alert and toast background', '200' => 'gradient end', '400' => 'button gradient end', '600' => 'hover', '800' => 'text on tints' }],
+           ['orange', %w[50 100 200 400 500 600 700 800], { '800' => 'warning text' }],
+           ['red', %w[50 100 200 400 500 600 700 800], { '800' => 'danger text' }]
+         ].each do |name, steps, notes| %>
+        <div>
+          <div class="fw-bold mb-1">--<%= name %>-*</div>
+          <div class="row g-2">
+            <% steps.each do |step| %>
+              <div class="col-3 col-md">
+                <div class="rounded mb-1 d-flex align-items-end p-2 small fw-bold" style="height: 72px; background: var(--<%= name %>-<%= step %>); color: <%= step.to_i >= 500 ? '#fff' : 'var(--grey-20)' %>"><%= step %></div>
+                <div class="font-monospace small text-body-secondary text-break"><%== css_var.call("--#{name}-#{step}") %></div>
+                <% if notes[step] %><div class="small text-body-secondary"><%= notes[step] %></div><% end %>
+              </div>
+            <% end %>
           </div>
-        <% end %>
+        </div>
+      <% end %>
+      <div class="d-flex align-items-center gap-3 flex-wrap">
+        <span class="rounded px-3 py-2 fw-bold" style="background: var(--theme-500); color: var(--theme-on-500)">--theme-on-500</span>
+        <span class="small text-body-secondary">Black or white, whichever reads better on the 500: <code>oklch(from var(--theme-500) clamp(0, (0.65 - l) * 1000, 1) 0 0)</code>. Not yet used; buttons still get white text, so <code>/theme.css</code> darkens light theme colours with <code>clamp_color</code>.</span>
       </div>
+      <div class="small text-body-secondary">The older <code>--theme-color*</code> names remain as aliases: <code>--theme-color</code> 500, <code>-light</code> 400, <code>-hover</code> 600, <code>-darker</code> 800, <code>-tint</code> 50, <code>-tint-strong</code> 200. Bootstrap's <code>rgba(var(--bs-*-rgb))</code> colours need an rgb triplet, so <code>/theme.css</code> also sets <code>--theme-500-rgb</code>.</div>
     </div>
 
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">Status</h3>
-        <span class="text-body-secondary">iOS system colours. Each has a light (gradient end), dark (hover/text) and tint (alert background).</span>
+        <span class="text-body-secondary">iOS system colours, from the ramps above. Each uses its 500, 400 (gradient end), a darker step for text, and 50 (alert background).</span>
         <%== flags.call(1) %>
       </div>
       <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-3">
         <% [
-             ['Success · --theme-color', %w[--theme-color --theme-color-light --theme-color-tint], 'Follows the theme colour'],
-             ['Warning · --color-orange', %w[--color-orange --color-orange-light --color-orange-dark --color-orange-darker --color-orange-tint], 'light · dark · darker · tint'],
-             ['Danger · --color-red', %w[--color-red --color-red-light --color-red-hover --color-red-dark --color-red-tint], 'light · hover · dark · tint'],
-             ['Yellow · --color-yellow', %w[--color-yellow --color-yellow-light], nil]
+             ['Success · --theme-500', %w[--theme-500 --theme-400 --theme-800 --theme-50], 'Follows the theme colour'],
+             ['Warning · --orange-500', %w[--orange-500 --orange-400 --orange-800 --orange-50], nil],
+             ['Danger · --red-500', %w[--red-500 --red-400 --red-800 --red-50], nil]
            ].each do |title, names, note| %>
           <%# The main colour gets two units of the row, the others one %>
           <% unit = 12 / (names.length + 1) %>
@@ -117,6 +123,8 @@
              [%w[--color-highlight-1], 'header, AI'],
              [%w[--color-highlight-1-light-2 --color-highlight-1-light-1 --color-highlight-1-light-3], nil],
              [%w[--color-star], nil],
+             [%w[--color-yellow --color-yellow-light], 'badge-yellow: Featured, Co-host, rota points'],
+             [%w[--color-amber --color-amber-light --color-amber-dark], 'map areas, features page'],
              [%w[--color-search-highlight], 'mark'],
              [%w[--color-paper], nil],
              [%w[--color-superlight], 'body.greyed']
@@ -130,7 +138,7 @@
                   <% end %>
                 </div>
               </div>
-              <div class="fw-bold">highlight-1-light-2/1/3</div>
+              <div class="fw-bold text-break"><%= names.first.start_with?('--color-highlight-1') ? 'highlight-1-light-2/1/3' : "#{names.first}, -light, -dark" %></div>
             <% else %>
               <div class="rounded mb-1 <%= 'border' if %w[--color-paper --color-superlight].include?(names.first) %>" style="height: 64px; background: var(<%= names.first %>)"></div>
               <div class="fw-bold text-break"><%= names.first %></div>
@@ -463,7 +471,7 @@
           </div>
           <div class="mb-3">
             <label for="dg-location">Location <span class="fw-normal subtle">· focused</span></label>
-            <input type="text" class="form-control" id="dg-location" autocomplete="off" placeholder="Search for a place" style="border-color: var(--theme-color); box-shadow: 0 0 0 2px rgba(var(--theme-color-rgb), .6)">
+            <input type="text" class="form-control" id="dg-location" autocomplete="off" placeholder="Search for a place" style="border-color: var(--theme-color); box-shadow: 0 0 0 2px oklch(from var(--theme-500) l c h / .6)">
             <div class="form-text">Form text is --grey-54.</div>
           </div>
           <div class="d-flex flex-wrap gap-4 align-items-center mb-3">
@@ -561,7 +569,7 @@
     <div class="d-flex flex-column gap-1 border-top border-2 border-dark pt-3">
       <div class="font-monospace small text-body-secondary fw-bold">06</div>
       <h2 class="m-0">Theming</h2>
-      <p class="m-0 text-body-secondary" style="max-width: 680px">Organisations and events set one colour. <code>theme_css_variables</code> derives the eight <code>--theme-color*</code> variables from it, and every primary button, link, focus ring, crumb, check and progress bar follows. On themed pages, success alerts, toasts and the AI well switch to theme tints with darker text.</p>
+      <p class="m-0 text-body-secondary" style="max-width: 680px">Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check and progress bar follows. Alerts and toasts use the ramp's tints with --theme-800 text on every page; on themed pages the AI well and calendar events also switch to the theme colour.</p>
     </div>
     <div class="row g-3">
       <div class="col-md-6 col-xxl-4">
@@ -573,13 +581,13 @@
               <%= dropdown_nav [['Edit', '#theming']], button_text: 'Crumb' %>
             </div>
           </div>
-          <div class="alert alert-primary mb-0">Saved. Text 2.6:1</div>
+          <div class="alert alert-primary mb-0">Saved. Text is --theme-800</div>
           <div class="ai-well">AI well: purple</div>
         </div>
       </div>
       <% themed_colors.each do |color, clamped| %>
         <div class="col-md-6 col-xxl-4">
-          <div class="border rounded p-4 h-100 d-flex flex-column gap-3" style="<%= theme_css_variables(clamped)[/\{(.*)\}/m, 1].squish %>">
+          <div class="theme-scope border rounded p-4 h-100 d-flex flex-column gap-3" style="<%= theme_css_variables(clamped)[/\{(.*)\}/m, 1].squish %>">
             <div class="font-monospace small text-body-secondary fw-bold">THEMED · <%= color %><%= " → #{clamped} (clamped)" if clamped != color %></div>
             <div class="d-flex flex-wrap gap-2 align-items-center">
               <a class="btn btn-primary" href="#theming">Book</a>
@@ -587,13 +595,13 @@
                 <%= dropdown_nav [['Edit', '#theming']], button_text: 'Crumb' %>
               </div>
             </div>
-            <div class="alert mb-0" style="color: var(--theme-color-darker); background: #fff linear-gradient(135deg, rgba(var(--theme-color-rgb), .1) 0%, rgba(var(--theme-color-rgb), .1) 50%, rgba(var(--theme-color-rgb), .25) 100%)">Saved. Text uses -darker</div>
-            <div class="p-3 rounded-3" style="background: linear-gradient(135deg, rgba(var(--theme-color-rgb), .175) 0%, rgba(var(--theme-color-rgb), .175) 50%, rgba(var(--theme-color-rgb), .325) 100%)">AI well: theme tint</div>
+            <div class="alert alert-primary mb-0">Saved. Text is --theme-800</div>
+            <div class="p-3 rounded-3" style="background: linear-gradient(135deg, oklch(from var(--theme-500) l c h / .175) 0%, oklch(from var(--theme-500) l c h / .175) 50%, oklch(from var(--theme-500) l c h / .325) 100%)">AI well: theme tint</div>
           </div>
         </div>
       <% end %>
     </div>
-    <div class="small text-body-secondary">Each themed panel sets the variables from <code>theme_css_variables(clamp_color(colour))</code> on itself, as <code>/theme.css</code> does. Their alerts and AI wells copy theme.css's rules, which only load on themed pages.</div>
+    <div class="small text-body-secondary">Each themed panel sets <code>--theme-500</code> from <code>theme_css_variables(clamp_color(colour))</code> on itself, as <code>/theme.css</code> does, and has the <code>theme-scope</code> class so the ramp is recomputed from it. Their AI wells copy theme.css's rule, which only loads on themed pages.</div>
   </section>
 
   <!-- ISSUES -->
@@ -626,9 +634,17 @@
 
 <script>
   $(function () {
-    var root = getComputedStyle(document.documentElement);
+    // Custom properties come back as written (e.g. oklch(from ...)), so paint each one to resolve it to hex
+    var ctx = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+    var probe = $('<span>').hide().appendTo('body')[0];
     $('[data-css-var]').each(function () {
-      $(this).text(root.getPropertyValue($(this).attr('data-css-var')).trim());
+      probe.style.color = 'var(' + $(this).attr('data-css-var') + ')';
+      ctx.clearRect(0, 0, 1, 1);
+      ctx.fillStyle = getComputedStyle(probe).color;
+      ctx.fillRect(0, 0, 1, 1);
+      var d = ctx.getImageData(0, 0, 1, 1).data;
+      var hex = '#' + [0, 1, 2].map(function (i) { return d[i].toString(16).padStart(2, '0'); }).join('');
+      $(this).text(d[3] < 255 ? hex + ' / ' + Math.round(d[3] / 2.55) + '%' : hex);
     });
     $('[data-spec-row]').each(function () {
       var px = parseFloat(getComputedStyle($(this).find('[data-sample]')[0]).fontSize);

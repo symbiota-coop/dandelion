@@ -51,7 +51,7 @@
     font-size: 1.35rem;
     margin-bottom: 1rem;
   }
-  .feature-icon.yellow { background: rgba(251,174,59,0.15); color: #d99520; }
+  .feature-icon.yellow { background: oklch(from var(--color-amber) l c h / 0.15); color: var(--color-amber-dark); }
   .feature-icon.rose { background: rgba(224,96,122,0.12); color: #d94f6e; }
   .feature-icon.magenta { background: rgba(185,0,161,0.1); color: #B900A1; }
   .feature-icon.purple { background: rgba(68,0,185,0.1); color: #4400B9; }
@@ -59,7 +59,7 @@
   .section-heading { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
   @media(min-width: 992px) { .section-heading { font-size: 2vw; } }
   .section-divider { width: 3rem; height: 3px; border-radius: 2px; margin-bottom: 1.5rem; }
-  .section-divider.yellow { background: linear-gradient(90deg, #FBAE3B, #fcc56e); }
+  .section-divider.yellow { background: linear-gradient(90deg, var(--color-amber), var(--color-amber-light)); }
   .section-divider.rose { background: linear-gradient(90deg, #d94f6e, #f0889a); }
   .section-divider.magenta { background: linear-gradient(90deg, #B900A1, #e84dc4); }
   .section-divider.purple { background: linear-gradient(90deg, #4400B9, #7c5ce7); }

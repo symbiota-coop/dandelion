@@ -149,23 +149,15 @@ Dandelion::App.helpers do
     colors.reject.with_index { |_, i| i == 1 }[0..-4]
   end
 
-  # The :root block of custom properties that theme.css reads its colours from
+  # The :root block of custom properties that theme.css reads its colours from. app.css derives the
+  # rest of the ramp from --theme-500; the rgb triplet is for Bootstrap's rgba(var(--bs-*-rgb)) colours
   def theme_css_variables(hex)
     color = Chroma.paint(hex)
     rgb = color.rgb
-    light = color.lighten(6.66)
-    hover = color.darken(2.5)
-    hover_rgb = hover.rgb
     <<~CSS.strip
       :root {
-        --theme-color: #{color.to_hex};
-        --theme-color-rgb: #{rgb.r.round}, #{rgb.g.round}, #{rgb.b.round};
-        --theme-color-light: #{light.to_hex};
-        --theme-color-hover: #{hover.to_hex};
-        --theme-color-hover-rgb: #{hover_rgb.r.round}, #{hover_rgb.g.round}, #{hover_rgb.b.round};
-        --theme-color-hover-light: #{light.darken(2.5).to_hex};
-        --theme-color-dark: #{color.darken(6.66).to_hex};
-        --theme-color-darker: #{color.darken(10).to_hex};
+        --theme-500: #{color.to_hex};
+        --theme-500-rgb: #{rgb.r.round}, #{rgb.g.round}, #{rgb.b.round};
       }
     CSS
   end

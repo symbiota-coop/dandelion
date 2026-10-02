@@ -39,11 +39,12 @@ window.DandelionMap = {
     ];
   },
 
+  // Google Maps needs a plain colour, so read --color-amber from app.css
   polygonStyle: {
-    strokeColor: '#FBAE3B',
+    strokeColor: getComputedStyle(document.documentElement).getPropertyValue('--color-amber').trim(),
     strokeOpacity: 0.8,
     strokeWeight: 2,
-    fillColor: '#FBAE3B',
+    fillColor: getComputedStyle(document.documentElement).getPropertyValue('--color-amber').trim(),
     fillOpacity: 0.35
   },
 

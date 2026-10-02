@@ -31,28 +31,20 @@
 }
 
 :root {
-  /* The primary colour. /theme.css replaces these for organisations and events with their own colour */
-  --theme-color: #00af5e;
-  --theme-color-rgb: 0, 175, 94;
-  --theme-color-light: #00d170;
-  --theme-color-hover: #00a257;
-  --theme-color-hover-rgb: 0, 162, 87;
-  --theme-color-hover-light: #00c469;
-  --theme-color-dark: #008d4c;
-  --theme-color-darker: #007c43;
-  /* Backgrounds for success alerts and toasts */
-  --theme-color-tint: #E6F8EF;
-  --theme-color-tint-strong: #aae7c9;
+  /* The primary colour. Organisations and events set --theme-500 (and its rgb triplet, which Bootstrap's
+     rgba(var(--bs-*-rgb)) colours need) through /theme.css; the rest of the ramp is derived from it below */
+  --theme-500: #00af5e;
+  --theme-500-rgb: 0, 175, 94;
   /* so Bootstrap follows it too */
-  --bs-primary: var(--theme-color);
-  --bs-primary-rgb: var(--theme-color-rgb);
-  --bs-success: var(--theme-color);
-  --bs-success-rgb: var(--theme-color-rgb);
-  --bs-link-color: var(--theme-color);
-  --bs-link-color-rgb: var(--theme-color-rgb);
-  --bs-link-hover-color: var(--theme-color-hover);
-  --bs-link-hover-color-rgb: var(--theme-color-hover-rgb);
-  --bs-focus-ring-color: rgba(var(--theme-color-rgb), 0.25);
+  --bs-primary: var(--theme-500);
+  --bs-primary-rgb: var(--theme-500-rgb);
+  --bs-success: var(--theme-500);
+  --bs-success-rgb: var(--theme-500-rgb);
+  --bs-link-color: var(--theme-500);
+  --bs-link-color-rgb: var(--theme-500-rgb);
+  --bs-link-hover-color: var(--theme-600);
+  --bs-link-hover-color-rgb: var(--theme-500-rgb);
+  --bs-focus-ring-color: oklch(from var(--theme-500) l c h / 0.25);
   --color-highlight-1: #4400B9;
   --color-highlight-1-light-1: #ebdfff;
   --color-highlight-1-light-2: #bb93ff;
@@ -76,28 +68,63 @@
   --grey-87: #ddd;
   --grey-92: #EAE9EF;
   --grey-93: #eee;
-  --color-red: #FF3B30;
-  --color-red-light: #ff5b52;
-  --color-red-hover: #e85249;
-  --color-red-dark: #e2342a;
-  --color-red-tint: #ffe8e7;
-  --color-red-tint-strong: #ff9f9a;
-  --color-orange: #FF9500;
-  --color-orange-light: #ffa322;
-  --color-orange-dark: #e28502;
-  --color-orange-darker: #ca7702;
-  --color-orange-tint: #fff5e6;
-  --color-orange-tint-strong: #ffd69a;
-  --color-yellow: #FFCC00;
-  --color-yellow-light: #ffd322;
   --color-signal: #3B45FE;
   --color-signal-dark: #2a32d4;
   --color-stripe: #6158F7;
   --color-search-highlight: #FDFFAA;
+  --color-yellow: #FFCC00;
+  --color-yellow-light: #ffd322;
   --color-star: #f5b041;
+  /* Warm amber for map areas and the features page */
+  --color-amber: #FBAE3B;
+  --color-amber-light: #fcc56e;
+  --color-amber-dark: #d99520;
   --gradient-active: linear-gradient(135deg, #fd7514 0%, #efe707 100%);
   --gradient-rainbow: radial-gradient(circle at 0 0, #099ef1 0%, #6863f8 18.82%, #d84ffa 32.6%, #f058c5 52.83%, #ff4f90 68.03%, #ff6558 87.66%, #ff891f 100%);
   accent-color: var(--theme-color);
+}
+
+/* Colour ramps, generated with oklch() so steps at the same lightness look equally light across hues.
+   Tints (50–200) sit at fixed lightness; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints.
+   .theme-scope recomputes the theme ramp for an element that sets its own --theme-500 */
+:root,
+.theme-scope {
+  --theme-50: oklch(from var(--theme-500) 0.97 calc(c * 0.15) h);
+  --theme-100: oklch(from var(--theme-500) 0.94 calc(c * 0.3) h);
+  --theme-200: oklch(from var(--theme-500) 0.88 calc(c * 0.55) h);
+  --theme-400: oklch(from var(--theme-500) calc(l + 0.06) c h);
+  --theme-600: oklch(from var(--theme-500) calc(l - 0.05) c h);
+  --theme-700: oklch(from var(--theme-500) calc(l - 0.12) c h);
+  --theme-800: oklch(from var(--theme-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
+  /* Black or white, whichever reads better on the 500 */
+  --theme-on-500: oklch(from var(--theme-500) clamp(0, (0.65 - l) * 1000, 1) 0 0);
+  /* Older names, kept as aliases */
+  --theme-color: var(--theme-500);
+  --theme-color-light: var(--theme-400);
+  --theme-color-hover: var(--theme-600);
+  --theme-color-hover-light: var(--theme-500);
+  --theme-color-darker: var(--theme-800);
+  --theme-color-tint: var(--theme-50);
+  --theme-color-tint-strong: var(--theme-200);
+}
+
+:root {
+  --orange-500: #FF9500;
+  --orange-50: oklch(from var(--orange-500) 0.97 calc(c * 0.15) h);
+  --orange-100: oklch(from var(--orange-500) 0.94 calc(c * 0.3) h);
+  --orange-200: oklch(from var(--orange-500) 0.88 calc(c * 0.55) h);
+  --orange-400: oklch(from var(--orange-500) calc(l + 0.06) c h);
+  --orange-600: oklch(from var(--orange-500) calc(l - 0.05) c h);
+  --orange-700: oklch(from var(--orange-500) calc(l - 0.12) c h);
+  --orange-800: oklch(from var(--orange-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
+  --red-500: #FF3B30;
+  --red-50: oklch(from var(--red-500) 0.97 calc(c * 0.15) h);
+  --red-100: oklch(from var(--red-500) 0.94 calc(c * 0.3) h);
+  --red-200: oklch(from var(--red-500) 0.88 calc(c * 0.55) h);
+  --red-400: oklch(from var(--red-500) calc(l + 0.06) c h);
+  --red-600: oklch(from var(--red-500) calc(l - 0.05) c h);
+  --red-700: oklch(from var(--red-500) calc(l - 0.12) c h);
+  --red-800: oklch(from var(--red-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
 }
 
 /* ==========================================================================
@@ -722,24 +749,24 @@ body.greyed #content {
 
 /* Alerts are gradients from a tint of their colour to a stronger one, over Bootstrap's --bs-alert-* colours */
 .alert-primary {
-  --bs-alert-color: var(--theme-color);
-  --bs-alert-bg: var(--theme-color-tint);
-  --bs-alert-link-color: var(--theme-color);
-  --alert-bg-end: var(--theme-color-tint-strong);
+  --bs-alert-color: var(--theme-800);
+  --bs-alert-bg: var(--theme-50);
+  --bs-alert-link-color: var(--theme-800);
+  --alert-bg-end: var(--theme-200);
 }
 
 .alert-warning {
-  --bs-alert-color: var(--color-orange-darker);
-  --bs-alert-bg: var(--color-orange-tint);
-  --bs-alert-link-color: var(--color-orange-dark);
-  --alert-bg-end: var(--color-orange-tint-strong);
+  --bs-alert-color: var(--orange-800);
+  --bs-alert-bg: var(--orange-50);
+  --bs-alert-link-color: var(--orange-800);
+  --alert-bg-end: var(--orange-200);
 }
 
 .alert-danger {
-  --bs-alert-color: var(--color-red-dark);
-  --bs-alert-bg: var(--color-red-tint);
-  --bs-alert-link-color: var(--color-red-dark);
-  --alert-bg-end: var(--color-red-tint-strong);
+  --bs-alert-color: var(--red-800);
+  --bs-alert-bg: var(--red-50);
+  --bs-alert-link-color: var(--red-800);
+  --alert-bg-end: var(--red-200);
 }
 
 .alert-primary,
@@ -754,24 +781,24 @@ body.greyed #content {
 
 /* Toasts use the same colours and gradients as alerts, plus a border in their text colour (alerts have none: $alert-border-width is 0) */
 .toast-primary {
-  --bs-toast-color: var(--theme-color);
-  --bs-toast-bg: var(--theme-color-tint);
-  --bs-toast-border-color: var(--theme-color);
-  --toast-bg-end: var(--theme-color-tint-strong);
+  --bs-toast-color: var(--theme-800);
+  --bs-toast-bg: var(--theme-50);
+  --bs-toast-border-color: var(--theme-800);
+  --toast-bg-end: var(--theme-200);
 }
 
 .toast-warning {
-  --bs-toast-color: var(--color-orange-darker);
-  --bs-toast-bg: var(--color-orange-tint);
-  --bs-toast-border-color: var(--color-orange-darker);
-  --toast-bg-end: var(--color-orange-tint-strong);
+  --bs-toast-color: var(--orange-800);
+  --bs-toast-bg: var(--orange-50);
+  --bs-toast-border-color: var(--orange-800);
+  --toast-bg-end: var(--orange-200);
 }
 
 .toast-danger {
-  --bs-toast-color: var(--color-red-dark);
-  --bs-toast-bg: var(--color-red-tint);
-  --bs-toast-border-color: var(--color-red-dark);
-  --toast-bg-end: var(--color-red-tint-strong);
+  --bs-toast-color: var(--red-800);
+  --bs-toast-bg: var(--red-50);
+  --bs-toast-border-color: var(--red-800);
+  --toast-bg-end: var(--red-200);
 }
 
 .toast-primary,
@@ -812,14 +839,14 @@ body.greyed #content {
 }
 
 .badge-warning {
-  --badge-color: var(--color-orange);
-  --badge-color-light: var(--color-orange-light);
+  --badge-color: var(--orange-500);
+  --badge-color-light: var(--orange-400);
 }
 
 .badge-danger,
 .label-danger {
-  --badge-color: var(--color-red);
-  --badge-color-light: var(--color-red-light);
+  --badge-color: var(--red-500);
+  --badge-color-light: var(--red-400);
 }
 
 .badge-yellow,
@@ -880,18 +907,18 @@ body.greyed #content {
   --bs-btn-active-border-color: var(--theme-color-hover);
   --bs-btn-disabled-bg: var(--theme-color);
   --bs-btn-disabled-border-color: var(--theme-color);
-  --bs-btn-focus-shadow-rgb: var(--theme-color-rgb);
+  --bs-btn-focus-shadow-rgb: var(--theme-500-rgb);
   --btn-gradient-end: var(--theme-color-light);
   --btn-hover-gradient-end: var(--theme-color-hover-light);
 }
 
 .btn-danger {
-  --bs-btn-hover-bg: var(--color-red-dark);
-  --bs-btn-hover-border-color: var(--color-red-dark);
-  --bs-btn-active-bg: var(--color-red-dark);
-  --bs-btn-active-border-color: var(--color-red-dark);
-  --btn-gradient-end: var(--color-red-light);
-  --btn-hover-gradient-end: var(--color-red-hover);
+  --bs-btn-hover-bg: var(--red-600);
+  --bs-btn-hover-border-color: var(--red-600);
+  --bs-btn-active-bg: var(--red-600);
+  --bs-btn-active-border-color: var(--red-600);
+  --btn-gradient-end: var(--red-400);
+  --btn-hover-gradient-end: var(--red-500);
 }
 
 .btn-primary,
@@ -914,7 +941,7 @@ body.greyed #content {
   --bs-btn-active-border-color: var(--theme-color);
   --bs-btn-disabled-color: var(--theme-color);
   --bs-btn-disabled-border-color: var(--theme-color);
-  --bs-btn-focus-shadow-rgb: var(--theme-color-rgb);
+  --bs-btn-focus-shadow-rgb: var(--theme-500-rgb);
 }
 
 /* Bootstrap components that use the primary colour */
@@ -1140,10 +1167,10 @@ body.greyed #content {
 
 /* Through the button variables, so hover, pressed and open keep theme-coloured text on a tint rather than Bootstrap's white on solid */
 .nav-crumbs .btn {
-  --bs-btn-bg: rgba(var(--theme-color-rgb), 0.1);
-  --bs-btn-hover-bg: rgba(var(--theme-color-rgb), 0.2);
+  --bs-btn-bg: oklch(from var(--theme-500) l c h / 0.1);
+  --bs-btn-hover-bg: oklch(from var(--theme-500) l c h / 0.2);
   --bs-btn-hover-color: var(--theme-color);
-  --bs-btn-active-bg: rgba(var(--theme-color-rgb), 0.2);
+  --bs-btn-active-bg: oklch(from var(--theme-500) l c h / 0.2);
   --bs-btn-active-color: var(--theme-color);
   display: flex;
   align-items: center;
@@ -1247,7 +1274,7 @@ body.greyed #content {
 }
 
 .message-preview.unread {
-  background: rgba(var(--theme-color-rgb), 0.15) !important
+  background: oklch(from var(--theme-500) l c h / 0.15) !important
 }
 
 /* ==========================================================================
@@ -1622,7 +1649,7 @@ ul.pagination {
    ========================================================================== */
 
 .progress {
-  background-color: rgba(var(--theme-color-rgb), 0.3);
+  background-color: oklch(from var(--theme-500) l c h / 0.3);
 }
 
 @media(min-width: 992px) {
@@ -2457,7 +2484,7 @@ table.event-details td {
 .newsfeed-icon {
   font-size: 16px;
   color: var(--theme-color);
-  background-color: rgba(var(--theme-color-rgb), 0.1);
+  background-color: oklch(from var(--theme-500) l c h / 0.1);
   width: 2.25em;
   height: 2.25em;
 }

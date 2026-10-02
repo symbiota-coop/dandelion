@@ -2078,7 +2078,7 @@ progress {
   background-color: var(--bs-body-bg);
   border-color: var(--theme-color);
   outline: 0;
-  box-shadow: 0 0 0 2px rgba(var(--theme-color-rgb), 0.6);
+  box-shadow: 0 0 0 2px rgba(var(--theme-500-rgb), 0.6);
 }
 .form-control::-webkit-date-and-time-value {
   min-width: 85px;
@@ -2223,7 +2223,7 @@ textarea.form-control-lg {
 .form-select:focus {
   border-color: var(--theme-color);
   outline: 0;
-  box-shadow: 0 0 0 2px rgba(var(--theme-color-rgb), 0.6);
+  box-shadow: 0 0 0 2px rgba(var(--theme-500-rgb), 0.6);
 }
 .form-select[multiple], .form-select[size]:not([size="1"]) {
   padding-right: 0.75rem;
@@ -2398,10 +2398,10 @@ textarea.form-control-lg {
   outline: 0;
 }
 .form-range:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 1px #fff, 0 0 0 2px rgba(var(--theme-color-rgb), 0.6);
+  box-shadow: 0 0 0 1px #fff, 0 0 0 2px rgba(var(--theme-500-rgb), 0.6);
 }
 .form-range:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 1px #fff, 0 0 0 2px rgba(var(--theme-color-rgb), 0.6);
+  box-shadow: 0 0 0 1px #fff, 0 0 0 2px rgba(var(--theme-500-rgb), 0.6);
 }
 .form-range::-moz-focus-outer {
   border: 0;
