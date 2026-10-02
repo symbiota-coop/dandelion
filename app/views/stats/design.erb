@@ -9,9 +9,8 @@
    issues = [
      [3, 'Medium', 'Default and themed pages diverge with the same colour', 'theme.css restyles .ai-well and calendar events: the AI well is purple by default and a theme tint when themed; calendar events are purple by default and theme-coloured when themed. (Alerts and toasts no longer differ: their tints come from the ramp.)', 'Move the remaining theme.css rules into app.css so there is one behaviour, or document that the purple is intentional only for the unthemed site.', 'theme.css · app.css .ai-well, #calendar a.fc-event'],
      [7, 'Medium', 'Too many accent colours and active states', 'Besides the theme colour there is purple #4400B9 (header, AI), an orange-to-yellow gradient (sidebar active, notification dot, load bar), a rainbow gradient, signal blue and Stripe purple. The sidebar active item uses the orange gradient while every other active state (pills, list groups, dropdown items, checks) uses the theme colour.', 'Decide which accent marks "active" and use it everywhere; restrict purple to AI features.', 'app.css .sidebar .nav-link.active, #header, --gradient-*'],
-     [8, 'Medium', 'Type scale has no clear steps', 'Small sizes include .693, .75, .8, .825, .85, .875 and .9rem plus 82.5%, 85% and 90%. h1 (34px) and h2 (31.9px) differ by 2px; .block-title (1.66rem) sits between h2 and h3. h6 equals body size. small.form-text is .85rem, larger than the body text it supports.', 'Reduce to a 6–7 step scale (for example .75, .825, .875, 1, 1.125, 1.4, 2rem) and alias .block-title to one of them.', 'app.css Base section'],
      [13, 'Low', 'Three focus ring styles', 'Inputs: 2px at 60%. Checks, pagination, accordion, close: .25rem at 25%. btn-signal: .2rem with its own colour. Nav links have none.', 'Use one ring (e.g. 2px at 60%) via --bs-focus-ring-*.', 'bootstrap5.scss $input-focus-box-shadow · app.css'],
-     [14, 'Low', 'Badges and labels are parallel systems', '.label is a legacy Bootstrap 3 component with different size and padding (85%, .2em .6em) and only some variants (no label-warning).', 'Migrate .label usages to .badge and remove .label.', 'app.css Labels section'],
+     [14, 'Low', 'Badges and labels are parallel systems', '.label is a legacy Bootstrap 3 component with different size and padding (.85em, .2em .6em) and only some variants (no label-warning).', 'Migrate .label usages to .badge and remove .label.', 'app.css Labels section'],
      [15, 'Low', 'Button treatments vary', 'Primary and danger are gradients; secondary and warning are flat. btn-signal forces its hover with !important. p.action a is a separate CTA style (10px padding, 5px radius).', 'Apply the gradient pattern to all solid variants or none; express btn-signal through --bs-btn-* variables.', 'app.css Buttons, p.action'],
      [17, 'Low', 'Mixed px and rem', 'The file converts most values to rem, but 5px radii, 15px insets, 7.5px slick padding, 16px newsfeed icons, 20–22px map icons and 36/40px controls remain. Because the root scales to 19 and 21px, these shrink relative to everything else on large screens.', 'Convert remaining px to rem.', 'app.css']
    ]
@@ -242,22 +241,20 @@
     <div>
       <div class="d-flex align-items-baseline flex-wrap gap-2 mb-3">
         <h3 class="m-0">Scale</h3>
-        <%== flags.call(8) %>
-      </div>
+              </div>
       <% [
-           ['h1', '2rem', '<h1 data-sample class="m-0">Gatherings near you</h1>'],
-           ['h2', '1.875rem', '<h2 data-sample class="m-0">Gatherings near you</h2>'],
-           ['.block-title', '1.66rem', '<h4 data-sample class="block-title m-0">Gatherings near you</h4>'],
-           ['h3', '1.4rem', '<h3 data-sample class="m-0">Your upcoming events</h3>'],
-           ['h4', '1.125rem', '<h4 data-sample class="m-0">Upcoming birthdays</h4>'],
-           ['h5', '.875rem', '<h5 data-sample class="m-0">Ticket types</h5>'],
-           ['.readable', '1rem', '<div data-sample class="readable">Long-form copy such as event descriptions sets at 1rem.</div>'],
-           ['nav · .btn', '.875rem', '<span data-sample class="btn btn-outline-primary">Buttons, nav links and tabs</span>'],
-           ['body · h6', '.825rem', '<div data-sample>Body text, inputs, tables, dropdown items</div>'],
-           ['.badge', '.75rem', '<span data-sample class="badge badge-default">Badges</span>'],
-           ['.breadcrumb', '.693rem', '<ol data-sample class="breadcrumb m-0"><li class="breadcrumb-item">Breadcrumbs</li><li class="breadcrumb-item">and carets</li></ol>']
+           ['h1', '--font-size-3xl · 2rem', '<h1 data-sample class="m-0">Gatherings near you</h1>'],
+           ['h2', '--font-size-2xl · 1.66rem', '<h2 data-sample class="m-0">Gatherings near you</h2>'],
+           ['h3', '--font-size-xl · 1.4rem', '<h3 data-sample class="m-0">Your upcoming events</h3>'],
+           ['h4', '--font-size-lg · 1.125rem', '<h4 data-sample class="m-0">Upcoming birthdays</h4>'],
+           ['h5', '--font-size-md · .875rem', '<h5 data-sample class="m-0">Ticket types</h5>'],
+           ['.readable', '--font-size-base · 1rem', '<div data-sample class="readable">Long-form copy such as event descriptions sets at 1rem.</div>'],
+           ['nav · .btn', '--font-size-md · .875rem', '<span data-sample class="btn btn-outline-primary">Buttons, nav links and tabs</span>'],
+           ['body · h6', '--font-size-sm · .825rem', '<div data-sample>Body text, inputs, tables, dropdown items</div>'],
+           ['.badge', '--font-size-xs · .75rem', '<span data-sample class="badge badge-default">Badges</span>'],
+           ['.breadcrumb', '--font-size-xs · .75rem', '<ol data-sample class="breadcrumb m-0"><li class="breadcrumb-item">Breadcrumbs</li><li class="breadcrumb-item">and carets</li></ol>']
          ].each_with_index do |(name, size, sample), i| %>
-        <div data-spec-row class="py-3 border-top <%= 'border-bottom' if i == 10 %>">
+        <div data-spec-row class="py-3 border-top <%= 'border-bottom' if i == 9 %>">
           <div class="row align-items-baseline">
             <code class="col-md-2 font-monospace small text-body-secondary"><%= name %></code>
             <div class="col-md-7"><%== sample %></div>
@@ -265,7 +262,7 @@
           </div>
         </div>
       <% end %>
-      <div class="small text-body-secondary mt-3">Relative helpers: <code>.fs-xs</code> .75em · <code>.fs-sm</code> .875em · <code>.fs-lg</code> 1.2em · <code>.fs-xl</code> 1.5em · <code>.fs-xxl</code> 2em. Secondary text is --bs-gray-600 (<code>.subtle</code>, form-text).</div>
+      <div class="small text-body-secondary mt-3"><code>.h1</code>–<code>.h6</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. Relative helpers, also as <code>--fs-*</code> tokens for CSS: <code>.fs-xs</code> .75em · <code>.fs-sm</code> .875em · <code>.fs-lg</code> 1.2em · <code>.fs-xl</code> 1.5em · <code>.fs-xxl</code> 2em. Secondary text is --bs-gray-600 (<code>.subtle</code>, form-text).</div>
     </div>
   </section>
 
@@ -428,7 +425,7 @@
             <span class="label label-<%= variant %>">label-<%= variant %></span>
           <% end %>
         </div>
-        <div class="font-monospace small text-body-secondary">.label · 85% · .2em .6em .3em (legacy)</div>
+        <div class="font-monospace small text-body-secondary">.label · .85em · .2em .6em .3em (legacy)</div>
       </div>
     </div>
 

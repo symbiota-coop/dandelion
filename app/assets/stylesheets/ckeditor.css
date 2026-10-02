@@ -2,11 +2,11 @@
    Loaded on every page (see _dependencies.erb), after app.css */
 
 .ck-heading_paragraph_lead {
-  font-size: 0.85rem !important
+  font-size: var(--font-size-md) !important
 }
 
 .ck-heading_paragraph_small {
-  font-size: 90% !important
+  font-size: var(--fs-sm) !important
 }
 
 div.wysiwyg img {
@@ -51,7 +51,7 @@ div.wysiwyg img {
 #tab-description .ck.ck-editor .ck.ck-editor__editable.ck-content {
   font-family: var(--body-font-family) !important;
   letter-spacing: normal !important;
-  font-size: 1rem !important;
+  font-size: var(--font-size-base) !important;
   line-height: 1.5;
   color: var(--bs-body-color);
 }
@@ -67,7 +67,7 @@ div.wysiwyg img {
 }
 
 div.wysiwyg figcaption {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   margin-top: 0.25rem;
   text-align: center
 }
@@ -75,7 +75,7 @@ div.wysiwyg figcaption {
 .ck-content blockquote,
 blockquote {
   margin-bottom: 1rem;
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   border-left: 0.25rem solid oklch(from var(--theme-500) l c h / 0.33) !important;
   padding-left: 1rem;
   font-style: italic;

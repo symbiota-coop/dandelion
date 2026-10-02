@@ -56,22 +56,22 @@ $form-switch-padding-start: 0;
 $form-switch-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3.3' cy='.35' fill='rgba(0,0,0,.35)'/%3e%3ccircle r='3.3' fill='%23fff'/%3e%3c/svg%3e");
 $form-switch-focus-bg-image: $form-switch-bg-image;
 $form-switch-checked-bg-image: $form-switch-bg-image;
-$btn-font-size: .875rem;
+$btn-font-size: .875rem; // --font-size-md
 $btn-padding-y-sm: .3125rem;
 $btn-padding-x-sm: .625rem;
-$btn-font-size-sm: .825rem;
+$btn-font-size-sm: .825rem; // --font-size-sm
 $btn-padding-y-lg: .625rem;
 $btn-padding-x-lg: 1rem;
-$btn-font-size-lg: 1.125rem;
+$btn-font-size-lg: 1.125rem; // --font-size-lg
 $btn-border-radius-lg: .25rem;
-$badge-font-size: .75rem;
+$badge-font-size: .75rem; // --font-size-xs
 $badge-padding-y: .1875rem;
 $badge-padding-x: .4375rem;
 $badge-border-radius: .25rem;
 $alert-padding-y: .625rem;
 $alert-padding-x: .625rem;
 $alert-border-width: 0;
-$tooltip-font-size: .825rem;
+$tooltip-font-size: .825rem; // --font-size-sm
 $table-cell-padding-y: .5rem;
 $table-cell-padding-x: .5rem;
 $table-cell-padding-y-sm: .5rem; // small tables aren't any tighter

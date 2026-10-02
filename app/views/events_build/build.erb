@@ -1,9 +1,5 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
-<style>
-  #build-event .input-group-text { font-size: 1em; }
-</style>
-
 <% if params[:new_org] && !params[:draft_id] %>
   <div class="alert alert-primary mt-3 d-flex align-items-start">
     <i class="bi bi-calendar-event me-3 mt-1 fs-3" style="opacity: 0.85"></i>

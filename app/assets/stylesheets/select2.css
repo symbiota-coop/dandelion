@@ -17,7 +17,7 @@
 .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice,
 .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field,
 .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option {
-  font-size: 0.825rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
 }
 

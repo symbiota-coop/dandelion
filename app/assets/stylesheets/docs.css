@@ -6,7 +6,7 @@
 /* Docs */
 .docs-main {
   max-width: 42rem;
-  font-size: 1.05rem;
+  font-size: var(--font-size-base);
   line-height: 1.45;
   color: var(--bs-body-color);
 }
@@ -17,7 +17,7 @@
 
 .docs-header-select .form-select:not([size]):not([multiple]) {
   font-family: var(--header-font-family);
-  font-size: 1.35rem;
+  font-size: var(--font-size-xl);
   font-weight: bold;
   height: auto;
   padding: 0.25rem 2.25rem 0.25rem 0.5rem;
@@ -41,7 +41,7 @@
 #doc-body h1,
 .docs-deepwiki-answer h1,
 .docs-ask h1 {
-  font-size: 1.75rem;
+  font-size: var(--font-size-2xl);
   margin: 0 0 0.75rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--bs-gray-300);
@@ -50,7 +50,7 @@
 #doc-body h2,
 .docs-deepwiki-answer h2,
 .docs-ask h2 {
-  font-size: 1.35rem;
+  font-size: var(--font-size-xl);
   margin: 2.25rem 0 0.7rem;
   padding-bottom: 0.35rem;
   border-bottom: 1px solid var(--bs-gray-300);
@@ -59,7 +59,7 @@
 #doc-body h3,
 .docs-deepwiki-answer h3,
 .docs-ask h3 {
-  font-size: 1.12rem;
+  font-size: var(--font-size-lg);
   margin: 1.6rem 0 0.5rem;
 }
 
@@ -121,13 +121,13 @@
 
 #doc-body .table,
 .docs-deepwiki-answer .table {
-  font-size: 0.95em;
+  font-size: var(--fs-sm);
   margin-bottom: 0;
 }
 
 #doc-body pre,
 .docs-deepwiki-answer pre {
-  font-size: 0.85em;
+  font-size: var(--fs-sm);
   line-height: 1.5;
   padding: 0;
   overflow-x: auto;
@@ -141,7 +141,7 @@
 
 #doc-body code,
 .docs-deepwiki-answer code {
-  font-size: 0.88em;
+  font-size: var(--fs-sm);
 }
 
 .doc-table-wrap {
@@ -159,7 +159,7 @@
 
 .doc-transcript summary {
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: var(--font-size-md);
   color: var(--theme-500);
   font-family: var(--header-font-family);
 }
@@ -170,7 +170,7 @@
 
 .doc-transcript blockquote {
   margin: 0;
-  font-size: 0.95em;
+  font-size: var(--fs-sm);
   line-height: 1.45;
 }
 
@@ -207,7 +207,7 @@
 }
 
 .doc-index {
-  font-size: 0.88rem;
+  font-size: var(--font-size-md);
   line-height: 1.35;
 }
 
@@ -246,7 +246,7 @@
 
 .doc-index-h3s .doc-link {
   padding-left: 1.4rem;
-  font-size: 0.92em;
+  font-size: var(--fs-sm);
   color: var(--bs-secondary);
 }
 
@@ -397,7 +397,7 @@
 
 .doc-search-page {
   display: block;
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--bs-secondary);
   margin-bottom: 0.15rem;
 }
@@ -406,7 +406,7 @@
   display: block;
   font-family: var(--header-font-family);
   font-weight: bold;
-  font-size: 1.05rem;
+  font-size: var(--font-size-base);
   line-height: 1.3;
   letter-spacing: -0.02em;
 }
@@ -414,7 +414,7 @@
 .doc-search-snippet {
   display: block;
   margin-top: 0.25rem;
-  font-size: 0.9em;
+  font-size: var(--fs-sm);
   line-height: 1.4;
   color: var(--bs-secondary);
 }
