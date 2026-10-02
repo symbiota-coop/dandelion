@@ -41,7 +41,7 @@ $input-placeholder-color: rgba(33, 37, 41, .75); // as before $body-secondary-co
 $hr-border-color: #ced4da; // gray-400
 $input-color: #000;
 $input-border-color: #ced4da; // gray-400
-$input-font-size: .825rem;
+$input-font-size: .825rem; // matches --body-font-size in app.css (Sass needs a literal for its calculations)
 $input-focus-border-color: var(--theme-500);
 $input-focus-box-shadow: 0 0 0 2px rgba(var(--theme-500-rgb), .6);
 $form-select-focus-box-shadow: $input-focus-box-shadow;

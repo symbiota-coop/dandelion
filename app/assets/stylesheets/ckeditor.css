@@ -19,7 +19,7 @@ div.wysiwyg img {
  * - Figures with inline width (CKEditor): use full column width; img fills the figure.
  * CKEditor stores width on <figure class="image"> (inline style), not only on <img>
  */
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
 
   div.wysiwyg.readable figure.image,
   #tab-description .ck-content figure.image {
@@ -81,13 +81,13 @@ blockquote {
   font-style: italic;
 }
 
-@media(min-width: 576px) {
+@media (min-width: 576px) {
   .slick-container .slick-item:nth-child(2) {
     display: block;
   }
 }
 
-@media(min-width: 992px) {
+@media (min-width: 992px) {
   .slick-container .slick-item:nth-child(3) {
     display: block;
   }
