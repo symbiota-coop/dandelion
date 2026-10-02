@@ -1,5 +1,6 @@
 <%# Swatch values are read from the live stylesheet by the script at the bottom %>
 <% css_var = ->(name) { %(<span data-css-var="#{name}"></span>) }
+   css_var_raw = ->(name) { %(<span data-css-value="#{name}"></span>) }
    css_vars = ->(*names) { names.map { |name| css_var.call(name) }.join(' · ') }
    flag_class = 'badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle'
    flags = ->(*numbers) { numbers.map { |n| %(<a href="#i-#{n}" class="#{flag_class}">I-#{n}</a>) }.join }
@@ -9,7 +10,6 @@
      [3, 'Medium', 'Default and themed pages diverge with the same colour', 'theme.css restyles .ai-well and calendar events: the AI well is purple by default and a theme tint when themed; calendar events are purple by default and theme-coloured when themed. (Alerts and toasts no longer differ: their tints come from the ramp.)', 'Move the remaining theme.css rules into app.css so there is one behaviour, or document that the purple is intentional only for the unthemed site.', 'theme.css · app.css .ai-well, #calendar a.fc-event'],
      [7, 'Medium', 'Too many accent colours and active states', 'Besides the theme colour there is purple #4400B9 (header, AI), an orange-to-yellow gradient (sidebar active, notification dot, load bar), a rainbow gradient, signal blue and Stripe purple. The sidebar active item uses the orange gradient while every other active state (pills, list groups, dropdown items, checks) uses the theme colour.', 'Decide which accent marks "active" and use it everywhere; restrict purple to AI features.', 'app.css .sidebar .nav-link.active, #header, --gradient-*'],
      [8, 'Medium', 'Type scale has no clear steps', 'Small sizes include .693, .75, .8, .825, .85, .875 and .9rem plus 82.5%, 85% and 90%. h1 (34px) and h2 (31.9px) differ by 2px; .block-title (1.66rem) sits between h2 and h3. h6 equals body size. small.form-text is .85rem, larger than the body text it supports.', 'Reduce to a 6–7 step scale (for example .75, .825, .875, 1, 1.125, 1.4, 2rem) and alias .block-title to one of them.', 'app.css Base section'],
-     [11, 'Low', 'Radius values', 'Ten values in use: 0, .2rem, .25rem, .25em, .3rem, 5px, .375rem, .5rem, .75rem, 999px. 5px and .25rem are near-duplicates. Dropdowns are .5rem but the jQuery UI autocomplete, also a menu, has radius 0.', 'Settle on sm/md/lg/pill (.25, .5, .75rem, 999px) and give the autocomplete the dropdown treatment.', 'bootstrap5.scss · app.css .ui-autocomplete, .sidebar .nav'],
      [13, 'Low', 'Three focus ring styles', 'Inputs: 2px at 60%. Checks, pagination, accordion, close: .25rem at 25%. btn-signal: .2rem with its own colour. Nav links have none.', 'Use one ring (e.g. 2px at 60%) via --bs-focus-ring-*.', 'bootstrap5.scss $input-focus-box-shadow · app.css'],
      [14, 'Low', 'Badges and labels are parallel systems', '.label is a legacy Bootstrap 3 component with different size and padding (85%, .2em .6em) and only some variants (no label-warning).', 'Migrate .label usages to .badge and remove .label.', 'app.css Labels section'],
      [15, 'Low', 'Button treatments vary', 'Primary and danger are gradients; secondary and warning are flat. btn-signal forces its hover with !important. p.action a is a separate CTA style (10px padding, 5px radius).', 'Apply the gradient pattern to all solid variants or none; express btn-signal through --bs-btn-* variables.', 'app.css Buttons, p.action'],
@@ -279,21 +279,19 @@
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">Radius</h3>
-        <%== flags.call(11) %>
+        <span class="text-body-secondary">Bootstrap's radius variables, set to four steps in <code>bootstrap5.scss</code>. Square corners (0) where an element sits flush against another; 50% for circles.</span>
       </div>
       <div class="row g-3">
         <% [
-             ['0', '0', 'Autocomplete, sidebar dropdown, minify button'],
-             ['.25rem', '.25rem · base', 'Buttons, inputs, cards, badges, alerts. sm .2rem, lg .3rem'],
-             ['5px', '5px', 'Sidebar pills, cookie banner, email CTA'],
-             ['.375rem', '.375rem', 'Pagination'],
-             ['.5rem', '.5rem', 'Dropdowns, AI well, ask box'],
-             ['.75rem .75rem 0 0', '.75rem top', 'Mobile bottom sheet'],
-             ['999px', '999px', 'Nav crumbs, avatars']
-           ].each do |radius, title, note| %>
-          <div class="col-6 col-md-3 col-xl">
-            <div class="bg-body-secondary border mb-2" style="height: 72px; border-radius: <%= radius %>"></div>
-            <div class="fw-bold"><%= title %></div>
+             ['--bs-border-radius', 'Buttons, inputs, cards, badges, labels, pagination, sidebar pills. -sm is the same'],
+             ['--bs-border-radius-lg', 'Menus and panels: dropdowns, autocomplete, cookie banner, AI well, ask box'],
+             ['--bs-border-radius-xl', 'Mobile bottom sheet (top corners), marketing cards'],
+             ['--bs-border-radius-pill', 'Nav crumbs, avatars, round buttons and dots']
+           ].each do |name, note| %>
+          <div class="col-6 col-md-3">
+            <div class="bg-body-secondary border mb-2" style="height: 72px; border-radius: var(<%= name %>)"></div>
+            <div class="fw-bold text-break"><%= name %></div>
+            <div class="font-monospace small text-body-secondary"><%== css_var_raw.call(name) %></div>
             <div class="small text-body-secondary"><%= note %></div>
           </div>
         <% end %>
@@ -654,6 +652,9 @@
       var d = ctx.getImageData(0, 0, 1, 1).data;
       var hex = '#' + [0, 1, 2].map(function (i) { return d[i].toString(16).padStart(2, '0'); }).join('');
       $(this).text(d[3] < 255 ? hex + ' / ' + Math.round(d[3] / 2.55) + '%' : hex);
+    });
+    $('[data-css-value]').each(function () {
+      $(this).text(getComputedStyle(document.documentElement).getPropertyValue($(this).attr('data-css-value')).trim());
     });
     $('[data-spec-row]').each(function () {
       var px = parseFloat(getComputedStyle($(this).find('[data-sample]')[0]).fontSize);

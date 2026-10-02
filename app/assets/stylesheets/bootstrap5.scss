@@ -20,8 +20,9 @@ $grid-gutter-width: .75rem;
 $container-padding-x: 30px; // the whole gutter, so containers keep 15px padding
 $container-max-widths: (sm: 540px, md: 720px, lg: 960px, xl: 1140px);
 $border-radius: .25rem;
-$border-radius-sm: .2rem;
-$border-radius-lg: .3rem;
+$border-radius-sm: .25rem; // the same as the base: one small radius
+$border-radius-lg: .5rem; // menus and panels
+$border-radius-xl: .75rem; // sheets and large cards
 $card-spacer-y: 1.25rem;
 $card-spacer-x: 1.25rem;
 $card-cap-padding-y: .75rem;
@@ -81,7 +82,7 @@ $table-striped-bg: #e9ecef; // gray-200
 $pagination-color: #000;
 $pagination-bg: transparent;
 $pagination-border-color: transparent;
-$pagination-border-radius: .375rem;
+$pagination-border-radius: .25rem;
 $pagination-margin-start: .1875rem;
 $pagination-hover-color: #000;
 $pagination-hover-bg: transparent;

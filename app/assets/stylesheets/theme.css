@@ -28,7 +28,7 @@
       oklch(from var(--theme-500) l c h / 0.175) 50%,
       oklch(from var(--theme-500) l c h / 0.325) 100%) !important;
   padding: 1rem;
-  border-radius: 0.5rem;
+  border-radius: var(--bs-border-radius-lg);
 }
 
 #map-container,

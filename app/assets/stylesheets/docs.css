@@ -135,7 +135,7 @@
   word-wrap: normal;
   background: transparent;
   border: 0;
-  border-radius: 0.4rem;
+  border-radius: var(--bs-border-radius-lg);
   margin-bottom: 1.25rem;
 }
 
@@ -152,7 +152,7 @@
 .doc-transcript {
   margin: 0.5rem 0 1.25rem;
   border: 1px solid oklch(from var(--theme-500) l c h / 0.3);
-  border-radius: 0.4rem;
+  border-radius: var(--bs-border-radius-lg);
   background: oklch(from var(--theme-500) l c h / 0.1);
   padding: 0.55rem 0.85rem;
 }
@@ -185,7 +185,7 @@
 .doc-toc-mobile {
   margin: 0 0 1.25rem;
   border: 1px solid var(--bs-gray-300);
-  border-radius: 0.4rem;
+  border-radius: var(--bs-border-radius-lg);
   padding: 0.55rem 0.85rem;
   background: var(--bs-tertiary-bg);
 }
@@ -283,7 +283,7 @@
 
 #sticky-index .doc-index-headings::-webkit-scrollbar-thumb {
   background: var(--bs-gray-500);
-  border-radius: 4px;
+  border-radius: var(--bs-border-radius);
 }
 
 .doc-search {

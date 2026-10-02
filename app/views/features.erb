@@ -31,7 +31,7 @@
   .feature-card {
     background: var(--bs-white);
     border: 1px solid rgba(var(--bs-black-rgb), 0.08);
-    border-radius: 0.75rem;
+    border-radius: var(--bs-border-radius-xl);
     padding: 1.75rem;
     height: 100%;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -44,7 +44,7 @@
   .feature-icon {
     width: 3rem;
     height: 3rem;
-    border-radius: 0.5rem;
+    border-radius: var(--bs-border-radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -58,7 +58,7 @@
 
   .section-heading { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
   @media (min-width: 992px) { .section-heading { font-size: 2vw; } }
-  .section-divider { width: 3rem; height: 3px; border-radius: 2px; margin-bottom: 1.5rem; }
+  .section-divider { width: 3rem; height: 3px; border-radius: var(--bs-border-radius-pill); margin-bottom: 1.5rem; }
   .section-divider.yellow { background: linear-gradient(90deg, var(--color-amber), var(--color-amber-light)); }
   .section-divider.rose { background: linear-gradient(90deg, var(--color-rose), var(--color-rose-light)); }
   .section-divider.magenta { background: linear-gradient(90deg, var(--color-magenta), var(--color-magenta-light)); }
