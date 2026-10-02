@@ -53,7 +53,6 @@
   --bs-link-hover-color: var(--theme-color-hover);
   --bs-link-hover-color-rgb: var(--theme-color-hover-rgb);
   --bs-focus-ring-color: rgba(var(--theme-color-rgb), 0.25);
-  --color-theme-transparent: rgba(251, 174, 59, 0.5);
   --color-highlight-1: #4400B9;
   --color-highlight-1-light-1: #ebdfff;
   --color-highlight-1-light-2: #bb93ff;
@@ -1248,7 +1247,7 @@ body.greyed #content {
 }
 
 .message-preview.unread {
-  background: var(--color-theme-transparent) !important
+  background: rgba(var(--theme-color-rgb), 0.15) !important
 }
 
 /* ==========================================================================

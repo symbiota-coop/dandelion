@@ -2,7 +2,7 @@
 <% conversations = current_account.conversations(limit: m) %>
 <% conversations.each { |message| %>
 <% account = message.other_party(current_account) %>
-<%= partial :'messages/preview', locals: { message: message, klass: "p-2 d-block #{'active' if @account && account && account.id == @account.id}" } %>
+<%= partial :'messages/preview', locals: { message: message, klass: ('active' if @account && account && account.id == @account.id) } %>
 <% } %>
 <% if conversations.length == m %>
   <div class="text-center mt-1 pagination d-block">
