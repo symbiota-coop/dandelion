@@ -4,3 +4,8 @@ port ENV['PORT'] || 3000
 environment ENV['RACK_ENV']
 
 preload_app!
+
+# Runs once per instance (in the master process when clustered)
+after_booted do
+  VectorSearchWarmer.start if Padrino.env == :production
+end
