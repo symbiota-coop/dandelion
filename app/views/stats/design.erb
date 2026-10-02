@@ -6,7 +6,7 @@
 
    severity_classes = { 'High' => 'text-danger', 'Medium' => 'text-warning-emphasis', 'Low' => 'text-body-secondary', 'Fixed' => 'text-primary' }
    issues = [
-     ['High', 'Two greens mean "success"', 'Alerts and toasts use the theme green #00af5e, while btn-success, badge-success, text-success and bg-success use $success #4CD964, and --color-green-tint is a tint of the theme green rather than of --color-green.', "Set $success to #00af5e, point --bs-success and --bs-success-rgb at the theme colour, have badge-success use --theme-color, rename the tints --theme-color-tint and --theme-color-tint-strong, and remove --color-green, so success follows each organisation's theme.", 'bootstrap5.scss $success · app.css :root, .badge-success'],
+     ['Fixed', 'Two greens mean "success"', 'Alerts and toasts used the theme green #00af5e, while btn-success, badge-success, text-success and bg-success used $success #4CD964, and --color-green-tint was a tint of the theme green rather than of --color-green.', "Applied: $success is now #00af5e, app.css points --bs-success and --bs-success-rgb at the theme colour, badge-success uses --theme-color, the tints are renamed --theme-color-tint and --theme-color-tint-strong, and --color-green is gone. Success follows each organisation's theme.", 'bootstrap5.scss $success · app.css :root, .badge-success'],
      ['High', 'Success alert text fails contrast on the default theme', '#00af5e on #E6F8EF is about 2.6:1. theme.css already uses --theme-color-darker (#007c43, about 4.8:1) for themed pages, but the default green page keeps the light text. White text on primary buttons is about 2.9:1 ($min-contrast-ratio was lowered to 2.5 to allow it).', 'Use --theme-color-darker for alert and toast text in app.css, matching theme.css.', 'app.css .alert-success, .toast-success · bootstrap5.scss $min-contrast-ratio'],
      ['Medium', 'Default and themed pages diverge with the same colour', 'theme.css restyles alert-success, toast-success, .ai-well and calendar events. A page themed #00af5e looks different from the unthemed default: the AI well is purple by default and green when themed; calendar events are purple by default and theme-coloured when themed.', 'Move the theme.css rules into app.css so there is one behaviour, or document that the purple is intentional only for the unthemed site.', 'theme.css · app.css .ai-well, #calendar a.fc-event'],
      ['Medium', 'Colours outside the palette', 'The palette comment says every colour comes from it, but the CSS also uses #e0e0e0 (table border), #eee (striped), #F5F5F5 and #EFEFF4 (Bootstrap secondary/tertiary bg), #e9ecef and #495057 (input addon), rgba(200,199,204,.3) (message hover), Bootstrap --bs-gray-500 and --bs-secondary #6c757d (comments, calendar buttons). _block.erb hardcodes #212529 inline.', 'Map each to a --grey-* token, and add the two Bootstrap backgrounds to the grey scale.', 'bootstrap5.scss · app.css .fc-button, .comment-grey, .message-preview · _block.erb'],
@@ -84,7 +84,7 @@
       </div>
       <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-3">
         <% [
-             ['Success · --color-green', %w[--color-green --color-green-light --color-green-tint], 'The tint is a tint of the theme colour, not of --color-green'],
+             ['Success · --theme-color', %w[--theme-color --theme-color-light --theme-color-tint], 'Follows the theme colour'],
              ['Info · --color-blue', %w[--color-blue --color-blue-light], nil],
              ['Warning · --color-orange', %w[--color-orange --color-orange-light --color-orange-dark --color-orange-darker --color-orange-tint], 'light · dark · darker · tint'],
              ['Danger · --color-red', %w[--color-red --color-red-light --color-red-hover --color-red-dark --color-red-tint], 'light · hover · dark · tint'],
@@ -166,7 +166,7 @@
       <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-3">
         <% [
              ['linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-light) 100%)', 'Fill pattern', '135°, flat to 50%, then to -light. Primary/danger buttons, badges, progress, text-bg-primary.'],
-             ['linear-gradient(135deg, var(--color-green-tint) 0%, var(--color-green-tint) 50%, var(--color-green-tint-strong) 100%)', 'Tint pattern', 'Same geometry, tint to tint-strong. Alerts and toasts.'],
+             ['linear-gradient(135deg, var(--theme-color-tint) 0%, var(--theme-color-tint) 50%, var(--theme-color-tint-strong) 100%)', 'Tint pattern', 'Same geometry, tint to tint-strong. Alerts and toasts.'],
              ['var(--gradient-active)', '--gradient-active', 'Sidebar active item, notification dot, page-load bar.'],
              ['linear-gradient(45deg, var(--grey-13) 0%, var(--grey-13) 66%, var(--color-highlight-1) 100%)', 'Header', '45°, --grey-13 to 66%, then highlight-1.'],
              ['var(--gradient-rainbow)', '--gradient-rainbow', '.gradient-text only.'],
@@ -371,7 +371,6 @@
         <a class="btn btn-outline-primary" href="#components">Outline primary</a>
         <a class="btn btn-secondary" href="#components">Secondary</a>
         <a class="btn btn-danger" href="#components">Delete</a>
-        <a class="btn btn-success" href="#components">Success</a>
         <a class="btn btn-signal" href="#components"><i class="bi bi-signal"></i> Signal</a>
       </div>
       <div class="d-flex flex-wrap gap-3 align-items-center px-4">
@@ -388,7 +387,7 @@
       </div>
       <div class="border rounded p-4 d-flex flex-column gap-3">
         <div class="d-flex flex-wrap gap-2 align-items-center">
-          <% %w[primary success info warning danger yellow inverse default outline-primary].each do |variant| %>
+          <% %w[primary info warning danger yellow inverse default outline-primary].each do |variant| %>
             <span class="badge badge-<%= variant %>"><%= variant %></span>
           <% end %>
         </div>

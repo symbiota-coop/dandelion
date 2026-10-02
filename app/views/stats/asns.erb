@@ -64,7 +64,7 @@
                 <td class="text-nowrap">
                   <% if blocked %>
                     <form method="post" action="/stats/asns/unblock/<%= row['asn'] %>" class="d-inline">
-                      <button type="submit" class="btn btn-outline-success btn-sm" title="Unblock"><i class="bi bi-shield-x"></i></button>
+                      <button type="submit" class="btn btn-outline-primary btn-sm" title="Unblock"><i class="bi bi-shield-x"></i></button>
                     </form>
                   <% else %>
                     <form method="post" action="/stats/asns/block/<%= row['asn'] %>" class="d-inline">
@@ -109,7 +109,7 @@
               <td<%== bp ? " style=\"color: #{bp[:bot] >= 60 ? '#dc3545' : bp[:bot] >= 30 ? '#fd7e14' : '#28a745'}\"" : '' %>><%== bp ? "#{bp[:bot]}%" : '&ndash;' %></td>
                   <td>
                     <form method="post" action="/stats/asns/unblock/<%= asn %>" class="d-inline">
-                      <button type="submit" class="btn btn-outline-success btn-sm" title="Unblock"><i class="bi bi-shield-x"></i></button>
+                      <button type="submit" class="btn btn-outline-primary btn-sm" title="Unblock"><i class="bi bi-shield-x"></i></button>
                     </form>
                   </td>
                 </tr>

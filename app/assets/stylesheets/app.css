@@ -40,9 +40,14 @@
   --theme-color-hover-light: #00c469;
   --theme-color-dark: #008d4c;
   --theme-color-darker: #007c43;
+  /* Backgrounds for success alerts and toasts */
+  --theme-color-tint: #E6F8EF;
+  --theme-color-tint-strong: #aae7c9;
   /* so Bootstrap follows it too */
   --bs-primary: var(--theme-color);
   --bs-primary-rgb: var(--theme-color-rgb);
+  --bs-success: var(--theme-color);
+  --bs-success-rgb: var(--theme-color-rgb);
   --bs-link-color: var(--theme-color);
   --bs-link-color-rgb: var(--theme-color-rgb);
   --bs-link-hover-color: var(--theme-color-hover);
@@ -84,10 +89,6 @@
   --color-orange-darker: #ca7702;
   --color-orange-tint: #fff5e6;
   --color-orange-tint-strong: #ffd69a;
-  --color-green: #4CD964;
-  --color-green-light: #68df7c;
-  --color-green-tint: #E6F8EF;
-  --color-green-tint-strong: #aae7c9;
   --color-blue: #5AC8FA;
   --color-blue-light: #7bd3fb;
   --color-yellow: #FFCC00;
@@ -725,9 +726,9 @@ body.greyed #content {
 /* Alerts are gradients from a tint of their colour to a stronger one, over Bootstrap's --bs-alert-* colours */
 .alert-success {
   --bs-alert-color: var(--theme-color);
-  --bs-alert-bg: var(--color-green-tint);
+  --bs-alert-bg: var(--theme-color-tint);
   --bs-alert-link-color: var(--theme-color);
-  --alert-bg-end: var(--color-green-tint-strong);
+  --alert-bg-end: var(--theme-color-tint-strong);
 }
 
 .alert-warning {
@@ -757,9 +758,9 @@ body.greyed #content {
 /* Toasts use the same colours and gradients as alerts, plus a border in their text colour (alerts have none: $alert-border-width is 0) */
 .toast-success {
   --bs-toast-color: var(--theme-color);
-  --bs-toast-bg: var(--color-green-tint);
+  --bs-toast-bg: var(--theme-color-tint);
   --bs-toast-border-color: var(--theme-color);
-  --toast-bg-end: var(--color-green-tint-strong);
+  --toast-bg-end: var(--theme-color-tint-strong);
 }
 
 .toast-warning {
@@ -813,11 +814,6 @@ body.greyed #content {
   --badge-color-light: var(--theme-color-light);
 }
 
-.badge-success {
-  --badge-color: var(--color-green);
-  --badge-color-light: var(--color-green-light);
-}
-
 .badge-info {
   --badge-color: var(--color-blue);
   --badge-color-light: var(--color-blue-light);
@@ -847,7 +843,7 @@ body.greyed #content {
 }
 
 /* Coloured badges and labels are gradients from their colour to a lighter one */
-:is(.badge, .label):is(.badge-default, .label-default, .badge-primary, .label-primary, .badge-success, .badge-info, .badge-warning, .badge-danger, .label-danger, .badge-yellow, .label-yellow, .badge-inverse, .label-inverse) {
+:is(.badge, .label):is(.badge-default, .label-default, .badge-primary, .label-primary, .badge-info, .badge-warning, .badge-danger, .label-danger, .badge-yellow, .label-yellow, .badge-inverse, .label-inverse) {
   background: linear-gradient(135deg, var(--badge-color) 0%, var(--badge-color) 50%, var(--badge-color-light) 100%) !important;
 }
 

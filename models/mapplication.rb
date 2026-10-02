@@ -81,7 +81,7 @@ class Mapplication
   def label
     case status
     when 'pending' then 'primary'
-    when 'accepted' then 'success'
+    when 'accepted' then 'primary'
     when 'paused' then 'warning'
     end
   end

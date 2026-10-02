@@ -19,7 +19,7 @@
             <% route_path = route_parts[1] %>
             <span class="badge badge-<%= case route_type.downcase
                                           when 'get' then 'secondary'
-                                          when 'post' then 'success'
+                                          when 'post' then 'primary'
                                           when 'put' then 'warning'
                                           when 'patch' then 'info'
                                           when 'delete' then 'danger'
