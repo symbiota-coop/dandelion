@@ -726,7 +726,6 @@ body.greyed #content {
 .alert-success {
   --bs-alert-color: var(--theme-color);
   --bs-alert-bg: var(--color-green-tint);
-  --bs-alert-border-color: var(--theme-color);
   --bs-alert-link-color: var(--theme-color);
   --alert-bg-end: var(--color-green-tint-strong);
 }
@@ -734,7 +733,6 @@ body.greyed #content {
 .alert-warning {
   --bs-alert-color: var(--color-orange-darker);
   --bs-alert-bg: var(--color-orange-tint);
-  --bs-alert-border-color: var(--color-orange);
   --bs-alert-link-color: var(--color-orange-dark);
   --alert-bg-end: var(--color-orange-tint-strong);
 }
@@ -742,7 +740,6 @@ body.greyed #content {
 .alert-danger {
   --bs-alert-color: var(--color-red-dark);
   --bs-alert-bg: var(--color-red-tint);
-  --bs-alert-border-color: var(--color-red);
   --bs-alert-link-color: var(--color-red-dark);
   --alert-bg-end: var(--color-red-tint-strong);
 }
@@ -753,16 +750,11 @@ body.greyed #content {
   background-image: linear-gradient(135deg, var(--bs-alert-bg) 0%, var(--bs-alert-bg) 50%, var(--alert-bg-end) 100%);
 }
 
-/* Success flashes have a border ($alert-border-width is 0) */
-.alert-success.alert-dismissable {
-  border: 1px solid var(--bs-alert-border-color);
-}
-
 .alert-dismissible .btn-close {
   padding: 0.875rem;
 }
 
-/* Toasts use the same colours and gradients as alerts */
+/* Toasts use the same colours and gradients as alerts, plus a border in their text colour (alerts have none: $alert-border-width is 0) */
 .toast-success {
   --bs-toast-color: var(--theme-color);
   --bs-toast-bg: var(--color-green-tint);
@@ -773,14 +765,14 @@ body.greyed #content {
 .toast-warning {
   --bs-toast-color: var(--color-orange-darker);
   --bs-toast-bg: var(--color-orange-tint);
-  --bs-toast-border-width: 0;
+  --bs-toast-border-color: var(--color-orange-darker);
   --toast-bg-end: var(--color-orange-tint-strong);
 }
 
 .toast-danger {
   --bs-toast-color: var(--color-red-dark);
   --bs-toast-bg: var(--color-red-tint);
-  --bs-toast-border-width: 0;
+  --bs-toast-border-color: var(--color-red-dark);
   --toast-bg-end: var(--color-red-tint-strong);
 }
 

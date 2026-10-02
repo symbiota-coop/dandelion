@@ -61,6 +61,10 @@ Dandelion::App.controller do
     erb :'stats/icons'
   end
 
+  get '/stats/design' do
+    erb :'stats/design'
+  end
+
   get '/stats/frontend_dependencies' do
     @dependencies = []
     mutex = Mutex.new

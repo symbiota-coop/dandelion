@@ -35,7 +35,6 @@
       rgba(var(--theme-color-rgb), 0.1) 50%,
       rgba(var(--theme-color-rgb), 0.25) 100%) !important;
   color: var(--theme-color-darker);
-  border-color: var(--theme-color-darker);
 }
 
 .alert.alert-success a {
