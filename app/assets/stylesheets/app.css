@@ -54,23 +54,8 @@
   --body-font-family: "Plus Jakarta Sans", sans-serif;
   --header-font-family: "Hanken Grotesk", "Plus Jakarta Sans", sans-serif;
   --body-font-size: 0.825rem;
-  /* Our palette: every colour in our stylesheets comes from here or from Bootstrap's variables.
-     Greys are named by lightness (--grey-54 is 54% light) */
-  --grey-7: #111111;
-  --grey-13: #222;
-  --grey-20: #333;
-  --grey-27: #444;
-  --grey-40: #666;
-  --grey-47: #777;
-  --grey-54: #8A8A8F;
-  --grey-60: #999;
-  --grey-73: #bbb;
-  --grey-78: #C8C7CC;
-  --grey-80: #ccc;
-  --grey-86: #DADADE;
-  --grey-87: #ddd;
-  --grey-92: #EAE9EF;
-  --grey-93: #eee;
+  /* Our palette: every colour in our stylesheets comes from here or from Bootstrap's variables
+     (greys are Bootstrap's --bs-gray-100 to 900) */
   --color-signal: #3B45FE;
   --color-signal-dark: #2a32d4;
   --color-stripe: #6158F7;
@@ -371,7 +356,7 @@
 }
 
 #header {
-  background: linear-gradient(45deg, var(--grey-13) 0%, var(--grey-13) 66%, var(--color-highlight-1) 100%) !important;
+  background: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-highlight-1) 100%) !important;
 }
 
 .header [data-pagelet-url] .bi-spin {
@@ -384,7 +369,7 @@
 
 .header-search-bar {
   --bs-offcanvas-height: 2.8125rem;
-  --bs-offcanvas-bg: var(--grey-20);
+  --bs-offcanvas-bg: var(--bs-gray-800);
   --bs-offcanvas-border-width: 0;
   padding: 0 17.125rem;
 }
@@ -403,7 +388,7 @@
   border: none;
   height: 2.8125rem;
   padding: 0;
-  background: var(--grey-20);
+  background: var(--bs-gray-800);
   color: var(--bs-white);
   font-size: 0.875rem;
   border-radius: 0;
@@ -420,7 +405,7 @@
   position: absolute;
   top: 0;
   left: -2.75rem;
-  color: var(--grey-78);
+  color: var(--bs-gray-400);
   text-decoration: none;
 }
 
@@ -533,7 +518,7 @@
   display: block;
   padding: 0.3125rem 0.9375rem 0.3125rem 0;
   line-height: 1.25rem;
-  color: var(--grey-60);
+  color: var(--bs-gray-500);
   text-decoration: none;
 }
 
@@ -544,13 +529,13 @@
 }
 
 .sidebar.sidebar-inverse {
-  --bs-offcanvas-bg: var(--grey-13);
+  --bs-offcanvas-bg: var(--bs-gray-900);
   /* offcanvas-md makes the sidebar transparent from md up (with !important), so restate it */
-  background-color: var(--grey-13) !important;
+  background-color: var(--bs-gray-900) !important;
 }
 
 .sidebar hr {
-  border-color: var(--grey-20);
+  border-color: var(--bs-gray-800);
   opacity: 1;
 }
 
@@ -574,7 +559,7 @@
 
 .sidebar .sidebar-dropdown {
   --bs-dropdown-bg: rgba(var(--bs-black-rgb), 0.8);
-  --bs-dropdown-link-color: var(--grey-60);
+  --bs-dropdown-link-color: var(--bs-gray-500);
   --bs-dropdown-link-hover-color: var(--bs-white);
   --bs-dropdown-link-hover-bg: transparent;
   --bs-dropdown-link-active-color: var(--bs-white);
@@ -637,7 +622,7 @@
   position: absolute;
   right: 0;
   text-decoration: none;
-  background: var(--grey-40);
+  background: var(--bs-gray-600);
   color: var(--bs-white);
   bottom: 0.9375rem;
   z-index: 1040;
@@ -655,7 +640,7 @@
 
 .sidebar .sidebar-minify-btn:hover,
 .sidebar .sidebar-minify-btn:focus {
-  background: var(--grey-20);
+  background: var(--bs-gray-800);
 }
 
 .page-sidebar-minified .sidebar {
@@ -832,7 +817,7 @@ body.greyed #content {
    ========================================================================== */
 
 .badge {
-  background: var(--grey-47);
+  background: var(--bs-gray-600);
   min-width: 0.625rem;
   vertical-align: middle;
 }
@@ -843,8 +828,8 @@ body.greyed #content {
 
 .badge-default,
 .label-default {
-  --badge-color: var(--grey-54);
-  --badge-color-light: var(--grey-60);
+  --badge-color: var(--bs-gray-600);
+  --badge-color-light: var(--bs-gray-500);
 }
 
 .badge-primary,
@@ -873,7 +858,7 @@ body.greyed #content {
 .badge-inverse,
 .label-inverse {
   --badge-color: var(--bs-black);
-  --badge-color-light: var(--grey-7);
+  --badge-color-light: var(--bs-black);
 }
 
 /* Payment method badges, named after the method in lib/payment_methods/event_payment_methods.rb */
@@ -1299,7 +1284,7 @@ body.greyed #content {
 
 .message-preview:hover,
 .message-preview.active {
-  background: oklch(from var(--grey-78) l c h / 0.3)
+  background: oklch(from var(--bs-gray-400) l c h / 0.3)
 }
 
 .message-preview.unread {
@@ -1656,7 +1641,7 @@ div.block-title .label {
   }
 
   .nav-wrapper::-webkit-scrollbar-track {
-    background: var(--grey-93);
+    background: var(--bs-gray-200);
   }
 
   .nav-wrapper::-webkit-scrollbar-thumb {
@@ -1779,7 +1764,7 @@ table.dataTable.table-sm > thead > tr > th[class*="dt-order"] .dt-column-order {
 
 .table-hr td {
   border: 0 !important;
-  border-bottom: 0.1rem solid var(--grey-92) !important;
+  border-bottom: 0.1rem solid var(--bs-gray-200) !important;
 }
 
 body .table > tfoot > tr > th {
@@ -1870,14 +1855,14 @@ a.ui-button:active,
   line-height: 1.225rem;
   font-size: 1.125rem;
   color: var(--bs-white);
-  background: var(--grey-78);
+  background: var(--bs-gray-400);
   border-radius: 1.125rem;
 }
 
 .search-close:hover,
 .search-close:focus {
   text-decoration: none;
-  background: var(--grey-54);
+  background: var(--bs-gray-600);
   color: var(--bs-white);
 }
 
@@ -1885,7 +1870,7 @@ a.ui-button:active,
   list-style-type: none;
   margin: 0 -1.5625rem;
   padding: 0 1.5625rem;
-  border-bottom: 1px solid var(--grey-78);
+  border-bottom: 1px solid var(--bs-gray-400);
   white-space: nowrap;
 }
 
@@ -1923,8 +1908,8 @@ a.ui-button:active,
 .search-result-list > li {
   padding: 1.25rem 0;
   margin: 0;
-  border-top: 1px solid var(--grey-78);
-  border-bottom: 1px solid var(--grey-78);
+  border-top: 1px solid var(--bs-gray-400);
+  border-bottom: 1px solid var(--bs-gray-400);
 }
 
 .search-result-list > li:before,
@@ -2642,7 +2627,7 @@ td .tactivity-accept {
   margin: 0 auto;
   padding: 1rem;
   background: var(--bs-body-bg);
-  border: 1px solid var(--grey-87);
+  border: 1px solid var(--bs-gray-300);
   border-radius: 5px;
   box-shadow: 0 0.5rem 1.5rem rgba(var(--bs-black-rgb), 0.16);
 }
@@ -2704,7 +2689,7 @@ td .tactivity-accept {
   width: 15em;
   border: 0;
   border-radius: 0;
-  border-bottom: 1px dotted var(--grey-78);
+  border-bottom: 1px dotted var(--bs-gray-400);
   padding: 0;
   padding-left: 0.375rem
 }

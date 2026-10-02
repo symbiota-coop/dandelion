@@ -80,7 +80,7 @@
     </td>
     <% timetable.spaces.order('o asc').each { |space| tactivity = tactivities_by_tslot_space[[tslot.id, space.id]] %>
     <td>
-      <div class="tactivity-accept" style="background: var(--grey-87);" <% if tactivity %> data-tactivity-id="<%= tactivity.id %>"<% end %> data-tslot-id="<%= tslot.id %>" data-space-id="<%= space.id %>">
+      <div class="tactivity-accept" style="background: var(--bs-gray-300);" <% if tactivity %> data-tactivity-id="<%= tactivity.id %>"<% end %> data-tslot-id="<%= tslot.id %>" data-space-id="<%= space.id %>">
         <% if tactivity %>
           <%= partial :'timetables/tactivity', object: tactivity %>
         <% end %>

@@ -44,7 +44,7 @@
   font-size: 1.75rem;
   margin: 0 0 0.75rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--grey-87);
+  border-bottom: 2px solid var(--bs-gray-300);
 }
 
 #doc-body h2,
@@ -53,7 +53,7 @@
   font-size: 1.35rem;
   margin: 2.25rem 0 0.7rem;
   padding-bottom: 0.35rem;
-  border-bottom: 1px solid var(--grey-87);
+  border-bottom: 1px solid var(--bs-gray-300);
 }
 
 #doc-body h3,
@@ -184,7 +184,7 @@
 
 .doc-toc-mobile {
   margin: 0 0 1.25rem;
-  border: 1px solid var(--grey-87);
+  border: 1px solid var(--bs-gray-300);
   border-radius: 0.4rem;
   padding: 0.55rem 0.85rem;
   background: var(--bs-tertiary-bg);
@@ -274,7 +274,7 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  scrollbar-color: var(--grey-73) transparent;
+  scrollbar-color: var(--bs-gray-500) transparent;
 }
 
 #sticky-index .doc-index-headings::-webkit-scrollbar {
@@ -282,7 +282,7 @@
 }
 
 #sticky-index .doc-index-headings::-webkit-scrollbar-thumb {
-  background: var(--grey-73);
+  background: var(--bs-gray-500);
   border-radius: 4px;
 }
 
@@ -381,7 +381,7 @@
 .doc-search-result {
   display: block;
   padding: 0.75rem 0;
-  border-bottom: 1px solid var(--grey-87);
+  border-bottom: 1px solid var(--bs-gray-300);
   color: var(--bs-body-color);
   text-decoration: none;
 }

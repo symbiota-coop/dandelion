@@ -1,5 +1,5 @@
 <%# Chart segments rotate the hue of --color-chart, resolved in the browser by cssColor %>
-<% chart_color = ->(degrees) { degrees.finite? ? "hsl(from var(--color-chart) calc(h + #{degrees.round(2)}) s l)" : 'var(--grey-93)' } %>
+<% chart_color = ->(degrees) { degrees.finite? ? "hsl(from var(--color-chart) calc(h + #{degrees.round(2)}) s l)" : 'var(--bs-gray-200)' } %>
 
 <% if defined?(memberships) %>
   <h2>Followers</h2>

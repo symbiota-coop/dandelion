@@ -40,7 +40,7 @@
 }
 
 .widget-chat-message {
-  background: var(--grey-92);
+  background: var(--bs-gray-200);
   color: var(--bs-black);
   padding: 0.375rem 0.625rem;
   position: relative;
@@ -65,7 +65,7 @@
 .widget-chat-status {
   font-size: 0.5625rem;
   font-weight: 500;
-  color: var(--grey-54);
+  color: var(--bs-gray-600);
   line-height: 1rem;
 }
 
@@ -81,8 +81,8 @@
 .widget-chat-message.last:before {
   content: "";
   border: 0.3125rem solid transparent;
-  border-bottom-color: var(--grey-92);
-  border-right-color: var(--grey-92);
+  border-bottom-color: var(--bs-gray-200);
+  border-right-color: var(--bs-gray-200);
   position: absolute;
   left: -0.25rem;
   bottom: 0.1875rem;

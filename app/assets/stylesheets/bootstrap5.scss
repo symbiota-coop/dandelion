@@ -28,25 +28,25 @@ $card-cap-padding-y: .75rem;
 $card-cap-padding-x: 1.25rem;
 $table-bg: transparent;
 $hr-opacity: 1;
-$input-group-addon-bg: #e9ecef;
-$input-group-addon-color: #495057;
+$input-group-addon-bg: #e9ecef; // gray-200
+$input-group-addon-color: #495057; // gray-700
 $enable-smooth-scroll: false;
 $enable-rfs: false;
 
 // Dandelion's look
-$body-secondary-color: #8A8A8F; // text-body-secondary and form-text
-$body-secondary-bg: #EFEFF4; // --bs-secondary-bg: hovered nav links, switches when off
-$body-tertiary-bg: #F5F5F5; // --bs-tertiary-bg: wells, hovered dropdown and list items
+$body-secondary-color: #6c757d; // gray-600: text-body-secondary and form-text
+$body-secondary-bg: #e9ecef; // gray-200 (--bs-secondary-bg): hovered nav links, switches when off
+$body-tertiary-bg: #f8f9fa; // gray-100 (--bs-tertiary-bg): wells, hovered dropdown and list items
 $input-placeholder-color: rgba(33, 37, 41, .75); // as before $body-secondary-color changed
-$hr-border-color: #C8C7CC;
+$hr-border-color: #ced4da; // gray-400
 $input-color: #000;
-$input-border-color: #C8C7CC;
+$input-border-color: #ced4da; // gray-400
 $input-font-size: .825rem;
 $input-focus-border-color: var(--theme-500);
 $input-focus-box-shadow: 0 0 0 2px rgba(var(--theme-500-rgb), .6);
 $form-select-focus-box-shadow: $input-focus-box-shadow;
 $form-check-input-width: 1.3em;
-$form-check-input-border: 1px solid #C8C7CC;
+$form-check-input-border: 1px solid #ced4da; // gray-400
 $form-check-input-border-radius: .25rem;
 $form-check-margin-bottom: .5rem;
 // Label-less switches, a little bigger than Bootstrap's, with a white, shadowed knob whether off, focused or on
@@ -75,9 +75,9 @@ $table-cell-padding-y: .5rem;
 $table-cell-padding-x: .5rem;
 $table-cell-padding-y-sm: .5rem; // small tables aren't any tighter
 $table-cell-padding-x-sm: .5rem;
-$table-border-color: #e0e0e0;
-$table-hover-bg: #efeff4;
-$table-striped-bg: #eee;
+$table-border-color: #dee2e6; // gray-300
+$table-hover-bg: #e9ecef; // gray-200
+$table-striped-bg: #e9ecef; // gray-200
 $pagination-color: #000;
 $pagination-bg: transparent;
 $pagination-border-color: transparent;
@@ -85,13 +85,13 @@ $pagination-border-radius: .375rem;
 $pagination-margin-start: .1875rem;
 $pagination-hover-color: #000;
 $pagination-hover-bg: transparent;
-$pagination-hover-border-color: #C8C7CC;
+$pagination-hover-border-color: #ced4da; // gray-400
 $pagination-focus-color: #000;
 $pagination-focus-bg: transparent;
 $pagination-active-color: #000;
 $pagination-active-bg: transparent;
-$pagination-active-border-color: #8a8a8f;
-$pagination-disabled-color: #8a8a8f;
+$pagination-active-border-color: #6c757d; // gray-600
+$pagination-disabled-color: #6c757d; // gray-600
 $pagination-disabled-bg: transparent;
 $pagination-disabled-border-color: transparent;
 
