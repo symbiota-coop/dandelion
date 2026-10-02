@@ -4,9 +4,10 @@ module MonthlyContributionsCalculator
     'direct_stripe_charges' => 'Direct Stripe charges',
     'stripe_connect_application_fees' => 'Stripe Connect application fees'
   }.freeze
+  # CSS colours, resolved in the browser by cssColor
   BREAKDOWN_COLORS = {
-    'direct_stripe_charges' => 'rgba(0, 175, 94, 0.92)',
-    'stripe_connect_application_fees' => 'rgba(58, 190, 130, 0.88)'
+    'direct_stripe_charges' => 'oklch(from var(--theme-500) l c h / 0.92)',
+    'stripe_connect_application_fees' => 'oklch(from var(--theme-400) l c h / 0.88)'
   }.freeze
 
   def self.calculate

@@ -3,15 +3,15 @@
      style="
      text-decoration: none;
      height: 10rem; overflow: hidden;
-     <% if !image %>border: 0.175rem solid #212529; background: white;<% end %>
-     <% if image %>background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('<%= image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>
+     <% if !image %>border: 0.175rem solid var(--bs-body-color); background: var(--bs-white);<% end %>
+     <% if image %>background: linear-gradient( rgba(var(--bs-black-rgb), 0.5), rgba(var(--bs-black-rgb), 0.5) ), url('<%= image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>
      ">
   <% else %>
     <div class="p-2 d-block block"
      style="
      height: 10rem; overflow: hidden;
-     <% if !image %>border: 0.175rem solid #212529; background: white;<% end %>
-     <% if image %>background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('<%= image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>
+     <% if !image %>border: 0.175rem solid var(--bs-body-color); background: var(--bs-white);<% end %>
+     <% if image %>background: linear-gradient( rgba(var(--bs-black-rgb), 0.5), rgba(var(--bs-black-rgb), 0.5) ), url('<%= image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>
      ">
     <% end %>
     <table class="w-100 h-100">

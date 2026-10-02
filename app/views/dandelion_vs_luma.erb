@@ -28,8 +28,8 @@
   }
 
   .reason-card {
-    background: #fff;
-    border: 1px solid rgba(0,0,0,0.08);
+    background: var(--bs-white);
+    border: 1px solid rgba(var(--bs-black-rgb), 0.08);
     border-radius: 0.75rem;
     padding: 2rem;
     height: 100%;
@@ -37,7 +37,7 @@
   }
   .reason-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 24px rgba(var(--bs-black-rgb), 0.1);
   }
 
   .reason-number {
@@ -50,7 +50,7 @@
     font-size: 1.1rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    color: #fff;
+    color: var(--bs-white);
   }
 
   .reason-icon {
@@ -67,22 +67,22 @@
   .section-heading { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
   @media(min-width: 992px) { .section-heading { font-size: 2vw; } }
   .section-divider { width: 3rem; height: 3px; border-radius: 2px; margin-bottom: 1.5rem; }
-  .section-divider.magenta { background: linear-gradient(90deg, #B900A1, #e84dc4); }
+  .section-divider.magenta { background: linear-gradient(90deg, var(--color-magenta), var(--color-magenta-light)); }
 
   .reasons-section {
-    background: linear-gradient(to bottom, #ffffff 30%, #f4e6f5);
+    background: linear-gradient(to bottom, var(--bs-white) 30%, var(--wash-magenta));
   }
 
   .cta-section {
     background:
-      radial-gradient(ellipse at 15% 80%, rgba(68,0,185,0.5) 0%, transparent 50%),
-      radial-gradient(ellipse at 85% 20%, rgba(185,0,161,0.4) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 50%, rgba(124,60,230,0.3) 0%, transparent 60%),
-      linear-gradient(to bottom, #5a1fd6, #4c10c0 30%, #4400B9 60%, #3a0099 100%);
-    color: #fff;
+      radial-gradient(ellipse at 15% 80%, oklch(from var(--color-highlight-1) l c h / 0.5) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 20%, oklch(from var(--color-magenta) l c h / 0.4) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, oklch(from var(--color-violet) l c h / 0.3) 0%, transparent 60%),
+      linear-gradient(to bottom, oklch(from var(--color-highlight-1) calc(l + 0.08) c h), oklch(from var(--color-highlight-1) calc(l + 0.03) c h) 30%, var(--color-highlight-1) 60%, oklch(from var(--color-highlight-1) calc(l - 0.05) c h) 100%);
+    color: var(--bs-white);
   }
-  .cta-section .btn-light:focus { color: #212529; }
-  .cta-section .btn-outline-light:hover { background: #fff; color: #4400B9; }
+  .cta-section .btn-light:focus { color: var(--bs-body-color); }
+  .cta-section .btn-outline-light:hover { background: var(--bs-white); color: var(--color-highlight-1); }
 </style>
 
 <!-- Hero -->
@@ -108,8 +108,8 @@
     <% [
       {
         number: 1,
-        color: '#B900A1',
-        bg: 'rgba(185,0,161,0.1)',
+        color: 'color-mix(in srgb, var(--color-magenta), var(--color-highlight-1) 0%)',
+        bg: 'oklch(from color-mix(in srgb, var(--color-magenta), var(--color-highlight-1) 0%) l c h / 0.1)',
         icon: 'bi-gift',
         title: 'No platform fees, ever',
         desc: 'Luma charges a 5% platform fee on paid tickets, or $59/month to remove it. On Dandelion, there are no platform fees, full stop. You only pay what the payment processor charges. That means more money goes directly to you and your event.',
@@ -117,8 +117,8 @@
       },
       {
         number: 2,
-        color: '#9D00AD',
-        bg: 'rgba(157,0,173,0.1)',
+        color: 'color-mix(in srgb, var(--color-magenta), var(--color-highlight-1) 25%)',
+        bg: 'oklch(from color-mix(in srgb, var(--color-magenta), var(--color-highlight-1) 25%) l c h / 0.1)',
         icon: 'bi-star',
         title: 'Reputation, feedback and AI summaries',
         desc: 'On Dandelion, attendee ratings are public, building a visible reputation for you as an organiser, and AI-powered summaries surface actionable insights from your feedback. Luma has feedback too, but it\'s hidden and doesn\'t build reputation.',
@@ -126,8 +126,8 @@
       },
       {
         number: 3,
-        color: '#8000B5',
-        bg: 'rgba(128,0,181,0.1)',
+        color: 'color-mix(in srgb, var(--color-magenta), var(--color-highlight-1) 50%)',
+        bg: 'oklch(from color-mix(in srgb, var(--color-magenta), var(--color-highlight-1) 50%) l c h / 0.1)',
         icon: 'bi-image',
         title: 'Full-width event banners',
         desc: 'Dandelion gives your events the visual impact they deserve with full-width banner images that make your event page stand out. On Luma, your event imagery is constrained to a small box at the top of the page.',
@@ -135,8 +135,8 @@
       },
       {
         number: 4,
-        color: '#6200B7',
-        bg: 'rgba(98,0,183,0.1)',
+        color: 'color-mix(in srgb, var(--color-magenta), var(--color-highlight-1) 75%)',
+        bg: 'oklch(from color-mix(in srgb, var(--color-magenta), var(--color-highlight-1) 75%) l c h / 0.1)',
         icon: 'bi-people',
         title: 'Run by a worker co-op, not venture capital',
         desc: 'Luma is a VC-backed startup that needs to generate returns for investors. Dandelion is owned and run by the people who build it, a UK-based not-for-profit worker co-op. Our incentives are aligned with yours: making the best possible platform for event organisers.',
@@ -144,8 +144,8 @@
       },
       {
         number: 5,
-        color: '#4400B9',
-        bg: 'rgba(68,0,185,0.1)',
+        color: 'color-mix(in srgb, var(--color-magenta), var(--color-highlight-1) 100%)',
+        bg: 'oklch(from color-mix(in srgb, var(--color-magenta), var(--color-highlight-1) 100%) l c h / 0.1)',
         icon: 'bi-code-square',
         title: 'Fair source and open data',
         desc: 'Luma is a closed platform. Dandelion\'s code is fair source and events are cross-posted to ATProto, so your content isn\'t locked away in a walled garden. At the same time, Dandelion takes privacy seriously: we\'re security audited and fully GDPR-compliant.',

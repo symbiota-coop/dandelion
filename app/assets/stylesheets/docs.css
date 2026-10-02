@@ -91,13 +91,13 @@
 
 #doc-body a,
 .docs-deepwiki-answer a {
-  color: var(--theme-color);
+  color: var(--theme-500);
 }
 
 #doc-body a:hover, #doc-body a:focus,
 .docs-deepwiki-answer a:hover,
 .docs-deepwiki-answer a:focus {
-  color: var(--theme-color-hover);
+  color: var(--theme-600);
 }
 
 #doc-body p.action a,
@@ -160,7 +160,7 @@
 .doc-transcript summary {
   cursor: pointer;
   font-size: 0.9rem;
-  color: var(--theme-color);
+  color: var(--theme-500);
   font-family: var(--header-font-family);
 }
 
@@ -235,12 +235,12 @@
 }
 
 .doc-link:hover, .doc-link:focus {
-  color: var(--theme-color);
+  color: var(--theme-500);
   text-decoration: none;
 }
 
 .doc-link.is-active {
-  border-left-color: var(--theme-color);
+  border-left-color: var(--theme-500);
   color: var(--bs-body-color);
 }
 
@@ -392,7 +392,7 @@
 }
 
 .doc-search-result:hover .doc-search-heading, .doc-search-result:focus .doc-search-heading {
-  color: var(--theme-color);
+  color: var(--theme-500);
 }
 
 .doc-search-page {

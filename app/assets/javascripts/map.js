@@ -50,12 +50,12 @@ window.DandelionMap = {
 
   // Model configurations for map markers
   models: [
-    { name: 'Account', color: '#00AF5E', icon: 'bi bi-person-fill' },
-    { name: 'ActivityApplication', color: '#00AF5E', icon: 'bi bi-person-fill' },
-    { name: 'Event', color: '#FF5241', icon: 'bi bi-calendar-event' },
-    { name: 'Gathering', color: '#00AF5E', icon: 'bi bi-people-fill' },
-    { name: 'Organisation', color: '#FF5241', icon: 'bi bi-flag-fill' },
-    { name: 'Organisationship', color: '#00AF5E', icon: 'bi bi-person-fill' }
+    { name: 'Account', color: 'var(--theme-500)', icon: 'bi bi-person-fill' },
+    { name: 'ActivityApplication', color: 'var(--theme-500)', icon: 'bi bi-person-fill' },
+    { name: 'Event', color: 'var(--red-400)', icon: 'bi bi-calendar-event' },
+    { name: 'Gathering', color: 'var(--theme-500)', icon: 'bi bi-people-fill' },
+    { name: 'Organisation', color: 'var(--red-400)', icon: 'bi bi-flag-fill' },
+    { name: 'Organisationship', color: 'var(--theme-500)', icon: 'bi bi-person-fill' }
   ],
 
   dynamicLoadingTimeout: 500,
@@ -175,7 +175,7 @@ window.DandelionMap = {
         position: new google.maps.LatLng(point.lat, point.lng),
         icon: {
           path: mapIcons.shapes.MAP_PIN,
-          fillColor: modelConfig.color,
+          fillColor: cssColor(modelConfig.color),
           fillOpacity: 1,
           strokeColor: '',
           strokeWeight: 0

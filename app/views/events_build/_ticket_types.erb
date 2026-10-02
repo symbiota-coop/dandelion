@@ -4,20 +4,20 @@
 %>
 
 <style>
-  .ticket_type { position: relative; border: 1px solid #DADADE; border-radius: 5px; cursor: grab; }
+  .ticket_type { position: relative; border: 1px solid var(--grey-86); border-radius: 5px; cursor: grab; }
   .ticket_type.ui-sortable-helper { cursor: grabbing; }
   .ticket_type .ticket-type-grip {
     position: absolute;
     right: 0.35rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #adb5bd;
+    color: var(--bs-gray-500);
     font-size: 1.1rem;
     line-height: 1;
     opacity: 0.45;
     pointer-events: none;
   }
-  .ticket_type:hover .ticket-type-grip { color: #6c757d; opacity: 1; }
+  .ticket_type:hover .ticket-type-grip { color: var(--bs-gray-600); opacity: 1; }
   .ticket_type .remove-ticket-type { position: absolute; right: 0; top: 0; }
 </style>
 

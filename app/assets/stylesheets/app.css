@@ -59,29 +59,52 @@
   --grey-7: #111111;
   --grey-13: #222;
   --grey-20: #333;
+  --grey-27: #444;
   --grey-40: #666;
   --grey-47: #777;
   --grey-54: #8A8A8F;
   --grey-60: #999;
   --grey-73: #bbb;
   --grey-78: #C8C7CC;
+  --grey-80: #ccc;
+  --grey-86: #DADADE;
   --grey-87: #ddd;
   --grey-92: #EAE9EF;
   --grey-93: #eee;
   --color-signal: #3B45FE;
   --color-signal-dark: #2a32d4;
   --color-stripe: #6158F7;
+  /* Payment providers, for the badge-payment-* classes */
+  --color-coinbase: #2D53F1;
+  --color-mollie: #000;
+  --color-paypal: #003087;
+  --color-gocardless: #1C1B18;
+  --color-gocardless-text: #F1F252;
+  --color-opencollective: var(--bs-gray-600);
+  --color-evm: var(--bs-gray-600);
   --color-search-highlight: #FDFFAA;
   --color-yellow: #FFCC00;
   --color-yellow-light: #ffd322;
   --color-star: #f5b041;
+  /* Base for chart segments, whose hues rotate from it */
+  --color-chart: #57B98C;
+  /* Marketing pages (features, comparisons) */
+  --color-magenta: #B900A1;
+  --color-magenta-light: #e84dc4;
+  --color-rose: #d94f6e;
+  --color-rose-light: #f0889a;
+  --color-violet: #7c5ce7;
+  --wash-amber: #fdf0dc;
+  --wash-rose: #fce8e6;
+  --wash-magenta: #f4e6f5;
+  --wash-purple: #ece0f0;
   /* Warm amber for map areas and the features page */
   --color-amber: #FBAE3B;
   --color-amber-light: #fcc56e;
   --color-amber-dark: #d99520;
   --gradient-active: linear-gradient(135deg, #fd7514 0%, #efe707 100%);
   --gradient-rainbow: radial-gradient(circle at 0 0, #099ef1 0%, #6863f8 18.82%, #d84ffa 32.6%, #f058c5 52.83%, #ff4f90 68.03%, #ff6558 87.66%, #ff891f 100%);
-  accent-color: var(--theme-color);
+  accent-color: var(--theme-500);
 }
 
 /* Colour ramps, generated with oklch() so steps at the same lightness look equally light across hues.
@@ -98,14 +121,6 @@
   --theme-800: oklch(from var(--theme-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
   /* Black or white, whichever reads better on the 500 */
   --theme-on-500: oklch(from var(--theme-500) clamp(0, (0.65 - l) * 1000, 1) 0 0);
-  /* Older names, kept as aliases */
-  --theme-color: var(--theme-500);
-  --theme-color-light: var(--theme-400);
-  --theme-color-hover: var(--theme-600);
-  --theme-color-hover-light: var(--theme-500);
-  --theme-color-darker: var(--theme-800);
-  --theme-color-tint: var(--theme-50);
-  --theme-color-tint-strong: var(--theme-200);
 }
 
 :root {
@@ -211,7 +226,7 @@
   right: 0;
   top: 0;
   z-index: 1020;
-  box-shadow: 0 0.125rem 2.5rem 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0.125rem 2.5rem 0 rgba(var(--bs-black-rgb), 0.08);
 }
 
 .header .container-fluid {
@@ -558,7 +573,7 @@
    ========================================================================== */
 
 .sidebar .sidebar-dropdown {
-  --bs-dropdown-bg: rgba(0, 0, 0, 0.8);
+  --bs-dropdown-bg: rgba(var(--bs-black-rgb), 0.8);
   --bs-dropdown-link-color: var(--grey-60);
   --bs-dropdown-link-hover-color: var(--bs-white);
   --bs-dropdown-link-hover-bg: transparent;
@@ -823,7 +838,7 @@ body.greyed #content {
 }
 
 .btn-primary .badge {
-  color: var(--theme-color);
+  color: var(--theme-500);
 }
 
 .badge-default,
@@ -834,8 +849,8 @@ body.greyed #content {
 
 .badge-primary,
 .label-primary {
-  --badge-color: var(--theme-color);
-  --badge-color-light: var(--theme-color-light);
+  --badge-color: var(--theme-500);
+  --badge-color-light: var(--theme-400);
 }
 
 .badge-warning {
@@ -859,6 +874,20 @@ body.greyed #content {
 .label-inverse {
   --badge-color: var(--bs-black);
   --badge-color-light: var(--grey-7);
+}
+
+/* Payment method badges, named after the method in lib/payment_methods/event_payment_methods.rb */
+.badge-payment-coinbase { --payment-bg: var(--color-coinbase); }
+.badge-payment-mollie { --payment-bg: var(--color-mollie); }
+.badge-payment-paypal { --payment-bg: var(--color-paypal); }
+.badge-payment-gocardless-instant,
+.badge-payment-gocardless-instalment { --payment-bg: var(--color-gocardless); --payment-text: var(--color-gocardless-text); }
+.badge-payment-opencollective { --payment-bg: var(--color-opencollective); }
+.badge-payment-evm { --payment-bg: var(--color-evm); }
+
+.badge[class*="badge-payment-"] {
+  background: var(--payment-bg);
+  color: var(--payment-text, var(--bs-white));
 }
 
 /* Coloured badges and labels are gradients from their colour to a lighter one */
@@ -899,17 +928,17 @@ body.greyed #content {
 
 /* Primary and danger buttons are gradients, to a lighter colour, over Bootstrap's --bs-btn-* colours */
 .btn-primary {
-  --bs-btn-bg: var(--theme-color);
-  --bs-btn-border-color: var(--theme-color);
-  --bs-btn-hover-bg: var(--theme-color-hover);
-  --bs-btn-hover-border-color: var(--theme-color-hover);
-  --bs-btn-active-bg: var(--theme-color-hover);
-  --bs-btn-active-border-color: var(--theme-color-hover);
-  --bs-btn-disabled-bg: var(--theme-color);
-  --bs-btn-disabled-border-color: var(--theme-color);
+  --bs-btn-bg: var(--theme-500);
+  --bs-btn-border-color: var(--theme-500);
+  --bs-btn-hover-bg: var(--theme-600);
+  --bs-btn-hover-border-color: var(--theme-600);
+  --bs-btn-active-bg: var(--theme-600);
+  --bs-btn-active-border-color: var(--theme-600);
+  --bs-btn-disabled-bg: var(--theme-500);
+  --bs-btn-disabled-border-color: var(--theme-500);
   --bs-btn-focus-shadow-rgb: var(--theme-500-rgb);
-  --btn-gradient-end: var(--theme-color-light);
-  --btn-hover-gradient-end: var(--theme-color-hover-light);
+  --btn-gradient-end: var(--theme-400);
+  --btn-hover-gradient-end: var(--theme-500);
 }
 
 .btn-danger {
@@ -933,29 +962,29 @@ body.greyed #content {
 }
 
 .btn-outline-primary {
-  --bs-btn-color: var(--theme-color);
-  --bs-btn-border-color: var(--theme-color);
-  --bs-btn-hover-bg: var(--theme-color);
-  --bs-btn-hover-border-color: var(--theme-color);
-  --bs-btn-active-bg: var(--theme-color);
-  --bs-btn-active-border-color: var(--theme-color);
-  --bs-btn-disabled-color: var(--theme-color);
-  --bs-btn-disabled-border-color: var(--theme-color);
+  --bs-btn-color: var(--theme-500);
+  --bs-btn-border-color: var(--theme-500);
+  --bs-btn-hover-bg: var(--theme-500);
+  --bs-btn-hover-border-color: var(--theme-500);
+  --bs-btn-active-bg: var(--theme-500);
+  --bs-btn-active-border-color: var(--theme-500);
+  --bs-btn-disabled-color: var(--theme-500);
+  --bs-btn-disabled-border-color: var(--theme-500);
   --bs-btn-focus-shadow-rgb: var(--theme-500-rgb);
 }
 
 /* Bootstrap components that use the primary colour */
 .nav-pills {
-  --bs-nav-pills-link-active-bg: var(--theme-color);
+  --bs-nav-pills-link-active-bg: var(--theme-500);
 }
 
 .list-group {
-  --bs-list-group-active-bg: var(--theme-color);
-  --bs-list-group-active-border-color: var(--theme-color);
+  --bs-list-group-active-bg: var(--theme-500);
+  --bs-list-group-active-border-color: var(--theme-500);
 }
 
 .progress {
-  --bs-progress-bar-bg: var(--theme-color);
+  --bs-progress-bar-bg: var(--theme-500);
 }
 
 .form-check-input:focus {
@@ -971,18 +1000,18 @@ body.greyed #content {
 }
 
 .form-check-input:checked {
-  background-color: var(--theme-color);
-  border-color: var(--theme-color);
+  background-color: var(--theme-500);
+  border-color: var(--theme-500);
 }
 
 .form-range::-webkit-slider-thumb,
 .form-range::-webkit-slider-thumb:active {
-  background-color: var(--theme-color);
+  background-color: var(--theme-500);
 }
 
 .form-range::-moz-range-thumb,
 .form-range::-moz-range-thumb:active {
-  background-color: var(--theme-color);
+  background-color: var(--theme-500);
 }
 
 .btn-close {
@@ -1002,7 +1031,7 @@ body.greyed #content {
 
 .quick-color-btn:hover {
   transform: scale(1.1);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(var(--bs-black-rgb), 0.2);
 }
 
 .quick-color-btn:focus, .quick-color-btn.selected {
@@ -1026,7 +1055,7 @@ body.greyed #content {
   background-color: var(--color-signal-dark) !important;
   border-color: var(--color-signal-dark) !important;
   color: var(--bs-white) !important;
-  box-shadow: 0 0 0 0.2rem rgba(59, 69, 254, 0.25) !important;
+  box-shadow: 0 0 0 0.2rem oklch(from var(--color-signal) l c h / 0.25) !important;
 }
 
 #donation-percent-buttons .btn {
@@ -1061,14 +1090,14 @@ body.greyed #content {
    ========================================================================== */
 
 .dropdown-menu {
-  border-color: rgba(0, 0, 0, 0.05);
+  border-color: rgba(var(--bs-black-rgb), 0.05);
   float: none;
   right: auto;
   margin-top: 0;
   --bs-dropdown-font-size: 0.825rem;
-  --bs-dropdown-link-active-bg: var(--theme-color);
+  --bs-dropdown-link-active-bg: var(--theme-500);
   border-radius: 0.5rem;
-  box-shadow: 0 0.125rem 0.375rem 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0.125rem 0.375rem 1px rgba(var(--bs-black-rgb), 0.1);
   z-index: 9999
 }
 
@@ -1095,7 +1124,7 @@ body.greyed #content {
 
 .dropdown-menu:before {
   top: -1.3125rem;
-  border-bottom-color: rgba(0, 0, 0, 0.1);
+  border-bottom-color: rgba(var(--bs-black-rgb), 0.1);
 }
 
 .dropdown .dropdown-menu.show {
@@ -1169,9 +1198,9 @@ body.greyed #content {
 .nav-crumbs .btn {
   --bs-btn-bg: oklch(from var(--theme-500) l c h / 0.1);
   --bs-btn-hover-bg: oklch(from var(--theme-500) l c h / 0.2);
-  --bs-btn-hover-color: var(--theme-color);
+  --bs-btn-hover-color: var(--theme-500);
   --bs-btn-active-bg: oklch(from var(--theme-500) l c h / 0.2);
-  --bs-btn-active-color: var(--theme-color);
+  --bs-btn-active-color: var(--theme-500);
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -1270,7 +1299,7 @@ body.greyed #content {
 
 .message-preview:hover,
 .message-preview.active {
-  background: rgba(200, 199, 204, 0.3)
+  background: oklch(from var(--grey-78) l c h / 0.3)
 }
 
 .message-preview.unread {
@@ -1545,8 +1574,8 @@ label.remove-image input {
 
 .label-outline-primary,
 .badge-outline-primary {
-  color: var(--theme-color);
-  border: 1px solid var(--theme-color);
+  color: var(--theme-500);
+  border: 1px solid var(--theme-500);
 }
 
 div.block-title .label {
@@ -1765,7 +1794,7 @@ body .table > tfoot > tr > th {
   border: none !important;
   font-size: 0.825rem;
   padding: 0.9375rem 0;
-  box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0.125rem 0.375rem rgba(var(--bs-black-rgb), 0.3);
   border-radius: 0;
 }
 
@@ -1954,7 +1983,7 @@ a.ui-button:active,
 
 .search {
   background: var(--bs-tertiary-bg);
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+  box-shadow: 0 0.125rem 0.25rem rgba(var(--bs-black-rgb), 0.075) !important;
 }
 
 .search .form-check-inline {
@@ -1980,7 +2009,7 @@ a.ui-button:active,
 }
 
 .search .form-check-inline:has(:checked) {
-  box-shadow: inset 0 0 0 1px var(--theme-color);
+  box-shadow: inset 0 0 0 1px var(--theme-500);
 }
 
 .search-result-list>li {
@@ -2057,13 +2086,13 @@ a {
 /* Not .btn: Bootstrap 5 buttons have no :focus colour, so this would turn a clicked <a class="btn"> the link colour */
 a:where(:not(.btn)):focus,
 a:where(:not(.btn)):hover {
-  color: var(--link-hover-color, var(--theme-color-hover));
+  color: var(--link-hover-color, var(--theme-600));
   outline: none;
 }
 
 a.text-primary:hover,
 a.text-primary:focus {
-  color: var(--theme-color-hover) !important
+  color: var(--theme-600) !important
 }
 
 h1,
@@ -2171,7 +2200,7 @@ body[contenteditable] {
 
 .subtle.active,
 .subtle:hover {
-  color: var(--theme-color) !important
+  color: var(--theme-500) !important
 }
 
 h4.block-title,
@@ -2236,12 +2265,12 @@ small.form-text {
 
 .text-bg-primary,
 .progress-bar {
-  background: linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-light) 100%) !important;
+  background: linear-gradient(135deg, var(--theme-500) 0%, var(--theme-500) 50%, var(--theme-400) 100%) !important;
   border: none !important;
 }
 
 .bg-primary-hover {
-  background-color: var(--theme-color-hover) !important
+  background-color: var(--theme-600) !important
 }
 
 /* ==========================================================================
@@ -2282,8 +2311,8 @@ small.form-text {
 .flatpickr-day.selected.nextMonthDay,
 .flatpickr-day.startRange.nextMonthDay,
 .flatpickr-day.endRange.nextMonthDay {
-  background: var(--theme-color);
-  border-color: var(--theme-color)
+  background: var(--theme-500);
+  border-color: var(--theme-500)
 }
 
 /* ==========================================================================
@@ -2439,7 +2468,7 @@ table.event-details td {
 }
 
 .event-detail:hover {
-  background-color: var(--theme-color);
+  background-color: var(--theme-500);
 }
 
 .event-detail:hover img {
@@ -2478,12 +2507,12 @@ table.event-details td {
   left: 15px;
   right: 15px;
   height: 1px;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(var(--bs-black-rgb), 0.1);
 }
 
 .newsfeed-icon {
   font-size: 16px;
-  color: var(--theme-color);
+  color: var(--theme-500);
   background-color: oklch(from var(--theme-500) l c h / 0.1);
   width: 2.25em;
   height: 2.25em;
@@ -2615,7 +2644,7 @@ td .tactivity-accept {
   background: var(--bs-body-bg);
   border: 1px solid var(--grey-87);
   border-radius: 5px;
-  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.16);
+  box-shadow: 0 0.5rem 1.5rem rgba(var(--bs-black-rgb), 0.16);
 }
 
 .cookie-consent h2 {
@@ -2734,7 +2763,7 @@ img.private:hover {
 
 /* Match the pre-Bootstrap 5 flicker: a faint grey a full line high, fading from opacity 1 to 0.5 */
 .placeholder {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(var(--bs-black-rgb), 0.1);
   opacity: 1;
   min-height: 1lh;
 }
@@ -2751,7 +2780,7 @@ p.action {
 
 p.action a {
   display: inline-block;
-  background: var(--theme-color) !important;
+  background: var(--theme-500) !important;
   color: var(--bs-white);
   text-decoration: none;
   padding: 10px;
@@ -2759,7 +2788,7 @@ p.action a {
 }
 
 p.action a:hover {
-  background: var(--theme-color-hover) !important;
+  background: var(--theme-600) !important;
 }
 
 .icon-list {

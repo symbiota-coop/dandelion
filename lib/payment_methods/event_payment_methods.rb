@@ -6,7 +6,7 @@ class EventPaymentMethod
   end
 
   attr_accessor :name, :label, :outline, :visible, :event_condition, :org_condition, :process, :partial,
-                :provider_name, :badge_class, :badge_background, :badge_color, :badge_text, :identity_fields,
+                :provider_name, :badge_text, :identity_fields,
                 :payment_id_field, :refund, :purchase_errors, :card, :complimentary, :platform_donations,
                 :dashboard_help, :contribution_reminder
 
@@ -21,9 +21,7 @@ class EventPaymentMethod
     @partial = options[:partial]
     @order_currency = options[:order_currency]
     @provider_name = options[:provider_name]
-    @badge_class = options[:badge_class]
-    @badge_background = options[:badge_background]
-    @badge_color = options[:badge_color]
+    @badge = options.fetch(:badge, true)
     @badge_text = options[:badge_text]
     @payment_id_field = options[:payment_id_field]
     @identity_fields = Array(options[:identity_fields] || @payment_id_field)
@@ -139,18 +137,15 @@ class EventPaymentMethod
     record.try(payment_id_field)
   end
 
+  # Colours come from the badge-payment-<name> class in app.css
   def badge(record)
+    return unless @badge
+
     text = badge_text.respond_to?(:call) ? badge_text.call(record) : badge_text
-    text ||= provider_name if badge_class || badge_background
+    text ||= provider_name
     return if text.blank?
 
-    parts = [
-      ("background: #{badge_background} !important" if badge_background),
-      ("color: #{badge_color} !important" if badge_color)
-    ].compact
-    style = parts.join('; ') if parts.any?
-
-    { class: badge_background ? nil : (badge_class || 'bg-secondary'), style: style, text: text }
+    { class: "badge-payment-#{name.dasherize}", text: text }
   end
 end
 
@@ -163,13 +158,13 @@ EventPaymentMethod.new('rsvp',
 
 EventPaymentMethod.new('coinbase',
                        provider_name: 'Coinbase',
-                       badge_background: '#2D53F1',
                        identity_fields: %i[coinbase_checkout_id],
                        org_condition: ->(_org) { false },
                        event_condition: ->(_event) { false })
 
 EventPaymentMethod.new('stripe',
                        label: 'Pay',
+                       badge: false,
                        outline: false,
                        card: true,
                        platform_donations: true,
@@ -191,8 +186,6 @@ EventPaymentMethod.new('stripe',
 EventPaymentMethod.new('mollie',
                        label: 'Pay with Mollie',
                        provider_name: 'Mollie',
-                       badge_background: '#000',
-                       badge_color: '#fff',
                        payment_id_field: :mollie_payment_id,
                        org_condition: ->(org) { org.mollie_api_key },
                        event_condition: ->(event) { FIAT_CURRENCIES.include?(event.currency) },
@@ -207,8 +200,6 @@ EventPaymentMethod.new('mollie',
 EventPaymentMethod.new('paypal',
                        label: 'Pay with PayPal',
                        provider_name: 'PayPal',
-                       badge_background: '#003087',
-                       badge_color: '#fff',
                        identity_fields: %i[paypal_order_id paypal_capture_id],
                        payment_id_field: :paypal_capture_id,
                        org_condition: ->(org) { org.paypal_client_id && org.paypal_secret },
@@ -225,8 +216,6 @@ EventPaymentMethod.new('gocardless_instant',
                        label: 'Pay with GoCardless',
                        provider_name: 'GoCardless',
                        contribution_reminder_label: 'GoCardless Instant Bank Pay',
-                       badge_background: '#1C1B18',
-                       badge_color: '#F1F252',
                        identity_fields: %i[gocardless_payment_request_id gocardless_payment_id],
                        payment_id_field: :gocardless_payment_id,
                        org_condition: ->(org) { org.gocardless_instant_bank_pay && org.gocardless_access_token },
@@ -243,8 +232,6 @@ EventPaymentMethod.new('gocardless_instalment',
                        label: ->(event) { "Pay in #{event.gocardless_instalment_count} monthly instalments" },
                        provider_name: 'GoCardless',
                        contribution_reminder_label: 'GoCardless instalments',
-                       badge_background: '#1C1B18',
-                       badge_color: '#F1F252',
                        badge_text: 'GoCardless instalments',
                        identity_fields: %i[gocardless_billing_request_id],
                        org_condition: ->(org) { org.gocardless_instalments && org.gocardless_access_token },
@@ -261,7 +248,6 @@ EventPaymentMethod.new('gocardless_instalment',
 EventPaymentMethod.new('opencollective',
                        label: 'Pay with Open Collective',
                        provider_name: 'Open Collective',
-                       badge_class: 'bg-secondary',
                        badge_text: ->(record) { "OC: #{record.oc_secret.split('dandelion:').last}" },
                        identity_fields: %i[oc_secret],
                        org_condition: lambda(&:oc_slug),
@@ -273,7 +259,6 @@ EventPaymentMethod.new('evm',
                        label: lambda { |event|
                          event.currency.in?(%w[BREAD USD]) ? 'Pay with BREAD on Gnosis Chain' : "Pay with #{event.chain.try(:name)}"
                        },
-                       badge_class: 'bg-secondary',
                        badge_text: ->(record) { "EVM: #{record.evm_secret}" },
                        identity_fields: %i[evm_secret],
                        org_condition: lambda(&:evm_address),

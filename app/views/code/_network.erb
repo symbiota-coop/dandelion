@@ -2,7 +2,6 @@
   node_min_width = 0
   edge_min_opacity = 0.25
   edge_opacity_scale = 10
-  color = '#00AF5E'
 
   elements = []
 
@@ -15,8 +14,7 @@
         id: model.name.underscore,
         name: model.name,
         weight: w,
-        width: node_min_width + w,
-        color: color
+        width: node_min_width + w
       }
     }
 
@@ -28,7 +26,6 @@
             source: assoc.class_name.underscore,
             target: model.name.underscore,
             weight: 1,
-            color: color,
             opacity: edge_min_opacity + 1.0 / edge_opacity_scale
           }
         }

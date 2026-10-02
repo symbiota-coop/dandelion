@@ -10,7 +10,7 @@
 }
 
 #calendar a.fc-event {
-  color: var(--theme-color) !important;
+  color: var(--theme-500) !important;
 }
 
 .event-detail,

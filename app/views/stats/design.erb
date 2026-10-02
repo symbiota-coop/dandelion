@@ -55,16 +55,17 @@
 
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Ramps</h3>
-        <span class="text-body-secondary">Each generated from one value with <code>oklch()</code>. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints.</span>
+        <h3 class="m-0">Theme and status</h3>
+        <span class="text-body-secondary">Three ramps, each generated from one value with <code>oklch()</code>. Components use the 500, 400 as the gradient end, 600 for hover, 50 to 200 for alert and toast backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints.</span>
+        <%== flags.call(1) %>
       </div>
       <% [
-           ['theme', %w[50 100 200 400 500 600 700 800], { '50' => 'alert and toast background', '200' => 'gradient end', '400' => 'button gradient end', '600' => 'hover', '800' => 'text on tints' }],
-           ['orange', %w[50 100 200 400 500 600 700 800], { '800' => 'warning text' }],
-           ['red', %w[50 100 200 400 500 600 700 800], { '800' => 'danger text' }]
-         ].each do |name, steps, notes| %>
+           ['theme', 'Primary and success · follows each organisation\'s theme', %w[50 100 200 400 500 600 700 800], { '50' => 'alert and toast background', '200' => 'gradient end', '400' => 'button gradient end', '600' => 'hover', '800' => 'text on tints' }],
+           ['orange', 'Warning', %w[50 100 200 400 500 600 700 800], { '800' => 'warning text' }],
+           ['red', 'Danger', %w[50 100 200 400 500 600 700 800], { '800' => 'danger text' }]
+         ].each do |name, role, steps, notes| %>
         <div>
-          <div class="fw-bold mb-1">--<%= name %>-*</div>
+          <div class="mb-1"><span class="fw-bold">--<%= name %>-*</span> <span class="text-body-secondary">· <%= role %></span></div>
           <div class="row g-2">
             <% steps.each do |step| %>
               <div class="col-3 col-md">
@@ -80,37 +81,7 @@
         <span class="rounded px-3 py-2 fw-bold" style="background: var(--theme-500); color: var(--theme-on-500)">--theme-on-500</span>
         <span class="small text-body-secondary">Black or white, whichever reads better on the 500: <code>oklch(from var(--theme-500) clamp(0, (0.65 - l) * 1000, 1) 0 0)</code>. Not yet used; buttons still get white text, so <code>/theme.css</code> darkens light theme colours with <code>clamp_color</code>.</span>
       </div>
-      <div class="small text-body-secondary">The older <code>--theme-color*</code> names remain as aliases: <code>--theme-color</code> 500, <code>-light</code> 400, <code>-hover</code> 600, <code>-darker</code> 800, <code>-tint</code> 50, <code>-tint-strong</code> 200. Bootstrap's <code>rgba(var(--bs-*-rgb))</code> colours need an rgb triplet, so <code>/theme.css</code> also sets <code>--theme-500-rgb</code>.</div>
-    </div>
-
-    <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Status</h3>
-        <span class="text-body-secondary">iOS system colours, from the ramps above. Each uses its 500, 400 (gradient end), a darker step for text, and 50 (alert background).</span>
-        <%== flags.call(1) %>
-      </div>
-      <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-3">
-        <% [
-             ['Success · --theme-500', %w[--theme-500 --theme-400 --theme-800 --theme-50], 'Follows the theme colour'],
-             ['Warning · --orange-500', %w[--orange-500 --orange-400 --orange-800 --orange-50], nil],
-             ['Danger · --red-500', %w[--red-500 --red-400 --red-800 --red-50], nil]
-           ].each do |title, names, note| %>
-          <%# The main colour gets two units of the row, the others one %>
-          <% unit = 12 / (names.length + 1) %>
-          <div class="col">
-            <div class="rounded overflow-hidden mb-1" style="height: 88px">
-              <div class="row g-0 h-100">
-                <% names.each_with_index do |name, i| %>
-                  <div class="col-<%= i.zero? ? unit * 2 : unit %>" style="background: var(<%= name %>)"></div>
-                <% end %>
-              </div>
-            </div>
-            <div class="fw-bold"><%= title %></div>
-            <div class="font-monospace small text-body-secondary"><%== css_vars.call(*names) %></div>
-            <% if note %><div class="small text-body-secondary"><%= note %></div><% end %>
-          </div>
-        <% end %>
-      </div>
+      <div class="small text-body-secondary">Bootstrap's <code>rgba(var(--bs-*-rgb))</code> colours need an rgb triplet, so <code>/theme.css</code> also sets <code>--theme-500-rgb</code>.</div>
     </div>
 
     <div class="d-flex flex-column gap-3">
@@ -123,6 +94,7 @@
              [%w[--color-highlight-1], 'header, AI'],
              [%w[--color-highlight-1-light-2 --color-highlight-1-light-1 --color-highlight-1-light-3], nil],
              [%w[--color-star], nil],
+             [%w[--color-chart], 'chart segments rotate its hue'],
              [%w[--color-yellow --color-yellow-light], 'badge-yellow: Featured, Co-host, rota points'],
              [%w[--color-amber --color-amber-light --color-amber-dark], 'map areas, features page'],
              [%w[--color-search-highlight], 'mark'],
@@ -157,13 +129,25 @@
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
              [%w[--color-signal --color-signal-dark], 'Signal · btn-signal'],
-             [%w[--color-stripe], 'Stripe · label-stripe']
+             [%w[--color-stripe], 'Stripe · label-stripe'],
+             [%w[--color-coinbase], 'Coinbase'],
+             [%w[--color-mollie], 'Mollie'],
+             [%w[--color-paypal], 'PayPal'],
+             [%w[--color-gocardless --color-gocardless-text], 'GoCardless'],
+             [%w[--color-opencollective], 'Open Collective'],
+             [%w[--color-evm], 'EVM']
            ].each do |names, note| %>
           <div class="col">
             <div class="rounded mb-1" style="height: 64px; background: var(<%= names.first %>)"></div>
             <div class="fw-bold text-break"><%= names.first %></div>
             <div class="font-monospace small text-body-secondary"><%== css_vars.call(*names) %> · <%= note %></div>
           </div>
+        <% end %>
+      </div>
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <span class="small text-body-secondary">Payment badges, from <code>badge-payment-&lt;method&gt;</code>:</span>
+        <% [%w[coinbase Coinbase], %w[mollie Mollie], %w[paypal PayPal], ['gocardless-instant', 'GoCardless'], ['gocardless-instalment', 'GoCardless instalments'], ['opencollective', 'OC: …'], ['evm', 'EVM: …']].each do |name, text| %>
+          <span class="badge badge-payment-<%= name %>"><%= text %></span>
         <% end %>
       </div>
     </div>
@@ -176,8 +160,8 @@
       </div>
       <div class="border rounded overflow-hidden">
         <div class="row g-0">
-          <% [7, 13, 20, 40, 47, 54, 60, 73, 78, 87, 92, 93].each do |lightness| %>
-            <div class="col-3 col-md-2 col-xl-1 pt-5 px-2 pb-2 font-monospace small <%= lightness <= 54 ? 'text-white' : 'text-dark' %>" style="background: var(--grey-<%= lightness %>)"><%= lightness %><br><%== css_var.call("--grey-#{lightness}") %></div>
+          <% [7, 13, 20, 27, 40, 47, 54, 60, 73, 78, 80, 86, 87, 92, 93].each do |lightness| %>
+            <div class="col-3 col-md-2 col-xl pt-5 px-2 pb-2 font-monospace small <%= lightness <= 54 ? 'text-white' : 'text-dark' %>" style="background: var(--grey-<%= lightness %>)"><%= lightness %><br><%== css_var.call("--grey-#{lightness}") %></div>
           <% end %>
         </div>
       </div>
@@ -185,11 +169,65 @@
     </div>
 
     <div class="d-flex flex-column gap-3">
+      <div class="d-flex align-items-baseline flex-wrap gap-2">
+        <h3 class="m-0">Bootstrap colours in use</h3>
+        <span class="text-body-secondary">Used through Bootstrap's own variables. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows, hairlines and image overlays.</span>
+      </div>
+      <div class="row g-3">
+        <% %w[--bs-black --bs-body-color --bs-gray-600 --bs-gray-500 --bs-gray-300 --bs-gray-200 --bs-gray-100 --bs-white].each do |name| %>
+          <div class="col-6 col-md-3 col-xl">
+            <div class="rounded border mb-1" style="height: 64px; background: var(<%= name %>)"></div>
+            <div class="fw-bold text-break small"><%= name %></div>
+            <div class="font-monospace small text-body-secondary"><%== css_var.call(name) %></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="d-flex flex-column gap-3">
+      <div class="d-flex align-items-baseline flex-wrap gap-2">
+        <h3 class="m-0">Marketing pages</h3>
+        <span class="text-body-secondary">The features and comparison pages. Their purple gradient and the five reason colours on the Luma page are derived from <code>--color-highlight-1</code> and <code>--color-magenta</code>.</span>
+      </div>
+      <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
+        <% [
+             [%w[--color-magenta --color-magenta-light], nil],
+             [%w[--color-rose --color-rose-light], nil],
+             [%w[--color-violet], 'purple divider end'],
+             [%w[--wash-amber --wash-rose --wash-magenta --wash-purple], 'section backgrounds']
+           ].each do |names, note| %>
+          <div class="col">
+            <div class="rounded overflow-hidden border mb-1" style="height: 64px">
+              <div class="row g-0 h-100">
+                <% names.each do |name| %>
+                  <div class="col" style="background: var(<%= name %>)"></div>
+                <% end %>
+              </div>
+            </div>
+            <div class="fw-bold text-break"><%= names.first %><%= ', …' if names.length > 1 %></div>
+            <div class="font-monospace small text-body-secondary"><%== css_vars.call(*names) %><%= " · #{note}" if note %></div>
+          </div>
+        <% end %>
+        <div class="col">
+          <div class="rounded overflow-hidden mb-1" style="height: 64px">
+            <div class="row g-0 h-100">
+              <% 0.step(100, 25) do |pct| %>
+                <div class="col" style="background: color-mix(in srgb, var(--color-magenta), var(--color-highlight-1) <%= pct %>%)"></div>
+              <% end %>
+            </div>
+          </div>
+          <div class="fw-bold">Magenta to highlight-1</div>
+          <div class="small text-body-secondary">color-mix, 0–100%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex flex-column gap-3">
       <h3 class="m-0">Gradients</h3>
       <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-3">
         <% [
-             ['linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color) 50%, var(--theme-color-light) 100%)', 'Fill pattern', '135°, flat to 50%, then to -light. Primary/danger buttons, badges, progress, text-bg-primary.'],
-             ['linear-gradient(135deg, var(--theme-color-tint) 0%, var(--theme-color-tint) 50%, var(--theme-color-tint-strong) 100%)', 'Tint pattern', 'Same geometry, tint to tint-strong. Alerts and toasts.'],
+             ['linear-gradient(135deg, var(--theme-500) 0%, var(--theme-500) 50%, var(--theme-400) 100%)', 'Fill pattern', '135°, flat to 50%, then to -light. Primary/danger buttons, badges, progress, text-bg-primary.'],
+             ['linear-gradient(135deg, var(--theme-50) 0%, var(--theme-50) 50%, var(--theme-200) 100%)', 'Tint pattern', 'Same geometry, tint to tint-strong. Alerts and toasts.'],
              ['var(--gradient-active)', '--gradient-active', 'Sidebar active item, notification dot, page-load bar.'],
              ['linear-gradient(45deg, var(--grey-13) 0%, var(--grey-13) 66%, var(--color-highlight-1) 100%)', 'Header', '45°, --grey-13 to 66%, then highlight-1.'],
              ['var(--gradient-rainbow)', '--gradient-rainbow', '.gradient-text only.'],
@@ -390,7 +428,7 @@
       </div>
       <div class="border rounded p-4 d-flex flex-wrap gap-3 align-items-center">
         <a class="btn btn-primary" href="#components">Book tickets</a>
-        <a class="btn btn-primary" href="#components" style="--bs-btn-bg: var(--theme-color-hover); --btn-gradient-end: var(--theme-color-hover-light)">Hover</a>
+        <a class="btn btn-primary" href="#components" style="--bs-btn-bg: var(--theme-600); --btn-gradient-end: var(--theme-500)">Hover</a>
         <a class="btn btn-outline-primary" href="#components">Outline primary</a>
         <a class="btn btn-secondary" href="#components">Secondary</a>
         <a class="btn btn-danger" href="#components">Delete</a>
@@ -471,7 +509,7 @@
           </div>
           <div class="mb-3">
             <label for="dg-location">Location <span class="fw-normal subtle">· focused</span></label>
-            <input type="text" class="form-control" id="dg-location" autocomplete="off" placeholder="Search for a place" style="border-color: var(--theme-color); box-shadow: 0 0 0 2px oklch(from var(--theme-500) l c h / .6)">
+            <input type="text" class="form-control" id="dg-location" autocomplete="off" placeholder="Search for a place" style="border-color: var(--theme-500); box-shadow: 0 0 0 2px oklch(from var(--theme-500) l c h / .6)">
             <div class="form-text">Form text is --grey-54.</div>
           </div>
           <div class="d-flex flex-wrap gap-4 align-items-center mb-3">
@@ -574,7 +612,7 @@
     <div class="row g-3">
       <div class="col-md-6 col-xxl-4">
         <div class="border rounded p-4 h-100 d-flex flex-column gap-3">
-          <div class="font-monospace small text-body-secondary fw-bold">DEFAULT · <%== css_var.call('--theme-color') %></div>
+          <div class="font-monospace small text-body-secondary fw-bold">DEFAULT · <%== css_var.call('--theme-500') %></div>
           <div class="d-flex flex-wrap gap-2 align-items-center">
             <a class="btn btn-primary" href="#theming">Book</a>
             <div class="nav-crumbs mb-0">
@@ -622,7 +660,7 @@
           <div class="d-flex flex-column gap-1">
             <div class="fw-bold"><%= title %></div>
             <div><%= body %></div>
-            <div style="color: var(--theme-color-darker)"><b>Fix:</b> <%= fix %></div>
+            <div style="color: var(--theme-800)"><b>Fix:</b> <%= fix %></div>
             <code class="font-monospace small text-body-secondary"><%= where %></code>
           </div>
         </div>

@@ -17,7 +17,7 @@
   if has_breakdown && entries.any? { |entry| entry[:breakdown].blank? }
     breakdown_keys << 'legacy_total'
     breakdown_labels['legacy_total'] = 'Legacy total'
-    breakdown_colors['legacy_total'] = 'rgba(108, 117, 125, 0.82)'
+    breakdown_colors['legacy_total'] = 'oklch(from var(--bs-gray-600) l c h / 0.82)'
   end
 %>
 
@@ -47,7 +47,7 @@
                                { 'total' => chart_actual_values }
                              end
     chart_breakdown_labels = has_breakdown ? breakdown_labels : { 'total' => 'Total' }
-    chart_breakdown_colors = has_breakdown ? breakdown_colors : { 'total' => 'rgba(0, 175, 94, 0.92)' }
+    chart_breakdown_colors = has_breakdown ? breakdown_colors : { 'total' => 'oklch(from var(--theme-500) l c h / 0.92)' }
     chart_projection_values = entries.map do |entry|
       entry[:month] == current_month_label ? [projected_value - entry[:total], 0].max : nil
     end

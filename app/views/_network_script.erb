@@ -27,8 +27,8 @@
         {
           selector: 'node',
           style: {
-            'color': '#212529',
-            'background-color': 'data(color)',
+            'color': cssColor('var(--bs-body-color)'),
+            'background-color': cssColor('var(--theme-500)'),
             'opacity': 0.85,
             'label': 'data(name)',
             'width': 'data(width)',
@@ -39,7 +39,7 @@
           selector: 'edge',
           style: {
             'opacity': 'data(opacity)',
-            'line-color': 'data(color)',
+            'line-color': cssColor('var(--theme-500)'),
           }
         }
       ],

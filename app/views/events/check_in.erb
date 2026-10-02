@@ -68,6 +68,7 @@
         })
       }
 
+      var scanLineColor = cssColor('var(--red-500)');
       function tick() {
         loadingMessage.innerText = "⌛ Loading video..."
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
@@ -83,10 +84,10 @@
             inversionAttempts: "dontInvert",
           });
           if (code) {
-            drawLine(code.location.topLeftCorner, code.location.topRightCorner, "#FF3B58");
-            drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#FF3B58");
-            drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#FF3B58");
-            drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
+            drawLine(code.location.topLeftCorner, code.location.topRightCorner, scanLineColor);
+            drawLine(code.location.topRightCorner, code.location.bottomRightCorner, scanLineColor);
+            drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, scanLineColor);
+            drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, scanLineColor);
             outputMessage.hidden = true;
             outputData.parentElement.hidden = false;
             outputData.innerText = code.data;

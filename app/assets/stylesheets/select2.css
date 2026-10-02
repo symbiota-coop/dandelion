@@ -25,12 +25,12 @@
 .select2-container--bootstrap-5.select2-container--focus .select2-selection,
 .select2-container--bootstrap-5.select2-container--open .select2-selection,
 .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field:focus {
-  border-color: var(--theme-color);
+  border-color: var(--theme-500);
   box-shadow: 0 0 0 2px oklch(from var(--theme-500) l c h / .6);
 }
 
 .select2-container--bootstrap-5 .select2-dropdown {
-  border-color: var(--theme-color);
+  border-color: var(--theme-500);
   box-shadow: 0 0 0 2px oklch(from var(--theme-500) l c h / .6);
 }
 
@@ -69,7 +69,7 @@
 /* Selected options, which the theme hard-codes Bootstrap blue */
 .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--selected,
 .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option[aria-selected=true]:not(.select2-results__option--highlighted) {
-  background-color: var(--theme-color);
+  background-color: var(--theme-500);
 }
 
 /* The theme fades the box's glow in, but the dropdown appears at once, so the two would glow out of step */

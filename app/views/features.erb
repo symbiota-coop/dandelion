@@ -29,8 +29,8 @@
   }
 
   .feature-card {
-    background: #fff;
-    border: 1px solid rgba(0,0,0,0.08);
+    background: var(--bs-white);
+    border: 1px solid rgba(var(--bs-black-rgb), 0.08);
     border-radius: 0.75rem;
     padding: 1.75rem;
     height: 100%;
@@ -38,7 +38,7 @@
   }
   .feature-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 24px rgba(var(--bs-black-rgb), 0.1);
   }
 
   .feature-icon {
@@ -52,44 +52,44 @@
     margin-bottom: 1rem;
   }
   .feature-icon.yellow { background: oklch(from var(--color-amber) l c h / 0.15); color: var(--color-amber-dark); }
-  .feature-icon.rose { background: rgba(224,96,122,0.12); color: #d94f6e; }
-  .feature-icon.magenta { background: rgba(185,0,161,0.1); color: #B900A1; }
-  .feature-icon.purple { background: rgba(68,0,185,0.1); color: #4400B9; }
+  .feature-icon.rose { background: oklch(from var(--color-rose) l c h / 0.12); color: var(--color-rose); }
+  .feature-icon.magenta { background: oklch(from var(--color-magenta) l c h / 0.1); color: var(--color-magenta); }
+  .feature-icon.purple { background: oklch(from var(--color-highlight-1) l c h / 0.1); color: var(--color-highlight-1); }
 
   .section-heading { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
   @media(min-width: 992px) { .section-heading { font-size: 2vw; } }
   .section-divider { width: 3rem; height: 3px; border-radius: 2px; margin-bottom: 1.5rem; }
   .section-divider.yellow { background: linear-gradient(90deg, var(--color-amber), var(--color-amber-light)); }
-  .section-divider.rose { background: linear-gradient(90deg, #d94f6e, #f0889a); }
-  .section-divider.magenta { background: linear-gradient(90deg, #B900A1, #e84dc4); }
-  .section-divider.purple { background: linear-gradient(90deg, #4400B9, #7c5ce7); }
+  .section-divider.rose { background: linear-gradient(90deg, var(--color-rose), var(--color-rose-light)); }
+  .section-divider.magenta { background: linear-gradient(90deg, var(--color-magenta), var(--color-magenta-light)); }
+  .section-divider.purple { background: linear-gradient(90deg, var(--color-highlight-1), var(--color-violet)); }
 
   .events-section {
-    background: linear-gradient(to bottom, #ffffff 30%, #fdf0dc);
+    background: linear-gradient(to bottom, var(--bs-white) 30%, var(--wash-amber));
   }
 
   .gatherings-section {
-    background: linear-gradient(to bottom, #fdf0dc, #fce8e6 30%);
+    background: linear-gradient(to bottom, var(--wash-amber), var(--wash-rose) 30%);
   }
 
   .orgs-section {
-    background: linear-gradient(to bottom, #fce8e6, #f4e6f5 30%);
+    background: linear-gradient(to bottom, var(--wash-rose), var(--wash-magenta) 30%);
   }
 
   .values-section {
-    background: linear-gradient(to bottom, #f4e6f5, #ece0f0 30%);
+    background: linear-gradient(to bottom, var(--wash-magenta), var(--wash-purple) 30%);
   }
 
   .cta-section {
     background:
-      radial-gradient(ellipse at 15% 80%, rgba(68,0,185,0.5) 0%, transparent 50%),
-      radial-gradient(ellipse at 85% 20%, rgba(185,0,161,0.4) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 50%, rgba(124,60,230,0.3) 0%, transparent 60%),
-      linear-gradient(to bottom, #5a1fd6, #4c10c0 30%, #4400B9 60%, #3a0099 100%);
-    color: #fff;
+      radial-gradient(ellipse at 15% 80%, oklch(from var(--color-highlight-1) l c h / 0.5) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 20%, oklch(from var(--color-magenta) l c h / 0.4) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, oklch(from var(--color-violet) l c h / 0.3) 0%, transparent 60%),
+      linear-gradient(to bottom, oklch(from var(--color-highlight-1) calc(l + 0.08) c h), oklch(from var(--color-highlight-1) calc(l + 0.03) c h) 30%, var(--color-highlight-1) 60%, oklch(from var(--color-highlight-1) calc(l - 0.05) c h) 100%);
+    color: var(--bs-white);
   }
-  .cta-section .btn-light:focus { color: #212529; }
-  .cta-section .btn-outline-light:hover { background: #fff; color: #4400B9; }
+  .cta-section .btn-light:focus { color: var(--bs-body-color); }
+  .cta-section .btn-outline-light:hover { background: var(--bs-white); color: var(--color-highlight-1); }
 </style>
 
 <!-- Hero -->

@@ -2,6 +2,7 @@
 <script>
   const canvas = document.getElementById('dandelion-canvas');
   const ctx = canvas.getContext('2d');
+  const inkRgb = getComputedStyle(document.documentElement).getPropertyValue('--bs-black-rgb').trim();
   function calculateBaseUnit() {
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
@@ -111,14 +112,14 @@
               ctx.beginPath();
               ctx.moveTo(0, 0);
               ctx.lineTo(-sizes.stalkLength, 0);
-              ctx.strokeStyle = `rgba(0, 0, 0, ${opacity})`;
+              ctx.strokeStyle = `rgba(${inkRgb}, ${opacity})`;
               ctx.lineWidth = 1;
               ctx.stroke();
           }
 
           ctx.beginPath();
           ctx.arc(-sizes.stalkLength, 0, this.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+          ctx.fillStyle = `rgba(${inkRgb}, ${opacity})`;
           ctx.fill();
 
           ctx.restore();
@@ -157,7 +158,7 @@
   }
 
   function drawRadialLines() {
-      ctx.strokeStyle = '#000';
+      ctx.strokeStyle = `rgb(${inkRgb})`;
       ctx.lineWidth = 1;
       for (let h = 0; h < 12; h++) {
           if (h === 1) continue;
@@ -199,7 +200,7 @@
       drawRadialLines();
       ctx.beginPath();
       ctx.arc(centerX, centerY, sizes.centerDot, 0, Math.PI * 2);
-      ctx.fillStyle = '#000';
+      ctx.fillStyle = `rgb(${inkRgb})`;
       ctx.fill();
 
       if (isScattering) {

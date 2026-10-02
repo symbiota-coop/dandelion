@@ -4,7 +4,6 @@
   node_width_scale = 20
   edge_min_opacity = 0.25
   edge_opacity_scale = 1000
-  color = '#00AF5E'
 
   organisation_edges = OrganisationEdge.and(:mutual_followers.gte => Padrino.env == :development ? 1 : 10).to_a
   org_ids = organisation_edges.flat_map { |edge| [edge.source_id, edge.sink_id] }.uniq
@@ -21,8 +20,7 @@
         slug: organisation.slug,
         name: CGI.unescapeHTML(Sanitize.fragment(organisation.name)),
         weight: w,
-        width: [node_min_width + w.to_f / node_width_scale, node_max_width].min,
-        color: color
+        width: [node_min_width + w.to_f / node_width_scale, node_max_width].min
       }
     }
 
@@ -34,7 +32,6 @@
           source: edge.source_id.to_s,
           target: edge.sink_id.to_s,
           weight: w,
-          color: color,
           opacity: edge_min_opacity + w.to_f / edge_opacity_scale
         }
       }

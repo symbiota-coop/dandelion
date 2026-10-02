@@ -1,3 +1,20 @@
+// Resolves a CSS colour expression such as 'var(--theme-500)' to a plain colour, for canvas, charts and maps,
+// which can't read custom properties themselves. Call it once the page has loaded
+// Returns rgb() or rgba(), as some libraries can't parse oklch() or color()
+function cssColor (value) {
+  const probe = document.createElement('span')
+  probe.style.color = value
+  document.body.appendChild(probe)
+  const color = getComputedStyle(probe).color
+  probe.remove()
+  const context = (cssColor.canvas ||= document.createElement('canvas')).getContext('2d', { willReadFrequently: true })
+  context.clearRect(0, 0, 1, 1)
+  context.fillStyle = color
+  context.fillRect(0, 0, 1, 1)
+  const [r, g, b, a] = context.getImageData(0, 0, 1, 1).data
+  return a === 255 ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${Math.round(a / 2.55) / 100})`
+}
+
 // Hide every tooltip, including any whose element a pagelet has just replaced
 function hideTooltips () {
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
@@ -95,7 +112,7 @@ $(function () {
 
     function styleSelectElement (select) {
       if ($(select).find('option:selected').is(':disabled')) {
-        $(select).css('color', '#6c757d');
+        $(select).css('color', 'var(--bs-gray-600)');
       } else {
         $(select).css('color', '');
       }

@@ -1,4 +1,5 @@
-<% base_paint = '#57B98C' %>
+<%# Chart segments rotate the hue of --color-chart, resolved in the browser by cssColor %>
+<% chart_color = ->(degrees) { degrees.finite? ? "hsl(from var(--color-chart) calc(h + #{degrees.round(2)}) s l)" : 'var(--grey-93)' } %>
 
 <% if defined?(memberships) %>
   <h2>Followers</h2>
@@ -50,13 +51,7 @@ if youngest && oldest %>
               labels: <%== data.keys.map { |p| "People in their #{p}s" }.to_json %>,
               datasets: [{
               data: <%= data.values %>,
-              backgroundColor: <%== 0.upto(data.values.length).map do |i|
-                                     begin
-                                       base_paint.paint.spin((i.to_f / (data.values.length - 1)) * (360 - (360 / data.values.length))).to_s(:hex)
-                                     rescue StandardError
-                                       '#eee'
-                                     end
-                                   end.to_json %>
+              backgroundColor: <%== 0.upto(data.values.length).map { |i| chart_color.call((i.to_f / (data.values.length - 1)) * (360 - (360 / data.values.length))) }.to_json %>.map(cssColor)
               }],
             },
             options: {
@@ -116,9 +111,7 @@ if youngest && oldest %>
             labels: ['Women', 'Men', 'Other'],
             datasets: [{
             data: <%= [women, men, other] %>,
-            backgroundColor: <%== 0.upto(2).map do |i|
-                                   base_paint.paint.spin((i.to_f / 2) * (360 - (360 / 3))).to_s(:hex)
-                                 end.to_json %>
+            backgroundColor: <%== 0.upto(2).map { |i| chart_color.call((i.to_f / 2) * (360 - (360 / 3))) }.to_json %>.map(cssColor)
             }],
           },
           options: {
