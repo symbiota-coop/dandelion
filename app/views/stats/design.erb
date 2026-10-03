@@ -83,7 +83,7 @@
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <%== subhead.call('Warning and danger', "Two families, used the same way. The 500 is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match. There are no warning buttons yet, so --color-orange-600 is unused.") %>
+      <%== subhead.call('Warning and danger', "Two families, used the same way as the theme ramp: each variant class (alert-warning, toast-warning, table-warning, btn-warning, text-bg-warning and the danger ones) sets its steps as <code>--variant-50</code> to <code>--variant-800</code>, and each component maps those to its roles once. The 500 is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match. There are no warning buttons yet, so --color-orange-600 is unused.") %>
       <% roles = {
            '50' => 'alert, toast and row background',
            '200' => 'tint gradient end, row border',
@@ -114,7 +114,7 @@
               sample_to: '200'
             } %>
       <% end %>
-      <div class="small text-body-secondary">Alerts and toasts: 135°, the 50 flat to halfway, then to the 200. table-warning and table-danger rows: the 50, with the 200 for borders and a mix 30% of the way to it on hover.</div>
+      <div class="small text-body-secondary">Alerts and toasts: a sheen from the 50 to the 200. table-warning and table-danger rows: the 50, with the 200 for borders and a mix 30% of the way to it on hover.</div>
     </div>
 
     <div class="d-flex flex-column gap-3">
@@ -349,10 +349,10 @@
     <%== section_head.call('components') %>
 
     <div class="d-flex flex-column gap-3">
-      <%== subhead.call('Buttons', 'Primary, secondary and danger are gradients over a transparent border: 135°, flat 500 to 50%, then to a lighter 400 end, the same fill as badges, progress and text-bg-primary. btn-warning is styled the same but not used yet; brand buttons like btn-signal stay flat.') %>
+      <%== subhead.call('Buttons', 'Primary, secondary and danger are sheens over a transparent border: 135°, <code>--sheen-from</code> flat to halfway, then to <code>--sheen-to</code>. Fills (buttons, badges, progress bars, text-bg-primary and p.action) go from their 500 to the lighter 400, and on hover from the 600 to the 500; alerts, toasts and the AI well set their own pair. One rule draws every sheen. btn-warning is styled the same but not used yet; brand buttons like btn-signal stay flat.') %>
       <div class="border rounded p-4 d-flex flex-wrap gap-3 align-items-center">
         <a class="btn btn-primary" href="#components">Book tickets</a>
-        <a class="btn btn-primary" href="#components" style="--bs-btn-bg: var(--theme-600); --btn-gradient-end: var(--theme-500)">Hover</a>
+        <a class="btn btn-primary" href="#components" style="--sheen-from: var(--theme-600); --sheen-to: var(--theme-500)">Hover</a>
         <a class="btn btn-outline-primary" href="#components">Outline primary</a>
         <a class="btn btn-secondary" href="#components">Secondary</a>
         <a class="btn btn-danger" href="#components">Delete</a>

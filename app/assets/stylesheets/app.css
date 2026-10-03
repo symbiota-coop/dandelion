@@ -724,6 +724,110 @@ body.canvas #content {
 }
 
 /* ==========================================================================
+   Variants and sheens
+   ========================================================================== */
+
+/* Each colour variant names its ramp's steps once, as --variant-*. Alerts, toasts, table rows, buttons and badges
+   map those steps to their own roles, so a variant's colours are set in one place */
+.alert-primary,
+.toast-primary,
+.btn-primary,
+.text-bg-primary,
+.progress-bar,
+p.action a {
+  --variant-50: var(--theme-50);
+  --variant-200: var(--theme-200);
+  --variant-400: var(--theme-400);
+  --variant-500: var(--theme-500);
+  --variant-600: var(--theme-600);
+  --variant-800: var(--theme-800);
+}
+
+.alert-warning,
+.toast-warning,
+.table-warning,
+.btn-warning,
+.text-bg-warning {
+  --variant-50: var(--color-orange-50);
+  --variant-200: var(--color-orange-200);
+  --variant-400: var(--color-orange-400);
+  --variant-500: var(--color-orange-500);
+  --variant-600: var(--color-orange-600);
+  --variant-800: var(--color-orange-800);
+}
+
+.alert-danger,
+.toast-danger,
+.table-danger,
+.btn-danger,
+.text-bg-danger {
+  --variant-50: var(--color-red-50);
+  --variant-200: var(--color-red-200);
+  --variant-400: var(--color-red-400);
+  --variant-500: var(--color-red-500);
+  --variant-600: var(--color-red-600);
+  --variant-800: var(--color-red-800);
+}
+
+/* Secondary and yellow only fill buttons and badges, so they have no tints */
+.btn-secondary,
+.text-bg-secondary {
+  --variant-400: var(--bs-gray-500);
+  --variant-500: var(--bs-gray-600);
+  --variant-600: var(--bs-gray-700);
+}
+
+.text-bg-yellow {
+  --variant-400: var(--color-yellow-400);
+  --variant-500: var(--color-yellow-500);
+}
+
+/* The sheen: 135°, --sheen-from flat to halfway, then to --sheen-to. Each of these sets the two (alerts and toasts
+   from their 50 to their 200, the AI well in Misc) and their hover states only change them */
+.alert-primary,
+.alert-warning,
+.alert-danger,
+.toast-primary,
+.toast-warning,
+.toast-danger,
+.btn-primary,
+.btn-secondary,
+.btn-warning,
+.btn-danger,
+.text-bg-primary,
+.text-bg-secondary,
+.text-bg-warning,
+.text-bg-danger,
+.text-bg-yellow,
+.progress-bar,
+p.action a,
+.ai-well {
+  background-image: linear-gradient(135deg, var(--sheen-from) 50%, var(--sheen-to));
+}
+
+/* Fills go from their 500 to the lighter 400, and on hover from the 600 to the 500 */
+.btn-primary,
+.btn-secondary,
+.btn-warning,
+.btn-danger,
+.text-bg-primary,
+.text-bg-secondary,
+.text-bg-warning,
+.text-bg-danger,
+.text-bg-yellow,
+.progress-bar,
+p.action a {
+  --sheen-from: var(--variant-500);
+  --sheen-to: var(--variant-400);
+}
+
+:is(.btn-primary, .btn-secondary, .btn-warning, .btn-danger):is(:hover, :focus, :active, .active, .show),
+p.action a:hover {
+  --sheen-from: var(--variant-600);
+  --sheen-to: var(--variant-500);
+}
+
+/* ==========================================================================
    Alerts
    ========================================================================== */
 
@@ -738,64 +842,30 @@ body.canvas #content {
   text-decoration: underline
 }
 
-/* Alerts are gradients from a tint of their colour to a stronger one, over Bootstrap's --bs-alert-* colours */
-.alert-primary {
-  --bs-alert-color: var(--theme-800);
-  --bs-alert-bg: var(--theme-50);
-  --bs-alert-link-color: var(--theme-800);
-  --alert-bg-end: var(--theme-200);
-}
-
-.alert-warning {
-  --bs-alert-color: var(--color-orange-800);
-  --bs-alert-bg: var(--color-orange-50);
-  --bs-alert-link-color: var(--color-orange-800);
-  --alert-bg-end: var(--color-orange-200);
-}
-
-.alert-danger {
-  --bs-alert-color: var(--color-red-800);
-  --bs-alert-bg: var(--color-red-50);
-  --bs-alert-link-color: var(--color-red-800);
-  --alert-bg-end: var(--color-red-200);
-}
-
+/* Alerts are sheens from their variant's 50 to its 200, with its 800 for text and links */
 .alert-primary,
 .alert-warning,
 .alert-danger {
-  background-image: linear-gradient(135deg, var(--bs-alert-bg) 0%, var(--bs-alert-bg) 50%, var(--alert-bg-end) 100%);
+  --bs-alert-color: var(--variant-800);
+  --bs-alert-bg: var(--variant-50);
+  --bs-alert-link-color: var(--variant-800);
+  --sheen-from: var(--variant-50);
+  --sheen-to: var(--variant-200);
 }
 
 .alert-dismissible .btn-close {
   padding: 0.875rem;
 }
 
-/* Toasts use the same colours and gradients as alerts, plus a border in their text colour (alerts have none: $alert-border-width is 0) */
-.toast-primary {
-  --bs-toast-color: var(--theme-800);
-  --bs-toast-bg: var(--theme-50);
-  --bs-toast-border-color: var(--theme-800);
-  --toast-bg-end: var(--theme-200);
-}
-
-.toast-warning {
-  --bs-toast-color: var(--color-orange-800);
-  --bs-toast-bg: var(--color-orange-50);
-  --bs-toast-border-color: var(--color-orange-800);
-  --toast-bg-end: var(--color-orange-200);
-}
-
-.toast-danger {
-  --bs-toast-color: var(--color-red-800);
-  --bs-toast-bg: var(--color-red-50);
-  --bs-toast-border-color: var(--color-red-800);
-  --toast-bg-end: var(--color-red-200);
-}
-
+/* Toasts are drawn like alerts, plus a border in their text colour (alerts have none: $alert-border-width is 0) */
 .toast-primary,
 .toast-warning,
 .toast-danger {
-  background-image: linear-gradient(135deg, var(--bs-toast-bg) 0%, var(--bs-toast-bg) 50%, var(--toast-bg-end) 100%);
+  --bs-toast-color: var(--variant-800);
+  --bs-toast-bg: var(--variant-50);
+  --bs-toast-border-color: var(--variant-800);
+  --sheen-from: var(--variant-50);
+  --sheen-to: var(--variant-200);
 }
 
 .flash-toasts .toast {
@@ -839,16 +909,7 @@ body.canvas #content {
   color: var(--payment-text, var(--bs-white));
 }
 
-/* Coloured badges are gradients from their colour to a lighter one */
-.badge.text-bg-primary { --badge-color: var(--theme-500); --badge-color-light: var(--theme-400); }
-.badge.text-bg-secondary { --badge-color: var(--bs-gray-600); --badge-color-light: var(--bs-gray-500); }
-.badge.text-bg-warning { --badge-color: var(--color-orange-500); --badge-color-light: var(--color-orange-400); }
-.badge.text-bg-danger { --badge-color: var(--color-red-500); --badge-color-light: var(--color-red-400); }
-.badge.text-bg-yellow { --badge-color: var(--color-yellow-500); --badge-color-light: var(--color-yellow-400); }
-
-.badge:is(.text-bg-primary, .text-bg-secondary, .text-bg-warning, .text-bg-danger, .text-bg-yellow) {
-  background: linear-gradient(135deg, var(--badge-color) 0%, var(--badge-color) 50%, var(--badge-color-light) 100%) !important;
-}
+/* Primary, secondary, warning, danger and yellow badges are sheens, like buttons (Variants and sheens) */
 
 /* Location badges match the text beside them */
 .popular-locations {
@@ -891,66 +952,26 @@ body.canvas #content {
   line-height: 1.3333333;
 }
 
-/* Primary, secondary, warning and danger buttons are gradients, to a lighter colour, over Bootstrap's --bs-btn-* colours */
-.btn-primary {
-  --bs-btn-bg: var(--theme-500);
-  --bs-btn-border-color: var(--theme-500);
-  --bs-btn-hover-bg: var(--theme-600);
-  --bs-btn-hover-border-color: var(--theme-600);
-  --bs-btn-active-bg: var(--theme-600);
-  --bs-btn-active-border-color: var(--theme-600);
-  --bs-btn-disabled-bg: var(--theme-500);
-  --bs-btn-disabled-border-color: var(--theme-500);
-  --bs-btn-focus-shadow-rgb: var(--theme-500-rgb);
-  --btn-gradient-end: var(--theme-400);
-  --btn-hover-gradient-end: var(--theme-500);
-}
-
-.btn-secondary {
-  --bs-btn-hover-bg: var(--bs-gray-700);
-  --bs-btn-hover-border-color: var(--bs-gray-700);
-  --bs-btn-active-bg: var(--bs-gray-700);
-  --bs-btn-active-border-color: var(--bs-gray-700);
-  --btn-gradient-end: var(--bs-gray-500);
-  --btn-hover-gradient-end: var(--bs-gray-600);
-}
-
-.btn-warning {
-  --bs-btn-hover-bg: var(--color-orange-600);
-  --bs-btn-hover-border-color: var(--color-orange-600);
-  --bs-btn-active-bg: var(--color-orange-600);
-  --bs-btn-active-border-color: var(--color-orange-600);
-  --btn-gradient-end: var(--color-orange-400);
-  --btn-hover-gradient-end: var(--color-orange-500);
-}
-
-.btn-danger {
-  --bs-btn-hover-bg: var(--color-red-600);
-  --bs-btn-hover-border-color: var(--color-red-600);
-  --bs-btn-active-bg: var(--color-red-600);
-  --bs-btn-active-border-color: var(--color-red-600);
-  --btn-gradient-end: var(--color-red-400);
-  --btn-hover-gradient-end: var(--color-red-500);
-}
-
+/* Primary, secondary, warning and danger buttons take their variant's 500, and 600 for hover, through Bootstrap's
+   --bs-btn-* colours, and are sheens (Variants and sheens) */
 .btn-primary,
 .btn-secondary,
 .btn-warning,
 .btn-danger {
-  /* A transparent border with the gradient drawn under it, so these are the same height as bordered buttons */
+  --bs-btn-bg: var(--variant-500);
+  --bs-btn-hover-bg: var(--variant-600);
+  --bs-btn-active-bg: var(--variant-600);
+  --bs-btn-disabled-bg: var(--variant-500);
+  /* A transparent border with the sheen drawn under it, so these are the same height as bordered buttons */
   --bs-btn-border-color: transparent;
   --bs-btn-hover-border-color: transparent;
   --bs-btn-active-border-color: transparent;
   --bs-btn-disabled-border-color: transparent;
   background-origin: border-box;
-  background-image: linear-gradient(135deg, var(--bs-btn-bg) 0%, var(--bs-btn-bg) 50%, var(--btn-gradient-end) 100%);
 }
 
-.btn-primary:is(:hover, :focus, :active, .active, .show),
-.btn-secondary:is(:hover, :focus, :active, .active, .show),
-.btn-warning:is(:hover, :focus, :active, .active, .show),
-.btn-danger:is(:hover, :focus, :active, .active, .show) {
-  background-image: linear-gradient(135deg, var(--bs-btn-hover-bg) 0%, var(--bs-btn-hover-bg) 50%, var(--btn-hover-gradient-end) 100%);
+.btn-primary {
+  --bs-btn-focus-shadow-rgb: var(--theme-500-rgb);
 }
 
 .btn-outline-primary {
@@ -1724,21 +1745,15 @@ table.dataTable.table-sm > thead > tr > th[class*="dt-order"] .dt-column-order {
   font-size: 0.875em;
 }
 
-/* Warning and danger rows use the alert and toast tints: the tint, the stronger tint for borders, and 30% of the way to it for hover, stripes and active */
-.table-warning {
-  --bs-table-bg: var(--color-orange-50);
-  --bs-table-border-color: var(--color-orange-200);
-  --bs-table-striped-bg: color-mix(in srgb, var(--color-orange-50), var(--color-orange-200) 30%);
-  --bs-table-hover-bg: color-mix(in srgb, var(--color-orange-50), var(--color-orange-200) 30%);
-  --bs-table-active-bg: color-mix(in srgb, var(--color-orange-50), var(--color-orange-200) 30%);
-}
-
+/* Warning and danger rows use the alert and toast tints: the variant's 50, its 200 for borders, and 30% of the way to it for hover, stripes and active */
+.table-warning,
 .table-danger {
-  --bs-table-bg: var(--color-red-50);
-  --bs-table-border-color: var(--color-red-200);
-  --bs-table-striped-bg: color-mix(in srgb, var(--color-red-50), var(--color-red-200) 30%);
-  --bs-table-hover-bg: color-mix(in srgb, var(--color-red-50), var(--color-red-200) 30%);
-  --bs-table-active-bg: color-mix(in srgb, var(--color-red-50), var(--color-red-200) 30%);
+  --row-tint: color-mix(in srgb, var(--variant-50), var(--variant-200) 30%);
+  --bs-table-bg: var(--variant-50);
+  --bs-table-border-color: var(--variant-200);
+  --bs-table-striped-bg: var(--row-tint);
+  --bs-table-hover-bg: var(--row-tint);
+  --bs-table-active-bg: var(--row-tint);
 }
 
 .table-striped > thead > tr > th {
@@ -2197,9 +2212,8 @@ small.form-text {
   color: var(--bs-black) !important;
 }
 
-.text-bg-primary,
-.progress-bar {
-  background: linear-gradient(135deg, var(--theme-500) 0%, var(--theme-500) 50%, var(--theme-400) 100%) !important;
+/* A sheen (Variants and sheens) with no border, for card headers and table cells too */
+.text-bg-primary {
   border: none !important;
 }
 
@@ -2622,8 +2636,10 @@ td .tactivity-accept {
    Misc
    ========================================================================== */
 
+/* A lavender sheen; themed pages switch it to the theme in theme.css */
 .ai-well {
-  background: linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-lavender-50) 50%, var(--color-lavender-400) 100%) !important;
+  --sheen-from: var(--color-lavender-50);
+  --sheen-to: var(--color-lavender-400);
   padding: 1rem;
   border-radius: var(--bs-border-radius-lg);
 }
@@ -2708,7 +2724,7 @@ p.action {
   text-align: center
 }
 
-/* A call to action in docs and email previews, drawn like .btn-primary (emails have their own in email.css) */
+/* A call to action in docs and email previews, drawn like .btn-primary, with its sheen (emails have their own in email.css) */
 p.action a {
   display: inline-block;
   padding: 0.375rem 0.75rem;
@@ -2719,12 +2735,10 @@ p.action a {
   text-decoration: none;
   border-radius: var(--bs-border-radius);
   background-origin: border-box;
-  background-image: linear-gradient(135deg, var(--theme-500) 0%, var(--theme-500) 50%, var(--theme-400) 100%);
 }
 
 p.action a:hover {
   color: var(--bs-white);
-  background-image: linear-gradient(135deg, var(--theme-600) 0%, var(--theme-600) 50%, var(--theme-500) 100%);
 }
 
 .icon-list {
