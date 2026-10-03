@@ -8,7 +8,7 @@
   <p>
     Feedback from <% if event_feedback.anonymous? %>Anonymous<% else %><a href="<%= ENV['BASE_URI'] %>/u/<%= event_feedback.account.username %>"><%= event_feedback.account.name %></a><% end %>
   </p>
-  <p style="color: #F5B042">
+  <p style="color: #ffa738">
     <%= event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating %>
   </p>
   <% if event_feedback.answers %>

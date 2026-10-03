@@ -1,3 +1,7 @@
+/* Inlined into emails, which can't use custom properties, so colours are literal copies of the site's:
+   the warm greys from bootstrap5.scss (#77736f gray-600 for secondary text, #3c3935 gray-800 for dark text,
+   #d6d3cf gray-400 and #eeebe7 gray-200 for borders and fills) */
+
 html,
 body,
 p,
@@ -103,11 +107,11 @@ td {
   margin: 2em 0;
   text-align: center;
   font-size: 0.85em;
-  color: #999;
+  color: #77736f;
 }
 
 .footer a {
-  color: #333;
+  color: #3c3935;
   text-decoration: none;
 }
 
@@ -183,14 +187,14 @@ p.action {
 }
 
 hr {
-  border: 0.0625em solid #eee;
+  border: 0.0625em solid #eeebe7;
   margin: 1em 0;
 }
 
 a.attachment {
   margin: 1em 0;
   padding: 0.75em;
-  border: 0.125em solid #eee;
+  border: 0.125em solid #eeebe7;
   border-radius: 0.125em;
   text-decoration: none;
   display: block;
@@ -198,9 +202,9 @@ a.attachment {
 
 pre {
   padding: 1em;
-  color: #353535;
-  background: #eee;
-  border: 0.0625em solid #c4c4c4;
+  color: #3c3935;
+  background: #eeebe7;
+  border: 0.0625em solid #d6d3cf;
   border-radius: 0.125em;
   text-align: left;
   direction: ltr;
@@ -233,11 +237,11 @@ pre {
 }
 
 .text-muted {
-  color: #999;
+  color: #77736f;
 }
 
 .text-dark {
-  color: #333;
+  color: #3c3935;
 }
 
 .qr-code {
@@ -255,5 +259,5 @@ pre {
   display: block;
   margin-bottom: 1em;
   font-size: 90%;
-  color: #999;
+  color: #77736f;
 }
