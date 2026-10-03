@@ -244,7 +244,7 @@
           </div>
         <% end %>
       </div>
-      <div class="small text-body-secondary"><code>.h1</code>–<code>.h6</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. The heading sizes are set in bootstrap5.scss (<code>$h1-font-size</code>…), so <code>.fs-1</code>–<code>.fs-6</code> make text a heading's size without its weight or font. <code>.small</code> shrinks text to .875em of its context; it's Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is --bs-gray-600 (<code>.subtle</code>, form-text).</div>
+      <div class="small text-body-secondary"><code>.h1</code>–<code>.h6</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. The heading sizes are set in bootstrap5.scss (<code>$h1-font-size</code>…), so <code>.fs-1</code>–<code>.fs-6</code> make text a heading's size without its weight or font. <code>.small</code> shrinks text to .875em of its context; it's Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is --bs-gray-600: <code>.text-body-secondary</code>, and form-text. <code>.subtle</code> is for links in it, which turn the theme colour on hover.</div>
     </div>
   </section>
 
@@ -439,7 +439,7 @@
             <input type="text" class="form-control" id="dg-event-name" autocomplete="off" value="Full moon gathering">
           </div>
           <div class="mb-3">
-            <label for="dg-location">Location <span class="fw-normal subtle">· focused</span></label>
+            <label for="dg-location">Location <span class="fw-normal text-body-secondary">· focused</span></label>
             <input type="text" class="form-control" id="dg-location" autocomplete="off" placeholder="Search for a place" style="border-color: var(--theme-500); box-shadow: var(--focus-ring)">
             <div class="form-text">Form text is --bs-gray-600. Every focused control gets the same ring, --focus-ring: --bs-focus-ring-width (2px) of --bs-focus-ring-color (the theme at 60%). Danger buttons ring in red, btn-signal in its blue, and colour swatches add a white gap. Nav links have none.</div>
           </div>
@@ -484,11 +484,11 @@
           <div class="card-body">
             <div class="d-flex gap-3 align-items-start mb-3">
               <span class="newsfeed-icon"><i class="bi bi-ticket-detailed-fill"></i></span>
-              <div><div class="mb-1"><b>Ecstatic dance</b> on Sat 4 Oct</div><div class="subtle small">2 hours ago</div></div>
+              <div><div class="mb-1"><b>Ecstatic dance</b> on Sat 4 Oct</div><div class="text-body-secondary small">2 hours ago</div></div>
             </div>
             <div class="d-flex gap-3 align-items-start mb-3">
               <span class="newsfeed-icon"><i class="bi bi-person-fill-add"></i></span>
-              <div><div class="mb-1"><b>Ruby</b> followed you</div><div class="subtle small">Yesterday</div></div>
+              <div><div class="mb-1"><b>Ruby</b> followed you</div><div class="text-body-secondary small">Yesterday</div></div>
             </div>
             <a href="#components">All events →</a>
           </div>
@@ -618,12 +618,12 @@
                 <span class="newsfeed-icon"><i class="bi <%= icon %>"></i></span>
                 <div class="notification-info flex-grow-1">
                   <div class="notification-title"><%== sentence %></div>
-                  <div class="notification-time subtle"><%= time %></div>
+                  <div class="notification-time text-body-secondary"><%= time %></div>
                 </div>
               </a>
             <% end %>
-            <a class="message-preview unread p-2 d-block text-dark text-decoration-none" href="#components"><b>Alex</b> · See you there! <span class="subtle small">unread</span></a>
-            <a class="message-preview p-2 d-block text-dark text-decoration-none" href="#components"><b>Jo</b> · Thanks <span class="subtle small">read</span></a>
+            <a class="message-preview unread p-2 d-block text-dark text-decoration-none" href="#components"><b>Alex</b> · See you there! <span class="text-body-secondary small">unread</span></a>
+            <a class="message-preview p-2 d-block text-dark text-decoration-none" href="#components"><b>Jo</b> · Thanks <span class="text-body-secondary small">read</span></a>
             <a class="list-group-item list-group-item-action text-center" href="#components">All notifications <i class="bi bi-arrow-right"></i></a>
           </div>
         </div>

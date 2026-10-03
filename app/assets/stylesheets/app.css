@@ -2173,6 +2173,7 @@ body[contenteditable] {
   background: var(--bs-white)
 }
 
+/* A link in secondary text colour that turns the theme colour on hover. Plain secondary text is .text-body-secondary */
 .subtle {
   color: var(--bs-secondary-color) !important
 }

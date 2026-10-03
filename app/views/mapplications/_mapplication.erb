@@ -29,7 +29,7 @@
         <% unless @gathering.send("anonymise_#{noun.pluralize}") %>
           <strong><a href="/u/<%= account.username %>"><%= account.name %></a></strong>
         <% end %>
-        <small class="subtle">
+        <small class="text-body-secondary">
           <%= timeago(verdict.created_at) %>
         </small>
         <% if verdict.reason %>

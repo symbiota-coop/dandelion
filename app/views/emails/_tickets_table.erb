@@ -9,12 +9,12 @@
           <% if defined?(account) %>
             <% when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ') %>
             <%= when_parts[0] %>
-            <div class="text-muted" style="font-size: 90%;">
+            <div class="text-body-secondary" style="font-size: 90%;">
               <%= when_parts[1..].join(', ') %>
             </div>
           <% else %>
             %recipient.when_parts_0%
-            <div class="text-muted" style="font-size: 90%;">
+            <div class="text-body-secondary" style="font-size: 90%;">
               %recipient.when_parts_1%
             </div>
           <% end %>
