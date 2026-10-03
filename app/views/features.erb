@@ -1,102 +1,10 @@
-<style>
-  #content { padding-left: 0; padding-right: 0; padding-top: 0; }
-
-  .features-section { padding-top: 3.5rem; padding-bottom: 3.5rem; }
-  @media (min-width: 992px) { .features-section { padding-top: 5rem; padding-bottom: 5rem; } }
-
-  .features-hero { padding-top: 0; }
-
-  .features-gradient-text {
-    background-size: 100% 100%;
-  }
-
-
-  .features-strapline-bottom {
-  font-size: 4.7vw;
-  line-height: 130%
-  }
-
-  @media (min-width: 768px) {
-  .features-strapline-bottom {
-    font-size: 4.2vw;
-  }
-  }
-
-  @media (min-width: 992px) {
-  .features-strapline-bottom {
-    font-size: 2.9vw;
-  }
-  }
-
-  .feature-card {
-    background: var(--bs-white);
-    border: 1px solid rgba(var(--bs-black-rgb), 0.08);
-    border-radius: var(--bs-border-radius-xl);
-    padding: 1.75rem;
-    height: 100%;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  .feature-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--bs-box-shadow);
-  }
-
-  .feature-icon {
-    width: 3rem;
-    height: 3rem;
-    border-radius: var(--bs-border-radius-lg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.35rem;
-    margin-bottom: 1rem;
-  }
-  .feature-icon.yellow { background: oklch(from var(--color-orange-400) l c h / 0.15); color: var(--color-orange-400); }
-  .feature-icon.rose { background: oklch(from var(--color-rose-500) l c h / 0.12); color: var(--color-rose-500); }
-  .feature-icon.magenta { background: oklch(from var(--color-magenta-500) l c h / 0.1); color: var(--color-magenta-500); }
-  .feature-icon.purple { background: oklch(from var(--color-midnight) l c h / 0.1); color: var(--color-midnight); }
-
-  .section-heading { font-size: var(--font-size-xl); font-weight: 700; margin-bottom: 0.5rem; }
-  @media (min-width: 992px) { .section-heading { font-size: 2vw; } }
-  .section-divider { width: 3rem; height: 3px; border-radius: var(--bs-border-radius-pill); margin-bottom: 1.5rem; }
-  .section-divider.yellow { background: linear-gradient(90deg, var(--color-orange-400), var(--color-orange-200)); }
-  .section-divider.rose { background: linear-gradient(90deg, var(--color-rose-500), var(--color-rose-200)); }
-  .section-divider.magenta { background: linear-gradient(90deg, var(--color-magenta-500), var(--color-magenta-200)); }
-  .section-divider.purple { background: linear-gradient(90deg, var(--color-midnight), var(--color-lavender-600)); }
-
-  .events-section {
-    background: linear-gradient(to bottom, var(--bs-white) 30%, var(--color-orange-50));
-  }
-
-  .gatherings-section {
-    background: linear-gradient(to bottom, var(--color-orange-50), var(--color-rose-50) 30%);
-  }
-
-  .orgs-section {
-    background: linear-gradient(to bottom, var(--color-rose-50), var(--color-magenta-50) 30%);
-  }
-
-  .values-section {
-    background: linear-gradient(to bottom, var(--color-magenta-50), var(--color-lavender-50) 30%);
-  }
-
-  .cta-section {
-    background:
-      radial-gradient(ellipse at 15% 80%, oklch(from var(--color-midnight) l c h / 0.5) 0%, transparent 50%),
-      radial-gradient(ellipse at 85% 20%, oklch(from var(--color-magenta-500) l c h / 0.4) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 50%, oklch(from var(--color-lavender-600) l c h / 0.3) 0%, transparent 60%),
-      linear-gradient(to bottom, oklch(from var(--color-midnight) calc(l + 0.08) c h), oklch(from var(--color-midnight) calc(l + 0.03) c h) 30%, var(--color-midnight) 60%, oklch(from var(--color-midnight) calc(l - 0.05) c h) 100%);
-    color: var(--bs-white);
-  }
-  .cta-section .btn-light:focus { color: var(--bs-body-color); }
-  .cta-section .btn-outline-light:hover { background: var(--bs-white); color: var(--color-midnight); }
-</style>
+<link rel="stylesheet" href="<%= cachebust('/stylesheets/marketing.css') %>">
 
 <!-- Hero -->
-<div class="gradient content-padding-x features-section features-hero text-lg-center">
+<div class="gradient content-padding-x marketing-section marketing-hero text-lg-center">
   <div class="row justify-content-center mx-0 py-5">
     <div class="col-lg-9 col-xl-8">
-      <p class="features-strapline strapline mb-3">The platform for <strong class="gradient-text features-gradient-text">events that matter</strong></p>
+      <p class="strapline mb-3">The platform for <strong class="gradient-text">events that matter</strong></p>
       <p class="readable mb-3">Run by a not-for-profit worker co-op.<br class="d-lg-none" />
         No platform fees.</p>
       <a class="btn btn-primary btn-lg" href="/events/new">List an event</a>
@@ -107,11 +15,11 @@
 </div>
 
 <!-- Events & Ticketing -->
-<div class="features-section events-section content-padding-x">
+<div class="marketing-section events-section content-padding-x">
   <div class="container">
     <div class="text-center mb-5">
       <h2 class="section-heading">Events &amp; Ticketing</h2>
-      <div class="section-divider yellow mx-auto"></div>
+      <div class="section-divider mx-auto"></div>
       <p class="text-body-secondary">Everything you need to list, manage and sell tickets for your events.</p>
     </div>
     <div class="row">
@@ -124,8 +32,8 @@
         ['bi-people', 'Smart recommendations', 'Get personalised suggestions for events and people based on your attendance history and community connections.'],
       ].each do |icon, title, desc| %>
         <div class="col-md-6 col-lg-4 mb-4">
-          <div class="feature-card">
-            <div class="feature-icon yellow"><i class="bi <%= icon %>"></i></div>
+          <div class="marketing-card">
+            <div class="marketing-icon"><i class="bi <%= icon %>"></i></div>
             <h5><%= title %></h5>
             <p class="text-body-secondary mb-0"><%= desc %></p>
           </div>
@@ -136,11 +44,11 @@
 </div>
 
 <!-- Co-created Gatherings -->
-<div class="features-section gatherings-section content-padding-x">
+<div class="marketing-section gatherings-section content-padding-x">
   <div class="container">
     <div class="text-center mb-5">
       <h2 class="section-heading">Co-created Gatherings</h2>
-      <div class="section-divider rose mx-auto"></div>
+      <div class="section-divider mx-auto"></div>
       <p class="text-body-secondary">Tools for participatory events where everyone contributes.</p>
     </div>
     <div class="row">
@@ -153,8 +61,8 @@
         ['bi-box-seam', 'Inventory & budget', 'Track shared resources, equipment and budgets transparently with all organisers.'],
       ].each do |icon, title, desc| %>
         <div class="col-md-6 col-lg-4 mb-4">
-          <div class="feature-card">
-            <div class="feature-icon rose"><i class="bi <%= icon %>"></i></div>
+          <div class="marketing-card">
+            <div class="marketing-icon"><i class="bi <%= icon %>"></i></div>
             <h5><%= title %></h5>
             <p class="text-body-secondary mb-0"><%= desc %></p>
           </div>
@@ -165,11 +73,11 @@
 </div>
 
 <!-- Organisations & Community -->
-<div class="features-section orgs-section content-padding-x">
+<div class="marketing-section orgs-section content-padding-x">
   <div class="container">
     <div class="text-center mb-5">
       <h2 class="section-heading">Organisations &amp; Community</h2>
-      <div class="section-divider magenta mx-auto"></div>
+      <div class="section-divider mx-auto"></div>
       <p class="text-body-secondary">Grow your community and keep everyone in the loop.</p>
     </div>
     <div class="row">
@@ -182,8 +90,8 @@
         ['bi-code-square', 'Embeddable widgets', 'Embed event listings or ticket forms on your own website with auto-resizing iframes.'],
       ].each do |icon, title, desc| %>
         <div class="col-md-6 col-lg-4 mb-4">
-          <div class="feature-card">
-            <div class="feature-icon magenta"><i class="bi <%= icon %>"></i></div>
+          <div class="marketing-card">
+            <div class="marketing-icon"><i class="bi <%= icon %>"></i></div>
             <h5><%= title %></h5>
             <p class="text-body-secondary mb-0"><%= desc %></p>
           </div>
@@ -194,11 +102,11 @@
 </div>
 
 <!-- Values -->
-<div class="features-section values-section content-padding-x">
+<div class="marketing-section values-section content-padding-x">
   <div class="container">
     <div class="text-center mb-5">
       <h2 class="section-heading">Built on values, not venture capital</h2>
-      <div class="section-divider purple mx-auto"></div>
+      <div class="section-divider mx-auto"></div>
     </div>
     <div class="row justify-content-center mb-5">
       <% [
@@ -207,7 +115,7 @@
         ['/images/opendata.png', '570/569', 'Fair source & open data', 'Our code is fair source, and events are cross-posted to ATProto.'],
       ].each do |img, aspect, title, desc| %>
         <div class="col-md-6 col-lg-4 mb-4">
-          <div class="feature-card text-center">
+          <div class="marketing-card text-center">
             <div class="mx-auto mb-3" style="width: 5rem;"><img src="<%= img %>" class="w-100" style="aspect-ratio: <%= aspect %>;"></div>
             <h5><%= title %></h5>
             <p class="text-body-secondary mb-0"><%= desc %></p>
@@ -219,10 +127,10 @@
 </div>
 
 <!-- CTA -->
-<div class="features-section cta-section content-padding-x text-lg-center pb-3">
+<div class="marketing-section cta-section content-padding-x text-lg-center pb-3">
   <div class="row justify-content-center mx-0">
     <div class="col-lg-9 col-xl-8">
-      <p class="features-strapline-bottom strapline mb-3">What will you bring people together for?</p>
+      <p class="strapline strapline-closing mb-3">What will you bring people together for?</p>
       <p class="readable mb-4" style="opacity: 0.9;">Join a growing community of organisers creating soulful, participatory and regenerative events.</p>
       <a class="btn btn-light btn-lg" href="/events/new">List an event</a>
       <a class="btn btn-outline-light btn-lg ms-1" href="/events">Explore events</a>

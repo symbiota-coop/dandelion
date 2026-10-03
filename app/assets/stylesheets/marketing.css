@@ -1,0 +1,163 @@
+/* The marketing pages: features (/features) and the Luma comparison (/dandelion-vs-luma) */
+
+/* Sections run edge to edge, padding themselves with .content-padding-x */
+#content {
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+}
+
+.marketing-section {
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+}
+
+@media (min-width: 992px) {
+  .marketing-section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
+.marketing-hero {
+  padding-top: 0;
+}
+
+/* Each section's accent: --accent for icons and the divider's start, --accent-light for its end.
+   Lighter accents get a stronger icon tint (--accent-tint) so they read as strongly as the darker ones */
+.events-section {
+  --accent: var(--color-orange-400);
+  --accent-light: var(--color-orange-200);
+  --accent-tint: 0.15;
+  background: linear-gradient(to bottom, var(--bs-white) 30%, var(--color-orange-50));
+}
+
+.gatherings-section {
+  --accent: var(--color-rose-500);
+  --accent-light: var(--color-rose-200);
+  --accent-tint: 0.12;
+  background: linear-gradient(to bottom, var(--color-orange-50), var(--color-rose-50) 30%);
+}
+
+.orgs-section {
+  --accent: var(--color-magenta-500);
+  --accent-light: var(--color-magenta-200);
+  background: linear-gradient(to bottom, var(--color-rose-50), var(--color-magenta-50) 30%);
+}
+
+.values-section {
+  --accent: var(--color-midnight);
+  --accent-light: var(--color-lavender-600);
+  background: linear-gradient(to bottom, var(--color-magenta-50), var(--color-lavender-50) 30%);
+}
+
+.reasons-section {
+  --accent: var(--color-magenta-500);
+  --accent-light: var(--color-magenta-200);
+  background: linear-gradient(to bottom, var(--bs-white) 30%, var(--color-magenta-50));
+}
+
+.section-heading {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 992px) {
+  .section-heading {
+    font-size: 2vw;
+  }
+}
+
+.section-divider {
+  width: 3rem;
+  height: 3px;
+  border-radius: var(--bs-border-radius-pill);
+  margin-bottom: 1.5rem;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
+}
+
+.marketing-card {
+  background: var(--bs-white);
+  border: 1px solid rgba(var(--bs-black-rgb), 0.08);
+  border-radius: var(--bs-border-radius-xl);
+  padding: 1.75rem;
+  height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.marketing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--bs-box-shadow);
+}
+
+/* The comparison's cards are wider, with more to say */
+.reasons-section .marketing-card {
+  padding: 2rem;
+}
+
+.marketing-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--bs-border-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  margin-bottom: 1rem;
+  color: var(--accent);
+  background: oklch(from var(--accent) l c h / var(--accent-tint, 0.1));
+}
+
+.reason-number {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--bs-white);
+  background: var(--accent);
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+/* A strapline a little smaller than .strapline, for the closing call to action */
+.strapline-closing {
+  font-size: 4.7vw;
+}
+
+@media (min-width: 768px) {
+  .strapline-closing {
+    font-size: 4.2vw;
+  }
+}
+
+@media (min-width: 992px) {
+  .strapline-closing {
+    font-size: 2.9vw;
+  }
+}
+
+.cta-section {
+  background:
+    radial-gradient(ellipse at 15% 80%, oklch(from var(--color-midnight) l c h / 0.5) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 20%, oklch(from var(--color-magenta-500) l c h / 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, oklch(from var(--color-lavender-600) l c h / 0.3) 0%, transparent 60%),
+    linear-gradient(to bottom, oklch(from var(--color-midnight) calc(l + 0.08) c h), oklch(from var(--color-midnight) calc(l + 0.03) c h) 30%, var(--color-midnight) 60%, oklch(from var(--color-midnight) calc(l - 0.05) c h) 100%);
+  color: var(--bs-white);
+}
+
+.cta-section .btn-light:focus {
+  color: var(--bs-body-color);
+}
+
+.cta-section .btn-outline-light:hover {
+  background: var(--bs-white);
+  color: var(--color-midnight);
+}
