@@ -14,7 +14,7 @@
     <div class="spec text-uppercase fw-bold">Design guide · v1 · October 2026</div>
     <h1 class="m-0">Dandelion</h1>
     <p class="m-0 readable">The visual language of dandelion.events as it exists in code today. This page is rendered with the site's own <code>app.css</code> and <code>bootstrap5.css</code>, so swatches, type and components are the real thing. The site is Bootstrap 5.3.8, restyled through its variables.</p>
-    <p class="m-0 small text-body-secondary">The root font size is 17px (19px from 1680px, 21px from 1920px), so rem values scale with the viewport. Sizes are in rem (or em, to follow the text); px is kept for 1–2px hairlines, the containers' 15px side padding (<code>$container-padding-x</code>) and overrides that must line up with Google Maps. Colour values, radii and type sizes are measured live; other sizes are copied from the stylesheets.</p>
+    <p class="m-0 small text-body-secondary">The root font size is 17px (19px from 1680px, 21px from 1920px), so rem values scale with the viewport. Sizes are in rem (or em, to follow the text); px is kept for 1–2px hairlines, shadows, the containers' 15px side padding (<code>$container-padding-x</code>) and overrides that must line up with Google Maps. Colour values, radii and type sizes are measured live; other sizes are copied from the stylesheets.</p>
     <nav class="d-flex flex-wrap gap-2">
       <% design_sections.each do |id, (title, _)| %>
         <a class="btn btn-outline-primary btn-sm" href="#<%= id %>"><%= title %></a>
@@ -233,7 +233,7 @@
       </div>
     <% end %>
 
-    <% design_subsection 'Elevation', "Bootstrap's three shadows, used through its variables or the <code>shadow-sm</code>, <code>shadow</code> and <code>shadow-lg</code> classes.".html_safe do %>
+    <% design_subsection 'Elevation', "Bootstrap's three shadows, set in <code>bootstrap5.scss</code> and used through its variables or the <code>shadow-sm</code>, <code>shadow</code> and <code>shadow-lg</code> classes. Soft and layered: a tight contact shadow (1–2px) under a wide, faint one, in px like hairlines. Floating surfaces also have a --hairline border, so the shadow can stay light.".html_safe do %>
       <div class="bg-body-tertiary rounded p-4">
         <div class="row g-4">
           <% [
