@@ -2,12 +2,13 @@
  * Served by /theme.css on themed pages, with the requested colour in place of the default green
  * (theme_css_variables in app/helpers/markup_helpers.rb, which the design guide's themed panels use too).
  * Variables only: app.css derives the theme ramp from --theme-500, and the rest of this block switches the
- * default site's own accents (calendar events in midnight, the AI well in lavender) to the theme.
+ * default site's own accents (calendar events in midnight, the AI well in lavender) to the theme. The AI well
+ * takes the same steps of the theme ramp that it takes of the lavender one.
  */
 :root {
   --theme-500: #00af5e;
   --theme-500-rgb: 0, 175, 94;
   --calendar-event-color: var(--theme-500);
-  --ai-well-from: var(--theme-a20);
-  --ai-well-to: var(--theme-a30);
+  --ai-well-from: var(--theme-50);
+  --ai-well-to: var(--theme-400);
 }

@@ -120,9 +120,8 @@
   --theme-600: oklch(from var(--theme-500) calc(l - 0.05) c h);
   --theme-800: oklch(from var(--theme-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
   /* Translucent tints of the 500, for what should take on the colour behind it: progress tracks, tile borders,
-     the themed AI well. Tints that sit on white use the solid 50 to 200 */
+     transcripts. Tints that sit on white use the solid 50 to 200 */
   --theme-a10: oklch(from var(--theme-500) l c h / 0.1);
-  --theme-a20: oklch(from var(--theme-500) l c h / 0.2);
   --theme-a30: oklch(from var(--theme-500) l c h / 0.3);
   --theme-a50: oklch(from var(--theme-500) l c h / 0.5);
   /* One focus ring everywhere: --bs-focus-ring-width (2px) of the theme at --bs-focus-ring-opacity (.6), both from bootstrap5.scss.
