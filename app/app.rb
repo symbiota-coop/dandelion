@@ -115,7 +115,7 @@ module Dandelion
           notifications = current_account.network_notifications.includes(:circle, :notifiable).order('created_at desc').paginate(page: params[:page])
           partial :newsfeed, locals: { notifications: notifications, include_circle_name: true }
         else
-          @body_class = 'greyed'
+          @body_class = 'canvas'
           erb :home_signed_in
         end
       elsif request.xhr?

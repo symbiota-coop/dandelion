@@ -247,7 +247,7 @@ Dandelion::App.controller do
       if params[:ticket_form_only]
         partial :'purchase/purchase', layout: :minimal
       else
-        @body_class = 'greyed'
+        @body_class = 'canvas'
         erb :'events/event'
       end
     when :json

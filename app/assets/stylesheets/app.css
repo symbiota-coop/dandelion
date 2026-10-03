@@ -50,6 +50,7 @@
   --color-highlight-1-light-2: #bb93ff;
   --color-highlight-1-light-3: #f3ecff;
   --color-paper: #FFFAF3;
+  --color-canvas: #F9F8FA;
   --body-font-family: "Plus Jakarta Sans", sans-serif;
   --header-font-family: "Hanken Grotesk", "Plus Jakarta Sans", sans-serif;
   /* Type scale */
@@ -718,9 +719,9 @@ body.gradient #content {
   }
 }
 
-body.greyed,
-body.greyed #content {
-  background-color: var(--bs-gray-100);
+body.canvas,
+body.canvas #content {
+  background-color: var(--color-canvas);
 }
 
 #content {
