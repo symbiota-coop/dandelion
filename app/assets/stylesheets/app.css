@@ -2162,10 +2162,6 @@ h6,
   }
 }
 
-p.small {
-  font-size: var(--font-size-xs)
-}
-
 mark,
 .highlight {
   padding-left: 0;
