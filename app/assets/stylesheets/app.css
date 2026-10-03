@@ -1546,6 +1546,7 @@ label.remove-image input {
 
 .nav {
   font-size: var(--font-size-md);
+  --bs-nav-link-hover-color: var(--bs-emphasis-color);
 }
 
 .nav > li > a {
@@ -1554,11 +1555,12 @@ label.remove-image input {
   text-decoration: none;
 }
 
-/* Dark text on the grey, as in dropdowns and the autocomplete: theme-coloured text on grey reads poorly */
+/* Dark text on the grey, as in dropdowns and the autocomplete: theme-coloured text on grey reads poorly.
+   Through the hover colour variable, so navs that set their own (the sidebar's white) keep it */
 .nav > li > a:focus,
 .nav > li > a:hover {
   background: var(--bs-secondary-bg);
-  color: var(--bs-emphasis-color);
+  color: var(--bs-nav-link-hover-color);
 }
 
 /* No focus ring on nav links: their focus background already shows where focus is */

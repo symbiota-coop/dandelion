@@ -25,10 +25,9 @@
     <p class="m-0 readable">The visual language of dandelion.events as it exists in code today. This page is rendered with the site's own <code>app.css</code> and <code>bootstrap5.css</code>, so swatches, type and components are the real thing. The site is Bootstrap 5.3.8, restyled through its variables.</p>
     <p class="m-0 small text-body-secondary">The root font size is 17px (19px from 1680px, 21px from 1920px), so rem values scale with the viewport. Colour values and pixel sizes are measured live. Items marked with an orange tag are inconsistencies, listed in full at the <a href="#issues">end</a>.</p>
     <nav class="d-flex flex-wrap gap-2">
-      <% [%w[colour Colour], %w[type Type], %w[shape Shape], %w[layout Layout], %w[components Components], %w[theming Theming]].each do |id, title| %>
+      <% [%w[colour Colour], %w[type Type], %w[shape Shape], %w[layout Layout], %w[components Components], %w[theming Theming], %w[issues Inconsistencies]].each do |id, title| %>
         <a class="btn btn-outline-primary btn-sm" href="#<%= id %>"><%= title %></a>
       <% end %>
-      <a class="btn btn-sm text-white" style="background: var(--gradient-active)" href="#issues">Inconsistencies</a>
     </nav>
   </header>
 
