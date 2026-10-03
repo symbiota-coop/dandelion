@@ -1,3 +1,6 @@
+/* Inlined into emails, which can't use custom properties, so the date and icon tiles take the default green's ramp steps
+   as hex: #75d695 (the 300) for borders and #a8eabb (the 200) for the month. On the site, app.css switches them to the theme */
+
 table.event-details td {
   vertical-align: middle;
   font-size: 1.1em;
@@ -13,7 +16,7 @@ table.event-details td:first-child {
   vertical-align: middle;
   display: inline-block;
   text-align: center;
-  border: 0.13em solid rgba(0, 175, 94, 0.5);
+  border: 0.13em solid #75d695;
   border-radius: 0.25em;
   width: 2.5em;
   height: 2.5em;
@@ -39,8 +42,8 @@ span.event-detail.calendar-date {
 .event-detail.calendar-date .month {
   display: block;
   text-transform: uppercase;
-  background-color: rgba(0, 175, 94, 0.3);
-  border-bottom: 0.13em solid rgba(0, 175, 94, 0.5);
+  background-color: #a8eabb;
+  border-bottom: 0.13em solid #75d695;
 
 }
 

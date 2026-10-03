@@ -1,6 +1,7 @@
 /* Inlined into emails, which can't use custom properties, so colours are literal copies of the site's:
-   the warm greys from bootstrap5.scss (#77736f gray-600 for secondary text, #3c3935 gray-800 for dark text,
-   #d6d3cf gray-400 and #eeebe7 gray-200 for borders and fills) */
+   the warm greys from bootstrap5.scss (#272420 gray-900 for body text, #77736f gray-600 for secondary text, #3c3935 gray-800
+   for footer links and code, #d6d3cf gray-400 and #eeebe7 gray-200 for borders and fills), the site's .875em small text and
+   its radii. Theme colours, including the ramp steps for hovers and blockquotes, come from EmailHelper.theme_css */
 
 html,
 body,
@@ -14,6 +15,7 @@ blockquote {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, sans-serif;
   font-size: 17px;
   line-height: 1.45;
+  color: #272420;
 }
 
 h1,
@@ -62,7 +64,8 @@ p.action a {
   color: white;
   text-decoration: none;
   padding: 0.5em 0.75em;
-  border-radius: 0.25em;
+  border-radius: 0.5em;
+  font-weight: 600;
 }
 
 p.action a:hover {
@@ -106,7 +109,7 @@ td {
 .footer {
   margin: 2em 0;
   text-align: center;
-  font-size: 0.85em;
+  font-size: 0.875em;
   color: #77736f;
 }
 
@@ -179,7 +182,7 @@ p.lead {
 }
 
 p.small {
-  font-size: 90%;
+  font-size: 0.875em;
 }
 
 p.action {
@@ -187,7 +190,8 @@ p.action {
 }
 
 hr {
-  border: 0.0625em solid #eeebe7;
+  border: 0;
+  border-top: 1px solid #d6d3cf;
   margin: 1em 0;
 }
 
@@ -195,7 +199,7 @@ a.attachment {
   margin: 1em 0;
   padding: 0.75em;
   border: 0.125em solid #eeebe7;
-  border-radius: 0.125em;
+  border-radius: 0.5em;
   text-decoration: none;
   display: block;
 }
@@ -205,7 +209,7 @@ pre {
   color: #3c3935;
   background: #eeebe7;
   border: 0.0625em solid #d6d3cf;
-  border-radius: 0.125em;
+  border-radius: 0.25em;
   text-align: left;
   direction: ltr;
   tab-size: 4;
@@ -241,7 +245,7 @@ pre {
 }
 
 .text-dark {
-  color: #3c3935;
+  color: #272420;
 }
 
 .qr-code {
@@ -258,6 +262,6 @@ pre {
 .media span {
   display: block;
   margin-bottom: 1em;
-  font-size: 90%;
+  font-size: 0.875em;
   color: #77736f;
 }
