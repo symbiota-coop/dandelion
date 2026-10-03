@@ -120,7 +120,7 @@
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">Greys, black and white</h3>
-        <span class="text-body-secondary">Bootstrap's own variables. Usage: 100 wells · 200 hovers and stripes · 300 table borders · 400 input borders and hr · 600 secondary text · 700 input add-ons · 800 search bar · 900 header and sidebar. Body text is <code>--bs-body-color</code>, the same as 900. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows, hairlines and image overlays.</span>
+        <span class="text-body-secondary">Bootstrap's own variables, set in bootstrap5.scss to warm greys: Bootstrap's lightness steps at a slight warm hue (oklch hue 75, chroma .006–.008). Usage: 100 wells and the body.greyed background · 200 hovers and stripes · 300 table borders · 400 input borders and hr · 600 secondary text · 700 input add-ons · 800 search bar · 900 header and sidebar. Body text is <code>--bs-body-color</code>, the same as 900. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows, hairlines and image overlays.</span>
       </div>
       <div class="row g-3">
         <% %w[--bs-white --bs-gray-100 --bs-gray-200 --bs-gray-300 --bs-gray-400 --bs-gray-500 --bs-gray-600 --bs-gray-700 --bs-gray-800 --bs-gray-900 --bs-black].each do |name| %>
@@ -141,7 +141,6 @@
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
              [%w[--color-paper], 'body.gradient end'],
-             [%w[--color-superlight], 'body.greyed'],
              [%w[--color-search-highlight], 'mark'],
              [%w[--color-highlight-1-light-2 --color-highlight-1-light-1 --color-highlight-1-light-3], 'AI well gradient (1 to 2), body.gradient (3)'],
              [%w[--color-yellow --color-yellow-light], 'text-bg-yellow: Featured, Co-host, rota points'],
@@ -160,7 +159,7 @@
               </div>
               <div class="fw-bold text-break"><%= names.first.start_with?('--color-highlight-1') ? 'highlight-1-light-2/1/3' : "#{names.first}, …" %></div>
             <% else %>
-              <div class="rounded mb-1 <%= 'border' if %w[--color-paper --color-superlight].include?(names.first) %>" style="height: 64px; background: var(<%= names.first %>)"></div>
+              <div class="rounded mb-1 <%= 'border' if names.first == '--color-paper' %>" style="height: 64px; background: var(<%= names.first %>)"></div>
               <div class="fw-bold text-break"><%= names.first %></div>
             <% end %>
             <div class="font-monospace small text-body-secondary"><%== css_vars.call(*names) %><%= " · #{note}" if note %></div>
@@ -416,7 +415,7 @@
           <div class="row g-3 flex-grow-1">
             <% [['col-8', 'col-lg-8 · newsfeed'], ['col-4', 'col-lg-4 · sticky']].each do |col, label| %>
               <div class="<%= col %>">
-                <div class="h-100 border rounded shadow-sm d-flex align-items-center justify-content-center text-center font-monospace small text-body-secondary" style="background: repeating-linear-gradient(135deg, var(--color-superlight) 0 10px, #fff 10px 20px)"><%= label %></div>
+                <div class="h-100 border rounded shadow-sm d-flex align-items-center justify-content-center text-center font-monospace small text-body-secondary" style="background: repeating-linear-gradient(135deg, var(--bs-gray-100) 0 10px, #fff 10px 20px)"><%= label %></div>
               </div>
             <% end %>
           </div>

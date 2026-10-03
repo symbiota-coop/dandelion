@@ -2,12 +2,23 @@
 // After editing, run `rake bootstrap:build` (needs Node) and commit bootstrap5.css.
 // Anything that isn't a Bootstrap variable belongs in app.css.
 
+// Warm greys: Bootstrap's grey lightness steps in oklch at hue 75, chroma .006 (.008 from 500 down)
+$gray-100: #fbf8f5;
+$gray-200: #eeebe7;
+$gray-300: #e4e1dd;
+$gray-400: #d6d3cf;
+$gray-500: #b7b3ae;
+$gray-600: #77736f;
+$gray-700: #524f4a;
+$gray-800: #3c3935;
+$gray-900: #272420;
+
 $blue: #00af5e;
 // Status colours: bg-*, text-*, btn-*, alert-* and friends all follow these
 $success: #00af5e;
 $info: #5AC8FA;
-$warning: #FF9500;
-$danger: #FF3B30;
+$warning: #fc9417; // --color-orange in app.css
+$danger: #e54d45; // --color-red in app.css
 $font-family-sans-serif: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 $font-weight-normal: 500;
 $lead-font-weight: inherit;
@@ -29,19 +40,19 @@ $card-cap-padding-y: .75rem;
 $card-cap-padding-x: 1.25rem;
 $table-bg: transparent;
 $hr-opacity: 1;
-$input-group-addon-bg: #e9ecef; // gray-200
-$input-group-addon-color: #495057; // gray-700
+$input-group-addon-bg: $gray-200;
+$input-group-addon-color: $gray-700;
 $enable-smooth-scroll: false;
 $enable-rfs: false;
 
 // Dandelion's look
-$body-secondary-color: #6c757d; // gray-600: text-body-secondary and form-text
-$body-secondary-bg: #e9ecef; // gray-200 (--bs-secondary-bg): hovered nav links, switches when off
-$body-tertiary-bg: #f8f9fa; // gray-100 (--bs-tertiary-bg): wells, hovered dropdown and list items
-$input-placeholder-color: rgba(33, 37, 41, .75); // as before $body-secondary-color changed
-$hr-border-color: #ced4da; // gray-400
+$body-secondary-color: $gray-600; // text-body-secondary and form-text
+$body-secondary-bg: $gray-200; // --bs-secondary-bg: hovered nav links, switches when off
+$body-tertiary-bg: $gray-100; // --bs-tertiary-bg: wells, hovered dropdown and list items
+$input-placeholder-color: rgba($gray-900, .75); // as before $body-secondary-color changed
+$hr-border-color: $gray-400;
 $input-color: #000;
-$input-border-color: #ced4da; // gray-400
+$input-border-color: $gray-400;
 $input-font-size: .825rem; // matches --body-font-size in app.css (Sass needs a literal for its calculations)
 $input-focus-border-color: var(--theme-500);
 // One focus ring everywhere: 2px of the theme colour at 60%. app.css points the themed rings at --bs-focus-ring-*
@@ -52,7 +63,7 @@ $input-btn-focus-color-opacity: $focus-ring-opacity;
 $input-focus-box-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-focus-ring-color);
 $form-select-focus-box-shadow: $input-focus-box-shadow;
 $form-check-input-width: 1.3em;
-$form-check-input-border: 1px solid #ced4da; // gray-400
+$form-check-input-border: 1px solid $gray-400;
 $form-check-input-border-radius: .25rem;
 $form-check-margin-bottom: .5rem;
 // Label-less switches, a little bigger than Bootstrap's, with a white, shadowed knob whether off, focused or on
@@ -80,9 +91,9 @@ $table-cell-padding-y: .5rem;
 $table-cell-padding-x: .5rem;
 $table-cell-padding-y-sm: .5rem; // small tables aren't any tighter
 $table-cell-padding-x-sm: .5rem;
-$table-border-color: #dee2e6; // gray-300
-$table-hover-bg: #e9ecef; // gray-200
-$table-striped-bg: #e9ecef; // gray-200
+$table-border-color: $gray-300;
+$table-hover-bg: $gray-200;
+$table-striped-bg: $gray-200;
 $pagination-color: #000;
 $pagination-bg: transparent;
 $pagination-border-color: transparent;
@@ -90,13 +101,13 @@ $pagination-border-radius: .25rem;
 $pagination-margin-start: .1875rem;
 $pagination-hover-color: #000;
 $pagination-hover-bg: transparent;
-$pagination-hover-border-color: #ced4da; // gray-400
+$pagination-hover-border-color: $gray-400;
 $pagination-focus-color: #000;
 $pagination-focus-bg: transparent;
 $pagination-active-color: #000;
 $pagination-active-bg: transparent;
-$pagination-active-border-color: #6c757d; // gray-600
-$pagination-disabled-color: #6c757d; // gray-600
+$pagination-active-border-color: $gray-600;
+$pagination-disabled-color: $gray-600;
 $pagination-disabled-bg: transparent;
 $pagination-disabled-border-color: transparent;
 
