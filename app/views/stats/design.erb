@@ -223,15 +223,16 @@
   <!-- SHAPE -->
   <% design_section 'shape' do %>
 
-    <% design_subsection 'Radius', "Bootstrap's radius variables, set to four steps in <code>bootstrap5.scss</code>. Square corners (0) where an element sits flush against another; 50% for circles.".html_safe do %>
+    <% design_subsection 'Radius', "Bootstrap's radius variables, set to one scale in <code>bootstrap5.scss</code>: controls on the base, surfaces on lg, sheets on xl. Inputs and buttons share a radius at every size (sm, base, lg), so they match side by side. Square corners (0) where an element sits flush against another; 50% for circles.".html_safe do %>
       <div class="row g-3">
         <% [
-             ['--bs-border-radius', 'Inputs, cards, labels, pagination, sidebar pills. -sm is the same'],
-             ['--bs-border-radius-lg', 'Buttons (every size, and button groups), menus and panels: dropdowns, autocomplete, cookie banner, AI well, ask box'],
+             ['--bs-border-radius-sm', 'form-control-sm and btn-sm, Select2 tags'],
+             ['--bs-border-radius', 'Inputs, buttons, button groups, alerts, toasts, pagination, tooltips, sidebar pills'],
+             ['--bs-border-radius-lg', 'Cards, modals, menus and panels: dropdowns, autocomplete, cookie banner, AI well, ask box. Also form-control-lg and btn-lg'],
              ['--bs-border-radius-xl', 'Mobile bottom sheet (top corners), marketing cards'],
              ['--bs-border-radius-pill', 'Badges, nav crumbs, avatars, round buttons and dots']
            ].each do |name, note| %>
-          <div class="col-6 col-md-3">
+          <div class="col-6 col-md">
             <div class="bg-body-secondary border mb-2" style="height: 72px; border-radius: var(<%= name %>)"></div>
             <div class="fw-bold text-break"><%= name %></div>
             <div class="spec"><span data-css-value="<%= name %>"></span></div>
@@ -331,7 +332,7 @@
         <a class="btn btn-primary" href="#components">btn</a>
         <a class="btn btn-primary btn-lg" href="#components">btn-lg</a>
       </div>
-      <div class="spec">.btn · .875rem · weight 600 · padding .5rem 1rem (sm .375rem .75rem), the same height as an input · radius .5rem (--bs-border-radius-lg)</div>
+      <div class="spec">.btn · .875rem · weight 600 · padding .5rem 1rem (sm .375rem .75rem), the same height as an input · radius .5rem (--bs-border-radius), as inputs</div>
     <% end %>
 
     <% design_subsection 'Badges', "Bootstrap's <code>.badge</code> with a <code>text-bg-*</code> colour, for counts, statuses, tags and amounts. Sized in em, so a badge scales with the text around it: small in a nav, bigger beside a heading. Pick the colour by what it means.".html_safe do %>

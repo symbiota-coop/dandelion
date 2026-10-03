@@ -26,6 +26,17 @@
   min-height: calc(1.5em + 1rem + 2px);
 }
 
+/* The theme hard-codes .25rem; take .form-control's radius (its open-state rules still square the joined corners) */
+.select2-container--bootstrap-5 .select2-selection,
+.select2-container--bootstrap-5 .select2-dropdown,
+.select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field {
+  border-radius: var(--bs-border-radius);
+}
+
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
+  border-radius: var(--bs-border-radius-sm);
+}
+
 .select2-container--bootstrap-5 .select2-selection--single {
   padding-top: .5rem;
   padding-bottom: .5rem;
