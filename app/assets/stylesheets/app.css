@@ -48,6 +48,7 @@
   /* Lavender: the default green's lightness and chroma at hue 300 (oklch(0.661 0.169 300)), with the theme ramp's steps derived from its 500 */
   --color-lavender-500: #A476E9;
   --color-lavender-50: oklch(from var(--color-lavender-500) 0.97 calc(c * 0.15) h);
+  --color-lavender-100: oklch(from var(--color-lavender-500) 0.93 calc(c * 0.3) h);
   --color-lavender-200: oklch(from var(--color-lavender-500) 0.88 calc(c * 0.55) h);
   --color-lavender-400: oklch(from var(--color-lavender-500) calc(l + 0.06) c h);
   --color-lavender-600: oklch(from var(--color-lavender-500) calc(l - 0.05) c h);
@@ -97,7 +98,7 @@
   --hairline: rgba(var(--bs-black-rgb), 0.1);
   --color-yellow-500: #FFCC00;
   --color-yellow-400: oklch(from var(--color-yellow-500) calc(l + 0.06) c h);
-  --color-yellow-50: oklch(from var(--color-yellow-500) 0.97 calc(c * 0.15) h);
+  --color-yellow-100: oklch(from var(--color-yellow-500) 0.93 calc(c * 0.3) h);
   --color-yellow-800: oklch(from var(--color-yellow-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
   --gradient-active: linear-gradient(135deg, #fd7514 0%, #efe707 100%);
   --gradient-rainbow: radial-gradient(circle at 0 0, #099ef1 0%, #6863f8 18.82%, #d84ffa 32.6%, #f058c5 52.83%, #ff4f90 68.03%, #ff6558 87.66%, #ff891f 100%);
@@ -135,12 +136,14 @@
   /* Warning and danger: fixed hues matched to the default green (red oklch(0.63 0.19 27), orange lighter so it reads as orange: oklch(0.76 0.17 62)), with the theme ramp's steps derived from each 500 */
   --color-orange-500: #fc9417;
   --color-orange-50: oklch(from var(--color-orange-500) 0.97 calc(c * 0.15) h);
+  --color-orange-100: oklch(from var(--color-orange-500) 0.93 calc(c * 0.3) h);
   --color-orange-200: oklch(from var(--color-orange-500) 0.88 calc(c * 0.55) h);
   --color-orange-400: oklch(from var(--color-orange-500) calc(l + 0.06) c h);
   --color-orange-600: oklch(from var(--color-orange-500) calc(l - 0.05) c h);
   --color-orange-800: oklch(from var(--color-orange-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
   --color-red-500: #e54d45;
   --color-red-50: oklch(from var(--color-red-500) 0.97 calc(c * 0.15) h);
+  --color-red-100: oklch(from var(--color-red-500) 0.93 calc(c * 0.3) h);
   --color-red-200: oklch(from var(--color-red-500) 0.88 calc(c * 0.55) h);
   --color-red-400: oklch(from var(--color-red-500) calc(l + 0.06) c h);
   --color-red-600: oklch(from var(--color-red-500) calc(l - 0.05) c h);
@@ -744,6 +747,7 @@ body.canvas #content {
 .progress-bar,
 p.action a {
   --variant-50: var(--theme-50);
+  --variant-100: var(--theme-100);
   --variant-200: var(--theme-200);
   --variant-400: var(--theme-400);
   --variant-500: var(--theme-500);
@@ -757,6 +761,7 @@ p.action a {
 .btn-warning,
 .text-bg-warning {
   --variant-50: var(--color-orange-50);
+  --variant-100: var(--color-orange-100);
   --variant-200: var(--color-orange-200);
   --variant-400: var(--color-orange-400);
   --variant-500: var(--color-orange-500);
@@ -770,6 +775,7 @@ p.action a {
 .btn-danger,
 .text-bg-danger {
   --variant-50: var(--color-red-50);
+  --variant-100: var(--color-red-100);
   --variant-200: var(--color-red-200);
   --variant-400: var(--color-red-400);
   --variant-500: var(--color-red-500);
@@ -777,10 +783,10 @@ p.action a {
   --variant-800: var(--color-red-800);
 }
 
-/* Secondary and yellow fill buttons, and tint badges with their 50 and 800 */
+/* Secondary and yellow fill buttons, and tint badges with their 100 and 800 */
 .btn-secondary,
 .text-bg-secondary {
-  --variant-50: var(--bs-gray-200);
+  --variant-100: var(--bs-gray-200);
   --variant-400: var(--bs-gray-500);
   --variant-500: var(--bs-gray-600);
   --variant-600: var(--bs-gray-700);
@@ -788,7 +794,7 @@ p.action a {
 }
 
 .text-bg-yellow {
-  --variant-50: var(--color-yellow-50);
+  --variant-100: var(--color-yellow-100);
   --variant-400: var(--color-yellow-400);
   --variant-500: var(--color-yellow-500);
   --variant-800: var(--color-yellow-800);
@@ -892,10 +898,10 @@ p.action a:hover {
 /* Bootstrap's badge, coloured with its text-bg-* classes, for counts, statuses, tags and amounts alike.
    Sized in em and shaped as a pill (bootstrap5.scss), so a badge scales with the text around it */
 
-/* Soft pills: their variant's 50, with its 800 for text. Other elements with text-bg-* classes, like card headers, stay filled */
+/* Soft pills: their variant's 100, deep enough to show on grey as well as white, with its 800 for text. Other elements with text-bg-* classes, like card headers, stay filled */
 .badge:is(.text-bg-primary, .text-bg-secondary, .text-bg-warning, .text-bg-danger, .text-bg-yellow) {
   color: var(--variant-800) !important;
-  background: var(--variant-50) !important;
+  background: var(--variant-100) !important;
 }
 
 .btn-primary .badge {

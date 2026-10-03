@@ -31,7 +31,7 @@
             label_note: "Primary and success · follows each organisation's theme",
             notes: {
               '50' => 'alert and toast background, crumbs, newsfeed icons, docs transcripts, themed AI well',
-              '100' => 'crumb hover, unread messages',
+              '100' => 'crumb hover, unread messages, badge background',
               '200' => 'alert and toast gradient end, progress tracks, date tile months, blockquote and transcript borders, chart projections',
               '300' => 'date and icon tile borders, bar chart projections',
               '400' => 'button gradient end, themed AI well end',
@@ -51,6 +51,7 @@
             prefix: '--color-lavender',
             notes: {
               '50' => '.lavender-wash, AI well background',
+              '100' => 'not used yet',
               '200' => 'not used yet',
               '400' => 'AI well gradient end',
               '500' => 'not used yet',
@@ -65,7 +66,8 @@
 
     <% design_subsection 'Warning and danger', "Two families, used the same way as the theme ramp: each variant class (alert-warning, toast-warning, table-warning, btn-warning, text-bg-warning and the danger ones) sets its steps as <code>--variant-50</code> to <code>--variant-800</code>, and each component maps those to its roles once. The 500 is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match. There are no warning buttons yet, so --color-orange-600 is unused.".html_safe do %>
       <% roles = {
-           '50' => 'alert, toast, row and badge background',
+           '50' => 'alert, toast and row background',
+           '100' => 'badge background',
            '200' => 'tint gradient end, row border',
            '400' => 'gradient end',
            '500' => 'fill: buttons, filled badges',
@@ -336,7 +338,7 @@
       <div class="border rounded p-4 d-flex flex-column gap-3">
         <h4 class="m-0">Full moon gathering <span class="badge text-bg-yellow">Featured</span> <span class="badge text-bg-secondary">Locked</span></h4>
         <div>Followers <span class="badge text-bg-primary">128</span> · Tagged <a class="badge text-bg-primary" href="#components">breathwork</a> in <span class="badge text-primary border border-primary">Weekend pass</span> · Paid <span class="badge text-bg-secondary">£5 discount applied</span></div>
-        <div class="spec">.badge · 1em · .4em .85em · pill · weight 600 · primary, secondary, warning, danger and yellow are soft: their variant's 50 behind its 800 (secondary: --bs-gray-200 and 800); dark, stripe and payment badges are filled</div>
+        <div class="spec">.badge · 1em · .4em .85em · pill · weight 600 · primary, secondary, warning, danger and yellow are soft: their variant's 100 behind its 800, so they show on grey as well as white (secondary: --bs-gray-200 and 800); dark, stripe and payment badges are filled</div>
       </div>
       <table class="table table-sm mb-0">
         <thead>
