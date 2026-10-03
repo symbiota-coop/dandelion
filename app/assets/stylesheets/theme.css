@@ -30,8 +30,3 @@
   padding: 1rem;
   border-radius: var(--bs-border-radius-lg);
 }
-
-#map-container,
-#map-canvas {
-  min-height: 500px;
-}
