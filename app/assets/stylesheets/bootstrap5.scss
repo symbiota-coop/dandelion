@@ -44,7 +44,12 @@ $input-color: #000;
 $input-border-color: #ced4da; // gray-400
 $input-font-size: .825rem; // matches --body-font-size in app.css (Sass needs a literal for its calculations)
 $input-focus-border-color: var(--theme-500);
-$input-focus-box-shadow: 0 0 0 2px rgba(var(--theme-500-rgb), .6);
+// One focus ring everywhere: 2px of the theme colour at 60%. app.css points the themed rings at --bs-focus-ring-*
+$focus-ring-width: 2px;
+$focus-ring-opacity: .6;
+$input-btn-focus-width: $focus-ring-width;
+$input-btn-focus-color-opacity: $focus-ring-opacity;
+$input-focus-box-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-focus-ring-color);
 $form-select-focus-box-shadow: $input-focus-box-shadow;
 $form-check-input-width: 1.3em;
 $form-check-input-border: 1px solid #ced4da; // gray-400

@@ -44,7 +44,7 @@
   --bs-link-color-rgb: var(--theme-500-rgb);
   --bs-link-hover-color: var(--theme-600);
   --bs-link-hover-color-rgb: var(--theme-500-rgb);
-  --bs-focus-ring-color: oklch(from var(--theme-500) l c h / 0.25);
+  --bs-focus-ring-color: oklch(from var(--theme-500) l c h / var(--bs-focus-ring-opacity));
   --color-highlight-1: #4400B9;
   --color-highlight-1-light-1: #ebdfff;
   --color-highlight-1-light-2: #bb93ff;
@@ -907,6 +907,11 @@ body.greyed #content {
   outline: none;
 }
 
+/* Bootstrap hard-codes .5 opacity for button focus rings; use the shared ring */
+.btn {
+  --bs-btn-focus-box-shadow: 0 0 0 var(--bs-focus-ring-width) rgba(var(--bs-btn-focus-shadow-rgb), var(--bs-focus-ring-opacity));
+}
+
 .btn.btn-lg {
   line-height: 1.3333333;
 }
@@ -973,15 +978,15 @@ body.greyed #content {
 }
 
 .form-check-input:focus {
-  box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+  box-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-focus-ring-color);
 }
 
 .pagination {
-  --bs-pagination-focus-box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+  --bs-pagination-focus-box-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-focus-ring-color);
 }
 
 .accordion {
-  --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+  --bs-accordion-btn-focus-box-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-focus-ring-color);
 }
 
 .form-check-input:checked {
@@ -1000,7 +1005,7 @@ body.greyed #content {
 }
 
 .btn-close {
-  --bs-btn-close-focus-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+  --bs-btn-close-focus-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-focus-ring-color);
 }
 
 .comment-grey .btn-outline-light,
@@ -1021,7 +1026,7 @@ body.greyed #content {
 
 .quick-color-btn:focus, .quick-color-btn.selected {
   outline: none;
-  box-shadow: 0 0 0 2px var(--bs-white), 0 0 0 4px var(--ring-color);
+  box-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-white), 0 0 0 calc(var(--bs-focus-ring-width) * 2) var(--ring-color);
 }
 
 .btn-secondary:focus {
@@ -1040,7 +1045,7 @@ body.greyed #content {
   background-color: var(--color-signal-dark) !important;
   border-color: var(--color-signal-dark) !important;
   color: var(--bs-white) !important;
-  box-shadow: 0 0 0 0.2rem oklch(from var(--color-signal) l c h / 0.25) !important;
+  box-shadow: 0 0 0 var(--bs-focus-ring-width) oklch(from var(--color-signal) l c h / var(--bs-focus-ring-opacity)) !important;
 }
 
 #donation-percent-buttons .btn {
