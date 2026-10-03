@@ -13,7 +13,7 @@
     <div class="font-monospace small text-body-secondary text-uppercase fw-bold">Design guide · v1 · October 2026</div>
     <h1 class="m-0">Dandelion</h1>
     <p class="m-0 readable">The visual language of dandelion.events as it exists in code today. This page is rendered with the site's own <code>app.css</code> and <code>bootstrap5.css</code>, so swatches, type and components are the real thing. The site is Bootstrap 5.3.8, restyled through its variables.</p>
-    <p class="m-0 small text-body-secondary">The root font size is 17px (19px from 1680px, 21px from 1920px), so rem values scale with the viewport. Sizes are in rem (or em, to follow the text); px is kept for 1–2px hairlines and for overrides that must line up with Google Maps. Colour values and pixel sizes are measured live.</p>
+    <p class="m-0 small text-body-secondary">The root font size is 17px (19px from 1680px, 21px from 1920px), so rem values scale with the viewport. Sizes are in rem (or em, to follow the text); px is kept for 1–2px hairlines, the containers' 15px side padding (<code>$container-padding-x</code>) and overrides that must line up with Google Maps. Colour values, radii and type sizes are measured live; other sizes are copied from the stylesheets.</p>
     <nav class="d-flex flex-wrap gap-2">
       <% [%w[colour Colour], %w[type Type], %w[shape Shape], %w[layout Layout], %w[components Components], %w[theming Theming]].each do |id, title| %>
         <a class="btn btn-outline-primary btn-sm" href="#<%= id %>"><%= title %></a>
@@ -33,22 +33,27 @@
         <h3 class="m-0">Theme</h3>
         <span class="text-body-secondary">A ramp generated from one value with <code>oklch()</code>. Components use the 500, 400 as the gradient end, 600 for hover, 50 to 200 for alert and toast backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints.</span>
       </div>
-      <% [
-           ['theme', 'Primary and success · follows each organisation\'s theme', %w[50 100 200 400 500 600 700 800], { '50' => 'alert and toast background', '200' => 'alert and toast gradient end', '100' => 'not used yet', '400' => 'button gradient end', '600' => 'hover', '700' => 'not used yet', '800' => 'text on tints' }]
-         ].each do |name, role, steps, notes| %>
-        <div>
-          <div class="mb-1"><span class="fw-bold">--<%= name %>-*</span> <span class="text-body-secondary">· <%= role %></span></div>
-          <div class="row g-2">
-            <% steps.each do |step| %>
-              <div class="col-3 col-md">
-                <div class="rounded mb-1 d-flex align-items-end p-2 small fw-bold" style="height: 72px; background: var(--<%= name %>-<%= step %>); color: <%= step.to_i >= 500 ? '#fff' : 'var(--bs-gray-800)' %>"><%= step %></div>
-                <div class="font-monospace small text-body-secondary text-break"><%== css_var.call("--#{name}-#{step}") %></div>
-                <% if notes[step] %><div class="small text-body-secondary"><%= notes[step] %></div><% end %>
-              </div>
-            <% end %>
-          </div>
+      <div>
+        <div class="mb-1"><span class="fw-bold">--theme-*</span> <span class="text-body-secondary">· Primary and success · follows each organisation's theme</span></div>
+        <div class="row g-2">
+          <% {
+               '50' => 'alert and toast background',
+               '100' => 'not used yet',
+               '200' => 'alert and toast gradient end',
+               '400' => 'button gradient end',
+               '500' => nil,
+               '600' => 'hover',
+               '700' => 'not used yet',
+               '800' => 'text on tints'
+             }.each do |step, note| %>
+            <div class="col-3 col-md">
+              <div class="rounded mb-1 d-flex align-items-end p-2 small fw-bold" style="height: 72px; background: var(--theme-<%= step %>); color: <%= step.to_i >= 500 ? '#fff' : 'var(--bs-gray-800)' %>"><%= step %></div>
+              <div class="font-monospace small text-body-secondary text-break"><%== css_var.call("--theme-#{step}") %></div>
+              <% if note %><div class="small text-body-secondary"><%= note %></div><% end %>
+            </div>
+          <% end %>
         </div>
-      <% end %>
+      </div>
       <div class="row g-3 row-cols-1 row-cols-sm-2">
         <div class="col">
           <div class="rounded border mb-1" style="height: 64px; background: linear-gradient(135deg, var(--theme-50) 0%, var(--theme-50) 50%, var(--theme-200) 100%)"></div>
@@ -63,7 +68,7 @@
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">Warning and danger</h3>
-        <span class="text-body-secondary">Two families, used the same way. The fill is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match.</span>
+        <span class="text-body-secondary">Two families, used the same way. The fill is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match. There are no warning buttons yet, so --color-orange-hover is unused.</span>
       </div>
       <% [%w[Warning orange], %w[Danger red]].each do |title, colour| %>
         <div>
@@ -87,7 +92,7 @@
                 <div class="rounded border mb-1" style="height: 64px; background: var(<%= name %>)"></div>
                 <div class="fw-bold small text-break"><%= suffix.empty? ? 'fill' : suffix.delete_prefix('-') %></div>
                 <div class="font-monospace small text-body-secondary"><%== css_var.call(name) %></div>
-                <div class="small text-body-secondary"><%= name == '--color-orange-hover' ? 'button hover (no warning buttons yet)' : note %></div>
+                <div class="small text-body-secondary"><%= note %></div>
                 <% if other_uses %><div class="small text-body-secondary">Also: <%= other_uses %></div><% end %>
               </div>
             <% end %>
@@ -127,21 +132,19 @@
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Accents and surfaces</h3>
-      </div>
+      <h3 class="m-0">Accents and surfaces</h3>
       <p class="m-0 text-body-secondary" style="max-width: 680px">Each accent has one role. The dark header and sidebar are a sunset: near-black fading to purple (--color-highlight-1), with the orange-to-yellow --gradient-active as the sun on the active sidebar item, the notification dot and the load bar. Light content marks active states with the theme colour, so there is one active colour per surface. On the default site purple also marks AI and calendar events; themed pages switch those to the theme. --gradient-rainbow is only for .gradient-text headlines on marketing pages and the signed-out home.</p>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
              [%w[--color-paper], '.gradient end'],
              [%w[--color-canvas], 'body.canvas'],
              [%w[--color-search-highlight], 'mark'],
-             [%w[--color-highlight-1-light-2 --color-highlight-1-light-1 --color-highlight-1-light-3], 'AI well gradient (1 to 2), .gradient (3)'],
+             [%w[--color-highlight-1-light-2 --color-highlight-1-light-1 --color-highlight-1-light-3], 'AI well gradient (1 to 2), .gradient (3)', 'highlight-1-light-2/1/3'],
              [%w[--color-yellow --color-yellow-light], 'text-bg-yellow: Featured, Co-host, rota points'],
              [%w[--color-amber --color-amber-light --color-amber-dark], 'star icons, feedback stars, map areas, features page'],
              [%w[--color-chart], 'chart segments rotate its hue'],
              [%w[--color-highlight-1], 'header sunset; AI and calendar events on the default site']
-           ].each do |names, note| %>
+           ].each do |names, note, title| %>
           <div class="col">
             <% if names.length > 1 %>
               <div class="rounded overflow-hidden mb-1" style="height: 64px">
@@ -151,7 +154,7 @@
                   <% end %>
                 </div>
               </div>
-              <div class="fw-bold text-break"><%= names.first.start_with?('--color-highlight-1') ? 'highlight-1-light-2/1/3' : "#{names.first}, …" %></div>
+              <div class="fw-bold text-break"><%= title || "#{names.first}, …" %></div>
             <% else %>
               <div class="rounded mb-1 <%= 'border' if %w[--color-paper --color-canvas].include?(names.first) %>" style="height: 64px; background: var(<%= names.first %>)"></div>
               <div class="fw-bold text-break"><%= names.first %></div>
@@ -278,29 +281,29 @@
     </div>
 
     <div>
-      <div class="d-flex align-items-baseline flex-wrap gap-2 mb-3">
-        <h3 class="m-0">Scale</h3>
-              </div>
-      <% [
-           ['h1', '--font-size-3xl · 2rem', '<h1 data-sample class="m-0">Gatherings near you</h1>'],
-           ['h2', '--font-size-2xl · 1.66rem', '<h2 data-sample class="m-0">Gatherings near you</h2>'],
-           ['h3', '--font-size-xl · 1.4rem', '<h3 data-sample class="m-0">Your upcoming events</h3>'],
-           ['h4', '--font-size-lg · 1.125rem', '<h4 data-sample class="m-0">Upcoming birthdays</h4>'],
-           ['h5', '--font-size-md · .875rem', '<h5 data-sample class="m-0">Ticket types</h5>'],
-           ['.readable', '--font-size-base · 1rem', '<div data-sample class="readable">Long-form copy such as event descriptions sets at 1rem.</div>'],
-           ['nav · .btn', '--font-size-md · .875rem', '<span data-sample class="btn btn-outline-primary">Buttons, nav links and tabs</span>'],
-           ['body · h6', '--font-size-sm · .825rem', '<div data-sample>Body text, inputs, tables, dropdown items</div>'],
-           ['.badge', '.875em of its context', '<span data-sample class="badge text-bg-secondary">Badges</span>'],
-           ['.breadcrumb', '--font-size-xs · .75rem', '<ol data-sample class="breadcrumb m-0"><li class="breadcrumb-item">Breadcrumbs</li><li class="breadcrumb-item">and carets</li></ol>']
-         ].each_with_index do |(name, size, sample), i| %>
-        <div data-spec-row class="py-3 border-top <%= 'border-bottom' if i == 9 %>">
-          <div class="row align-items-baseline">
-            <code class="col-md-2 font-monospace small text-body-secondary"><%= name %></code>
-            <div class="col-md-7"><%== sample %></div>
-            <code class="col-md-3 font-monospace small text-body-secondary"><%= size %> · <span data-px></span></code>
+      <h3 class="mb-3">Scale</h3>
+      <div class="border-bottom">
+        <% [
+             ['h1', '--font-size-3xl · 2rem', '<h1 data-sample class="m-0">Gatherings near you</h1>'],
+             ['h2', '--font-size-2xl · 1.66rem', '<h2 data-sample class="m-0">Gatherings near you</h2>'],
+             ['h3', '--font-size-xl · 1.4rem', '<h3 data-sample class="m-0">Your upcoming events</h3>'],
+             ['h4', '--font-size-lg · 1.125rem', '<h4 data-sample class="m-0">Upcoming birthdays</h4>'],
+             ['h5', '--font-size-md · .875rem', '<h5 data-sample class="m-0">Ticket types</h5>'],
+             ['.readable', '--font-size-base · 1rem', '<div data-sample class="readable">Long-form copy such as event descriptions sets at 1rem.</div>'],
+             ['nav · .btn', '--font-size-md · .875rem', '<span data-sample class="btn btn-outline-primary">Buttons, nav links and tabs</span>'],
+             ['body · h6', '--font-size-sm · .825rem', '<div data-sample>Body text, inputs, tables, dropdown items</div>'],
+             ['.badge', '.875em of its context', '<span data-sample class="badge text-bg-secondary">Badges</span>'],
+             ['.breadcrumb', '--font-size-xs · .75rem', '<ol data-sample class="breadcrumb m-0"><li class="breadcrumb-item">Breadcrumbs</li><li class="breadcrumb-item">and carets</li></ol>']
+           ].each do |name, size, sample| %>
+          <div data-spec-row class="py-3 border-top">
+            <div class="row align-items-baseline">
+              <code class="col-md-2 font-monospace small text-body-secondary"><%= name %></code>
+              <div class="col-md-7"><%== sample %></div>
+              <code class="col-md-3 font-monospace small text-body-secondary"><%= size %> · <span data-px></span></code>
+            </div>
           </div>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
       <div class="small text-body-secondary mt-3"><code>.h1</code>–<code>.h6</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. Relative helpers, also as <code>--fs-*</code> tokens for CSS: <code>.fs-xs</code> .75em · <code>.fs-sm</code> .875em · <code>.fs-lg</code> 1.2em · <code>.fs-xl</code> 1.5em · <code>.fs-xxl</code> 2em. Secondary text is --bs-gray-600 (<code>.subtle</code>, form-text).</div>
     </div>
   </section>
@@ -384,17 +387,17 @@
       <p class="m-0 text-body-secondary" style="max-width: 680px">Fixed dark header (2.8125rem) and a fixed sidebar (14.375rem, minified to 3.75rem). Below 768px the sidebar becomes a full-width offcanvas and header icons spread across a second row.</p>
     </div>
     <div class="border rounded-3 overflow-hidden shadow">
-      <div class="d-flex align-items-center px-3 text-white fs-5" style="height: 48px; background: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-highlight-1) 100%)">
+      <div class="d-flex align-items-center px-3 text-white" style="height: 2.8125rem; font-size: 1.125rem; background: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-highlight-1) 100%)">
         <img class="position-relative" style="max-height: 1.75rem; top: -0.25rem" src="/images/logos/white-on-transparent.png" alt="">
         <div class="ms-auto d-flex align-items-center">
           <span class="px-3"><i class="bi bi-search"></i></span>
-          <span class="px-3 position-relative"><i class="bi bi-bell"></i><span class="position-absolute top-0 rounded-circle" style="right: .75rem; width: 8px; height: 8px; background: var(--gradient-active)"></span></span>
+          <span class="px-3 position-relative"><i class="bi bi-bell"></i><span class="position-absolute top-0 rounded-circle" style="right: .75rem; width: .5rem; height: .5rem; background: var(--gradient-active)"></span></span>
           <span class="px-3"><i class="bi bi-chat-left"></i></span>
-          <span class="px-2"><span class="d-block rounded-circle" style="width: 28px; height: 28px; background: var(--bs-gray-600)"></span></span>
+          <span class="px-2"><span class="d-block rounded-circle" style="width: 1.75rem; height: 1.75rem; background: var(--bs-gray-600)"></span></span>
         </div>
       </div>
       <div class="d-flex" style="min-height: 420px">
-        <div class="d-none d-md-block flex-shrink-0 p-2" style="width: 244px; background: var(--bs-gray-900)">
+        <div class="d-none d-md-block flex-shrink-0 p-2" style="width: 14.375rem; background: var(--bs-gray-900)">
           <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded" style="background: var(--gradient-active)"><i class="bi bi-house fs-5"></i><span>Home</span></div>
           <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded"><i class="bi bi-newspaper fs-5" style="opacity: .35"></i><span>Dandelion Daily</span></div>
           <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded bg-black"><i class="bi bi-calendar-event fs-5" style="opacity: .35"></i><span>Events</span><span class="ms-auto small opacity-50">hover</span></div>
@@ -483,11 +486,9 @@
 
     <div class="row g-5">
       <div class="col-lg-6 d-flex flex-column gap-3">
-        <div class="d-flex align-items-baseline flex-wrap gap-2">
-          <h3 class="m-0">Alerts</h3>
-        </div>
+        <h3 class="m-0">Alerts</h3>
         <div>
-          <div class="alert fade show alert-primary alert-dismissible">Your ticket is booked. <a href="#components">View order</a><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+          <div class="alert fade show alert-primary alert-dismissible">Your ticket is booked. <a href="#components">View order</a><button type="button" class="btn-close" aria-label="Close"></button></div>
           <div class="alert alert-warning">Only 3 tickets left. <a href="#components">Book now</a></div>
           <div class="alert alert-danger">Payment failed. <a href="#components">Try again</a></div>
           <div class="font-monospace small text-body-secondary">Inline, in the page. Padding .625rem, no border. Links bold and underlined in the alert's link colour. Flashes render as alerts only on pages that set @hide_alert.</div>
@@ -495,15 +496,13 @@
       </div>
 
       <div class="col-lg-6 d-flex flex-column gap-3">
-        <div class="d-flex align-items-baseline flex-wrap gap-2">
-          <h3 class="m-0">Toasts</h3>
-        </div>
+        <h3 class="m-0">Toasts</h3>
         <div class="d-flex flex-column align-items-start gap-2">
           <% [['primary', 'Your ticket is booked.'], ['warning', 'Only 3 tickets left.'], ['danger', 'Payment failed.']].each do |variant, message| %>
             <div class="toast toast-<%= variant %> show w-auto">
               <div class="d-flex">
                 <div class="toast-body"><%= message %></div>
-                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button" class="btn-close me-2 m-auto" aria-label="Close"></button>
               </div>
             </div>
           <% end %>
@@ -748,12 +747,18 @@
               </div>
             </div>
             <div class="alert alert-primary mb-0">Saved. Text is --theme-800</div>
-            <div class="p-3 rounded-3" style="background: linear-gradient(135deg, oklch(from var(--theme-500) l c h / .175) 0%, oklch(from var(--theme-500) l c h / .175) 50%, oklch(from var(--theme-500) l c h / .325) 100%)">AI well: theme tint</div>
+            <div class="ai-well">AI well: theme tint</div>
           </div>
         </div>
       <% end %>
     </div>
-    <div class="small text-body-secondary">Each themed panel sets <code>--theme-500</code> from <code>theme_css_variables(clamp_color(colour))</code> on itself, as <code>/theme.css</code> does, and has the <code>theme-scope</code> class so the ramp is recomputed from it. Their AI wells copy theme.css's rule, which only loads on themed pages.</div>
+    <div class="small text-body-secondary">Each themed panel sets <code>--theme-500</code> from <code>theme_css_variables(clamp_color(colour))</code> on itself, as <code>/theme.css</code> does, and has the <code>theme-scope</code> class so the ramp is recomputed from it. theme.css itself only loads on themed pages, so its rules are applied here inside <code>@scope (.theme-scope)</code>.</div>
+    <%# theme.css's rules without its comment and :root block, which the panels set themselves %>
+    <style>
+      @scope (.theme-scope) {
+        <%== File.read(Padrino.root('app/assets/stylesheets/theme.css')).sub(%r{/\*.*?\*/}m, '').sub(/:root \{.*?\}/m, '').strip %>
+      }
+    </style>
   </section>
 
 </div>
