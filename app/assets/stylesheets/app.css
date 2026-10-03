@@ -159,7 +159,7 @@
 .pace .pace-progress-inner {
   display: block;
   position: absolute;
-  right: 0px;
+  right: 0;
   width: 6.25rem;
   height: 100%;
   opacity: 1;
@@ -1530,7 +1530,7 @@ label.remove-image {
 
 label.remove-file input,
 label.remove-image input {
-  margin-left: 5px;
+  margin-left: 0.3125rem;
   vertical-align: -0.2em;
 }
 
@@ -1613,7 +1613,7 @@ label.remove-image input {
   }
 
   .nav-wrapper::-webkit-scrollbar {
-    height: 6px;
+    height: 0.375rem;
     display: block;
   }
 
@@ -2312,6 +2312,7 @@ ul.map-event li {
   font-size: var(--font-size-sm) !important
 }
 
+/* Google Maps and the map-icons markers draw in pixels, so these overrides stay in px to line up with them */
 #map-canvas button[title=Close] {
   height: 36px !important;
   margin-top: -8px !important;
@@ -2483,14 +2484,14 @@ table.event-details td {
   content: '';
   position: absolute;
   bottom: 0;
-  left: 15px;
-  right: 15px;
+  left: 0.9375rem;
+  right: 0.9375rem;
   height: 1px;
   background-color: rgba(var(--bs-black-rgb), 0.1);
 }
 
 .newsfeed-icon {
-  font-size: 16px;
+  font-size: 1rem;
   color: var(--theme-500);
   background-color: oklch(from var(--theme-500) l c h / 0.1);
   width: 2.25em;
@@ -2512,13 +2513,13 @@ table.event-details td {
 }
 
 .slick-container .slick-responsive {
-  margin-bottom: 25px
+  margin-bottom: 1.5625rem
 }
 
 .slick-container .slick-item {
   display: none;
-  padding-left: 7.5px;
-  padding-right: 7.5px;
+  padding-left: 0.46875rem;
+  padding-right: 0.46875rem;
 }
 
 .slick-container .slick-item:nth-child(1) {
@@ -2547,11 +2548,11 @@ table.event-details td {
 }
 
 .slick-prev {
-  left: 0px
+  left: 0
 }
 
 .slick-next {
-  right: 0px
+  right: 0
 }
 
 .slick-next:focus,
@@ -2567,9 +2568,9 @@ table.event-details td {
 .slick-next {
   border-radius: 50% !important;
   background: var(--bs-white);
-  font-size: 40px;
-  width: 40px;
-  height: 40px;
+  font-size: 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
   z-index: 2;
   color: var(--bs-black);
   opacity: 0.5;
