@@ -2336,17 +2336,35 @@ table.event-details td {
   font-size: var(--font-size-base)
 }
 
-/* The date and icon tiles follow the theme; event_details.css hard-codes the default green as it's inlined into emails */
-.event-detail,
-.event-detail.calendar-date .month {
-  border-color: var(--theme-300);
+/* The date and icon tiles, restyled for the site: event_details.css draws them for emails, with a thick green border and band.
+   Here they're white with a hairline border and a soft shadow, like cards; the date's month is a band of the theme's 50 in its 800, over a bold day */
+.event-detail {
+  border: 1px solid var(--hairline);
+  border-radius: 0.3em;
+  box-shadow: var(--bs-box-shadow-sm);
+  overflow: hidden;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .event-detail.calendar-date .month {
-  background: var(--theme-200);
+  background: var(--theme-50);
+  border-bottom: 0;
+  color: var(--theme-800);
 }
 
-/* On hover the whole tile, month band and borders included, turns solid theme */
+.event-detail.calendar-date .month .month-text {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.3em 0.225em 0.25em;
+}
+
+.event-detail.calendar-date .day {
+  padding: 0.12em 0.1em 0.1em;
+  color: var(--bs-emphasis-color);
+  font-weight: 600;
+}
+
+/* On hover the whole tile, month band included, turns solid theme */
 .event-detail:hover,
 .event-detail.calendar-date:hover .month {
   background-color: var(--theme-500);
@@ -2358,13 +2376,11 @@ table.event-details td {
   opacity: 1;
 }
 
-.event-detail.calendar-date:hover {
+.event-detail.calendar-date:hover,
+.event-detail.calendar-date:hover .month,
+.event-detail.calendar-date:hover .day {
   color: var(--bs-white) !important;
   text-decoration: none !important;
-}
-
-.event-detail.calendar-date .day {
-  padding: 0.1em;
 }
 
 .average-rating {

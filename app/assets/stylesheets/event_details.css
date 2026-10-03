@@ -1,5 +1,5 @@
 /* Inlined into emails, which can't use custom properties, so the date and icon tiles take the default green's ramp steps
-   as hex: #75d695 (the 300) for borders and #a8eabb (the 200) for the month. On the site, app.css switches them to the theme */
+   as hex: #75d695 (the 300) for borders and #a8eabb (the 200) for the month. On the site, app.css restyles them, in the theme */
 
 table.event-details td {
   vertical-align: middle;
