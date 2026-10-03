@@ -81,17 +81,17 @@
   --color-opencollective: #1869F5;
   --color-evm: #627EEA; /* Ethereum */
   --color-highlight: #FDFFAA;
-  --color-yellow: #FFCC00;
-  --color-yellow-light: #ffd322;
+  --color-yellow-500: #FFCC00;
+  --color-yellow-400: oklch(from var(--color-yellow-500) calc(l + 0.06) c h);
   /* Marketing pages (features, comparisons) */
-  --color-magenta: #B900A1;
-  --color-magenta-light: #e84dc4;
-  --color-rose: #d94f6e;
-  --color-rose-light: #f0889a;
+  --color-magenta-500: #B900A1;
+  --color-magenta-200: oklch(from var(--color-magenta-500) 0.88 calc(c * 0.55) h);
+  --color-rose-500: #d94f6e;
+  --color-rose-200: oklch(from var(--color-rose-500) 0.88 calc(c * 0.55) h);
   /* Section washes: each section colour's 50 step */
   --wash-amber: var(--color-orange-50);
-  --wash-rose: oklch(from var(--color-rose) 0.97 calc(c * 0.15) h);
-  --wash-magenta: oklch(from var(--color-magenta) 0.97 calc(c * 0.15) h);
+  --wash-rose: oklch(from var(--color-rose-500) 0.97 calc(c * 0.15) h);
+  --wash-magenta: oklch(from var(--color-magenta-500) 0.97 calc(c * 0.15) h);
   --wash-purple: var(--color-lavender-50);
   --gradient-active: linear-gradient(135deg, #fd7514 0%, #efe707 100%);
   --gradient-rainbow: radial-gradient(circle at 0 0, #099ef1 0%, #6863f8 18.82%, #d84ffa 32.6%, #f058c5 52.83%, #ff4f90 68.03%, #ff6558 87.66%, #ff891f 100%);
@@ -816,7 +816,7 @@ body.canvas #content {
 /* Our own colours, in the form of Bootstrap's text-bg-* */
 .text-bg-yellow {
   color: var(--bs-white) !important;
-  background-color: var(--color-yellow) !important;
+  background-color: var(--color-yellow-500) !important;
 }
 
 .text-bg-stripe {
@@ -843,7 +843,7 @@ body.canvas #content {
 .badge.text-bg-secondary { --badge-color: var(--bs-gray-600); --badge-color-light: var(--bs-gray-500); }
 .badge.text-bg-warning { --badge-color: var(--color-orange-500); --badge-color-light: var(--color-orange-400); }
 .badge.text-bg-danger { --badge-color: var(--color-red-500); --badge-color-light: var(--color-red-400); }
-.badge.text-bg-yellow { --badge-color: var(--color-yellow); --badge-color-light: var(--color-yellow-light); }
+.badge.text-bg-yellow { --badge-color: var(--color-yellow-500); --badge-color-light: var(--color-yellow-400); }
 
 .badge:is(.text-bg-primary, .text-bg-secondary, .text-bg-warning, .text-bg-danger, .text-bg-yellow) {
   background: linear-gradient(135deg, var(--badge-color) 0%, var(--badge-color) 50%, var(--badge-color-light) 100%) !important;

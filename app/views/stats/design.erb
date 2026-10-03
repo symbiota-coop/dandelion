@@ -170,7 +170,7 @@
              [%w[--color-paper], '.gradient end'],
              [%w[--color-canvas], 'body.canvas'],
              [%w[--color-highlight], 'mark'],
-             [%w[--color-yellow --color-yellow-light], 'text-bg-yellow: Featured, Co-host, rota points'],
+             [%w[--color-yellow-500 --color-yellow-400], 'text-bg-yellow: Featured, Co-host, rota points; contributions chart (500)'],
              [%w[--color-midnight], 'header sunset; AI and calendar events on the default site']
            ].each do |names, note| %>
           <div class="col">
@@ -195,12 +195,12 @@
 
     <div class="d-flex flex-column gap-3">
       <h3 class="m-0">Other gradients</h3>
-      <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-3">
+      <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-4">
         <% [
+             ['linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-paper) 50%)', '.gradient', 'Lavender to paper. body.gradient on the sign-in, sign-up and auth failure pages; a .gradient div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.'],
              ['var(--gradient-active)', '--gradient-active', 'Sidebar active item, notification dot, page-load bar.'],
-             ['linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-midnight) 100%)', 'Header', '45°, --bs-gray-900 to 66%, then midnight.'],
              ['var(--gradient-rainbow)', '--gradient-rainbow', '.gradient-text only.'],
-             ['linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-paper) 50%)', '.gradient', 'Lavender to paper. body.gradient on the sign-in, sign-up and auth failure pages; a .gradient div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.']
+             ['linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-midnight) 100%)', 'Header', '45°, --bs-gray-900 to 66%, then midnight.']
            ].each do |background, title, note| %>
           <div class="col">
             <div class="rounded border mb-1" style="height: 64px; background: <%= background %>"></div>
@@ -214,13 +214,13 @@
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">Marketing pages</h3>
-        <span class="text-body-secondary">The features and comparison pages. Their purple gradient and the five reason colours on the Luma page are derived from <code>--color-midnight</code> and <code>--color-magenta</code>.</span>
+        <span class="text-body-secondary">The features and comparison pages. Their purple gradient and the five reason colours on the Luma page are derived from <code>--color-midnight</code> and <code>--color-magenta-500</code>.</span>
       </div>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
              [%w[--wash-amber --wash-rose --wash-magenta --wash-purple], 'section backgrounds: the 50 step of orange, rose, magenta and lavender'],
-             [%w[--color-rose --color-rose-light], nil],
-             [%w[--color-magenta --color-magenta-light], nil],
+             [%w[--color-rose-500 --color-rose-200], 'section divider: 500 to 200'],
+             [%w[--color-magenta-500 --color-magenta-200], 'section divider: 500 to 200'],
              :magenta_to_highlight
            ].each do |names, note| %>
           <div class="col">
@@ -228,7 +228,7 @@
               <div class="rounded overflow-hidden mb-1" style="height: 64px">
                 <div class="row g-0 h-100">
                   <% 0.step(100, 25) do |pct| %>
-                    <div class="col" style="background: color-mix(in srgb, var(--color-magenta), var(--color-midnight) <%= pct %>%)"></div>
+                    <div class="col" style="background: color-mix(in srgb, var(--color-magenta-500), var(--color-midnight) <%= pct %>%)"></div>
                   <% end %>
                 </div>
               </div>
