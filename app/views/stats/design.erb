@@ -9,7 +9,7 @@
    issues = [
      [3, 'Medium', 'Default and themed pages diverge with the same colour', 'theme.css restyles .ai-well and calendar events: the AI well is purple by default and a theme tint when themed; calendar events are purple by default and theme-coloured when themed. (Alerts and toasts no longer differ: their tints come from the ramp.)', 'Move the remaining theme.css rules into app.css so there is one behaviour, or document that the purple is intentional only for the unthemed site.', 'theme.css · app.css .ai-well, #calendar a.fc-event'],
      [7, 'Medium', 'Too many accent colours and active states', 'Besides the theme colour there is purple #4400B9 (header, AI), an orange-to-yellow gradient (sidebar active, notification dot, load bar), a rainbow gradient, signal blue and Stripe purple. The sidebar active item uses the orange gradient while every other active state (pills, list groups, dropdown items, checks) uses the theme colour.', 'Decide which accent marks "active" and use it everywhere; restrict purple to AI features.', 'app.css .sidebar .nav-link.active, #header, --gradient-*'],
-     [15, 'Low', 'Button treatments vary', 'Primary and danger are gradients; secondary and warning are flat. btn-signal forces its hover with !important. p.action a is a separate CTA style (10px padding, 5px radius).', 'Apply the gradient pattern to all solid variants or none; express btn-signal through --bs-btn-* variables.', 'app.css Buttons, p.action'],
+     [15, 'Low', 'Button treatments vary', 'Primary, warning and danger are gradients; secondary is flat. btn-signal forces its hover with !important. p.action a is a separate CTA style (10px padding, 5px radius).', 'Apply the gradient pattern to all solid variants or none; express btn-signal through --bs-btn-* variables.', 'app.css Buttons, p.action'],
      [17, 'Low', 'Mixed px and rem', 'The file converts most values to rem, but 5px radii, 15px insets, 7.5px slick padding, 16px newsfeed icons, 20–22px map icons and 36/40px controls remain. Because the root scales to 19 and 21px, these shrink relative to everything else on large screens.', 'Convert remaining px to rem.', 'app.css']
    ]
 
@@ -59,7 +59,65 @@
           </div>
         </div>
       <% end %>
+      <div class="row g-3 row-cols-1 row-cols-sm-2">
+        <div class="col">
+          <div class="rounded border mb-1" style="height: 64px; background: linear-gradient(135deg, var(--theme-50) 0%, var(--theme-50) 50%, var(--theme-200) 100%)"></div>
+          <div class="fw-bold">Primary alerts and toasts</div>
+          <div class="small text-body-secondary">--theme-50 to --theme-200, the same pattern as warning and danger</div>
+          <div class="font-monospace small text-body-secondary"><%== css_vars.call('--theme-50', '--theme-200') %></div>
+        </div>
+      </div>
       <div class="small text-body-secondary">Bootstrap's <code>rgba(var(--bs-*-rgb))</code> colours need an rgb triplet, so <code>/theme.css</code> also sets <code>--theme-500-rgb</code>.</div>
+    </div>
+
+    <div class="d-flex flex-column gap-3">
+      <div class="d-flex align-items-baseline flex-wrap gap-2">
+        <h3 class="m-0">Warning and danger</h3>
+        <span class="text-body-secondary">Two families, used the same way. The fill is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match.</span>
+      </div>
+      <% [%w[Warning orange], %w[Danger red]].each do |title, colour| %>
+        <div>
+          <div class="mb-1"><span class="fw-bold"><%= title %></span> <span class="text-body-secondary">· --color-<%= colour %>-*</span></div>
+          <div class="row g-2">
+            <% [
+                 ['', 'fill: badges, buttons'],
+                 ['-light', 'gradient end'],
+                 ['-hover', 'button hover'],
+                 ['-text', 'text and border on tints'],
+                 ['-tint', 'alert, toast and row background'],
+                 ['-tint-strong', 'tint gradient end, row border']
+               ].each do |suffix, note| %>
+              <% name = "--color-#{colour}#{suffix}" %>
+              <% other_uses = {
+                   '--color-orange' => 'ASN stats: bot % of 30 and over',
+                   '--color-red' => 'ASN stats: bot % of 60 and over; check-in QR scan line',
+                   '--color-red-light' => 'map: event and organisation markers'
+                 }[name] %>
+              <div class="col-4 col-md-2">
+                <div class="rounded border mb-1" style="height: 64px; background: var(<%= name %>)"></div>
+                <div class="fw-bold small text-break"><%= suffix.empty? ? 'fill' : suffix.delete_prefix('-') %></div>
+                <div class="font-monospace small text-body-secondary"><%== css_var.call(name) %></div>
+                <div class="small text-body-secondary"><%= note %></div>
+                <% if other_uses %><div class="small text-body-secondary">Also: <%= other_uses %></div><% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      <div class="small text-body-secondary">Alerts and toasts: 135°, flat tint to 50%, then to the stronger tint. table-warning and table-danger rows: flat tint, the stronger tint for borders, and a mix 30% of the way to it on hover.</div>
+      <div class="row g-3 row-cols-1 row-cols-sm-2">
+        <% [
+             %w[Warning --color-orange-tint --color-orange-tint-strong],
+             %w[Danger --color-red-tint --color-red-tint-strong]
+           ].each do |title, from, to| %>
+          <div class="col">
+            <div class="rounded border mb-1" style="height: 64px; background: linear-gradient(135deg, var(<%= from %>) 0%, var(<%= from %>) 50%, var(<%= to %>) 100%)"></div>
+            <div class="fw-bold"><%= title %></div>
+            <div class="small text-body-secondary"><%= from %> to <%= to %></div>
+            <div class="font-monospace small text-body-secondary"><%== css_vars.call(from, to) %></div>
+          </div>
+        <% end %>
+      </div>
     </div>
 
     <div class="d-flex flex-column gap-3">
@@ -88,15 +146,10 @@
              [%w[--color-paper], 'body.gradient end'],
              [%w[--color-superlight], 'body.greyed'],
              [%w[--color-search-highlight], 'mark'],
-             [%w[--color-orange-tint --color-orange-tint-strong], 'warning alert and toast background'],
-             [%w[--color-red-tint --color-red-tint-strong], 'danger alert and toast background'],
              [%w[--color-highlight-1-light-2 --color-highlight-1-light-1 --color-highlight-1-light-3], 'AI well gradient (1 to 2), body.gradient (3)'],
              [%w[--color-yellow --color-yellow-light], 'text-bg-yellow: Featured, Co-host, rota points'],
-             [%w[--color-amber --color-amber-light --color-amber-dark], 'map areas, features page'],
-             [%w[--color-star], '.bi-star-fill icons'],
-             [%w[--color-orange --color-orange-light --color-orange-text], 'warning: fill, gradient end, text'],
+             [%w[--color-amber --color-amber-light --color-amber-dark], 'star icons, feedback stars, map areas, features page'],
              [%w[--color-chart], 'chart segments rotate its hue'],
-             [%w[--color-red --color-red-light --color-red-hover --color-red-text], 'danger: fill, gradient end, hover, text'],
              [%w[--color-highlight-1], 'header, AI']
            ].each do |names, note| %>
           <div class="col">
@@ -120,30 +173,10 @@
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Alert and toast gradients</h3>
-        <span class="text-body-secondary">135°, flat tint to 50%, then to the stronger tint.</span>
-      </div>
-      <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-3">
-        <% [
-             ['linear-gradient(135deg, var(--theme-50) 0%, var(--theme-50) 50%, var(--theme-200) 100%)', 'Primary', '--theme-50 to --theme-200'],
-             ['linear-gradient(135deg, var(--color-orange-tint) 0%, var(--color-orange-tint) 50%, var(--color-orange-tint-strong) 100%)', 'Warning', '--color-orange-tint to -tint-strong'],
-             ['linear-gradient(135deg, var(--color-red-tint) 0%, var(--color-red-tint) 50%, var(--color-red-tint-strong) 100%)', 'Danger', '--color-red-tint to -tint-strong']
-           ].each do |background, title, note| %>
-          <div class="col">
-            <div class="rounded border mb-1" style="height: 64px; background: <%= background %>"></div>
-            <div class="fw-bold"><%= title %></div>
-            <div class="small text-body-secondary"><%= note %></div>
-          </div>
-        <% end %>
-      </div>
-    </div>
-
-    <div class="d-flex flex-column gap-3">
       <h3 class="m-0">Other gradients</h3>
       <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-3">
         <% [
-             ['linear-gradient(135deg, var(--theme-500) 0%, var(--theme-500) 50%, var(--theme-400) 100%)', 'Fill pattern', '135°, flat to 50%, then to a lighter end (--theme-400, --color-red-light). Primary/danger buttons, badges, progress, text-bg-primary.'],
+             ['linear-gradient(135deg, var(--theme-500) 0%, var(--theme-500) 50%, var(--theme-400) 100%)', 'Fill pattern', '135°, flat to 50%, then to a lighter end (--theme-400, --color-orange-light, --color-red-light). Primary, warning and danger buttons, badges, progress, text-bg-primary.'],
              ['var(--gradient-active)', '--gradient-active', 'Sidebar active item, notification dot, page-load bar.'],
              ['linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-highlight-1) 100%)', 'Header', '45°, --bs-gray-900 to 66%, then highlight-1.'],
              ['var(--gradient-rainbow)', '--gradient-rainbow', '.gradient-text only.'],
@@ -405,7 +438,7 @@
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">Buttons</h3>
-        <span class="text-body-secondary">.875rem, padding .375rem .75rem, radius .25rem. Primary and danger are borderless gradients.</span>
+        <span class="text-body-secondary">.875rem, padding .375rem .75rem, radius .25rem. Primary, warning and danger are borderless gradients.</span>
         <%== flags.call(15) %>
       </div>
       <div class="border rounded p-4 d-flex flex-wrap gap-3 align-items-center">
@@ -413,6 +446,7 @@
         <a class="btn btn-primary" href="#components" style="--bs-btn-bg: var(--theme-600); --btn-gradient-end: var(--theme-500)">Hover</a>
         <a class="btn btn-outline-primary" href="#components">Outline primary</a>
         <a class="btn btn-secondary" href="#components">Secondary</a>
+        <a class="btn btn-warning" href="#components">Warning</a>
         <a class="btn btn-danger" href="#components">Delete</a>
         <a class="btn btn-signal" href="#components"><i class="bi bi-signal"></i> Signal</a>
       </div>
@@ -564,11 +598,12 @@
             <tr><th>Ticket type</th><th>Sold</th><th class="text-end">Price</th></tr>
           </thead>
           <tbody>
-            <tr><td>Early bird</td><td>40/40</td><td class="text-end">£15</td></tr>
+            <tr class="table-danger"><td>Early bird</td><td>40/40</td><td class="text-end">£15</td></tr>
             <tr><td>Standard</td><td>23/80</td><td class="text-end">£22</td></tr>
-            <tr><td>Solidarity</td><td>6/10</td><td class="text-end">£8</td></tr>
+            <tr class="table-warning"><td>Solidarity</td><td>9/10</td><td class="text-end">£8</td></tr>
           </tbody>
         </table>
+        <div class="font-monospace small text-body-secondary">Row colours: table-warning flags a row to look at (low delivery rate), table-danger a problem (blocked ASN). Both use the alert tints</div>
         <ul class="pagination justify-content-center mb-0">
           <li class="page-item disabled"><a class="page-link" href="#components">‹</a></li>
           <li class="page-item active"><a class="page-link" href="#components">1</a></li>

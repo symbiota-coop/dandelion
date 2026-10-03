@@ -85,7 +85,6 @@
   --color-search-highlight: #FDFFAA;
   --color-yellow: #FFCC00;
   --color-yellow-light: #ffd322;
-  --color-star: #f5b041;
   /* Base for chart segments, whose hues rotate from it */
   --color-chart: #57B98C;
   /* Marketing pages (features, comparisons) */
@@ -125,6 +124,7 @@
   /* Warning and danger */
   --color-orange: #ff9500;
   --color-orange-light: #ffa830;
+  --color-orange-hover: #eb8200;
   --color-orange-text: #984100;
   --color-orange-tint: #fff2e4;
   --color-orange-tint-strong: #ffca95;
@@ -900,7 +900,7 @@ body.greyed #content {
   line-height: 1.3333333;
 }
 
-/* Primary and danger buttons are gradients, to a lighter colour, over Bootstrap's --bs-btn-* colours */
+/* Primary, warning and danger buttons are gradients, to a lighter colour, over Bootstrap's --bs-btn-* colours */
 .btn-primary {
   --bs-btn-bg: var(--theme-500);
   --bs-btn-border-color: var(--theme-500);
@@ -915,6 +915,15 @@ body.greyed #content {
   --btn-hover-gradient-end: var(--theme-500);
 }
 
+.btn-warning {
+  --bs-btn-hover-bg: var(--color-orange-hover);
+  --bs-btn-hover-border-color: var(--color-orange-hover);
+  --bs-btn-active-bg: var(--color-orange-hover);
+  --bs-btn-active-border-color: var(--color-orange-hover);
+  --btn-gradient-end: var(--color-orange-light);
+  --btn-hover-gradient-end: var(--color-orange);
+}
+
 .btn-danger {
   --bs-btn-hover-bg: var(--color-red-hover);
   --bs-btn-hover-border-color: var(--color-red-hover);
@@ -925,12 +934,14 @@ body.greyed #content {
 }
 
 .btn-primary,
+.btn-warning,
 .btn-danger {
   border: none;
   background-image: linear-gradient(135deg, var(--bs-btn-bg) 0%, var(--bs-btn-bg) 50%, var(--btn-gradient-end) 100%);
 }
 
 .btn-primary:is(:hover, :focus, :active, .active, .show),
+.btn-warning:is(:hover, :focus, :active, .active, .show),
 .btn-danger:is(:hover, :focus, :active, .active, .show) {
   background-image: linear-gradient(135deg, var(--bs-btn-hover-bg) 0%, var(--bs-btn-hover-bg) 50%, var(--btn-hover-gradient-end) 100%);
 }
@@ -1700,6 +1711,23 @@ table.dataTable.table-sm > thead > tr > th[class*="dt-order"] .dt-column-order {
 
 .table {
   font-size: var(--font-size-sm);
+}
+
+/* Warning and danger rows use the alert and toast tints: the tint, the stronger tint for borders, and 30% of the way to it for hover, stripes and active */
+.table-warning {
+  --bs-table-bg: var(--color-orange-tint);
+  --bs-table-border-color: var(--color-orange-tint-strong);
+  --bs-table-striped-bg: color-mix(in srgb, var(--color-orange-tint), var(--color-orange-tint-strong) 30%);
+  --bs-table-hover-bg: color-mix(in srgb, var(--color-orange-tint), var(--color-orange-tint-strong) 30%);
+  --bs-table-active-bg: color-mix(in srgb, var(--color-orange-tint), var(--color-orange-tint-strong) 30%);
+}
+
+.table-danger {
+  --bs-table-bg: var(--color-red-tint);
+  --bs-table-border-color: var(--color-red-tint-strong);
+  --bs-table-striped-bg: color-mix(in srgb, var(--color-red-tint), var(--color-red-tint-strong) 30%);
+  --bs-table-hover-bg: color-mix(in srgb, var(--color-red-tint), var(--color-red-tint-strong) 30%);
+  --bs-table-active-bg: color-mix(in srgb, var(--color-red-tint), var(--color-red-tint-strong) 30%);
 }
 
 .table-striped > thead > tr > th {
@@ -2672,7 +2700,7 @@ td .tactivity-accept {
 }
 
 .bi.bi-star-fill {
-  color: var(--color-star)
+  color: var(--color-amber)
 }
 
 img.private {

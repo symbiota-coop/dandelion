@@ -45,7 +45,7 @@
             <% blocked = @blocked_asns.include?(row['asn'].to_s) %>
             <% bp = @bot_pct[row['asn'].to_s] %>
             <% mult = window[:baseline] > 0 ? (row['count'].to_f / window[:baseline]).round(1) : nil %>
-            <tr class="<%= 'asn-window-start' if i.zero? %>"<%== blocked ? ' style="background-color: var(--color-red-tint)"' : '' %>>
+            <tr class="<%= 'asn-window-start' if i.zero? %> <%= 'table-danger' if blocked %>">
               <td><%== i.zero? ? "#{window[:start].strftime('%a %d %b %H:%M')} &ndash; #{window[:end].strftime('%H:%M')}" : '' %></td>
               <td>
                 <% if i.zero? %>
