@@ -9,7 +9,7 @@
    issues = [
      [3, 'Medium', 'Default and themed pages diverge with the same colour', 'theme.css restyles .ai-well and calendar events: the AI well is purple by default and a theme tint when themed; calendar events are purple by default and theme-coloured when themed. (Alerts and toasts no longer differ: their tints come from the ramp.)', 'Move the remaining theme.css rules into app.css so there is one behaviour, or document that the purple is intentional only for the unthemed site.', 'theme.css · app.css .ai-well, #calendar a.fc-event'],
      [7, 'Medium', 'Too many accent colours and active states', 'Besides the theme colour there is purple #4400B9 (header, AI), an orange-to-yellow gradient (sidebar active, notification dot, load bar), a rainbow gradient, signal blue and Stripe purple. The sidebar active item uses the orange gradient while every other active state (pills, list groups, dropdown items, checks) uses the theme colour.', 'Decide which accent marks "active" and use it everywhere; restrict purple to AI features.', 'app.css .sidebar .nav-link.active, #header, --gradient-*'],
-     [13, 'Low', 'Three focus ring styles', 'Inputs: 2px at 60%. Checks, pagination, accordion, close: .25rem at 25%. btn-signal: .2rem with its own colour. Nav links have none.', 'Use one ring (e.g. 2px at 60%) via --bs-focus-ring-*.', 'bootstrap5.scss $input-focus-box-shadow · app.css'],
+     [13, 'Low', 'Four focus ring styles', 'Inputs: 2px at 60%. Checks, pagination, accordion, close: .25rem at 25%. btn-signal: .2rem with its own colour. Colour picker swatches (.quick-color-btn): a 2px white gap then a 2px ring. Nav links have none.', 'Use one ring (e.g. 2px at 60%) via --bs-focus-ring-*.', 'bootstrap5.scss $input-focus-box-shadow · app.css'],
      [14, 'Low', 'Badges and labels are parallel systems', '.label is a legacy Bootstrap 3 component with different size and padding (.85em, .2em .6em) and only some variants (no label-warning).', 'Migrate .label usages to .badge and remove .label.', 'app.css Labels section'],
      [15, 'Low', 'Button treatments vary', 'Primary and danger are gradients; secondary and warning are flat. btn-signal forces its hover with !important. p.action a is a separate CTA style (10px padding, 5px radius).', 'Apply the gradient pattern to all solid variants or none; express btn-signal through --bs-btn-* variables.', 'app.css Buttons, p.action'],
      [17, 'Low', 'Mixed px and rem', 'The file converts most values to rem, but 5px radii, 15px insets, 7.5px slick padding, 16px newsfeed icons, 20–22px map icons and 36/40px controls remain. Because the root scales to 19 and 21px, these shrink relative to everything else on large screens.', 'Convert remaining px to rem.', 'app.css']
@@ -47,7 +47,7 @@
         <span class="text-body-secondary">A ramp generated from one value with <code>oklch()</code>. Components use the 500, 400 as the gradient end, 600 for hover, 50 to 200 for alert and toast backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints.</span>
       </div>
       <% [
-           ['theme', 'Primary and success · follows each organisation\'s theme', %w[50 100 200 400 500 600 700 800], { '50' => 'alert and toast background', '200' => 'gradient end', '400' => 'button gradient end', '600' => 'hover', '800' => 'text on tints' }]
+           ['theme', 'Primary and success · follows each organisation\'s theme', %w[50 100 200 400 500 600 700 800], { '50' => 'alert and toast background', '200' => 'gradient end', '100' => 'not used yet', '400' => 'button gradient end', '600' => 'hover', '700' => 'not used yet', '800' => 'text on tints' }]
          ].each do |name, role, steps, notes| %>
         <div>
           <div class="mb-1"><span class="fw-bold">--<%= name %>-*</span> <span class="text-body-secondary">· <%= role %></span></div>
@@ -88,15 +88,15 @@
       </div>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
-             [%w[--color-paper], nil],
+             [%w[--color-paper], 'body.gradient end'],
              [%w[--color-superlight], 'body.greyed'],
              [%w[--color-search-highlight], 'mark'],
              [%w[--color-orange-tint --color-orange-tint-strong], 'warning alert and toast background'],
              [%w[--color-red-tint --color-red-tint-strong], 'danger alert and toast background'],
-             [%w[--color-highlight-1-light-2 --color-highlight-1-light-1 --color-highlight-1-light-3], nil],
+             [%w[--color-highlight-1-light-2 --color-highlight-1-light-1 --color-highlight-1-light-3], 'AI well gradient (1 to 2), body.gradient (3)'],
              [%w[--color-yellow --color-yellow-light], 'badge-yellow: Featured, Co-host, rota points'],
              [%w[--color-amber --color-amber-light --color-amber-dark], 'map areas, features page'],
-             [%w[--color-star], nil],
+             [%w[--color-star], '.bi-star-fill icons'],
              [%w[--color-orange --color-orange-light --color-orange-text], 'warning: fill, gradient end, text'],
              [%w[--color-chart], 'chart segments rotate its hue'],
              [%w[--color-red --color-red-light --color-red-hover --color-red-text], 'danger: fill, gradient end, hover, text'],
@@ -146,7 +146,7 @@
       <h3 class="m-0">Other gradients</h3>
       <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-3">
         <% [
-             ['linear-gradient(135deg, var(--theme-500) 0%, var(--theme-500) 50%, var(--theme-400) 100%)', 'Fill pattern', '135°, flat to 50%, then to -light. Primary/danger buttons, badges, progress, text-bg-primary.'],
+             ['linear-gradient(135deg, var(--theme-500) 0%, var(--theme-500) 50%, var(--theme-400) 100%)', 'Fill pattern', '135°, flat to 50%, then to a lighter end (--theme-400, --color-red-light). Primary/danger buttons, badges, progress, text-bg-primary.'],
              ['var(--gradient-active)', '--gradient-active', 'Sidebar active item, notification dot, page-load bar.'],
              ['linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-highlight-1) 100%)', 'Header', '45°, --bs-gray-900 to 66%, then highlight-1.'],
              ['var(--gradient-rainbow)', '--gradient-rainbow', '.gradient-text only.'],
@@ -369,7 +369,7 @@
         <div class="ms-auto d-flex align-items-center">
           <span class="px-3"><i class="bi bi-search"></i></span>
           <span class="px-3 position-relative"><i class="bi bi-bell"></i><span class="position-absolute top-0 rounded-circle" style="right: .75rem; width: 8px; height: 8px; background: var(--gradient-active)"></span></span>
-          <span class="px-3"><i class="bi bi-chat-left-text"></i></span>
+          <span class="px-3"><i class="bi bi-chat-left"></i></span>
           <span class="px-2"><span class="d-block rounded-circle" style="width: 28px; height: 28px; background: var(--bs-gray-600)"></span></span>
         </div>
       </div>
@@ -568,6 +568,103 @@
       </div>
     </div>
 
+    <div class="row g-5">
+      <div class="col-lg-6 d-flex flex-column gap-3">
+        <h3 class="m-0">Tabs and pills</h3>
+        <div class="border rounded p-4 d-flex flex-column gap-4">
+          <div class="nav-wrapper">
+            <ul class="nav nav-tabs">
+              <li class="nav-item"><a class="nav-link active" href="#components">Details</a></li>
+              <li class="nav-item"><a class="nav-link" href="#components">Tickets</a></li>
+              <li class="nav-item"><a class="nav-link" href="#components">Emails</a></li>
+            </ul>
+          </div>
+          <ul class="nav nav-pills">
+            <li class="nav-item"><a class="nav-link active" href="#components">Upcoming</a></li>
+            <li class="nav-item"><a class="nav-link" href="#components">Past</a></li>
+            <li class="nav-item"><a class="nav-link" href="#components">Drafts</a></li>
+          </ul>
+          <div class="font-monospace small text-body-secondary">.nav · .875rem · hover and focus --bs-secondary-bg, no focus ring · active pill --theme-500 · .tab-content padding .9375rem · in .nav-wrapper, tabs scroll sideways on mobile</div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 d-flex flex-column gap-3">
+        <h3 class="m-0">Modal</h3>
+        <div class="bg-body-tertiary rounded p-4">
+          <div class="modal position-static d-block h-auto overflow-visible" style="z-index: auto">
+            <div class="modal-dialog my-0">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Add a ticket type</h5>
+                  <button type="button" class="btn-close" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Name, price and quantity go here.</div>
+                <div class="modal-footer">
+                  <a class="btn btn-secondary" href="#components">Cancel</a>
+                  <a class="btn btn-primary" href="#components">Save</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="font-monospace small text-body-secondary">37.5rem wide from 768px · no border or shadow</div>
+      </div>
+    </div>
+
+    <div class="row g-5">
+      <div class="col-lg-6 d-flex flex-column gap-3">
+        <h3 class="m-0">Header search and autocomplete</h3>
+        <div class="rounded overflow-hidden" style="background: var(--bs-gray-800)">
+          <div class="header-search-bar position-relative" style="padding: 0 2.75rem">
+            <form onsubmit="return false">
+              <span class="left-icon"><i class="bi bi-search"></i></span>
+              <label class="visually-hidden" for="dg-search">Search</label>
+              <input type="text" class="form-control" id="dg-search" autocomplete="off" value="breath">
+              <span class="right-icon"><i class="bi bi-x-lg"></i></span>
+            </form>
+          </div>
+        </div>
+        <ul class="ui-autocomplete ui-menu ui-widget ui-widget-content list-unstyled bg-white align-self-start" style="position: static; display: block; min-width: 16rem">
+          <li class="ui-menu-item"><div class="ui-menu-item-wrapper ui-state-active">Breathwork Collective</div></li>
+          <li class="ui-menu-item"><div class="ui-menu-item-wrapper">Breath and sound journey</div></li>
+          <li class="ui-menu-item"><div class="ui-menu-item-wrapper">Holotropic breathwork</div></li>
+        </ul>
+        <div class="font-monospace small text-body-secondary">Search: offcanvas-top, 2.8125rem, --bs-gray-800, backdrop at .9 · autocomplete: radius-lg, --bs-box-shadow, items .3125rem .9375rem, hover --bs-secondary-bg</div>
+      </div>
+
+      <div class="col-lg-6 d-flex flex-column gap-3">
+        <h3 class="m-0">Notifications and messages dropdowns</h3>
+        <div class="dropdown-menu show position-relative align-self-start p-0" style="width: 22rem; max-width: 100%">
+          <div class="list-group list-group-flush notification-list">
+            <% [['bi-person-fill-add', '<b>Ruby</b> followed you', '2 hours ago'], ['bi-ticket-detailed-fill', '<b>Sam</b> booked tickets to <b>Ecstatic dance</b>', 'Yesterday']].each do |icon, sentence, time| %>
+              <a class="list-group-item list-group-item-action d-flex align-items-start gap-2" href="#components">
+                <span class="newsfeed-icon d-inline-flex align-items-center justify-content-center flex-shrink-0 rounded-circle"><i class="bi <%= icon %>"></i></span>
+                <div class="notification-info flex-grow-1">
+                  <div class="notification-title"><%== sentence %></div>
+                  <div class="notification-time subtle"><%= time %></div>
+                </div>
+              </a>
+            <% end %>
+            <a class="message-preview unread p-2 d-block text-dark text-decoration-none" href="#components"><b>Alex</b> · See you there! <span class="subtle small">unread</span></a>
+            <a class="message-preview p-2 d-block text-dark text-decoration-none" href="#components"><b>Jo</b> · Thanks <span class="subtle small">read</span></a>
+            <a class="list-group-item list-group-item-action text-center" href="#components">All notifications <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+        <div class="font-monospace small text-body-secondary">.notification-list: list-group-flush, items .625rem .9375rem, smaller newsfeed icons · .message-preview: unread --theme-500 at 15%, hover --bs-gray-400 at 30%</div>
+      </div>
+    </div>
+
+    <div class="d-flex flex-column gap-3">
+      <div class="d-flex align-items-baseline flex-wrap gap-2">
+        <h3 class="m-0">p.action</h3>
+        <span class="text-body-secondary">A centred call to action in page copy and emails, separate from .btn.</span>
+        <%== flags.call(15) %>
+      </div>
+      <div class="border rounded p-4">
+        <p class="action m-0"><a href="#components">Confirm your email</a></p>
+      </div>
+    </div>
+
     <div class="d-flex flex-column gap-3">
       <h3 class="m-0">AI well and ask box</h3>
       <div class="row g-4 align-items-start">
@@ -579,7 +676,7 @@
             <label class="visually-hidden" for="dg-ask">Ask a question</label>
             <textarea class="form-control autosize" id="dg-ask" rows="1" placeholder="Ask a question…"></textarea>
             <div class="ask-box-actions">
-              <button type="button" class="btn btn-primary btn-sm" aria-label="Ask"><i class="bi bi-arrow-up" aria-hidden="true"></i></button>
+              <button type="button" class="btn btn-primary btn-sm" aria-label="Ask"><i class="bi bi-arrow-right" aria-hidden="true"></i></button>
             </div>
           </div>
         </div>
