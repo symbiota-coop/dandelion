@@ -121,19 +121,19 @@
 }
 
 :root {
-  /* Warning and danger */
-  --color-orange: #ff9500;
-  --color-orange-light: #ffa830;
-  --color-orange-hover: #eb8200;
-  --color-orange-text: #984100;
-  --color-orange-tint: #fff2e4;
-  --color-orange-tint-strong: #ffca95;
-  --color-red: #ff3b30;
-  --color-red-light: #ff5344;
-  --color-red-hover: #ec221d;
-  --color-red-text: #ad0000;
-  --color-red-tint: #ffede8;
-  --color-red-tint-strong: #ffb6a7;
+  /* Warning and danger: fixed hues matched to the default green (red oklch(0.63 0.19 27), orange lighter so it reads as orange: oklch(0.76 0.17 62)), with the same steps as the theme ramp (-light 400, -hover 600, -text 800, -tint 50, -tint-strong 200) */
+  --color-orange: #fc9417;
+  --color-orange-light: oklch(from var(--color-orange) calc(l + 0.06) c h);
+  --color-orange-hover: oklch(from var(--color-orange) calc(l - 0.05) c h);
+  --color-orange-text: oklch(from var(--color-orange) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
+  --color-orange-tint: oklch(from var(--color-orange) 0.97 calc(c * 0.15) h);
+  --color-orange-tint-strong: oklch(from var(--color-orange) 0.88 calc(c * 0.55) h);
+  --color-red: #e54d45;
+  --color-red-light: oklch(from var(--color-red) calc(l + 0.06) c h);
+  --color-red-hover: oklch(from var(--color-red) calc(l - 0.05) c h);
+  --color-red-text: oklch(from var(--color-red) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
+  --color-red-tint: oklch(from var(--color-red) 0.97 calc(c * 0.15) h);
+  --color-red-tint-strong: oklch(from var(--color-red) 0.88 calc(c * 0.55) h);
 }
 
 /* ==========================================================================

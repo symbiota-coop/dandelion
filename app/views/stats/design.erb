@@ -7,7 +7,7 @@
 
    severity_classes = { 'High' => 'text-danger', 'Medium' => 'text-warning-emphasis', 'Low' => 'text-body-secondary' }
    issues = [
-     [7, 'Medium', 'Too many accent colours and active states', 'Besides the theme colour there is purple #4400B9 (header, AI), an orange-to-yellow gradient (sidebar active, notification dot, load bar), a rainbow gradient, signal blue and Stripe purple. The sidebar active item uses the orange gradient while every other active state (pills, list groups, dropdown items, checks) uses the theme colour.', 'Decide which accent marks "active" and use it everywhere; restrict purple to AI features.', 'app.css .sidebar .nav-link.active, #header, --gradient-*']
+     [7, 'Medium', 'Too many accent colours and active states', 'Besides the theme colour there is purple #4400B9 (header, AI), an orange-to-yellow gradient (sidebar active, notification dot, load bar) and a rainbow gradient. The sidebar active item uses the orange gradient while every other active state (pills, list groups, dropdown items, checks) uses the theme colour.', 'Decide which accent marks "active" and use it everywhere; restrict purple to AI features.', 'app.css .sidebar .nav-link.active, #header, --gradient-*']
    ]
 
    # Run through clamp_color as /theme.css does, so a colour too light for white text is darkened
