@@ -97,7 +97,7 @@
       <div class="small text-body-secondary">Alerts and toasts: a sheen from the 50 to the 200. table-warning and table-danger rows: the 50, with the 200 for borders and a mix 30% of the way to it on hover.</div>
     <% end %>
 
-    <% design_subsection 'Greys, black and white', "Bootstrap's own variables, set in bootstrap5.scss to warm greys: Bootstrap's lightness steps at a slight warm hue (oklch hue 75, chroma .006–.008). The cool --color-canvas behind them on body.canvas pages is deliberate. Usage: 100 wells and hovered dropdown and list items · 200 hovered nav links, autocomplete items and table rows, and stripes · 300 table borders · 400 input borders and hr · 600 secondary text · 700 input add-ons · 800 search bar · 900 header and sidebar. Body text is <code>--bs-body-color</code>, the same as 900. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows, hairlines and image overlays.".html_safe do %>
+    <% design_subsection 'Greys, black and white', "Bootstrap's own variables, set in bootstrap5.scss to warm greys: Bootstrap's lightness steps at a slight warm hue (oklch hue 75, chroma .006–.008). The cool --color-canvas behind them on body.canvas pages is deliberate. Usage: 100 wells and hovered dropdown and list items · 200 hovered nav links, autocomplete items and table rows, and stripes · 300 table borders · 400 input borders and hr · 600 secondary text · 700 input add-ons · 800 search bar · 900 header and sidebar. Body text is <code>--bs-body-color</code>, the same as 900. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows and image overlays. Hairlines (dropdown borders and arrows, the .chill card header's divider, marketing cards) use <code>--hairline</code>, black at 10%.".html_safe do %>
       <div class="row g-3">
         <% %w[--bs-white --bs-gray-100 --bs-gray-200 --bs-gray-300 --bs-gray-400 --bs-gray-500 --bs-gray-600 --bs-gray-700 --bs-gray-800 --bs-gray-900 --bs-black].each do |name| %>
           <%= partial :'stats/design/swatch', locals: { vars: [name], col: 'col-6 col-md-3 col-xl' } %>
@@ -577,7 +577,7 @@
             <a class="list-group-item list-group-item-action text-center" href="#components">All notifications <i class="bi bi-arrow-right"></i></a>
           </div>
         </div>
-        <div class="spec">.notification-list: list-group-flush, items .625rem .9375rem, smaller newsfeed icons · .message-preview: unread --theme-500 at 15%, hover --bs-gray-400 at 30%</div>
+        <div class="spec">.notification-list: list-group-flush, items .625rem .9375rem, smaller newsfeed icons · .message-preview: unread --theme-100, hover --bs-tertiary-bg like the notification items</div>
       <% end %>
     </div>
 

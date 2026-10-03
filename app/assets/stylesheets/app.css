@@ -93,6 +93,8 @@
   --color-opencollective: #1869F5;
   --color-evm: #627EEA; /* Ethereum */
   --color-highlight: #FDFFAA;
+  /* Hairlines: dividers and borders on white that should show what's behind them */
+  --hairline: rgba(var(--bs-black-rgb), 0.1);
   --color-yellow-500: #FFCC00;
   --color-yellow-400: oklch(from var(--color-yellow-500) calc(l + 0.06) c h);
   --gradient-active: linear-gradient(135deg, #fd7514 0%, #efe707 100%);
@@ -1106,7 +1108,7 @@ p.action a:hover {
    ========================================================================== */
 
 .dropdown-menu {
-  border-color: rgba(var(--bs-black-rgb), 0.05);
+  border-color: var(--hairline);
   float: none;
   right: auto;
   margin-top: 0;
@@ -1140,7 +1142,7 @@ p.action a:hover {
 
 .dropdown-menu:before {
   top: -1.3125rem;
-  border-bottom-color: rgba(var(--bs-black-rgb), 0.1);
+  border-bottom-color: var(--hairline);
 }
 
 .dropdown .dropdown-menu.show {
@@ -1315,7 +1317,7 @@ p.action a:hover {
 
 .message-preview:hover,
 .message-preview.active {
-  background: oklch(from var(--bs-gray-400) l c h / 0.3)
+  background: var(--bs-tertiary-bg)
 }
 
 .message-preview.unread {
@@ -2447,7 +2449,7 @@ table.event-details td {
   left: 0.9375rem;
   right: 0.9375rem;
   height: 1px;
-  background-color: rgba(var(--bs-black-rgb), 0.1);
+  background-color: var(--hairline);
 }
 
 .newsfeed-icon {

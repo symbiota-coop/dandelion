@@ -89,7 +89,7 @@
 
 .marketing-card {
   background: var(--bs-white);
-  border: 1px solid rgba(var(--bs-black-rgb), 0.08);
+  border: 1px solid var(--hairline);
   border-radius: var(--bs-border-radius-xl);
   padding: 1.75rem;
   height: 100%;
