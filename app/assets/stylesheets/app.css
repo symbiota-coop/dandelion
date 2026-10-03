@@ -44,7 +44,6 @@
   --bs-link-color-rgb: var(--theme-500-rgb);
   --bs-link-hover-color: var(--theme-600);
   --bs-link-hover-color-rgb: var(--theme-500-rgb);
-  --bs-focus-ring-color: oklch(from var(--theme-500) l c h / var(--bs-focus-ring-opacity));
   --color-midnight: #4400B9;
   /* Lavender: the default green's lightness and chroma at hue 300 (oklch(0.661 0.169 300)), with the theme ramp's steps derived from its 500 */
   --color-lavender-500: #A476E9;
@@ -101,7 +100,7 @@
 
 /* The theme ramp, generated from --theme-500 with oklch() so steps at the same lightness look equally light whatever the hue.
    Tints (50–200) sit at fixed lightness; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints.
-   .theme-scope recomputes the theme ramp for an element that sets its own --theme-500 */
+   .theme-scope recomputes the theme ramp and focus ring for an element that sets its own --theme-500 */
 :root,
 .theme-scope {
   --theme-50: oklch(from var(--theme-500) 0.97 calc(c * 0.15) h);
@@ -109,6 +108,10 @@
   --theme-400: oklch(from var(--theme-500) calc(l + 0.06) c h);
   --theme-600: oklch(from var(--theme-500) calc(l - 0.05) c h);
   --theme-800: oklch(from var(--theme-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
+  /* One focus ring everywhere: --bs-focus-ring-width (2px) of the theme at --bs-focus-ring-opacity (.6), both from bootstrap5.scss.
+     Resolved here, so an element that wants a ring in another colour builds its own from the width and opacity, as buttons do */
+  --bs-focus-ring-color: oklch(from var(--theme-500) l c h / var(--bs-focus-ring-opacity));
+  --focus-ring: 0 0 0 var(--bs-focus-ring-width) var(--bs-focus-ring-color);
 }
 
 :root {
@@ -1001,15 +1004,15 @@ p.action a:hover {
 }
 
 .form-check-input:focus {
-  box-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-focus-ring-color);
+  box-shadow: var(--focus-ring);
 }
 
 .pagination {
-  --bs-pagination-focus-box-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-focus-ring-color);
+  --bs-pagination-focus-box-shadow: var(--focus-ring);
 }
 
 .accordion {
-  --bs-accordion-btn-focus-box-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-focus-ring-color);
+  --bs-accordion-btn-focus-box-shadow: var(--focus-ring);
 }
 
 .form-check-input:checked {
@@ -1028,7 +1031,7 @@ p.action a:hover {
 }
 
 .btn-close {
-  --bs-btn-close-focus-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-focus-ring-color);
+  --bs-btn-close-focus-shadow: var(--focus-ring);
 }
 
 .comment-grey .btn-outline-light,

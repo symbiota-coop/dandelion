@@ -21,17 +21,17 @@
   font-weight: 500;
 }
 
-/* The theme hard-codes Bootstrap's blue focus glow; use the same theme-coloured glow as .form-control (see $input-focus-box-shadow) */
+/* The theme hard-codes Bootstrap's blue focus glow; use our focus ring, as .form-control does */
 .select2-container--bootstrap-5.select2-container--focus .select2-selection,
 .select2-container--bootstrap-5.select2-container--open .select2-selection,
 .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field:focus {
   border-color: var(--theme-500);
-  box-shadow: 0 0 0 2px oklch(from var(--theme-500) l c h / .6);
+  box-shadow: var(--focus-ring);
 }
 
 .select2-container--bootstrap-5 .select2-dropdown {
   border-color: var(--theme-500);
-  box-shadow: 0 0 0 2px oklch(from var(--theme-500) l c h / .6);
+  box-shadow: var(--focus-ring);
 }
 
 /* Type on the same row as the tags, not on a row of its own below them */
