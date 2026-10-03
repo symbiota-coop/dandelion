@@ -50,6 +50,7 @@
   --color-lavender-50: oklch(from var(--color-lavender-500) 0.97 calc(c * 0.15) h);
   --color-lavender-100: oklch(from var(--color-lavender-500) 0.93 calc(c * 0.3) h);
   --color-lavender-200: oklch(from var(--color-lavender-500) 0.88 calc(c * 0.55) h);
+  --color-lavender-300: color-mix(in oklch, var(--color-lavender-200), var(--color-lavender-400));
   --color-lavender-400: oklch(from var(--color-lavender-500) calc(l + 0.06) c h);
   --color-lavender-600: oklch(from var(--color-lavender-500) calc(l - 0.05) c h);
   --color-lavender-800: oklch(from var(--color-lavender-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
@@ -138,6 +139,7 @@
   --color-orange-50: oklch(from var(--color-orange-500) 0.97 calc(c * 0.15) h);
   --color-orange-100: oklch(from var(--color-orange-500) 0.93 calc(c * 0.3) h);
   --color-orange-200: oklch(from var(--color-orange-500) 0.88 calc(c * 0.55) h);
+  --color-orange-300: color-mix(in oklch, var(--color-orange-200), var(--color-orange-400));
   --color-orange-400: oklch(from var(--color-orange-500) calc(l + 0.06) c h);
   --color-orange-600: oklch(from var(--color-orange-500) calc(l - 0.05) c h);
   --color-orange-800: oklch(from var(--color-orange-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
@@ -145,6 +147,7 @@
   --color-red-50: oklch(from var(--color-red-500) 0.97 calc(c * 0.15) h);
   --color-red-100: oklch(from var(--color-red-500) 0.93 calc(c * 0.3) h);
   --color-red-200: oklch(from var(--color-red-500) 0.88 calc(c * 0.55) h);
+  --color-red-300: color-mix(in oklch, var(--color-red-200), var(--color-red-400));
   --color-red-400: oklch(from var(--color-red-500) calc(l + 0.06) c h);
   --color-red-600: oklch(from var(--color-red-500) calc(l - 0.05) c h);
   --color-red-800: oklch(from var(--color-red-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
