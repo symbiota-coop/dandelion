@@ -290,7 +290,7 @@
   z-index: 10;
 }
 
-/* The header's dropdowns hang centred under their link, with an arrow pointing up at it */
+/* The header's dropdowns hang centred under their link */
 .header .dropdown-menu {
   left: 50%;
   right: auto;
@@ -299,12 +299,6 @@
 
 .header .dropdown-menu.dropdown-lg {
   margin-left: -9.375rem;
-}
-
-.header .dropdown-menu:before,
-.header .dropdown-menu:after {
-  left: 50%;
-  margin-left: -0.625rem;
 }
 
 /* On mobile the brand and toggler share the top row, and the icons spread across a second row */
@@ -584,12 +578,6 @@
 
 .sidebar .sidebar-dropdown li.active > .dropdown-item {
   color: var(--bs-white);
-}
-
-/* No arrow: that's for dropdowns hanging below their link */
-.sidebar .sidebar-dropdown:before,
-.sidebar .sidebar-dropdown:after {
-  display: none;
 }
 
 @media (min-width: 768px) {
@@ -1092,25 +1080,10 @@ p.action a {
   width: 18.75rem;
 }
 
-.dropdown-menu:before,
-.dropdown-menu:after {
-  content: "";
-  position: absolute;
-  top: -1.25rem;
-  left: 1.25rem;
-  border: 0.625rem solid transparent;
-  border-bottom-color: var(--bs-dropdown-bg);
-}
-
-.dropdown-menu:before {
-  top: -1.3125rem;
-  border-bottom-color: var(--hairline);
-}
-
+/* Menus float just below their trigger, with no arrow: a hairline border and a shadow set them off */
 .dropdown .dropdown-menu.show {
   display: block;
-  margin-top: 0.625rem !important;
-  overflow: initial;
+  margin-top: 0.25rem !important;
 }
 
 .dropdown .dropdown-menu {
