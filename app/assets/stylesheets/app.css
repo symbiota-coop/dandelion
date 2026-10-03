@@ -97,6 +97,8 @@
   --hairline: rgba(var(--bs-black-rgb), 0.1);
   --color-yellow-500: #FFCC00;
   --color-yellow-400: oklch(from var(--color-yellow-500) calc(l + 0.06) c h);
+  --color-yellow-50: oklch(from var(--color-yellow-500) 0.97 calc(c * 0.15) h);
+  --color-yellow-800: oklch(from var(--color-yellow-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
   --gradient-active: linear-gradient(135deg, #fd7514 0%, #efe707 100%);
   --gradient-rainbow: radial-gradient(circle at 0 0, #099ef1 0%, #6863f8 18.82%, #d84ffa 32.6%, #f058c5 52.83%, #ff4f90 68.03%, #ff6558 87.66%, #ff891f 100%);
   --gradient-header: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-midnight) 100%);
@@ -775,17 +777,21 @@ p.action a {
   --variant-800: var(--color-red-800);
 }
 
-/* Secondary and yellow only fill buttons and badges, so they have no tints */
+/* Secondary and yellow fill buttons, and tint badges with their 50 and 800 */
 .btn-secondary,
 .text-bg-secondary {
+  --variant-50: var(--bs-gray-200);
   --variant-400: var(--bs-gray-500);
   --variant-500: var(--bs-gray-600);
   --variant-600: var(--bs-gray-700);
+  --variant-800: var(--bs-gray-800);
 }
 
 .text-bg-yellow {
+  --variant-50: var(--color-yellow-50);
   --variant-400: var(--color-yellow-400);
   --variant-500: var(--color-yellow-500);
+  --variant-800: var(--color-yellow-800);
 }
 
 /* The sheen: 135°, --sheen-from flat to halfway, then to --sheen-to. Each of these sets the two (alerts and toasts
@@ -884,7 +890,13 @@ p.action a:hover {
    ========================================================================== */
 
 /* Bootstrap's badge, coloured with its text-bg-* classes, for counts, statuses, tags and amounts alike.
-   Sized in em (bootstrap5.scss), so a badge scales with the text around it */
+   Sized in em and shaped as a pill (bootstrap5.scss), so a badge scales with the text around it */
+
+/* Soft pills: their variant's 50, with its 800 for text. Other elements with text-bg-* classes, like card headers, stay filled */
+.badge:is(.text-bg-primary, .text-bg-secondary, .text-bg-warning, .text-bg-danger, .text-bg-yellow) {
+  color: var(--variant-800) !important;
+  background: var(--variant-50) !important;
+}
 
 .btn-primary .badge {
   color: var(--theme-500);
@@ -915,15 +927,8 @@ p.action a:hover {
   color: var(--payment-text, var(--bs-white));
 }
 
-/* Primary, secondary, warning, danger and yellow badges are sheens, like buttons (Variants and sheens) */
-
-/* Location badges match the text beside them */
 .popular-locations {
   font-size: var(--font-size-md)
-}
-
-.popular-locations .badge {
-  font-size: 1em
 }
 
 /* ==========================================================================

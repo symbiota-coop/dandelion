@@ -4682,12 +4682,12 @@ textarea.form-control-lg {
 }
 
 .badge {
-  --bs-badge-padding-x: 0.6em;
-  --bs-badge-padding-y: 0.25em;
-  --bs-badge-font-size: 0.875em;
-  --bs-badge-font-weight: 700;
+  --bs-badge-padding-x: 0.85em;
+  --bs-badge-padding-y: 0.4em;
+  --bs-badge-font-size: 1em;
+  --bs-badge-font-weight: 600;
   --bs-badge-color: #fff;
-  --bs-badge-border-radius: var(--bs-border-radius);
+  --bs-badge-border-radius: 50rem;
   display: inline-block;
   padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
   font-size: var(--bs-badge-font-size);
