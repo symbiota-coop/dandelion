@@ -1,8 +1,10 @@
 /*
  * Served by /theme.css, which replaces this :root block with the requested theme colour
  * (see theme_css_variables in app/helpers/markup_helpers.rb). app.css derives the rest of the theme
- * ramp from --theme-500, so most things follow the theme without rules here: this file only holds the
- * places where a themed page deliberately looks different from the default green one.
+ * ramp from --theme-500, so most things follow the theme without rules here: this file holds the
+ * places where a themed page deliberately looks different from the default green one (calendar events
+ * and the AI well), and the .event-detail tiles, whose green event_details.css hard-codes because it is
+ * inlined into emails and can't use custom properties.
  */
 :root {
   --theme-500: #00af5e;

@@ -170,7 +170,7 @@
   display: block;
   position: fixed;
   z-index: 2000;
-  top: 3.6875rem;
+  top: 3.75rem;
   right: 0.9375rem;
   width: 1.25rem;
   height: 1.25rem;
@@ -187,7 +187,7 @@
 
 @media (max-width: 767.98px) {
   .pace .pace-activity {
-    top: 6.5625rem;
+    top: 6.625rem;
   }
 }
 
@@ -221,7 +221,7 @@
 
 .header .navbar-brand {
   width: 14.375rem;
-  height: 2.75rem;
+  height: 2.8125rem;
   padding-left: 0.9375rem;
   padding-right: 0.9375rem;
   font-size: var(--font-size-base);
@@ -609,7 +609,7 @@
     --bs-offcanvas-width: 100%;
     --bs-offcanvas-zindex: 1020;
     --bs-offcanvas-transition: transform 0.15s ease-in-out;
-    top: 2.75rem;
+    top: 2.8125rem;
     border-right: 0;
   }
 }
@@ -1581,7 +1581,7 @@ label.remove-image input {
   text-decoration: none;
 }
 
-/* Dark text on the grey, as in dropdowns and the autocomplete: theme-coloured text on grey reads poorly.
+/* Dark text on --bs-secondary-bg, as in the autocomplete (dropdown items hover on the lighter --bs-tertiary-bg): theme-coloured text on grey reads poorly.
    Through the hover colour variable, so navs that set their own (the sidebar's white) keep it */
 .nav > li > a:focus,
 .nav > li > a:hover {
@@ -2049,12 +2049,12 @@ body {
 }
 
 #page-container {
-  padding-top: 2.75rem;
+  padding-top: 2.8125rem;
 }
 
 @media (max-width: 767.98px) {
   #page-container {
-    padding-top: 5.5625rem;
+    padding-top: 5.625rem;
   }
 }
 
