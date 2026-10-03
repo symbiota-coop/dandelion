@@ -786,8 +786,7 @@ p.action a {
   --variant-800: var(--color-red-800);
 }
 
-/* Secondary and yellow fill buttons, and tint badges with their 100 and 800 */
-.btn-secondary,
+/* Secondary and yellow tint badges with their 100 and 800; their 400 to 500 fill other text-bg-* elements */
 .text-bg-secondary {
   --variant-100: var(--bs-gray-200);
   --variant-400: var(--bs-gray-500);
@@ -812,7 +811,6 @@ p.action a {
 .toast-warning,
 .toast-danger,
 .btn-primary,
-.btn-secondary,
 .btn-warning,
 .btn-danger,
 .text-bg-primary,
@@ -828,7 +826,6 @@ p.action a,
 
 /* Fills go from their 500 to the lighter 400, and on hover from the 600 to the 500 */
 .btn-primary,
-.btn-secondary,
 .btn-warning,
 .btn-danger,
 .text-bg-primary,
@@ -842,7 +839,7 @@ p.action a {
   --sheen-to: var(--variant-400);
 }
 
-:is(.btn-primary, .btn-secondary, .btn-warning, .btn-danger):is(:hover, :focus, :active, .active, .show),
+:is(.btn-primary, .btn-warning, .btn-danger):is(:hover, :focus, :active, .active, .show),
 p.action a:hover {
   --sheen-from: var(--variant-600);
   --sheen-to: var(--variant-500);
@@ -878,13 +875,12 @@ p.action a:hover {
   padding: 0.875rem;
 }
 
-/* Toasts are drawn like alerts, plus a border in their text colour (alerts have none: $alert-border-width is 0) */
+/* Toasts are drawn like alerts, with no border ($toast-border-width and $alert-border-width are 0) */
 .toast-primary,
 .toast-warning,
 .toast-danger {
   --bs-toast-color: var(--variant-800);
   --bs-toast-bg: var(--variant-50);
-  --bs-toast-border-color: var(--variant-800);
   --sheen-from: var(--variant-50);
   --sheen-to: var(--variant-200);
 }
@@ -972,10 +968,9 @@ p.action a:hover {
   line-height: 1.3333333;
 }
 
-/* Primary, secondary, warning and danger buttons take their variant's 500, and 600 for hover, through Bootstrap's
+/* Primary, warning and danger buttons take their variant's 500, and 600 for hover, through Bootstrap's
    --bs-btn-* colours, and are sheens (Variants and sheens) */
 .btn-primary,
-.btn-secondary,
 .btn-warning,
 .btn-danger {
   --bs-btn-bg: var(--variant-500);
@@ -992,6 +987,22 @@ p.action a:hover {
 
 .btn-primary {
   --bs-btn-focus-shadow-rgb: var(--theme-500-rgb);
+}
+
+/* Secondary buttons are quiet: white with a grey hairline border and body text, turning grey on hover */
+.btn-secondary {
+  --bs-btn-color: var(--bs-body-color);
+  --bs-btn-bg: var(--bs-white);
+  --bs-btn-border-color: var(--bs-gray-300);
+  --bs-btn-hover-color: var(--bs-body-color);
+  --bs-btn-hover-bg: var(--bs-secondary-bg);
+  --bs-btn-hover-border-color: var(--bs-gray-300);
+  --bs-btn-active-color: var(--bs-body-color);
+  --bs-btn-active-bg: var(--bs-secondary-bg);
+  --bs-btn-active-border-color: var(--bs-gray-400);
+  --bs-btn-disabled-color: var(--bs-body-color);
+  --bs-btn-disabled-bg: var(--bs-white);
+  --bs-btn-disabled-border-color: var(--bs-gray-300);
 }
 
 .btn-outline-primary {
@@ -1070,10 +1081,6 @@ p.action a:hover {
 .quick-color-btn:focus, .quick-color-btn.selected {
   outline: none;
   box-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-white), 0 0 0 calc(var(--bs-focus-ring-width) * 2) var(--ring-color);
-}
-
-.btn-secondary:focus {
-  color: var(--bs-white)
 }
 
 /* Signal's brand blue, through Bootstrap's button variables. Brand buttons stay flat, without our gradient */
