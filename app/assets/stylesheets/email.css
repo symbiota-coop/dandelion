@@ -1,6 +1,6 @@
 /* Inlined into emails, which can't use custom properties, so colours are literal copies of the site's:
-   the warm greys from bootstrap5.scss (#272420 gray-900 for body text, #77736f gray-600 for secondary text, #3c3935 gray-800
-   for footer links and code, #d6d3cf gray-400 and #eeebe7 gray-200 for borders and fills), the site's .875em small text and
+   the greys from bootstrap5.scss (#252423 gray-900 for body text, #757372 gray-600 for secondary text, #3a3938 gray-800
+   for footer links and code, #d4d3d2 gray-400 and #ecebea gray-200 for borders and fills), the site's .875em small text and
    its radii. Theme colours, including the ramp steps for hovers and blockquotes, come from EmailHelper.theme_css */
 
 html,
@@ -15,7 +15,7 @@ blockquote {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, sans-serif;
   font-size: 17px;
   line-height: 1.45;
-  color: #272420;
+  color: #252423;
 }
 
 h1,
@@ -110,11 +110,11 @@ td {
   margin: 2em 0;
   text-align: center;
   font-size: 0.875em;
-  color: #77736f;
+  color: #757372;
 }
 
 .footer a {
-  color: #3c3935;
+  color: #3a3938;
   text-decoration: none;
 }
 
@@ -191,14 +191,14 @@ p.action {
 
 hr {
   border: 0;
-  border-top: 1px solid #d6d3cf;
+  border-top: 1px solid #d4d3d2;
   margin: 1em 0;
 }
 
 a.attachment {
   margin: 1em 0;
   padding: 0.75em;
-  border: 0.125em solid #eeebe7;
+  border: 0.125em solid #ecebea;
   border-radius: 0.5em;
   text-decoration: none;
   display: block;
@@ -206,9 +206,9 @@ a.attachment {
 
 pre {
   padding: 1em;
-  color: #3c3935;
-  background: #eeebe7;
-  border: 0.0625em solid #d6d3cf;
+  color: #3a3938;
+  background: #ecebea;
+  border: 0.0625em solid #d4d3d2;
   border-radius: 0.25em;
   text-align: left;
   direction: ltr;
@@ -241,11 +241,11 @@ pre {
 }
 
 .text-body-secondary {
-  color: #77736f;
+  color: #757372;
 }
 
 .text-dark {
-  color: #272420;
+  color: #252423;
 }
 
 .qr-code {
@@ -263,5 +263,5 @@ pre {
   display: block;
   margin-bottom: 1em;
   font-size: 0.875em;
-  color: #77736f;
+  color: #757372;
 }

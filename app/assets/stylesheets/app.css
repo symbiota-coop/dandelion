@@ -59,7 +59,6 @@
   --ai-well-from: var(--color-lavender-50);
   --ai-well-to: var(--color-lavender-400);
   --color-paper: #FFFAF3;
-  --color-canvas: #F9F8FA;
   --body-font-family: "Plus Jakarta Sans", sans-serif;
   --header-font-family: "Hanken Grotesk", "Plus Jakarta Sans", sans-serif;
   /* Type scale. bootstrap5.scss repeats the heading sizes (3xl to sm) as $h1-font-size to $h6-font-size */
@@ -726,7 +725,7 @@ body.lavender-wash #content {
 
 body.canvas,
 body.canvas #content {
-  background-color: var(--color-canvas);
+  background-color: var(--bs-gray-100);
 }
 
 #content {

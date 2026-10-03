@@ -101,7 +101,7 @@
       <div class="small text-body-secondary">Alerts and toasts: a sheen from the 50 to the 200. table-warning and table-danger rows: the 50, with the 200 for borders and a mix 30% of the way to it on hover.</div>
     <% end %>
 
-    <% design_subsection 'Greys, black and white', "Bootstrap's own variables, set in bootstrap5.scss to warm greys: Bootstrap's lightness steps at a slight warm hue (oklch hue 75, chroma .006–.008). The cool --color-canvas behind them on body.canvas pages is deliberate. Usage: 100 wells and hovered dropdown and list items · 200 hovered nav links, autocomplete items, table rows and secondary buttons, and stripes · 300 table and secondary button borders · 400 input borders and hr · 600 secondary text · 700 input add-ons · 800 search bar · 900 header and sidebar. Body text is <code>--bs-body-color</code>, the same as 900. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows and image overlays. Hairlines (dropdown borders and arrows, the .chill card header's divider, marketing cards) use <code>--hairline</code>, black at 10%.".html_safe do %>
+    <% design_subsection 'Greys, black and white', "Bootstrap's own variables, set in bootstrap5.scss to near-neutral greys: Bootstrap's lightness steps with a trace of warmth (oklch hue 75, chroma .00225–.003). Usage: 100 body.canvas pages, wells and hovered dropdown and list items · 200 hovered nav links, autocomplete items, table rows and secondary buttons, and stripes · 300 table and secondary button borders · 400 input borders and hr · 600 secondary text · 700 input add-ons · 800 search bar · 900 header and sidebar. Body text is <code>--bs-body-color</code>, the same as 900. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows and image overlays. Hairlines (dropdown borders and arrows, the .chill card header's divider, marketing cards) use <code>--hairline</code>, black at 10%.".html_safe do %>
       <div class="row g-3">
         <% %w[--bs-white --bs-gray-100 --bs-gray-200 --bs-gray-300 --bs-gray-400 --bs-gray-500 --bs-gray-600 --bs-gray-700 --bs-gray-800 --bs-gray-900 --bs-black].each do |name| %>
           <%= partial :'stats/design/swatch', locals: { vars: [name], col: 'col-6 col-md-3 col-xl' } %>
@@ -110,10 +110,9 @@
     <% end %>
 
     <% design_subsection 'Accents and surfaces', 'Each accent has one role. The dark header and sidebar are a sunset: near-black fading to --color-midnight, with the orange-to-yellow --gradient-active as the sun on the active sidebar item, the notification dot and the load bar. Light content marks active states with the theme colour, so there is one active colour per surface. On the default site purple also marks AI and calendar events; themed pages switch those to the theme. --gradient-rainbow is only for .gradient-text headlines on marketing pages and the signed-out home.' do %>
-      <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
+      <div class="row g-3 row-cols-2 row-cols-md-4">
         <% [
              [%w[--color-paper], '.lavender-wash end'],
-             [%w[--color-canvas], 'body.canvas'],
              [%w[--color-highlight], 'mark'],
              [%w[--color-yellow-500 --color-yellow-400], 'text-bg-yellow: Featured, Co-host, rota points; contributions chart (500)'],
              [%w[--color-midnight], 'header sunset; AI and calendar events on the default site']
@@ -307,7 +306,7 @@
           <div class="row g-3 flex-grow-1">
             <% [['col-8', 'col-lg-8 · newsfeed'], ['col-4', 'col-lg-4 · sticky']].each do |col, label| %>
               <div class="<%= col %>">
-                <div class="h-100 border rounded shadow-sm d-flex align-items-center justify-content-center text-center spec" style="background: repeating-linear-gradient(135deg, var(--color-canvas) 0 10px, #fff 10px 20px)"><%= label %></div>
+                <div class="h-100 border rounded shadow-sm d-flex align-items-center justify-content-center text-center spec" style="background: repeating-linear-gradient(135deg, var(--bs-gray-100) 0 10px, #fff 10px 20px)"><%= label %></div>
               </div>
             <% end %>
           </div>

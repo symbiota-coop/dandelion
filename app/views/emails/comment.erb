@@ -23,7 +23,7 @@
   <% end %>
   <% close_divs = ''; comment.post.comments.order_by(:created_at.desc)[1..].each { |comment| next if comment.body.nil? %>
   <p>On <%= comment.created_at %>, <%= comment.account.name %> wrote:</p>
-  <%== '<div style="border-left: 1px solid #d6d3cf; margin-left: 1em; padding-left: 1em">' %>
+  <%== '<div style="border-left: 1px solid #d4d3d2; margin-left: 1em; padding-left: 1em">' %>
   <p><%= comment.body_with_additions %></p>
   <% if comment.file %>
     <p>

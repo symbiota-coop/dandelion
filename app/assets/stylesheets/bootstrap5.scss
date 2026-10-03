@@ -2,16 +2,16 @@
 // After editing, run `rake bootstrap:build` (needs Node) and commit bootstrap5.css.
 // Anything that isn't a Bootstrap variable belongs in app.css.
 
-// Warm greys: Bootstrap's grey lightness steps in oklch at hue 75, chroma .006 (.008 from 500 down)
-$gray-100: #fbf8f5;
-$gray-200: #eeebe7;
-$gray-300: #e4e1dd;
-$gray-400: #d6d3cf;
-$gray-500: #b7b3ae;
-$gray-600: #77736f;
-$gray-700: #524f4a;
-$gray-800: #3c3935;
-$gray-900: #272420;
+// Near-neutral greys with a trace of warmth: Bootstrap's grey lightness steps in oklch at hue 75, chroma .00225 (.003 from 500 down)
+$gray-100: #f9f8f7;
+$gray-200: #ecebea;
+$gray-300: #e2e1e0;
+$gray-400: #d4d3d2;
+$gray-500: #b5b3b1;
+$gray-600: #757372;
+$gray-700: #504f4d;
+$gray-800: #3a3938;
+$gray-900: #252423;
 
 $blue: #00af5e;
 // Status colours: bg-*, text-*, btn-*, alert-* and friends all follow these
