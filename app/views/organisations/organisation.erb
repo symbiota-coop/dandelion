@@ -9,7 +9,7 @@
     <div class="text-center text-lg-start">
       <h1>
         <%= @organisation.name %>
-        <span class="fs-xs"><%= partial :'organisations/check', locals: {organisation: @organisation} %></span>
+        <span class="small"><%= partial :'organisations/check', locals: {organisation: @organisation} %></span>
       </h1>
       <% if current_account %>
         <%= partial :'organisations/buttons' %>

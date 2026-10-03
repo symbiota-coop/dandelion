@@ -46,14 +46,18 @@
   --bs-link-hover-color-rgb: var(--theme-500-rgb);
   --bs-focus-ring-color: oklch(from var(--theme-500) l c h / var(--bs-focus-ring-opacity));
   --color-midnight: #4400B9;
-  --color-lavender-1: #ebdfff;
-  --color-lavender-2: #bb93ff;
-  --color-lavender-3: #f3ecff;
+  /* Lavender: the default green's lightness and chroma at hue 300 (oklch(0.661 0.169 300)), with the theme ramp's steps derived from its 500 */
+  --color-lavender-500: #A476E9;
+  --color-lavender-50: oklch(from var(--color-lavender-500) 0.97 calc(c * 0.15) h);
+  --color-lavender-200: oklch(from var(--color-lavender-500) 0.88 calc(c * 0.55) h);
+  --color-lavender-400: oklch(from var(--color-lavender-500) calc(l + 0.06) c h);
+  --color-lavender-600: oklch(from var(--color-lavender-500) calc(l - 0.05) c h);
+  --color-lavender-800: oklch(from var(--color-lavender-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
   --color-paper: #FFFAF3;
   --color-canvas: #F9F8FA;
   --body-font-family: "Plus Jakarta Sans", sans-serif;
   --header-font-family: "Hanken Grotesk", "Plus Jakarta Sans", sans-serif;
-  /* Type scale */
+  /* Type scale. bootstrap5.scss repeats the heading sizes (3xl to sm) as $h1-font-size to $h6-font-size */
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.825rem;
   --font-size-md: 0.875rem;
@@ -63,12 +67,6 @@
   --font-size-2xl: 1.66rem;
   --font-size-3xl: 2rem;
   --body-font-size: var(--font-size-sm);
-  /* Relative sizes, also as the .fs-* classes */
-  --fs-xs: 0.75em;
-  --fs-sm: 0.875em;
-  --fs-lg: 1.2em;
-  --fs-xl: 1.5em;
-  --fs-xxl: 2em;
   /* Our palette: every colour in our stylesheets comes from here or from Bootstrap's variables
      (greys are Bootstrap's --bs-gray-100 to 900) */
   --color-signal: #3B45FE;
@@ -90,15 +88,11 @@
   --color-magenta-light: #e84dc4;
   --color-rose: #d94f6e;
   --color-rose-light: #f0889a;
-  --color-violet: #7c5ce7;
-  --wash-amber: #fdf0dc;
-  --wash-rose: #fce8e6;
-  --wash-magenta: #f4e6f5;
-  --wash-purple: #ece0f0;
-  /* Warm amber for map areas and the features page */
-  --color-amber: #FBAE3B;
-  --color-amber-light: #fcc56e;
-  --color-amber-dark: #d99520;
+  /* Section washes: each section colour's 50 step */
+  --wash-amber: var(--color-orange-50);
+  --wash-rose: oklch(from var(--color-rose) 0.97 calc(c * 0.15) h);
+  --wash-magenta: oklch(from var(--color-magenta) 0.97 calc(c * 0.15) h);
+  --wash-purple: var(--color-lavender-50);
   --gradient-active: linear-gradient(135deg, #fd7514 0%, #efe707 100%);
   --gradient-rainbow: radial-gradient(circle at 0 0, #099ef1 0%, #6863f8 18.82%, #d84ffa 32.6%, #f058c5 52.83%, #ff4f90 68.03%, #ff6558 87.66%, #ff891f 100%);
   accent-color: var(--theme-500);
@@ -110,28 +104,26 @@
 :root,
 .theme-scope {
   --theme-50: oklch(from var(--theme-500) 0.97 calc(c * 0.15) h);
-  --theme-100: oklch(from var(--theme-500) 0.94 calc(c * 0.3) h);
   --theme-200: oklch(from var(--theme-500) 0.88 calc(c * 0.55) h);
   --theme-400: oklch(from var(--theme-500) calc(l + 0.06) c h);
   --theme-600: oklch(from var(--theme-500) calc(l - 0.05) c h);
-  --theme-700: oklch(from var(--theme-500) calc(l - 0.12) c h);
   --theme-800: oklch(from var(--theme-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
 }
 
 :root {
-  /* Warning and danger: fixed hues matched to the default green (red oklch(0.63 0.19 27), orange lighter so it reads as orange: oklch(0.76 0.17 62)), with the same steps as the theme ramp (-light 400, -hover 600, -text 800, -tint 50, -tint-strong 200) */
-  --color-orange: #fc9417;
-  --color-orange-light: oklch(from var(--color-orange) calc(l + 0.06) c h);
-  --color-orange-hover: oklch(from var(--color-orange) calc(l - 0.05) c h);
-  --color-orange-text: oklch(from var(--color-orange) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
-  --color-orange-tint: oklch(from var(--color-orange) 0.97 calc(c * 0.15) h);
-  --color-orange-tint-strong: oklch(from var(--color-orange) 0.88 calc(c * 0.55) h);
-  --color-red: #e54d45;
-  --color-red-light: oklch(from var(--color-red) calc(l + 0.06) c h);
-  --color-red-hover: oklch(from var(--color-red) calc(l - 0.05) c h);
-  --color-red-text: oklch(from var(--color-red) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
-  --color-red-tint: oklch(from var(--color-red) 0.97 calc(c * 0.15) h);
-  --color-red-tint-strong: oklch(from var(--color-red) 0.88 calc(c * 0.55) h);
+  /* Warning and danger: fixed hues matched to the default green (red oklch(0.63 0.19 27), orange lighter so it reads as orange: oklch(0.76 0.17 62)), with the theme ramp's steps derived from each 500 */
+  --color-orange-500: #fc9417;
+  --color-orange-50: oklch(from var(--color-orange-500) 0.97 calc(c * 0.15) h);
+  --color-orange-200: oklch(from var(--color-orange-500) 0.88 calc(c * 0.55) h);
+  --color-orange-400: oklch(from var(--color-orange-500) calc(l + 0.06) c h);
+  --color-orange-600: oklch(from var(--color-orange-500) calc(l - 0.05) c h);
+  --color-orange-800: oklch(from var(--color-orange-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
+  --color-red-500: #e54d45;
+  --color-red-50: oklch(from var(--color-red-500) 0.97 calc(c * 0.15) h);
+  --color-red-200: oklch(from var(--color-red-500) 0.88 calc(c * 0.55) h);
+  --color-red-400: oklch(from var(--color-red-500) calc(l + 0.06) c h);
+  --color-red-600: oklch(from var(--color-red-500) calc(l - 0.05) c h);
+  --color-red-800: oklch(from var(--color-red-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
 }
 
 /* ==========================================================================
@@ -695,12 +687,12 @@
 body.gradient,
 body.gradient #content {
   background:
-    linear-gradient(135deg, var(--color-lavender-3) 0%, var(--color-paper) 50%);
+    linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-paper) 50%);
 }
 
 .gradient {
   background:
-    linear-gradient(135deg, var(--color-lavender-3) 0%, var(--color-paper) 50%),
+    linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-paper) 50%),
     linear-gradient(to bottom, transparent 80%, var(--bs-white) 100%);
   background-blend-mode: lighten;
 }
@@ -754,17 +746,17 @@ body.canvas #content {
 }
 
 .alert-warning {
-  --bs-alert-color: var(--color-orange-text);
-  --bs-alert-bg: var(--color-orange-tint);
-  --bs-alert-link-color: var(--color-orange-text);
-  --alert-bg-end: var(--color-orange-tint-strong);
+  --bs-alert-color: var(--color-orange-800);
+  --bs-alert-bg: var(--color-orange-50);
+  --bs-alert-link-color: var(--color-orange-800);
+  --alert-bg-end: var(--color-orange-200);
 }
 
 .alert-danger {
-  --bs-alert-color: var(--color-red-text);
-  --bs-alert-bg: var(--color-red-tint);
-  --bs-alert-link-color: var(--color-red-text);
-  --alert-bg-end: var(--color-red-tint-strong);
+  --bs-alert-color: var(--color-red-800);
+  --bs-alert-bg: var(--color-red-50);
+  --bs-alert-link-color: var(--color-red-800);
+  --alert-bg-end: var(--color-red-200);
 }
 
 .alert-primary,
@@ -786,17 +778,17 @@ body.canvas #content {
 }
 
 .toast-warning {
-  --bs-toast-color: var(--color-orange-text);
-  --bs-toast-bg: var(--color-orange-tint);
-  --bs-toast-border-color: var(--color-orange-text);
-  --toast-bg-end: var(--color-orange-tint-strong);
+  --bs-toast-color: var(--color-orange-800);
+  --bs-toast-bg: var(--color-orange-50);
+  --bs-toast-border-color: var(--color-orange-800);
+  --toast-bg-end: var(--color-orange-200);
 }
 
 .toast-danger {
-  --bs-toast-color: var(--color-red-text);
-  --bs-toast-bg: var(--color-red-tint);
-  --bs-toast-border-color: var(--color-red-text);
-  --toast-bg-end: var(--color-red-tint-strong);
+  --bs-toast-color: var(--color-red-800);
+  --bs-toast-bg: var(--color-red-50);
+  --bs-toast-border-color: var(--color-red-800);
+  --toast-bg-end: var(--color-red-200);
 }
 
 .toast-primary,
@@ -849,8 +841,8 @@ body.canvas #content {
 /* Coloured badges are gradients from their colour to a lighter one */
 .badge.text-bg-primary { --badge-color: var(--theme-500); --badge-color-light: var(--theme-400); }
 .badge.text-bg-secondary { --badge-color: var(--bs-gray-600); --badge-color-light: var(--bs-gray-500); }
-.badge.text-bg-warning { --badge-color: var(--color-orange); --badge-color-light: var(--color-orange-light); }
-.badge.text-bg-danger { --badge-color: var(--color-red); --badge-color-light: var(--color-red-light); }
+.badge.text-bg-warning { --badge-color: var(--color-orange-500); --badge-color-light: var(--color-orange-400); }
+.badge.text-bg-danger { --badge-color: var(--color-red-500); --badge-color-light: var(--color-red-400); }
 .badge.text-bg-yellow { --badge-color: var(--color-yellow); --badge-color-light: var(--color-yellow-light); }
 
 .badge:is(.text-bg-primary, .text-bg-secondary, .text-bg-warning, .text-bg-danger, .text-bg-yellow) {
@@ -923,21 +915,21 @@ body.canvas #content {
 }
 
 .btn-warning {
-  --bs-btn-hover-bg: var(--color-orange-hover);
-  --bs-btn-hover-border-color: var(--color-orange-hover);
-  --bs-btn-active-bg: var(--color-orange-hover);
-  --bs-btn-active-border-color: var(--color-orange-hover);
-  --btn-gradient-end: var(--color-orange-light);
-  --btn-hover-gradient-end: var(--color-orange);
+  --bs-btn-hover-bg: var(--color-orange-600);
+  --bs-btn-hover-border-color: var(--color-orange-600);
+  --bs-btn-active-bg: var(--color-orange-600);
+  --bs-btn-active-border-color: var(--color-orange-600);
+  --btn-gradient-end: var(--color-orange-400);
+  --btn-hover-gradient-end: var(--color-orange-500);
 }
 
 .btn-danger {
-  --bs-btn-hover-bg: var(--color-red-hover);
-  --bs-btn-hover-border-color: var(--color-red-hover);
-  --bs-btn-active-bg: var(--color-red-hover);
-  --bs-btn-active-border-color: var(--color-red-hover);
-  --btn-gradient-end: var(--color-red-light);
-  --btn-hover-gradient-end: var(--color-red);
+  --bs-btn-hover-bg: var(--color-red-600);
+  --bs-btn-hover-border-color: var(--color-red-600);
+  --bs-btn-active-bg: var(--color-red-600);
+  --bs-btn-active-border-color: var(--color-red-600);
+  --btn-gradient-end: var(--color-red-400);
+  --btn-hover-gradient-end: var(--color-red-500);
 }
 
 .btn-primary,
@@ -1726,21 +1718,26 @@ table.dataTable.table-sm > thead > tr > th[class*="dt-order"] .dt-column-order {
   font-size: var(--font-size-sm);
 }
 
+/* Bootstrap's .small comes before the rule above, so restate it for small tables */
+.table.small {
+  font-size: 0.875em;
+}
+
 /* Warning and danger rows use the alert and toast tints: the tint, the stronger tint for borders, and 30% of the way to it for hover, stripes and active */
 .table-warning {
-  --bs-table-bg: var(--color-orange-tint);
-  --bs-table-border-color: var(--color-orange-tint-strong);
-  --bs-table-striped-bg: color-mix(in srgb, var(--color-orange-tint), var(--color-orange-tint-strong) 30%);
-  --bs-table-hover-bg: color-mix(in srgb, var(--color-orange-tint), var(--color-orange-tint-strong) 30%);
-  --bs-table-active-bg: color-mix(in srgb, var(--color-orange-tint), var(--color-orange-tint-strong) 30%);
+  --bs-table-bg: var(--color-orange-50);
+  --bs-table-border-color: var(--color-orange-200);
+  --bs-table-striped-bg: color-mix(in srgb, var(--color-orange-50), var(--color-orange-200) 30%);
+  --bs-table-hover-bg: color-mix(in srgb, var(--color-orange-50), var(--color-orange-200) 30%);
+  --bs-table-active-bg: color-mix(in srgb, var(--color-orange-50), var(--color-orange-200) 30%);
 }
 
 .table-danger {
-  --bs-table-bg: var(--color-red-tint);
-  --bs-table-border-color: var(--color-red-tint-strong);
-  --bs-table-striped-bg: color-mix(in srgb, var(--color-red-tint), var(--color-red-tint-strong) 30%);
-  --bs-table-hover-bg: color-mix(in srgb, var(--color-red-tint), var(--color-red-tint-strong) 30%);
-  --bs-table-active-bg: color-mix(in srgb, var(--color-red-tint), var(--color-red-tint-strong) 30%);
+  --bs-table-bg: var(--color-red-50);
+  --bs-table-border-color: var(--color-red-200);
+  --bs-table-striped-bg: color-mix(in srgb, var(--color-red-50), var(--color-red-200) 30%);
+  --bs-table-hover-bg: color-mix(in srgb, var(--color-red-50), var(--color-red-200) 30%);
+  --bs-table-active-bg: color-mix(in srgb, var(--color-red-50), var(--color-red-200) 30%);
 }
 
 .table-striped > thead > tr > th {
@@ -2088,36 +2085,6 @@ h6 small,
   font-weight: 500;
 }
 
-h1,
-.h1 {
-  font-size: var(--font-size-3xl);
-}
-
-h2,
-.h2 {
-  font-size: var(--font-size-2xl);
-}
-
-h3,
-.h3 {
-  font-size: var(--font-size-xl);
-}
-
-h4,
-.h4 {
-  font-size: var(--font-size-lg);
-}
-
-h5,
-.h5 {
-  font-size: var(--font-size-md);
-}
-
-h6,
-.h6 {
-  font-size: var(--font-size-sm);
-}
-
 b,
 strong {
   font-weight: bold;
@@ -2208,27 +2175,6 @@ small.form-text {
 
 .read-more-toggle {
   font-size: var(--font-size-xs)
-}
-
-/* Font sizes relative to the surrounding text, in place of inline font-size and <big> */
-.fs-xs {
-  font-size: var(--fs-xs)
-}
-
-.fs-sm {
-  font-size: var(--fs-sm)
-}
-
-.fs-lg {
-  font-size: var(--fs-lg)
-}
-
-.fs-xl {
-  font-size: var(--fs-xl)
-}
-
-.fs-xxl {
-  font-size: var(--fs-xxl)
 }
 
 .ui-widget,
@@ -2442,7 +2388,7 @@ ul.map-event li {
 }
 
 table.event-details td {
-  font-size: var(--fs-lg)
+  font-size: var(--font-size-base)
 }
 
 .event-detail:hover {
@@ -2464,7 +2410,7 @@ table.event-details td {
 }
 
 .average-rating {
-  font-size: var(--fs-xxl);
+  font-size: var(--font-size-2xl);
 }
 
 /* ==========================================================================
@@ -2671,7 +2617,7 @@ td .tactivity-accept {
    ========================================================================== */
 
 .ai-well {
-  background: linear-gradient(135deg, var(--color-lavender-1) 0%, var(--color-lavender-1) 50%, var(--color-lavender-2) 100%) !important;
+  background: linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-lavender-50) 50%, var(--color-lavender-400) 100%) !important;
   padding: 1rem;
   border-radius: var(--bs-border-radius-lg);
 }
@@ -2714,7 +2660,7 @@ td .tactivity-accept {
 }
 
 .bi.bi-star-fill {
-  color: var(--color-amber)
+  color: var(--color-orange-400)
 }
 
 img.private {

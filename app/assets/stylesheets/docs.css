@@ -121,13 +121,13 @@
 
 #doc-body .table,
 .docs-deepwiki-answer .table {
-  font-size: var(--fs-sm);
+  font-size: 0.875em;
   margin-bottom: 0;
 }
 
 #doc-body pre,
 .docs-deepwiki-answer pre {
-  font-size: var(--fs-sm);
+  font-size: 0.875em;
   line-height: 1.5;
   padding: 0;
   overflow-x: auto;
@@ -141,7 +141,7 @@
 
 #doc-body code,
 .docs-deepwiki-answer code {
-  font-size: var(--fs-sm);
+  font-size: 0.875em;
 }
 
 .doc-table-wrap {
@@ -170,7 +170,7 @@
 
 .doc-transcript blockquote {
   margin: 0;
-  font-size: var(--fs-sm);
+  font-size: 0.875em;
   line-height: 1.45;
 }
 
@@ -246,7 +246,7 @@
 
 .doc-index-h3s .doc-link {
   padding-left: 1.4rem;
-  font-size: var(--fs-sm);
+  font-size: 0.875em;
   color: var(--bs-secondary);
 }
 
@@ -414,7 +414,7 @@
 .doc-search-snippet {
   display: block;
   margin-top: 0.25rem;
-  font-size: var(--fs-sm);
+  font-size: 0.875em;
   line-height: 1.4;
   color: var(--bs-secondary);
 }

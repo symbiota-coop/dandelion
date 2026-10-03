@@ -5,7 +5,7 @@
     <tr>
       <td class="pe-2" style="width: 1px">
 
-        <a href="/e/<%= event.slug %>" class="event-detail calendar-date mt-1 fs-lg" data-bs-toggle="tooltip" title="in <%=distance_of_time_in_words event.start_time - Time.now %>">
+        <a href="/e/<%= event.slug %>" class="event-detail calendar-date mt-1 fs-4" data-bs-toggle="tooltip" title="in <%=distance_of_time_in_words event.start_time - Time.now %>">
           <span class="month">
             <span class="month-text">
               <%= event.start_time.strftime('%b') %>

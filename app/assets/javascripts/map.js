@@ -39,22 +39,25 @@ window.DandelionMap = {
     ];
   },
 
-  // Google Maps needs a plain colour, so read --color-amber from app.css
-  polygonStyle: {
-    strokeColor: getComputedStyle(document.documentElement).getPropertyValue('--color-amber').trim(),
-    strokeOpacity: 0.8,
-    strokeWeight: 2,
-    fillColor: getComputedStyle(document.documentElement).getPropertyValue('--color-amber').trim(),
-    fillOpacity: 0.35
+  // Google Maps needs a plain colour, so resolve --color-orange-400 when a polygon is drawn
+  get polygonStyle () {
+    const color = cssColor('var(--color-orange-400)')
+    return {
+      strokeColor: color,
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: color,
+      fillOpacity: 0.35
+    }
   },
 
   // Model configurations for map markers
   models: [
     { name: 'Account', color: 'var(--theme-500)', icon: 'bi bi-person-fill' },
     { name: 'ActivityApplication', color: 'var(--theme-500)', icon: 'bi bi-person-fill' },
-    { name: 'Event', color: 'var(--color-red-light)', icon: 'bi bi-calendar-event' },
+    { name: 'Event', color: 'var(--color-red-400)', icon: 'bi bi-calendar-event' },
     { name: 'Gathering', color: 'var(--theme-500)', icon: 'bi bi-people-fill' },
-    { name: 'Organisation', color: 'var(--color-red-light)', icon: 'bi bi-flag-fill' },
+    { name: 'Organisation', color: 'var(--color-red-400)', icon: 'bi bi-flag-fill' },
     { name: 'Organisationship', color: 'var(--theme-500)', icon: 'bi bi-person-fill' }
   ],
 

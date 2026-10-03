@@ -1,12 +1,12 @@
 <% if mapplication.answers %>
   <div class="mb-5">
     <% mapplication.answers.each { |q,a| if q && a %>
-    <p class="fs-6">
+    <p class="fs-4">
       <strong>
         <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
       </strong>
     </p>
-    <p class="fs-6">
+    <p class="fs-4">
       <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
     </p>
   <% end } if mapplication.answers %>
@@ -20,7 +20,7 @@
     <div class="d-flex align-items-start mb-3">
       <span class="me-2">
         <% if @gathering.send("anonymise_#{noun.pluralize}") %>
-          <i class="bi bi-person-bounding-box fs-xxl"></i>
+          <i class="bi bi-person-bounding-box fs-2"></i>
         <% else %>
           <%= partial :'accounts/square', locals: { account: account, width: '32px' } %>
         <% end %>

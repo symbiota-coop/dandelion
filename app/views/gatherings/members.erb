@@ -105,7 +105,7 @@
 <% when 'map' %>
   <%= partial :'maps/map', locals: { points: Account.and(:id.in => @memberships.pluck(:account_id)).and(:coordinates.ne => nil) } %>
 <% when 'birthdays' %>
-  <a data-bs-toggle="tooltip" title="iCal feed" class="text-primary fs-6" id="ical" target="_blank" href="/g/<%=@gathering.slug%>/birthdays.ics?ics_key=<%=current_account.ensure_ics_key!%>">
+  <a data-bs-toggle="tooltip" title="iCal feed" class="text-primary fs-4" id="ical" target="_blank" href="/g/<%=@gathering.slug%>/birthdays.ics?ics_key=<%=current_account.ensure_ics_key!%>">
     <i class="bi bi-rss-fill"></i>
   </a>
   <% birthday_ids = Account.and(:id.in => @memberships.pluck(:account_id)).ids_by_next_birthday; birthday_accounts = Account.and(:id.in => birthday_ids).index_by { |a| a.id.to_s } %>

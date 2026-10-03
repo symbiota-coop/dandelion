@@ -32,7 +32,7 @@
             <%= gem[:downloads]&.to_s&.reverse&.gsub(/(\d{3})(?=\d)/, '\\1,')&.reverse %>
           </td>
           <td>
-            <span class="fs-sm"><%= gem[:info] %></span>
+            <span class="small"><%= gem[:info] %></span>
           </td>
           <td>
             <% if gem[:homepage] %>

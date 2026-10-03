@@ -6,7 +6,7 @@
   <div class="col-lg-8">
     <%= partial :'timetables/tactivity', object: @tactivity %>
     <% if @tactivity.description %>
-      <p class="fs-6">
+      <p class="fs-4">
         <%== Sanitize.fragment(Rinku.auto_link(@tactivity.description.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
       </p>
     <% end %>

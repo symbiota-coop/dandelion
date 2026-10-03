@@ -38,15 +38,13 @@
         <div class="row g-2">
           <% {
                '50' => 'alert and toast background',
-               '100' => 'not used yet',
                '200' => 'alert and toast gradient end',
                '400' => 'button gradient end',
                '500' => nil,
                '600' => 'hover',
-               '700' => 'not used yet',
                '800' => 'text on tints'
              }.each do |step, note| %>
-            <div class="col-3 col-md">
+            <div class="col-4 col-md-2">
               <div class="rounded mb-1 d-flex align-items-end p-2 small fw-bold" style="height: 72px; background: var(--theme-<%= step %>); color: <%= step.to_i >= 500 ? '#fff' : 'var(--bs-gray-800)' %>"><%= step %></div>
               <div class="font-monospace small text-body-secondary text-break"><%== css_var.call("--theme-#{step}") %></div>
               <% if note %><div class="small text-body-secondary"><%= note %></div><% end %>
@@ -67,52 +65,85 @@
 
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
+        <h3 class="m-0">Lavender</h3>
+        <span class="text-body-secondary">The default site's AI well and <code>.gradient</code> backgrounds, with the theme ramp's steps derived from --color-lavender-500, which has the default green's lightness and chroma. Themed pages switch the AI well to the theme.</span>
+      </div>
+      <div>
+        <div class="row g-2">
+          <% {
+               '50' => '.gradient, AI well background',
+               '200' => 'not used yet',
+               '400' => 'AI well gradient end',
+               '500' => 'not used yet',
+               '600' => 'features and Luma pages: purple divider end, call-to-action glow',
+               '800' => 'not used yet'
+             }.each do |step, note| %>
+            <div class="col-4 col-md-2">
+              <div class="rounded border mb-1" style="height: 64px; background: var(--color-lavender-<%= step %>)"></div>
+              <div class="fw-bold small"><%= step %></div>
+              <div class="font-monospace small text-body-secondary"><%== css_var.call("--color-lavender-#{step}") %></div>
+              <div class="small text-body-secondary"><%= note %></div>
+            </div>
+          <% end %>
+        </div>
+        <div class="row g-3 row-cols-1 row-cols-sm-2 mt-0">
+          <div class="col">
+            <div class="rounded border mb-1" style="height: 64px; background: linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-lavender-50) 50%, var(--color-lavender-400) 100%)"></div>
+            <div class="fw-bold">AI well</div>
+            <div class="small text-body-secondary">--color-lavender-50 to --color-lavender-400</div>
+            <div class="font-monospace small text-body-secondary"><%== css_vars.call('--color-lavender-50', '--color-lavender-400') %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex flex-column gap-3">
+      <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">Warning and danger</h3>
-        <span class="text-body-secondary">Two families, used the same way. The fill is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match. There are no warning buttons yet, so --color-orange-hover is unused.</span>
+        <span class="text-body-secondary">Two families, used the same way. The 500 is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match. There are no warning buttons yet, so --color-orange-600 is unused.</span>
       </div>
       <% [%w[Warning orange], %w[Danger red]].each do |title, colour| %>
         <div>
           <div class="mb-1"><span class="fw-bold"><%= title %></span> <span class="text-body-secondary">· --color-<%= colour %>-*</span></div>
           <div class="row g-2">
             <% [
-                 ['', 'fill: badges, buttons'],
-                 ['-light', 'gradient end'],
-                 ['-hover', 'button hover'],
-                 ['-text', 'text and border on tints'],
-                 ['-tint', 'alert, toast and row background'],
-                 ['-tint-strong', 'tint gradient end, row border']
-               ].each do |suffix, note| %>
-              <% name = "--color-#{colour}#{suffix}" %>
+                 ['50', 'alert, toast and row background'],
+                 ['200', 'tint gradient end, row border'],
+                 ['400', 'gradient end'],
+                 ['500', 'fill: badges, buttons'],
+                 ['600', 'button hover'],
+                 ['800', 'text and border on tints']
+               ].each do |step, note| %>
+              <% name = "--color-#{colour}-#{step}" %>
               <% other_uses = {
-                   '--color-orange' => 'ASN stats: bot % of 30 and over',
-                   '--color-red' => 'ASN stats: bot % of 60 and over; check-in QR scan line',
-                   '--color-red-light' => 'map: event and organisation markers'
+                   '--color-orange-500' => 'ASN stats: bot % of 30 and over',
+                   '--color-orange-400' => 'star icons, feedback stars, map areas, features page',
+                   '--color-orange-200' => 'features page divider end',
+                   '--color-red-500' => 'ASN stats: bot % of 60 and over; check-in QR scan line',
+                   '--color-red-400' => 'map: event and organisation markers'
                  }[name] %>
               <div class="col-4 col-md-2">
                 <div class="rounded border mb-1" style="height: 64px; background: var(<%= name %>)"></div>
-                <div class="fw-bold small text-break"><%= suffix.empty? ? 'fill' : suffix.delete_prefix('-') %></div>
+                <div class="fw-bold small text-break"><%= step %></div>
                 <div class="font-monospace small text-body-secondary"><%== css_var.call(name) %></div>
                 <div class="small text-body-secondary"><%= note %></div>
                 <% if other_uses %><div class="small text-body-secondary">Also: <%= other_uses %></div><% end %>
               </div>
             <% end %>
           </div>
+          <% from = "--color-#{colour}-50"
+             to = "--color-#{colour}-200" %>
+          <div class="row g-3 row-cols-1 row-cols-sm-2 mt-0">
+            <div class="col">
+              <div class="rounded border mb-1" style="height: 64px; background: linear-gradient(135deg, var(<%= from %>) 0%, var(<%= from %>) 50%, var(<%= to %>) 100%)"></div>
+              <div class="fw-bold"><%= title %> alerts and toasts</div>
+              <div class="small text-body-secondary"><%= from %> to <%= to %></div>
+              <div class="font-monospace small text-body-secondary"><%== css_vars.call(from, to) %></div>
+            </div>
+          </div>
         </div>
       <% end %>
-      <div class="small text-body-secondary">Alerts and toasts: 135°, flat tint to 50%, then to the stronger tint. table-warning and table-danger rows: flat tint, the stronger tint for borders, and a mix 30% of the way to it on hover.</div>
-      <div class="row g-3 row-cols-1 row-cols-sm-2">
-        <% [
-             %w[Warning --color-orange-tint --color-orange-tint-strong],
-             %w[Danger --color-red-tint --color-red-tint-strong]
-           ].each do |title, from, to| %>
-          <div class="col">
-            <div class="rounded border mb-1" style="height: 64px; background: linear-gradient(135deg, var(<%= from %>) 0%, var(<%= from %>) 50%, var(<%= to %>) 100%)"></div>
-            <div class="fw-bold"><%= title %></div>
-            <div class="small text-body-secondary"><%= from %> to <%= to %></div>
-            <div class="font-monospace small text-body-secondary"><%== css_vars.call(from, to) %></div>
-          </div>
-        <% end %>
-      </div>
+      <div class="small text-body-secondary">Alerts and toasts: 135°, the 50 flat to halfway, then to the 200. table-warning and table-danger rows: the 50, with the 200 for borders and a mix 30% of the way to it on hover.</div>
     </div>
 
     <div class="d-flex flex-column gap-3">
@@ -139,11 +170,9 @@
              [%w[--color-paper], '.gradient end'],
              [%w[--color-canvas], 'body.canvas'],
              [%w[--color-highlight], 'mark'],
-             [%w[--color-lavender-2 --color-lavender-1 --color-lavender-3], 'AI well gradient (1 to 2), .gradient (3)', 'lavender-2/1/3'],
              [%w[--color-yellow --color-yellow-light], 'text-bg-yellow: Featured, Co-host, rota points'],
-             [%w[--color-amber --color-amber-light --color-amber-dark], 'star icons, feedback stars, map areas, features page'],
              [%w[--color-midnight], 'header sunset; AI and calendar events on the default site']
-           ].each do |names, note, title| %>
+           ].each do |names, note| %>
           <div class="col">
             <% if names.length > 1 %>
               <div class="rounded overflow-hidden mb-1" style="height: 64px">
@@ -153,7 +182,7 @@
                   <% end %>
                 </div>
               </div>
-              <div class="fw-bold text-break"><%= title || "#{names.first}, …" %></div>
+              <div class="fw-bold text-break"><%= names.first %>, …</div>
             <% else %>
               <div class="rounded mb-1 <%= 'border' if %w[--color-paper --color-canvas].include?(names.first) %>" style="height: 64px; background: var(<%= names.first %>)"></div>
               <div class="fw-bold text-break"><%= names.first %></div>
@@ -168,11 +197,10 @@
       <h3 class="m-0">Other gradients</h3>
       <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-3">
         <% [
-             ['linear-gradient(135deg, var(--theme-500) 0%, var(--theme-500) 50%, var(--theme-400) 100%)', 'Fill pattern', '135°, flat to 50%, then to a lighter end (--theme-400, --color-red-light). Primary, secondary and danger buttons, badges, progress, text-bg-primary.'],
              ['var(--gradient-active)', '--gradient-active', 'Sidebar active item, notification dot, page-load bar.'],
              ['linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-midnight) 100%)', 'Header', '45°, --bs-gray-900 to 66%, then midnight.'],
              ['var(--gradient-rainbow)', '--gradient-rainbow', '.gradient-text only.'],
-             ['linear-gradient(135deg, var(--color-lavender-3) 0%, var(--color-paper) 50%)', '.gradient', 'Lavender to paper. body.gradient on the sign-in, sign-up and auth failure pages; a .gradient div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.']
+             ['linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-paper) 50%)', '.gradient', 'Lavender to paper. body.gradient on the sign-in, sign-up and auth failure pages; a .gradient div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.']
            ].each do |background, title, note| %>
           <div class="col">
             <div class="rounded border mb-1" style="height: 64px; background: <%= background %>"></div>
@@ -190,9 +218,8 @@
       </div>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
-             [%w[--wash-amber --wash-rose --wash-magenta --wash-purple], 'section backgrounds'],
+             [%w[--wash-amber --wash-rose --wash-magenta --wash-purple], 'section backgrounds: the 50 step of orange, rose, magenta and lavender'],
              [%w[--color-rose --color-rose-light], nil],
-             [%w[--color-violet], 'purple divider end'],
              [%w[--color-magenta --color-magenta-light], nil],
              :magenta_to_highlight
            ].each do |names, note| %>
@@ -283,14 +310,15 @@
       <h3 class="mb-3">Scale</h3>
       <div class="border-bottom">
         <% [
-             ['h1', '--font-size-3xl · 2rem', '<h1 data-sample class="m-0">Gatherings near you</h1>'],
-             ['h2', '--font-size-2xl · 1.66rem', '<h2 data-sample class="m-0">Gatherings near you</h2>'],
-             ['h3', '--font-size-xl · 1.4rem', '<h3 data-sample class="m-0">Your upcoming events</h3>'],
-             ['h4', '--font-size-lg · 1.125rem', '<h4 data-sample class="m-0">Upcoming birthdays</h4>'],
-             ['h5', '--font-size-md · .875rem', '<h5 data-sample class="m-0">Ticket types</h5>'],
+             ['h1 · .fs-1', '--font-size-3xl · 2rem', '<h1 data-sample class="m-0">Gatherings near you</h1>'],
+             ['h2 · .fs-2', '--font-size-2xl · 1.66rem', '<h2 data-sample class="m-0">Gatherings near you</h2>'],
+             ['h3 · .fs-3', '--font-size-xl · 1.4rem', '<h3 data-sample class="m-0">Your upcoming events</h3>'],
+             ['h4 · .fs-4', '--font-size-lg · 1.125rem', '<h4 data-sample class="m-0">Upcoming birthdays</h4>'],
+             ['h5 · .fs-5', '--font-size-md · .875rem', '<h5 data-sample class="m-0">Ticket types</h5>'],
              ['.readable', '--font-size-base · 1rem', '<div data-sample class="readable">Long-form copy such as event descriptions sets at 1rem.</div>'],
              ['nav · .btn', '--font-size-md · .875rem', '<span data-sample class="btn btn-outline-primary">Buttons, nav links and tabs</span>'],
-             ['body · h6', '--font-size-sm · .825rem', '<div data-sample>Body text, inputs, tables, dropdown items</div>'],
+             ['body · h6 · .fs-6', '--font-size-sm · .825rem', '<div data-sample>Body text, inputs, tables, dropdown items</div>'],
+             ['.small', '.875em of its context', '<span data-sample class="small">Secondary details: a location, a description</span>'],
              ['.badge', '.875em of its context', '<span data-sample class="badge text-bg-secondary">Badges</span>'],
              ['.breadcrumb', '--font-size-xs · .75rem', '<ol data-sample class="breadcrumb m-0"><li class="breadcrumb-item">Breadcrumbs</li><li class="breadcrumb-item">and carets</li></ol>']
            ].each do |name, size, sample| %>
@@ -303,7 +331,7 @@
           </div>
         <% end %>
       </div>
-      <div class="small text-body-secondary mt-3"><code>.h1</code>–<code>.h6</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. Relative helpers, also as <code>--fs-*</code> tokens for CSS: <code>.fs-xs</code> .75em · <code>.fs-sm</code> .875em · <code>.fs-lg</code> 1.2em · <code>.fs-xl</code> 1.5em · <code>.fs-xxl</code> 2em. Secondary text is --bs-gray-600 (<code>.subtle</code>, form-text).</div>
+      <div class="small text-body-secondary mt-3"><code>.h1</code>–<code>.h6</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. The heading sizes are set in bootstrap5.scss (<code>$h1-font-size</code>…), so <code>.fs-1</code>–<code>.fs-6</code> make text a heading's size without its weight or font. <code>.small</code> shrinks text to .875em of its context; it's Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is --bs-gray-600 (<code>.subtle</code>, form-text).</div>
     </div>
   </section>
 
@@ -397,10 +425,10 @@
       </div>
       <div class="d-flex" style="min-height: 420px">
         <div class="d-none d-md-block flex-shrink-0 p-2" style="width: 14.375rem; background: var(--bs-gray-900)">
-          <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded" style="background: var(--gradient-active)"><i class="bi bi-house fs-5"></i><span>Home</span></div>
-          <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded"><i class="bi bi-newspaper fs-5" style="opacity: .35"></i><span>Dandelion Daily</span></div>
-          <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded bg-black"><i class="bi bi-calendar-event fs-5" style="opacity: .35"></i><span>Events</span><span class="ms-auto small opacity-50">hover</span></div>
-          <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded"><i class="bi bi-flag-fill fs-5" style="opacity: .35"></i><span class="flex-grow-1">Organisations</span><i class="bi bi-chevron-down small"></i></div>
+          <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded" style="background: var(--gradient-active)"><i class="bi bi-house fs-4"></i><span>Home</span></div>
+          <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded"><i class="bi bi-newspaper fs-4" style="opacity: .35"></i><span>Dandelion Daily</span></div>
+          <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded bg-black"><i class="bi bi-calendar-event fs-4" style="opacity: .35"></i><span>Events</span><span class="ms-auto small opacity-50">hover</span></div>
+          <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded"><i class="bi bi-flag-fill fs-4" style="opacity: .35"></i><span class="flex-grow-1">Organisations</span><i class="bi bi-chevron-down small"></i></div>
           <div class="d-flex flex-column py-1 text-white" style="margin-left: 2.5625rem">
             <span class="py-1">Symbiota</span>
             <span class="py-1 opacity-50">All organisations</span>
@@ -430,7 +458,7 @@
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">Buttons</h3>
-        <span class="text-body-secondary">.875rem, padding .375rem .75rem, radius .25rem. Primary, secondary and danger are gradients over a transparent border (btn-warning is styled the same but not used yet); brand buttons like btn-signal stay flat.</span>
+        <span class="text-body-secondary">.875rem, padding .375rem .75rem, radius .25rem. Primary, secondary and danger are gradients over a transparent border: 135°, flat 500 to 50%, then to a lighter 400 end, the same fill as badges, progress and text-bg-primary. btn-warning is styled the same but not used yet; brand buttons like btn-signal stay flat.</span>
       </div>
       <div class="border rounded p-4 d-flex flex-wrap gap-3 align-items-center">
         <a class="btn btn-primary" href="#components">Book tickets</a>

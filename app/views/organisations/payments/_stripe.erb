@@ -4,17 +4,17 @@
   </div>
   <div class="card-body">
     <% if @organisation.stripe_client_id %>
-      <div class="fs-lg">
+      <div class="fs-4">
         <i class="bi bi-credit-card"></i>
         Using revenue sharing
       </div>
     <% elsif @organisation.stripe_sk %>
-      <div class="fs-lg">
+      <div class="fs-4">
         <i class="bi bi-credit-card"></i>
         Using Stripe API keys (legacy)
       </div>
     <% elsif @organisation.stripe_connect_json %>
-      <div class="mb-1 fs-lg">
+      <div class="mb-1 fs-4">
         <i class="bi bi-credit-card"></i>
         Connected to <%= @organisation.stripe_account_name ? "#{@organisation.stripe_account_name}'s Stripe account" : 'Stripe' %>
         (id: <%= @organisation.stripe_user_id %>)

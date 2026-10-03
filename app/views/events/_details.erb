@@ -16,7 +16,7 @@
         <% else %>
 
           <%= when_parts = when_details(@event, with_zone: true).split(', '); when_parts[0] %>
-          <div class="text-body-secondary fs-sm">
+          <div class="text-body-secondary small">
             <%= when_parts[1..-1].join(', ') %>
           </div>
 
