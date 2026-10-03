@@ -2429,8 +2429,11 @@ table.event-details td {
   background: var(--theme-200);
 }
 
-.event-detail:hover {
+/* On hover the whole tile, month band and borders included, turns solid theme */
+.event-detail:hover,
+.event-detail.calendar-date:hover .month {
   background-color: var(--theme-500);
+  border-color: var(--theme-500);
 }
 
 .event-detail:hover img {
