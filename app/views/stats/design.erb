@@ -52,7 +52,8 @@
             label: '--theme-*',
             label_note: "Primary and success · follows each organisation's theme",
             notes: {
-              '50' => 'alert and toast background',
+              '50' => 'alert and toast background, crumbs, newsfeed icons',
+              '100' => 'crumb hover, unread messages',
               '200' => 'alert and toast gradient end',
               '400' => 'button gradient end',
               '500' => nil,
@@ -65,8 +66,8 @@
           } %>
       <div class="row g-2">
         <% {
-             'a10' => 'crumbs, newsfeed icons, docs transcripts',
-             'a20' => 'crumb hover, unread messages, themed AI well start',
+             'a10' => 'docs transcripts',
+             'a20' => 'themed AI well start',
              'a30' => 'progress tracks, date tile months, blockquote and transcript borders, themed AI well end, chart projections',
              'a50' => 'date and icon tile borders, bar chart projections'
            }.each do |step, note| %>
