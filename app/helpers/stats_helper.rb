@@ -253,4 +253,14 @@ Dandelion::App.helpers do
     # Fallback: return the last match (actual gems come after dependencies)
     matches.last&.last
   end
+
+  # Colours for a doughnut's segments: the hue of --theme-500 turned evenly round the wheel at a fixed, soft
+  # oklch lightness and chroma (near the old #57B98C), so every segment has the same weight. They're CSS, so
+  # resolve them in the browser with cssColor
+  def chart_colors(count)
+    count.times.map do |i|
+      degrees = (i.to_f / (count - 1)) * (360 - (360 / count))
+      degrees.finite? ? "oklch(from var(--theme-500) 0.71 0.11 calc(h + #{degrees.round(2)}))" : 'var(--bs-gray-200)'
+    end
+  end
 end

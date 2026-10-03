@@ -133,17 +133,16 @@
 
     <div class="d-flex flex-column gap-3">
       <h3 class="m-0">Accents and surfaces</h3>
-      <p class="m-0 text-body-secondary" style="max-width: 680px">Each accent has one role. The dark header and sidebar are a sunset: near-black fading to --color-purple, with the orange-to-yellow --gradient-active as the sun on the active sidebar item, the notification dot and the load bar. Light content marks active states with the theme colour, so there is one active colour per surface. On the default site purple also marks AI and calendar events; themed pages switch those to the theme. --gradient-rainbow is only for .gradient-text headlines on marketing pages and the signed-out home.</p>
+      <p class="m-0 text-body-secondary" style="max-width: 680px">Each accent has one role. The dark header and sidebar are a sunset: near-black fading to --color-midnight, with the orange-to-yellow --gradient-active as the sun on the active sidebar item, the notification dot and the load bar. Light content marks active states with the theme colour, so there is one active colour per surface. On the default site purple also marks AI and calendar events; themed pages switch those to the theme. --gradient-rainbow is only for .gradient-text headlines on marketing pages and the signed-out home.</p>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
              [%w[--color-paper], '.gradient end'],
              [%w[--color-canvas], 'body.canvas'],
              [%w[--color-highlight], 'mark'],
-             [%w[--color-purple-light-2 --color-purple-light-1 --color-purple-light-3], 'AI well gradient (1 to 2), .gradient (3)', 'purple-light-2/1/3'],
+             [%w[--color-lavender-2 --color-lavender-1 --color-lavender-3], 'AI well gradient (1 to 2), .gradient (3)', 'lavender-2/1/3'],
              [%w[--color-yellow --color-yellow-light], 'text-bg-yellow: Featured, Co-host, rota points'],
              [%w[--color-amber --color-amber-light --color-amber-dark], 'star icons, feedback stars, map areas, features page'],
-             [%w[--color-chart], 'chart segments rotate its hue'],
-             [%w[--color-purple], 'header sunset; AI and calendar events on the default site']
+             [%w[--color-midnight], 'header sunset; AI and calendar events on the default site']
            ].each do |names, note, title| %>
           <div class="col">
             <% if names.length > 1 %>
@@ -171,9 +170,9 @@
         <% [
              ['linear-gradient(135deg, var(--theme-500) 0%, var(--theme-500) 50%, var(--theme-400) 100%)', 'Fill pattern', '135°, flat to 50%, then to a lighter end (--theme-400, --color-red-light). Primary, secondary and danger buttons, badges, progress, text-bg-primary.'],
              ['var(--gradient-active)', '--gradient-active', 'Sidebar active item, notification dot, page-load bar.'],
-             ['linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-purple) 100%)', 'Header', '45°, --bs-gray-900 to 66%, then purple.'],
+             ['linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-midnight) 100%)', 'Header', '45°, --bs-gray-900 to 66%, then midnight.'],
              ['var(--gradient-rainbow)', '--gradient-rainbow', '.gradient-text only.'],
-             ['linear-gradient(135deg, var(--color-purple-light-3) 0%, var(--color-paper) 50%)', '.gradient', 'Lilac to paper. body.gradient on the sign-in, sign-up and auth failure pages; a .gradient div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.']
+             ['linear-gradient(135deg, var(--color-lavender-3) 0%, var(--color-paper) 50%)', '.gradient', 'Lavender to paper. body.gradient on the sign-in, sign-up and auth failure pages; a .gradient div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.']
            ].each do |background, title, note| %>
           <div class="col">
             <div class="rounded border mb-1" style="height: 64px; background: <%= background %>"></div>
@@ -187,7 +186,7 @@
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">Marketing pages</h3>
-        <span class="text-body-secondary">The features and comparison pages. Their purple gradient and the five reason colours on the Luma page are derived from <code>--color-purple</code> and <code>--color-magenta</code>.</span>
+        <span class="text-body-secondary">The features and comparison pages. Their purple gradient and the five reason colours on the Luma page are derived from <code>--color-midnight</code> and <code>--color-magenta</code>.</span>
       </div>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
@@ -202,11 +201,11 @@
               <div class="rounded overflow-hidden mb-1" style="height: 64px">
                 <div class="row g-0 h-100">
                   <% 0.step(100, 25) do |pct| %>
-                    <div class="col" style="background: color-mix(in srgb, var(--color-magenta), var(--color-purple) <%= pct %>%)"></div>
+                    <div class="col" style="background: color-mix(in srgb, var(--color-magenta), var(--color-midnight) <%= pct %>%)"></div>
                   <% end %>
                 </div>
               </div>
-              <div class="fw-bold">Magenta to purple</div>
+              <div class="fw-bold">Magenta to midnight</div>
               <div class="small text-body-secondary">color-mix, 0–100%</div>
             <% else %>
               <div class="rounded overflow-hidden border mb-1" style="height: 64px">
@@ -387,7 +386,7 @@
       <p class="m-0 text-body-secondary" style="max-width: 680px">Fixed dark header (2.8125rem) and a fixed sidebar (14.375rem, minified to 3.75rem). Below 768px the sidebar becomes a full-width offcanvas and header icons spread across a second row.</p>
     </div>
     <div class="border rounded-3 overflow-hidden shadow">
-      <div class="d-flex align-items-center px-3 text-white" style="height: 2.8125rem; font-size: 1.125rem; background: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-purple) 100%)">
+      <div class="d-flex align-items-center px-3 text-white" style="height: 2.8125rem; font-size: 1.125rem; background: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-midnight) 100%)">
         <img class="position-relative" style="max-height: 1.75rem; top: -0.25rem" src="/images/logos/white-on-transparent.png" alt="">
         <div class="ms-auto d-flex align-items-center">
           <span class="px-3"><i class="bi bi-search"></i></span>
@@ -600,6 +599,35 @@
       </div>
     </div>
 
+    <div class="d-flex flex-column gap-3">
+      <div class="d-flex align-items-baseline flex-wrap gap-2">
+        <h3 class="m-0">Charts</h3>
+        <span class="text-body-secondary">Chart.js, with white bold value labels from chartjs-plugin-datalabels.</span>
+      </div>
+      <div class="row g-5">
+        <div class="col-lg-7 d-flex flex-column gap-3">
+          <%= partial :chart, locals: { data: { 'May' => 12, 'June' => 19, 'July' => 15, 'August' => 27, 'September' => 31, 'October' => 24 }, projection: 10 } %>
+          <div class="font-monospace small text-body-secondary">Bar (_chart.erb): monthly counts in --theme-500, with the current month's projection stacked on top at 50% (make_projection estimates it from the days so far; here it's fixed)</div>
+        </div>
+        <div class="col-lg-5 d-flex flex-column gap-3">
+          <canvas id="dg-doughnut"></canvas>
+          <script>
+            $(function () {
+              new Chart(document.getElementById('dg-doughnut').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                  labels: ['10s', '20s', '30s', '40s', '50s', '60s'],
+                  datasets: [{ data: [3, 21, 34, 22, 12, 8], backgroundColor: <%== chart_colors(6).to_json %>.map(cssColor) }]
+                },
+                options: { responsive: true }
+              })
+            })
+          </script>
+          <div class="font-monospace small text-body-secondary">Doughnut (_stats.erb): chart_colors turns the theme's hue evenly round the wheel at oklch lightness .71, chroma .11, so every segment has the same weight</div>
+        </div>
+      </div>
+    </div>
+
     <div class="row g-5">
       <div class="col-lg-6 d-flex flex-column gap-3">
         <h3 class="m-0">Tabs and pills</h3>
@@ -720,7 +748,7 @@
     <div class="d-flex flex-column gap-1 border-top border-2 border-dark pt-3">
       <div class="font-monospace small text-body-secondary fw-bold">06</div>
       <h2 class="m-0">Theming</h2>
-      <p class="m-0 text-body-secondary" style="max-width: 680px">Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check and progress bar follows. Alerts and toasts use the ramp's tints with --theme-800 text on every page; on themed pages the AI well and calendar events also switch to the theme colour. That is deliberate: the default site keeps them --color-purple, as its own accent. The .event-detail tiles (date and icons) follow the theme through theme.css too, as event_details.css is inlined into emails and hard-codes the default green.</p>
+      <p class="m-0 text-body-secondary" style="max-width: 680px">Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check, progress bar and stats chart follows. Alerts and toasts use the ramp's tints with --theme-800 text on every page; on themed pages the AI well and calendar events also switch to the theme colour. That is deliberate: the default site keeps them --color-midnight, as its own accent. The .event-detail tiles (date and icons) follow the theme through theme.css too, as event_details.css is inlined into emails and hard-codes the default green.</p>
     </div>
     <div class="row g-3">
       <div class="col-md-6 col-xxl-4">
