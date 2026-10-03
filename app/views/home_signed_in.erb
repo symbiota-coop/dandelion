@@ -25,7 +25,7 @@
     </div>
   </div>
   <div class="col-lg-4">
-    <div class="position-sticky" style="top: 3.75rem">
+    <div class="position-sticky" style="top: var(--sticky-top)">
       <%= partial :'events/awesome' %>
       <% if current_account.following.and(:hidden => false, :date_of_birth.ne => nil).exists? %>
         <div class="card shadow-sm mt-3">

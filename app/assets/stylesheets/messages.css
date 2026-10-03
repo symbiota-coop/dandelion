@@ -100,14 +100,14 @@
 
 .message-thread-layout {
   position: sticky;
-  top: var(--fixed-header-height, 3.75rem);
+  top: var(--fixed-header-height, var(--header-offset));
 }
 
 .message-thread-layout-open {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - var(--fixed-header-height, 3.75rem) - var(--content-padding-top, 1.5625rem) - var(--content-padding-bottom, 1.5625rem));
-  height: calc(100dvh - var(--fixed-header-height, 3.75rem) - var(--content-padding-top, 1.5625rem) - var(--content-padding-bottom, 1.5625rem));
+  height: calc(100vh - var(--fixed-header-height, var(--header-offset)) - var(--content-padding-top, var(--content-padding)) - var(--content-padding-bottom, var(--content-padding)));
+  height: calc(100dvh - var(--fixed-header-height, var(--header-offset)) - var(--content-padding-top, var(--content-padding)) - var(--content-padding-bottom, var(--content-padding)));
 }
 
 .message-thread-layout-open > .message-thread {

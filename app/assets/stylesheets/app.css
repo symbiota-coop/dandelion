@@ -66,6 +66,15 @@
   --font-size-2xl: 1.66rem;
   --font-size-3xl: 2rem;
   --body-font-size: var(--font-size-sm);
+  /* Layout: the fixed header's row height, the sidebar's widths and #content's padding.
+     --header-offset is the height the fixed header covers: one row, two on mobile where its icons wrap below */
+  --header-height: 2.8125rem;
+  --header-offset: var(--header-height);
+  --sidebar-width: 14.375rem;
+  --sidebar-width-minified: 3.75rem;
+  --content-padding: 1.5625rem;
+  /* Where sticky panels and the page-load spinner sit: just below the header */
+  --sticky-top: calc(var(--header-offset) + 0.9375rem);
   /* Our palette: every colour in our stylesheets comes from here or from Bootstrap's variables
      (greys are Bootstrap's --bs-gray-100 to 900) */
   --color-signal: #3B45FE;
@@ -96,6 +105,13 @@
   --gradient-rainbow: radial-gradient(circle at 0 0, #099ef1 0%, #6863f8 18.82%, #d84ffa 32.6%, #f058c5 52.83%, #ff4f90 68.03%, #ff6558 87.66%, #ff891f 100%);
   --gradient-header: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-midnight) 100%);
   accent-color: var(--theme-500);
+}
+
+@media (max-width: 767.98px) {
+  :root {
+    --header-offset: calc(2 * var(--header-height));
+    --content-padding: 0.9375rem;
+  }
 }
 
 /* The theme ramp, generated from --theme-500 with oklch() so steps at the same lightness look equally light whatever the hue.
@@ -164,7 +180,7 @@
   display: block;
   position: fixed;
   z-index: 2000;
-  top: 3.75rem;
+  top: var(--sticky-top);
   right: 0.9375rem;
   width: 1.25rem;
   height: 1.25rem;
@@ -177,12 +193,6 @@
 
 .pace-inactive {
   display: none;
-}
-
-@media (max-width: 767.98px) {
-  .pace .pace-activity {
-    top: 6.625rem;
-  }
 }
 
 /* ==========================================================================
@@ -199,7 +209,7 @@
   --bs-navbar-nav-link-padding-x: 0.75rem;
   --bs-navbar-brand-padding-y: 0.75rem;
   --bs-navbar-brand-margin-end: 0;
-  min-height: 2.8125rem;
+  min-height: var(--header-height);
   position: fixed;
   left: 0;
   right: 0;
@@ -214,8 +224,8 @@
 }
 
 .header .navbar-brand {
-  width: 14.375rem;
-  height: 2.8125rem;
+  width: var(--sidebar-width);
+  height: var(--header-height);
   padding-left: 0.9375rem;
   padding-right: 0.9375rem;
   font-size: var(--font-size-base);
@@ -226,7 +236,7 @@
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
   line-height: 1.25rem;
-  min-height: 2.8125rem;
+  min-height: var(--header-height);
 }
 
 .header .navbar-icon {
@@ -362,10 +372,12 @@
    ========================================================================== */
 
 .header-search-bar {
-  --bs-offcanvas-height: 2.8125rem;
+  --bs-offcanvas-height: var(--header-height);
   --bs-offcanvas-bg: var(--bs-gray-800);
   --bs-offcanvas-border-width: 0;
-  padding: 0 17.125rem;
+  /* The search and clear icons sit in the padding either side of the field */
+  --search-icon-width: 2.75rem;
+  padding: 0 calc(var(--sidebar-width) + var(--search-icon-width));
 }
 
 /* Darker than Bootstrap's default backdrop. The sidebar's offcanvas has no backdrop, so this is only the search's */
@@ -380,7 +392,7 @@
 
 .header-search-bar .form-control {
   border: none;
-  height: 2.8125rem;
+  height: var(--header-height);
   padding: 0;
   background: var(--bs-gray-800);
   color: var(--bs-white);
@@ -391,21 +403,21 @@
 
 .header-search-bar .left-icon,
 .header-search-bar .right-icon {
-  width: 2.75rem;
-  height: 2.8125rem;
+  width: var(--search-icon-width);
+  height: var(--header-height);
   font-size: var(--font-size-lg);
-  line-height: 2.8125rem;
+  line-height: var(--header-height);
   text-align: center;
   position: absolute;
   top: 0;
-  left: -2.75rem;
+  left: calc(-1 * var(--search-icon-width));
   color: var(--bs-gray-400);
   text-decoration: none;
 }
 
 .header-search-bar .right-icon {
   left: auto;
-  right: -2.75rem;
+  right: calc(-1 * var(--search-icon-width));
 }
 
 /* ==========================================================================
@@ -446,7 +458,7 @@
 
 @media (max-width: 767.98px) {
   .header-search-bar {
-    padding: 0 2.75rem;
+    padding: 0 var(--search-icon-width);
   }
 }
 
@@ -455,10 +467,10 @@
    ========================================================================== */
 
 .sidebar {
-  width: 14.375rem;
+  width: var(--sidebar-width);
   position: absolute;
   left: 0;
-  top: 2.8125rem;
+  top: var(--header-height);
 }
 
 .page-sidebar-fixed .sidebar {
@@ -559,7 +571,7 @@
   --bs-dropdown-link-active-color: var(--bs-white);
   --bs-dropdown-link-active-bg: transparent;
   --bs-dropdown-padding-y: 0.625rem;
-  width: 14.375rem;
+  width: var(--sidebar-width);
   border: 0;
   border-radius: 0;
 }
@@ -576,7 +588,7 @@
 
 @media (min-width: 768px) {
   .page-sidebar-minified .sidebar {
-    width: 3.75rem;
+    width: var(--sidebar-width-minified);
     overflow: visible !important;
     z-index: 1020;
   }
@@ -593,7 +605,7 @@
     display: none;
   }
   .page-sidebar-minified .content {
-    margin-left: 3.75rem;
+    margin-left: var(--sidebar-width-minified);
   }
 }
 
@@ -603,7 +615,7 @@
     --bs-offcanvas-width: 100%;
     --bs-offcanvas-zindex: 1020;
     --bs-offcanvas-transition: transform 0.15s ease-in-out;
-    top: 2.8125rem;
+    top: var(--header-height);
     border-right: 0;
   }
 }
@@ -664,8 +676,8 @@
    ========================================================================== */
 
 .content {
-  margin-left: 14.375rem;
-  padding: 1.5625rem;
+  margin-left: var(--sidebar-width);
+  padding: var(--content-padding);
   position: relative;
   height: 100%;
 }
@@ -674,7 +686,6 @@
   .content,
   .page-header-fixed.page-sidebar-fixed .content {
     margin-left: 0;
-    padding: 0.9375rem 0.9375rem 0.9375rem;
     overflow: initial;
     height: auto;
   }
@@ -702,15 +713,8 @@ body.gradient #content {
 }
 
 .content-padding-x {
-  padding-left: 0.9375rem;
-  padding-right: 0.9375rem;
-}
-
-@media (min-width: 768px) {
-  .content-padding-x {
-    padding-left: 1.5625rem;
-    padding-right: 1.5625rem;
-  }
+  padding-left: var(--content-padding);
+  padding-right: var(--content-padding);
 }
 
 body.canvas,
@@ -1876,8 +1880,8 @@ a.ui-button:active,
 
 .search-tab {
   list-style-type: none;
-  margin: 0 -1.5625rem;
-  padding: 0 1.5625rem;
+  margin: 0 calc(-1 * var(--content-padding));
+  padding: 0 var(--content-padding);
   border-bottom: 1px solid var(--bs-gray-400);
   white-space: nowrap;
 }
@@ -1961,10 +1965,6 @@ a.ui-button:active,
 }
 
 @media (max-width: 767.98px) {
-  .search-tab {
-    margin: 0 -0.9375rem;
-    padding: 0 0.9375rem;
-  }
   .search-result-list .search-result-media {
     width: 5.625rem;
     height: 4.6875rem;
@@ -2063,13 +2063,7 @@ body {
 }
 
 #page-container {
-  padding-top: 2.8125rem;
-}
-
-@media (max-width: 767.98px) {
-  #page-container {
-    padding-top: 5.625rem;
-  }
+  padding-top: var(--header-offset);
 }
 
 a {

@@ -4,8 +4,7 @@
   <%= partial :'events/locked' %>
 <% else %>
   <style>
-    #event-image { margin-top: -0.9375rem }
-    @media (min-width: 768px) { #event-image { margin-top: -1.5625rem } }
+    #event-image { margin-top: calc(-1 * var(--content-padding)) }
   </style>
 <% end %>
 

@@ -289,7 +289,7 @@
       <%== subhead.call('Spacing') %>
       <div class="row gx-4 row-cols-1 row-cols-md-2 row-cols-xl-3">
         <% [
-             ['Content padding', '1.5625rem · mobile .9375rem'],
+             ['Content padding · --content-padding', '1.5625rem · mobile .9375rem'],
              ['Grid gutter', '.75rem'],
              ['Container padding', '15px each side'],
              ['Card body', '1.25rem'],
@@ -308,9 +308,9 @@
 
   <!-- LAYOUT -->
   <section id="layout">
-    <%== section_head.call('layout', 'Fixed dark header (2.8125rem) and a fixed sidebar (14.375rem, minified to 3.75rem). Below 768px the sidebar becomes a full-width offcanvas and header icons spread across a second row.') %>
+    <%== section_head.call('layout', 'Fixed dark header (--header-height, 2.8125rem) and a fixed sidebar (--sidebar-width, 14.375rem, minified to --sidebar-width-minified, 3.75rem). Sticky panels sit at --sticky-top, just below the header. Below 768px the sidebar becomes a full-width offcanvas and header icons spread across a second row.') %>
     <div class="border rounded-3 overflow-hidden shadow">
-      <div class="d-flex align-items-center px-3 text-white" style="height: 2.8125rem; font-size: 1.125rem; background: var(--gradient-header)">
+      <div class="d-flex align-items-center px-3 text-white" style="height: var(--header-height); font-size: 1.125rem; background: var(--gradient-header)">
         <img class="position-relative" style="max-height: 1.75rem; top: -0.25rem" src="/images/logos/white-on-transparent.png" alt="">
         <div class="ms-auto d-flex align-items-center">
           <span class="px-3"><i class="bi bi-search"></i></span>
@@ -320,7 +320,7 @@
         </div>
       </div>
       <div class="d-flex" style="min-height: 420px">
-        <div class="d-none d-md-block flex-shrink-0 p-2" style="width: 14.375rem; background: var(--bs-gray-900)">
+        <div class="d-none d-md-block flex-shrink-0 p-2" style="width: var(--sidebar-width); background: var(--bs-gray-900)">
           <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded" style="background: var(--gradient-active)"><i class="bi bi-house fs-4"></i><span>Home</span></div>
           <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded"><i class="bi bi-newspaper fs-4" style="opacity: .35"></i><span>Dandelion Daily</span></div>
           <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded bg-black"><i class="bi bi-calendar-event fs-4" style="opacity: .35"></i><span>Events</span><span class="ms-auto small opacity-50">hover</span></div>
@@ -331,7 +331,7 @@
           </div>
         </div>
         <div class="flex-grow-1 p-4 d-flex flex-column gap-3">
-          <div class="spec">#content · padding 1.5625rem</div>
+          <div class="spec">#content · padding --content-padding</div>
           <div class="row g-3 flex-grow-1">
             <% [['col-8', 'col-lg-8 · newsfeed'], ['col-4', 'col-lg-4 · sticky']].each do |col, label| %>
               <div class="<%= col %>">
