@@ -3,7 +3,7 @@
     The dropdown leaves these out, since its whole row is already a link. %>
 <% full_view = defined?(full) && full %>
 <% show_circle = !defined?(include_circle_name) || include_circle_name %>
-<span class="newsfeed-icon d-inline-flex align-items-center justify-content-center flex-shrink-0 rounded-circle"><i class="bi <%= notification.icon %>"></i></span>
+<span class="newsfeed-icon"><i class="bi <%= notification.icon %>"></i></span>
 <div class="notification-info flex-grow-1">
   <div class="notification-title">
     <% if full_view %><a class="text-dark" href="<%= notification.link[1] %>"><% end %>

@@ -95,6 +95,7 @@
   --wash-purple: var(--color-lavender-50);
   --gradient-active: linear-gradient(135deg, #fd7514 0%, #efe707 100%);
   --gradient-rainbow: radial-gradient(circle at 0 0, #099ef1 0%, #6863f8 18.82%, #d84ffa 32.6%, #f058c5 52.83%, #ff4f90 68.03%, #ff6558 87.66%, #ff891f 100%);
+  --gradient-header: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-midnight) 100%);
   accent-color: var(--theme-500);
 }
 
@@ -346,7 +347,7 @@
 }
 
 #header {
-  background: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-midnight) 100%) !important;
+  background: var(--gradient-header) !important;
 }
 
 .header [data-pagelet-url] .bi-spin {
@@ -2435,6 +2436,11 @@ table.event-details td {
 }
 
 .newsfeed-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
   font-size: 1rem;
   color: var(--theme-500);
   background-color: oklch(from var(--theme-500) l c h / 0.1);

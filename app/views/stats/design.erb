@@ -1,170 +1,133 @@
+<link rel="stylesheet" href="<%= cachebust('/stylesheets/design.css') %>">
+
 <%# Swatch values are read from the live stylesheet by the script at the bottom %>
-<% css_var = ->(name) { %(<span data-css-var="#{name}"></span>) }
-   css_var_raw = ->(name) { %(<span data-css-value="#{name}"></span>) }
-   css_vars = ->(*names) { names.map { |name| css_var.call(name) }.join(' · ') }
+<% sections = {
+     'colour' => %w[Colour Colour],
+     'type' => %w[Type Typography],
+     'shape' => ['Shape', 'Radius, elevation, spacing'],
+     'layout' => ['Layout', 'Page shell'],
+     'components' => %w[Components Components],
+     'theming' => %w[Theming Theming]
+   }
+   section_head = lambda do |id, intro = nil|
+     %(<div class="d-flex flex-column gap-1 border-top border-2 border-dark pt-3">
+         <div class="spec fw-bold">#{format('%02d', sections.keys.index(id) + 1)}</div>
+         <h2 class="m-0">#{sections[id].last}</h2>
+         #{%(<p class="m-0 text-body-secondary" style="max-width: 680px">#{intro}</p>) if intro}
+       </div>)
+   end
+   subhead = lambda do |title, note = nil|
+     %(<div class="d-flex align-items-baseline flex-wrap gap-2"><h3 class="m-0">#{title}</h3>#{%(<span class="text-body-secondary">#{note}</span>) if note}</div>)
+   end
 
    # Run through clamp_color as /theme.css does, so a colour too light for white text is darkened
-   themed_colors = %w[#1a73e8 #ffc107].map { |color| [color, clamp_color(color)] } %>
+   themed_colors = %w[#1a73e8 #ffc107].map { |color| [color, clamp_color(color)] }
 
-<%# scroll-margin-top keeps anchored headings clear of the fixed header %>
-<div class="d-flex flex-column gap-5" style="max-width: 1080px">
+   flashes = [['primary', 'Your ticket is booked.', 'View order'], ['warning', 'Only 3 tickets left.', 'Book now'], ['danger', 'Payment failed.', 'Try again']] %>
+
+<div class="design-guide d-flex flex-column gap-5" style="max-width: 1080px">
 
   <header class="d-flex flex-column gap-3" style="max-width: 720px">
-    <div class="font-monospace small text-body-secondary text-uppercase fw-bold">Design guide · v1 · October 2026</div>
+    <div class="spec text-uppercase fw-bold">Design guide · v1 · October 2026</div>
     <h1 class="m-0">Dandelion</h1>
     <p class="m-0 readable">The visual language of dandelion.events as it exists in code today. This page is rendered with the site's own <code>app.css</code> and <code>bootstrap5.css</code>, so swatches, type and components are the real thing. The site is Bootstrap 5.3.8, restyled through its variables.</p>
     <p class="m-0 small text-body-secondary">The root font size is 17px (19px from 1680px, 21px from 1920px), so rem values scale with the viewport. Sizes are in rem (or em, to follow the text); px is kept for 1–2px hairlines, the containers' 15px side padding (<code>$container-padding-x</code>) and overrides that must line up with Google Maps. Colour values, radii and type sizes are measured live; other sizes are copied from the stylesheets.</p>
     <nav class="d-flex flex-wrap gap-2">
-      <% [%w[colour Colour], %w[type Type], %w[shape Shape], %w[layout Layout], %w[components Components], %w[theming Theming]].each do |id, title| %>
+      <% sections.each do |id, (title, _)| %>
         <a class="btn btn-outline-primary btn-sm" href="#<%= id %>"><%= title %></a>
       <% end %>
     </nav>
   </header>
 
   <!-- COLOUR -->
-  <section id="colour" class="d-flex flex-column gap-5" style="scroll-margin-top: 4rem">
-    <div class="d-flex flex-column gap-1 border-top border-2 border-dark pt-3">
-      <div class="font-monospace small text-body-secondary fw-bold">01</div>
-      <h2 class="m-0">Colour</h2>
-    </div>
+  <section id="colour">
+    <%== section_head.call('colour') %>
 
     <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Theme</h3>
-        <span class="text-body-secondary">A ramp generated from one value with <code>oklch()</code>. Components use the 500, 400 as the gradient end, 600 for hover, 50 to 200 for alert and toast backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints.</span>
-      </div>
-      <div>
-        <div class="mb-1"><span class="fw-bold">--theme-*</span> <span class="text-body-secondary">· Primary and success · follows each organisation's theme</span></div>
-        <div class="row g-2">
-          <% {
-               '50' => 'alert and toast background',
-               '200' => 'alert and toast gradient end',
-               '400' => 'button gradient end',
-               '500' => nil,
-               '600' => 'hover',
-               '800' => 'text on tints'
-             }.each do |step, note| %>
-            <div class="col-4 col-md-2">
-              <div class="rounded mb-1 d-flex align-items-end p-2 small fw-bold" style="height: 72px; background: var(--theme-<%= step %>); color: <%= step.to_i >= 500 ? '#fff' : 'var(--bs-gray-800)' %>"><%= step %></div>
-              <div class="font-monospace small text-body-secondary text-break"><%== css_var.call("--theme-#{step}") %></div>
-              <% if note %><div class="small text-body-secondary"><%= note %></div><% end %>
-            </div>
-          <% end %>
-        </div>
-      </div>
-      <div class="row g-3 row-cols-1 row-cols-sm-2">
-        <div class="col">
-          <div class="rounded border mb-1" style="height: 64px; background: linear-gradient(135deg, var(--theme-50) 0%, var(--theme-50) 50%, var(--theme-200) 100%)"></div>
-          <div class="fw-bold">Primary alerts and toasts</div>
-          <div class="small text-body-secondary">--theme-50 to --theme-200, the same pattern as warning and danger</div>
-          <div class="font-monospace small text-body-secondary"><%== css_vars.call('--theme-50', '--theme-200') %></div>
-        </div>
-      </div>
+      <%== subhead.call('Theme', 'A ramp generated from one value with <code>oklch()</code>. Components use the 500, 400 as the gradient end, 600 for hover, 50 to 200 for alert and toast backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints.') %>
+      <%= partial :'stats/design/ramp', locals: {
+            prefix: '--theme',
+            label: '--theme-*',
+            label_note: "Primary and success · follows each organisation's theme",
+            notes: {
+              '50' => 'alert and toast background',
+              '200' => 'alert and toast gradient end',
+              '400' => 'button gradient end',
+              '500' => nil,
+              '600' => 'hover',
+              '800' => 'text on tints'
+            },
+            sample_class: 'alert alert-primary',
+            sample_title: 'Primary alerts and toasts',
+            sample_to: '200'
+          } %>
       <div class="small text-body-secondary">Bootstrap's <code>rgba(var(--bs-*-rgb))</code> colours need an rgb triplet, so <code>/theme.css</code> also sets <code>--theme-500-rgb</code>.</div>
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Lavender</h3>
-        <span class="text-body-secondary">The default site's AI well and <code>.gradient</code> backgrounds, with the theme ramp's steps derived from --color-lavender-500, which has the default green's lightness and chroma. Themed pages switch the AI well to the theme.</span>
-      </div>
-      <div>
-        <div class="row g-2">
-          <% {
-               '50' => '.gradient, AI well background',
-               '200' => 'not used yet',
-               '400' => 'AI well gradient end',
-               '500' => 'not used yet',
-               '600' => 'features and Luma pages: purple divider end, call-to-action glow',
-               '800' => 'not used yet'
-             }.each do |step, note| %>
-            <div class="col-4 col-md-2">
-              <div class="rounded border mb-1" style="height: 64px; background: var(--color-lavender-<%= step %>)"></div>
-              <div class="fw-bold small"><%= step %></div>
-              <div class="font-monospace small text-body-secondary"><%== css_var.call("--color-lavender-#{step}") %></div>
-              <div class="small text-body-secondary"><%= note %></div>
-            </div>
-          <% end %>
-        </div>
-        <div class="row g-3 row-cols-1 row-cols-sm-2 mt-0">
-          <div class="col">
-            <div class="rounded border mb-1" style="height: 64px; background: linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-lavender-50) 50%, var(--color-lavender-400) 100%)"></div>
-            <div class="fw-bold">AI well</div>
-            <div class="small text-body-secondary">--color-lavender-50 to --color-lavender-400</div>
-            <div class="font-monospace small text-body-secondary"><%== css_vars.call('--color-lavender-50', '--color-lavender-400') %></div>
-          </div>
-        </div>
-      </div>
+      <%== subhead.call('Lavender', "The default site's AI well and <code>.gradient</code> backgrounds, with the theme ramp's steps derived from --color-lavender-500, which has the default green's lightness and chroma. Themed pages switch the AI well to the theme.") %>
+      <%= partial :'stats/design/ramp', locals: {
+            prefix: '--color-lavender',
+            notes: {
+              '50' => '.gradient, AI well background',
+              '200' => 'not used yet',
+              '400' => 'AI well gradient end',
+              '500' => 'not used yet',
+              '600' => 'features and Luma pages: purple divider end, call-to-action glow',
+              '800' => 'not used yet'
+            },
+            sample_class: 'ai-well',
+            sample_title: 'AI well',
+            sample_to: '400'
+          } %>
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Warning and danger</h3>
-        <span class="text-body-secondary">Two families, used the same way. The 500 is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match. There are no warning buttons yet, so --color-orange-600 is unused.</span>
-      </div>
-      <% [%w[Warning orange], %w[Danger red]].each do |title, colour| %>
-        <div>
-          <div class="mb-1"><span class="fw-bold"><%= title %></span> <span class="text-body-secondary">· --color-<%= colour %>-*</span></div>
-          <div class="row g-2">
-            <% [
-                 ['50', 'alert, toast and row background'],
-                 ['200', 'tint gradient end, row border'],
-                 ['400', 'gradient end'],
-                 ['500', 'fill: badges, buttons'],
-                 ['600', 'button hover'],
-                 ['800', 'text and border on tints']
-               ].each do |step, note| %>
-              <% name = "--color-#{colour}-#{step}" %>
-              <% other_uses = {
-                   '--color-orange-500' => 'ASN stats: bot % of 30 and over',
-                   '--color-orange-400' => 'star icons, feedback stars, map areas, features page',
-                   '--color-orange-200' => 'features page divider end',
-                   '--color-red-500' => 'ASN stats: bot % of 60 and over; check-in QR scan line',
-                   '--color-red-400' => 'map: event and organisation markers'
-                 }[name] %>
-              <div class="col-4 col-md-2">
-                <div class="rounded border mb-1" style="height: 64px; background: var(<%= name %>)"></div>
-                <div class="fw-bold small text-break"><%= step %></div>
-                <div class="font-monospace small text-body-secondary"><%== css_var.call(name) %></div>
-                <div class="small text-body-secondary"><%= note %></div>
-                <% if other_uses %><div class="small text-body-secondary">Also: <%= other_uses %></div><% end %>
-              </div>
-            <% end %>
-          </div>
-          <% from = "--color-#{colour}-50"
-             to = "--color-#{colour}-200" %>
-          <div class="row g-3 row-cols-1 row-cols-sm-2 mt-0">
-            <div class="col">
-              <div class="rounded border mb-1" style="height: 64px; background: linear-gradient(135deg, var(<%= from %>) 0%, var(<%= from %>) 50%, var(<%= to %>) 100%)"></div>
-              <div class="fw-bold"><%= title %> alerts and toasts</div>
-              <div class="small text-body-secondary"><%= from %> to <%= to %></div>
-              <div class="font-monospace small text-body-secondary"><%== css_vars.call(from, to) %></div>
-            </div>
-          </div>
-        </div>
+      <%== subhead.call('Warning and danger', "Two families, used the same way. The 500 is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match. There are no warning buttons yet, so --color-orange-600 is unused.") %>
+      <% roles = {
+           '50' => 'alert, toast and row background',
+           '200' => 'tint gradient end, row border',
+           '400' => 'gradient end',
+           '500' => 'fill: badges, buttons',
+           '600' => 'button hover',
+           '800' => 'text and border on tints'
+         }
+         other_uses = {
+           'orange' => {
+             '500' => 'ASN stats: bot % of 30 and over',
+             '400' => 'star icons, feedback stars, map areas, features page',
+             '200' => 'features page divider end'
+           },
+           'red' => {
+             '500' => 'ASN stats: bot % of 60 and over; check-in QR scan line',
+             '400' => 'map: event and organisation markers'
+           }
+         } %>
+      <% [%w[Warning orange warning], %w[Danger red danger]].each do |title, colour, variant| %>
+        <%= partial :'stats/design/ramp', locals: {
+              prefix: "--color-#{colour}",
+              label: title,
+              label_note: "--color-#{colour}-*",
+              notes: roles.merge(other_uses[colour]) { |_, role, uses| "#{role}. Also: #{uses}" },
+              sample_class: "alert alert-#{variant}",
+              sample_title: "#{title} alerts and toasts",
+              sample_to: '200'
+            } %>
       <% end %>
       <div class="small text-body-secondary">Alerts and toasts: 135°, the 50 flat to halfway, then to the 200. table-warning and table-danger rows: the 50, with the 200 for borders and a mix 30% of the way to it on hover.</div>
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Greys, black and white</h3>
-        <span class="text-body-secondary">Bootstrap's own variables, set in bootstrap5.scss to warm greys: Bootstrap's lightness steps at a slight warm hue (oklch hue 75, chroma .006–.008). The cool --color-canvas behind them on body.canvas pages is deliberate. Usage: 100 wells and hovered dropdown and list items · 200 hovered nav links, autocomplete items and table rows, and stripes · 300 table borders · 400 input borders and hr · 600 secondary text · 700 input add-ons · 800 search bar · 900 header and sidebar. Body text is <code>--bs-body-color</code>, the same as 900. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows, hairlines and image overlays.</span>
-      </div>
+      <%== subhead.call('Greys, black and white', "Bootstrap's own variables, set in bootstrap5.scss to warm greys: Bootstrap's lightness steps at a slight warm hue (oklch hue 75, chroma .006–.008). The cool --color-canvas behind them on body.canvas pages is deliberate. Usage: 100 wells and hovered dropdown and list items · 200 hovered nav links, autocomplete items and table rows, and stripes · 300 table borders · 400 input borders and hr · 600 secondary text · 700 input add-ons · 800 search bar · 900 header and sidebar. Body text is <code>--bs-body-color</code>, the same as 900. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows, hairlines and image overlays.") %>
       <div class="row g-3">
         <% %w[--bs-white --bs-gray-100 --bs-gray-200 --bs-gray-300 --bs-gray-400 --bs-gray-500 --bs-gray-600 --bs-gray-700 --bs-gray-800 --bs-gray-900 --bs-black].each do |name| %>
-          <div class="col-6 col-md-3 col-xl">
-            <div class="rounded border mb-1" style="height: 64px; background: var(<%= name %>)"></div>
-            <div class="fw-bold text-break small"><%= name %></div>
-            <div class="font-monospace small text-body-secondary"><%== css_var.call(name) %></div>
-          </div>
+          <%= partial :'stats/design/swatch', locals: { vars: [name], col: 'col-6 col-md-3 col-xl' } %>
         <% end %>
       </div>
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <h3 class="m-0">Accents and surfaces</h3>
-      <p class="m-0 text-body-secondary" style="max-width: 680px">Each accent has one role. The dark header and sidebar are a sunset: near-black fading to --color-midnight, with the orange-to-yellow --gradient-active as the sun on the active sidebar item, the notification dot and the load bar. Light content marks active states with the theme colour, so there is one active colour per surface. On the default site purple also marks AI and calendar events; themed pages switch those to the theme. --gradient-rainbow is only for .gradient-text headlines on marketing pages and the signed-out home.</p>
+      <%== subhead.call('Accents and surfaces', 'Each accent has one role. The dark header and sidebar are a sunset: near-black fading to --color-midnight, with the orange-to-yellow --gradient-active as the sun on the active sidebar item, the notification dot and the load bar. Light content marks active states with the theme colour, so there is one active colour per surface. On the default site purple also marks AI and calendar events; themed pages switch those to the theme. --gradient-rainbow is only for .gradient-text headlines on marketing pages and the signed-out home.') %>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
              [%w[--color-paper], '.gradient end'],
@@ -172,89 +135,42 @@
              [%w[--color-highlight], 'mark'],
              [%w[--color-yellow-500 --color-yellow-400], 'text-bg-yellow: Featured, Co-host, rota points; contributions chart (500)'],
              [%w[--color-midnight], 'header sunset; AI and calendar events on the default site']
-           ].each do |names, note| %>
-          <div class="col">
-            <% if names.length > 1 %>
-              <div class="rounded overflow-hidden mb-1" style="height: 64px">
-                <div class="row g-0 h-100">
-                  <% names.each do |name| %>
-                    <div class="col" style="background: var(<%= name %>)"></div>
-                  <% end %>
-                </div>
-              </div>
-              <div class="fw-bold text-break"><%= names.first %>, …</div>
-            <% else %>
-              <div class="rounded mb-1 <%= 'border' if %w[--color-paper --color-canvas].include?(names.first) %>" style="height: 64px; background: var(<%= names.first %>)"></div>
-              <div class="fw-bold text-break"><%= names.first %></div>
-            <% end %>
-            <div class="font-monospace small text-body-secondary"><%== css_vars.call(*names) %><%= " · #{note}" if note %></div>
-          </div>
+           ].each do |vars, note| %>
+          <%= partial :'stats/design/swatch', locals: { vars: vars, note: note } %>
         <% end %>
       </div>
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <h3 class="m-0">Other gradients</h3>
+      <%== subhead.call('Other gradients') %>
       <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-4">
         <% [
-             ['linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-paper) 50%)', '.gradient', 'Lavender to paper. body.gradient on the sign-in, sign-up and auth failure pages; a .gradient div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.'],
-             ['var(--gradient-active)', '--gradient-active', 'Sidebar active item, notification dot, page-load bar.'],
-             ['var(--gradient-rainbow)', '--gradient-rainbow', '.gradient-text only.'],
-             ['linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-midnight) 100%)', 'Header', '45°, --bs-gray-900 to 66%, then midnight.']
-           ].each do |background, title, note| %>
-          <div class="col">
-            <div class="rounded border mb-1" style="height: 64px; background: <%= background %>"></div>
-            <div class="fw-bold"><%= title %></div>
-            <div class="small text-body-secondary"><%= note %></div>
-          </div>
+             { box_class: 'gradient', title: '.gradient', note: 'Lavender to paper. body.gradient on the sign-in, sign-up and auth failure pages; a .gradient div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.' },
+             { fills: ['var(--gradient-active)'], title: '--gradient-active', note: 'Sidebar active item, notification dot, page-load bar.' },
+             { fills: ['var(--gradient-rainbow)'], title: '--gradient-rainbow', note: '.gradient-text only.' },
+             { fills: ['var(--gradient-header)'], title: '--gradient-header', note: 'The header: 45°, --bs-gray-900 to 66%, then midnight.' }
+           ].each do |swatch| %>
+          <%= partial :'stats/design/swatch', locals: swatch %>
         <% end %>
       </div>
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Marketing pages</h3>
-        <span class="text-body-secondary">The features and comparison pages. Their purple gradient and the five reason colours on the Luma page are derived from <code>--color-midnight</code> and <code>--color-magenta-500</code>.</span>
-      </div>
+      <%== subhead.call('Marketing pages', 'The features and comparison pages. Their purple gradient and the five reason colours on the Luma page are derived from <code>--color-midnight</code> and <code>--color-magenta-500</code>.') %>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
-             [%w[--wash-amber --wash-rose --wash-magenta --wash-purple], 'section backgrounds: the 50 step of orange, rose, magenta and lavender'],
-             [%w[--color-rose-500 --color-rose-200], 'section divider: 500 to 200'],
-             [%w[--color-magenta-500 --color-magenta-200], 'section divider: 500 to 200'],
-             :magenta_to_highlight
-           ].each do |names, note| %>
-          <div class="col">
-            <% if names == :magenta_to_highlight %>
-              <div class="rounded overflow-hidden mb-1" style="height: 64px">
-                <div class="row g-0 h-100">
-                  <% 0.step(100, 25) do |pct| %>
-                    <div class="col" style="background: color-mix(in srgb, var(--color-magenta-500), var(--color-midnight) <%= pct %>%)"></div>
-                  <% end %>
-                </div>
-              </div>
-              <div class="fw-bold">Magenta to midnight</div>
-              <div class="small text-body-secondary">color-mix, 0–100%</div>
-            <% else %>
-              <div class="rounded overflow-hidden border mb-1" style="height: 64px">
-                <div class="row g-0 h-100">
-                  <% names.each do |name| %>
-                    <div class="col" style="background: var(<%= name %>)"></div>
-                  <% end %>
-                </div>
-              </div>
-              <div class="fw-bold text-break"><%= names.first %><%= ', …' if names.length > 1 %></div>
-              <div class="font-monospace small text-body-secondary"><%== css_vars.call(*names) %><%= " · #{note}" if note %></div>
-            <% end %>
-          </div>
+             { vars: %w[--wash-amber --wash-rose --wash-magenta --wash-purple], note: 'section backgrounds: the 50 step of orange, rose, magenta and lavender' },
+             { vars: %w[--color-rose-500 --color-rose-200], note: 'section divider: 500 to 200' },
+             { vars: %w[--color-magenta-500 --color-magenta-200], note: 'section divider: 500 to 200' },
+             { fills: 0.step(100, 25).map { |pct| "color-mix(in srgb, var(--color-magenta-500), var(--color-midnight) #{pct}%)" }, title: 'Magenta to midnight', note: 'color-mix, 0–100%' }
+           ].each do |swatch| %>
+          <%= partial :'stats/design/swatch', locals: swatch %>
         <% end %>
       </div>
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Third-party brands</h3>
-        <span class="text-body-secondary">Only for buttons and labels that stand for these services.</span>
-      </div>
+      <%== subhead.call('Third-party brands', 'Only for buttons and labels that stand for these services.') %>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
              [%w[--color-evm], 'EVM'],
@@ -265,12 +181,8 @@
              [%w[--color-paypal], 'PayPal'],
              [%w[--color-gocardless --color-gocardless-text], 'GoCardless'],
              [%w[--color-mollie], 'Mollie']
-           ].each do |names, note| %>
-          <div class="col">
-            <div class="rounded mb-1" style="height: 64px; background: var(<%= names.first %>)"></div>
-            <div class="fw-bold text-break"><%= names.first %></div>
-            <div class="font-monospace small text-body-secondary"><%== css_vars.call(*names) %> · <%= note %></div>
-          </div>
+           ].each do |vars, note| %>
+          <%= partial :'stats/design/swatch', locals: { vars: vars, fills: ["var(#{vars.first})"], title: vars.first, note: note } %>
         <% end %>
       </div>
       <div class="d-flex flex-wrap gap-2 align-items-center">
@@ -283,31 +195,28 @@
   </section>
 
   <!-- TYPE -->
-  <section id="type" class="d-flex flex-column gap-5" style="scroll-margin-top: 4rem">
-    <div class="d-flex flex-column gap-1 border-top border-2 border-dark pt-3">
-      <div class="font-monospace small text-body-secondary fw-bold">02</div>
-      <h2 class="m-0">Typography</h2>
-    </div>
+  <section id="type">
+    <%== section_head.call('type') %>
 
     <div class="row g-4">
       <div class="col-lg-6">
         <div class="border rounded p-4 h-100 d-flex flex-column gap-3">
-          <div class="font-monospace small text-body-secondary fw-bold">HEADINGS · --header-font-family</div>
+          <div class="spec fw-bold">HEADINGS · --header-font-family</div>
           <div class="header-font display-5 fw-bold lh-1">Hanken Grotesk</div>
           <div class="small text-body-secondary">Variable 100–900, used at bold. Letter-spacing −0.02em. Also <code>.strapline</code> and <code>.header-font</code>.</div>
         </div>
       </div>
       <div class="col-lg-6">
         <div class="border rounded p-4 h-100 d-flex flex-column gap-3">
-          <div class="font-monospace small text-body-secondary fw-bold">BODY · --body-font-family</div>
+          <div class="spec fw-bold">BODY · --body-font-family</div>
           <div class="display-5 lh-1">Plus Jakarta Sans</div>
           <div class="small text-body-secondary">Default weight 500, labels 700, bold for <code>b</code>/<code>strong</code>. Line height 1.45.</div>
         </div>
       </div>
     </div>
 
-    <div>
-      <h3 class="mb-3">Scale</h3>
+    <div class="d-flex flex-column gap-3">
+      <%== subhead.call('Scale') %>
       <div class="border-bottom">
         <% [
              ['h1 · .fs-1', '--font-size-3xl · 2rem', '<h1 data-sample class="m-0">Gatherings near you</h1>'],
@@ -324,29 +233,23 @@
            ].each do |name, size, sample| %>
           <div data-spec-row class="py-3 border-top">
             <div class="row align-items-baseline">
-              <code class="col-md-2 font-monospace small text-body-secondary"><%= name %></code>
+              <code class="col-md-2 spec"><%= name %></code>
               <div class="col-md-7"><%== sample %></div>
-              <code class="col-md-3 font-monospace small text-body-secondary"><%= size %> · <span data-px></span></code>
+              <code class="col-md-3 spec"><%= size %> · <span data-px></span></code>
             </div>
           </div>
         <% end %>
       </div>
-      <div class="small text-body-secondary mt-3"><code>.h1</code>–<code>.h6</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. The heading sizes are set in bootstrap5.scss (<code>$h1-font-size</code>…), so <code>.fs-1</code>–<code>.fs-6</code> make text a heading's size without its weight or font. <code>.small</code> shrinks text to .875em of its context; it's Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is --bs-gray-600 (<code>.subtle</code>, form-text).</div>
+      <div class="small text-body-secondary"><code>.h1</code>–<code>.h6</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. The heading sizes are set in bootstrap5.scss (<code>$h1-font-size</code>…), so <code>.fs-1</code>–<code>.fs-6</code> make text a heading's size without its weight or font. <code>.small</code> shrinks text to .875em of its context; it's Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is --bs-gray-600 (<code>.subtle</code>, form-text).</div>
     </div>
   </section>
 
   <!-- SHAPE -->
-  <section id="shape" class="d-flex flex-column gap-5" style="scroll-margin-top: 4rem">
-    <div class="d-flex flex-column gap-1 border-top border-2 border-dark pt-3">
-      <div class="font-monospace small text-body-secondary fw-bold">03</div>
-      <h2 class="m-0">Radius, elevation, spacing</h2>
-    </div>
+  <section id="shape">
+    <%== section_head.call('shape') %>
 
     <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Radius</h3>
-        <span class="text-body-secondary">Bootstrap's radius variables, set to four steps in <code>bootstrap5.scss</code>. Square corners (0) where an element sits flush against another; 50% for circles.</span>
-      </div>
+      <%== subhead.call('Radius', "Bootstrap's radius variables, set to four steps in <code>bootstrap5.scss</code>. Square corners (0) where an element sits flush against another; 50% for circles.") %>
       <div class="row g-3">
         <% [
              ['--bs-border-radius', 'Buttons, inputs, cards, badges, labels, pagination, sidebar pills. -sm is the same'],
@@ -357,7 +260,7 @@
           <div class="col-6 col-md-3">
             <div class="bg-body-secondary border mb-2" style="height: 72px; border-radius: var(<%= name %>)"></div>
             <div class="fw-bold text-break"><%= name %></div>
-            <div class="font-monospace small text-body-secondary"><%== css_var_raw.call(name) %></div>
+            <div class="spec"><span data-css-value="<%= name %>"></span></div>
             <div class="small text-body-secondary"><%= note %></div>
           </div>
         <% end %>
@@ -365,10 +268,7 @@
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Elevation</h3>
-        <span class="text-body-secondary">Bootstrap's three shadows, used through its variables or the <code>shadow-sm</code>, <code>shadow</code> and <code>shadow-lg</code> classes.</span>
-      </div>
+      <%== subhead.call('Elevation', "Bootstrap's three shadows, used through its variables or the <code>shadow-sm</code>, <code>shadow</code> and <code>shadow-lg</code> classes.") %>
       <div class="bg-body-tertiary rounded p-4">
         <div class="row g-4">
           <% [
@@ -385,8 +285,8 @@
       <div class="small text-body-secondary">The mobile event page's fixed tickets bar keeps its own upward shadow.</div>
     </div>
 
-    <div class="d-flex flex-column gap-2">
-      <h3 class="m-0">Spacing</h3>
+    <div class="d-flex flex-column gap-3">
+      <%== subhead.call('Spacing') %>
       <div class="row gx-4 row-cols-1 row-cols-md-2 row-cols-xl-3">
         <% [
              ['Content padding', '1.5625rem · mobile .9375rem'],
@@ -407,14 +307,10 @@
   </section>
 
   <!-- LAYOUT -->
-  <section id="layout" class="d-flex flex-column gap-4" style="scroll-margin-top: 4rem">
-    <div class="d-flex flex-column gap-1 border-top border-2 border-dark pt-3">
-      <div class="font-monospace small text-body-secondary fw-bold">04</div>
-      <h2 class="m-0">Page shell</h2>
-      <p class="m-0 text-body-secondary" style="max-width: 680px">Fixed dark header (2.8125rem) and a fixed sidebar (14.375rem, minified to 3.75rem). Below 768px the sidebar becomes a full-width offcanvas and header icons spread across a second row.</p>
-    </div>
+  <section id="layout">
+    <%== section_head.call('layout', 'Fixed dark header (2.8125rem) and a fixed sidebar (14.375rem, minified to 3.75rem). Below 768px the sidebar becomes a full-width offcanvas and header icons spread across a second row.') %>
     <div class="border rounded-3 overflow-hidden shadow">
-      <div class="d-flex align-items-center px-3 text-white" style="height: 2.8125rem; font-size: 1.125rem; background: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-midnight) 100%)">
+      <div class="d-flex align-items-center px-3 text-white" style="height: 2.8125rem; font-size: 1.125rem; background: var(--gradient-header)">
         <img class="position-relative" style="max-height: 1.75rem; top: -0.25rem" src="/images/logos/white-on-transparent.png" alt="">
         <div class="ms-auto d-flex align-items-center">
           <span class="px-3"><i class="bi bi-search"></i></span>
@@ -435,11 +331,11 @@
           </div>
         </div>
         <div class="flex-grow-1 p-4 d-flex flex-column gap-3">
-          <div class="font-monospace small text-body-secondary">#content · padding 1.5625rem</div>
+          <div class="spec">#content · padding 1.5625rem</div>
           <div class="row g-3 flex-grow-1">
             <% [['col-8', 'col-lg-8 · newsfeed'], ['col-4', 'col-lg-4 · sticky']].each do |col, label| %>
               <div class="<%= col %>">
-                <div class="h-100 border rounded shadow-sm d-flex align-items-center justify-content-center text-center font-monospace small text-body-secondary" style="background: repeating-linear-gradient(135deg, var(--color-canvas) 0 10px, #fff 10px 20px)"><%= label %></div>
+                <div class="h-100 border rounded shadow-sm d-flex align-items-center justify-content-center text-center spec" style="background: repeating-linear-gradient(135deg, var(--color-canvas) 0 10px, #fff 10px 20px)"><%= label %></div>
               </div>
             <% end %>
           </div>
@@ -449,17 +345,11 @@
   </section>
 
   <!-- COMPONENTS -->
-  <section id="components" class="d-flex flex-column gap-5" style="scroll-margin-top: 4rem">
-    <div class="d-flex flex-column gap-1 border-top border-2 border-dark pt-3">
-      <div class="font-monospace small text-body-secondary fw-bold">05</div>
-      <h2 class="m-0">Components</h2>
-    </div>
+  <section id="components">
+    <%== section_head.call('components') %>
 
     <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Buttons</h3>
-        <span class="text-body-secondary">.875rem, padding .375rem .75rem, radius .25rem. Primary, secondary and danger are gradients over a transparent border: 135°, flat 500 to 50%, then to a lighter 400 end, the same fill as badges, progress and text-bg-primary. btn-warning is styled the same but not used yet; brand buttons like btn-signal stay flat.</span>
-      </div>
+      <%== subhead.call('Buttons', 'Primary, secondary and danger are gradients over a transparent border: 135°, flat 500 to 50%, then to a lighter 400 end, the same fill as badges, progress and text-bg-primary. btn-warning is styled the same but not used yet; brand buttons like btn-signal stay flat.') %>
       <div class="border rounded p-4 d-flex flex-wrap gap-3 align-items-center">
         <a class="btn btn-primary" href="#components">Book tickets</a>
         <a class="btn btn-primary" href="#components" style="--bs-btn-bg: var(--theme-600); --btn-gradient-end: var(--theme-500)">Hover</a>
@@ -473,17 +363,15 @@
         <a class="btn btn-primary" href="#components">btn</a>
         <a class="btn btn-primary btn-lg" href="#components">btn-lg</a>
       </div>
+      <div class="spec">.btn · .875rem · padding .375rem .75rem · radius .25rem</div>
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Badges</h3>
-        <span class="text-body-secondary">Bootstrap's <code>.badge</code> with a <code>text-bg-*</code> colour, for counts, statuses, tags and amounts. Sized in em, so a badge scales with the text around it: small in a nav, bigger beside a heading. Pick the colour by what it means.</span>
-      </div>
+      <%== subhead.call('Badges', "Bootstrap's <code>.badge</code> with a <code>text-bg-*</code> colour, for counts, statuses, tags and amounts. Sized in em, so a badge scales with the text around it: small in a nav, bigger beside a heading. Pick the colour by what it means.") %>
       <div class="border rounded p-4 d-flex flex-column gap-3">
         <h4 class="m-0">Full moon gathering <span class="badge text-bg-yellow">Featured</span> <span class="badge text-bg-secondary">Locked</span></h4>
         <div>Followers <span class="badge text-bg-primary">128</span> · Tagged <a class="badge text-bg-primary" href="#components">breathwork</a> in <span class="badge text-primary border border-primary">Weekend pass</span> · Paid <span class="badge text-bg-secondary">£5 discount applied</span></div>
-        <div class="font-monospace small text-body-secondary">.badge · .875em · .25em .6em · inline-block, baseline · primary, secondary, warning, danger and yellow fills are gradients, like buttons; dark, stripe and payment badges are flat</div>
+        <div class="spec">.badge · .875em · .25em .6em · inline-block, baseline · primary, secondary, warning, danger and yellow fills are gradients, like buttons; dark, stripe and payment badges are flat</div>
       </div>
       <table class="table table-sm mb-0">
         <thead>
@@ -513,19 +401,19 @@
 
     <div class="row g-5">
       <div class="col-lg-6 d-flex flex-column gap-3">
-        <h3 class="m-0">Alerts</h3>
+        <%== subhead.call('Alerts') %>
         <div>
-          <div class="alert fade show alert-primary alert-dismissible">Your ticket is booked. <a href="#components">View order</a><button type="button" class="btn-close" aria-label="Close"></button></div>
-          <div class="alert alert-warning">Only 3 tickets left. <a href="#components">Book now</a></div>
-          <div class="alert alert-danger">Payment failed. <a href="#components">Try again</a></div>
-          <div class="font-monospace small text-body-secondary">Inline, in the page. Padding .625rem, no border. Links bold and underlined in the alert's link colour. Flashes render as alerts only on pages that set @hide_alert.</div>
+          <% flashes.each do |variant, message, link| %>
+            <div class="alert alert-<%= variant %> alert-dismissible"><%= message %> <a href="#components"><%= link %></a><button type="button" class="btn-close" aria-label="Close"></button></div>
+          <% end %>
+          <div class="spec">Inline, in the page. Padding .625rem, no border. Links bold and underlined in the alert's link colour. Flashes render as alerts only on pages that set @hide_alert.</div>
         </div>
       </div>
 
       <div class="col-lg-6 d-flex flex-column gap-3">
-        <h3 class="m-0">Toasts</h3>
+        <%== subhead.call('Toasts') %>
         <div class="d-flex flex-column align-items-start gap-2">
-          <% [['primary', 'Your ticket is booked.'], ['warning', 'Only 3 tickets left.'], ['danger', 'Payment failed.']].each do |variant, message| %>
+          <% flashes.each do |variant, message, _link| %>
             <div class="toast toast-<%= variant %> show w-auto">
               <div class="d-flex">
                 <div class="toast-body"><%= message %></div>
@@ -533,14 +421,14 @@
               </div>
             </div>
           <% end %>
-          <div class="font-monospace small text-body-secondary">Flash messages, fixed at the top centre (_alert.erb). Same tint gradients as alerts, plus a 1px border in the text colour. Notices fade after 3s, errors and warnings after 6s.</div>
+          <div class="spec">Flash messages, fixed at the top centre (_alert.erb). Same tint gradients as alerts, plus a 1px border in the text colour. Notices fade after 3s, errors and warnings after 6s.</div>
         </div>
       </div>
     </div>
 
     <div class="row g-5">
       <div class="col-lg-6 d-flex flex-column gap-3">
-        <h3 class="m-0">Forms</h3>
+        <%== subhead.call('Forms') %>
         <div class="border rounded p-4">
           <div class="mb-3">
             <label for="dg-event-name">Event name</label>
@@ -561,12 +449,12 @@
             <label for="dg-range" class="form-label">Pay what you can</label>
             <input type="range" class="form-range" id="dg-range" autocomplete="off" min="5" max="50" value="20">
           </div>
-          <div class="font-monospace small text-body-secondary">input 2.125rem tall · .825rem · border --bs-gray-400 · labels 700</div>
+          <div class="spec">input 2.125rem tall · .825rem · border --bs-gray-400 · labels 700</div>
         </div>
       </div>
 
       <div class="col-lg-6 d-flex flex-column gap-3">
-        <h3 class="m-0">Navigation crumbs and dropdown</h3>
+        <%== subhead.call('Navigation crumbs and dropdown') %>
         <div class="border rounded p-4 d-flex flex-column gap-4 flex-grow-1">
           <div class="nav-crumbs mb-0">
             <% crumb_items = [['<i class="bi bi-pencil"></i> Edit', '#components'], ['<i class="bi bi-people"></i> Members', '#components'], ['<i class="bi bi-ticket"></i> Orders', '#components']] %>
@@ -586,16 +474,16 @@
 
     <div class="row g-5">
       <div class="col-lg-6 d-flex flex-column gap-3">
-        <h3 class="m-0">Card with .chill header</h3>
+        <%== subhead.call('Card with .chill header') %>
         <div class="card shadow-sm">
           <h3 class="card-header chill">Your upcoming events</h3>
           <div class="card-body">
             <div class="d-flex gap-3 align-items-start mb-3">
-              <span class="newsfeed-icon d-inline-flex align-items-center justify-content-center flex-shrink-0 rounded-circle"><i class="bi bi-ticket-detailed-fill"></i></span>
+              <span class="newsfeed-icon"><i class="bi bi-ticket-detailed-fill"></i></span>
               <div><div class="mb-1"><b>Ecstatic dance</b> on Sat 4 Oct</div><div class="subtle small">2 hours ago</div></div>
             </div>
             <div class="d-flex gap-3 align-items-start mb-3">
-              <span class="newsfeed-icon d-inline-flex align-items-center justify-content-center flex-shrink-0 rounded-circle"><i class="bi bi-person-fill-add"></i></span>
+              <span class="newsfeed-icon"><i class="bi bi-person-fill-add"></i></span>
               <div><div class="mb-1"><b>Ruby</b> followed you</div><div class="subtle small">Yesterday</div></div>
             </div>
             <a href="#components">All events →</a>
@@ -604,7 +492,7 @@
       </div>
 
       <div class="col-lg-6 d-flex flex-column gap-3">
-        <h3 class="m-0">Table and pagination</h3>
+        <%== subhead.call('Table and pagination') %>
         <table class="table table-hover mb-0">
           <thead>
             <tr><th>Ticket type</th><th>Sold</th><th class="text-end">Price</th></tr>
@@ -615,7 +503,7 @@
             <tr class="table-warning"><td>Solidarity</td><td>9/10</td><td class="text-end">£8</td></tr>
           </tbody>
         </table>
-        <div class="font-monospace small text-body-secondary">Row colours: table-warning flags a row to look at (low delivery rate), table-danger a problem (blocked ASN). Both use the alert tints</div>
+        <div class="spec">Row colours: table-warning flags a row to look at (low delivery rate), table-danger a problem (blocked ASN). Both use the alert tints</div>
         <ul class="pagination justify-content-center mb-0">
           <li class="page-item disabled"><a class="page-link" href="#components">‹</a></li>
           <li class="page-item active"><a class="page-link" href="#components">1</a></li>
@@ -623,19 +511,16 @@
           <li class="page-item"><a class="page-link" href="#components">3</a></li>
           <li class="page-item"><a class="page-link" href="#components">›</a></li>
         </ul>
-        <div class="font-monospace small text-body-secondary text-center">Active: grey border · Hover: light border</div>
+        <div class="spec text-center">Active: grey border · Hover: light border</div>
       </div>
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Charts</h3>
-        <span class="text-body-secondary">Chart.js, with white bold value labels from chartjs-plugin-datalabels.</span>
-      </div>
+      <%== subhead.call('Charts', 'Chart.js, with white bold value labels from chartjs-plugin-datalabels.') %>
       <div class="row g-5">
         <div class="col-lg-7 d-flex flex-column gap-3">
           <%= partial :chart, locals: { data: { 'May' => 12, 'June' => 19, 'July' => 15, 'August' => 27, 'September' => 31, 'October' => 24 }, projection: 10 } %>
-          <div class="font-monospace small text-body-secondary">Bar (_chart.erb): monthly counts in --theme-500, with the current month's projection stacked on top at 50% (make_projection estimates it from the days so far; here it's fixed)</div>
+          <div class="spec">Bar (_chart.erb): monthly counts in --theme-500, with the current month's projection stacked on top at 50% (make_projection estimates it from the days so far; here it's fixed)</div>
         </div>
         <div class="col-lg-5 d-flex flex-column gap-3">
           <canvas id="dg-doughnut"></canvas>
@@ -651,14 +536,14 @@
               })
             })
           </script>
-          <div class="font-monospace small text-body-secondary">Doughnut (_stats.erb): chart_colors turns the theme's hue evenly round the wheel at oklch lightness .71, chroma .11, so every segment has the same weight</div>
+          <div class="spec">Doughnut (_stats.erb): chart_colors turns the theme's hue evenly round the wheel at oklch lightness .71, chroma .11, so every segment has the same weight</div>
         </div>
       </div>
     </div>
 
     <div class="row g-5">
       <div class="col-lg-6 d-flex flex-column gap-3">
-        <h3 class="m-0">Tabs and pills</h3>
+        <%== subhead.call('Tabs and pills') %>
         <div class="border rounded p-4 d-flex flex-column gap-4">
           <div class="nav-wrapper">
             <ul class="nav nav-tabs">
@@ -672,12 +557,12 @@
             <li class="nav-item"><a class="nav-link" href="#components">Past</a></li>
             <li class="nav-item"><a class="nav-link" href="#components">Drafts</a></li>
           </ul>
-          <div class="font-monospace small text-body-secondary">.nav · .875rem · hover and focus: dark text on --bs-secondary-bg, no focus ring · active pill --theme-500 · .tab-content padding .9375rem · in .nav-wrapper, tabs scroll sideways on mobile</div>
+          <div class="spec">.nav · .875rem · hover and focus: dark text on --bs-secondary-bg, no focus ring · active pill --theme-500 · .tab-content padding .9375rem · in .nav-wrapper, tabs scroll sideways on mobile</div>
         </div>
       </div>
 
       <div class="col-lg-6 d-flex flex-column gap-3">
-        <h3 class="m-0">Modal</h3>
+        <%== subhead.call('Modal') %>
         <div class="bg-body-tertiary rounded p-4">
           <div class="modal position-static d-block h-auto overflow-visible" style="z-index: auto">
             <div class="modal-dialog my-0" style="width: auto"><%# shrink to the column; real modals are 37.5rem %>
@@ -695,13 +580,13 @@
             </div>
           </div>
         </div>
-        <div class="font-monospace small text-body-secondary">37.5rem wide from 768px · no border or shadow</div>
+        <div class="spec">37.5rem wide from 768px · no border or shadow</div>
       </div>
     </div>
 
     <div class="row g-5">
       <div class="col-lg-6 d-flex flex-column gap-3">
-        <h3 class="m-0">Header search and autocomplete</h3>
+        <%== subhead.call('Header search and autocomplete') %>
         <div class="rounded overflow-hidden" style="background: var(--bs-gray-800)">
           <div class="header-search-bar position-relative" style="padding: 0 2.75rem">
             <form onsubmit="return false">
@@ -717,16 +602,16 @@
           <li class="ui-menu-item"><div class="ui-menu-item-wrapper">Breath and sound journey</div></li>
           <li class="ui-menu-item"><div class="ui-menu-item-wrapper">Holotropic breathwork</div></li>
         </ul>
-        <div class="font-monospace small text-body-secondary">Search: offcanvas-top, 2.8125rem, --bs-gray-800, backdrop at .9 · autocomplete: radius-lg, --bs-box-shadow, items .3125rem .9375rem, hover --bs-secondary-bg</div>
+        <div class="spec">Search: offcanvas-top, 2.8125rem, --bs-gray-800, backdrop at .9 · autocomplete: radius-lg, --bs-box-shadow, items .3125rem .9375rem, hover --bs-secondary-bg</div>
       </div>
 
       <div class="col-lg-6 d-flex flex-column gap-3">
-        <h3 class="m-0">Notifications and messages dropdowns</h3>
+        <%== subhead.call('Notifications and messages dropdowns') %>
         <div class="dropdown-menu show position-relative align-self-start p-0" style="width: 22rem; max-width: 100%">
           <div class="list-group list-group-flush notification-list">
             <% [['bi-person-fill-add', '<b>Ruby</b> followed you', '2 hours ago'], ['bi-ticket-detailed-fill', '<b>Sam</b> booked tickets to <b>Ecstatic dance</b>', 'Yesterday']].each do |icon, sentence, time| %>
               <a class="list-group-item list-group-item-action d-flex align-items-start gap-2" href="#components">
-                <span class="newsfeed-icon d-inline-flex align-items-center justify-content-center flex-shrink-0 rounded-circle"><i class="bi <%= icon %>"></i></span>
+                <span class="newsfeed-icon"><i class="bi <%= icon %>"></i></span>
                 <div class="notification-info flex-grow-1">
                   <div class="notification-title"><%== sentence %></div>
                   <div class="notification-time subtle"><%= time %></div>
@@ -738,22 +623,19 @@
             <a class="list-group-item list-group-item-action text-center" href="#components">All notifications <i class="bi bi-arrow-right"></i></a>
           </div>
         </div>
-        <div class="font-monospace small text-body-secondary">.notification-list: list-group-flush, items .625rem .9375rem, smaller newsfeed icons · .message-preview: unread --theme-500 at 15%, hover --bs-gray-400 at 30%</div>
+        <div class="spec">.notification-list: list-group-flush, items .625rem .9375rem, smaller newsfeed icons · .message-preview: unread --theme-500 at 15%, hover --bs-gray-400 at 30%</div>
       </div>
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">p.action</h3>
-        <span class="text-body-secondary">A centred call to action for docs and email previews, where a .btn class can't be added. Drawn like btn-primary; emails use their own in email.css.</span>
-      </div>
+      <%== subhead.call('p.action', "A centred call to action for docs and email previews, where a .btn class can't be added. Drawn like btn-primary; emails use their own in email.css.") %>
       <div class="border rounded p-4">
         <p class="action m-0"><a href="#components">Confirm your email</a></p>
       </div>
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <h3 class="m-0">AI well and ask box</h3>
+      <%== subhead.call('AI well and ask box') %>
       <div class="row g-4 align-items-start">
         <div class="col-lg-6">
           <div class="ai-well"><b>Suggested description</b><br>A gentle evening of breathwork and sound for all levels.</div>
@@ -772,30 +654,19 @@
   </section>
 
   <!-- THEMING -->
-  <section id="theming" class="d-flex flex-column gap-4" style="scroll-margin-top: 4rem">
-    <div class="d-flex flex-column gap-1 border-top border-2 border-dark pt-3">
-      <div class="font-monospace small text-body-secondary fw-bold">06</div>
-      <h2 class="m-0">Theming</h2>
-      <p class="m-0 text-body-secondary" style="max-width: 680px">Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check, progress bar and stats chart follows. Alerts and toasts use the ramp's tints with --theme-800 text on every page; on themed pages the AI well and calendar events also switch to the theme colour. That is deliberate: the default site keeps them --color-midnight, as its own accent. The .event-detail tiles (date and icons) follow the theme through theme.css too, as event_details.css is inlined into emails and hard-codes the default green.</p>
-    </div>
+  <section id="theming">
+    <%== section_head.call('theming', 'Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check, progress bar and stats chart follows. Alerts and toasts use the ramp\'s tints with --theme-800 text on every page; on themed pages the AI well and calendar events also switch to the theme colour. That is deliberate: the default site keeps them --color-midnight, as its own accent. The .event-detail tiles (date and icons) follow the theme through theme.css too, as event_details.css is inlined into emails and hard-codes the default green.') %>
     <div class="row g-3">
-      <div class="col-md-6 col-xxl-4">
-        <div class="border rounded p-4 h-100 d-flex flex-column gap-3">
-          <div class="font-monospace small text-body-secondary fw-bold">DEFAULT · <%== css_var.call('--theme-500') %></div>
-          <div class="d-flex flex-wrap gap-2 align-items-center">
-            <a class="btn btn-primary" href="#theming">Book</a>
-            <div class="nav-crumbs mb-0">
-              <%= dropdown_nav [['Edit', '#theming']], button_text: 'Crumb' %>
-            </div>
-          </div>
-          <div class="alert alert-primary mb-0">Saved. Text is --theme-800</div>
-          <div class="ai-well">AI well: purple</div>
-        </div>
-      </div>
-      <% themed_colors.each do |color, clamped| %>
+      <% ([[nil, nil]] + themed_colors).each do |color, clamped| %>
         <div class="col-md-6 col-xxl-4">
-          <div class="theme-scope border rounded p-4 h-100 d-flex flex-column gap-3" style="<%= theme_css_variables(clamped)[/\{(.*)\}/m, 1].squish %>">
-            <div class="font-monospace small text-body-secondary fw-bold">THEMED · <%= color %><%= " → #{clamped} (clamped)" if clamped != color %></div>
+          <div class="<%= 'theme-scope' if color %> border rounded p-4 h-100 d-flex flex-column gap-3"<% if color %> style="<%= theme_css_variables(clamped)[/\{(.*)\}/m, 1].squish %>"<% end %>>
+            <div class="spec fw-bold">
+              <% if color %>
+                THEMED · <%= color %><%= " → #{clamped} (clamped)" if clamped != color %>
+              <% else %>
+                DEFAULT · <span data-css-var="--theme-500"></span>
+              <% end %>
+            </div>
             <div class="d-flex flex-wrap gap-2 align-items-center">
               <a class="btn btn-primary" href="#theming">Book</a>
               <div class="nav-crumbs mb-0">
@@ -803,7 +674,7 @@
               </div>
             </div>
             <div class="alert alert-primary mb-0">Saved. Text is --theme-800</div>
-            <div class="ai-well">AI well: theme tint</div>
+            <div class="ai-well">AI well: <%= color ? 'theme tint' : 'lavender' %></div>
           </div>
         </div>
       <% end %>

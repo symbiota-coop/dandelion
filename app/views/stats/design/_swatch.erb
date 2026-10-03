@@ -1,0 +1,17 @@
+<%# A colour tile: its fills side by side (or a real class's background), a title, each var's value (read live by design.erb's script) and a note %>
+<% vars ||= []
+   fills ||= vars.map { |name| "var(#{name})" }
+   box_class ||= nil
+   title ||= "#{vars.first}#{', …' if vars.length > 1}"
+   note ||= nil
+   col ||= 'col' %>
+<div class="<%= col %>">
+  <div class="d-flex rounded overflow-hidden border mb-1 <%= box_class %>" style="height: 4rem">
+    <% fills.each do |fill| %>
+      <div class="flex-fill" style="background: <%= fill %>"></div>
+    <% end %>
+  </div>
+  <div class="fw-bold text-break"><%= title %></div>
+  <% if vars.any? %><div class="spec"><%== vars.map { |name| %(<span data-css-var="#{name}"></span>) }.join(' · ') %></div><% end %>
+  <% if note %><div class="small text-body-secondary"><%= note %></div><% end %>
+</div>

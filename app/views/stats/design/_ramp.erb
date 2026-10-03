@@ -1,0 +1,14 @@
+<%# A colour ramp's steps, then the gradient it's used for, drawn with the real class (sample_class) %>
+<% label ||= nil
+   label_note ||= nil %>
+<div>
+  <% if label %><div class="mb-1"><span class="fw-bold"><%= label %></span> <span class="text-body-secondary">· <%= label_note %></span></div><% end %>
+  <div class="row g-2">
+    <% notes.each do |step, note| %>
+      <%= partial :'stats/design/swatch', locals: { vars: ["#{prefix}-#{step}"], title: step, note: note, col: 'col-4 col-md-2' } %>
+    <% end %>
+  </div>
+  <div class="row g-3 row-cols-1 row-cols-sm-2 mt-0">
+    <%= partial :'stats/design/swatch', locals: { vars: ["#{prefix}-50", "#{prefix}-#{sample_to}"], fills: [], box_class: sample_class, title: sample_title, note: "#{prefix}-50 to #{prefix}-#{sample_to}" } %>
+  </div>
+</div>

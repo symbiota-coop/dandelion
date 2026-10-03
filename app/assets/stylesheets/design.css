@@ -1,0 +1,16 @@
+/* The design guide (/stats/design) */
+
+/* scroll-margin-top keeps sections clear of the fixed header when jumped to from the nav */
+.design-guide > section {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  scroll-margin-top: 4rem;
+}
+
+/* Captions that spec an example or swatch: values, sizes, classes. Prose notes are .small.text-body-secondary */
+.design-guide .spec {
+  font-family: var(--bs-font-monospace);
+  font-size: 0.875em;
+  color: var(--bs-secondary-color);
+}
