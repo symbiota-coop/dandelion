@@ -9,7 +9,6 @@
    issues = [
      [3, 'Medium', 'Default and themed pages diverge with the same colour', 'theme.css restyles .ai-well and calendar events: the AI well is purple by default and a theme tint when themed; calendar events are purple by default and theme-coloured when themed. (Alerts and toasts no longer differ: their tints come from the ramp.)', 'Move the remaining theme.css rules into app.css so there is one behaviour, or document that the purple is intentional only for the unthemed site.', 'theme.css · app.css .ai-well, #calendar a.fc-event'],
      [7, 'Medium', 'Too many accent colours and active states', 'Besides the theme colour there is purple #4400B9 (header, AI), an orange-to-yellow gradient (sidebar active, notification dot, load bar), a rainbow gradient, signal blue and Stripe purple. The sidebar active item uses the orange gradient while every other active state (pills, list groups, dropdown items, checks) uses the theme colour.', 'Decide which accent marks "active" and use it everywhere; restrict purple to AI features.', 'app.css .sidebar .nav-link.active, #header, --gradient-*'],
-     [14, 'Low', 'Badges and labels are parallel systems', '.label is a legacy Bootstrap 3 component with different size and padding (.85em, .2em .6em) and only some variants (no label-warning).', 'Migrate .label usages to .badge and remove .label.', 'app.css Labels section'],
      [15, 'Low', 'Button treatments vary', 'Primary and danger are gradients; secondary and warning are flat. btn-signal forces its hover with !important. p.action a is a separate CTA style (10px padding, 5px radius).', 'Apply the gradient pattern to all solid variants or none; express btn-signal through --bs-btn-* variables.', 'app.css Buttons, p.action'],
      [17, 'Low', 'Mixed px and rem', 'The file converts most values to rem, but 5px radii, 15px insets, 7.5px slick padding, 16px newsfeed icons, 20–22px map icons and 36/40px controls remain. Because the root scales to 19 and 21px, these shrink relative to everything else on large screens.', 'Convert remaining px to rem.', 'app.css']
    ]
@@ -93,7 +92,7 @@
              [%w[--color-orange-tint --color-orange-tint-strong], 'warning alert and toast background'],
              [%w[--color-red-tint --color-red-tint-strong], 'danger alert and toast background'],
              [%w[--color-highlight-1-light-2 --color-highlight-1-light-1 --color-highlight-1-light-3], 'AI well gradient (1 to 2), body.gradient (3)'],
-             [%w[--color-yellow --color-yellow-light], 'badge-yellow: Featured, Co-host, rota points'],
+             [%w[--color-yellow --color-yellow-light], 'text-bg-yellow: Featured, Co-host, rota points'],
              [%w[--color-amber --color-amber-light --color-amber-dark], 'map areas, features page'],
              [%w[--color-star], '.bi-star-fill icons'],
              [%w[--color-orange --color-orange-light --color-orange-text], 'warning: fill, gradient end, text'],
@@ -208,7 +207,7 @@
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
              [%w[--color-evm], 'EVM'],
-             [%w[--color-stripe], 'Stripe · label-stripe'],
+             [%w[--color-stripe], 'Stripe · text-bg-stripe'],
              [%w[--color-opencollective], 'Open Collective'],
              [%w[--color-coinbase], 'Coinbase'],
              [%w[--color-signal --color-signal-dark], 'Signal · btn-signal'],
@@ -269,7 +268,7 @@
            ['.readable', '--font-size-base · 1rem', '<div data-sample class="readable">Long-form copy such as event descriptions sets at 1rem.</div>'],
            ['nav · .btn', '--font-size-md · .875rem', '<span data-sample class="btn btn-outline-primary">Buttons, nav links and tabs</span>'],
            ['body · h6', '--font-size-sm · .825rem', '<div data-sample>Body text, inputs, tables, dropdown items</div>'],
-           ['.badge', '--font-size-xs · .75rem', '<span data-sample class="badge badge-default">Badges</span>'],
+           ['.badge', '.875em of its context', '<span data-sample class="badge text-bg-secondary">Badges</span>'],
            ['.breadcrumb', '--font-size-xs · .75rem', '<ol data-sample class="breadcrumb m-0"><li class="breadcrumb-item">Breadcrumbs</li><li class="breadcrumb-item">and carets</li></ol>']
          ].each_with_index do |(name, size, sample), i| %>
         <div data-spec-row class="py-3 border-top <%= 'border-bottom' if i == 9 %>">
@@ -427,24 +426,38 @@
 
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
-        <h3 class="m-0">Badges and labels</h3>
-        <%== flags.call(14) %>
+        <h3 class="m-0">Badges</h3>
+        <span class="text-body-secondary">Bootstrap's <code>.badge</code> with a <code>text-bg-*</code> colour, for counts, statuses, tags and amounts. Sized in em, so a badge scales with the text around it: small in a nav, bigger beside a heading. Pick the colour by what it means.</span>
       </div>
       <div class="border rounded p-4 d-flex flex-column gap-3">
-        <div class="d-flex flex-wrap gap-2 align-items-center">
-          <% %w[primary warning danger yellow inverse default outline-primary].each do |variant| %>
-            <span class="badge badge-<%= variant %>"><%= variant %></span>
-          <% end %>
-        </div>
-        <div class="font-monospace small text-body-secondary">.badge · .75rem · .1875rem .4375rem</div>
-        <div class="d-flex flex-wrap gap-2 align-items-baseline">
-          <span>Text with</span>
-          <% %w[primary danger stripe].each do |variant| %>
-            <span class="label label-<%= variant %>">label-<%= variant %></span>
-          <% end %>
-        </div>
-        <div class="font-monospace small text-body-secondary">.label · .85em · .2em .6em .3em (legacy)</div>
+        <h4 class="m-0">Full moon gathering <span class="badge text-bg-yellow">Featured</span> <span class="badge text-bg-secondary">Locked</span></h4>
+        <div>Followers <span class="badge text-bg-primary">128</span> · Tagged <a class="badge text-bg-primary" href="#components">breathwork</a> in <span class="badge text-primary border border-primary">Weekend pass</span> · Paid <span class="badge text-bg-secondary">£5 discount applied</span></div>
+        <div class="font-monospace small text-body-secondary">.badge · .875em · .25em .6em · inline-block, baseline · coloured fills are gradients, like buttons</div>
       </div>
+      <table class="table table-sm mb-0">
+        <thead>
+          <tr><th>Class</th><th>Means</th><th>As used</th></tr>
+        </thead>
+        <tbody>
+          <% [
+               ['text-bg-primary', 'Good, or the main count', ['128', '6/6 points', 'breathwork', 'Kitchen shift']],
+               ['text-bg-secondary', 'Neutral detail', ['Locked', 'Secret', '£5 discount applied']],
+               ['text-bg-warning', 'Needs attention, not yet a problem', ['On hold']],
+               ['text-bg-danger', 'A problem or a hard limit', ['Full', 'Rejected, to contact', 'Resign']],
+               ['text-bg-yellow', 'Highlighted or rewarded', ['Featured', 'Co-host', '2 points']],
+               ['text-bg-dark', 'Counts in a gathering\'s nav', ['3', '12/20']],
+               ['text-primary border border-primary', 'Outline: an unselected choice', ['Available', 'Weekend pass', 'London']],
+               ['text-bg-stripe', 'Reported by Stripe', ['£1,240']]
+             ].each do |klass, meaning, texts| %>
+            <tr>
+              <td><code><%= klass %></code></td>
+              <td class="text-body-secondary"><%= meaning %></td>
+              <td><% texts.each do |text| %><span class="badge <%= klass %> me-1"><%= text %></span><% end %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <div class="small text-body-secondary"><code>text-bg-yellow</code> and <code>text-bg-stripe</code> are ours, written like Bootstrap's. Payment badges (<code>badge-payment-&lt;method&gt;</code>) are under Third-party brands. A badge with no colour class has no background, so always give it one (or an inline background, as the hashed organisation and gathering badges do).</div>
     </div>
 
     <div class="row g-5">
@@ -501,7 +514,7 @@
           </div>
           <div class="mb-3">
             <label for="dg-range" class="form-label">Pay what you can</label>
-            <input type="range" class="form-range" id="dg-range" min="5" max="50" value="20">
+            <input type="range" class="form-range" id="dg-range" autocomplete="off" min="5" max="50" value="20">
           </div>
           <div class="font-monospace small text-body-secondary">input 2.125rem tall · .825rem · border --bs-gray-400 · labels 700</div>
         </div>
@@ -584,7 +597,7 @@
             <li class="nav-item"><a class="nav-link" href="#components">Past</a></li>
             <li class="nav-item"><a class="nav-link" href="#components">Drafts</a></li>
           </ul>
-          <div class="font-monospace small text-body-secondary">.nav · .875rem · hover and focus --bs-secondary-bg, no focus ring · active pill --theme-500 · .tab-content padding .9375rem · in .nav-wrapper, tabs scroll sideways on mobile</div>
+          <div class="font-monospace small text-body-secondary">.nav · .875rem · hover and focus: dark text on --bs-secondary-bg, no focus ring · active pill --theme-500 · .tab-content padding .9375rem · in .nav-wrapper, tabs scroll sideways on mobile</div>
         </div>
       </div>
 

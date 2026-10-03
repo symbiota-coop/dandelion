@@ -22,7 +22,7 @@
           <% if organisation.reward_claimer_id.present? %>
             Claimed by <a href="/u/<%= organisation.reward_claimer.username %>"><%= organisation.reward_claimer.name %></a>
           <% elsif revenue >= Organisation::REFERRAL_REWARD_THRESHOLD %>
-            <span class="badge badge-secondary">Claimable</span>
+            <span class="badge text-bg-secondary">Claimable</span>
           <% end %>
         </td>
       </tr>

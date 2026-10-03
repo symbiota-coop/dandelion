@@ -3,7 +3,7 @@
 
 <% if event.purchase_url %>
   <a target="_blank" href="<%= event.purchase_url %>">
-    <span class="label label-primary"><%=URI(event.purchase_url).host.gsub('www.','')%></span>
+    <span class="badge text-bg-primary"><%=URI(event.purchase_url).host.gsub('www.','')%></span>
   </a>
 <% elsif (event.live? || tc > 0) %>
   <a href="/events/<%= event.id %>/tickets">
@@ -29,7 +29,7 @@
   <% end %>
   <% if event.sold_out_cache %>
     <div class="mt-1">
-      <span class="badge badge-primary">
+      <span class="badge text-bg-primary">
         <% if event.sold_out_due_to_sales_end_cache %>
           Sales ended
         <% else %>

@@ -13,7 +13,7 @@
     <% end %>
     <% if full_view %></a><% end %>
     <% if notification.type.to_sym == :applied; mapplication = notification.notifiable %>
-      <span class="float-end badge badge-<%= mapplication.label %>"><%= mapplication.status.capitalize %></span>
+      <span class="float-end badge text-bg-<%= mapplication.label %>"><%= mapplication.status.capitalize %></span>
     <% end %>
     <% if full_view && notification.type.to_sym == :left_feedback && (event_feedback = notification.notifiable).event %>
       <a href="/e/<%= event_feedback.event.slug %>" class="float-md-end">

@@ -5,15 +5,15 @@
 <% shifts.each { |shift| %>
 <div>
   <% if defined?(show_title) && show_title %>
-    <a <% if @gathering.enable_shift_worth %>style="border-top-right-radius: 0; border-bottom-right-radius: 0"<% end %> class="label label-primary text-white d-inline-block mb-1" href="/shifts/<%= shift.id %>/edit">
+    <a <% if @gathering.enable_shift_worth %>style="border-top-right-radius: 0; border-bottom-right-radius: 0"<% end %> class="badge text-bg-primary text-white d-inline-block mb-1" href="/shifts/<%= shift.id %>/edit">
       <%= shift.description %>
     </a><% if @gathering.enable_shift_worth %><%= partial :'rotas/shift_worth', locals: {shift: shift, style: 'border-top-left-radius: 0; border-bottom-left-radius: 0'} %>
     <% end %>
-    <a data-confirm="<% if shift.account_id == current_account.id %>Resign from this shift?<% else %>Remove this person from this shift?<% end %>" class="pagelet-trigger label label-danger text-white d-inline-block mb-1" href="/shifts/<%= shift.id %>/destroy">
+    <a data-confirm="<% if shift.account_id == current_account.id %>Resign from this shift?<% else %>Remove this person from this shift?<% end %>" class="pagelet-trigger badge text-bg-danger text-white d-inline-block mb-1" href="/shifts/<%= shift.id %>/destroy">
       <i class="bi bi-x-lg"></i>
     </a>
   <% else %>
-    <a <% if @gathering.enable_shift_worth %>style="border-top-right-radius: 0; border-bottom-right-radius: 0"<% end %> href="/g/<%= @gathering.slug %>/rotas/<%= shift.rota_id %>" class="label label-primary text-white d-inline-block mb-1">
+    <a <% if @gathering.enable_shift_worth %>style="border-top-right-radius: 0; border-bottom-right-radius: 0"<% end %> href="/g/<%= @gathering.slug %>/rotas/<%= shift.rota_id %>" class="badge text-bg-primary text-white d-inline-block mb-1">
       <%= shift.description %>
     </a><% if @gathering.enable_shift_worth %><%= partial :'rotas/shift_worth', locals: {shift: shift, style: 'border-top-left-radius: 0; border-bottom-left-radius: 0'} %><% end %>
   <% end %>

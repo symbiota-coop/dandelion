@@ -6,7 +6,7 @@
 <% if current_account && organisationship %>
   <% if organisationship.credit_balance > 0 %>
     <div class="mb-2">
-      <a class="label label-primary text-white" href="/organisationships/<%= organisationship.id %>/credit_balance"><%= m organisationship.credit_balance, @organisation.currency %> credit</a>
+      <a class="badge text-bg-primary text-white" href="/organisationships/<%= organisationship.id %>/credit_balance"><%= m organisationship.credit_balance, @organisation.currency %> credit</a>
     </div>
   <% end %>
 <% end %>

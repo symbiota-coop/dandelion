@@ -816,49 +816,22 @@ body.greyed #content {
    Badges
    ========================================================================== */
 
-.badge {
-  background: var(--bs-gray-600);
-  min-width: 0.625rem;
-  vertical-align: middle;
-}
+/* Bootstrap's badge, coloured with its text-bg-* classes, for counts, statuses, tags and amounts alike.
+   Sized in em (bootstrap5.scss), so a badge scales with the text around it */
 
 .btn-primary .badge {
   color: var(--theme-500);
 }
 
-.badge-default,
-.label-default {
-  --badge-color: var(--bs-gray-600);
-  --badge-color-light: var(--bs-gray-500);
+/* Our own colours, in the form of Bootstrap's text-bg-* */
+.text-bg-yellow {
+  color: var(--bs-white) !important;
+  background-color: var(--color-yellow) !important;
 }
 
-.badge-primary,
-.label-primary {
-  --badge-color: var(--theme-500);
-  --badge-color-light: var(--theme-400);
-}
-
-.badge-warning {
-  --badge-color: var(--color-orange);
-  --badge-color-light: var(--color-orange-light);
-}
-
-.badge-danger,
-.label-danger {
-  --badge-color: var(--color-red);
-  --badge-color-light: var(--color-red-light);
-}
-
-.badge-yellow,
-.label-yellow {
-  --badge-color: var(--color-yellow);
-  --badge-color-light: var(--color-yellow-light);
-}
-
-.badge-inverse,
-.label-inverse {
-  --badge-color: var(--bs-black);
-  --badge-color-light: var(--bs-black);
+.text-bg-stripe {
+  color: var(--bs-white) !important;
+  background-color: var(--color-stripe) !important;
 }
 
 /* Payment method badges, named after the method in lib/payment_methods/event_payment_methods.rb */
@@ -875,13 +848,24 @@ body.greyed #content {
   color: var(--payment-text, var(--bs-white));
 }
 
-/* Coloured badges and labels are gradients from their colour to a lighter one */
-:is(.badge, .label):is(.badge-default, .label-default, .badge-primary, .label-primary, .badge-warning, .badge-danger, .label-danger, .badge-yellow, .label-yellow, .badge-inverse, .label-inverse) {
+/* Coloured badges are gradients from their colour to a lighter one */
+.badge.text-bg-primary { --badge-color: var(--theme-500); --badge-color-light: var(--theme-400); }
+.badge.text-bg-secondary { --badge-color: var(--bs-gray-600); --badge-color-light: var(--bs-gray-500); }
+.badge.text-bg-warning { --badge-color: var(--color-orange); --badge-color-light: var(--color-orange-light); }
+.badge.text-bg-danger { --badge-color: var(--color-red); --badge-color-light: var(--color-red-light); }
+.badge.text-bg-yellow { --badge-color: var(--color-yellow); --badge-color-light: var(--color-yellow-light); }
+
+.badge:is(.text-bg-primary, .text-bg-secondary, .text-bg-warning, .text-bg-danger, .text-bg-yellow) {
   background: linear-gradient(135deg, var(--badge-color) 0%, var(--badge-color) 50%, var(--badge-color-light) 100%) !important;
 }
 
-.badge-outline-primary {
-  background: transparent;
+/* Location badges match the text beside them */
+.popular-locations {
+  font-size: var(--font-size-md)
+}
+
+.popular-locations .badge {
+  font-size: 1em
 }
 
 /* ==========================================================================
@@ -1533,49 +1517,6 @@ label.remove-image input {
 }
 
 /* ==========================================================================
-   Labels
-   ========================================================================== */
-
-.label {
-  display: inline;
-  padding: 0.2em 0.6em 0.3em;
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  line-height: 1;
-  color: var(--bs-white);
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: baseline;
-  border-radius: var(--bs-border-radius);
-}
-
-/* Location labels match the text beside them rather than shrinking to 85% */
-.popular-locations {
-  font-size: var(--font-size-md)
-}
-
-.popular-locations .label {
-  font-size: 1em
-}
-
-.label-stripe {
-  background: var(--color-stripe)
-}
-
-.label-outline-primary,
-.badge-outline-primary {
-  color: var(--theme-500);
-  border: 1px solid var(--theme-500);
-}
-
-/* Labels beside an event's title in event blocks */
-.event-block-title .label {
-  font-size: var(--font-size-xs);
-  position: relative;
-  top: -0.25rem;
-}
-
-/* ==========================================================================
    Modals
    ========================================================================== */
 
@@ -1613,9 +1554,11 @@ label.remove-image input {
   text-decoration: none;
 }
 
+/* Dark text on the grey, as in dropdowns and the autocomplete: theme-coloured text on grey reads poorly */
 .nav > li > a:focus,
 .nav > li > a:hover {
   background: var(--bs-secondary-bg);
+  color: var(--bs-emphasis-color);
 }
 
 /* No focus ring on nav links: their focus background already shows where focus is */
@@ -2346,16 +2289,6 @@ ul.map-event li {
 
 .infowindow .row {
   margin: 0
-}
-
-.event-block-title.map-event {
-  margin-bottom: 0.5rem !important;
-}
-
-.event-block-title.map-event h4 {
-  font-size: var(--font-size-lg) !important;
-  display: inline-block !important;
-  margin-bottom: 0 !important;
 }
 
 /* ==========================================================================

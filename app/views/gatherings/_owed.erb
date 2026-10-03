@@ -38,7 +38,7 @@
   $(function() {
     const owed = <%= @membership.owes_contribution? %>
     $('.contribution-label').text('<%= %(#{m (@membership.paid or 0), @gathering.currency}/#{m @membership.requested_contribution, @gathering.currency}) %>').each(function () {
-      $(this).removeClass('badge-danger ' + $(this).attr('data-colour')).addClass(owed ? 'badge-danger' : $(this).attr('data-colour'))
+      $(this).removeClass('text-bg-danger ' + $(this).attr('data-colour')).addClass(owed ? 'text-bg-danger' : $(this).attr('data-colour'))
     })
   })
 </script>

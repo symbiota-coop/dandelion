@@ -1,7 +1,7 @@
 <% if organisation.stripe_client_id %>
   <td data-sort="<%=event_method_in_organisation_currency(event, :discounted_ticket_revenue, organisation)%>">
-    <span data-bs-toggle="tooltip" title="Reported by Dandelion" class="label label-primary d-block mb-1"><%= m event.discounted_ticket_revenue, event.currency %></span>
-    <span data-bs-toggle="tooltip" title="Reported by Stripe" class="label label-stripe d-block mb-1"><%= m event.stripe_ticket_revenue, event.currency %></span>
+    <span data-bs-toggle="tooltip" title="Reported by Dandelion" class="badge text-bg-primary d-block mb-1"><%= m event.discounted_ticket_revenue, event.currency %></span>
+    <span data-bs-toggle="tooltip" title="Reported by Stripe" class="badge text-bg-stripe d-block mb-1"><%= m event.stripe_ticket_revenue, event.currency %></span>
   </td>
 <% else %>
   <% if organisation.hide_ticket_revenue %>

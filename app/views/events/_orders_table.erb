@@ -146,21 +146,21 @@
         <% end %>)
       <% end %>
       <% if order.transferred? %>
-        <span class="badge badge-default">Transferred</span>
+        <span class="badge text-bg-secondary">Transferred</span>
       <% end %>
       <% if order.credit_applied %>
-        <span class="label label-default"><%= m order.credit_applied, order.currency %> credit applied</span>
+        <span class="badge text-bg-secondary"><%= m order.credit_applied, order.currency %> credit applied</span>
       <% end %>
       <% if order.fixed_discount_applied %>
-        <span data-bs-toggle="tooltip" title="<%= order.discount_code&.code %>" class="label label-default"><%= m order.fixed_discount_applied, order.currency %> discount applied</span>
+        <span data-bs-toggle="tooltip" title="<%= order.discount_code&.code %>" class="badge text-bg-secondary"><%= m order.fixed_discount_applied, order.currency %> discount applied</span>
       <% end %>
       <% if order.percentage_discount %>
-        <span data-bs-toggle="tooltip" class="label label-default me-1" title="<%= "#{order.percentage_discount}%" %> discount code applied<% if order.discount_code %>: <%=order.discount_code.code%><% end %>">
+        <span data-bs-toggle="tooltip" class="badge text-bg-secondary me-1" title="<%= "#{order.percentage_discount}%" %> discount code applied<% if order.discount_code %>: <%=order.discount_code.code%><% end %>">
           <%= "#{order.percentage_discount}%" %>
         </span>
       <% end %>
       <% if order.percentage_discount_monthly_donor %>
-        <span data-bs-toggle="tooltip" class="label label-default me-1" title="<%= "#{order.percentage_discount_monthly_donor}%" %> monthly donor discount applied">
+        <span data-bs-toggle="tooltip" class="badge text-bg-secondary me-1" title="<%= "#{order.percentage_discount_monthly_donor}%" %> monthly donor discount applied">
           <%= "#{order.percentage_discount_monthly_donor}%" %>
         </span>
       <% end %>
@@ -178,7 +178,7 @@
     <% if defined?(donation_to_dandelion) %>
       <td>
         <% if order.application_fee_paid_to_dandelion? && order.donation_revenue > 0 %>
-          <%= m order.donation_revenue, order.currency %> <% if order.donation_via_modal? %><span class="badge badge-default">via modal</span><% end %>
+          <%= m order.donation_revenue, order.currency %> <% if order.donation_via_modal? %><span class="badge text-bg-secondary">via modal</span><% end %>
         <% end %>
       </td>
     <% end %>

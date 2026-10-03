@@ -11,7 +11,7 @@
   Activity: <a href="/o/<%= pmail.mailable.organisation.slug %>/a/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
 <% when 'activity_tag' %>
   Activity tag:
-  <span class="text-white label label-primary d-inline-block mb-1"><%= pmail.mailable.name %></span>
+  <span class="text-white badge text-bg-primary d-inline-block mb-1"><%= pmail.mailable.name %></span>
 <% when 'local_group' %>
   Local group: <a href="/o/<%= pmail.mailable.organisation.slug %>/lg/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
 <% when 'ticket_group' %>

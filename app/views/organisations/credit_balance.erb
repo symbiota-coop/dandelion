@@ -4,7 +4,7 @@
   at <%= @organisation.name %>
 </h1>
 <p class="lead">
-  <span class="label label-primary"><%= m @organisationship.credit_balance, @organisation.currency %></span>
+  <span class="badge text-bg-primary"><%= m @organisationship.credit_balance, @organisation.currency %></span>
   <% if organisation_admin? %>
     <a href="javascript:;" onclick="$(this).hide();
       $('#plus-credit').show().find('input').focus();

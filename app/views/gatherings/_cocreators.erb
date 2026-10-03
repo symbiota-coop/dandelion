@@ -3,9 +3,9 @@
     Co-creators
     <span class="fs-sm">
       <% if @gathering.member_limit %>
-        <span class="badge badge-primary d-inline-block mb-1"><%= @gathering.memberships.count %>/<%= @gathering.member_limit %></span>
+        <span class="badge text-bg-primary d-inline-block mb-1"><%= @gathering.memberships.count %>/<%= @gathering.member_limit %></span>
       <% else %>
-        <span class="badge badge-primary d-inline-block mb-1"><%= @gathering.memberships.count %></span>
+        <span class="badge text-bg-primary d-inline-block mb-1"><%= @gathering.memberships.count %></span>
       <% end %>
     </span>
   </h2>

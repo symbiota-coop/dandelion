@@ -17,7 +17,7 @@
             <% route_parts = method[:name].split(' ', 2) %>
             <% route_type = route_parts[0] %>
             <% route_path = route_parts[1] %>
-            <span class="badge badge-<%= case route_type.downcase
+            <span class="badge text-bg-<%= case route_type.downcase
                                           when 'get' then 'secondary'
                                           when 'post' then 'primary'
                                           when 'put' then 'warning'

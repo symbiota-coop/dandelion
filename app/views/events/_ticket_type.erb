@@ -4,7 +4,7 @@
       <%= ticket_type.name %>
     </a>
     <% if ticket_type.ticket_group %>
-      <span class="label label-outline-primary"><%=ticket_type.ticket_group.name%></span>
+      <span class="badge text-primary border border-primary"><%=ticket_type.ticket_group.name%></span>
     <% end %>
   </span>
   <% form_tag "/tickets/#{ticket.id}/ticket_type", style: 'display:none' do %>

@@ -35,7 +35,7 @@
     <% if ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>
     <% elsif availability > 0 %>
       <% if !@event.organisation.hide_few_left && !@event.hide_few_left && (wiser_remaining = ticket_type.wiser_remaining) <= 3 %>
-        <span style="top: -2px" class="badge badge-secondary position-relative"><%= wiser_remaining %> left</span>
+        <span style="top: -2px" class="badge text-bg-secondary position-relative"><%= wiser_remaining %> left</span>
       <% end %>
     <% end %>
 
@@ -94,7 +94,7 @@
   </td>
   <td class="border-top-0 align-middle">
     <% if ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>
-      <span class="badge badge-default">Sales closed</span>
+      <span class="badge text-bg-secondary">Sales closed</span>
     <% elsif availability > 0 %>
       <% if ticket_type_monthly_donor_required %>
       <% if current_account %>
@@ -121,7 +121,7 @@
         </button>
       </div>
     <% else %>
-      <span class="badge badge-primary">Sold out</span>
+      <span class="badge text-bg-primary">Sold out</span>
     <% end %>
   <% end %>
 </td>

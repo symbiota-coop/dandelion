@@ -6,7 +6,7 @@
   <span class="tag-container">
     <% event_tag_names_to_display.each_with_index do |event_tag_name, index| %>
       <span class="tag-item"<% if index >= show_more_limit %> style="display: none"<% end %>>
-        <span class="text-white label label-primary d-inline-block mb-1"><%== Sanitize.fragment(event_tag_name) %></span>
+        <span class="text-white badge text-bg-primary d-inline-block mb-1"><%== Sanitize.fragment(event_tag_name) %></span>
       </span>
     <% end %>
 

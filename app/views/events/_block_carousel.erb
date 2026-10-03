@@ -7,7 +7,7 @@
       <%= blurred_image_tag(image_source.image, width: image_source.image_width_unmagic, height: image_source.image_height_unmagic) %>
     </a>
   <% end %>
-  <span data-bs-toggle="tooltip" title="<%= when_details(event) || 'On-demand' %>" class="label label-primary" style="opacity: 0.85; border-radius: 0; position: absolute; top: 0; right: 0">
+  <span data-bs-toggle="tooltip" title="<%= when_details(event) || 'On-demand' %>" class="badge text-bg-primary" style="opacity: 0.85; border-radius: 0; position: absolute; top: 0; right: 0">
     <% if event.evergreen? %>
       On-demand
     <% elsif event.recording? %>
@@ -21,7 +21,7 @@
     <% end %>
   </span>
   <% if event.sold_out_cache %>
-    <span class="badge badge-danger position-absolute bottom-0 end-0" style="opacity: 0.85; border-radius: 0">
+    <span class="badge text-bg-danger position-absolute bottom-0 end-0" style="opacity: 0.85; border-radius: 0">
       <% if event.sold_out_due_to_sales_end_cache %>
         Sales ended
       <% else %>

@@ -88,7 +88,7 @@
           <div>
             <% membership.teamships.each { |teamship| %>
             <a href="/g/<%= @gathering.slug %>/teams">
-              <span class="label label-primary d-inline-block mb-1"><%= teamship.team.name %></span>
+              <span class="badge text-bg-primary d-inline-block mb-1"><%= teamship.team.name %></span>
             </a>
             <% } %>
           </div>

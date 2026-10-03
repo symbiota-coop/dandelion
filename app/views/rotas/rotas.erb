@@ -9,7 +9,7 @@
   <h2>
     Your shifts
     <% if @gathering.enable_shift_worth %>
-      <span class="badge <% if @membership.shift_points >= (@membership.shift_points_required || 0) %>badge-primary<% else %>badge-danger<% end %>" data-bs-toggle="tooltip" title="<%= sprintf('%g', @membership.shift_points) %>/<%= pluralize(@membership.shift_points_required ? sprintf('%g', @membership.shift_points_required) : '?', 'shift point') %>">
+      <span class="badge <% if @membership.shift_points >= (@membership.shift_points_required || 0) %>text-bg-primary<% else %>text-bg-danger<% end %>" data-bs-toggle="tooltip" title="<%= sprintf('%g', @membership.shift_points) %>/<%= pluralize(@membership.shift_points_required ? sprintf('%g', @membership.shift_points_required) : '?', 'shift point') %>">
         <%= sprintf('%g', @membership.shift_points) %>/<%= @membership.shift_points_required ? sprintf('%g', @membership.shift_points_required) : '?' %>
       </span>
     <% end %>

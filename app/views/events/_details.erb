@@ -24,7 +24,7 @@
 
         <% if @event.event_sessions.exists? %>
           <div class="my-2">
-            <span class="badge badge-primary"><%= pluralize @event.event_sessions.count, 'session' %></span>
+            <span class="badge text-bg-primary"><%= pluralize @event.event_sessions.count, 'session' %></span>
           </div>
         <% end %>
 

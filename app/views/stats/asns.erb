@@ -49,7 +49,7 @@
               <td><%== i.zero? ? "#{window[:start].strftime('%a %d %b %H:%M')} &ndash; #{window[:end].strftime('%H:%M')}" : '' %></td>
               <td>
                 <% if i.zero? %>
-                  <span class="badge badge-secondary" title="<%= window[:window_length] %>-hour window, threshold &ge;<%= window[:threshold] %>&times; baseline">
+                  <span class="badge text-bg-secondary" title="<%= window[:window_length] %>-hour window, threshold &ge;<%= window[:threshold] %>&times; baseline">
                     <%= window[:window_length] %>h
                   </span>
                 <% end %>
