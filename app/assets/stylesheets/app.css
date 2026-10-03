@@ -696,13 +696,13 @@
   display: inline-block;
 }
 
-body.gradient,
-body.gradient #content {
+body.lavender-wash,
+body.lavender-wash #content {
   background:
     linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-paper) 50%);
 }
 
-.gradient {
+.lavender-wash {
   background:
     linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-paper) 50%),
     linear-gradient(to bottom, transparent 80%, var(--bs-white) 100%);

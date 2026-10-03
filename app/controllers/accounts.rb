@@ -33,7 +33,7 @@ Dandelion::App.controller do
   end
 
   get '/accounts/sign_in' do
-    @body_class = 'gradient'
+    @body_class = 'lavender-wash'
     erb :'accounts/sign_in'
   end
 
@@ -42,19 +42,19 @@ Dandelion::App.controller do
     @siwe_template = session.delete(OmniAuth::Strategies::Ethereum::TEMPLATE_SESSION_KEY)
     redirect '/auth/ethereum' unless @siwe_template
     @title = 'Sign in with Ethereum'
-    @body_class = 'gradient'
+    @body_class = 'lavender-wash'
     erb :'accounts/ethereum'
   end
 
   get '/accounts/sign_in_code' do
-    @body_class = 'gradient'
+    @body_class = 'lavender-wash'
     not_found unless params[:account_id]
     @account = Account.find(params[:account_id]) || not_found
     erb :'accounts/requested_sign_in_code'
   end
 
   post '/accounts/sign_in_code' do
-    @body_class = 'gradient'
+    @body_class = 'lavender-wash'
     if params[:email] && (@account = Account.find_by(email: params[:email].downcase.strip))
       @account.send_sign_in_code
       @show_email = true
@@ -81,7 +81,7 @@ Dandelion::App.controller do
 
   get '/accounts/new' do
     session.delete('omniauth.auth')
-    @body_class = 'gradient'
+    @body_class = 'lavender-wash'
     @account = Account.new
     @account.default_currency ||= visitor_currency
     load_context

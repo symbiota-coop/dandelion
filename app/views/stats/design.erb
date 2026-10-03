@@ -65,11 +65,11 @@
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <%== subhead.call('Lavender', "The default site's AI well and <code>.gradient</code> backgrounds, with the theme ramp's steps derived from --color-lavender-500, which has the default green's lightness and chroma. Themed pages switch the AI well to the theme.") %>
+      <%== subhead.call('Lavender', "The default site's AI well and <code>.lavender-wash</code> backgrounds, with the theme ramp's steps derived from --color-lavender-500, which has the default green's lightness and chroma. Themed pages switch the AI well to the theme.") %>
       <%= partial :'stats/design/ramp', locals: {
             prefix: '--color-lavender',
             notes: {
-              '50' => '.gradient, AI well background',
+              '50' => '.lavender-wash, AI well background',
               '200' => 'not used yet',
               '400' => 'AI well gradient end',
               '500' => 'not used yet',
@@ -130,7 +130,7 @@
       <%== subhead.call('Accents and surfaces', 'Each accent has one role. The dark header and sidebar are a sunset: near-black fading to --color-midnight, with the orange-to-yellow --gradient-active as the sun on the active sidebar item, the notification dot and the load bar. Light content marks active states with the theme colour, so there is one active colour per surface. On the default site purple also marks AI and calendar events; themed pages switch those to the theme. --gradient-rainbow is only for .gradient-text headlines on marketing pages and the signed-out home.') %>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
-             [%w[--color-paper], '.gradient end'],
+             [%w[--color-paper], '.lavender-wash end'],
              [%w[--color-canvas], 'body.canvas'],
              [%w[--color-highlight], 'mark'],
              [%w[--color-yellow-500 --color-yellow-400], 'text-bg-yellow: Featured, Co-host, rota points; contributions chart (500)'],
@@ -145,7 +145,7 @@
       <%== subhead.call('Other gradients') %>
       <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-4">
         <% [
-             { box_class: 'gradient', title: '.gradient', note: 'Lavender to paper. body.gradient on the sign-in, sign-up and auth failure pages; a .gradient div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.' },
+             { box_class: 'lavender-wash', title: '.lavender-wash', note: 'Lavender to paper. body.lavender-wash on the sign-in, sign-up and auth failure pages; a .lavender-wash div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.' },
              { fills: ['var(--gradient-active)'], title: '--gradient-active', note: 'Sidebar active item, notification dot, page-load bar.' },
              { fills: ['var(--gradient-rainbow)'], title: '--gradient-rainbow', note: '.gradient-text only.' },
              { fills: ['var(--gradient-header)'], title: '--gradient-header', note: 'The header: 45°, --bs-gray-900 to 66%, then midnight.' }
