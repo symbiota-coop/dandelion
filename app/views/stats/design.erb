@@ -159,7 +159,7 @@
       <%== subhead.call('Marketing pages', 'The features and comparison pages. Their purple gradient and the five reason colours on the Luma page are derived from <code>--color-midnight</code> and <code>--color-magenta-500</code>.') %>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
-             { vars: %w[--wash-amber --wash-rose --wash-magenta --wash-purple], note: 'section backgrounds: the 50 step of orange, rose, magenta and lavender' },
+             { vars: %w[--color-orange-50 --color-rose-50 --color-magenta-50 --color-lavender-50], title: 'Section washes', note: 'section backgrounds: the 50 step of each ramp' },
              { vars: %w[--color-rose-500 --color-rose-200], note: 'section divider: 500 to 200' },
              { vars: %w[--color-magenta-500 --color-magenta-200], note: 'section divider: 500 to 200' },
              { fills: 0.step(100, 25).map { |pct| "color-mix(in srgb, var(--color-magenta-500), var(--color-midnight) #{pct}%)" }, title: 'Magenta to midnight', note: 'color-mix, 0–100%' }
