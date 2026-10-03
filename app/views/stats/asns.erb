@@ -45,7 +45,7 @@
             <% blocked = @blocked_asns.include?(row['asn'].to_s) %>
             <% bp = @bot_pct[row['asn'].to_s] %>
             <% mult = window[:baseline] > 0 ? (row['count'].to_f / window[:baseline]).round(1) : nil %>
-            <tr class="<%= 'asn-window-start' if i.zero? %>"<%== blocked ? ' style="background-color: var(--red-50)"' : '' %>>
+            <tr class="<%= 'asn-window-start' if i.zero? %>"<%== blocked ? ' style="background-color: var(--color-red-tint)"' : '' %>>
               <td><%== i.zero? ? "#{window[:start].strftime('%a %d %b %H:%M')} &ndash; #{window[:end].strftime('%H:%M')}" : '' %></td>
               <td>
                 <% if i.zero? %>
@@ -58,7 +58,7 @@
               <td><a href="https://radar.cloudflare.com/as<%= row['asn'] %>" target="_blank"><code><%= row['asn'] %></code></a></td>
               <td class="text-truncate"><%= row['description'] %></td>
               <td><%= @asn_countries[row['asn'].to_s] %></td>
-              <td<%== bp ? " style=\"color: #{bp[:bot] >= 60 ? 'var(--red-500)' : bp[:bot] >= 30 ? 'var(--orange-500)' : 'var(--theme-500)'}\"" : '' %>><%== bp ? "#{bp[:bot]}%" : '&ndash;' %></td>
+              <td<%== bp ? " style=\"color: #{bp[:bot] >= 60 ? 'var(--color-red)' : bp[:bot] >= 30 ? 'var(--color-orange)' : 'var(--theme-500)'}\"" : '' %>><%== bp ? "#{bp[:bot]}%" : '&ndash;' %></td>
               <td><%= row['count'] %></td>
               <td><%== mult ? "#{mult}&times;" : '&ndash;' %></td>
                 <td class="text-nowrap">
@@ -106,7 +106,7 @@
                 <td><a href="https://radar.cloudflare.com/as<%= asn %>" target="_blank"><code><%= asn %></code></a></td>
                 <td class="text-truncate"><%= @asn_names[asn] %></td>
                 <td><%= @asn_countries[asn] %></td>
-              <td<%== bp ? " style=\"color: #{bp[:bot] >= 60 ? 'var(--red-500)' : bp[:bot] >= 30 ? 'var(--orange-500)' : 'var(--theme-500)'}\"" : '' %>><%== bp ? "#{bp[:bot]}%" : '&ndash;' %></td>
+              <td<%== bp ? " style=\"color: #{bp[:bot] >= 60 ? 'var(--color-red)' : bp[:bot] >= 30 ? 'var(--color-orange)' : 'var(--theme-500)'}\"" : '' %>><%== bp ? "#{bp[:bot]}%" : '&ndash;' %></td>
                   <td>
                     <form method="post" action="/stats/asns/unblock/<%= asn %>" class="d-inline">
                       <button type="submit" class="btn btn-outline-primary btn-sm" title="Unblock"><i class="bi bi-shield-x"></i></button>

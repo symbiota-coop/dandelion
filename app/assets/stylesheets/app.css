@@ -107,7 +107,7 @@
   accent-color: var(--theme-500);
 }
 
-/* Colour ramps, generated with oklch() so steps at the same lightness look equally light across hues.
+/* The theme ramp, generated from --theme-500 with oklch() so steps at the same lightness look equally light whatever the hue.
    Tints (50–200) sit at fixed lightness; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints.
    .theme-scope recomputes the theme ramp for an element that sets its own --theme-500 */
 :root,
@@ -119,27 +119,21 @@
   --theme-600: oklch(from var(--theme-500) calc(l - 0.05) c h);
   --theme-700: oklch(from var(--theme-500) calc(l - 0.12) c h);
   --theme-800: oklch(from var(--theme-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
-  /* Black or white, whichever reads better on the 500 */
-  --theme-on-500: oklch(from var(--theme-500) clamp(0, (0.65 - l) * 1000, 1) 0 0);
 }
 
 :root {
-  --orange-500: #FF9500;
-  --orange-50: oklch(from var(--orange-500) 0.97 calc(c * 0.15) h);
-  --orange-100: oklch(from var(--orange-500) 0.94 calc(c * 0.3) h);
-  --orange-200: oklch(from var(--orange-500) 0.88 calc(c * 0.55) h);
-  --orange-400: oklch(from var(--orange-500) calc(l + 0.06) c h);
-  --orange-600: oklch(from var(--orange-500) calc(l - 0.05) c h);
-  --orange-700: oklch(from var(--orange-500) calc(l - 0.12) c h);
-  --orange-800: oklch(from var(--orange-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
-  --red-500: #FF3B30;
-  --red-50: oklch(from var(--red-500) 0.97 calc(c * 0.15) h);
-  --red-100: oklch(from var(--red-500) 0.94 calc(c * 0.3) h);
-  --red-200: oklch(from var(--red-500) 0.88 calc(c * 0.55) h);
-  --red-400: oklch(from var(--red-500) calc(l + 0.06) c h);
-  --red-600: oklch(from var(--red-500) calc(l - 0.05) c h);
-  --red-700: oklch(from var(--red-500) calc(l - 0.12) c h);
-  --red-800: oklch(from var(--red-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
+  /* Warning and danger */
+  --color-orange: #ff9500;
+  --color-orange-light: #ffa830;
+  --color-orange-text: #984100;
+  --color-orange-tint: #fff2e4;
+  --color-orange-tint-strong: #ffca95;
+  --color-red: #ff3b30;
+  --color-red-light: #ff5344;
+  --color-red-hover: #ec221d;
+  --color-red-text: #ad0000;
+  --color-red-tint: #ffede8;
+  --color-red-tint-strong: #ffb6a7;
 }
 
 /* ==========================================================================
@@ -762,17 +756,17 @@ body.greyed #content {
 }
 
 .alert-warning {
-  --bs-alert-color: var(--orange-800);
-  --bs-alert-bg: var(--orange-50);
-  --bs-alert-link-color: var(--orange-800);
-  --alert-bg-end: var(--orange-200);
+  --bs-alert-color: var(--color-orange-text);
+  --bs-alert-bg: var(--color-orange-tint);
+  --bs-alert-link-color: var(--color-orange-text);
+  --alert-bg-end: var(--color-orange-tint-strong);
 }
 
 .alert-danger {
-  --bs-alert-color: var(--red-800);
-  --bs-alert-bg: var(--red-50);
-  --bs-alert-link-color: var(--red-800);
-  --alert-bg-end: var(--red-200);
+  --bs-alert-color: var(--color-red-text);
+  --bs-alert-bg: var(--color-red-tint);
+  --bs-alert-link-color: var(--color-red-text);
+  --alert-bg-end: var(--color-red-tint-strong);
 }
 
 .alert-primary,
@@ -794,17 +788,17 @@ body.greyed #content {
 }
 
 .toast-warning {
-  --bs-toast-color: var(--orange-800);
-  --bs-toast-bg: var(--orange-50);
-  --bs-toast-border-color: var(--orange-800);
-  --toast-bg-end: var(--orange-200);
+  --bs-toast-color: var(--color-orange-text);
+  --bs-toast-bg: var(--color-orange-tint);
+  --bs-toast-border-color: var(--color-orange-text);
+  --toast-bg-end: var(--color-orange-tint-strong);
 }
 
 .toast-danger {
-  --bs-toast-color: var(--red-800);
-  --bs-toast-bg: var(--red-50);
-  --bs-toast-border-color: var(--red-800);
-  --toast-bg-end: var(--red-200);
+  --bs-toast-color: var(--color-red-text);
+  --bs-toast-bg: var(--color-red-tint);
+  --bs-toast-border-color: var(--color-red-text);
+  --toast-bg-end: var(--color-red-tint-strong);
 }
 
 .toast-primary,
@@ -845,14 +839,14 @@ body.greyed #content {
 }
 
 .badge-warning {
-  --badge-color: var(--orange-500);
-  --badge-color-light: var(--orange-400);
+  --badge-color: var(--color-orange);
+  --badge-color-light: var(--color-orange-light);
 }
 
 .badge-danger,
 .label-danger {
-  --badge-color: var(--red-500);
-  --badge-color-light: var(--red-400);
+  --badge-color: var(--color-red);
+  --badge-color-light: var(--color-red-light);
 }
 
 .badge-yellow,
@@ -933,12 +927,12 @@ body.greyed #content {
 }
 
 .btn-danger {
-  --bs-btn-hover-bg: var(--red-600);
-  --bs-btn-hover-border-color: var(--red-600);
-  --bs-btn-active-bg: var(--red-600);
-  --bs-btn-active-border-color: var(--red-600);
-  --btn-gradient-end: var(--red-400);
-  --btn-hover-gradient-end: var(--red-500);
+  --bs-btn-hover-bg: var(--color-red-hover);
+  --bs-btn-hover-border-color: var(--color-red-hover);
+  --bs-btn-active-bg: var(--color-red-hover);
+  --bs-btn-active-border-color: var(--color-red-hover);
+  --btn-gradient-end: var(--color-red-light);
+  --btn-hover-gradient-end: var(--color-red);
 }
 
 .btn-primary,

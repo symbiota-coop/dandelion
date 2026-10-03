@@ -52,9 +52,9 @@ window.DandelionMap = {
   models: [
     { name: 'Account', color: 'var(--theme-500)', icon: 'bi bi-person-fill' },
     { name: 'ActivityApplication', color: 'var(--theme-500)', icon: 'bi bi-person-fill' },
-    { name: 'Event', color: 'var(--red-400)', icon: 'bi bi-calendar-event' },
+    { name: 'Event', color: 'var(--color-red-light)', icon: 'bi bi-calendar-event' },
     { name: 'Gathering', color: 'var(--theme-500)', icon: 'bi bi-people-fill' },
-    { name: 'Organisation', color: 'var(--red-400)', icon: 'bi bi-flag-fill' },
+    { name: 'Organisation', color: 'var(--color-red-light)', icon: 'bi bi-flag-fill' },
     { name: 'Organisationship', color: 'var(--theme-500)', icon: 'bi bi-person-fill' }
   ],
 
