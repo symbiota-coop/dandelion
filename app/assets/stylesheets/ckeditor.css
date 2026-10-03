@@ -76,7 +76,7 @@ div.wysiwyg figcaption {
 blockquote {
   margin-bottom: 1rem;
   font-size: var(--font-size-base);
-  border-left: 0.25rem solid var(--theme-a30) !important;
+  border-left: 0.25rem solid var(--theme-200) !important;
   padding-left: 1rem;
   font-style: italic;
 }

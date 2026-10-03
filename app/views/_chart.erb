@@ -72,8 +72,8 @@
             data: <%== data.values.to_json %>
           },
           {
-            backgroundColor: cssColor('var(--theme-a50)'),
-            borderColor: cssColor('var(--theme-a50)'),
+            backgroundColor: cssColor('var(--theme-300)'),
+            borderColor: cssColor('var(--theme-300)'),
             data: <%== data.size.times.map { |i| i == data.size - 1 ? (defined?(projection) ? projection : nil) : nil }.to_json %>
           }
         ],

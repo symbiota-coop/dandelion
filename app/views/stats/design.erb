@@ -46,15 +46,16 @@
     <%== section_head.call('colour') %>
 
     <div class="d-flex flex-column gap-3">
-      <%== subhead.call('Theme', 'A ramp generated from one value with <code>oklch()</code>. Components use the 500, 400 as the gradient end, 600 for hover, 50 to 200 for alert and toast backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints.') %>
+      <%== subhead.call('Theme', 'A ramp generated from one value with <code>oklch()</code>. Components use the 500, 400 as the gradient end, 600 for hover, 50 to 200 for alert and toast backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints. The 300 is halfway between the 200 and 400. Every theme colour is a solid step of this ramp; the only translucent one is the focus ring.') %>
       <%= partial :'stats/design/ramp', locals: {
             prefix: '--theme',
             label: '--theme-*',
             label_note: "Primary and success · follows each organisation's theme",
             notes: {
-              '50' => 'alert and toast background, crumbs, newsfeed icons, themed AI well',
+              '50' => 'alert and toast background, crumbs, newsfeed icons, docs transcripts, themed AI well',
               '100' => 'crumb hover, unread messages',
-              '200' => 'alert and toast gradient end',
+              '200' => 'alert and toast gradient end, progress tracks, date tile months, blockquote and transcript borders, chart projections',
+              '300' => 'date and icon tile borders, bar chart projections',
               '400' => 'button gradient end, themed AI well end',
               '500' => nil,
               '600' => 'hover',
@@ -64,16 +65,7 @@
             sample_title: 'Primary alerts and toasts',
             sample_to: '200'
           } %>
-      <div class="row g-2">
-        <% {
-             'a10' => 'docs transcripts',
-             'a30' => 'progress tracks, date tile months, blockquote and transcript borders, chart projections',
-             'a50' => 'date and icon tile borders, bar chart projections'
-           }.each do |step, note| %>
-          <%= partial :'stats/design/swatch', locals: { vars: ["--theme-#{step}"], title: step, note: note, col: 'col-6 col-md-4' } %>
-        <% end %>
-      </div>
-      <div class="small text-body-secondary">The translucent steps are the 500 at 10, 30 and 50% opacity, for tints that should take on what's behind them. Every see-through theme colour is one of these three. Bootstrap's <code>rgba(var(--bs-*-rgb))</code> colours need an rgb triplet, so <code>/theme.css</code> also sets <code>--theme-500-rgb</code>.</div>
+      <div class="small text-body-secondary">Bootstrap's <code>rgba(var(--bs-*-rgb))</code> colours need an rgb triplet, so <code>/theme.css</code> also sets <code>--theme-500-rgb</code>.</div>
     </div>
 
     <div class="d-flex flex-column gap-3">
