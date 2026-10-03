@@ -70,7 +70,7 @@
   --font-size-xl: 1.4rem;
   --font-size-2xl: 1.66rem;
   --font-size-3xl: 2rem;
-  --body-font-size: var(--font-size-sm);
+  --body-font-size: var(--font-size-md);
   /* Layout: the fixed header's row height, the sidebar's widths and #content's padding.
      --header-offset is the height the fixed header covers: one row, two on mobile where its icons wrap below */
   --header-height: 2.8125rem;
@@ -1352,7 +1352,7 @@ p.action a:hover {
 
 .form-control,
 .form-select:not([size]):not([multiple]) {
-  height: 2.125rem;
+  height: calc(1.5em + 1rem + 2px);
 }
 
 textarea.form-control,
@@ -1363,7 +1363,7 @@ select[size] {
 
 .form-control-sm,
 .form-select-sm:not([size]):not([multiple]) {
-  height: 1.875rem;
+  height: calc(1.5em + 0.75rem + 2px);
 }
 
 /*
@@ -1765,7 +1765,7 @@ table.dataTable.table-sm > thead > tr > th[class*="dt-order"] .dt-column-order {
 }
 
 .table {
-  font-size: var(--font-size-sm);
+  font-size: var(--body-font-size);
 }
 
 /* Bootstrap's .small comes before the rule above, so restate it for small tables */
@@ -2079,7 +2079,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: var(--body-font-size);
-  line-height: 1.45;
+  line-height: 1.5;
   background: var(--bs-white)
 }
 

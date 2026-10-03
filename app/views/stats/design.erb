@@ -187,7 +187,7 @@
         <div class="border rounded p-4 h-100 d-flex flex-column gap-3">
           <div class="spec fw-bold">BODY · --body-font-family</div>
           <div class="display-5 lh-1">Plus Jakarta Sans</div>
-          <div class="small text-body-secondary">Default weight 500, labels 700, bold for <code>b</code>/<code>strong</code>. Line height 1.45.</div>
+          <div class="small text-body-secondary">Default weight 500, labels 700, bold for <code>b</code>/<code>strong</code>. Line height 1.5.</div>
         </div>
       </div>
     </div>
@@ -200,9 +200,9 @@
              ['h3 · .fs-3', '--font-size-xl · 1.4rem', '<h3 data-sample class="m-0">Your upcoming events</h3>'],
              ['h4 · .fs-4', '--font-size-lg · 1.125rem', '<h4 data-sample class="m-0">Upcoming birthdays</h4>'],
              ['h5 · .fs-5', '--font-size-md · .875rem', '<h5 data-sample class="m-0">Ticket types</h5>'],
+             ['h6 · .fs-6', '--font-size-sm · .825rem', '<div data-sample class="fs-6">Dropdown items, btn-sm, tooltips</div>'],
              ['.readable', '--font-size-base · 1rem', '<div data-sample class="readable">Long-form copy such as event descriptions sets at 1rem.</div>'],
-             ['nav · .btn', '--font-size-md · .875rem', '<span data-sample class="btn btn-outline-primary">Buttons, nav links and tabs</span>'],
-             ['body · h6 · .fs-6', '--font-size-sm · .825rem', '<div data-sample>Body text, inputs, tables, dropdown items</div>'],
+             ['body · nav · .btn', '--font-size-md · .875rem', '<div data-sample>Body text, inputs, tables, buttons, nav links and tabs</div>'],
              ['.small', '.875em of its context', '<span data-sample class="small">Secondary details: a location, a description</span>'],
              ['.badge', '.9375em of its context', '<span data-sample class="badge text-bg-secondary">Badges</span>'],
              ['.breadcrumb', '--font-size-xs · .75rem', '<ol data-sample class="breadcrumb m-0"><li class="breadcrumb-item">Breadcrumbs</li><li class="breadcrumb-item">and carets</li></ol>']
@@ -267,7 +267,7 @@
              ['Card body', '1.25rem'],
              ['Card header', '.75rem 1.25rem'],
              ['Field spacing', 'mb-3'],
-             ['Table cells', '.5rem (sm too)'],
+             ['Table cells', '.75rem · sm .5rem'],
              ['Containers', '540 / 720 / 960 / 1140']
            ].each do |title, value| %>
           <div class="col">
@@ -331,7 +331,7 @@
         <a class="btn btn-primary" href="#components">btn</a>
         <a class="btn btn-primary btn-lg" href="#components">btn-lg</a>
       </div>
-      <div class="spec">.btn · .875rem · weight 600 · padding .375rem .75rem · radius .5rem (--bs-border-radius-lg)</div>
+      <div class="spec">.btn · .875rem · weight 600 · padding .5rem 1rem (sm .375rem .75rem), the same height as an input · radius .5rem (--bs-border-radius-lg)</div>
     <% end %>
 
     <% design_subsection 'Badges', "Bootstrap's <code>.badge</code> with a <code>text-bg-*</code> colour, for counts, statuses, tags and amounts. Sized in em, so a badge scales with the text around it: small in a nav, bigger beside a heading. Pick the colour by what it means.".html_safe do %>
@@ -372,7 +372,7 @@
           <% flashes.each do |variant, message, link| %>
             <div class="alert alert-<%= variant %> alert-dismissible"><%= message %> <a href="#components"><%= link %></a><button type="button" class="btn-close" aria-label="Close"></button></div>
           <% end %>
-          <div class="spec">Inline, in the page. Padding .625rem, no border. Links bold and underlined in the alert's link colour. Flashes render as alerts only on pages that set @hide_alert.</div>
+          <div class="spec">Inline, in the page. Padding .875rem 1rem, no border. Links bold and underlined in the alert's link colour. Flashes render as alerts only on pages that set @hide_alert.</div>
         </div>
       <% end %>
 
@@ -418,7 +418,7 @@
             <label for="dg-range" class="form-label">Pay what you can</label>
             <input type="range" class="form-range" id="dg-range" autocomplete="off" min="5" max="50" value="20">
           </div>
-          <div class="spec">input 2.125rem tall · .825rem · border --bs-gray-400 · labels 700 · errors: lib/form_builder.rb adds is-invalid and an .invalid-feedback message in --bs-danger, the field name first</div>
+          <div class="spec">input .875rem with .5rem vertical padding, the same height as a button (about 2.4rem) · border --bs-gray-400 · labels 700 · errors: lib/form_builder.rb adds is-invalid and an .invalid-feedback message in --bs-danger, the field name first</div>
         </div>
       <% end %>
 
