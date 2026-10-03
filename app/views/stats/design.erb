@@ -1,4 +1,6 @@
 <link rel="stylesheet" href="<%= cachebust('/stylesheets/design.css') %>">
+<%# For the marketing pages' rose and magenta %>
+<link rel="stylesheet" href="<%= cachebust('/stylesheets/marketing.css') %>">
 
 <%# Swatch values are read from the live stylesheet by the script at the bottom %>
 <% sections = {
@@ -156,7 +158,7 @@
     </div>
 
     <div class="d-flex flex-column gap-3">
-      <%== subhead.call('Marketing pages', 'The features and comparison pages. Their purple gradient and the five reason colours on the Luma page are derived from <code>--color-midnight</code> and <code>--color-magenta-500</code>.') %>
+      <%== subhead.call('Marketing pages', 'The features and comparison pages. Their purple gradient and the five reason colours on the Luma page are derived from <code>--color-midnight</code> and <code>--color-magenta-500</code>. Rose and magenta are only used here, so they are defined in <code>marketing.css</code>, which only these pages and this guide load.') %>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
              { vars: %w[--color-orange-50 --color-rose-50 --color-magenta-50 --color-lavender-50], title: 'Section washes', note: 'section backgrounds: the 50 step of orange, rose, magenta and lavender' },

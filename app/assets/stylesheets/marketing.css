@@ -1,7 +1,17 @@
-/* The marketing pages: features (/features) and the Luma comparison (/dandelion-vs-luma) */
+/* The marketing pages: features (/features) and the Luma comparison (/dandelion-vs-luma). The design guide loads it too, for the colours */
 
-/* Sections run edge to edge, padding themselves with .content-padding-x */
-#content {
+/* Rose and magenta are only used here. Their steps are derived like the other ramps' in app.css */
+:root {
+  --color-magenta-500: #B900A1;
+  --color-magenta-50: oklch(from var(--color-magenta-500) 0.97 calc(c * 0.15) h);
+  --color-magenta-200: oklch(from var(--color-magenta-500) 0.88 calc(c * 0.55) h);
+  --color-rose-500: #d94f6e;
+  --color-rose-50: oklch(from var(--color-rose-500) 0.97 calc(c * 0.15) h);
+  --color-rose-200: oklch(from var(--color-rose-500) 0.88 calc(c * 0.55) h);
+}
+
+/* Sections run edge to edge, padding themselves with .content-padding-x (only on the pages themselves, not the design guide) */
+#content:has(.marketing-hero) {
   padding-left: 0;
   padding-right: 0;
   padding-top: 0;
