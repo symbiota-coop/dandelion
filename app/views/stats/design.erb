@@ -7,9 +7,7 @@
 
    severity_classes = { 'High' => 'text-danger', 'Medium' => 'text-warning-emphasis', 'Low' => 'text-body-secondary' }
    issues = [
-     [3, 'Medium', 'Default and themed pages diverge with the same colour', 'theme.css restyles .ai-well and calendar events: the AI well is purple by default and a theme tint when themed; calendar events are purple by default and theme-coloured when themed. (Alerts and toasts no longer differ: their tints come from the ramp.)', 'Move the remaining theme.css rules into app.css so there is one behaviour, or document that the purple is intentional only for the unthemed site.', 'theme.css · app.css .ai-well, #calendar a.fc-event'],
      [7, 'Medium', 'Too many accent colours and active states', 'Besides the theme colour there is purple #4400B9 (header, AI), an orange-to-yellow gradient (sidebar active, notification dot, load bar), a rainbow gradient, signal blue and Stripe purple. The sidebar active item uses the orange gradient while every other active state (pills, list groups, dropdown items, checks) uses the theme colour.', 'Decide which accent marks "active" and use it everywhere; restrict purple to AI features.', 'app.css .sidebar .nav-link.active, #header, --gradient-*'],
-     [15, 'Low', 'Button treatments vary', 'Primary, warning and danger are gradients; secondary is flat. btn-signal forces its hover with !important. p.action a is a separate CTA style (10px padding, 5px radius).', 'Apply the gradient pattern to all solid variants or none; express btn-signal through --bs-btn-* variables.', 'app.css Buttons, p.action'],
      [17, 'Low', 'Mixed px and rem', 'The file converts most values to rem, but 5px radii, 15px insets, 7.5px slick padding, 16px newsfeed icons, 20–22px map icons and 36/40px controls remain. Because the root scales to 19 and 21px, these shrink relative to everything else on large screens.', 'Convert remaining px to rem.', 'app.css']
    ]
 
@@ -97,7 +95,7 @@
                 <div class="rounded border mb-1" style="height: 64px; background: var(<%= name %>)"></div>
                 <div class="fw-bold small text-break"><%= suffix.empty? ? 'fill' : suffix.delete_prefix('-') %></div>
                 <div class="font-monospace small text-body-secondary"><%== css_var.call(name) %></div>
-                <div class="small text-body-secondary"><%= note %></div>
+                <div class="small text-body-secondary"><%= name == '--color-orange-hover' ? 'button hover (no warning buttons yet)' : note %></div>
                 <% if other_uses %><div class="small text-body-secondary">Also: <%= other_uses %></div><% end %>
               </div>
             <% end %>
@@ -176,7 +174,7 @@
       <h3 class="m-0">Other gradients</h3>
       <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-3">
         <% [
-             ['linear-gradient(135deg, var(--theme-500) 0%, var(--theme-500) 50%, var(--theme-400) 100%)', 'Fill pattern', '135°, flat to 50%, then to a lighter end (--theme-400, --color-orange-light, --color-red-light). Primary, warning and danger buttons, badges, progress, text-bg-primary.'],
+             ['linear-gradient(135deg, var(--theme-500) 0%, var(--theme-500) 50%, var(--theme-400) 100%)', 'Fill pattern', '135°, flat to 50%, then to a lighter end (--theme-400, --color-red-light). Primary, secondary and danger buttons, badges, progress, text-bg-primary.'],
              ['var(--gradient-active)', '--gradient-active', 'Sidebar active item, notification dot, page-load bar.'],
              ['linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-highlight-1) 100%)', 'Header', '45°, --bs-gray-900 to 66%, then highlight-1.'],
              ['var(--gradient-rainbow)', '--gradient-rainbow', '.gradient-text only.'],
@@ -438,15 +436,13 @@
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">Buttons</h3>
-        <span class="text-body-secondary">.875rem, padding .375rem .75rem, radius .25rem. Primary, warning and danger are borderless gradients.</span>
-        <%== flags.call(15) %>
+        <span class="text-body-secondary">.875rem, padding .375rem .75rem, radius .25rem. Primary, secondary and danger are gradients over a transparent border (btn-warning is styled the same but not used yet); brand buttons like btn-signal stay flat.</span>
       </div>
       <div class="border rounded p-4 d-flex flex-wrap gap-3 align-items-center">
         <a class="btn btn-primary" href="#components">Book tickets</a>
         <a class="btn btn-primary" href="#components" style="--bs-btn-bg: var(--theme-600); --btn-gradient-end: var(--theme-500)">Hover</a>
         <a class="btn btn-outline-primary" href="#components">Outline primary</a>
         <a class="btn btn-secondary" href="#components">Secondary</a>
-        <a class="btn btn-warning" href="#components">Warning</a>
         <a class="btn btn-danger" href="#components">Delete</a>
         <a class="btn btn-signal" href="#components"><i class="bi bi-signal"></i> Signal</a>
       </div>
@@ -497,7 +493,6 @@
       <div class="col-lg-6 d-flex flex-column gap-3">
         <div class="d-flex align-items-baseline flex-wrap gap-2">
           <h3 class="m-0">Alerts</h3>
-          <%== flags.call(3) %>
         </div>
         <div>
           <div class="alert fade show alert-primary alert-dismissible">Your ticket is booked. <a href="#components">View order</a><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
@@ -510,7 +505,6 @@
       <div class="col-lg-6 d-flex flex-column gap-3">
         <div class="d-flex align-items-baseline flex-wrap gap-2">
           <h3 class="m-0">Toasts</h3>
-          <%== flags.call(3) %>
         </div>
         <div class="d-flex flex-column align-items-start gap-2">
           <% [['primary', 'Your ticket is booked.'], ['warning', 'Only 3 tickets left.'], ['danger', 'Payment failed.']].each do |variant, message| %>
@@ -704,8 +698,7 @@
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">p.action</h3>
-        <span class="text-body-secondary">A centred call to action in page copy and emails, separate from .btn.</span>
-        <%== flags.call(15) %>
+        <span class="text-body-secondary">A centred call to action for docs and email previews, where a .btn class can't be added. Drawn like btn-primary; emails use their own in email.css.</span>
       </div>
       <div class="border rounded p-4">
         <p class="action m-0"><a href="#components">Confirm your email</a></p>
@@ -736,7 +729,7 @@
     <div class="d-flex flex-column gap-1 border-top border-2 border-dark pt-3">
       <div class="font-monospace small text-body-secondary fw-bold">06</div>
       <h2 class="m-0">Theming</h2>
-      <p class="m-0 text-body-secondary" style="max-width: 680px">Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check and progress bar follows. Alerts and toasts use the ramp's tints with --theme-800 text on every page; on themed pages the AI well and calendar events also switch to the theme colour.</p>
+      <p class="m-0 text-body-secondary" style="max-width: 680px">Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check and progress bar follows. Alerts and toasts use the ramp's tints with --theme-800 text on every page; on themed pages the AI well and calendar events also switch to the theme colour. That is deliberate: the default site keeps them purple (--color-highlight-1), as its own accent.</p>
     </div>
     <div class="row g-3">
       <div class="col-md-6 col-xxl-4">

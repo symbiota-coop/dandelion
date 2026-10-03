@@ -900,7 +900,7 @@ body.greyed #content {
   line-height: 1.3333333;
 }
 
-/* Primary, warning and danger buttons are gradients, to a lighter colour, over Bootstrap's --bs-btn-* colours */
+/* Primary, secondary, warning and danger buttons are gradients, to a lighter colour, over Bootstrap's --bs-btn-* colours */
 .btn-primary {
   --bs-btn-bg: var(--theme-500);
   --bs-btn-border-color: var(--theme-500);
@@ -913,6 +913,15 @@ body.greyed #content {
   --bs-btn-focus-shadow-rgb: var(--theme-500-rgb);
   --btn-gradient-end: var(--theme-400);
   --btn-hover-gradient-end: var(--theme-500);
+}
+
+.btn-secondary {
+  --bs-btn-hover-bg: var(--bs-gray-700);
+  --bs-btn-hover-border-color: var(--bs-gray-700);
+  --bs-btn-active-bg: var(--bs-gray-700);
+  --bs-btn-active-border-color: var(--bs-gray-700);
+  --btn-gradient-end: var(--bs-gray-500);
+  --btn-hover-gradient-end: var(--bs-gray-600);
 }
 
 .btn-warning {
@@ -934,13 +943,20 @@ body.greyed #content {
 }
 
 .btn-primary,
+.btn-secondary,
 .btn-warning,
 .btn-danger {
-  border: none;
+  /* A transparent border with the gradient drawn under it, so these are the same height as bordered buttons */
+  --bs-btn-border-color: transparent;
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-active-border-color: transparent;
+  --bs-btn-disabled-border-color: transparent;
+  background-origin: border-box;
   background-image: linear-gradient(135deg, var(--bs-btn-bg) 0%, var(--bs-btn-bg) 50%, var(--btn-gradient-end) 100%);
 }
 
 .btn-primary:is(:hover, :focus, :active, .active, .show),
+.btn-secondary:is(:hover, :focus, :active, .active, .show),
 .btn-warning:is(:hover, :focus, :active, .active, .show),
 .btn-danger:is(:hover, :focus, :active, .active, .show) {
   background-image: linear-gradient(135deg, var(--bs-btn-hover-bg) 0%, var(--bs-btn-hover-bg) 50%, var(--btn-hover-gradient-end) 100%);
@@ -1028,19 +1044,18 @@ body.greyed #content {
   color: var(--bs-white)
 }
 
+/* Signal's brand blue, through Bootstrap's button variables. Brand buttons stay flat, without our gradient */
 .btn-signal {
-  background-color: var(--color-signal);
-  border-color: var(--color-signal);
-  color: var(--bs-white);
-}
-
-.btn-signal:hover,
-.btn-signal:focus,
-.btn-signal:active {
-  background-color: var(--color-signal-dark) !important;
-  border-color: var(--color-signal-dark) !important;
-  color: var(--bs-white) !important;
-  box-shadow: 0 0 0 var(--bs-focus-ring-width) oklch(from var(--color-signal) l c h / var(--bs-focus-ring-opacity)) !important;
+  --bs-btn-color: var(--bs-white);
+  --bs-btn-bg: var(--color-signal);
+  --bs-btn-border-color: var(--color-signal);
+  --bs-btn-hover-color: var(--bs-white);
+  --bs-btn-hover-bg: var(--color-signal-dark);
+  --bs-btn-hover-border-color: var(--color-signal-dark);
+  --bs-btn-active-color: var(--bs-white);
+  --bs-btn-active-bg: var(--color-signal-dark);
+  --bs-btn-active-border-color: var(--color-signal-dark);
+  --bs-btn-focus-box-shadow: 0 0 0 var(--bs-focus-ring-width) oklch(from var(--color-signal) l c h / var(--bs-focus-ring-opacity));
 }
 
 #donation-percent-buttons .btn {
@@ -2742,17 +2757,23 @@ p.action {
   text-align: center
 }
 
+/* A call to action in docs and email previews, drawn like .btn-primary (emails have their own in email.css) */
 p.action a {
   display: inline-block;
-  background: var(--theme-500) !important;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid transparent;
+  font-size: var(--font-size-md);
+  line-height: 1.5;
   color: var(--bs-white);
   text-decoration: none;
-  padding: 10px;
-  border-radius: var(--bs-border-radius)
+  border-radius: var(--bs-border-radius);
+  background-origin: border-box;
+  background-image: linear-gradient(135deg, var(--theme-500) 0%, var(--theme-500) 50%, var(--theme-400) 100%);
 }
 
 p.action a:hover {
-  background: var(--theme-600) !important;
+  color: var(--bs-white);
+  background-image: linear-gradient(135deg, var(--theme-600) 0%, var(--theme-600) 50%, var(--theme-500) 100%);
 }
 
 .icon-list {
