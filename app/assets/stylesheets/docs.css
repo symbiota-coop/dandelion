@@ -247,7 +247,7 @@
 .doc-index-h3s .doc-link {
   padding-left: 1.4rem;
   font-size: 0.875em;
-  color: var(--bs-secondary);
+  color: var(--bs-secondary-color);
 }
 
 #sticky-index {
@@ -296,7 +296,7 @@
   left: 0.6rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--bs-secondary);
+  color: var(--bs-secondary-color);
   pointer-events: none;
   font-size: 0.85rem;
 }
@@ -368,7 +368,7 @@
 }
 
 .doc-search-count {
-  color: var(--bs-secondary);
+  color: var(--bs-secondary-color);
   margin-bottom: 0.85rem;
 }
 
@@ -398,7 +398,7 @@
 .doc-search-page {
   display: block;
   font-size: var(--font-size-xs);
-  color: var(--bs-secondary);
+  color: var(--bs-secondary-color);
   margin-bottom: 0.15rem;
 }
 
@@ -416,5 +416,5 @@
   margin-top: 0.25rem;
   font-size: 0.875em;
   line-height: 1.4;
-  color: var(--bs-secondary);
+  color: var(--bs-secondary-color);
 }
