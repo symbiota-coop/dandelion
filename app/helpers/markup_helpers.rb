@@ -149,17 +149,14 @@ Dandelion::App.helpers do
     colors.reject.with_index { |_, i| i == 1 }[0..-4]
   end
 
-  # The :root block of custom properties that theme.css reads its colours from. app.css derives the
-  # rest of the ramp from --theme-500; the rgb triplet is for Bootstrap's rgba(var(--bs-*-rgb)) colours
+  # theme.css's :root block for a theme colour: its --theme-500 and the rgb triplet Bootstrap's
+  # rgba(var(--bs-*-rgb)) colours need, with the accents that follow them. app.css derives the ramp
   def theme_css_variables(hex)
     color = Chroma.paint(hex)
     rgb = color.rgb
-    <<~CSS.strip
-      :root {
-        --theme-500: #{color.to_hex};
-        --theme-500-rgb: #{rgb.r.round}, #{rgb.g.round}, #{rgb.b.round};
-      }
-    CSS
+    File.read(Padrino.root('app/assets/stylesheets/theme.css'))[/:root \{.*?\}/m]
+        .sub(/--theme-500: [^;]+;/, "--theme-500: #{color.to_hex};")
+        .sub(/--theme-500-rgb: [^;]+;/, "--theme-500-rgb: #{rgb.r.round}, #{rgb.g.round}, #{rgb.b.round};")
   end
 
   def clamp_color(hex, min_contrast: 2, min_lightness: 0.25)

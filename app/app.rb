@@ -335,16 +335,13 @@ module Dandelion
 
     get '/theme.css' do
       content_type 'text/css'
-      css = File.read(Padrino.root('app/assets/stylesheets/theme.css'))
-      if (theme_color = params[:theme_color])
-        theme_color = "##{theme_color}" unless theme_color.start_with?('#')
+      theme_color = '#00af5e'
+      if params[:theme_color]
+        requested = params[:theme_color].start_with?('#') ? params[:theme_color] : "##{params[:theme_color]}"
         # Validate hex color format: # followed by 3 or 6 hexadecimal characters
-        if theme_color.match?(/\A#[0-9A-Fa-f]{3}\z|\A#[0-9A-Fa-f]{6}\z/)
-          theme_color = clamp_color(theme_color)
-          css = css.sub(/:root \{.*?\}/m, theme_css_variables(theme_color))
-        end
+        theme_color = clamp_color(requested) if requested.match?(/\A#[0-9A-Fa-f]{3}\z|\A#[0-9A-Fa-f]{6}\z/)
       end
-      css
+      theme_css_variables(theme_color)
     end
   end
 end

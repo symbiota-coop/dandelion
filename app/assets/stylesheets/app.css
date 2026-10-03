@@ -52,6 +52,10 @@
   --color-lavender-400: oklch(from var(--color-lavender-500) calc(l + 0.06) c h);
   --color-lavender-600: oklch(from var(--color-lavender-500) calc(l - 0.05) c h);
   --color-lavender-800: oklch(from var(--color-lavender-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
+  /* The default site's own accents, which themed pages switch to the theme (theme.css) */
+  --calendar-event-color: var(--color-midnight);
+  --ai-well-from: var(--color-lavender-50);
+  --ai-well-to: var(--color-lavender-400);
   --color-paper: #FFFAF3;
   --color-canvas: #F9F8FA;
   --body-font-family: "Plus Jakarta Sans", sans-serif;
@@ -2364,7 +2368,7 @@ ul.map-event li {
    ========================================================================== */
 
 #calendar a.fc-event {
-  color: var(--color-midnight) !important;
+  color: var(--calendar-event-color) !important;
 }
 
 .fc-button {
@@ -2404,6 +2408,16 @@ ul.map-event li {
 
 table.event-details td {
   font-size: var(--font-size-base)
+}
+
+/* The date and icon tiles follow the theme; event_details.css hard-codes the default green as it's inlined into emails */
+.event-detail,
+.event-detail.calendar-date .month {
+  border-color: oklch(from var(--theme-500) l c h / 0.5);
+}
+
+.event-detail.calendar-date .month {
+  background: oklch(from var(--theme-500) l c h / 0.3);
 }
 
 .event-detail:hover {
@@ -2636,10 +2650,10 @@ td .tactivity-accept {
    Misc
    ========================================================================== */
 
-/* A lavender sheen; themed pages switch it to the theme in theme.css */
+/* A lavender sheen on the default site, a theme tint on themed pages */
 .ai-well {
-  --sheen-from: var(--color-lavender-50);
-  --sheen-to: var(--color-lavender-400);
+  --sheen-from: var(--ai-well-from);
+  --sheen-to: var(--ai-well-to);
   padding: 1rem;
   border-radius: var(--bs-border-radius-lg);
 }

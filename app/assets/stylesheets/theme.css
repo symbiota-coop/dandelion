@@ -1,30 +1,13 @@
 /*
- * Served by /theme.css, which replaces this :root block with the requested theme colour
- * (see theme_css_variables in app/helpers/markup_helpers.rb). app.css derives the rest of the theme
- * ramp from --theme-500, so most things follow the theme without rules here: this file holds the
- * places where a themed page deliberately looks different from the default green one (calendar events
- * and the AI well), and the .event-detail tiles, whose green event_details.css hard-codes because it is
- * inlined into emails and can't use custom properties.
+ * Served by /theme.css on themed pages, with the requested colour in place of the default green
+ * (theme_css_variables in app/helpers/markup_helpers.rb, which the design guide's themed panels use too).
+ * Variables only: app.css derives the theme ramp from --theme-500, and the rest of this block switches the
+ * default site's own accents (calendar events in midnight, the AI well in lavender) to the theme.
  */
 :root {
   --theme-500: #00af5e;
   --theme-500-rgb: 0, 175, 94;
-}
-
-#calendar a.fc-event {
-  color: var(--theme-500) !important;
-}
-
-.event-detail,
-.event-detail.calendar-date .month {
-  border-color: oklch(from var(--theme-500) l c h / 0.5);
-}
-
-.event-detail.calendar-date .month {
-  background: oklch(from var(--theme-500) l c h / 0.3);
-}
-
-.ai-well {
-  --sheen-from: oklch(from var(--theme-500) l c h / 0.175);
-  --sheen-to: oklch(from var(--theme-500) l c h / 0.325);
+  --calendar-event-color: var(--theme-500);
+  --ai-well-from: oklch(from var(--theme-500) l c h / 0.175);
+  --ai-well-to: oklch(from var(--theme-500) l c h / 0.325);
 }

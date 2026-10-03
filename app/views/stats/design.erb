@@ -657,7 +657,7 @@
 
   <!-- THEMING -->
   <section id="theming">
-    <%== section_head.call('theming', 'Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check, progress bar and stats chart follows. Alerts and toasts use the ramp\'s tints with --theme-800 text on every page; on themed pages the AI well and calendar events also switch to the theme colour. That is deliberate: the default site keeps them --color-midnight, as its own accent. The .event-detail tiles (date and icons) follow the theme through theme.css too, as event_details.css is inlined into emails and hard-codes the default green.') %>
+    <%== section_head.call('theming', 'Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check, progress bar and stats chart follows. Alerts and toasts use the ramp\'s tints with --theme-800 text on every page. theme.css is only variables: as well as the theme colour, it switches --calendar-event-color and --ai-well-from/-to to the theme. That is deliberate: the default site keeps calendar events --color-midnight and the AI well lavender, as its own accents. The .event-detail tiles (date and icons) follow the theme through app.css, while event_details.css, which is inlined into emails, hard-codes the default green.') %>
     <div class="row g-3">
       <% ([[nil, nil]] + themed_colors).each do |color, clamped| %>
         <div class="col-md-6 col-xxl-4">
@@ -681,13 +681,7 @@
         </div>
       <% end %>
     </div>
-    <div class="small text-body-secondary">Each themed panel sets <code>--theme-500</code> from <code>theme_css_variables(clamp_color(colour))</code> on itself, as <code>/theme.css</code> does, and has the <code>theme-scope</code> class so the ramp is recomputed from it. theme.css itself only loads on themed pages, so its rules are applied here inside <code>@scope (.theme-scope)</code>.</div>
-    <%# theme.css's rules without its comment and :root block, which the panels set themselves %>
-    <style>
-      @scope (.theme-scope) {
-        <%== File.read(Padrino.root('app/assets/stylesheets/theme.css')).sub(%r{/\*.*?\*/}m, '').sub(/:root \{.*?\}/m, '').strip %>
-      }
-    </style>
+    <div class="small text-body-secondary">Each themed panel sets the same variables on itself that <code>/theme.css</code> sets on <code>:root</code>, from <code>theme_css_variables(clamp_color(colour))</code>, and has the <code>theme-scope</code> class so the ramp and focus ring are recomputed from its <code>--theme-500</code>.</div>
   </section>
 
 </div>
