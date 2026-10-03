@@ -133,17 +133,17 @@
 
     <div class="d-flex flex-column gap-3">
       <h3 class="m-0">Accents and surfaces</h3>
-      <p class="m-0 text-body-secondary" style="max-width: 680px">Each accent has one role. The dark header and sidebar are a sunset: near-black fading to purple (--color-highlight-1), with the orange-to-yellow --gradient-active as the sun on the active sidebar item, the notification dot and the load bar. Light content marks active states with the theme colour, so there is one active colour per surface. On the default site purple also marks AI and calendar events; themed pages switch those to the theme. --gradient-rainbow is only for .gradient-text headlines on marketing pages and the signed-out home.</p>
+      <p class="m-0 text-body-secondary" style="max-width: 680px">Each accent has one role. The dark header and sidebar are a sunset: near-black fading to --color-purple, with the orange-to-yellow --gradient-active as the sun on the active sidebar item, the notification dot and the load bar. Light content marks active states with the theme colour, so there is one active colour per surface. On the default site purple also marks AI and calendar events; themed pages switch those to the theme. --gradient-rainbow is only for .gradient-text headlines on marketing pages and the signed-out home.</p>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
              [%w[--color-paper], '.gradient end'],
              [%w[--color-canvas], 'body.canvas'],
-             [%w[--color-search-highlight], 'mark'],
-             [%w[--color-highlight-1-light-2 --color-highlight-1-light-1 --color-highlight-1-light-3], 'AI well gradient (1 to 2), .gradient (3)', 'highlight-1-light-2/1/3'],
+             [%w[--color-highlight], 'mark'],
+             [%w[--color-purple-light-2 --color-purple-light-1 --color-purple-light-3], 'AI well gradient (1 to 2), .gradient (3)', 'purple-light-2/1/3'],
              [%w[--color-yellow --color-yellow-light], 'text-bg-yellow: Featured, Co-host, rota points'],
              [%w[--color-amber --color-amber-light --color-amber-dark], 'star icons, feedback stars, map areas, features page'],
              [%w[--color-chart], 'chart segments rotate its hue'],
-             [%w[--color-highlight-1], 'header sunset; AI and calendar events on the default site']
+             [%w[--color-purple], 'header sunset; AI and calendar events on the default site']
            ].each do |names, note, title| %>
           <div class="col">
             <% if names.length > 1 %>
@@ -171,9 +171,9 @@
         <% [
              ['linear-gradient(135deg, var(--theme-500) 0%, var(--theme-500) 50%, var(--theme-400) 100%)', 'Fill pattern', '135°, flat to 50%, then to a lighter end (--theme-400, --color-red-light). Primary, secondary and danger buttons, badges, progress, text-bg-primary.'],
              ['var(--gradient-active)', '--gradient-active', 'Sidebar active item, notification dot, page-load bar.'],
-             ['linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-highlight-1) 100%)', 'Header', '45°, --bs-gray-900 to 66%, then highlight-1.'],
+             ['linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-purple) 100%)', 'Header', '45°, --bs-gray-900 to 66%, then purple.'],
              ['var(--gradient-rainbow)', '--gradient-rainbow', '.gradient-text only.'],
-             ['linear-gradient(135deg, var(--color-highlight-1-light-3) 0%, var(--color-paper) 50%)', '.gradient', 'Lilac to paper. body.gradient on the sign-in, sign-up and auth failure pages; a .gradient div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.']
+             ['linear-gradient(135deg, var(--color-purple-light-3) 0%, var(--color-paper) 50%)', '.gradient', 'Lilac to paper. body.gradient on the sign-in, sign-up and auth failure pages; a .gradient div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.']
            ].each do |background, title, note| %>
           <div class="col">
             <div class="rounded border mb-1" style="height: 64px; background: <%= background %>"></div>
@@ -187,7 +187,7 @@
     <div class="d-flex flex-column gap-3">
       <div class="d-flex align-items-baseline flex-wrap gap-2">
         <h3 class="m-0">Marketing pages</h3>
-        <span class="text-body-secondary">The features and comparison pages. Their purple gradient and the five reason colours on the Luma page are derived from <code>--color-highlight-1</code> and <code>--color-magenta</code>.</span>
+        <span class="text-body-secondary">The features and comparison pages. Their purple gradient and the five reason colours on the Luma page are derived from <code>--color-purple</code> and <code>--color-magenta</code>.</span>
       </div>
       <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <% [
@@ -202,11 +202,11 @@
               <div class="rounded overflow-hidden mb-1" style="height: 64px">
                 <div class="row g-0 h-100">
                   <% 0.step(100, 25) do |pct| %>
-                    <div class="col" style="background: color-mix(in srgb, var(--color-magenta), var(--color-highlight-1) <%= pct %>%)"></div>
+                    <div class="col" style="background: color-mix(in srgb, var(--color-magenta), var(--color-purple) <%= pct %>%)"></div>
                   <% end %>
                 </div>
               </div>
-              <div class="fw-bold">Magenta to highlight-1</div>
+              <div class="fw-bold">Magenta to purple</div>
               <div class="small text-body-secondary">color-mix, 0–100%</div>
             <% else %>
               <div class="rounded overflow-hidden border mb-1" style="height: 64px">
@@ -387,7 +387,7 @@
       <p class="m-0 text-body-secondary" style="max-width: 680px">Fixed dark header (2.8125rem) and a fixed sidebar (14.375rem, minified to 3.75rem). Below 768px the sidebar becomes a full-width offcanvas and header icons spread across a second row.</p>
     </div>
     <div class="border rounded-3 overflow-hidden shadow">
-      <div class="d-flex align-items-center px-3 text-white" style="height: 2.8125rem; font-size: 1.125rem; background: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-highlight-1) 100%)">
+      <div class="d-flex align-items-center px-3 text-white" style="height: 2.8125rem; font-size: 1.125rem; background: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-purple) 100%)">
         <img class="position-relative" style="max-height: 1.75rem; top: -0.25rem" src="/images/logos/white-on-transparent.png" alt="">
         <div class="ms-auto d-flex align-items-center">
           <span class="px-3"><i class="bi bi-search"></i></span>
@@ -720,7 +720,7 @@
     <div class="d-flex flex-column gap-1 border-top border-2 border-dark pt-3">
       <div class="font-monospace small text-body-secondary fw-bold">06</div>
       <h2 class="m-0">Theming</h2>
-      <p class="m-0 text-body-secondary" style="max-width: 680px">Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check and progress bar follows. Alerts and toasts use the ramp's tints with --theme-800 text on every page; on themed pages the AI well and calendar events also switch to the theme colour. That is deliberate: the default site keeps them purple (--color-highlight-1), as its own accent. The .event-detail tiles (date and icons) follow the theme through theme.css too, as event_details.css is inlined into emails and hard-codes the default green.</p>
+      <p class="m-0 text-body-secondary" style="max-width: 680px">Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check and progress bar follows. Alerts and toasts use the ramp's tints with --theme-800 text on every page; on themed pages the AI well and calendar events also switch to the theme colour. That is deliberate: the default site keeps them --color-purple, as its own accent. The .event-detail tiles (date and icons) follow the theme through theme.css too, as event_details.css is inlined into emails and hard-codes the default green.</p>
     </div>
     <div class="row g-3">
       <div class="col-md-6 col-xxl-4">

@@ -45,10 +45,10 @@
   --bs-link-hover-color: var(--theme-600);
   --bs-link-hover-color-rgb: var(--theme-500-rgb);
   --bs-focus-ring-color: oklch(from var(--theme-500) l c h / var(--bs-focus-ring-opacity));
-  --color-highlight-1: #4400B9;
-  --color-highlight-1-light-1: #ebdfff;
-  --color-highlight-1-light-2: #bb93ff;
-  --color-highlight-1-light-3: #f3ecff;
+  --color-purple: #4400B9;
+  --color-purple-light-1: #ebdfff;
+  --color-purple-light-2: #bb93ff;
+  --color-purple-light-3: #f3ecff;
   --color-paper: #FFFAF3;
   --color-canvas: #F9F8FA;
   --body-font-family: "Plus Jakarta Sans", sans-serif;
@@ -82,7 +82,7 @@
   --color-gocardless-text: #F1F252;
   --color-opencollective: #1869F5;
   --color-evm: #627EEA; /* Ethereum */
-  --color-search-highlight: #FDFFAA;
+  --color-highlight: #FDFFAA;
   --color-yellow: #FFCC00;
   --color-yellow-light: #ffd322;
   /* Base for chart segments, whose hues rotate from it */
@@ -356,7 +356,7 @@
 }
 
 #header {
-  background: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-highlight-1) 100%) !important;
+  background: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-purple) 100%) !important;
 }
 
 .header [data-pagelet-url] .bi-spin {
@@ -697,12 +697,12 @@
 body.gradient,
 body.gradient #content {
   background:
-    linear-gradient(135deg, var(--color-highlight-1-light-3) 0%, var(--color-paper) 50%);
+    linear-gradient(135deg, var(--color-purple-light-3) 0%, var(--color-paper) 50%);
 }
 
 .gradient {
   background:
-    linear-gradient(135deg, var(--color-highlight-1-light-3) 0%, var(--color-paper) 50%),
+    linear-gradient(135deg, var(--color-purple-light-3) 0%, var(--color-paper) 50%),
     linear-gradient(to bottom, transparent 80%, var(--bs-white) 100%);
   background-blend-mode: lighten;
 }
@@ -2182,7 +2182,7 @@ mark,
 .highlight {
   padding-left: 0;
   padding-right: 0;
-  background-color: var(--color-search-highlight)
+  background-color: var(--color-highlight)
 }
 
 body[contenteditable] {
@@ -2405,7 +2405,7 @@ ul.map-event li {
    ========================================================================== */
 
 #calendar a.fc-event {
-  color: var(--color-highlight-1) !important;
+  color: var(--color-purple) !important;
 }
 
 .fc-button {
@@ -2673,7 +2673,7 @@ td .tactivity-accept {
    ========================================================================== */
 
 .ai-well {
-  background: linear-gradient(135deg, var(--color-highlight-1-light-1) 0%, var(--color-highlight-1-light-1) 50%, var(--color-highlight-1-light-2) 100%) !important;
+  background: linear-gradient(135deg, var(--color-purple-light-1) 0%, var(--color-purple-light-1) 50%, var(--color-purple-light-2) 100%) !important;
   padding: 1rem;
   border-radius: var(--bs-border-radius-lg);
 }
