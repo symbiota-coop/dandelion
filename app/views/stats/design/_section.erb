@@ -1,0 +1,9 @@
+<%# A numbered section of the design guide (design_section) %>
+<section id="<%= id %>">
+  <div class="d-flex flex-column gap-1 border-top border-2 border-dark pt-3">
+    <div class="spec fw-bold"><%= format('%02d', number) %></div>
+    <h2 class="m-0"><%= title %></h2>
+    <% if intro %><p class="m-0 text-body-secondary" style="max-width: 680px"><%= intro %></p><% end %>
+  </div>
+  <%= body %>
+</section>
