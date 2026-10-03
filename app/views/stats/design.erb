@@ -63,7 +63,17 @@
             sample_title: 'Primary alerts and toasts',
             sample_to: '200'
           } %>
-      <div class="small text-body-secondary">Bootstrap's <code>rgba(var(--bs-*-rgb))</code> colours need an rgb triplet, so <code>/theme.css</code> also sets <code>--theme-500-rgb</code>.</div>
+      <div class="row g-2">
+        <% {
+             'a10' => 'crumbs, newsfeed icons, docs transcripts',
+             'a20' => 'crumb hover, unread messages, themed AI well start',
+             'a30' => 'progress tracks, date tile months, blockquote and transcript borders, themed AI well end, chart projections',
+             'a50' => 'date and icon tile borders, bar chart projections'
+           }.each do |step, note| %>
+          <%= partial :'stats/design/swatch', locals: { vars: ["--theme-#{step}"], title: step, note: note, col: 'col-6 col-md-3' } %>
+        <% end %>
+      </div>
+      <div class="small text-body-secondary">The translucent steps are the 500 at 10, 20, 30 and 50% opacity, for tints that should take on what's behind them. Every see-through theme colour is one of these four. Bootstrap's <code>rgba(var(--bs-*-rgb))</code> colours need an rgb triplet, so <code>/theme.css</code> also sets <code>--theme-500-rgb</code>.</div>
     </div>
 
     <div class="d-flex flex-column gap-3">

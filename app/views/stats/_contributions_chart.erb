@@ -25,7 +25,7 @@
       return {
         type: 'bar',
         label: breakdownLabels[key] || key,
-        backgroundColor: cssColor(breakdownColors[key] || 'oklch(from var(--theme-500) l c h / 0.92)'),
+        backgroundColor: cssColor(breakdownColors[key] || 'var(--theme-500)'),
         borderColor: cssColor(breakdownColors[key] || 'var(--theme-500)'),
         borderWidth: 1,
         data: breakdownValues[key],
@@ -36,8 +36,8 @@
     datasets.push({
       type: 'bar',
       label: 'Projected remainder',
-      backgroundColor: cssColor('oklch(from var(--theme-500) l c h / 0.28)'),
-      borderColor: cssColor('oklch(from var(--theme-500) l c h / 0.45)'),
+      backgroundColor: cssColor('var(--theme-a30)'),
+      borderColor: cssColor('var(--theme-a50)'),
       borderWidth: 1,
       data: projectionData,
       stack: 'contributions'

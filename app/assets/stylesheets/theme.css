@@ -8,6 +8,6 @@
   --theme-500: #00af5e;
   --theme-500-rgb: 0, 175, 94;
   --calendar-event-color: var(--theme-500);
-  --ai-well-from: oklch(from var(--theme-500) l c h / 0.175);
-  --ai-well-to: oklch(from var(--theme-500) l c h / 0.325);
+  --ai-well-from: var(--theme-a20);
+  --ai-well-to: var(--theme-a30);
 }

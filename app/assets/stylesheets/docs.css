@@ -151,9 +151,9 @@
 
 .doc-transcript {
   margin: 0.5rem 0 1.25rem;
-  border: 1px solid oklch(from var(--theme-500) l c h / 0.3);
+  border: 1px solid var(--theme-a30);
   border-radius: var(--bs-border-radius-lg);
-  background: oklch(from var(--theme-500) l c h / 0.1);
+  background: var(--theme-a10);
   padding: 0.55rem 0.85rem;
 }
 

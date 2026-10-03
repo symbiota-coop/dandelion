@@ -6,8 +6,8 @@ module MonthlyContributionsCalculator
   }.freeze
   # CSS colours, resolved in the browser by cssColor
   BREAKDOWN_COLORS = {
-    'direct_stripe_charges' => 'oklch(from var(--theme-500) l c h / 0.92)',
-    'stripe_connect_application_fees' => 'oklch(from var(--theme-400) l c h / 0.88)'
+    'direct_stripe_charges' => 'var(--theme-500)',
+    'stripe_connect_application_fees' => 'var(--theme-400)'
   }.freeze
 
   def self.calculate

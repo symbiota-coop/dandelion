@@ -118,6 +118,12 @@
   --theme-400: oklch(from var(--theme-500) calc(l + 0.06) c h);
   --theme-600: oklch(from var(--theme-500) calc(l - 0.05) c h);
   --theme-800: oklch(from var(--theme-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
+  /* Translucent tints of the 500, for what should take on the colour behind it: crumbs, icon chips,
+     unread rows, progress tracks, tile borders */
+  --theme-a10: oklch(from var(--theme-500) l c h / 0.1);
+  --theme-a20: oklch(from var(--theme-500) l c h / 0.2);
+  --theme-a30: oklch(from var(--theme-500) l c h / 0.3);
+  --theme-a50: oklch(from var(--theme-500) l c h / 0.5);
   /* One focus ring everywhere: --bs-focus-ring-width (2px) of the theme at --bs-focus-ring-opacity (.6), both from bootstrap5.scss.
      Resolved here, so an element that wants a ring in another colour builds its own from the width and opacity, as buttons do */
   --bs-focus-ring-color: oklch(from var(--theme-500) l c h / var(--bs-focus-ring-opacity));
@@ -1222,10 +1228,10 @@ p.action a:hover {
 
 /* Through the button variables, so hover, pressed and open keep theme-coloured text on a tint rather than Bootstrap's white on solid */
 .nav-crumbs .btn {
-  --bs-btn-bg: oklch(from var(--theme-500) l c h / 0.1);
-  --bs-btn-hover-bg: oklch(from var(--theme-500) l c h / 0.2);
+  --bs-btn-bg: var(--theme-a10);
+  --bs-btn-hover-bg: var(--theme-a20);
   --bs-btn-hover-color: var(--theme-500);
-  --bs-btn-active-bg: oklch(from var(--theme-500) l c h / 0.2);
+  --bs-btn-active-bg: var(--theme-a20);
   --bs-btn-active-color: var(--theme-500);
   display: flex;
   align-items: center;
@@ -1329,7 +1335,7 @@ p.action a:hover {
 }
 
 .message-preview.unread {
-  background: oklch(from var(--theme-500) l c h / 0.15) !important
+  background: var(--theme-a20) !important
 }
 
 /* ==========================================================================
@@ -1666,7 +1672,7 @@ ul.pagination {
    ========================================================================== */
 
 .progress {
-  background-color: oklch(from var(--theme-500) l c h / 0.3);
+  background-color: var(--theme-a30);
 }
 
 @media (min-width: 992px) {
@@ -2413,11 +2419,11 @@ table.event-details td {
 /* The date and icon tiles follow the theme; event_details.css hard-codes the default green as it's inlined into emails */
 .event-detail,
 .event-detail.calendar-date .month {
-  border-color: oklch(from var(--theme-500) l c h / 0.5);
+  border-color: var(--theme-a50);
 }
 
 .event-detail.calendar-date .month {
-  background: oklch(from var(--theme-500) l c h / 0.3);
+  background: var(--theme-a30);
 }
 
 .event-detail:hover {
@@ -2471,7 +2477,7 @@ table.event-details td {
   border-radius: 50%;
   font-size: 1rem;
   color: var(--theme-500);
-  background-color: oklch(from var(--theme-500) l c h / 0.1);
+  background-color: var(--theme-a10);
   width: 2.25em;
   height: 2.25em;
 }
