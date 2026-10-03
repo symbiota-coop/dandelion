@@ -888,11 +888,6 @@ p.action a:hover {
   color: var(--theme-500);
 }
 
-/* White text on warning fills, like every other fill: Bootstrap's contrast check ($min-contrast-ratio) picks black for orange */
-.text-bg-warning {
-  color: var(--bs-white) !important;
-}
-
 /* Our own colours, in the form of Bootstrap's text-bg-* */
 .text-bg-yellow {
   color: var(--bs-white) !important;
@@ -981,14 +976,6 @@ p.action a:hover {
 
 .btn-primary {
   --bs-btn-focus-shadow-rgb: var(--theme-500-rgb);
-}
-
-/* White text, like the other filled buttons and text-bg-warning (Bootstrap picks black for orange) */
-.btn-warning {
-  --bs-btn-color: var(--bs-white);
-  --bs-btn-hover-color: var(--bs-white);
-  --bs-btn-active-color: var(--bs-white);
-  --bs-btn-disabled-color: var(--bs-white);
 }
 
 .btn-outline-primary {

@@ -2975,18 +2975,18 @@ textarea.form-control-lg {
 }
 
 .btn-warning {
-  --bs-btn-color: #000;
+  --bs-btn-color: #fff;
   --bs-btn-bg: #fc9417;
   --bs-btn-border-color: #fc9417;
-  --bs-btn-hover-color: #000;
-  --bs-btn-hover-bg: #fca43a;
-  --bs-btn-hover-border-color: #fc9f2e;
-  --bs-btn-focus-shadow-rgb: 214, 126, 20;
-  --bs-btn-active-color: #000;
-  --bs-btn-active-bg: #fda945;
-  --bs-btn-active-border-color: #fc9f2e;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #d67e14;
+  --bs-btn-hover-border-color: #ca7612;
+  --bs-btn-focus-shadow-rgb: 252, 164, 58;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #ca7612;
+  --bs-btn-active-border-color: #bd6f11;
   --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-  --bs-btn-disabled-color: #000;
+  --bs-btn-disabled-color: #fff;
   --bs-btn-disabled-bg: #fc9417;
   --bs-btn-disabled-border-color: #fc9417;
 }
@@ -3113,11 +3113,11 @@ textarea.form-control-lg {
 .btn-outline-warning {
   --bs-btn-color: #fc9417;
   --bs-btn-border-color: #fc9417;
-  --bs-btn-hover-color: #000;
+  --bs-btn-hover-color: #fff;
   --bs-btn-hover-bg: #fc9417;
   --bs-btn-hover-border-color: #fc9417;
   --bs-btn-focus-shadow-rgb: 252, 148, 23;
-  --bs-btn-active-color: #000;
+  --bs-btn-active-color: #fff;
   --bs-btn-active-bg: #fc9417;
   --bs-btn-active-border-color: #fc9417;
   --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
@@ -6715,7 +6715,7 @@ textarea.form-control-lg {
 }
 
 .text-bg-warning {
-  color: #000 !important;
+  color: #fff !important;
   background-color: RGBA(var(--bs-warning-rgb), var(--bs-bg-opacity, 1)) !important;
 }
 
@@ -6775,8 +6775,8 @@ textarea.form-control-lg {
   text-decoration-color: RGBA(var(--bs-warning-rgb), var(--bs-link-underline-opacity, 1)) !important;
 }
 .link-warning:hover, .link-warning:focus {
-  color: RGBA(253, 169, 69, var(--bs-link-opacity, 1)) !important;
-  text-decoration-color: RGBA(253, 169, 69, var(--bs-link-underline-opacity, 1)) !important;
+  color: RGBA(202, 118, 18, var(--bs-link-opacity, 1)) !important;
+  text-decoration-color: RGBA(202, 118, 18, var(--bs-link-underline-opacity, 1)) !important;
 }
 
 .link-danger {
