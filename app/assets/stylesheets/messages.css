@@ -63,7 +63,7 @@
 }
 
 .widget-chat-status {
-  font-size: 0.5625rem;
+  font-size: var(--font-size-xs);
   font-weight: 500;
   color: var(--bs-gray-600);
   line-height: 1rem;
