@@ -843,10 +843,10 @@ p.action a {
   color: var(--theme-500);
 }
 
-/* Labels over images, like the carousel's dates: filled with their variant's 500 at 85%, so the image shows through, and square */
+/* Labels over images, like the carousel's dates: filled with their variant's 500 at 70%, so the image shows through, and square */
 .badge.badge-overlay:is(.text-bg-primary, .text-bg-danger) {
   color: var(--bs-white) !important;
-  background: color-mix(in srgb, var(--variant-500) 85%, transparent) !important;
+  background: color-mix(in srgb, var(--variant-500) 70%, transparent) !important;
   border-radius: 0;
 }
 
