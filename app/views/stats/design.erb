@@ -1,6 +1,10 @@
 <link rel="stylesheet" href="<%= cachebust('/stylesheets/design.css') %>">
 <%# For the marketing pages' rose and magenta %>
 <link rel="stylesheet" href="<%= cachebust('/stylesheets/marketing.css') %>">
+<%# For the chat bubbles %>
+<link rel="stylesheet" href="<%= cachebust('/stylesheets/messages.css') %>">
+<%# For the feedback form's stars %>
+<link rel="stylesheet" href="<%= cachebust('/stylesheets/event_feedbacks.css') %>">
 
 <%# Swatch values are read from the live stylesheet by the script at the bottom %>
 <%# Themed panels run through clamp_color as /theme.css does, so a colour too light for white text is darkened %>
@@ -294,7 +298,7 @@
           <span class="px-3"><i class="bi bi-search"></i></span>
           <span class="px-3 position-relative"><i class="bi bi-bell"></i><span class="position-absolute top-0 rounded-circle" style="right: .75rem; width: .5rem; height: .5rem; background: var(--gradient-active)"></span></span>
           <span class="px-3"><i class="bi bi-chat-left"></i></span>
-          <span class="px-2"><span class="d-block rounded-circle" style="width: 1.75rem; height: 1.75rem; background: var(--bs-gray-600)"></span></span>
+          <span class="px-2 d-flex align-items-center gap-2"><img class="d-block rounded-circle" src="/images/advisors/ruby.jpg" alt="" style="width: 1.75rem; height: 1.75rem; object-fit: cover"><span class="d-none d-md-inline" style="font-size: var(--font-size-md)">Ruby <i class="bi bi-chevron-down"></i></span></span>
         </div>
       </div>
       <div class="d-flex" style="min-height: 420px">
@@ -347,29 +351,31 @@
         <div>Followers <span class="badge text-bg-primary">128</span> · Tagged <a class="badge text-bg-primary" href="#components">breathwork</a> in <span class="badge text-primary border border-primary">Weekend pass</span> · Paid <span class="badge text-bg-secondary">£5 discount applied</span></div>
         <div class="spec">.badge · .9375em · .4em .85em · pill · weight 600 · primary, secondary, warning, danger and yellow are soft: their variant's 100 behind its 800, so they show on grey as well as white (secondary: --bs-gray-200 and 800); dark, stripe and payment badges are filled · .badge-overlay, for labels over images (the carousel), is filled with its variant's 500 at 70%, white text, square</div>
       </div>
-      <table class="table table-sm mb-0">
-        <thead>
-          <tr><th>Class</th><th>Means</th><th>As used</th></tr>
-        </thead>
-        <tbody>
-          <% [
-               ['text-bg-primary', 'Good, or the main count', ['128', '6/6 points', 'breathwork', 'Kitchen shift']],
-               ['text-bg-secondary', 'Neutral detail', ['Locked', 'Secret', '£5 discount applied']],
-               ['text-bg-warning', 'Needs attention, not yet a problem', ['On hold']],
-               ['text-bg-danger', 'A problem or a hard limit', ['Sold out', 'Full', 'Rejected, to contact', 'Resign']],
-               ['text-bg-yellow', 'Highlighted or rewarded', ['Featured', 'Co-host', '2 points']],
-               ['text-bg-dark', 'Counts in a gathering\'s nav', ['3', '12/20']],
-               ['text-primary border border-primary', 'Outline: an unselected choice', ['Available', 'Weekend pass', 'London']],
-               ['text-bg-stripe', 'Reported by Stripe', ['£1,240']]
-             ].each do |klass, meaning, texts| %>
-            <tr>
-              <td><code><%= klass %></code></td>
-              <td class="text-body-secondary"><%= meaning %></td>
-              <td><% texts.each do |text| %><span class="badge <%= klass %> me-1"><%= text %></span><% end %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0">
+          <thead>
+            <tr><th>Class</th><th>Means</th><th>As used</th></tr>
+          </thead>
+          <tbody>
+            <% [
+                 ['text-bg-primary', 'Good, or the main count', ['128', '6/6 points', 'breathwork', 'Kitchen shift']],
+                 ['text-bg-secondary', 'Neutral detail', ['Locked', 'Secret', '£5 discount applied']],
+                 ['text-bg-warning', 'Needs attention, not yet a problem', ['On hold']],
+                 ['text-bg-danger', 'A problem or a hard limit', ['Sold out', 'Full', 'Rejected, to contact', 'Resign']],
+                 ['text-bg-yellow', 'Highlighted or rewarded', ['Featured', 'Co-host', '2 points']],
+                 ['text-bg-dark', 'Counts in a gathering\'s nav', ['3', '12/20']],
+                 ['text-primary border border-primary', 'Outline: an unselected choice', ['Available', 'Weekend pass', 'London']],
+                 ['text-bg-stripe', 'Reported by Stripe', ['£1,240']]
+               ].each do |klass, meaning, texts| %>
+              <tr>
+                <td><code><%= klass %></code></td>
+                <td class="text-body-secondary"><%= meaning %></td>
+                <td><% texts.each do |text| %><span class="badge <%= klass %> me-1"><%= text %></span><% end %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
       <div class="small text-body-secondary"><code>text-bg-yellow</code> and <code>text-bg-stripe</code> are ours, written like Bootstrap's. Payment badges (<code>badge-payment-&lt;method&gt;</code>) are under Third-party brands. A badge with no colour class has no background, so always give it one (or an inline background, as the hashed organisation and gathering badges do).</div>
     <% end %>
 
@@ -550,6 +556,132 @@
       </div>
     <% end %>
 
+    <% design_subsection 'Filter forms', 'The search forms above lists and tables: orders, donations, members, applications. Bootstrap 5 dropped <code>.form-inline</code> and <code>.form-group</code>, so app.css keeps them for these: .form-inline lays the form out in a row from 576px, and each .form-group is a label and its field side by side. <code>.searchForm</code> spaces them and caps fields at 12em; <code>.submitOnChange</code> submits on any change.'.html_safe do %>
+      <div class="border rounded p-4">
+        <form class="searchForm form-inline mb-3" onsubmit="return false">
+          <div class="form-group">
+            <label for="dg-filter-from">Search orders between</label>
+            <input type="text" class="form-control datepicker mx-1" id="dg-filter-from" autocomplete="off" value="<%= (Date.today - 30).iso8601 %>">
+          </div>
+          <div class="form-group">
+            <label for="dg-filter-to">and</label>
+            <input type="text" class="form-control datepicker mx-1" id="dg-filter-to" autocomplete="off" value="<%= Date.today.iso8601 %>">
+          </div>
+          <div class="form-group">
+            <label for="dg-filter-q">containing the word</label>
+            <input type="text" class="form-control mx-1" id="dg-filter-q" autocomplete="off">
+          </div>
+          <%= checkbox 'Deleted', slug: 'dg_deleted' %>
+          <input type="submit" class="btn btn-primary" value="Search">
+        </form>
+        <div class="search rounded p-3 mb-3">
+          <form class="searchForm" onsubmit="return false">
+            <div class="row gx-2 align-items-end">
+              <div class="form-group col-12 col-sm-auto">
+                <label for="dg-filter-near">near</label>
+                <input type="text" class="form-control" id="dg-filter-near" autocomplete="off" value="London">
+              </div>
+              <div class="form-group col-12 col-sm-auto">
+                <label for="dg-filter-type">Type</label>
+                <select class="form-select select-placeholder" id="dg-filter-type">
+                  <option value="" selected disabled>Event type</option>
+                  <option>Workshop</option>
+                  <option>Retreat</option>
+                </select>
+              </div>
+            </div>
+            <div class="row gx-2 align-items-end mt-1">
+              <%= checkbox 'Online', slug: 'dg_online', form_group_class: 'col-auto col-sm-auto either-or' %>
+              <%= checkbox 'In person', slug: 'dg_in_person', form_group_class: 'col-auto col-sm-auto either-or' %>
+              <div class="form-group col-12 col-sm-auto">
+                <input type="submit" class="btn btn-primary" value="Search">
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="popular-locations">
+          <span class="d-inline-block mb-1">Popular locations:</span>
+          <a class="badge d-inline-block mb-1 text-bg-primary fw-medium" href="#components">London</a>
+          <% %w[Bristol Totnes Brighton].each do |place| %>
+            <a class="badge d-inline-block mb-1 text-primary border border-primary fw-medium" href="#components"><%= place %></a>
+          <% end %>
+          <a href="#components"><i class="bi bi-three-dots"></i></a>
+        </div>
+      </div>
+      <div class="spec">Fields stack below 576px, with the button below them · the checkbox helper (<code>checkbox 'Deleted'</code>) is a .form-group holding a .form-check-inline · in grid rows instead (events/_search_form.erb), each .form-group takes a col, with the checkboxes beside the button on a second row, inside a .search panel: --bs-tertiary-bg, --bs-box-shadow-sm · .select-placeholder greys a select while its disabled first option, the placeholder, is chosen · popular locations: outline badges, the current one filled</div>
+    <% end %>
+
+    <div class="row g-5">
+      <% design_subsection 'Short URL input', col: 'col-lg-6' do %>
+        <div class="border rounded p-4">
+          <div class="mb-3">
+            <label for="dg-shorturl">Short URL</label>
+            <div><span class="stem">https://dandelion.events/o/</span><input type="text" class="form-control shorturl" id="dg-shorturl" autocomplete="off" value="symbiota"> <a href="#components"><i class="bi bi-link-45deg"></i></a></div>
+          </div>
+          <div class="spec">shorturl_block (lib/form_builder.rb), for slugs on the build pages: the address's stem as text, then an inline input with only a dotted --bs-gray-400 underline and no focus ring, 15em wide, so it reads as part of the address · a link icon once saved · in .slugify, it fills in from the name</div>
+        </div>
+      <% end %>
+
+      <% design_subsection 'Theme colour picker', col: 'col-lg-6' do %>
+        <div class="border rounded p-4">
+          <label class="d-block">Theme colour</label>
+          <div class="quick-theme-colors mb-3 d-flex flex-wrap align-items-center column-gap-2 row-gap-1">
+            <% quick_colors.each_with_index do |color, i| %>
+              <button type="button" class="quick-color-btn rounded-circle border p-0<%= ' selected' if i.zero? %>" style="width: 26px; height: 26px; background: <%= color %>; --ring-color: <%= color %>" title="<%= color %>"></button>
+            <% end %>
+          </div>
+          <div class="spec">_quick_theme_colors.erb, beside the colour field: quick_colors turns the default green evenly round the wheel · 26px circles that grow 10% with a --bs-box-shadow on hover · selected or focused: a white gap, then a ring in the swatch's own colour</div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="row g-5">
+      <% design_subsection 'Add block', col: 'col-lg-6' do %>
+        <div class="border rounded p-4">
+          <div class="my-1"><img src="/images/dandelions/3.jpeg" alt="" style="width: 50px"> <a href="#components">Symbiota</a></div>
+          <div>
+            <a href="#components"><i class="bi bi-plus-square-fill"></i></a>
+            <a href="#components"><i class="bi bi-dash-square-fill"></i></a>
+            <form class="add-block bg-white shadow-sm p-3 mt-2 mb-3 rounded" onsubmit="return false">
+              <div class="mb-3">
+                <label for="dg-add-block">Organisation</label>
+                <input type="text" class="form-control" id="dg-add-block" autocomplete="off" placeholder="Search organisations">
+              </div>
+              <button type="button" class="btn btn-primary">Add co-host</button>
+            </form>
+          </div>
+          <div class="spec">organisations/_add.erb and accounts/_add.erb: plus and minus icons under a list of people or organisations, each opening a small form · .add-block hides the field's label, since the placeholder says it · white, --bs-box-shadow-sm, base radius · removing is a select and a btn-danger</div>
+        </div>
+      <% end %>
+
+      <% design_subsection 'Button groups', col: 'col-lg-6' do %>
+        <div class="border rounded p-4 d-flex flex-column gap-3">
+          <div>
+            <strong>Add a donation to Dandelion</strong>
+            <div>
+              <div class="btn-group mt-1">
+                <button type="button" class="btn btn-outline-secondary">1%</button>
+                <button type="button" class="btn btn-outline-secondary active">5%</button>
+                <button type="button" class="btn btn-outline-secondary">10%</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <% [['Seed 🌱', 5], ['Butterfly 🦋', 10]].each do |name, amount| %>
+              <div class="btn-group mb-1" role="group">
+                <a class="btn btn-outline-primary" href="#components"><%= name %></a>
+                <a class="btn btn-outline-primary" href="#components">£<%= amount %></a>
+              </div>
+            <% end %>
+          </div>
+          <div>
+            <%= dropdown_nav [['Orders', nil], ['Link to order confirmation', '#components'], ['Resend tickets', '#components'], nil, ['Delete', '#components']], button_text: 'Actions', container_class: 'btn-group mb-1' %>
+          </div>
+          <div class="spec">Joined buttons for a choice of amounts (the purchase form's donation: btn-outline-secondary like the Apply button beside it, the chosen one .active, filled --bs-gray-600) and paired tiers (accounts/_pay.erb) · dropdown_nav in a btn-group is the Actions menu on order and ticket tables: an item with no path is a .dropdown-header, bold --bs-emphasis-color over a --bs-border-color line (none in nav crumbs, whose sections have dividers), and nil a divider</div>
+        </div>
+      <% end %>
+    </div>
+
     <div class="row g-5">
       <% design_subsection 'Card with .chill header', col: 'col-lg-6' do %>
         <div class="card shadow-sm">
@@ -588,6 +720,32 @@
           <li class="page-item"><a class="page-link" href="#components">›</a></li>
         </ul>
         <div class="spec text-center">Active: --theme-500, like the active pill and dropdown item · Hover: --bs-secondary-bg, like pills and nav links</div>
+      <% end %>
+    </div>
+
+    <div class="row g-5">
+      <% design_subsection 'Key-value table', col: 'col-lg-6' do %>
+        <table class="table table-hr mb-0">
+          <tr><td>Email</td><td><a href="#components">ruby@example.com</a></td></tr>
+          <tr><td>Website</td><td><a href="#components">https://ruby.example.com</a></td></tr>
+          <tr><td>Location</td><td>Hackney, London</td></tr>
+        </table>
+        <div class="spec">.table-hr, for a profile's or an organisation's details (accounts/_table.erb, organisations/_table.erb): labels bold in a column only as wide as the longest, rows ruled with a --bs-gray-200 line and no other borders</div>
+      <% end %>
+
+      <% design_subsection 'Striped table', col: 'col-lg-6' do %>
+        <table class="table table-striped mb-0">
+          <tr><td></td><td><strong>Kitchen</strong><br><span class="badge text-bg-yellow d-inline-block mb-1"><i class="bi bi-hand-index"></i> 2</span></td><td><strong>Welcome desk</strong><br><span class="badge text-bg-yellow d-inline-block mb-1"><i class="bi bi-hand-index"></i> 1</span></td></tr>
+          <% [%w[Friday ruby tibet], ['Saturday', 'hugi', nil], ['Sunday', nil, 'ruby']].each do |slot, *people| %>
+            <tr>
+              <td><strong><%= slot %></strong></td>
+              <% people.each do |img| %>
+                <td><% if img %><img src="/images/advisors/<%= img %>.jpg" alt="" style="width: 50px; aspect-ratio: 1/1"><% else %><a class="btn btn-primary btn-sm mb-1" href="#components">Sign up</a><% end %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </table>
+        <div class="spec">Grids of slots: rotas (rotas/_rota.erb), timetables and the admin dashboard · stripes --bs-tertiary-bg · each cell a 50px avatar or a btn-sm to sign up · roles and slots carry their points as text-bg-yellow badges</div>
       <% end %>
     </div>
 
@@ -699,6 +857,41 @@
       <% end %>
     </div>
 
+    <% design_subsection 'Search page', 'The /search page (search.erb), and lists of people like birthdays. A large input with a round clear button, a row of underlined tabs, and results between rules.' do %>
+      <div class="border rounded overflow-hidden" style="padding: var(--content-padding)">
+        <div class="search-input">
+          <a href="#components" class="search-close">×</a>
+          <label class="visually-hidden" for="dg-search-page">Search</label>
+          <input type="text" class="form-control form-control-lg" id="dg-search-page" autocomplete="off" value="ruby">
+        </div>
+        <ul class="search-tab">
+          <% %w[Events People Organisations Gatherings].each do |tab| %>
+            <li<% if tab == 'People' %> class="active"<% end %>><a href="#components"><%= tab %></a></li>
+          <% end %>
+        </ul>
+        <ul class="search-result-list mb-0">
+          <% [%w[ruby Ruby ruby@example.com], %w[hugi Hugi hugi@example.com]].each do |img, name, email| %>
+            <li>
+              <div class="search-result-media h-auto">
+                <img src="/images/advisors/<%= img %>.jpg" alt="" style="display: block; aspect-ratio: 1/1">
+              </div>
+              <div class="search-result-content">
+                <h2><a class="text-dark" href="#components"><%= name %></a></h2>
+                <div class="d-block d-lg-inline-block"><a class="d-block d-lg-inline-block w-100 w-lg-auto mb-1 btn btn-outline-primary" href="#components">Follow</a></div>
+                <a class="d-block d-lg-inline-block mb-1 btn btn-outline-primary" href="#components"><i class="bi bi-chat-left"></i> Message</a>
+                <div class="mt-2">
+                  <table class="table table-hr mb-0">
+                    <tr><td>Email</td><td><a href="#components"><%= email %></a></td></tr>
+                  </table>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+      <div class="spec">.search-input: up to 32.5rem, form-control-lg, the clear button a 1.5rem --bs-gray-400 circle, --bs-gray-600 on hover · .search-tab: bleeds to the edges of #content, a --bs-gray-400 rule below; tabs weight 600 in --bs-secondary-color, the active one --bs-emphasis-color with a 1px underline of the same, which hover previews. It's the only underlined tab style: .nav-tabs and .nav-pills are for everything else · .search-result-list: each result 1.25rem top and bottom between --bs-gray-400 rules, the image floated in a 10rem column (5.625rem on mobile), the name an h2</div>
+    <% end %>
+
     <div class="row g-5">
       <% design_subsection 'Header search and autocomplete', col: 'col-lg-6' do %>
         <div>
@@ -740,6 +933,64 @@
           </div>
         </div>
         <div class="spec">.notification-list: list-group-flush, items .625rem 1rem, smaller newsfeed icons · .message-preview: unread --theme-100, hover --bs-tertiary-bg like the notification items</div>
+      <% end %>
+    </div>
+
+    <div class="row g-5">
+      <% design_subsection 'Messages', col: 'col-lg-6' do %>
+        <div class="border rounded p-4">
+          <div class="d-flex align-items-start mb-3">
+            <img src="/images/advisors/ruby.jpg" alt="" style="display: block; width: 64px; aspect-ratio: 1/1">
+            <div class="flex-grow-1 ms-3">
+              <h4 class="my-0"><a class="text-dark" href="#components">Ruby</a></h4>
+            </div>
+          </div>
+          <div id="thread-scroll">
+            <ul class="widget-chat p-1">
+              <% [[true, 'Are you coming to the full moon gathering?'], [false, 'Yes! Can I bring a friend?'], [true, 'Of course, see you there 🌕'], [false, 'Thank you <a href="#components">dandelion.events/e/full-moon</a>']].each_with_index do |(incoming, body), i| %>
+                <li class="<%= 'reply' unless incoming %>">
+                  <% if incoming %>
+                    <div class="widget-chat-media"><img src="/images/advisors/ruby.jpg" alt=""></div>
+                  <% end %>
+                  <div class="widget-chat-content">
+                    <div class="widget-chat-message last"><%== body %></div>
+                    <% if i == 3 %><div class="widget-chat-status"><b>Read</b> 2 minutes ago</div><% end %>
+                  </div>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+          <div class="ask-box mt-3">
+            <label class="visually-hidden" for="dg-message">Type a message</label>
+            <textarea class="form-control autosize" id="dg-message" rows="1" placeholder="Type a message..."></textarea>
+            <div class="ask-box-actions">
+              <button type="button" class="btn btn-primary btn-sm" aria-label="Send"><i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="spec">messages.css, loaded only by /messages: their bubbles --bs-gray-200 with black text, yours --theme-500 with white text and underlined links, each 1rem round with a tail at the bottom corner, on the left for theirs and the right for yours · their avatar a 1.5rem circle beside the bubble's tail · Read and when, .5625rem in --bs-gray-600, under your last message · the reply box is the ask box; Enter sends, Shift+Enter adds a line</div>
+      <% end %>
+
+      <% design_subsection 'Mobile bottom sheet', col: 'col-lg-6' do %>
+        <div class="bg-body-tertiary rounded p-4 d-flex justify-content-center">
+          <%# Without .show, which Bootstrap would open on load with a backdrop %>
+          <div class="offcanvas offcanvas-bottom nav-dropdown-sheet position-relative w-100" style="max-width: 23.4375rem; visibility: visible; transform: none; z-index: auto">
+            <div class="offcanvas-header">
+              <h3 class="offcanvas-title">Symbiota</h3>
+              <button type="button" class="btn-close" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body p-0">
+              <div class="list-group list-group-flush">
+                <div class="list-group-item small text-body-secondary fw-bold mb-0">Organisation</div>
+                <a class="list-group-item list-group-item-action" href="#components"><i class="bi bi-pencil"></i> Edit</a>
+                <a class="list-group-item list-group-item-action" href="#components"><i class="bi bi-people"></i> Members</a>
+                <hr class="my-1">
+                <a class="list-group-item list-group-item-action" href="#components"><i class="bi bi-ticket"></i> Orders</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="spec">Below 768px, nav crumbs (dropdown_nav, ul_nav), the notifications and messages dropdowns open in #nav-dropdown-sheet (layouts/application.erb) in place of a dropdown: an offcanvas-bottom as tall as its content up to 80dvh, its top corners --bs-border-radius-xl · app.js copies the menu in as a list-group-flush with no borders, headers small, bold and grey, dividers as an hr · the event stats row opens in it too, as a list of its columns</div>
       <% end %>
     </div>
 
@@ -833,6 +1084,123 @@
       <div class="spec">Arrows: 2.5rem white circles with bi-chevron-compact icons, black at 50%, 75% on hover · dates and Sold out as .badge-overlay: the variant's 500 at 70% so the image shows through, square corners · before Slick loads, only the first item shows</div>
     <% end %>
 
+    <% design_subsection 'Ticket purchase form', 'The Select tickets card on an event page (purchase/_purchase.erb), one row per ticket type from purchase/_ticket_type.erb, then discounts, a donation and the total down the right-hand column. Shown here without purchase.js, so totals don\'t add up.' do %>
+      <div class="row g-5">
+        <div class="col-lg-7">
+          <div class="card shadow-sm" id="select-tickets">
+            <h3 class="card-header text-bg-primary">Select tickets</h3>
+            <div class="card-body" id="ticket-types">
+              <table class="table mb-0">
+                <% [
+                     { group: 'Weekend', name: 'Standard', price: '£22', qty: true },
+                     { name: 'Solidarity', price: '£8', qty: true, left: 2, description: 'For those on a low income. No questions asked.' },
+                     { group: 'Day passes', name: 'Pay what you can', range: [5, 30], qty: true },
+                     { name: 'Early bird', price: '£15', sold_out: true }
+                   ].each do |t| %>
+                  <% if t[:group] %>
+                    <tr><td colspan="3" class="text-bg-primary text-center fw-bold header-font text-uppercase small"><%= t[:group] %></td></tr>
+                  <% end %>
+                  <tr><td class="pt-0 border-top" colspan="3"></td></tr>
+                  <tr>
+                    <td class="border-top-0 align-middle">
+                      <span class="fw-bold fs-4"><%= t[:name] %></span>
+                      <% if t[:left] %><span style="top: -2px" class="badge text-bg-secondary position-relative"><%= t[:left] %> left</span><% end %>
+                    </td>
+                    <td class="border-top-0 align-middle fs-4">
+                      <% if t[:range] %>
+                        <span>£<%= t[:range].first %> - £<%= t[:range].last %></span>
+                        <input type="range" class="form-range" min="<%= t[:range].first %>" max="<%= t[:range].last %>" autocomplete="off" aria-label="Price" oninput="$(this).prev().html('£' + this.value); $(this).next().find('.select-a-price-first').css('visibility', 'hidden')">
+                        <div class="text-end small"><em class="select-a-price-first text-nowrap">Drag<span class="d-none d-sm-inline"> the slider</span></em></div>
+                      <% else %>
+                        <%= t[:price] %>
+                      <% end %>
+                    </td>
+                    <td class="border-top-0 align-middle">
+                      <% if t[:sold_out] %>
+                        <div class="text-end"><button type="button" class="btn btn-sm btn-outline-primary">Join waitlist</button></div>
+                      <% else %>
+                        <select class="form-select w-100" aria-label="Quantity"><% 0.upto(10) do |n| %><option><%= n %></option><% end %></select>
+                      <% end %>
+                    </td>
+                  </tr>
+                  <tr><td class="text-body-secondary ticket-type-description border-0 pt-0" colspan="3"><div><% if t[:description] %><p><%= t[:description] %></p><% end %></div></td></tr>
+                <% end %>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <strong>Apply a code</strong>
+                    <div class="input-group my-1">
+                      <input type="text" class="form-control" style="width: 5em" autocomplete="off" aria-label="Code">
+                      <button class="btn btn-outline-secondary" style="padding: 0 0.75rem" type="button">Apply</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <strong>Add a donation to Dandelion</strong>
+                    <div>
+                      <div class="btn-group mt-1" id="donation-percent-buttons">
+                        <button type="button" class="btn btn-outline-secondary">1%</button>
+                        <button type="button" class="btn btn-outline-secondary active">5%</button>
+                        <button type="button" class="btn btn-outline-secondary">10%</button>
+                      </div>
+                    </div>
+                    <div class="input-group my-1">
+                      <span class="input-group-text">£</span>
+                      <input type="number" class="form-control" style="width: 5em" autocomplete="off" value="1.10" aria-label="Donation">
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td style="min-width: 8em">
+                    <strong>Total</strong>
+                    <div class="input-group" style="margin: 5px 0">
+                      <span class="input-group-text">£</span>
+                      <input type="number" class="form-control" style="width: 5em; border-top-right-radius: var(--bs-border-radius); border-bottom-right-radius: var(--bs-border-radius)" value="23.10" disabled autocomplete="off" aria-label="Total">
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5 d-flex flex-column gap-3">
+          <div class="bg-body-tertiary rounded p-4">
+            <div class="modal position-static d-block h-auto overflow-visible" style="z-index: auto">
+              <div class="modal-dialog my-0" style="width: auto">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h3 class="modal-title">Join waitlist</h3>
+                    <button type="button" class="btn-close" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="mb-3">
+                      <label for="dg-waitlist-name">Name</label>
+                      <input type="text" class="form-control" id="dg-waitlist-name" autocomplete="off" value="Ruby">
+                    </div>
+                    <div class="mb-0">
+                      <label for="dg-waitlist-email">Email</label>
+                      <input type="email" class="form-control" id="dg-waitlist-email" autocomplete="off" value="ruby@example.com">
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary">Cancel</button>
+                    <button type="button" class="btn btn-primary">Join waitlist</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="spec">Ticket groups: a text-bg-primary row, uppercase heading font, small · each type: the name bold at fs-4, a lock icon if it's secret or for members, "3 left" or fewer as a text-bg-secondary badge · price at fs-4: fixed, a form-range for a range (the price shows once dragged), or a £ input group for pay what you like, which enables the quantity · quantity a full-width form-select, 0 to 99 · the description in --bs-secondary-color, its paragraphs without margin · sold out: Join waitlist (btn-sm btn-outline-primary), which opens the waitlist modal (purchase/_ticket_type_waitlist_modal.erb), or a Sold out badge in text-bg-danger, as in event blocks, the carousel and the places-filled bar · a ticket type whose sales have ended says Sales closed in text-bg-secondary · the right-hand column: Apply a code, a membership discount, the donation (1/5/10% of the total, or a set amount for the organisation) and the disabled Total, Credit, Discount and Balance fields from currency_input_row, each a bold label over a 5em input group · below 576px the card's sides narrow to .75rem, cells take table-sm's .5rem with none at the table's edges, and the range hint says just Drag, so the three columns fit a phone</div>
+        </div>
+      </div>
+    <% end %>
+
     <div class="row g-5">
       <% design_subsection 'Comments', col: 'col-lg-7' do %>
         <div class="card">
@@ -870,6 +1238,42 @@
           <% end %>
         </div>
         <div class="spec mt-3">Square, never round (accounts/_square.erb): the account's thumbnail or Gravatar, with their name in a tooltip · 32px in comments, 50px in lists of people (the most common), 64–100px on cards and profiles · img.private at 50%, full on hover</div>
+      <% end %>
+    </div>
+
+    <div class="row g-5">
+      <% design_subsection 'Ratings and feedback', col: 'col-lg-7' do %>
+        <div class="border rounded p-4 d-flex flex-column gap-4">
+          <div class="average-rating">
+            4.8<small class="text-body-secondary">/5 from 36 ratings across 12 events</small>
+            <div class="d-lg-inline"><% 5.times do %><i class="bi bi-star-fill"></i><% end %></div>
+          </div>
+          <div>
+            <div class="row g-0 mb-3">
+              <div class="col-auto me-2"><i class="bi bi-quote"></i></div>
+              <div class="col readable">A beautiful, gentle evening. Ruby held the space with such care.</div>
+            </div>
+            <em>Symbiota replied</em>
+            <p class="mt-1 mb-0 readable read-more">&mdash; Thank you so much for coming!<br>We loved having you, and we'll be running the next one at the end of the month, with a longer sound bath.</p>
+          </div>
+          <div class="feedback-rating-panel text-center py-4 px-3">
+            <label class="feedback-question-label d-block mb-1">Your star rating</label>
+            <p class="small text-body-secondary mb-3">Your star rating is always public and contributes towards the host's average.</p>
+            <div class="feedback-stars" role="radiogroup" aria-label="Star rating">
+              <% 1.upto(5) do |i| %>
+                <i class="bi bi-star-fill<%= ' text-warning' if i <= 4 %>" data-rating="<%= i %>" aria-label="<%= i %> out of 5 stars"></i>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="spec">.average-rating (event_feedbacks/_average_rating.erb): the average at --font-size-2xl, the count in --bs-secondary-color, a star per point · public answers beside a bi-quote, at .readable · .read-more (app.js) cuts a reply at its first line break and adds a Read more link at --font-size-xs, which shows the rest · the feedback form (event_feedbacks/build.erb, styled by event_feedbacks.css): five 2.75rem stars on a --bs-tertiary-bg panel, --bs-gray-300 until chosen, then --color-orange-400</div>
+      <% end %>
+
+      <% design_subsection 'Image wall', col: 'col-lg-5' do %>
+        <div class="image-wall">
+          <% %w[ruby hugi tibet ruby hugi tibet ruby].each do |img| %><img class="me-1" src="/images/advisors/<%= img %>.jpg" alt="" style="width: 50px; aspect-ratio: 1/1"><% end %>
+        </div>
+        <div class="spec">.image-wall: who chose an option or is interested in an activity (options/_options.erb, comments/_voptions.erb, timetables/tactivity.erb), as 50px avatars that wrap, .2rem between rows · a "Show names" link swaps them for names separated by middots</div>
       <% end %>
     </div>
 
@@ -938,8 +1342,38 @@
       <% end %>
     </div>
 
+    <div class="row g-5">
+      <% design_subsection 'Map info window', col: 'col-lg-5' do %>
+        <div class="bg-body-tertiary rounded p-4">
+          <div class="gm-style position-relative bg-white mx-auto" style="max-width: 20rem; padding: 12px; border-radius: 8px; box-shadow: 0 2px 7px 1px rgba(var(--bs-black-rgb), .3)">
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-2" aria-label="Close"></button>
+            <div class="infowindow">
+              <table>
+                <tr>
+                  <td class="pe-2"><img src="/images/advisors/ruby.jpg" alt="" style="width: 64px; aspect-ratio: 1/1"></td>
+                  <td>
+                    <h4 class="mt-0"><a href="#components">Ruby</a></h4>
+                    <p class="mb-2">Hackney, London</p>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="spec">Clicking a marker loads /points/:model/:id into Google's InfoWindow, wrapped in .infowindow: a person (points/_account.erb, as here), an organisation or gathering, or an event as its block (ul.map-event, list items at --font-size-md) · Google draws the white box, its tail and the close button; app.css only sets its font to Plus Jakarta Sans and sizes the close button</div>
+      <% end %>
+
+      <% design_subsection 'Email previews', col: 'col-lg-7' do %>
+        <div class="email-preview-iframe-container border rounded" style="height: 20rem">
+          <iframe title="Email preview" srcdoc="<%= '<body style="margin: 0; padding: 2rem; font-family: sans-serif; background: #f6f6f6"><div style="max-width: 32rem; margin: 0 auto; background: #fff; padding: 1.5rem; border-radius: 8px"><h2 style="margin-top: 0">Your tickets to Full moon gathering</h2><p>Thanks for booking, Ruby. Your tickets are attached.</p></div></body>' %>"></iframe>
+        </div>
+        <div class="spec">.email-preview-iframe-container, on the ticket, reminder and feedback request email pages (events/ticket_email.erb and friends): the email rendered by its own route into a borderless iframe that fills the container, 80vh tall (20rem here)</div>
+      <% end %>
+    </div>
+
     <% design_subsection 'Cookie banner' do %>
-      <div class="cookie-consent position-static">
+      <%# z-index: auto, since as a flex item it would otherwise keep its 1100 and cover the header %>
+      <div class="cookie-consent position-static" style="z-index: auto">
         <div class="cookie-consent__copy">
           <h2>Cookies on Dandelion</h2>
           <p>Dandelion requires a few necessary cookies. We only use other cookies if you allow them.</p>
