@@ -2437,6 +2437,27 @@ ul.map-event li {
   margin-bottom: 0;
 }
 
+/* On phones the ticket table's three columns are wider than the card, so the card's sides narrow, the cells take
+   table-sm's padding, and the outer cells drop theirs, lining the table up with the card's padding */
+@media (max-width: 575.98px) {
+  #select-tickets {
+    --bs-card-spacer-x: 0.75rem;
+    --bs-card-cap-padding-x: 0.75rem;
+  }
+
+  #ticket-types .table > :not(caption) > * > * {
+    padding: 0.5rem;
+  }
+
+  #ticket-types .table > :not(caption) > * > :first-child {
+    padding-left: 0;
+  }
+
+  #ticket-types .table > :not(caption) > * > :last-child {
+    padding-right: 0;
+  }
+}
+
 #carousel-buttons-container {
   background: var(--bs-white);
 }
