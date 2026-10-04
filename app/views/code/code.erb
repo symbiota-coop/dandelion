@@ -23,7 +23,7 @@ end
 
 <% if commits.any? %>
   <% commits.group_by { |c| c.commit.author.date.to_date }.each do |date, day_commits| %>
-    <h6 class="mt-4">Commits on <%= date.strftime('%b %d, %Y') %></h6>
+    <h5 class="mt-4">Commits on <%= date.strftime('%b %d, %Y') %></h5>
     <div class="table-responsive">
       <table class="table table-sm">
         <tbody>

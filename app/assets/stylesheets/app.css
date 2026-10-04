@@ -61,9 +61,8 @@
   --color-paper: #FFFAF3;
   --body-font-family: "Plus Jakarta Sans", sans-serif;
   --header-font-family: "Hanken Grotesk", "Plus Jakarta Sans", sans-serif;
-  /* Type scale. bootstrap5.scss repeats the heading sizes (3xl to sm) as $h1-font-size to $h6-font-size */
+  /* Type scale. bootstrap5.scss repeats the heading sizes (3xl to md) as $h1-font-size to $h6-font-size */
   --font-size-xs: 0.75rem;
-  --font-size-sm: 0.825rem;
   --font-size-md: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
@@ -523,7 +522,7 @@
 .sidebar .sub-menu {
   margin: 0 0 0 2.5625rem;
   padding: 0.3125rem 0;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
 }
 
 .sidebar .sub-menu a {
@@ -1079,7 +1078,7 @@ p.action a {
   float: none;
   right: auto;
   margin-top: 0;
-  --bs-dropdown-font-size: var(--font-size-sm);
+  --bs-dropdown-font-size: var(--font-size-md);
   --bs-dropdown-link-active-bg: var(--theme-500);
   border-radius: var(--bs-border-radius-lg);
   box-shadow: var(--bs-box-shadow);
@@ -1111,7 +1110,7 @@ p.action a {
 
 .dropdown-header {
   border-bottom: 1px solid var(--bs-border-color);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   color: var(--bs-emphasis-color);
   padding: 0.625rem 0.9375rem;
 }
@@ -1742,7 +1741,7 @@ body .table > tfoot > tr > th {
 /* jQuery UI puts the menu flush under its input, so it's square at the top, where it joins it, with the base radius below, like Select2's dropdowns */
 .ui-autocomplete {
   border: 1px solid var(--hairline) !important;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   padding: 0.9375rem 0;
   box-shadow: var(--bs-box-shadow);
   border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius);
@@ -2223,7 +2222,7 @@ small.form-text {
    ========================================================================== */
 
 ul.map-event li {
-  font-size: var(--font-size-sm) !important
+  font-size: var(--font-size-md) !important
 }
 
 /* Google Maps and the map-icons markers draw in pixels, so these overrides stay in px to line up with them */
@@ -2569,7 +2568,7 @@ td .tactivity-accept {
 
 .tactivity a,
 .tactivity span {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   color: var(--bs-white)
 }
 

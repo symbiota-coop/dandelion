@@ -18,7 +18,7 @@ module NavigationHelpers
       s << if name.nil?
              %(<div class="dropdown-divider"></div>)
            elsif path.nil?
-             %(<h6 class="dropdown-header">#{name}</h6>)
+             %(<h5 class="dropdown-header">#{name}</h5>)
            else
              attr_str = ''
              if attrs.is_a?(Hash)

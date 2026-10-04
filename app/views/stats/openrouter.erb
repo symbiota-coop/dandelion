@@ -5,7 +5,7 @@
   <p class="text-body-secondary">No generations logged yet.</p>
 <% else %>
   <% @generations.group_by { |g| g.created_at.to_date }.each do |date, day_generations| %>
-    <h6 class="mt-4"><%= date.strftime('%b %d, %Y') %> <span class="text-body-secondary">(<%= day_generations.size %>)</span></h6>
+    <h5 class="mt-4"><%= date.strftime('%b %d, %Y') %> <span class="text-body-secondary">(<%= day_generations.size %>)</span></h5>
     <% day_generations.each do |generation| %>
       <div class="mb-4 p-3 border rounded">
         <div class="d-flex justify-content-between align-items-baseline mb-2">

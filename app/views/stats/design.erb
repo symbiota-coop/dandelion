@@ -206,10 +206,9 @@
              ['h3 · .fs-3', '--font-size-xl · 1.4rem', '<h3 data-sample class="m-0">Your upcoming events</h3>'],
              ['h4 · .fs-4', '--font-size-lg · 1.125rem', '<h4 data-sample class="m-0">Upcoming birthdays</h4>'],
              ['h5 · .fs-5', '--font-size-md · .875rem', '<h5 data-sample class="m-0">Ticket types</h5>'],
-             ['h6 · .fs-6', '--font-size-sm · .825rem', '<div data-sample class="fs-6">Dropdown items, btn-sm, tooltips</div>'],
              ['.lead', '--font-size-lg · 1.125rem', '<p data-sample class="lead m-0">An introductory line, like a sold-out card&#39;s</p>'],
              ['.readable', '--font-size-base · 1rem', '<div data-sample class="readable">Long-form copy such as event descriptions sets at 1rem.</div>'],
-             ['body · nav · .btn', '--font-size-md · .875rem', '<div data-sample>Body text, inputs, tables, buttons, nav links and tabs</div>'],
+             ['body · nav · .btn', '--font-size-md · .875rem', '<div data-sample>Body text, inputs, tables, buttons (btn-sm too), nav links, tabs, dropdown items and tooltips</div>'],
              ['.small', '.875em of its context', '<span data-sample class="small">Secondary details: a location, a description</span>'],
              ['.badge', '.9375em of its context', '<span data-sample class="badge text-bg-secondary">Badges</span>'],
              ['.breadcrumb', '--font-size-xs · .75rem', '<ol data-sample class="breadcrumb m-0"><li class="breadcrumb-item">Breadcrumbs</li><li class="breadcrumb-item">and carets</li></ol>']
@@ -223,7 +222,7 @@
           </div>
         <% end %>
       </div>
-      <div class="small text-body-secondary"><code>.h1</code>–<code>.h6</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. The heading sizes are set in bootstrap5.scss (<code>$h1-font-size</code>…), so <code>.fs-1</code>–<code>.fs-6</code> make text a heading's size without its weight or font. <code>.small</code> shrinks text to .875em of its context; it's Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is --bs-gray-600: <code>.text-body-secondary</code>, and form-text. <code>.subtle</code> is for links in it, which turn the theme colour on hover.</div>
+      <div class="small text-body-secondary"><code>.h1</code>–<code>.h5</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. h5 is the smallest heading we use; h6 is the same size, so it's left to user-written descriptions. The heading sizes are set in bootstrap5.scss (<code>$h1-font-size</code>…), so <code>.fs-1</code>–<code>.fs-5</code> make text a heading's size without its weight or font. <code>.small</code> shrinks text to .875em of its context; it's Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is --bs-gray-600: <code>.text-body-secondary</code>, and form-text. <code>.subtle</code> is for links in it, which turn the theme colour on hover.</div>
     <% end %>
   <% end %>
 
