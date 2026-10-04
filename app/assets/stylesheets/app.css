@@ -75,9 +75,9 @@
   --header-offset: var(--header-height);
   --sidebar-width: 14.375rem;
   --sidebar-width-minified: 3.75rem;
-  --content-padding: 1.5625rem;
+  --content-padding: 1.5rem;
   /* Where sticky panels and the page-load spinner sit: just below the header */
-  --sticky-top: calc(var(--header-offset) + 0.9375rem);
+  --sticky-top: calc(var(--header-offset) + 1rem);
   /* Our palette: every colour in our stylesheets comes from here or from Bootstrap's variables
      (greys are Bootstrap's --bs-gray-100 to 900), except the marketing pages' rose and magenta, in marketing.css */
   --color-signal: #3B45FE;
@@ -103,7 +103,7 @@
 @media (max-width: 767.98px) {
   :root {
     --header-offset: calc(2 * var(--header-height));
-    --content-padding: 0.9375rem;
+    --content-padding: 1rem;
   }
 }
 
@@ -193,7 +193,7 @@
   position: fixed;
   z-index: 2000;
   top: var(--sticky-top);
-  right: 0.9375rem;
+  right: 1rem;
   width: 1.25rem;
   height: 1.25rem;
   border: solid 0.125rem transparent;
@@ -238,8 +238,8 @@
 .header .navbar-brand {
   width: var(--sidebar-width);
   height: var(--header-height);
-  padding-left: 0.9375rem;
-  padding-right: 0.9375rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
   font-size: var(--font-size-base);
   line-height: 1.25rem;
 }
@@ -432,7 +432,7 @@
 
 .header .navbar-toggler {
   border: none;
-  padding: 1.125rem 0.9375rem;
+  padding: 1.125rem 1rem;
   box-shadow: none;
 }
 
@@ -528,7 +528,7 @@
 
 .sidebar .sub-menu a {
   display: block;
-  padding: 0.3125rem 0.9375rem 0.3125rem 0;
+  padding: 0.3125rem 1rem 0.3125rem 0;
   line-height: 1.25rem;
   color: var(--bs-gray-500);
   text-decoration: none;
@@ -630,7 +630,7 @@
   text-decoration: none;
   background: var(--bs-gray-600);
   color: var(--bs-white);
-  bottom: 0.9375rem;
+  bottom: 1rem;
   z-index: 1040;
   width: 1.625rem;
   height: 1.625rem;
@@ -1088,7 +1088,7 @@ p.action a {
 
 /* Items are Bootstrap's dropdown-item, restyled through its variables. Other dropdowns (dropdown_nav etc) keep Bootstrap's roomier item padding */
 .navbar .dropdown-menu {
-  --bs-dropdown-item-padding-x: 0.9375rem;
+  --bs-dropdown-item-padding-x: 1rem;
   --bs-dropdown-item-padding-y: 0.1875rem;
 }
 
@@ -1112,7 +1112,7 @@ p.action a {
   border-bottom: 1px solid var(--bs-border-color);
   font-size: var(--font-size-md);
   color: var(--bs-emphasis-color);
-  padding: 0.625rem 0.9375rem;
+  padding: 0.625rem 1rem;
 }
 
 /* Nav menus already separate sections with dividers, so their headers need no line of their own */
@@ -1238,7 +1238,7 @@ p.action a {
 
 /* The notifications and messages dropdowns hold a list-group-flush */
 .notification-list {
-  --bs-list-group-item-padding-x: 0.9375rem;
+  --bs-list-group-item-padding-x: 1rem;
   --bs-list-group-item-padding-y: 0.625rem;
   --bs-list-group-action-color: var(--bs-body-color);
   border-radius: inherit;
@@ -1533,7 +1533,7 @@ label.remove-image input {
    ========================================================================== */
 
 .tab-content {
-  padding: 0.9375rem;
+  padding: 1rem;
 }
 
 .nav-tabs > li > a:hover {
@@ -1742,7 +1742,7 @@ body .table > tfoot > tr > th {
 .ui-autocomplete {
   border: 1px solid var(--hairline) !important;
   font-size: var(--font-size-md);
-  padding: 0.9375rem 0;
+  padding: 1rem 0;
   box-shadow: var(--bs-box-shadow);
   border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius);
 }
@@ -1761,7 +1761,7 @@ body .table > tfoot > tr > th {
 
 .ui-menu .ui-menu-item a,
 .ui-menu .ui-menu-item .ui-menu-item-wrapper {
-  padding: 0.3125rem 0.9375rem;
+  padding: 0.3125rem 1rem;
   margin: 0;
   border-radius: 0;
 }
@@ -1813,7 +1813,7 @@ a.ui-button:active,
 .search-input {
   position: relative;
   max-width: 32.5rem;
-  margin-bottom: 0.9375rem;
+  margin-bottom: 1rem;
 }
 
 .search-close {
@@ -2537,8 +2537,8 @@ table.event-details td {
   content: '';
   position: absolute;
   bottom: 0;
-  left: 0.9375rem;
-  right: 0.9375rem;
+  left: 1rem;
+  right: 1rem;
   height: 1px;
   background-color: var(--hairline);
 }
@@ -2571,7 +2571,7 @@ table.event-details td {
 }
 
 .slick-container .slick-responsive {
-  margin-bottom: 1.5625rem
+  margin-bottom: 1.5rem
 }
 
 .slick-container .slick-item {
