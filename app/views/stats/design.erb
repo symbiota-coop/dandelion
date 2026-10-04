@@ -8,7 +8,7 @@
 
    flashes = [['primary', 'Your ticket is booked.', 'View order'], ['warning', 'Only 3 tickets left.', 'Book now'], ['danger', 'Payment failed.', 'Try again']] %>
 
-<div class="design-guide d-flex flex-column gap-5" style="max-width: 1080px">
+<div class="design-guide d-flex flex-column gap-5">
 
   <header class="d-flex flex-column gap-3" style="max-width: 720px">
     <div class="spec text-uppercase fw-bold">Design guide · v1 · October 2026</div>
@@ -116,12 +116,12 @@
       </div>
     <% end %>
 
-    <% design_subsection 'Accents and surfaces', 'Single colours with one role each. --color-midnight ends the header\'s sunset and, on the default site, marks AI and calendar events; themed pages switch those to the theme. --color-paper is where .lavender-wash fades to, and --color-highlight is behind mark.' do %>
+    <% design_subsection 'Accents and surfaces', 'Single colours with one role each. --color-midnight ends the header\'s sunset and is the root of the marketing pages\' purple. --color-paper is where .lavender-wash fades to, and --color-highlight is behind mark.' do %>
       <div class="row g-3 row-cols-2 row-cols-md-3">
         <% [
              [%w[--color-paper], '.lavender-wash end'],
              [%w[--color-highlight], 'mark'],
-             [%w[--color-midnight], 'header sunset; AI and calendar events on the default site']
+             [%w[--color-midnight], 'header sunset; marketing pages']
            ].each do |vars, note| %>
           <%= partial :'stats/design/swatch', locals: { vars: vars, note: note } %>
         <% end %>
@@ -345,7 +345,7 @@
       <div class="border rounded p-4 d-flex flex-column gap-3">
         <h4 class="m-0">Full moon gathering <span class="badge text-bg-yellow">Featured</span> <span class="badge text-bg-secondary">Locked</span></h4>
         <div>Followers <span class="badge text-bg-primary">128</span> · Tagged <a class="badge text-bg-primary" href="#components">breathwork</a> in <span class="badge text-primary border border-primary">Weekend pass</span> · Paid <span class="badge text-bg-secondary">£5 discount applied</span></div>
-        <div class="spec">.badge · .9375em · .4em .85em · pill · weight 600 · primary, secondary, warning, danger and yellow are soft: their variant's 100 behind its 800, so they show on grey as well as white (secondary: --bs-gray-200 and 800); dark, stripe and payment badges are filled · .badge-overlay, for labels over images (the carousel), is filled with its variant's 500 at 85%, white text, square</div>
+        <div class="spec">.badge · .9375em · .4em .85em · pill · weight 600 · primary, secondary, warning, danger and yellow are soft: their variant's 100 behind its 800, so they show on grey as well as white (secondary: --bs-gray-200 and 800); dark, stripe and payment badges are filled · .badge-overlay, for labels over images (the carousel), is filled with its variant's 500 at 70%, white text, square</div>
       </div>
       <table class="table table-sm mb-0">
         <thead>
@@ -448,6 +448,45 @@
     </div>
 
     <div class="row g-5">
+      <% design_subsection 'Input groups', col: 'col-lg-6' do %>
+        <div class="border rounded p-4">
+          <div class="mb-3">
+            <label for="dg-amount">Amount</label>
+            <div class="input-group">
+              <span class="input-group-text">£</span>
+              <input type="number" class="form-control" id="dg-amount" autocomplete="off" value="10">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="dg-code">Sign-in code</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="dg-code" autocomplete="off" placeholder="Email">
+              <button class="btn btn-primary" type="button">Get code</button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="input-group input-group-sm d-inline-flex w-auto">
+              <label class="input-group-text" for="dg-capacity">Capacity</label>
+              <input type="number" class="form-control form-control-sm" id="dg-capacity" autocomplete="off" value="80" style="width: 5em">
+            </div>
+          </div>
+          <div class="spec">input-group-text for currency symbols (money_symbol) and inline labels · a button on the end for one-field forms (sign in, search, reactions) · d-inline-flex w-auto when the field is narrow · input-group-sm with form-control-sm</div>
+        </div>
+      <% end %>
+
+      <% design_subsection 'File and image inputs', col: 'col-lg-6' do %>
+        <div class="border rounded p-4">
+          <div class="mb-3">
+            <label for="dg-file">Image</label>
+            <div style="margin-bottom: 1em"><img style="max-height: 200px" src="/images/dandelions/3.jpeg" alt="" class="mw-100"></div>
+            <input type="file" class="form-control" id="dg-file">
+          </div>
+          <div class="spec">file_block and image_block (lib/form_builder.rb): a plain form-control file input, with the current file above it once saved: a download link, or for images the image at up to 200px high · app.js rejects files over 10MB before upload</div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="row g-5">
       <% design_subsection 'Select2', col: 'col-lg-6' do %>
         <div class="border rounded p-4">
           <div class="mb-3">
@@ -504,6 +543,13 @@
       <% end %>
     </div>
 
+    <% design_subsection 'Rich text editor', 'CKEditor 5, from our own build (symbiota-coop/ckeditor5-dandelion). <code>wysiwyg_block</code> renders a textarea.wysiwyg, and app.js swaps in the editor. ckeditor.css styles it and the rich text it produces, and adds two paragraph styles, Lead and Small.'.html_safe do %>
+      <div class="border rounded p-4">
+        <label for="dg-wysiwyg">Description</label>
+        <textarea class="form-control wysiwyg" id="dg-wysiwyg" rows="5"><p>An evening of <strong>breathwork</strong> and sound, for all levels.</p><ul><li>Bring a mat and a blanket</li><li>Doors at 7pm</li></ul></textarea>
+      </div>
+    <% end %>
+
     <div class="row g-5">
       <% design_subsection 'Card with .chill header', col: 'col-lg-6' do %>
         <div class="card shadow-sm">
@@ -542,6 +588,48 @@
           <li class="page-item"><a class="page-link" href="#components">›</a></li>
         </ul>
         <div class="spec text-center">Active: --theme-500, like the active pill and dropdown item · Hover: --bs-secondary-bg, like pills and nav links</div>
+      <% end %>
+    </div>
+
+    <div class="row g-5">
+      <% design_subsection 'Tooltips', col: 'col-lg-6' do %>
+        <div class="border rounded p-4 d-flex flex-column gap-4">
+          <div class="d-flex flex-wrap align-items-end gap-4">
+            <div class="tooltip bs-tooltip-top show position-relative" role="tooltip">
+              <div class="tooltip-arrow position-absolute start-50 translate-middle-x"></div>
+              <div class="tooltip-inner">Host/facilitators</div>
+            </div>
+            <div class="tooltip bs-tooltip-top show position-relative" role="tooltip">
+              <div class="tooltip-arrow position-absolute start-50 translate-middle-x"></div>
+              <div class="tooltip-inner text-start"><strong>Ecstatic dance</strong><br><i class="bi bi-geo-alt-fill"></i> London<br><small>Sat 4 Oct, 7–10pm</small></div>
+            </div>
+          </div>
+          <div class="fs-4 d-flex gap-3">
+            <i data-bs-toggle="tooltip" title="Dates/times" class="bi bi-calendar-event"></i>
+            <i data-bs-toggle="tooltip" title="Location" class="bi bi-geo-alt-fill"></i>
+            <i data-bs-toggle="tooltip" title="Secret ticket type" class="bi bi-lock"></i>
+            <span class="small text-body-secondary align-self-center">hover these</span>
+          </div>
+          <div class="spec">data-bs-toggle="tooltip" and a title: app.js has one handler for the whole page, so content loaded later needs no setup. HTML is allowed, and with no title it shows the hidden span after the element (reaction names, timetable descriptions) · .875rem, --bs-emphasis-color at 90%, radius base, max 200px wide · label icons, truncated text and disabled controls, not essential information</div>
+        </div>
+      <% end %>
+
+      <% design_subsection 'Progress and loading', col: 'col-lg-6' do %>
+        <div class="border rounded p-4 d-flex flex-column gap-3">
+          <div>
+            <a href="#components">23/80</a>
+            <div class="progress"><div class="progress-bar" role="progressbar" style="width: 29%"></div></div>
+          </div>
+          <div class="progress"><div class="progress-bar" role="progressbar" style="width: 75%">60/80</div></div>
+          <div class="spec">Places filled (events/_progress.erb, _ticket_types_progress.erb), pay and rota progress · --theme-500 on --theme-200 · the count as a link above, or inside the bar where it's full width</div>
+          <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-spin bi-arrow-repeat fs-4"></i>
+            <span class="d-inline-block border border-2 rounded-circle" style="width: 1.25rem; height: 1.25rem; border-color: var(--bs-black) transparent transparent var(--bs-black) !important; animation: spin 400ms linear infinite"></span>
+            <span class="d-inline-block rounded" style="width: 6.25rem; height: .125rem; background: var(--gradient-active)"></span>
+            <span class="placeholder col-4"></span>
+          </div>
+          <div class="spec">.bi-spin turns any icon (an order in progress) · Pace, on every page load and ajax: a 2px --gradient-active bar along the top, and a black spinner at --sticky-top on the right · .placeholder, a faint grey line that pagelets show while they load</div>
+        </div>
       <% end %>
     </div>
 
@@ -686,6 +774,195 @@
       </div>
     <% end %>
 
+    <% design_subsection 'Event block', 'How events are listed on organisation and search pages (events/_block.erb, with _block_main.erb). From 992px the image sits on the right and the row gets a --bs-tertiary-bg panel with base radius; below that the image stacks on top.' do %>
+      <div class="row block g-0 align-items-stretch">
+        <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white">
+          <a href="#components"><img class="w-100" src="/images/test-event.jpg" alt=""></a>
+        </div>
+        <div class="col-lg-6 order-lg-1">
+          <div class="ms-1 p-lg-3">
+            <div class="mb-2">
+              <h4 class="h2 d-inline me-1"><a class="text-dark" href="#components">Breathwork and sound journey</a></h4>
+              <span class="badge text-bg-yellow align-middle me-1">Featured</span>
+              <span class="badge text-bg-danger align-middle me-1">Sold out</span>
+            </div>
+            <div class="mb-2">
+              <% %w[breathwork sound].each do |tag| %>
+                <span class="text-white badge text-bg-primary d-inline-block mb-1"><%= tag %></span>
+              <% end %>
+              <span class="text-white badge text-bg-primary d-inline-block mb-1"><i class="bi bi-stars"></i> healing</span>
+            </div>
+            <ul class="icon-list text-dark fs-4">
+              <li><i data-bs-toggle="tooltip" title="Host/facilitators" class="bi bi-flag-fill"></i> <a class="text-dark" href="#components">Ruby</a> and <a class="text-dark" href="#components">Sam</a></li>
+              <li><i data-bs-toggle="tooltip" title="Dates/times" class="bi bi-calendar-event"></i> Sat 4 Oct, 7–10pm</li>
+              <li><i data-bs-toggle="tooltip" title="Location" class="bi bi-geo-alt-fill"></i> <a href="#components">Hackney, London</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="spec">Name h2 · labels: Featured text-bg-yellow, Sold out or Sales ended text-bg-danger, Locked text-bg-secondary · tags text-bg-primary, up to 5, with bi-stars when AI-tagged · .icon-list at fs-4, each line's icon hung 2em to the left, with a tooltip naming it</div>
+    <% end %>
+
+    <% design_subsection 'Carousel', 'Featured and upcoming events on organisation pages (events/_carousel.erb), with Slick: three to a slide from 992px, two from 576px, then one.' do %>
+      <div class="slick-container" id="dg-slick">
+        <div class="slick-responsive row justify-content-center">
+          <% [['Sat 4 Oct', nil], ['Sun 5 Oct', 'Sold out'], ['Starts Fri 10 Oct', nil], ['Wed 15 Oct', nil], ['On-demand', nil]].each do |date, label| %>
+            <div class="col-12 col-sm-6 col-lg-4 slick-item">
+              <div class="m-1 position-relative">
+                <a href="#components"><img class="w-100" src="/images/test-event.jpg" alt=""></a>
+                <span class="badge badge-overlay text-bg-primary position-absolute top-0 end-0"><%= date %></span>
+                <% if label %><span class="badge badge-overlay text-bg-danger position-absolute bottom-0 end-0"><%= label %></span><% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <script>
+        $(function () {
+          $('#dg-slick .slick-responsive').slick({
+            speed: 300,
+            dots: true,
+            prevArrow: "<button type='button' class='rounded-circle slick-prev float-start'><i class='bi bi-chevron-compact-left'></i></button>",
+            nextArrow: "<button type='button' class='rounded-circle slick-next float-end'><i class='bi bi-chevron-compact-right'></i></button>",
+            slidesToShow: 3,
+            slidesToScroll: 3,
+            responsive: [{ breakpoint: 992, settings: { slidesToShow: 2, slidesToScroll: 2 } }, { breakpoint: 576, settings: { slidesToShow: 1, slidesToScroll: 1 } }]
+          })
+        })
+      </script>
+      <div class="spec">Arrows: 2.5rem white circles with bi-chevron-compact icons, black at 50%, 75% on hover · dates and Sold out as .badge-overlay: the variant's 500 at 70% so the image shows through, square corners · before Slick loads, only the first item shows</div>
+    <% end %>
+
+    <div class="row g-5">
+      <% design_subsection 'Comments', col: 'col-lg-7' do %>
+        <div class="card">
+          <div class="card-header text-bg-primary"><h4 class="mb-0">Lift shares from London</h4></div>
+          <div class="card-body p-0 pb-3">
+            <% [['ruby', 'Ruby', '2 hours ago', "I'm driving down from Hackney on Friday morning, room for three. Message me!", [['💚', 4, true], ['🙏', 2, false]]],
+                ['hugi', 'Hugi', '1 hour ago', 'Count me in, thank you @Ruby', []]].each do |img, name, time, body, reactions| %>
+              <div class="d-flex align-items-start m-0" style="padding: 10px 10px 0 10px">
+                <span class="me-2"><img src="/images/advisors/<%= img %>.jpg" alt="" style="width: 32px; aspect-ratio: 1/1"></span>
+                <div class="flex-grow-1 comment">
+                  <strong><a href="#components"><%= name %></a></strong>
+                  <small class="text-body-secondary"><%= time %></small>
+                  <div class="mb-2"><div class="comment-body"><%= body %></div></div>
+                  <div class="d-flex gap-1">
+                    <% reactions.each do |emoji, count, mine| %>
+                      <a href="#components" class="d-inline-block border rounded p-1 text-dark <%= mine ? 'border-primary' : 'border-light' %>" style="text-decoration: none; background: white"><% if emoji == '💚' %><i class="text-primary bi bi-heart-fill"></i><% else %><%= emoji %><% end %> <%= count %></a>
+                    <% end %>
+                    <a class="btn btn-sm btn-outline-primary" href="#components" data-bs-toggle="tooltip" title="React"><i class="bi bi-heart-fill"></i></a>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        <div class="spec">A post (comments/_post.erb) is a card with a text-bg-primary header, its subject · each comment: a 32px square avatar, the name bold, the time in --bs-secondary-color, the body linkified · reactions bordered tiles, your own bordered --theme-500, with the reactors' names in a tooltip</div>
+      <% end %>
+
+      <% design_subsection 'Avatars', col: 'col-lg-5' do %>
+        <div class="d-flex align-items-end flex-wrap gap-3">
+          <% [32, 50, 64, 75, 100].each_with_index do |px, i| %>
+            <div class="text-center">
+              <img src="/images/advisors/<%= %w[ruby hugi tibet ruby hugi][i] %>.jpg" alt="" style="width: <%= px %>px; aspect-ratio: 1/1" class="<%= 'private' if i == 2 %>">
+              <div class="spec mt-1"><%= px %><%= ' · private' if i == 2 %></div>
+            </div>
+          <% end %>
+        </div>
+        <div class="spec mt-3">Square, never round (accounts/_square.erb): the account's thumbnail or Gravatar, with their name in a tooltip · 32px in comments, 50px in lists of people (the most common), 64–100px on cards and profiles · img.private at 50%, full on hover</div>
+      <% end %>
+    </div>
+
+    <% design_subsection 'Calendar', 'An organisation\'s events by month or as a list (events/_calendar.erb), with FullCalendar. Events are --theme-500, or in embeds the organisation\'s own colour, so the grid has one colour: today\'s circle and the events. Each has a tooltip with its location and time.' do %>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.19/index.global.min.js"></script>
+      <div id="calendar"></div>
+      <script>
+        $(function () {
+          var d = function (day, hour) { var t = new Date(); return new Date(t.getFullYear(), t.getMonth(), day, hour) }
+          new FullCalendar.Calendar(document.getElementById('calendar'), {
+            initialView: 'dayGridMonth',
+            headerToolbar: { left: 'today prev,next title', center: '', right: 'dayGridMonth,listMonth' },
+            buttonText: { today: 'Today', month: 'Month', week: 'Week', list: 'List' },
+            height: 'auto',
+            events: [['Ecstatic dance', 4, 19], ['Breathwork', 9, 18], ['Sound bath', 9, 20], ['Community supper', 15, 19], ['Full moon gathering', 21, 20], ['Men\'s circle', 27, 19]].map(function (e) {
+              return { title: e[0], start: d(e[1], e[2]), end: d(e[1], e[2] + 2), url: '#components', color: cssColor('var(--theme-500)') }
+            }),
+            eventDidMount: function (info) {
+              $(info.el).tooltip({ title: '<strong>' + info.event.title + '</strong><br><i class="bi bi-geo-alt-fill"></i> London', html: true, placement: 'top', trigger: 'hover', container: 'body' })
+            }
+          }).render()
+        })
+      </script>
+      <div class="spec">Day numbers and headings --bs-secondary-color, since FullCalendar makes them href-less anchors that would otherwise take the link colour · today's number white on a --theme-500 circle, with no day tint · toolbar buttons outline --bs-secondary, filled on hover and when active, 38px high · prev and next borderless · on mobile the title drops to --font-size-base and Today hides</div>
+    <% end %>
+
+    <div class="row g-5">
+      <% design_subsection 'Timetable', col: 'col-lg-6' do %>
+        <div class="row g-3">
+          <% [['Morning yoga', 'Ruby', '5'], ['Sharing circle', 'Sam', nil]].each do |name, by, img| %>
+            <div class="col-sm-6">
+              <div class="tactivity position-relative" style="<%= img ? "background: linear-gradient(rgba(var(--bs-black-rgb), 0.5), rgba(var(--bs-black-rgb), 0.5)), url('/images/dandelions/#{img}.jpeg'); background-size: cover; background-position: center" : 'background: var(--bs-white); border: 2px solid var(--bs-body-color)' %>">
+                <div class="position-absolute" style="bottom: 10px; left: 10px">
+                  <h3 class="mt-0 mb-0"><a class="<%= img ? 'text-white' : 'text-dark' %>" href="#components"><%= name %></a></h3>
+                  <span class="<%= img ? 'text-white' : 'text-dark' %>">by <a class="<%= img ? 'text-white' : 'text-dark' %>" href="#components"><%= by %></a></span>
+                </div>
+                <div class="position-absolute" style="right: 10px; bottom: 10px">
+                  <a class="<%= img ? 'text-white' : 'text-dark' %>" href="#components"><i class="bi bi-pencil-fill"></i></a>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <div class="spec">A gathering's activities (timetables/_tactivity.erb), dragged into a table-striped grid of times by spaces · 8rem tall, 16rem wide in the grid · with an image, it's darkened by black at 50% under white text; without, white with a 2px --bs-body-color border</div>
+      <% end %>
+
+      <% design_subsection 'Map markers', col: 'col-lg-6' do %>
+        <div class="d-flex align-items-end flex-wrap gap-4">
+          <% [['var(--theme-500)', 'bi-person-fill', 'People, gatherings'], ['var(--color-red-400)', 'bi-calendar-event', 'Events'], ['var(--color-red-400)', 'bi-flag-fill', 'Organisations']].each do |color, icon, label| %>
+            <div class="text-center">
+              <span class="position-relative d-inline-block" style="width: 36px; height: 48px">
+                <svg viewBox="-18 -48 36 48" width="36" height="48" aria-hidden="true"><path fill="<%= color %>" d="M0-48c-9.8 0-17.8 7.9-17.8 17.6C-17.8-14.9 0 0 0 0s17.8-14.9 17.8-30.4C17.8-40.1 9.8-48 0-48z"></path></svg>
+                <i class="bi <%= icon %> position-absolute start-50 translate-middle-x text-white" style="top: 8px; font-size: 18px"></i>
+              </span>
+              <div class="spec mt-1"><%= label %></div>
+            </div>
+          <% end %>
+          <% [['green', 8], ['yellow', 42], ['red', 130]].each do |color, n| %>
+            <div class="text-center">
+              <span class="d-inline-flex align-items-center justify-content-center fw-bold text-white" style="width: 50px; height: 50px; background: url('/images/cluster-<%= color %>.png') center / contain"><%= n %></span>
+              <div class="spec mt-1">cluster</div>
+            </div>
+          <% end %>
+        </div>
+        <div class="spec mt-3">Google Maps (map.js): map-icons pins in --theme-500 for people and gatherings, --color-red-400 for events and organisations, each with its white Bootstrap icon · clusters green, yellow, then red as they grow, with white Plus Jakarta Sans counts · areas drawn in --color-orange-400, filled at 35%</div>
+      <% end %>
+    </div>
+
+    <% design_subsection 'Cookie banner' do %>
+      <div class="cookie-consent position-static">
+        <div class="cookie-consent__copy">
+          <h2>Cookies on Dandelion</h2>
+          <p>Dandelion requires a few necessary cookies. We only use other cookies if you allow them.</p>
+          <p><a href="#components">Cookie policy</a> <span aria-hidden="true">&middot;</span> <a href="#components">Privacy policy</a></p>
+        </div>
+        <div class="cookie-consent__settings">
+          <div class="form-check mb-0"><input class="form-check-input" type="checkbox" id="dg-cookie-necessary" checked disabled><label class="form-check-label" for="dg-cookie-necessary">Necessary</label></div>
+          <div class="form-check mb-0"><input class="form-check-input" type="checkbox" id="dg-cookie-analytics"><label class="form-check-label" for="dg-cookie-analytics">Analytics</label></div>
+          <div class="form-check mb-0"><input class="form-check-input" type="checkbox" id="dg-cookie-marketing"><label class="form-check-label" for="dg-cookie-marketing">Marketing</label></div>
+        </div>
+        <div class="cookie-consent__actions">
+          <button type="button" class="btn btn-outline-primary">Save choices</button>
+          <button type="button" class="btn btn-primary">Accept all</button>
+        </div>
+      </div>
+      <div class="spec">layouts/_cookie_consent.erb, fixed 1rem from the bottom, up to 64rem wide · radius lg, --bs-gray-300 border, --bs-box-shadow · Necessary only and Customise until Customise is pressed, which shows the choices (as here, .form-check checkboxes) and Save choices · one column on mobile, the buttons stretched</div>
+    <% end %>
+
+    <% design_subsection 'Empty states' do %>
+      <div class="border rounded p-4"><p class="mb-0 text-body-secondary">No upcoming events</p></div>
+      <div class="spec">A short "No …" phrase in --bs-secondary-color (.text-body-secondary), left-aligned and without a full stop, where the list or table would be: grey, since it is the absence of content rather than content</div>
+    <% end %>
+
     <% design_subsection 'p.action', "A centred call to action for docs and email previews, where a .btn class can't be added. Drawn like btn-primary; emails use their own in email.css." do %>
       <div class="border rounded p-4">
         <p class="action m-0"><a href="#components">Confirm your email</a></p>
@@ -711,7 +988,7 @@
   <% end %>
 
   <!-- THEMING -->
-  <% design_section 'theming', 'Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check, progress bar and stats chart follows. Alerts and toasts use the ramp\'s tints with --theme-800 text on every page. theme.css is only variables: as well as the theme colour, it switches --calendar-event-color to the theme, and --ai-well-from/-to to the theme ramp\'s 50 and 400, the steps the default AI well takes of lavender. That is deliberate: the default site keeps calendar events --color-midnight and the AI well lavender, as its own accents. The date tile\'s month follows the theme too (see Date and icon tiles).'.html_safe do %>
+  <% design_section 'theming', 'Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check, progress bar and stats chart follows. Alerts and toasts use the ramp\'s tints with --theme-800 text on every page. theme.css is only variables: as well as the theme colour, it switches --ai-well-from/-to to the theme ramp\'s 50 and 400, the steps the default AI well takes of lavender. That is deliberate: the default site keeps the AI well lavender, as its own accent. The date tile\'s month follows the theme too (see Date and icon tiles).'.html_safe do %>
     <div class="row g-3">
       <% ([[nil, nil]] + themed_colors).each do |color, clamped| %>
         <div class="col-md-6 col-xxl-4">
