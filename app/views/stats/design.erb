@@ -581,6 +581,37 @@
       <% end %>
     </div>
 
+    <% design_subsection 'Date and icon tiles', 'The event page\'s date, location and link, as tiles beside the details they stand for. On the site they\'re CSS (.event-detail in app.css, over event_details.css): white, a --hairline border, --bs-box-shadow-sm, .3em corners, 2.5em square; the month a bold, letter-spaced band of --theme-50 in --theme-800 over a semibold day; icons 1.5em in black at 50%. On hover the tile turns solid theme. Emails can\'t rely on that CSS, so they show the same tiles as PNGs from <code>rake icons:generate</code> (app/views/icons), at 2.75em with the tile inset to match: green for the default theme, greys for events and organisations with their own colour.'.html_safe do %>
+      <% today = Date.today; png_date = "#{today.strftime('%b').downcase}_#{today.strftime('%d')}" %>
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="d-flex flex-wrap align-items-center gap-2 mb-3" style="font-size: var(--font-size-base)">
+            <span class="event-detail calendar-date">
+              <span class="month"><span class="month-text"><%= today.strftime('%b') %></span></span>
+              <span class="day"><%= today.day %></span>
+            </span>
+            <span class="text-nowrap me-3"><%= today.strftime('%a %-d %b') %></span>
+            <a href="#components" class="event-detail location"><img src="/images/icons/_geo-alt.png" alt=""></a>
+            <span class="me-3">Location</span>
+            <a href="#components" class="event-detail link"><img src="/images/icons/_link.png" alt=""></a>
+            <span>Link</span>
+          </div>
+          <div class="spec">Site: .event-detail.calendar-date, .event-detail.location (or the camera for online events) and .event-detail.link · hover one to see it turn solid theme</div>
+        </div>
+        <div class="col-lg-6">
+          <% { 'green' => 'Default theme', 'greyscale' => 'Own theme colour' }.each do |scheme, label| %>
+            <div class="d-flex align-items-center gap-2 mb-2" style="font-size: 1.1em">
+              <% ["calendar/png/#{scheme}/#{png_date}", "image/#{scheme}/image-camera-video", "image/#{scheme}/image-geo-alt"].each do |path| %>
+                <img src="/images/icons/<%= path %>.png" alt="" style="width: 2.75em">
+              <% end %>
+              <span class="small text-body-secondary ms-2"><%= label %></span>
+            </div>
+          <% end %>
+          <div class="spec mt-3">Email: 160px PNGs in app/assets/images/icons/calendar/png and icons/image, picked by _tickets_table.erb</div>
+        </div>
+      </div>
+    <% end %>
+
     <% design_subsection 'p.action', "A centred call to action for docs and email previews, where a .btn class can't be added. Drawn like btn-primary; emails use their own in email.css." do %>
       <div class="border rounded p-4">
         <p class="action m-0"><a href="#components">Confirm your email</a></p>
