@@ -3,9 +3,7 @@
   <% comment.read_receipts.create account: current_account %>
 <% end %>
 <div class="card mb-5" id="post-<%= post.id %>">
-  <div class="card-header text-bg-primary">
-    <h4 class="mb-0"><%= post.subject %></h4>
-  </div>
+  <h3 class="card-header text-bg-primary"><%= post.subject %></h3>
   <div class="card-body p-0">
     <div class="d-flex align-items-start px-2 pt-2">
       <span class="me-2">

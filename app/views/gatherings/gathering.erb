@@ -6,7 +6,7 @@
     </div>
     <% if @gathering.intro_for_members %>
       <div class="card mb-3">
-        <h5 class="card-header text-bg-primary">Welcome to <%= @gathering.name %>!</h5>
+        <h3 class="card-header text-bg-primary">Welcome to <%= @gathering.name %>!</h3>
         <div class="card-body pb-0">
           <div class="wysiwyg">
             <%== Sanitize.fragment(Rinku.auto_link(@gathering.intro_for_members), Sanitize::Config::DANDELION) %>
