@@ -2338,6 +2338,71 @@ ul.map-event li {
   color: var(--bs-white) !important;
 }
 
+.fc-prev-button, .fc-next-button {
+  border: none !important;
+}
+
+.fc-toolbar-title {
+  white-space: nowrap !important;
+}
+
+.fc-toolbar-chunk {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.fc-toolbar-chunk .fc-toolbar-title {
+  margin: 0 !important;
+}
+
+/* Ensure all toolbar buttons have consistent height */
+.fc-toolbar .fc-button {
+  height: 38px !important;
+  min-height: 38px !important;
+  line-height: 1.2 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px 12px !important;
+}
+
+/* Specific styling for arrow buttons to match other buttons */
+.fc-toolbar .fc-button-group .fc-button {
+  height: 38px !important;
+  min-height: 38px !important;
+}
+
+/* Ensure button groups maintain consistent height */
+.fc-toolbar .fc-button-group {
+  height: 38px !important;
+}
+
+/* Add margin between events to prevent squashing */
+.fc-event {
+  margin-bottom: 2px !important;
+}
+
+/* Add some padding to event content */
+.fc-event-main {
+  padding: 1px 2px !important;
+}
+
+/* Shorten month names and hide Today button on small screens */
+@media (max-width: 767.98px) {
+  .fc-toolbar-title {
+    font-size: var(--font-size-base) !important;
+  }
+
+  .fc-button-group {
+    margin-left: 0 !important;
+  }
+
+  .fc-toolbar .fc-today-button {
+    display: none !important;
+  }
+}
+
 /* ==========================================================================
    Events
    ========================================================================== */
