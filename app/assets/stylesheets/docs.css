@@ -159,7 +159,7 @@
 
 .doc-transcript summary {
   cursor: pointer;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   color: var(--theme-500);
   font-family: var(--header-font-family);
 }
@@ -207,7 +207,7 @@
 }
 
 .doc-index {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   line-height: 1.35;
 }
 

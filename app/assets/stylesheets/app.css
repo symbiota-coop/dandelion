@@ -60,15 +60,15 @@
   --color-paper: #FFFAF3;
   --body-font-family: "Plus Jakarta Sans", sans-serif;
   --header-font-family: "Hanken Grotesk", "Plus Jakarta Sans", sans-serif;
-  /* Type scale. bootstrap5.scss repeats the heading sizes (3xl to md) as $h1-font-size to $h6-font-size */
+  /* Type scale. bootstrap5.scss repeats the heading sizes (3xl to sm) as $h1-font-size to $h6-font-size */
   --font-size-xs: 0.75rem;
-  --font-size-md: 0.875rem;
+  --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
   --font-size-xl: 1.4rem;
   --font-size-2xl: 1.66rem;
   --font-size-3xl: 2rem;
-  --body-font-size: var(--font-size-md);
+  --body-font-size: var(--font-size-sm);
   /* Layout: the fixed header's row height, the sidebar's widths and #content's padding.
      --header-offset is the height the fixed header covers: one row, two on mobile where its icons wrap below */
   --header-height: 2.8125rem;
@@ -402,7 +402,7 @@
   padding: 0;
   background: var(--bs-gray-800);
   color: var(--bs-white);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   border-radius: 0;
   box-shadow: none;
 }
@@ -488,7 +488,7 @@
 .sidebar .nav {
   --bs-nav-link-padding-x: 0.75rem;
   --bs-nav-link-padding-y: 0.5rem;
-  --bs-nav-link-font-size: var(--font-size-md);
+  --bs-nav-link-font-size: var(--font-size-sm);
   --bs-nav-link-color: var(--bs-white);
   --bs-nav-link-hover-color: var(--bs-white);
   --bs-nav-pills-border-radius: var(--bs-border-radius);
@@ -523,7 +523,7 @@
 .sidebar .sub-menu {
   margin: 0 0 0 2.5625rem;
   padding: 0.3125rem 0;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
 }
 
 .sidebar .sub-menu a {
@@ -877,7 +877,7 @@ p.action a {
 }
 
 .popular-locations {
-  font-size: var(--font-size-md)
+  font-size: var(--font-size-sm)
 }
 
 /* ==========================================================================
@@ -1078,7 +1078,7 @@ p.action a {
   float: none;
   right: auto;
   margin-top: 0;
-  --bs-dropdown-font-size: var(--font-size-md);
+  --bs-dropdown-font-size: var(--font-size-sm);
   --bs-dropdown-link-active-bg: var(--theme-500);
   border-radius: var(--bs-border-radius-lg);
   box-shadow: var(--bs-box-shadow);
@@ -1110,7 +1110,7 @@ p.action a {
 
 .dropdown-header {
   border-bottom: 1px solid var(--bs-border-color);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   color: var(--bs-emphasis-color);
   padding: 0.625rem 1rem;
 }
@@ -1206,7 +1206,7 @@ p.action a {
 
   .nav-crumbs .btn {
     max-width: 12rem;
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-sm);
     white-space: nowrap;
   }
 
@@ -1541,7 +1541,7 @@ label.remove-image input {
 }
 
 .nav {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   --bs-nav-link-hover-color: var(--bs-emphasis-color);
 }
 
@@ -1741,7 +1741,7 @@ body .table > tfoot > tr > th {
 /* jQuery UI puts the menu flush under its input, so it's square at the top, where it joins it, with the base radius below, like Select2's dropdowns */
 .ui-autocomplete {
   border: 1px solid var(--hairline) !important;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   padding: 1rem 0;
   box-shadow: var(--bs-box-shadow);
   border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius);
@@ -2222,7 +2222,7 @@ small.form-text {
    ========================================================================== */
 
 ul.map-event li {
-  font-size: var(--font-size-md) !important
+  font-size: var(--font-size-sm) !important
 }
 
 /* Google Maps and the map-icons markers draw in pixels, so these overrides stay in px to line up with them */
@@ -2674,7 +2674,7 @@ td .tactivity-accept {
 
 .tactivity a,
 .tactivity span {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   color: var(--bs-white)
 }
 
@@ -2834,7 +2834,7 @@ p.action a {
   display: inline-block;
   padding: 0.5rem 1rem;
   border: 1px solid transparent;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   font-weight: 600;
   line-height: 1.5;
   color: var(--bs-white);

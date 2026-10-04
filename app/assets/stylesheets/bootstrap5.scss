@@ -28,8 +28,8 @@ $h1-font-size: 2rem; // --font-size-3xl
 $h2-font-size: 1.66rem; // --font-size-2xl
 $h3-font-size: 1.4rem; // --font-size-xl
 $h4-font-size: 1.125rem; // --font-size-lg
-$h5-font-size: .875rem; // --font-size-md
-$h6-font-size: .875rem; // --font-size-md, as h5: we use h5 rather than h6, which only appears in user-written descriptions
+$h5-font-size: .875rem; // --font-size-sm
+$h6-font-size: .875rem; // --font-size-sm, as h5: we use h5 rather than h6, which only appears in user-written descriptions
 $line-height-base: 1.5;
 
 // Keep Bootstrap 4's look and behaviour where Bootstrap 5 changed the defaults
@@ -71,7 +71,7 @@ $hr-border-color: $gray-400;
 $input-color: #000;
 $input-border-color: $gray-400;
 $input-font-size: .875rem; // matches --body-font-size in app.css (Sass needs a literal for its calculations)
-$input-font-size-sm: .875rem; // --font-size-md, as btn-sm
+$input-font-size-sm: .875rem; // --font-size-sm, as btn-sm
 // Fields and buttons share their vertical padding, so they're the same height side by side (about 2.4rem, 2.1rem small)
 $input-btn-padding-y: .5rem;
 $input-btn-padding-y-sm: .375rem;
@@ -93,10 +93,10 @@ $form-switch-padding-start: 0;
 $form-switch-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3.3' cy='.35' fill='rgba(0,0,0,.35)'/%3e%3ccircle r='3.3' fill='%23fff'/%3e%3c/svg%3e");
 $form-switch-focus-bg-image: $form-switch-bg-image;
 $form-switch-checked-bg-image: $form-switch-bg-image;
-$btn-font-size: .875rem; // --font-size-md
+$btn-font-size: .875rem; // --font-size-sm
 $btn-padding-x: 1rem;
 $btn-padding-x-sm: .75rem;
-$btn-font-size-sm: .875rem; // --font-size-md
+$btn-font-size-sm: .875rem; // --font-size-sm
 $btn-padding-y-lg: .625rem;
 $btn-padding-x-lg: 1rem;
 $btn-font-size-lg: 1.125rem; // --font-size-lg
@@ -111,7 +111,7 @@ $alert-padding-y: .875rem;
 $alert-padding-x: 1rem;
 $alert-border-width: 0;
 $toast-border-width: 0;
-$tooltip-font-size: .875rem; // --font-size-md
+$tooltip-font-size: .875rem; // --font-size-sm
 $table-cell-padding-y: .75rem;
 $table-cell-padding-x: .75rem;
 $table-cell-padding-y-sm: .5rem;
