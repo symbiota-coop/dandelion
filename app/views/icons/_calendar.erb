@@ -1,62 +1,64 @@
 <%
-  # Configuration - base unit for scaling
-  base_unit = 8
-    
-  # Dimensions relative to base unit
-  svg_size = base_unit * 20          # 160
-  viewbox_size = base_unit * 20      # 160
-  
-  # Layout measurements
-  corner_radius = base_unit * 1      # 8  
-  border_width = base_unit * 1       # 8
-  outer_padding = base_unit * 1      # 8
-  inner_padding = base_unit * 1.5    # 12  
-  
-  # Month section
-  month_height = base_unit * 7       # 56
-  month_divider_y = base_unit * 8    # 64
-  
-  # Day section
-  day_height = base_unit * 10.5      # 84
-  
-  # Text positioning
-  month_text_x = base_unit * 10      # 80
-  month_text_y = base_unit * 6       # 48
-  day_text_x = base_unit * 10        # 80
-  day_text_y = base_unit * 16.375    # 131
-  
-  # Font sizes
-  month_font_size = base_unit * 4    # 32
-  day_font_size = base_unit * 8      # 64
-  
-  # Stroke width
-  stroke_width = base_unit * 1       # 8
+  # Drawn like the site's date tile (.event-detail.calendar-date in app.css and event_details.css), for emails, where it's
+  # a PNG: white with a hairline border and a soft shadow, the month a bold, letter-spaced band over a semibold day.
+  # The tile is 144 units (2.5em on the site, so 1em is 57.6), inset 8 so the shadow fits in the 160 canvas.
+  svg_size = 160
+  inset = 8
+  tile_size = 144
+  em = tile_size / 2.5
 
-  # Colors (can be set from rake task, defaults provided)
-  month_bg_color ||= "#B9EAD1"         # Light green background
-  border_color ||= "#8DDCB2"           # Medium green border/stroke
-  text_color ||= "#666"                # Gray text color  
+  corner_radius = (0.3 * em).round(2) # .3em
+  border_width = (tile_size / 41.0).round(2) # 1px of a 41px tile
+
+  # Text sits at line-height 1, where Plus Jakarta Sans puts its baseline .9 of the way down
+  baseline = 0.9
+
+  # Month band: inside the border, .65em text with .3em above and .25em below it
+  month_font_size = 0.65 * em
+  month_band_height = month_font_size * (0.3 + 1 + 0.25)
+  month_text_y = inset + border_width + (month_font_size * (0.3 + baseline))
+  month_letter_spacing = 0.06 * month_font_size
+
+  # Day: 1em text, .12em below the band
+  day_font_size = em
+  day_text_y = inset + border_width + month_band_height + (day_font_size * (0.12 + baseline))
+
+  font_family = 'Plus Jakarta Sans, Helvetica Neue, sans-serif' # unquoted, so rsvg-convert's fontconfig finds it
+
+  # Colours (set from the rake task; these are the default green's 50 and 800)
+  month_bg_color ||= '#e9fbed'
+  month_text_color ||= '#006f2a'
+  day_text_color ||= '#000000'
 %>
+<svg width="<%= svg_size %>" height="<%= svg_size %>" viewBox="0 0 <%= svg_size %> <%= svg_size %>" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="<%= border_width %>" stdDeviation="<%= border_width %>" flood-color="#000000" flood-opacity="0.06"/>
+    </filter>
+    <clipPath id="tile">
+      <rect x="<%= inset %>" y="<%= inset %>" width="<%= tile_size %>" height="<%= tile_size %>" rx="<%= corner_radius %>" ry="<%= corner_radius %>"/>
+    </clipPath>
+  </defs>
 
-<svg width="<%= svg_size %>" height="<%= svg_size %>" viewBox="0 0 <%= viewbox_size %> <%= viewbox_size %>" xmlns="http://www.w3.org/2000/svg">
-  <!-- Month section background -->
-  <rect x="<%= inner_padding %>" y="<%= outer_padding %>" width="<%= svg_size - inner_padding * 2 %>" height="<%= month_height %>"
-        fill="<%= month_bg_color %>"/>
-  <!-- Main calendar border -->
-  <rect x="<%= outer_padding %>" y="<%= outer_padding %>" width="<%= svg_size - outer_padding * 2 %>" height="<%= svg_size - outer_padding * 2 %>" rx="<%= corner_radius %>" ry="<%= corner_radius %>"
-        fill="transparent" stroke="<%= border_color %>" stroke-width="<%= stroke_width %>"/>
+  <!-- Tile, with its shadow -->
+  <rect x="<%= inset %>" y="<%= inset %>" width="<%= tile_size %>" height="<%= tile_size %>" rx="<%= corner_radius %>" ry="<%= corner_radius %>"
+        fill="#ffffff" filter="url(#shadow)"/>
 
-  <!-- Month divider line -->
-  <line x1="<%= outer_padding %>" y1="<%= month_divider_y %>" x2="<%= svg_size - outer_padding %>" y2="<%= month_divider_y %>"
-        stroke="<%= border_color %>" stroke-width="<%= stroke_width %>"/>
+  <!-- Month band -->
+  <rect x="<%= inset %>" y="<%= inset %>" width="<%= tile_size %>" height="<%= (border_width + month_band_height).round(2) %>" fill="<%= month_bg_color %>" clip-path="url(#tile)"/>
 
-  <!-- Month text -->
-  <text x="<%= month_text_x %>" y="<%= month_text_y %>" text-anchor="middle"
-        font-family="Helvetica Neue" font-size="<%= month_font_size %>"
-        fill="<%= text_color %>" text-transform="uppercase"><%= month %></text>
+  <!-- Hairline border (black at 10%), inside the tile's edge -->
+  <rect x="<%= (inset + (border_width / 2)).round(2) %>" y="<%= (inset + (border_width / 2)).round(2) %>" width="<%= (tile_size - border_width).round(2) %>" height="<%= (tile_size - border_width).round(2) %>"
+        rx="<%= (corner_radius - (border_width / 2)).round(2) %>" ry="<%= (corner_radius - (border_width / 2)).round(2) %>"
+        fill="none" stroke="#000000" stroke-opacity="0.1" stroke-width="<%= border_width %>"/>
+
+  <!-- Month text: its letter-spacing trails the last letter too, as on the site -->
+  <text x="<%= svg_size / 2.0 %>" y="<%= month_text_y.round(2) %>" text-anchor="middle"
+        font-family="<%= font_family %>" font-size="<%= month_font_size.round(2) %>" font-weight="700" letter-spacing="<%= month_letter_spacing.round(2) %>"
+        fill="<%= month_text_color %>"><%= month %></text>
 
   <!-- Day text -->
-  <text x="<%= day_text_x %>" y="<%= day_text_y %>" text-anchor="middle"
-        font-family="Helvetica Neue" font-size="<%= day_font_size %>"
-        fill="<%= text_color %>"><%= day %></text>
+  <text x="<%= svg_size / 2.0 %>" y="<%= day_text_y.round(2) %>" text-anchor="middle"
+        font-family="<%= font_family %>" font-size="<%= day_font_size.round(2) %>" font-weight="600"
+        fill="<%= day_text_color %>"><%= day %></text>
 </svg>

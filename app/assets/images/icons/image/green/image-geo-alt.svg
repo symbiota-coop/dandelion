@@ -1,12 +1,22 @@
 
-
 <svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-  <!-- Border -->
-  <rect x="8" y="8" width="144" height="144" rx="8" ry="8"
-    fill="transparent" stroke="#8DDCB2" stroke-width="8"/>
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3.51" stdDeviation="3.51" flood-color="#000000" flood-opacity="0.06"/>
+    </filter>
+  </defs>
 
-  <!-- Image icon -->
-  <g transform="translate(32, 32) scale(6.0)" style="filter: brightness(0) invert(22.5%);">
+  <!-- Tile, with its shadow -->
+  <rect x="8" y="8" width="144" height="144" rx="17.28" ry="17.28"
+        fill="#ffffff" filter="url(#shadow)"/>
+
+  <!-- Hairline border (black at 10%), inside the tile's edge -->
+  <rect x="9.75" y="9.75" width="140.49" height="140.49"
+        rx="15.53" ry="15.53"
+        fill="none" stroke="#000000" stroke-opacity="0.1" stroke-width="3.51"/>
+
+  <!-- Icon -->
+  <g transform="translate(36.8, 36.8) scale(5.4)" fill="#000000" opacity="0.5">
     
   <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
   <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>

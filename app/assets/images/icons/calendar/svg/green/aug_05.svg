@@ -1,24 +1,33 @@
 
-
 <svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-  <!-- Month section background -->
-  <rect x="12.0" y="8" width="136.0" height="56"
-        fill="#B9EAD1"/>
-  <!-- Main calendar border -->
-  <rect x="8" y="8" width="144" height="144" rx="8" ry="8"
-        fill="transparent" stroke="#8DDCB2" stroke-width="8"/>
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3.51" stdDeviation="3.51" flood-color="#000000" flood-opacity="0.06"/>
+    </filter>
+    <clipPath id="tile">
+      <rect x="8" y="8" width="144" height="144" rx="17.28" ry="17.28"/>
+    </clipPath>
+  </defs>
 
-  <!-- Month divider line -->
-  <line x1="8" y1="64" x2="152" y2="64"
-        stroke="#8DDCB2" stroke-width="8"/>
+  <!-- Tile, with its shadow -->
+  <rect x="8" y="8" width="144" height="144" rx="17.28" ry="17.28"
+        fill="#ffffff" filter="url(#shadow)"/>
 
-  <!-- Month text -->
-  <text x="80" y="48" text-anchor="middle"
-        font-family="Helvetica Neue" font-size="32"
-        fill="#666" text-transform="uppercase">AUG</text>
+  <!-- Month band -->
+  <rect x="8" y="8" width="144" height="61.54" fill="#e9fbed" clip-path="url(#tile)"/>
+
+  <!-- Hairline border (black at 10%), inside the tile's edge -->
+  <rect x="9.75" y="9.75" width="140.49" height="140.49"
+        rx="15.53" ry="15.53"
+        fill="none" stroke="#000000" stroke-opacity="0.1" stroke-width="3.51"/>
+
+  <!-- Month text: its letter-spacing trails the last letter too, as on the site -->
+  <text x="80.0" y="56.44" text-anchor="middle"
+        font-family="Plus Jakarta Sans, Helvetica Neue, sans-serif" font-size="37.44" font-weight="700" letter-spacing="2.25"
+        fill="#006f2a">AUG</text>
 
   <!-- Day text -->
-  <text x="80" y="131.0" text-anchor="middle"
-        font-family="Helvetica Neue" font-size="64"
-        fill="#666">5</text>
+  <text x="80.0" y="128.29" text-anchor="middle"
+        font-family="Plus Jakarta Sans, Helvetica Neue, sans-serif" font-size="57.6" font-weight="600"
+        fill="#000000">5</text>
 </svg>

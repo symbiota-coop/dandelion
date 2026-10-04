@@ -2343,8 +2343,9 @@ table.event-details td {
   font-size: var(--font-size-base)
 }
 
-/* The date and icon tiles, restyled for the site: event_details.css draws them for emails, with a thick green border and band.
-   Here they're white with a hairline border and a soft shadow, like cards; the date's month is a band of the theme's 50 in its 800, over a bold day */
+/* The date and icon tiles, restyled for the site from event_details.css's thick green border and band. Emails show the
+   same tiles as PNGs (rake icons:generate). Here they're white with a hairline border and a soft shadow, like cards;
+   the date's month is a band of the theme's 50 in its 800, over a bold day */
 .event-detail {
   border: 1px solid var(--hairline);
   border-radius: 0.3em;

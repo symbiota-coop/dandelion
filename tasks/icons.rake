@@ -17,17 +17,19 @@ namespace :icons do
     calendar_template_path = Padrino.root('app', 'views', 'icons', '_calendar.erb')
     calendar_template_content = File.read(calendar_template_path)
 
-    # Color schemes for calendar icons
+    # Color schemes for calendar icons: emails use green for the default theme and greyscale for events and
+    # organisations with their own, since the PNGs can't take any colour. Green is the default theme's 50 and 800,
+    # as on the site's date tile; greyscale is --bs-gray-200 and 800
     color_schemes = {
       green: {
-        month_bg_color: '#B9EAD1',  # Light green background
-        border_color: '#8DDCB2',    # Medium green border/stroke
-        text_color: '#666' # Gray text color
+        month_bg_color: '#e9fbed',
+        month_text_color: '#006f2a',
+        day_text_color: '#000000'
       },
       greyscale: {
-        month_bg_color: '#E5E5E5',  # Light gray background
-        border_color: '#999999',    # Medium gray border/stroke
-        text_color: '#333333'       # Dark gray text color
+        month_bg_color: '#ecebea',
+        month_text_color: '#3a3938',
+        day_text_color: '#000000'
       }
     }
 
@@ -50,8 +52,8 @@ namespace :icons do
 
       # Set color variables for this scheme
       month_bg_color = colors[:month_bg_color]
-      border_color = colors[:border_color]
-      text_color = colors[:text_color]
+      month_text_color = colors[:month_text_color]
+      day_text_color = colors[:day_text_color]
 
       calendar_svg_generated = 0
       calendar_png_converted = 0
@@ -130,52 +132,58 @@ namespace :icons do
     image_svg_generated = 0
     image_png_converted = 0
 
-    icons.each do |icon_name|
-      # Generate filenames
-      svg_filename = "image-#{icon_name}.svg"
-      png_filename = "image-#{icon_name}.png"
-      svg_filepath = File.join(image_dir, svg_filename)
-      png_filepath = File.join(image_dir, png_filename)
+    # The image tiles carry no theme colour, so green and greyscale are the same; emails pick the directory as for the calendar
+    color_schemes.each_key do |scheme_name|
+      scheme_image_dir = File.join(image_dir, scheme_name.to_s)
+      FileUtils.mkdir_p(scheme_image_dir)
 
-      # Generate SVG if it doesn't exist
-      if File.exist?(svg_filepath)
-        puts "Skipping #{svg_filename} (already exists)"
-      else
-        begin
-          # Generate SVG content using ERB template
-          erb = ERB.new(image_template_content)
-          image = icon_name # Set the image variable for the template
-          svg_content = erb.result(binding)
+      icons.each do |icon_name|
+        # Generate filenames
+        svg_filename = "image-#{icon_name}.svg"
+        png_filename = "image-#{icon_name}.png"
+        svg_filepath = File.join(scheme_image_dir, svg_filename)
+        png_filepath = File.join(scheme_image_dir, png_filename)
 
-          # Save the SVG content
-          File.write(svg_filepath, svg_content)
-          puts "Generated #{svg_filename}"
-          image_svg_generated += 1
-        rescue StandardError => e
-          puts "Error generating #{svg_filename}: #{e.message}"
-          next
-        end
-      end
+        # Generate SVG if it doesn't exist
+        if File.exist?(svg_filepath)
+          puts "Skipping #{scheme_name}/#{svg_filename} (already exists)"
+        else
+          begin
+            # Generate SVG content using ERB template
+            erb = ERB.new(image_template_content)
+            image = icon_name # Set the image variable for the template
+            svg_content = erb.result(binding)
 
-      # Convert to PNG if PNG doesn't exist
-      if File.exist?(png_filepath)
-        puts "Skipping #{png_filename} (already exists)"
-      else
-        begin
-          # Convert SVG to PNG using rsvg-convert
-          # --width 160 --height 160: Set output dimensions
-          # --format png: Specify PNG output format
-          # --background-color transparent: Keep transparent background
-          system("rsvg-convert --width 160 --height 160 --format png --background-color white '#{svg_filepath}' > '#{png_filepath}'")
-
-          if File.exist?(png_filepath)
-            puts "Converted #{svg_filename} → #{png_filename}"
-            image_png_converted += 1
-          else
-            puts "Failed to convert #{svg_filename}"
+            # Save the SVG content
+            File.write(svg_filepath, svg_content)
+            puts "Generated #{scheme_name}/#{svg_filename}"
+            image_svg_generated += 1
+          rescue StandardError => e
+            puts "Error generating #{scheme_name}/#{svg_filename}: #{e.message}"
+            next
           end
-        rescue StandardError => e
-          puts "Error converting #{svg_filename}: #{e.message}"
+        end
+
+        # Convert to PNG if PNG doesn't exist
+        if File.exist?(png_filepath)
+          puts "Skipping #{scheme_name}/#{png_filename} (already exists)"
+        else
+          begin
+            # Convert SVG to PNG using rsvg-convert
+            # --width 160 --height 160: Set output dimensions
+            # --format png: Specify PNG output format
+            # --background-color white: Set white background
+            system("rsvg-convert --width 160 --height 160 --format png --background-color white '#{svg_filepath}' > '#{png_filepath}'")
+
+            if File.exist?(png_filepath)
+              puts "Converted #{scheme_name}/#{svg_filename} → #{scheme_name}/#{png_filename}"
+              image_png_converted += 1
+            else
+              puts "Failed to convert #{scheme_name}/#{svg_filename}"
+            end
+          rescue StandardError => e
+            puts "Error converting #{scheme_name}/#{svg_filename}: #{e.message}"
+          end
         end
       end
     end
