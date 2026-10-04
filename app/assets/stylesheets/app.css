@@ -2353,6 +2353,22 @@ table.event-details td {
   transition: background-color 0.15s, border-color 0.15s, color 0.15s;
 }
 
+/* Icon tiles centre their icon, rather than relying on event_details.css's margin, which allows for its thicker border */
+.event-detail:not(.calendar-date) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.event-detail:not(.calendar-date) img {
+  margin-top: 0;
+}
+
+/* The link glyph sits 2/64 low in its icon (as in Bootstrap's), so it's lifted by that much of its 1.5em */
+.event-detail.link img {
+  translate: 0 -0.047em;
+}
+
 .event-detail.calendar-date .month {
   background: var(--theme-50);
   border-bottom: 0;
