@@ -1,7 +1,7 @@
 <% if comment.commentable.respond_to?(:gathering) %>
   <% comment.read_receipts.create account: current_account %>
 <% end %>
-<div class="d-flex align-items-start m-0" style="padding: 10px 10px 0 10px">
+<div class="d-flex align-items-start m-0 px-2 pt-2">
   <span class="me-2">
     <%= partial :'accounts/square', locals: { account: comment.account, width: '32px' } %>
   </span>
