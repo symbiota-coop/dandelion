@@ -1551,7 +1551,7 @@ label.remove-image input {
   text-decoration: none;
 }
 
-/* Dark text on --bs-secondary-bg, as in the autocomplete (dropdown items hover on the lighter --bs-tertiary-bg): theme-coloured text on grey reads poorly.
+/* Dark text on --bs-secondary-bg, a step darker than menu items' --bs-tertiary-bg: theme-coloured text on grey reads poorly.
    Through the hover colour variable, so navs that set their own (the sidebar's white) keep it */
 .nav > li > a:focus,
 .nav > li > a:hover {
@@ -1776,7 +1776,7 @@ body .table > tfoot > tr > th {
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active {
   border: none;
-  background: var(--bs-secondary-bg);
+  background: var(--bs-tertiary-bg);
   color: var(--bs-emphasis-color);
 }
 
