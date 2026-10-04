@@ -7,7 +7,7 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_inc
 <% r = 0 %>
 
 <% if recommended_events.empty? %>
-  <em>No recommended events</em>
+  <span class="text-body-secondary">No recommended events</span>
 <% else %>
   <div class="mb-3">
     <div class="row" id="events">

@@ -100,7 +100,7 @@
       <% } %>
     </table>
   <% else %>
-    <em>No dietary requirements.</em>
+    <span class="text-body-secondary">No dietary requirements</span>
   <% end %>
 <% when 'map' %>
   <%= partial :'maps/map', locals: { points: Account.and(:id.in => @memberships.pluck(:account_id)).and(:coordinates.ne => nil) } %>

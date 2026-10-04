@@ -6,7 +6,7 @@ recommended_people = @account.recommended_people || []
 <% p = 0 %>
 
 <% if recommended_people.empty? %>
-  <em>No recommended people</em>
+  <span class="text-body-secondary">No recommended people</span>
 <% else %>
   <ul class="search-result-list">
     <% recommended_people.each_with_index { |x,i| k,v = x;

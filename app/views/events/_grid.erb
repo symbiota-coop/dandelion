@@ -15,9 +15,7 @@
     <% previous_event = event } %>
   </div>
   <% if event_count == 0 %>
-    <div class="text-center">
-      <p><em>No events</em></p>
-    </div>
+    <p class="text-body-secondary">No events</p>
   <% elsif params[:show_more] && event_count > 6 %>
     <div class="text-center mt-3">
       <a onclick="$('.event-block').show(); $(this).hide();" href="javascript:;">Show more</a>

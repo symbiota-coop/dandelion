@@ -2,7 +2,7 @@
 <p class="text-body-secondary">Generated texts from <code>OpenRouter.chat</code>, newest first.</p>
 
 <% if @generations.empty? %>
-  <p class="text-body-secondary">No generations logged yet.</p>
+  <p class="text-body-secondary">No generations logged yet</p>
 <% else %>
   <% @generations.group_by { |g| g.created_at.to_date }.each do |date, day_generations| %>
     <h5 class="mt-4"><%= date.strftime('%b %d, %Y') %> <span class="text-body-secondary">(<%= day_generations.size %>)</span></h5>

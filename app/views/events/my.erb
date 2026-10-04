@@ -33,7 +33,7 @@
       <%= will_paginate events, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer, params: { 'tab' => 'upcoming' } %>
     </div>
   <% else %>
-    <em>No upcoming events</em>
+    <span class="text-body-secondary">No upcoming events</span>
   <% end %>
 
 <% elsif tab == 'starred' %>
@@ -44,7 +44,7 @@
       <%= will_paginate events, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer, params: { 'tab' => 'starred' } %>
     </div>
   <% else %>
-    <em>No starred upcoming events</em>
+    <span class="text-body-secondary">No starred upcoming events</span>
   <% end %>
 
 <% elsif tab == 'past' %>
@@ -113,6 +113,6 @@
     <%= will_paginate events, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer, params: { 'tab' => 'past' } %>
   </div>
 <% else %>
-  <em>No past events</em>
+  <span class="text-body-secondary">No past events</span>
 <% end %>
 <% end %>
