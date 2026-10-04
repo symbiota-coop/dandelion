@@ -240,7 +240,7 @@
              ['--bs-border-radius', 'Inputs, buttons, button groups, alerts, toasts, pagination, tooltips, sidebar pills; the bottom corners of menus that hang from their input (autocomplete, Select2)'],
              ['--bs-border-radius-lg', 'Cards, modals, menus and panels: dropdowns, cookie banner, AI well, ask box. Also form-control-lg and btn-lg'],
              ['--bs-border-radius-xl', 'Mobile bottom sheet (top corners), marketing cards'],
-             ['--bs-border-radius-pill', 'Badges, nav crumbs, avatars, round buttons and dots']
+             ['--bs-border-radius-pill', 'Badges, nav crumbs, the header and chat avatars, round buttons and dots']
            ].each do |name, note| %>
           <div class="col-6 col-md">
             <div class="bg-body-secondary border mb-2" style="height: 72px; border-radius: var(<%= name %>)"></div>
@@ -1237,7 +1237,7 @@
             </div>
           <% end %>
         </div>
-        <div class="spec mt-3">Square, never round (accounts/_square.erb): the account's thumbnail or Gravatar, with their name in a tooltip · 32px in comments, 50px in lists of people (the most common), 64–100px on cards and profiles · img.private at 50%, full on hover</div>
+        <div class="spec mt-3">Square (accounts/_square.erb), except the 1.75rem header avatar and the 1.5rem chat avatars, which are round: the account's thumbnail or Gravatar, with their name in a tooltip · 32px in comments, 50px in lists of people (the most common), 64–100px on cards and profiles · img.private at 50%, full on hover</div>
       <% end %>
     </div>
 
