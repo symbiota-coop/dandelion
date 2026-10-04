@@ -2701,7 +2701,7 @@ td .tactivity-accept {
   margin: 0 auto;
   padding: 1rem;
   background: var(--bs-body-bg);
-  border: 1px solid var(--bs-gray-300);
+  border: 1px solid var(--hairline);
   border-radius: var(--bs-border-radius-lg);
   box-shadow: var(--bs-box-shadow);
 }
