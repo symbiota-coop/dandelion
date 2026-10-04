@@ -102,7 +102,7 @@ $(function () {
   }
 
   $donationAmount.focus(function () {
-    $('#donation-percent-buttons button').addClass('btn-outline-secondary').removeClass('btn-secondary selected-percent')
+    $('#donation-percent-buttons button').removeClass('active selected-percent')
   })
 
   if ($('#donation-percent-buttons').length && $('#donation-cleared-modal').length) {
@@ -149,8 +149,8 @@ $(function () {
   }
 
   $('#donation-percent-buttons button').click(function () {
-    $('#donation-percent-buttons button').addClass('btn-outline-secondary').removeClass('btn-secondary selected-percent')
-    $(this).removeClass('btn-outline-secondary').addClass('btn-secondary selected-percent')
+    $('#donation-percent-buttons button').removeClass('active selected-percent')
+    $(this).addClass('active selected-percent')
     setTotal()
   })
 
@@ -181,10 +181,10 @@ $(function () {
     if (typeof dp !== 'undefined') {
       let donationAmount = parseFloat(p * (dp / 100))
       if (config.minimumApplicationFee && donationAmount < config.minimumApplicationFee) {
-        $('#donation-percent-buttons button').addClass('btn-outline-secondary').removeClass('btn-secondary')
+        $('#donation-percent-buttons button').removeClass('active')
         setDonationAmountValue(config.minimumApplicationFee)
       } else {
-        $('#donation-percent-buttons button.selected-percent').removeClass('btn-outline-secondary').addClass('btn-secondary')
+        $('#donation-percent-buttons button.selected-percent').addClass('active')
         setDonationAmountValue(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
       }
     }
