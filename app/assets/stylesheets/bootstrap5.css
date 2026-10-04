@@ -108,7 +108,7 @@
   --bs-border-width: 1px;
   --bs-border-style: solid;
   --bs-border-color: #e2e1e0;
-  --bs-border-color-translucent: rgba(0, 0, 0, 0.175);
+  --bs-border-color-translucent: rgba(0, 0, 0, 0.1);
   --bs-border-radius: 0.5rem;
   --bs-border-radius-sm: 0.375rem;
   --bs-border-radius-lg: 0.75rem;
@@ -4602,8 +4602,8 @@ textarea.form-control-lg {
   --bs-pagination-border-color: transparent;
   --bs-pagination-border-radius: var(--bs-border-radius);
   --bs-pagination-hover-color: #000;
-  --bs-pagination-hover-bg: transparent;
-  --bs-pagination-hover-border-color: #d4d3d2;
+  --bs-pagination-hover-bg: #ecebea;
+  --bs-pagination-hover-border-color: transparent;
   --bs-pagination-focus-color: #000;
   --bs-pagination-focus-bg: transparent;
   --bs-pagination-focus-box-shadow: 0 0 0 2px rgba(0, 175, 94, 0.6);

@@ -61,6 +61,8 @@ $enable-rfs: false;
 $box-shadow-sm: 0 1px 2px rgba(#000, .06);
 $box-shadow: 0 1px 2px rgba(#000, .04), 0 4px 12px rgba(#000, .08);
 $box-shadow-lg: 0 2px 4px rgba(#000, .04), 0 12px 32px rgba(#000, .12);
+// The hairline (--hairline in app.css): cards, dropdowns, modals, toasts and popovers all take their borders from it
+$border-color-translucent: rgba(#000, .1);
 $body-secondary-color: $gray-600; // text-body-secondary and form-text
 $body-secondary-bg: $gray-200; // --bs-secondary-bg: hovered nav links, switches when off
 $body-tertiary-bg: $gray-100; // --bs-tertiary-bg: wells, hovered dropdown and list items
@@ -122,8 +124,8 @@ $pagination-bg: transparent;
 $pagination-border-color: transparent;
 $pagination-margin-start: .1875rem;
 $pagination-hover-color: #000;
-$pagination-hover-bg: transparent;
-$pagination-hover-border-color: $gray-400;
+$pagination-hover-bg: $gray-200; // like hovered pills and nav links
+$pagination-hover-border-color: transparent;
 $pagination-focus-color: #000;
 $pagination-focus-bg: transparent;
 $pagination-active-color: #000;
