@@ -1,0 +1,34 @@
+/*
+ * Event feedback form (/events/:id/feedback): the star rating and its questions.
+ * Loaded only by event_feedbacks/build.erb, after app.css.
+ */
+
+.feedback-stars .bi-star-fill {
+  cursor: pointer;
+  font-size: 2.75rem;
+  color: var(--bs-gray-300);
+  transition: color 0.12s ease, transform 0.12s ease;
+  margin: 0 0.1rem;
+}
+
+.feedback-stars .bi-star-fill.text-warning {
+  color: var(--color-orange-400) !important;
+}
+
+.feedback-stars .bi-star-fill:hover {
+  transform: scale(1.08);
+}
+
+.feedback-rating-panel {
+  background: var(--bs-gray-100);
+  border-radius: var(--bs-border-radius-lg);
+}
+
+.feedback-question-label {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+}
+
+.feedback-question-answer {
+  font-size: var(--font-size-base);
+}
