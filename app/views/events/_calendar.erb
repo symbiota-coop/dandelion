@@ -32,7 +32,7 @@
                 end: isMultiDay ? null : event.end_time, // Don't set end for multi-day events
                 allDay: isMultiDay, // Make multi-day events appear as all-day on start date
                 url: '/e/' + event.slug,
-                color: <%== params[:minimal] && @organisation.theme_color ? @organisation.theme_color.to_json : "cssColor('var(--color-midnight)')" %>,
+                color: <%== params[:minimal] && @organisation.theme_color ? @organisation.theme_color.to_json : "cssColor('var(--theme-500)')" %>,
                 extendedProps: {
                   location: event.location,
                   when_details: event.when_details
