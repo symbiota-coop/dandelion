@@ -1,5 +1,6 @@
 <% conversions = google_ads_conversions %>
-<% first_id = conversions.first[:id] %>
+<% if (first = conversions.first) %>
+<% first_id = first[:id] %>
 <script type="text/plain" data-cookie-category="marketing" async src="https://www.googletagmanager.com/gtag/js?id=AW-<%= first_id %>"></script>
 <script type="text/plain" data-cookie-category="marketing">
   window.dataLayer = window.dataLayer || [];
@@ -33,3 +34,4 @@
     })();
   <% end %>
 </script>
+<% end %>
