@@ -234,8 +234,8 @@
       <div class="row g-3">
         <% [
              ['--bs-border-radius-sm', 'form-control-sm and btn-sm, Select2 tags'],
-             ['--bs-border-radius', 'Inputs, buttons, button groups, alerts, toasts, pagination, tooltips, sidebar pills'],
-             ['--bs-border-radius-lg', 'Cards, modals, menus and panels: dropdowns, autocomplete, cookie banner, AI well, ask box. Also form-control-lg and btn-lg'],
+             ['--bs-border-radius', 'Inputs, buttons, button groups, alerts, toasts, pagination, tooltips, sidebar pills; the bottom corners of menus that hang from their input (autocomplete, Select2)'],
+             ['--bs-border-radius-lg', 'Cards, modals, menus and panels: dropdowns, cookie banner, AI well, ask box. Also form-control-lg and btn-lg'],
              ['--bs-border-radius-xl', 'Mobile bottom sheet (top corners), marketing cards'],
              ['--bs-border-radius-pill', 'Badges, nav crumbs, avatars, round buttons and dots']
            ].each do |name, note| %>
@@ -557,22 +557,25 @@
 
     <div class="row g-5">
       <% design_subsection 'Header search and autocomplete', col: 'col-lg-6' do %>
-        <div class="rounded overflow-hidden" style="background: var(--bs-gray-800)">
-          <div class="header-search-bar position-relative" style="padding: 0 2.75rem">
-            <form onsubmit="return false">
-              <span class="left-icon"><i class="bi bi-search"></i></span>
-              <label class="visually-hidden" for="dg-search">Search</label>
-              <input type="text" class="form-control" id="dg-search" autocomplete="off" value="breath">
-              <span class="right-icon"><i class="bi bi-x-lg"></i></span>
-            </form>
+        <div>
+          <div class="rounded-top overflow-hidden" style="background: var(--bs-gray-800)">
+            <div class="header-search-bar position-relative" style="padding: 0 2.75rem">
+              <form onsubmit="return false">
+                <span class="left-icon"><i class="bi bi-search"></i></span>
+                <label class="visually-hidden" for="dg-search">Search</label>
+                <input type="text" class="form-control" id="dg-search" autocomplete="off" value="breath">
+                <span class="right-icon"><i class="bi bi-x-lg"></i></span>
+              </form>
+            </div>
           </div>
+          <%# Hangs from the search bar, as the real one does %>
+          <ul class="ui-autocomplete ui-menu ui-widget ui-widget-content search-bar-autocomplete list-unstyled bg-white mb-0" style="position: static; display: block; margin: 0 2.75rem">
+            <li class="ui-menu-item"><div class="ui-menu-item-wrapper ui-state-active">Breathwork Collective</div></li>
+            <li class="ui-menu-item"><div class="ui-menu-item-wrapper">Breath and sound journey</div></li>
+            <li class="ui-menu-item"><div class="ui-menu-item-wrapper">Holotropic breathwork</div></li>
+          </ul>
         </div>
-        <ul class="ui-autocomplete ui-menu ui-widget ui-widget-content list-unstyled bg-white align-self-start" style="position: static; display: block; min-width: 16rem">
-          <li class="ui-menu-item"><div class="ui-menu-item-wrapper ui-state-active">Breathwork Collective</div></li>
-          <li class="ui-menu-item"><div class="ui-menu-item-wrapper">Breath and sound journey</div></li>
-          <li class="ui-menu-item"><div class="ui-menu-item-wrapper">Holotropic breathwork</div></li>
-        </ul>
-        <div class="spec">Search: offcanvas-top, 2.8125rem, --bs-gray-800, backdrop at .9 · autocomplete: radius-lg, --hairline border, --bs-box-shadow, items .3125rem .9375rem, hover --bs-secondary-bg</div>
+        <div class="spec">Search: offcanvas-top, 2.8125rem, --bs-gray-800, backdrop at .9 · autocomplete (here and on the messages page): flush under its input, so square at the top with the base radius below, and while it's open (.autocomplete-open) the input's bottom corners are square, with no bottom border or focus ring, like Select2, --hairline border, --bs-box-shadow, items .3125rem .9375rem, hover --bs-secondary-bg</div>
       <% end %>
 
       <% design_subsection 'Notifications and messages dropdowns', col: 'col-lg-6' do %>

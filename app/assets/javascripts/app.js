@@ -614,6 +614,11 @@ $(function () {
     e.stopPropagation()
   })
 
+  // Mark an input while its autocomplete menu is open, so app.css can square its bottom corners onto the menu
+  $(document).on('autocompleteopen autocompleteclose', function (e) {
+    $(e.target).toggleClass('autocomplete-open', e.type === 'autocompleteopen')
+  })
+
   if (typeof Pace !== 'undefined') {
     Pace.stop()
   }

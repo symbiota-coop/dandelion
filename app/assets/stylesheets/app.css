@@ -1739,12 +1739,21 @@ body .table > tfoot > tr > th {
    jQuery UI autocomplete
    ========================================================================== */
 
+/* jQuery UI puts the menu flush under its input, so it's square at the top, where it joins it, with the base radius below, like Select2's dropdowns */
 .ui-autocomplete {
   border: 1px solid var(--hairline) !important;
   font-size: var(--font-size-sm);
   padding: 0.9375rem 0;
   box-shadow: var(--bs-box-shadow);
-  border-radius: var(--bs-border-radius-lg);
+  border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius);
+}
+
+/* While the menu is open, its input's bottom corners are square too, and it has no bottom border or focus ring there, so the two meet along the menu's hairline (app.js adds the class) */
+.form-control.autocomplete-open {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-color: transparent;
+  clip-path: inset(-0.5rem -0.5rem 0 -0.5rem);
 }
 
 .search-bar-autocomplete.ui-autocomplete {
