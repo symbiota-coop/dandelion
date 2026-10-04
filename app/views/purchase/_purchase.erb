@@ -206,7 +206,7 @@ end
 <%= partial :'purchase/ticket_type_waitlist_modal' if @event.allow_ticket_type_waitlists? %>
 
 <div class="card shadow-sm" id="card-error" style="display: none">
-  <h3 class="card-header bg-danger text-white">There was an error processing the transaction</h3>
+  <h3 class="card-header text-bg-danger">There was an error processing the transaction</h3>
   <div class="card-body">
     <p>
       You have not be charged. Please refresh the page to try again.

@@ -13,7 +13,7 @@
     <div class="p-1">
       <%= m event.send("paid_to_#{role}"), event.currency %> paid
     </div>
-    <a <% if event.send("remaining_to_#{role}") > 0 %> href="/events/<%=event.id%>/rpayments?create=1&role=<%=role%>&amount=<%=event.send("remaining_to_#{role}").abs%>&currency=<%=event.currency%>" <% else %> href="/events/<%=event.id%>/rpayments" <% end %> class="d-block p-1<% overpaid = nil; if event.send("remaining_to_#{role}") > 0 %> bg-warning text-white <% elsif event.send("remaining_to_#{role}") < 0; overpaid = true %> bg-danger text-white <% end %>">
+    <a <% if event.send("remaining_to_#{role}") > 0 %> href="/events/<%=event.id%>/rpayments?create=1&role=<%=role%>&amount=<%=event.send("remaining_to_#{role}").abs%>&currency=<%=event.currency%>" <% else %> href="/events/<%=event.id%>/rpayments" <% end %> class="d-block p-1<% overpaid = nil; if event.send("remaining_to_#{role}") > 0 %> text-bg-warning <% elsif event.send("remaining_to_#{role}") < 0; overpaid = true %> text-bg-danger <% end %>">
       <%= m event.send("remaining_to_#{role}").abs, event.currency %> <%= overpaid ? 'overpaid' : 'remaining' %>
     </a>
   </td>

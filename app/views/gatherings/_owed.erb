@@ -1,5 +1,5 @@
 <% if @membership.requested_contribution and @membership.requested_contribution > 0 and (!@membership.paid or (@membership.paid < @membership.requested_contribution)) %>
-  <div id="owed" class="card text-white bg-danger mb-3">
+  <div id="owed" class="card text-bg-danger mb-3">
     <div class="card-body">
       You owe <%= m (@membership.requested_contribution - @membership.paid), @gathering.currency %>.
       (You've paid <%= m (@membership.paid or 0), @gathering.currency %> of a requested contribution of <%= m @membership.requested_contribution, @gathering.currency %>.)
