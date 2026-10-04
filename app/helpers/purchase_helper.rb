@@ -24,7 +24,7 @@ Dandelion::App.helpers do
         <td></td>
         <td style="min-width: 8em">
           <strong>#{label}</strong>
-          <div class="input-group" style="margin: 5px 0">
+          <div class="input-group my-1">
             <span class="input-group-text">#{money_symbol(@event.currency)}</span>
             #{input}
           </div>
