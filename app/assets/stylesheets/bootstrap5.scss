@@ -118,7 +118,7 @@ $table-cell-padding-y-sm: .5rem;
 $table-cell-padding-x-sm: .5rem;
 $table-border-color: $gray-300;
 $table-hover-bg: $gray-200;
-$table-striped-bg: $gray-200;
+$table-striped-bg: $gray-100; // lighter than hover, so a hovered row still shows
 $pagination-color: #000;
 $pagination-bg: transparent;
 $pagination-border-color: transparent;
