@@ -2346,26 +2346,43 @@ ul.map-event li {
   font-weight: 600;
 }
 
-.fc-button {
-  background-color: transparent !important;
-  border-color: var(--bs-secondary) !important;
-  color: var(--bs-secondary) !important;
+/* Toolbar buttons look like .btn-secondary, with the active view filled --theme-500 like the active pill.
+   FullCalendar injects its CSS after ours, so these rules are scoped to #calendar to win */
+#calendar {
+  --fc-button-text-color: var(--bs-body-color);
+  --fc-button-bg-color: var(--bs-white);
+  --fc-button-border-color: var(--bs-gray-300);
+  --fc-button-hover-bg-color: var(--bs-secondary-bg);
+  --fc-button-hover-border-color: var(--bs-gray-300);
+  --fc-button-active-bg-color: var(--theme-500);
+  --fc-button-active-border-color: var(--theme-500);
 }
 
-.fc-button:hover {
-  background-color: var(--bs-secondary) !important;
-  border-color: var(--bs-secondary) !important;
-  color: var(--bs-white) !important;
+#calendar .fc-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: var(--bs-border-radius);
 }
 
-.fc-button-active {
-  background-color: var(--bs-secondary) !important;
-  border-color: var(--bs-secondary) !important;
-  color: var(--bs-white) !important;
+#calendar .fc-button-group > .fc-button:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
-.fc-prev-button, .fc-next-button {
-  border: none !important;
+#calendar .fc-button-group > .fc-button:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+#calendar .fc-button-active {
+  color: var(--bs-white);
+}
+
+#calendar :is(.fc-prev-button, .fc-next-button) {
+  border-color: transparent;
 }
 
 .fc-toolbar-title {
@@ -2380,28 +2397,6 @@ ul.map-event li {
 
 .fc-toolbar-chunk .fc-toolbar-title {
   margin: 0 !important;
-}
-
-/* Ensure all toolbar buttons have consistent height */
-.fc-toolbar .fc-button {
-  height: 38px !important;
-  min-height: 38px !important;
-  line-height: 1.2 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 8px 12px !important;
-}
-
-/* Specific styling for arrow buttons to match other buttons */
-.fc-toolbar .fc-button-group .fc-button {
-  height: 38px !important;
-  min-height: 38px !important;
-}
-
-/* Ensure button groups maintain consistent height */
-.fc-toolbar .fc-button-group {
-  height: 38px !important;
 }
 
 /* Add margin between events to prevent squashing */
