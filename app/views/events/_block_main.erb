@@ -1,6 +1,6 @@
 <% map = defined?(custom_class) && custom_class == 'map-event' %>
 <%# The star, edit and hide icons are fs-2, the size of the h2 beside them %>
-<div<% if map %> class="mb-2"<% end %>>
+<div class="mb-2">
   <h4 class="<%= 'h2' unless map %> d-inline me-1">
     <a class="text-dark" target="_parent" href="<%= "/e/#{event.slug}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }"%>">
       <%= event.name %>
