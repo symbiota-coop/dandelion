@@ -1,6 +1,12 @@
 /* CKEditor and the rich text it produces: the editor itself, and images, figures and quotes in rendered content.
    Loaded on every page (see _dependencies.erb), after app.css */
 
+/* CKEditor's theme sets its variables on :root, in a style tag injected after this file, so these go on .ck to win.
+   The editor takes the base radius, like .form-control */
+.ck {
+  --ck-border-radius: var(--bs-border-radius);
+}
+
 .ck-heading_paragraph_lead {
   font-size: var(--font-size-md) !important
 }
