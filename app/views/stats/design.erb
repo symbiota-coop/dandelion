@@ -1306,11 +1306,11 @@
           <% [['Morning yoga', 'Ruby', '5'], ['Sharing circle', 'Sam', nil]].each do |name, by, img| %>
             <div class="col-sm-6">
               <div class="tactivity position-relative" style="<%= img ? "background: linear-gradient(rgba(var(--bs-black-rgb), 0.5), rgba(var(--bs-black-rgb), 0.5)), url('/images/dandelions/#{img}.jpeg'); background-size: cover; background-position: center" : 'background: var(--bs-white); border: 2px solid var(--bs-body-color)' %>">
-                <div class="position-absolute" style="bottom: 10px; left: 10px">
+                <div class="position-absolute" style="bottom: .5rem; left: .5rem">
                   <h3 class="mt-0 mb-0"><a class="<%= img ? 'text-white' : 'text-dark' %>" href="#components"><%= name %></a></h3>
                   <span class="<%= img ? 'text-white' : 'text-dark' %>">by <a class="<%= img ? 'text-white' : 'text-dark' %>" href="#components"><%= by %></a></span>
                 </div>
-                <div class="position-absolute" style="right: 10px; bottom: 10px">
+                <div class="position-absolute" style="right: .5rem; bottom: .5rem">
                   <a class="<%= img ? 'text-white' : 'text-dark' %>" href="#components"><i class="bi bi-pencil-fill"></i></a>
                 </div>
               </div>
