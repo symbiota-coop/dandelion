@@ -2,7 +2,7 @@
   <h1 class="mt-0">
     <a style="text-decoration: none" href="<%= notification.circle_url %>"><%= circle.name %></a>
   </h1>
-  <p><%= notification.sentence %>. <a href="<%= notification.link[1] %>"><%= notification.link[0] %></a></p>
+  <p><%= notification.sentence %><%= '.' unless notification.sentence.end_with?('.', '!', '?') %> <a href="<%= notification.link[1] %>"><%= notification.link[0] %></a></p>
 </div>
 <% if notification.circle.is_a?(Gathering) %>
   <div class="footer">
