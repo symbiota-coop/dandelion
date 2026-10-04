@@ -24,7 +24,7 @@
 
   <!-- COLOUR -->
   <% design_section 'colour' do %>
-    <% design_subsection 'Theme', 'A ramp generated from one value with <code>oklch()</code>. Components use the 500 for fills, 600 for hover, 100 for alert, toast and badge backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints. The 300 is halfway between the 200 and 400. Every theme colour is a solid step of this ramp; the only translucent one is the focus ring.'.html_safe do %>
+    <% design_subsection 'Theme', 'A ramp generated from one value with <code>oklch()</code>. Components use the 500 for fills, 600 for hover, 100 for alert, toast and badge backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints. The 400 is .06 lighter than the 500, or half way to the 200 when the 500 is too light for that, and the 300 is halfway between the 200 and 400, so the steps stay in order however light the colour. Every theme colour is a solid step of this ramp; the only translucent one is the focus ring.'.html_safe do %>
       <%= partial :'stats/design/ramp', locals: {
             prefix: '--theme',
             label: '--theme-*',
@@ -55,6 +55,22 @@
               '500' => 'not used yet',
               '600' => 'features and Luma pages: purple divider end, call-to-action glow',
               '800' => 'not used yet'
+            }
+          } %>
+    <% end %>
+
+    <% design_subsection 'Yellow', "For highlighted or rewarded things, through <code>text-bg-yellow</code>: Featured, Co-host, rota points, PATCH routes. Its steps are derived from --color-yellow-500 with the theme ramp's formulas. A yellow 500 is much lighter than the other ramps' (oklch lightness .87, against .63 to .76), so its 200 to 500 sit close together, set apart more by saturation than lightness.".html_safe do %>
+      <%= partial :'stats/design/ramp', locals: {
+            prefix: '--color-yellow',
+            notes: {
+              '50' => 'not used yet',
+              '100' => 'badge background',
+              '200' => 'not used yet',
+              '300' => 'not used yet',
+              '400' => 'not used yet',
+              '500' => 'contributions chart line and fill; filled text-bg-yellow',
+              '600' => 'not used yet',
+              '800' => 'badge text'
             }
           } %>
     <% end %>
@@ -101,11 +117,10 @@
     <% end %>
 
     <% design_subsection 'Accents and surfaces', 'Each accent has one role. The dark header and sidebar are a sunset: near-black fading to --color-midnight, with the orange-to-yellow --gradient-active as the sun on the active sidebar item, the notification dot and the load bar. Light content marks active states with the theme colour, so there is one active colour per surface. On the default site purple also marks AI and calendar events; themed pages switch those to the theme. --gradient-rainbow is only for .gradient-text headlines on marketing pages and the signed-out home.' do %>
-      <div class="row g-3 row-cols-2 row-cols-md-4">
+      <div class="row g-3 row-cols-2 row-cols-md-3">
         <% [
              [%w[--color-paper], '.lavender-wash end'],
              [%w[--color-highlight], 'mark'],
-             [%w[--color-yellow-500], 'text-bg-yellow: Featured, Co-host, rota points; contributions chart (500)'],
              [%w[--color-midnight], 'header sunset; AI and calendar events on the default site']
            ].each do |vars, note| %>
           <%= partial :'stats/design/swatch', locals: { vars: vars, note: note } %>

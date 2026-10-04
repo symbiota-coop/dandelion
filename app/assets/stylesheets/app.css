@@ -51,7 +51,7 @@
   --color-lavender-100: oklch(from var(--color-lavender-500) 0.93 calc(c * 0.3) h);
   --color-lavender-200: oklch(from var(--color-lavender-500) 0.88 calc(c * 0.55) h);
   --color-lavender-300: color-mix(in oklch, var(--color-lavender-200), var(--color-lavender-400));
-  --color-lavender-400: oklch(from var(--color-lavender-500) calc(l + 0.06) c h);
+  --color-lavender-400: oklch(from var(--color-lavender-500) calc(l + min(0.06, (0.88 - l) / 2)) c h);
   --color-lavender-600: oklch(from var(--color-lavender-500) calc(l - 0.05) c h);
   --color-lavender-800: oklch(from var(--color-lavender-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
   /* The default site's own accents, which themed pages switch to the theme (theme.css) */
@@ -96,10 +96,6 @@
   --color-highlight: #FDFFAA;
   /* Hairlines: dividers and borders on white that should show what's behind them */
   --hairline: rgba(var(--bs-black-rgb), 0.1);
-  --color-yellow-500: #FFCC00;
-  --color-yellow-400: oklch(from var(--color-yellow-500) calc(l + 0.06) c h);
-  --color-yellow-100: oklch(from var(--color-yellow-500) 0.93 calc(c * 0.3) h);
-  --color-yellow-800: oklch(from var(--color-yellow-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
   --gradient-active: linear-gradient(135deg, #fd7514 0%, #efe707 100%);
   --gradient-rainbow: radial-gradient(circle at 0 0, #099ef1 0%, #6863f8 18.82%, #d84ffa 32.6%, #f058c5 52.83%, #ff4f90 68.03%, #ff6558 87.66%, #ff891f 100%);
   --gradient-header: linear-gradient(45deg, var(--bs-gray-900) 0%, var(--bs-gray-900) 66%, var(--color-midnight) 100%);
@@ -115,7 +111,8 @@
 
 /* The theme ramp, generated from --theme-500 with oklch() so steps at the same lightness look equally light whatever the hue.
    Tints (50–200) sit at fixed lightness; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints.
-   The 300 is halfway between the 200 and 400, so it stays between them however light the theme.
+   The 400 is .06 lighter than the 500, or half way to the 200 when the 500 is too light for that (yellow), and the 300 is
+   halfway between the 200 and 400, so both stay in order however light the 500.
    .theme-scope recomputes the theme ramp and focus ring for an element that sets its own --theme-500 */
 :root,
 .theme-scope {
@@ -123,7 +120,7 @@
   --theme-100: oklch(from var(--theme-500) 0.93 calc(c * 0.3) h);
   --theme-200: oklch(from var(--theme-500) 0.88 calc(c * 0.55) h);
   --theme-300: color-mix(in oklch, var(--theme-200), var(--theme-400));
-  --theme-400: oklch(from var(--theme-500) calc(l + 0.06) c h);
+  --theme-400: oklch(from var(--theme-500) calc(l + min(0.06, (0.88 - l) / 2)) c h);
   --theme-600: oklch(from var(--theme-500) calc(l - 0.05) c h);
   --theme-800: oklch(from var(--theme-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
   /* One focus ring everywhere: --bs-focus-ring-width (2px) of the theme at --bs-focus-ring-opacity (.6), both from bootstrap5.scss.
@@ -139,7 +136,7 @@
   --color-orange-100: oklch(from var(--color-orange-500) 0.93 calc(c * 0.3) h);
   --color-orange-200: oklch(from var(--color-orange-500) 0.88 calc(c * 0.55) h);
   --color-orange-300: color-mix(in oklch, var(--color-orange-200), var(--color-orange-400));
-  --color-orange-400: oklch(from var(--color-orange-500) calc(l + 0.06) c h);
+  --color-orange-400: oklch(from var(--color-orange-500) calc(l + min(0.06, (0.88 - l) / 2)) c h);
   --color-orange-600: oklch(from var(--color-orange-500) calc(l - 0.05) c h);
   --color-orange-800: oklch(from var(--color-orange-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
   --color-red-500: #e54d45;
@@ -147,9 +144,18 @@
   --color-red-100: oklch(from var(--color-red-500) 0.93 calc(c * 0.3) h);
   --color-red-200: oklch(from var(--color-red-500) 0.88 calc(c * 0.55) h);
   --color-red-300: color-mix(in oklch, var(--color-red-200), var(--color-red-400));
-  --color-red-400: oklch(from var(--color-red-500) calc(l + 0.06) c h);
+  --color-red-400: oklch(from var(--color-red-500) calc(l + min(0.06, (0.88 - l) / 2)) c h);
   --color-red-600: oklch(from var(--color-red-500) calc(l - 0.05) c h);
   --color-red-800: oklch(from var(--color-red-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
+  /* Yellow, for highlighted or rewarded things (text-bg-yellow), with the same steps */
+  --color-yellow-500: #FFCC00;
+  --color-yellow-50: oklch(from var(--color-yellow-500) 0.97 calc(c * 0.15) h);
+  --color-yellow-100: oklch(from var(--color-yellow-500) 0.93 calc(c * 0.3) h);
+  --color-yellow-200: oklch(from var(--color-yellow-500) 0.88 calc(c * 0.55) h);
+  --color-yellow-300: color-mix(in oklch, var(--color-yellow-200), var(--color-yellow-400));
+  --color-yellow-400: oklch(from var(--color-yellow-500) calc(l + min(0.06, (0.88 - l) / 2)) c h);
+  --color-yellow-600: oklch(from var(--color-yellow-500) calc(l - 0.05) c h);
+  --color-yellow-800: oklch(from var(--color-yellow-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
 }
 
 /* ==========================================================================
