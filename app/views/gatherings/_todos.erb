@@ -13,7 +13,7 @@
       <td>
         <% if @membership && @membership.optionships.exists? %>
           <% @membership.optionships.each { |optionship| %>
-          <a title="<%= optionship.option.type %>" href="/g/<%= @gathering.slug %>/options" class="badge text-bg-primary text-white d-inline-block mb-1">
+          <a title="<%= optionship.option.type %>" href="/g/<%= @gathering.slug %>/options" class="badge text-bg-primary d-inline-block mb-1">
             <i class="bi <%= optionship.option.icon %>"></i> <%= optionship.option.name %> (<%= m optionship.option.cost_per_person, @gathering.currency %>)
           </a>
           <% } %>
@@ -33,7 +33,7 @@
       <td>
         <% if @membership && @membership.teamships.exists? %>
           <% @membership.teamships.each { |teamship| %>
-          <a href="/g/<%= @gathering.slug %>/teams/<%= teamship.team_id %>" class="badge text-bg-primary text-white d-inline-block mb-1">
+          <a href="/g/<%= @gathering.slug %>/teams/<%= teamship.team_id %>" class="badge text-bg-primary d-inline-block mb-1">
             <%= teamship.team.name %>
           </a>
           <% } %>

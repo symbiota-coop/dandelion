@@ -47,7 +47,7 @@
   <td>
     <% @gathering.events.each { |event| %>
     <% event.tickets.complete.and(account: account).each { |ticket| %>
-    <a href="/events/<%=event.id%>/tickets" class="text-white badge text-bg-primary mb-1 d-inline-block text-decoration-none"><i class="bi bi-ticket-detailed-fill"></i> <%= (ticket.ticket_type.name + ', ') if ticket.ticket_type%><%= event.name %></a>
+    <a href="/events/<%=event.id%>/tickets" class="badge text-bg-primary mb-1 d-inline-block text-decoration-none"><i class="bi bi-ticket-detailed-fill"></i> <%= (ticket.ticket_type.name + ', ') if ticket.ticket_type%><%= event.name %></a>
     <% } %>
     <% } %>
   </td>
@@ -56,11 +56,11 @@
   <td>
     <% membership.optionships.each { |optionship| option = optionship.option %>
     <% if !@membership.admin? && optionship.option.hide_members? %>
-      <a href="/g/<%= @gathering.slug %>/options" class="badge text-bg-secondary text-white d-inline-block mb-1">
+      <a href="/g/<%= @gathering.slug %>/options" class="badge text-bg-secondary d-inline-block mb-1">
         <i class="bi <%= optionship.option.icon %>"></i> <%= optionship.option.type %>
       </a>
     <% else %>
-      <a title="<%= optionship.option.type %>" href="/g/<%= @gathering.slug %>/options" class="badge text-bg-primary text-white d-inline-block mb-1">
+      <a title="<%= optionship.option.type %>" href="/g/<%= @gathering.slug %>/options" class="badge text-bg-primary d-inline-block mb-1">
         <i class="bi <%= optionship.option.icon %>"></i> <%= optionship.option.name %> (<%= m optionship.option.cost_per_person, @gathering.currency %>)
       </a>
     <% end %>

@@ -1,6 +1,6 @@
 <% if (e = Event.past.and(:id.in => account.tickets.complete.pluck(:event_id)).count) > 0 %>
   <% if current_account == account %>
-    <a href="/events/my?tab=past" class="d-inline-block mt-1 mt-lg-0 badge text-bg-primary text-white">Attended <%= pluralize(e,'event') %></a>
+    <a href="/events/my?tab=past" class="d-inline-block mt-1 mt-lg-0 badge text-bg-primary">Attended <%= pluralize(e,'event') %></a>
   <% else %>
     <span class="d-inline-block mt-1 mt-lg-0 badge text-bg-primary">Attended <%= pluralize(e,'event') %></span>
   <% end %>
