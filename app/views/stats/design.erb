@@ -485,7 +485,7 @@
           <li class="page-item"><a class="page-link" href="#components">3</a></li>
           <li class="page-item"><a class="page-link" href="#components">›</a></li>
         </ul>
-        <div class="spec text-center">Active: grey border · Hover: light border</div>
+        <div class="spec text-center">Active: --theme-500, like the active pill and dropdown item · Hover: --bs-gray-400 border</div>
       <% end %>
     </div>
 
@@ -572,7 +572,7 @@
           <li class="ui-menu-item"><div class="ui-menu-item-wrapper">Breath and sound journey</div></li>
           <li class="ui-menu-item"><div class="ui-menu-item-wrapper">Holotropic breathwork</div></li>
         </ul>
-        <div class="spec">Search: offcanvas-top, 2.8125rem, --bs-gray-800, backdrop at .9 · autocomplete: radius-lg, --bs-box-shadow, items .3125rem .9375rem, hover --bs-secondary-bg</div>
+        <div class="spec">Search: offcanvas-top, 2.8125rem, --bs-gray-800, backdrop at .9 · autocomplete: radius-lg, --hairline border, --bs-box-shadow, items .3125rem .9375rem, hover --bs-secondary-bg</div>
       <% end %>
 
       <% design_subsection 'Notifications and messages dropdowns', col: 'col-lg-6' do %>
@@ -652,7 +652,7 @@
   <% end %>
 
   <!-- THEMING -->
-  <% design_section 'theming', 'Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check, progress bar and stats chart follows. Alerts and toasts use the ramp\'s tints with --theme-800 text on every page. theme.css is only variables: as well as the theme colour, it switches --calendar-event-color to the theme, and --ai-well-from/-to to the theme ramp\'s 50 and 400, the steps the default AI well takes of lavender. That is deliberate: the default site keeps calendar events --color-midnight and the AI well lavender, as its own accents. The .event-detail tiles (date and icons) are restyled for the site in app.css: white with a --hairline border and --bs-box-shadow-sm, the date\'s month in --theme-800 on --theme-50, turning solid theme on hover. Emails show the same tiles as PNGs, drawn by <code>rake icons:generate</code> from app/views/icons: in the default green\'s 50 and 800, or in greys for events and organisations with their own colour.'.html_safe do %>
+  <% design_section 'theming', 'Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check, progress bar and stats chart follows. Alerts and toasts use the ramp\'s tints with --theme-800 text on every page. theme.css is only variables: as well as the theme colour, it switches --calendar-event-color to the theme, and --ai-well-from/-to to the theme ramp\'s 50 and 400, the steps the default AI well takes of lavender. That is deliberate: the default site keeps calendar events --color-midnight and the AI well lavender, as its own accents. The date tile\'s month follows the theme too (see Date and icon tiles).'.html_safe do %>
     <div class="row g-3">
       <% ([[nil, nil]] + themed_colors).each do |color, clamped| %>
         <div class="col-md-6 col-xxl-4">

@@ -979,6 +979,10 @@ p.action a {
 
 .pagination {
   --bs-pagination-focus-box-shadow: var(--focus-ring);
+  /* The active page in the theme colour, like the active pill and dropdown item */
+  --bs-pagination-active-color: var(--bs-white);
+  --bs-pagination-active-bg: var(--theme-500);
+  --bs-pagination-active-border-color: var(--theme-500);
 }
 
 .accordion {
@@ -1177,9 +1181,8 @@ p.action a {
   border-radius: var(--bs-border-radius-pill);
 }
 
-.nav-crumbs .bi-caret-down-fill {
+.nav-crumbs .caret {
   flex-shrink: 0;
-  font-size: 0.65rem;
 }
 
 @media (max-width: 767.98px) {
@@ -1737,7 +1740,7 @@ body .table > tfoot > tr > th {
    ========================================================================== */
 
 .ui-autocomplete {
-  border: none !important;
+  border: 1px solid var(--hairline) !important;
   font-size: var(--font-size-sm);
   padding: 0.9375rem 0;
   box-shadow: var(--bs-box-shadow);
