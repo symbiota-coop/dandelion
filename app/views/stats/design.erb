@@ -448,6 +448,63 @@
     </div>
 
     <div class="row g-5">
+      <% design_subsection 'Select2', col: 'col-lg-6' do %>
+        <div class="border rounded p-4">
+          <div class="mb-3">
+            <label for="dg-select2-single">Send to</label>
+            <select class="form-select" id="dg-select2-single">
+              <option>Everyone</option>
+              <option>Followers</option>
+              <option>Ticket holders</option>
+              <option>Waitlist</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="dg-select2-tags">Tags</label>
+            <select class="form-select" id="dg-select2-tags" multiple size="1">
+              <% %w[breathwork sound ecstatic-dance meditation].each_with_index do |tag, i| %>
+                <option value="<%= tag %>"<% if i < 2 %> selected<% end %>><%= tag %></option>
+              <% end %>
+            </select>
+            <div class="form-text">Press comma to add a tag or enter to accept a suggestion</div>
+          </div>
+          <script>
+            $(function () {
+              $('#dg-select2-single').select2({ theme: 'bootstrap-5', width: '100%' })
+              $('#dg-select2-tags').select2({ theme: 'bootstrap-5', width: '100%', tags: true, tokenSeparators: [','] })
+            })
+          </script>
+          <div class="spec">select2.css overrides select2-bootstrap-5-theme: as tall as .form-control, --bs-gray-400 border, .form-control's font and radius · focused or open: --theme-500 border and --focus-ring, the box and dropdown glowing as one shape · selected option --theme-500 · tags (_tags_select.erb) sit on the typing row, radius sm</div>
+        </div>
+      <% end %>
+
+      <% design_subsection 'Flatpickr', col: 'col-lg-6' do %>
+        <div class="border rounded p-4">
+          <div class="row g-3 mb-3">
+            <div class="col-sm-6">
+              <label for="dg-date">Date</label>
+              <input type="text" class="form-control datepicker" id="dg-date" autocomplete="off" value="<%= Date.today.iso8601 %>">
+            </div>
+            <div class="col-sm-6">
+              <label for="dg-datetime">Start time</label>
+              <input type="text" class="form-control datetimepicker" id="dg-datetime" autocomplete="off" value="<%= Date.today.iso8601 %> 19:30">
+            </div>
+          </div>
+          <div id="dg-flatpickr-inline" class="mb-3"></div>
+          <script>
+            $(function () {
+              var today = new Date()
+              var el = document.getElementById('dg-flatpickr-inline')
+              // appendTo puts the calendar inside el, so it gets el's margin; inline would otherwise put it after el
+              flatpickr(el, { inline: true, appendTo: el, mode: 'range', defaultDate: [today, new Date(today.getTime() + 2 * 864e5)] })
+            })
+          </script>
+          <div class="spec">app.js wires up .datepicker (altFormat Y-m-d) and .datetimepicker (J F Y, H:i, 24-hour; data-flatpickr-min-date, -max-date and -linked-end) · selected days and range ends --theme-500 · on iPhone, a native input (.flatpickr-mobile) at full width</div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="row g-5">
       <% design_subsection 'Card with .chill header', col: 'col-lg-6' do %>
         <div class="card shadow-sm">
           <h3 class="card-header chill">Your upcoming events</h3>
