@@ -43,7 +43,7 @@
       <div class="small text-body-secondary">Bootstrap's <code>rgba(var(--bs-*-rgb))</code> colours need an rgb triplet, so <code>/theme.css</code> also sets <code>--theme-500-rgb</code>.</div>
     <% end %>
 
-    <% design_subsection 'Lavender', "The default site's AI well and <code>.lavender-wash</code> backgrounds, with the theme ramp's steps derived from --color-lavender-500, which has the default green's lightness and chroma. Themed pages switch the AI well to the theme.".html_safe do %>
+    <% design_subsection 'Lavender', "The default site's AI well and <code>.lavender-wash</code> backgrounds, with the theme ramp's steps derived from --color-lavender-500: the default green turned to hue 300, the same lightness and chroma. Themed pages switch the AI well to the theme.".html_safe do %>
       <%= partial :'stats/design/ramp', locals: {
             prefix: '--color-lavender',
             notes: {
@@ -59,7 +59,7 @@
           } %>
     <% end %>
 
-    <% design_subsection 'Yellow', "For highlighted or rewarded things, through <code>text-bg-yellow</code>: Featured, Co-host, rota points, PATCH routes. Its steps are derived from --color-yellow-500 with the theme ramp's formulas. A yellow 500 is much lighter than the other ramps' (oklch lightness .87, against .63 to .76), so its 200 to 500 sit close together, set apart more by saturation than lightness.".html_safe do %>
+    <% design_subsection 'Yellow', "For highlighted or rewarded things, through <code>text-bg-yellow</code>: Featured, Co-host, rota points, PATCH routes. Its steps are derived from --color-yellow-500 with the theme ramp's formulas. A yellow 500 is much lighter than the other ramps' (oklch lightness .86, against .63 to .76), so its 200 to 500 sit close together, set apart more by saturation than lightness.".html_safe do %>
       <%= partial :'stats/design/ramp', locals: {
             prefix: '--color-yellow',
             notes: {
@@ -75,7 +75,7 @@
           } %>
     <% end %>
 
-    <% design_subsection 'Warning and danger', "Two families, used the same way as the theme ramp: each variant class (alert-warning, toast-warning, table-warning, btn-warning, text-bg-warning and the danger ones) sets its steps as <code>--variant-50</code> to <code>--variant-800</code>, and each component maps those to its roles once. The 500 is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match. There are no warning buttons yet, so --color-orange-600 is unused.".html_safe do %>
+    <% design_subsection 'Warning and danger', "Two families, used the same way as the theme ramp: each variant class (alert-warning, toast-warning, table-warning, btn-warning, text-bg-warning and the danger ones) sets its steps as <code>--variant-50</code> to <code>--variant-800</code>, and each component maps those to its roles once. The 500 is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match. There are no warning buttons yet, so --color-orange-600 is unused. The lavender, yellow, orange and red 500s share the default green's oklch chroma, .169, so they are equally saturated; only lightness varies by hue, so each reads true: red .63, green and lavender .661, orange .76, yellow .86.".html_safe do %>
       <% roles = {
            '50' => 'row background',
            '100' => 'alert, toast and badge background',

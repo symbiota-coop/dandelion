@@ -17,8 +17,8 @@ $blue: #00af5e;
 // Status colours: bg-*, text-*, btn-*, alert-* and friends all follow these
 $success: #00af5e;
 $info: #5AC8FA;
-$warning: #fc9417; // --color-orange-500 in app.css
-$danger: #e54d45; // --color-red-500 in app.css
+$warning: #fb941a; // --color-orange-500 in app.css, oklch(0.76 0.169 62)
+$danger: #dd574e; // --color-red-500 in app.css, oklch(0.63 0.169 27)
 $font-family-sans-serif: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 $font-weight-normal: 500;
 $lead-font-size: 1.125rem; // --font-size-lg, like h4
