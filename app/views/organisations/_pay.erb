@@ -61,7 +61,7 @@
             <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
           </button>
           <% if (rt = internal_redirect_uri(params[:return_to])&.to_s) %>
-            <a class="btn btn-outline-secondary mb-1 me-1" style="height: 2.125rem" href="<%= rt.include?('?') ? "#{rt}&contribution_skipped=1" : "#{rt}?contribution_skipped=1" %>">Not now</a>
+            <a class="btn btn-secondary mb-1 me-1" style="height: 2.125rem" href="<%= rt.include?('?') ? "#{rt}&contribution_skipped=1" : "#{rt}?contribution_skipped=1" %>">Not now</a>
           <% end %>
           <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
         <% end %>

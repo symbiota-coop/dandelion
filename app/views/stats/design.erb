@@ -329,7 +329,7 @@
   <!-- COMPONENTS -->
   <% design_section 'components' do %>
 
-    <% design_subsection 'Buttons', 'Primary and danger are flat: their variant\'s 500 over a transparent border, and the 600 on hover. Other fills (progress bars, text-bg-* elements other than badges, like card headers, and p.action) are the same flat 500. The only gradient on a component is the AI well\'s sheen, so it marks AI. btn-warning is styled the same but not used yet. Secondary is quiet: white with a --bs-gray-300 border and body text, --bs-secondary-bg on hover. Brand buttons like btn-signal stay flat.'.html_safe do %>
+    <% design_subsection 'Buttons', 'Primary and danger are flat: their variant\'s 500 over a transparent border, and the 600 on hover. Other fills (progress bars, text-bg-* elements other than badges, like card headers, and p.action) are the same flat 500. The only gradient on a component is the AI well\'s sheen, so it marks AI. btn-warning is styled the same but not used yet. Secondary is quiet: white with a --bs-gray-300 border and body text, --bs-secondary-bg on hover. It's for dismissive actions like Cancel, Not now and Disconnect. btn-outline-secondary is only for buttons joined to an input (Apply, Copy) and the donation toggle group. Brand buttons like btn-signal stay flat.'.html_safe do %>
       <div class="border rounded p-4 d-flex flex-wrap gap-3 align-items-center">
         <a class="btn btn-primary" href="#components">Book tickets</a>
         <a class="btn btn-outline-primary" href="#components">Outline primary</a>
@@ -1189,7 +1189,7 @@
                     </div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary">Cancel</button>
+                    <button type="button" class="btn btn-secondary">Cancel</button>
                     <button type="button" class="btn btn-primary">Join waitlist</button>
                   </div>
                 </div>
