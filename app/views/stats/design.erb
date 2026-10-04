@@ -116,7 +116,7 @@
       </div>
     <% end %>
 
-    <% design_subsection 'Accents and surfaces', 'Each accent has one role. The dark header and sidebar are a sunset: near-black fading to --color-midnight, with the orange-to-yellow --gradient-active as the sun on the active sidebar item, the notification dot and the load bar. Light content marks active states with the theme colour, so there is one active colour per surface. On the default site purple also marks AI and calendar events; themed pages switch those to the theme. --gradient-rainbow is only for .gradient-text headlines on marketing pages and the signed-out home.' do %>
+    <% design_subsection 'Accents and surfaces', 'Single colours with one role each. --color-midnight ends the header\'s sunset and, on the default site, marks AI and calendar events; themed pages switch those to the theme. --color-paper is where .lavender-wash fades to, and --color-highlight is behind mark.' do %>
       <div class="row g-3 row-cols-2 row-cols-md-3">
         <% [
              [%w[--color-paper], '.lavender-wash end'],
@@ -128,7 +128,7 @@
       </div>
     <% end %>
 
-    <% design_subsection 'Other gradients' do %>
+    <% design_subsection 'Other gradients', 'The dark header and sidebar are a sunset: near-black fading to --color-midnight, with the orange-to-yellow --gradient-active as the sun on the active sidebar item, the notification dot and the load bar. Light content marks active states with the theme colour, so each surface has one active colour. --gradient-rainbow is only for .gradient-text headlines on marketing pages and the signed-out home.' do %>
       <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-4">
         <% [
              { box_class: 'lavender-wash', title: '.lavender-wash', note: 'Lavender to paper. body.lavender-wash on the sign-in, sign-up and auth failure pages; a .lavender-wash div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.' },
