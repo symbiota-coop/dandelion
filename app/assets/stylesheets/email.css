@@ -1,7 +1,7 @@
 /* Inlined into emails, which can't use custom properties, so colours are literal copies of the site's:
    the greys from bootstrap5.scss (#252423 gray-900 for body text, #757372 gray-600 for secondary text, #3a3938 gray-800
-   for footer links and code, #d4d3d2 gray-400 and #ecebea gray-200 for borders and fills), the site's .875em small text and
-   its radii. Theme colours, including the ramp steps for hovers and blockquotes, come from EmailHelper.theme_css */
+   for footer links and code, #d4d3d2 gray-400 and #ecebea gray-200 for borders and fills), #ffa738 orange-400 for rating
+   stars, the site's .875em small text and its radii. Theme colours, including the ramp steps for hovers and blockquotes, come from EmailHelper.theme_css */
 
 html,
 body,
@@ -136,6 +136,10 @@ td {
   text-align: center;
 }
 
+.header-image-container h1 a {
+  color: #252423;
+}
+
 .header-image-container img {
   width: 6rem;
   margin-top: 1em;
@@ -166,6 +170,16 @@ p {
 
 blockquote p {
   margin: 0
+}
+
+.quoted {
+  border-left: 1px solid #d4d3d2;
+  margin-left: 1em;
+  padding-left: 1em;
+}
+
+.stars {
+  color: #ffa738;
 }
 
 .password {

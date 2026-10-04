@@ -2349,7 +2349,7 @@ table.event-details td {
   font-size: var(--font-size-base)
 }
 
-/* The date and icon tiles, restyled for the site from event_details.css's thick green border and band. Emails show the
+/* The date and icon tiles, coloured for the site over event_details.css's layout. Emails show the
    same tiles as PNGs (rake icons:generate). Here they're white with a hairline border and a soft shadow, like cards;
    the date's month is a band of the theme's 50 in its 800, over a bold day */
 .event-detail {
@@ -2360,7 +2360,7 @@ table.event-details td {
   transition: background-color 0.15s, border-color 0.15s, color 0.15s;
 }
 
-/* Icon tiles centre their icon, rather than relying on event_details.css's margin, which allows for its thicker border */
+/* Icon tiles centre their icon, rather than relying on event_details.css's top margin */
 .event-detail:not(.calendar-date) {
   display: inline-flex;
   align-items: center;
@@ -2378,7 +2378,6 @@ table.event-details td {
 
 .event-detail.calendar-date .month {
   background: var(--theme-50);
-  border-bottom: 0;
   color: var(--theme-800);
 }
 

@@ -1,5 +1,5 @@
 /* Inlined into emails, for the event details table. Emails show the date and icon tiles as PNGs (rake icons:generate),
-   so the .event-detail rules here are the site's base, which app.css restyles in the theme */
+   so the .event-detail rules here are the site's layout, which app.css colours in the theme */
 
 table.event-details td {
   vertical-align: middle;
@@ -16,11 +16,8 @@ table.event-details td:first-child {
   vertical-align: middle;
   display: inline-block;
   text-align: center;
-  border: 0.13em solid #75d695;
-  border-radius: 0.25em;
   width: 2.5em;
   height: 2.5em;
-  color: #757372;
   background: white;
   line-height: 1;
 }
@@ -42,9 +39,6 @@ span.event-detail.calendar-date {
 .event-detail.calendar-date .month {
   display: block;
   text-transform: uppercase;
-  background-color: #a8eabb;
-  border-bottom: 0.13em solid #75d695;
-
 }
 
 .event-detail.calendar-date .month .month-text {
