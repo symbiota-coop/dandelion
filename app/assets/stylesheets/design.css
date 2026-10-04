@@ -14,3 +14,8 @@
   font-size: 0.875em;
   color: var(--bs-secondary-color);
 }
+
+/* Sample menus are shown open in the page flow, so they drop the z-index (9999) app.css gives menus and scroll under the fixed header */
+.design-guide .dropdown-menu.show.position-relative {
+  z-index: auto;
+}
