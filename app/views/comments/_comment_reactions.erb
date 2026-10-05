@@ -25,8 +25,8 @@
 <% if comment.comment_reactions.exists? %>
   <% all_reactions = comment.comment_reactions.includes(:account); reactions_by_body = all_reactions.group_by(&:body) %>
   <% reactions_by_body.each { |body, comment_reactions| %>
-  <% c = 'd-inline-block border rounded p-1 text-dark' %>
-  <a data-bs-toggle="tooltip" style="text-decoration: none; background: white" <% if comment_reactions.find { |r| r.account_id == current_account.id } %> class="pagelet-trigger border-primary <%= c %>" href="/comments/<%= comment.id %>/unreact" onclick="$(this).tooltip('hide')" <% else %> class="<%= c %> border-light" <% end %>>
+  <% c = 'd-inline-block border rounded p-1 text-dark text-decoration-none bg-white' %>
+  <a data-bs-toggle="tooltip" <% if comment_reactions.find { |r| r.account_id == current_account.id } %> class="pagelet-trigger border-primary <%= c %>" href="/comments/<%= comment.id %>/unreact" onclick="$(this).tooltip('hide')" <% else %> class="<%= c %> border-light" <% end %>>
     <% if body == "💚" %>
       <i class="text-primary bi bi-heart-fill"></i>
 <% else %>

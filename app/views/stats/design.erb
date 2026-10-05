@@ -1216,7 +1216,7 @@
                   <div class="mb-2"><div class="comment-body"><%= body %></div></div>
                   <div class="d-flex gap-1">
                     <% reactions.each do |emoji, count, mine| %>
-                      <a href="#components" class="d-inline-block border rounded p-1 text-dark <%= mine ? 'border-primary' : 'border-light' %>" style="text-decoration: none; background: white"><% if emoji == '💚' %><i class="text-primary bi bi-heart-fill"></i><% else %><%= emoji %><% end %> <%= count %></a>
+                      <a href="#components" class="d-inline-block border rounded p-1 text-dark text-decoration-none bg-white <%= mine ? 'border-primary' : 'border-light' %>"><% if emoji == '💚' %><i class="text-primary bi bi-heart-fill"></i><% else %><%= emoji %><% end %> <%= count %></a>
                     <% end %>
                     <a class="btn btn-sm btn-outline-primary" href="#components" data-bs-toggle="tooltip" title="React"><i class="bi bi-heart-fill"></i></a>
                   </div>
