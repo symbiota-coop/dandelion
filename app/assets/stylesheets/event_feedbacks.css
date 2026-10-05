@@ -20,7 +20,7 @@
 }
 
 .feedback-rating-panel {
-  background: var(--bs-gray-100);
+  background: var(--bs-tertiary-bg);
   border-radius: var(--bs-border-radius-lg);
 }
 
