@@ -2415,12 +2415,12 @@ ul.map-event li {
 
 /* Add margin between events to prevent squashing */
 .fc-event {
-  margin-bottom: 0.125rem !important;
+  margin-bottom: 2px !important;
 }
 
 /* Add some padding to event content */
 .fc-event-main {
-  padding: 0.0625rem 0.125rem !important;
+  padding: 1px 2px !important;
 }
 
 /* Shorten month names and hide Today button on small screens */
@@ -2632,10 +2632,6 @@ table.event-details td {
 .slick-container .slick-responsive.slick-initialized .slick-item {
   display: block;
   max-width: none !important
-}
-
-.slick-placeholder {
-  letter-spacing: -0.0625rem
 }
 
 .slick-placeholder .slick-dots {
