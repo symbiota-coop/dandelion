@@ -2,7 +2,7 @@
 <%# The star, edit and hide icons are fs-2, the size of the h2 beside them %>
 <div class="mb-2">
   <h4 class="<%= 'h2' unless map %> d-inline me-1">
-    <a class="text-dark" target="_parent" href="<%= "/e/#{event.slug}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }"%>">
+    <a class="text-body" target="_parent" href="<%= "/e/#{event.slug}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }"%>">
       <%= event.name %>
     </a>
   </h4>
@@ -13,7 +13,7 @@
       <div data-with-placeholder class="d-inline fs-2" data-pagelet-url="/events/<%=event.id%>/star?block_edit=1"><i class="bi bi-star opacity-0"></i></div>
     <% end %>
     <% if event_admin?(event) %>
-      <a class="text-dark block-edit fs-2" style="display: none" target="_parent" href="<%= "/e/#{event.slug}/edit" %>"><i class="bi bi-pencil-fill"></i></a>
+      <a class="text-body block-edit fs-2" style="display: none" target="_parent" href="<%= "/e/#{event.slug}/edit" %>"><i class="bi bi-pencil-fill"></i></a>
     <% end %>
     <% if admin? %>
       <div data-with-placeholder class="d-inline fs-2" data-pagelet-url="/events/<%=event.id%>/hide_from_homepage?block_edit=1"><i class="bi bi-eye-slash-fill opacity-0"></i></div>
@@ -23,7 +23,7 @@
 <div class="mb-2">
   <%= partial :'events/tag_labels', locals: { event: event, limit: 5 } %>
 </div>
-<ul class="icon-list text-dark <%= defined?(custom_class) ? custom_class : '' %> fs-4">
+<ul class="icon-list text-body <%= defined?(custom_class) ? custom_class : '' %> fs-4">
   <% if (ef = event.event_facilitations.select { |event_facilitation| event.organisation && event_facilitation.account.lastname && event_facilitation.account.name != event.organisation.name }).exists? || (!@organisation && event.organisation) %>
     <li>
       <i data-bs-toggle="tooltip" title="Host/facilitators" class="bi bi-flag-fill"></i>

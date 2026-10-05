@@ -1,4 +1,4 @@
-<a class="d-block p-2 <% if gathering.image %>text-white<% else %>text-dark<% end %>" href="/g/<%= gathering.slug %>" style="<% if !gathering.image %>border: 2px solid var(--bs-body-color);<% end %> <% if gathering.image %>background: linear-gradient( rgba(var(--bs-black-rgb), 0.4), rgba(var(--bs-black-rgb), 0.4) ), url('<%= u gathering.image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>" class="gathering">
+<a class="d-block p-2 <% if gathering.image %>text-white<% else %>text-body<% end %>" href="/g/<%= gathering.slug %>" style="<% if !gathering.image %>border: 2px solid var(--bs-body-color);<% end %> <% if gathering.image %>background: linear-gradient( rgba(var(--bs-black-rgb), 0.4), rgba(var(--bs-black-rgb), 0.4) ), url('<%= u gathering.image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>" class="gathering">
   <div style="height: 10rem;">
     <h4 class="h2"><%= gathering.name %></h4>
   </div>

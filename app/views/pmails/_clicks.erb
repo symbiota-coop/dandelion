@@ -18,9 +18,9 @@
       <tr>
         <td>
           <% if safe_url %>
-            <a class="<%= 'text-dark' unless event %>" target="_blank" rel="noopener noreferrer" href="<%= link.url %>"><%= event ? link.event.name : link.url %></a>
+            <a class="<%= 'text-body' unless event %>" target="_blank" rel="noopener noreferrer" href="<%= link.url %>"><%= event ? link.event.name : link.url %></a>
           <% else %>
-            <span class="<%= 'text-dark' unless event %>"><%= event ? link.event.name : link.url %></span>
+            <span class="<%= 'text-body' unless event %>"><%= event ? link.event.name : link.url %></span>
           <% end %>
         </td>
         <td>

@@ -65,9 +65,9 @@
       <% if @event.location == 'Online' %>
         Online
       <% elsif @event.location =~ URI::regexp %>
-        <span class="compact-urls"><a class="text-dark" target="_blank" href="<%= @event.location %>"><%= @event.location %></a></span>
+        <span class="compact-urls"><a class="text-body" target="_blank" href="<%= @event.location %>"><%= @event.location %></a></span>
       <% else %>
-        <a class="text-dark" target="_blank" href="https://www.google.com/maps?q=<%= @event.location %>"><%= @event.location %></a>
+        <a class="text-body" target="_blank" href="https://www.google.com/maps?q=<%= @event.location %>"><%= @event.location %></a>
       <% end %>
 
     </td>
@@ -86,7 +86,7 @@
     </td>
     <td>
 
-      <a href="javascript:;" class="copy-link text-dark" data-bs-toggle="tooltip" title="Click to copy" data-url="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>">
+      <a href="javascript:;" class="copy-link text-body" data-bs-toggle="tooltip" title="Click to copy" data-url="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>">
         <span class="d-none d-md-inline"><%=ENV['BASE_URI'].match(%r{(https?://)})[1] rescue ''%></span><%=ENV['BASE_URI'].gsub(%r{https?://}, '')%>/e/<%=@event.slug%>
       </a>
       <script>

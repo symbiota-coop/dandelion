@@ -1,7 +1,7 @@
 <% if (links = account.atproto_links) && links.any? %>
 
   <h2 class="mt-5">
-    <a target="_blank" class="text-dark text-decoration-none" href="https://bsky.app/profile/<%= account.atproto_handle %>">
+    <a target="_blank" class="text-body text-decoration-none" href="https://bsky.app/profile/<%= account.atproto_handle %>">
       <i class="bi bi-bluesky"></i> <%= account.atproto_handle %>
     </a>
   </h2>
@@ -20,13 +20,13 @@
                 <% end %>
                 <div class="p-3">
                   <h4>
-                    <a class="text-dark" href="<%= og['url'] %>" target="_blank">
+                    <a class="text-body" href="<%= og['url'] %>" target="_blank">
                       <%= og['title']%>
                     </a>
                   </h4>
                   <% if og['description'] %>
                     <p class="mb-2">
-                      <a class="text-dark text-decoration-none" href="<%= og['url']%>" target="_blank">
+                      <a class="text-body text-decoration-none" href="<%= og['url']%>" target="_blank">
                         <%= og['description'].truncate(150) %>
                       </a>
                     </p>

@@ -898,7 +898,7 @@
                 <img src="/images/advisors/<%= img %>.jpg" alt="" style="display: block; aspect-ratio: 1/1">
               </div>
               <div class="search-result-content">
-                <h2><a class="text-dark" href="#components"><%= name %></a></h2>
+                <h2><a class="text-body" href="#components"><%= name %></a></h2>
                 <div class="d-block d-lg-inline-block"><a class="d-block d-lg-inline-block w-100 w-lg-auto mb-1 btn btn-outline-primary" href="#components">Follow</a></div>
                 <a class="d-block d-lg-inline-block mb-1 btn btn-outline-primary" href="#components"><i class="bi bi-chat-left"></i> Message</a>
                 <div class="mt-2">
@@ -949,8 +949,8 @@
                 </div>
               </a>
             <% end %>
-            <a class="message-preview unread p-2 d-block text-dark text-decoration-none" href="#components"><b>Alex</b> · See you there! <span class="text-body-secondary small">unread</span></a>
-            <a class="message-preview p-2 d-block text-dark text-decoration-none" href="#components"><b>Jo</b> · Thanks <span class="text-body-secondary small">read</span></a>
+            <a class="message-preview unread p-2 d-block text-body text-decoration-none" href="#components"><b>Alex</b> · See you there! <span class="text-body-secondary small">unread</span></a>
+            <a class="message-preview p-2 d-block text-body text-decoration-none" href="#components"><b>Jo</b> · Thanks <span class="text-body-secondary small">read</span></a>
             <a class="list-group-item list-group-item-action text-center" href="#components">All notifications <i class="bi bi-arrow-right"></i></a>
           </div>
         </div>
@@ -964,7 +964,7 @@
           <div class="d-flex align-items-start mb-3">
             <img src="/images/advisors/ruby.jpg" alt="" class="avatar avatar-md d-block">
             <div class="flex-grow-1 ms-3">
-              <h4 class="my-0"><a class="text-dark" href="#components">Ruby</a></h4>
+              <h4 class="my-0"><a class="text-body" href="#components">Ruby</a></h4>
             </div>
           </div>
           <div id="thread-scroll">
@@ -1055,7 +1055,7 @@
         <div class="col-lg-6 order-lg-1">
           <div class="ms-1 p-lg-3">
             <div class="mb-2">
-              <h4 class="h2 d-inline me-1"><a class="text-dark" href="#components">Breathwork and sound journey</a></h4>
+              <h4 class="h2 d-inline me-1"><a class="text-body" href="#components">Breathwork and sound journey</a></h4>
               <span class="badge text-bg-yellow align-middle me-1">Featured</span>
               <span class="badge text-bg-danger align-middle me-1">Sold out</span>
             </div>
@@ -1065,8 +1065,8 @@
               <% end %>
               <span class="badge text-bg-primary d-inline-block mb-1"><i class="bi bi-stars"></i> healing</span>
             </div>
-            <ul class="icon-list text-dark fs-4">
-              <li><i data-bs-toggle="tooltip" title="Host/facilitators" class="bi bi-flag-fill"></i> <a class="text-dark" href="#components">Ruby</a> and <a class="text-dark" href="#components">Sam</a></li>
+            <ul class="icon-list text-body fs-4">
+              <li><i data-bs-toggle="tooltip" title="Host/facilitators" class="bi bi-flag-fill"></i> <a class="text-body" href="#components">Ruby</a> and <a class="text-body" href="#components">Sam</a></li>
               <li><i data-bs-toggle="tooltip" title="Dates/times" class="bi bi-calendar-event"></i> Sat 4 Oct, 7–10pm</li>
               <li><i data-bs-toggle="tooltip" title="Location" class="bi bi-geo-alt-fill"></i> <a href="#components">Hackney, London</a></li>
             </ul>
@@ -1238,7 +1238,7 @@
                   <div class="mb-2"><div class="comment-body"><%= body %></div></div>
                   <div class="d-flex gap-1">
                     <% reactions.each do |emoji, count, mine| %>
-                      <a href="#components" class="d-inline-block border rounded p-1 text-dark text-decoration-none bg-white <%= mine ? 'border-primary' : 'border-light' %>"><% if emoji == '💚' %><i class="text-primary bi bi-heart-fill"></i><% else %><%= emoji %><% end %> <%= count %></a>
+                      <a href="#components" class="d-inline-block border rounded p-1 text-body text-decoration-none bg-white <%= mine ? 'border-primary' : 'border-light' %>"><% if emoji == '💚' %><i class="text-primary bi bi-heart-fill"></i><% else %><%= emoji %><% end %> <%= count %></a>
                     <% end %>
                     <a class="btn btn-sm btn-outline-primary" href="#components" data-bs-toggle="tooltip" title="React"><i class="bi bi-heart-fill"></i></a>
                   </div>

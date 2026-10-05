@@ -21,21 +21,21 @@
             <div class="col">
               <h4 class="h2">
                 <% if !defined?(bottom_url) && !admin %>
-                  <span class="<% if image %>text-white<% else %>text-dark<% end %>">
+                  <span class="<% if image %>text-white<% else %>text-body<% end %>">
                     <%= title %>
                   </span>
                 <% else %>
-                  <a class="<% if image %>text-white<% else %>text-dark<% end %>" target="_parent" href="<%= view_url %>" onclick="event.stopPropagation();">
+                  <a class="<% if image %>text-white<% else %>text-body<% end %>" target="_parent" href="<%= view_url %>" onclick="event.stopPropagation();">
                     <%= title %>
                   </a>
                 <% end %>
                 <% if defined?(icon) && icon %>
-                  <span class="<% if image %>text-white<% else %>text-dark<% end %>">
+                  <span class="<% if image %>text-white<% else %>text-body<% end %>">
                     <%== icon %>
                   </span>
                 <% end %>
                 <% if admin %>
-                  <a class="<% if image %>text-white<% else %>text-dark<% end %> block-edit" style="display: none" href="<%= edit_url %>" onclick="event.stopPropagation();">
+                  <a class="<% if image %>text-white<% else %>text-body<% end %> block-edit" style="display: none" href="<%= edit_url %>" onclick="event.stopPropagation();">
                     <i class="bi bi-pencil-fill"></i>
                   </a>
                 <% end %>
@@ -48,7 +48,7 @@
       <% if defined?(bottom_url) && bottom_url %>
         <tr>
           <td class="align-bottom text-end">
-            <a class="<% if image %>text-white<% else %>text-dark<% end %>" target="_parent" href="<%= bottom_url %>" onclick="event.stopPropagation();">
+            <a class="<% if image %>text-white<% else %>text-body<% end %>" target="_parent" href="<%= bottom_url %>" onclick="event.stopPropagation();">
               <%= bottom_text %>
             </a>
           </td>

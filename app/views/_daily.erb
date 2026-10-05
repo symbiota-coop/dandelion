@@ -69,7 +69,7 @@ render_article("Trending events", "Create a two-paragraph summary of these trend
         <a class="text-decoration-none" href="javascript:;" data-account-username="<%= account.username %>">
           <img class="w-100 <%= 'private' if account.private? %>" src="<%= u account.image_thumb_or_gravatar_url %>">
           <h4 class="mt-2">
-            <a class="text-dark" href="/u/<%= account.username %>"><%= account.name %></a>
+            <a class="text-body" href="/u/<%= account.username %>"><%= account.name %></a>
           </h4>
           <div class="facilitator-info">
             <%= partial :'accounts/facilitator_info', locals: { account: account } %>

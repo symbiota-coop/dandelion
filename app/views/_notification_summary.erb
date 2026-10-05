@@ -6,7 +6,7 @@
 <span class="newsfeed-icon"><i class="bi <%= notification.icon %>"></i></span>
 <div class="notification-info flex-grow-1">
   <div class="notification-title">
-    <% if full_view %><a class="text-dark" href="<%= notification.link[1] %>"><% end %>
+    <% if full_view %><a class="text-body" href="<%= notification.link[1] %>"><% end %>
     <%= notification.sentence %>
     <% if show_circle && notification.circle.is_a?(Gathering) %>
       in <strong><%= notification.circle.name %></strong>
