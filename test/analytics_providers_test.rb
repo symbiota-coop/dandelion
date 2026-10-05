@@ -99,6 +99,17 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
     @organisation.assign_attributes(google_ads_conversion_id: '6782912626', google_ads_conversion_label: nil)
     refute @organisation.valid?
     assert @organisation.errors[:google_ads_conversion_label].any?
+    refute AnalyticsProvider.object('google_ads').enabled?(organisation: @organisation)
+    assert_empty AnalyticsProvider.google_ads_conversions(organisation: @organisation)
+  end
+
+  test 'event edit with a conversion id but no label re-renders' do
+    create_event
+    sign_in_with_rack(@account)
+    post "/e/#{@event.slug}/edit", event: { google_ads_conversion_id: '6782912626' }
+    refute last_response.redirect?
+    assert last_response.ok?
+    assert_includes last_response.body, 'There was an error saving the event.'
   end
 
   test 'clears blank google ads fields' do

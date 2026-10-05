@@ -76,4 +76,4 @@ AnalyticsProvider.new('google_ads',
                       partial: 'analytics/google_ads',
                       models: %i[organisation event],
                       expire_cookies: %w[_gcl_aw _gcl_dc _gcl_gb _gcl_au],
-                      identity_fields: %i[google_ads_conversion_id])
+                      identity_fields: %i[google_ads_conversion])
