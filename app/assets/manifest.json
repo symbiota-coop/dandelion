@@ -7,7 +7,7 @@
   "scope": "/",
   "display": "browser",
   "display_override": ["minimal-ui"],
-  "theme_color": "#212529",
+  "theme_color": "#252423",
   "background_color": "#ffffff",
   "icons": [
     {
