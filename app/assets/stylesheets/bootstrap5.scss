@@ -102,7 +102,7 @@ $btn-padding-x-lg: 1rem;
 $btn-font-size-lg: 1.125rem; // --font-size-lg
 $btn-font-weight: 600;
 $badge-font-size: .9375em; // relative, so badges scale with the text around them (Bootstrap default .75em)
-// Soft pills: app.css tints them with their variant's 50 and 800
+// Soft pills: app.css tints them with their variant's 100 (danger: the 200) and 800
 $badge-padding-y: .4em;
 $badge-padding-x: .85em;
 $badge-font-weight: 600;
