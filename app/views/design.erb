@@ -1269,14 +1269,34 @@
             4.8<small class="text-body-secondary">/5 from 36 ratings across 12 events</small>
             <div class="d-lg-inline"><% 5.times do %><i class="bi bi-star-fill"></i><% end %></div>
           </div>
-          <div>
-            <div class="row g-0 mb-3">
-              <div class="col-auto me-2"><i class="bi bi-quote"></i></div>
-              <div class="col readable">A beautiful, gentle evening. Maya held the space with such care.</div>
-            </div>
-            <em>Symbiota replied</em>
-            <p class="mt-1 mb-0 readable read-more">&mdash; Thank you so much for coming!<br>We loved having you, and we'll be running the next one at the end of the month, with a longer sound bath.</p>
-          </div>
+          <table class="table table-borderless mb-0">
+            <% [['amara', 'Amara', 5, '2 days ago', true],
+                [nil, 'Anonymous', 4, '5 days ago', false],
+                ['jonas', 'Jonas', 3, '2 weeks ago', false]].each do |img, name, stars, time, quote| %>
+              <tr class="align-middle">
+                <td class="w-100">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="feedback-avatar"><img src="<%= img ? "/images/samples/#{img}.jpg" : '/images/silhouette.png' %>" alt="" class="avatar avatar-sm"></div>
+                    <div><% if img %><a href="#components"><%= name %></a><% else %><%= name %><% end %> on <a href="#components">Full moon gathering</a></div>
+                  </div>
+                </td>
+                <td class="text-nowrap"><% stars.times do %><i class="bi bi-star-fill"></i><% end %></td>
+                <td class="text-nowrap text-end"><small><%= time %></small></td>
+              </tr>
+              <% if quote %>
+                <tr>
+                  <td class="border-top-0" colspan="3">
+                    <div class="row g-0 mb-3">
+                      <div class="col-auto me-2"><i class="bi bi-quote"></i></div>
+                      <div class="col readable">A beautiful, gentle evening. Maya held the space with such care.</div>
+                    </div>
+                    <em>Symbiota replied</em>
+                    <p class="mt-1 mb-0 readable read-more">&mdash; Thank you so much for coming!<br>We loved having you, and we'll be running the next one at the end of the month, with a longer sound bath.</p>
+                  </td>
+                </tr>
+              <% end %>
+            <% end %>
+          </table>
           <div class="feedback-rating-panel text-center py-4 px-3">
             <label class="feedback-question-label d-block mb-1">Your star rating</label>
             <p class="small text-body-secondary mb-3">Your star rating is always public and contributes towards the host's average.</p>
@@ -1287,7 +1307,7 @@
             </div>
           </div>
         </div>
-        <div class="spec">.average-rating (event_feedbacks/_average_rating.erb): the average at --font-size-2xl, the count in --bs-secondary-color, a star per point · public answers beside a bi-quote, at .readable · .read-more (app.js) cuts a reply at its first line break and adds a Read more link at --font-size-xs, which shows the rest · the feedback form (event_feedbacks/build.erb, styled by event_feedbacks.css): five 2.75rem stars on a --bs-tertiary-bg panel, radius lg, --bs-gray-300 until chosen, then --color-orange-400 with .chosen</div>
+        <div class="spec">.average-rating (event_feedbacks/_average_rating.erb): the average at --font-size-2xl, the count in --bs-secondary-color, a star per point · the list (event_feedbacks/_event_feedbacks.erb): rows middle-aligned, the name cell taking the spare width so the stars and the right-aligned date sit together on the right, and an avatar-sm in a .feedback-avatar slot before each name, so names line up: the account's picture, or its Gravatar, or /images/silhouette.png, and for anonymous feedback and people who aren't publicly visible the silhouette alone, with no link or name tooltip · public answers beside a bi-quote, in a row under their entry, at .readable · .read-more (app.js) cuts a reply at its first line break and adds a Read more link at --font-size-xs, which shows the rest · the feedback form (event_feedbacks/build.erb, styled by event_feedbacks.css): five 2.75rem stars on a --bs-tertiary-bg panel, radius lg, --bs-gray-300 until chosen, then --color-orange-400 with .chosen</div>
       <% end %>
 
       <% design_subsection 'Image wall', col: 'col-lg-5' do %>
