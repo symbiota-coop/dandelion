@@ -228,7 +228,7 @@
           </div>
         <% end %>
       </div>
-      <div class="small text-body-secondary"><code>.h1</code>–<code>.h5</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. h5 is the smallest heading we use; h6 is the same size, so it's left to user-written descriptions. The heading sizes are set in bootstrap5.scss (<code>$h1-font-size</code>…), so <code>.fs-1</code>–<code>.fs-5</code> make text a heading's size without its weight or font. <code>.small</code> is Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is <code>--bs-secondary-color</code> (--bs-gray-600), set with <code>.text-body-secondary</code>; form-text takes it too. <code>.subtle</code> is for links in it, which turn the theme colour on hover. <code>.underline-dotted</code> is for quiet links that read as part of a sentence (a rota's edit links) and text to copy.</div>
+      <div class="small text-body-secondary"><code>.h1</code>–<code>.h5</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. h5 is the smallest heading we use; h6 is the same size, so it's left to user-written descriptions. The heading sizes are set in bootstrap5.scss (<code>$h1-font-size</code>…), so <code>.fs-1</code>–<code>.fs-5</code> make text a heading's size without its weight or font. <code>.small</code> is Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is <code>--bs-secondary-color</code> (--bs-gray-600), set with <code>.text-body-secondary</code>; form-text takes it too. <code>.subtle</code> is for links in it, which turn the theme colour on hover. <code>.underline-dotted</code> is for quiet links that read as part of a sentence (a rota's edit links) and text to copy. One size is off the scale: tile titles on phones are halfway between --font-size-lg and -xl, a <code>calc()</code> on the two (see Tiles), as lg looked small and xl broke ten-letter names in two columns.</div>
     <% end %>
   <% end %>
 
@@ -303,6 +303,23 @@
              ['Field spacing', 'mb-3 · base'],
              ['Table cells', 'sm · table-sm xs'],
              ['Containers', '540 / 720 / 960 / 1140']
+           ].each do |title, value| %>
+          <div class="col">
+            <div class="d-flex justify-content-between gap-3 py-2 border-bottom"><span><%= title %></span><code class="text-body-secondary"><%= value %></code></div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% design_subsection 'Motion', "State changes fade rather than snap: hover, focus, active and open states change over <code>--transition-fast</code> (.15s ease-in-out, Bootstrap's own timing for nav links and buttons). Only colours, shadows, masks and turns move; nothing slides, scales or bounces, and toasts, dropdowns and tab panes appear at once. Under <code>prefers-reduced-motion</code> the token is 0s, so all of it stops, and the tab scroller's chevrons jump rather than scroll smoothly.".html_safe do %>
+      <div class="row gx-4 row-cols-1 row-cols-md-2 row-cols-xl-3">
+        <% [
+             ['Links, nav links, tabs', 'colour, underline'],
+             ['Dropdown items, message previews', 'background'],
+             ['Tiles', 'shadow, photo lightens'],
+             ['Date and icon tiles', 'fill'],
+             ['Tab scroller', 'edge fades, chevron colour'],
+             ['Sidebar group chevron', 'turns 180° when open']
            ].each do |title, value| %>
           <div class="col">
             <div class="d-flex justify-content-between gap-3 py-2 border-bottom"><span><%= title %></span><code class="text-body-secondary"><%= value %></code></div>
@@ -1131,7 +1148,7 @@
           </div>
         <% end %>
       </div>
-      <div class="spec">Title .block-title: --font-size-lg, --font-size-xl from 992px, clamped to 5 lines, 4 from 992px, so a line is always left empty at the bottom; long words break · with an image: the photo under black at 50%, white text · without: .block-fill, the lavender wash (lavender-50 to paper) with a --hairline border, dark text · an icon such as the verified tick follows the title after a &amp;nbsp;, so it keeps to the line with its last word · admins get a pencil on hover, and activities a link to their organisation at the bottom right</div>
+      <div class="spec">The whole tile links through the title's .stretched-link; hovered or keyboard focused, it takes --bs-box-shadow and a photo's black eases to 40% · title .block-title: halfway between --font-size-lg and -xl, clamped to 5 lines, then --font-size-xl and 4 lines from 992px, so a line is always left empty at the bottom; long words break · with an image: the photo under black at 50%, white text · without: .block-fill, the lavender wash (lavender-50 to paper) with a --hairline border, dark text · an icon such as the verified tick follows the title after a &amp;nbsp;, so it keeps to the line with its last word · admins get a pencil on hover, and activities a link to their organisation at the bottom right</div>
     <% end %>
 
     <% design_subsection 'Carousel', 'Featured events and the organisation\'s own carousels (upcoming events, plus past ones with recordings) on organisation pages (events/_carousel.erb), with Slick: three to a slide from 992px, two from 576px, then one.' do %>

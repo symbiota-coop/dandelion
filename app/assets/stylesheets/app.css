@@ -78,6 +78,9 @@
   --space-lg: 1.5rem;
   --space-xl: 2rem;
   --space-2xl: 3rem;
+  /* Motion: state changes (hover, focus, active, open) fade over this rather than snapping, as Bootstrap's own nav links
+     and buttons do. Only colours, shadows, masks and turns: nothing slides or bounces. Off under prefers-reduced-motion (below) */
+  --transition-fast: 0.15s ease-in-out;
   /* Layout: the fixed header's row height, the sidebar's widths and #content's padding.
      --header-offset is the height the fixed header covers: one row, two on mobile where its icons wrap below */
   --header-height: 2.8125rem;
@@ -339,6 +342,10 @@
   @view-transition {
     navigation: none;
   }
+
+  :root {
+    --transition-fast: 0s;
+  }
 }
 
 @view-transition {
@@ -451,7 +458,7 @@
   height: 2px;
   border-radius: var(--bs-border-radius-pill);
   background-color: var(--bs-white);
-  transition: all 0.2s linear;
+  transition: all var(--transition-fast);
 }
 
 .header .navbar-toggler .icon-bar + .icon-bar {
@@ -527,6 +534,16 @@
 
 .sidebar .nav-link.active i:not(.caret) {
   opacity: 1;
+}
+
+/* A group's chevron turns to point up while its submenu is open */
+.sidebar .nav-link .caret {
+  display: inline-block;
+  transition: transform var(--transition-fast);
+}
+
+.sidebar .nav-link[aria-expanded="true"] .caret {
+  transform: rotate(180deg);
 }
 
 .sidebar .sub-menu {
@@ -651,6 +668,7 @@
   border-radius: 0;
   text-align: center;
   line-height: 1.625rem;
+  transition: background-color var(--transition-fast);
 }
 
 .sidebar .sidebar-minify-btn i {
@@ -1026,7 +1044,7 @@ p.action a {
 
 .quick-color-btn {
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   outline: none;
 }
 
@@ -1110,6 +1128,11 @@ p.action a {
 .navbar .dropdown-menu {
   --bs-dropdown-item-padding-x: var(--space-base);
   --bs-dropdown-item-padding-y: var(--space-2xs);
+}
+
+/* Bootstrap's dropdown items snap to their hover colours; ours fade, like nav links */
+.dropdown-item {
+  transition: color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .dropdown-menu.dropdown-lg {
@@ -1287,6 +1310,10 @@ p.action a {
 /* ==========================================================================
    Message previews (nav dropdown and /messages list)
    ========================================================================== */
+
+.message-preview {
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
 
 .message-preview:hover,
 .message-preview.active {
@@ -1630,6 +1657,7 @@ label.remove-image input {
   border: 0;
   background: none;
   color: var(--bs-secondary-color);
+  transition: color var(--transition-fast);
 }
 
 .nav-scroller-arrow:hover {
@@ -1646,7 +1674,33 @@ label.remove-image input {
   text-align: right;
 }
 
-/* Clear under the arrow, then the tabs fade in over 2rem */
+/* Clear under the arrow, then the tabs fade in over 2rem. Registered as lengths so the fade
+   eases in and out as you leave or reach an end, rather than switching. Their initial values are px
+   because a registered property's must be computationally independent, which rem isn't */
+@property --clear-start {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --fade-start {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --clear-end {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --fade-end {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
 .nav-wrapper {
   --clear-start: 0rem;
   --fade-start: 0rem;
@@ -1656,6 +1710,7 @@ label.remove-image input {
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
+  transition: --clear-start var(--transition-fast), --fade-start var(--transition-fast), --clear-end var(--transition-fast), --fade-end var(--transition-fast);
   mask-image: linear-gradient(to right, transparent var(--clear-start), #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent calc(100% - var(--clear-end)));
 }
 
@@ -1699,15 +1754,16 @@ ul.pagination {
 
 /* Organisation, gathering and activity tiles (_block.erb): 10rem high, so the
    title is clamped to the lines that fit, and long words break rather than
-   running out of the tile. The clamp leaves a line empty at the bottom: 5 lines
-   at --font-size-lg, 4 at --font-size-xl. Tiles without an image get the lavender wash */
+   running out of the tile. The clamp leaves a line empty at the bottom: 5 lines on phones,
+   halfway between --font-size-lg and -xl (xl breaks a ten-letter name in two columns), and 4 at --font-size-xl from 992px.
+   Tiles without an image get the lavender wash */
 .block-fill {
   background: linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-paper) 50%);
   border: 1px solid var(--hairline);
 }
 
 .block-title {
-  font-size: var(--font-size-lg);
+  font-size: calc((var(--font-size-lg) + var(--font-size-xl)) / 2);
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 5;
@@ -1723,6 +1779,48 @@ ul.pagination {
     -webkit-line-clamp: 4;
     line-clamp: 4;
   }
+}
+
+/* The whole tile is a link: the title's .stretched-link covers it, and the links and icons
+   that should stay clickable or keep their tooltip (.tile-above) sit over that.
+   Hovered, or with its link keyboard focused, a tile takes a shadow and its photo lightens */
+.tile {
+  position: relative;
+  transition: box-shadow var(--transition-fast);
+}
+
+.tile-link,
+.tile-link:hover,
+.tile-link:focus {
+  text-decoration: none;
+}
+
+.tile-above {
+  position: relative;
+  z-index: 2;
+}
+
+/* The photo's black at 50% is an inset shadow over it, so it can fade with the hover shadow */
+.tile-image {
+  box-shadow: inset 0 0 0 50rem rgba(var(--bs-black-rgb), 0.5);
+}
+
+@media (hover: hover) {
+  .tile:hover {
+    box-shadow: var(--bs-box-shadow);
+  }
+
+  .tile-image:hover {
+    box-shadow: inset 0 0 0 50rem rgba(var(--bs-black-rgb), 0.4), var(--bs-box-shadow);
+  }
+}
+
+.tile:has(.tile-link:focus-visible) {
+  box-shadow: var(--bs-box-shadow);
+}
+
+.tile-image:has(.tile-link:focus-visible) {
+  box-shadow: inset 0 0 0 50rem rgba(var(--bs-black-rgb), 0.4), var(--bs-box-shadow);
 }
 
 @keyframes spin {
@@ -2112,7 +2210,7 @@ body {
 }
 
 a {
-  transition: color 0.2s cubic-bezier(0.3, 0.5, 0.6, 1);
+  transition: color var(--transition-fast);
 }
 
 /* Not .btn: Bootstrap 5 buttons have no :focus colour, so this would turn a clicked <a class="btn"> the link colour */
@@ -2590,7 +2688,7 @@ table.event-details td {
   border-radius: 0.3em;
   box-shadow: var(--bs-box-shadow-sm);
   overflow: hidden;
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
 /* Icon tiles centre their icon, rather than relying on event_details.css's top margin */

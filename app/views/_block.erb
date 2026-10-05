@@ -1,49 +1,43 @@
-<%# Tiles without an image get a wash (.block-fill) and dark text in place of the darkened photo and white text %>
-<% block_class = 'p-2 d-block block'
+<%# Tiles without an image get a wash (.block-fill) and dark text in place of the darkened photo (.tile-image) and white text.
+    The whole tile links to view_url through the title's .stretched-link; .tile-above keeps other links and icons clickable over it %>
+<% block_class = 'p-2 d-block block tile'
    title_class = image ? 'text-white' : 'text-body'
    block_style = 'height: 10rem; overflow: hidden;'
    if image
-     block_style += " background: linear-gradient(rgba(var(--bs-black-rgb), 0.5), rgba(var(--bs-black-rgb), 0.5)), url('#{image.thumb('400x400').url}') center / cover;"
+     block_class += ' tile-image'
+     block_style += " background: url('#{image.thumb('400x400').url}') center / cover;"
    else
      block_class += ' block-fill'
    end %>
-<% if !defined?(bottom_url) && !admin %>
-  <a target="_parent" href="<%= view_url %>" class="<%= block_class %>" style="text-decoration: none; <%= block_style %>">
-<% else %>
-  <div class="<%= block_class %>" style="<%= block_style %>">
-<% end %>
-    <table class="w-100 h-100">
-      <tr>
-        <td class="align-top">
-          <div class="row justify-content-between">
-            <div class="col">
-              <% icon = defined?(icon) ? icon.to_s.strip : '' %>
-              <h4 class="block-title <%= title_class %>">
-                <%# the icon follows the title with no space between them but a &nbsp;, so it stays on the line with the title's last word %>
-                <% if !defined?(bottom_url) && !admin %><span class="<%= title_class %>"><%= title %></span><% else %><a class="<%= title_class %>" target="_parent" href="<%= view_url %>" onclick="event.stopPropagation();"><%= title %></a><% end %><% unless icon.empty? %>&nbsp;<span class="<%= title_class %>"><%== icon %></span><% end %>
-                <% if admin %>
-                  <a class="<%= title_class %> block-edit" style="display: none" href="<%= edit_url %>" onclick="event.stopPropagation();">
-                    <i class="bi bi-pencil-fill"></i>
-                  </a>
-                <% end %>
-              </h4>
-              <%= content if defined?(content) %>
-            </div>
+<div class="<%= block_class %>" style="<%= block_style %>">
+  <table class="w-100 h-100">
+    <tr>
+      <td class="align-top">
+        <div class="row justify-content-between">
+          <div class="col">
+            <% icon = defined?(icon) ? icon.to_s.strip : '' %>
+            <h4 class="block-title <%= title_class %>">
+              <%# the icon follows the title with no space between them but a &nbsp;, so it stays on the line with the title's last word %>
+              <a class="<%= title_class %> tile-link stretched-link" target="_parent" href="<%= view_url %>"><%= title %></a><% unless icon.empty? %>&nbsp;<span class="<%= title_class %> tile-above"><%== icon %></span><% end %>
+              <% if admin %>
+                <a class="<%= title_class %> block-edit tile-above" style="display: none" href="<%= edit_url %>">
+                  <i class="bi bi-pencil-fill"></i>
+                </a>
+              <% end %>
+            </h4>
+            <%= content if defined?(content) %>
           </div>
+        </div>
+      </td>
+    </tr>
+    <% if defined?(bottom_url) && bottom_url %>
+      <tr>
+        <td class="align-bottom text-end">
+          <a class="<%= title_class %> tile-above" target="_parent" href="<%= bottom_url %>">
+            <%= bottom_text %>
+          </a>
         </td>
       </tr>
-      <% if defined?(bottom_url) && bottom_url %>
-        <tr>
-          <td class="align-bottom text-end">
-            <a class="<%= title_class %>" target="_parent" href="<%= bottom_url %>" onclick="event.stopPropagation();">
-              <%= bottom_text %>
-            </a>
-          </td>
-        </tr>
-      <% end %>
-    </table>
-    <% if !defined?(bottom_url) && !admin %>
-    </a>
-  <% else %>
-  </div>
-<% end %>
+    <% end %>
+  </table>
+</div>
