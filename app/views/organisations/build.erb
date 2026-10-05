@@ -158,7 +158,7 @@
                 if (filled) return
                 card.hide()
                 $('#payment-setup-links').append(
-                  $('<a href="javascript:;" class="d-inline-block me-3 mb-1">').text('Set up ' + card.find('h4').text()).click(function () {
+                  $('<a href="javascript:;" class="d-inline-block me-3 mb-1">').text('Set up ' + card.find('.card-header').text()).click(function () {
                     card.show()
                     $(window).scrollTop(card.offset().top - $('#header').height() - 36)
                     $(this).remove()
