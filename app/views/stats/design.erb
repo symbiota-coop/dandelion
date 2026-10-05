@@ -275,7 +275,7 @@
         <% [
              ['--space-2xs', '1', 'Label to field, dropdown and autocomplete items, sidebar sub-menu, badges in a row (mb-1, gap-1)'],
              ['--space-xs', '2', 'Nav links, dropdown headers, search tabs, filter form fields, cookie banner buttons'],
-             ['--space-sm', nil, 'Grid gutter, table cells, card headers, notification items, mobile sidebar links'],
+             ['--space-sm', nil, 'Grid gutter, table cells, card headers, alerts down, notification items, mobile sidebar links'],
              ['--space-base', '3', 'Between fields (mb-3), mobile --content-padding, dropdown and list items across, alerts across'],
              ['--space-lg', '4', '--content-padding, below a carousel'],
              ['--space-xl', nil, 'Dandelion Daily: between article columns and articles'],
@@ -407,7 +407,7 @@
           <% flashes.each do |variant, message, link| %>
             <div class="alert alert-<%= variant %> alert-dismissible"><%= message %> <a href="#components"><%= link %></a><button type="button" class="btn-close" aria-label="Close"></button></div>
           <% end %>
-          <div class="spec">Inline, in the page. Padding .875rem 1rem, no border. Links bold and underlined in the alert's link colour. Flashes are toasts, except on the few pages that set @hide_alert (sign in, sign up, subscriptions, the mailer header), which render them inline as alerts with no close button.</div>
+          <div class="spec">Inline, in the page. Padding .75rem 1rem (sm base, like card headers), no border. Links bold and underlined in the alert's link colour. Flashes are toasts, except on the few pages that set @hide_alert (sign in, sign up, subscriptions, the mailer header), which render them inline as alerts with no close button.</div>
         </div>
       <% end %>
 
