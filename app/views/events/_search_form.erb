@@ -17,7 +17,7 @@
     <span class="popular-locations-container">
       <% popular_locations.each_with_index do |location, index| %>
         <span class="location-item"<% if index >= show_more_limit %> style="display: none"<% end %>>
-          <a class="badge d-inline-block mb-1 <% if @location && @location == location %> text-bg-primary <% else %> text-primary border border-primary <% end %> fw-medium" href="/locations/<%= location.name %>"><%= location.name %></a>
+          <a class="badge d-inline-block mb-1 <% if @location && @location == location %> text-bg-primary <% else %> text-primary border border-primary <% end %>" href="/locations/<%= location.name %>"><%= location.name %></a>
         </span>
       <% end %>
       <% if popular_locations.size > show_more_limit %>
