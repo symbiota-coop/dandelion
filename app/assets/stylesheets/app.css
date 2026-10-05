@@ -1955,13 +1955,13 @@ a.ui-button:active,
   border-radius: var(--bs-border-radius);
 }
 
-/* In a search form's row, as tall as the Search button beside it (.btn: 1.5 line height at .875rem plus .375rem padding; .btn-primary has no border) */
+/* In a search form's row, as tall as the Search button beside it (.btn: 1.5 line height at .875rem, .5rem padding and a 1px border, transparent on .btn-primary) */
 .searchForm .row > .form-group > .form-check-inline {
   display: inline-flex;
   align-items: center;
   gap: 0.5em;
-  height: calc(1.5 * 0.875rem + 0.75rem);
-  padding: 0 var(--space-xs) 0 var(--space-2xs);
+  height: calc(1.5 * 0.875rem + 1rem + 2 * var(--bs-border-width));
+  padding: 0 var(--space-xs);
   margin-bottom: 0;
   white-space: nowrap;
 }
