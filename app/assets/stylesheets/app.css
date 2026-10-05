@@ -2694,10 +2694,25 @@ td .tactivity-accept {
   font-size: var(--font-size-lg)
 }
 
+.tactivity {
+  position: relative;
+  z-index: 99;
+  color: var(--bs-dark);
+  background: var(--bs-white);
+  border: 2px solid var(--bs-body-color)
+}
+
+/* --tactivity-image is set inline to the activity's image */
+.tactivity.tactivity-image {
+  color: var(--bs-white);
+  background: linear-gradient(rgba(var(--bs-black-rgb), 0.5), rgba(var(--bs-black-rgb), 0.5)), var(--tactivity-image) center / cover;
+  border: 0
+}
+
 .tactivity a,
 .tactivity span {
   font-size: var(--font-size-sm);
-  color: var(--bs-white)
+  color: inherit
 }
 
 /* ==========================================================================

@@ -1,33 +1,27 @@
 <% image = tactivity.image %>
-<div class="tactivity mb-2" data-attendances-count="<%= tactivity.attendances.count %>" data-tactivity-id="<%= tactivity.id %>"
-     style="
-     position: relative;
-     z-index: 99;
-     <% if !image %>background: var(--bs-white); border: 2px solid var(--bs-body-color);<% end %>
-     <% if image %>background: linear-gradient( rgba(var(--bs-black-rgb), 0.5), rgba(var(--bs-black-rgb), 0.5) ), url('<%= image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>
-     ">
-  <div class="position-absolute" style="bottom: .5rem; left: .5rem; color: white">
+<div class="tactivity<%= ' tactivity-image' if image %> mb-2" data-attendances-count="<%= tactivity.attendances.count %>" data-tactivity-id="<%= tactivity.id %>"<% if image %> style="--tactivity-image: url('<%= image.thumb('400x400').url %>')"<% end %>>
+  <div class="position-absolute" style="bottom: .5rem; left: .5rem">
     <h3 class="mt-0 mb-0 position-relative" data-bs-toggle="tooltip">
-      <a class="<% if image %>text-white<% else %>text-dark<% end %>" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>"><%= tactivity.name %></a>
+      <a href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>"><%= tactivity.name %></a>
     </h3>
     <span style="display: none"><%= tactivity.description.truncate(150) if tactivity.description %></span>
-    <span class="<% if image %>text-white<% else %>text-dark<% end %>">
+    <span>
       by
-      <a class="<% if image %>text-white<% else %>text-dark<% end %>" href="/u/<%= tactivity.account.username %>"><%= tactivity.account.name %></a>
+      <a href="/u/<%= tactivity.account.username %>"><%= tactivity.account.name %></a>
     </span>
     <div>
-      <div class="<% if image %>text-white<% else %>text-dark<% end %>" style="display: inline-block" data-pagelet-url="/tactivities/<%= tactivity.id %>/attendees"></div>
+      <div style="display: inline-block" data-pagelet-url="/tactivities/<%= tactivity.id %>/attendees"></div>
     </div>
   </div>
-  <div style="right: .5rem; bottom: .5rem" class="text-white position-absolute">
+  <div style="right: .5rem; bottom: .5rem" class="position-absolute">
     <% if tactivity.comments.exists? %>
-      <a class="<% if image %>text-white<% else %>text-dark<% end %>" data-bs-toggle="tooltip" title="<%= pluralize(tactivity.comments.count, 'comment') %>" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>"><i class="bi bi-chat-left-text"></i> <%= tactivity.comments.count %></a>
+      <a data-bs-toggle="tooltip" title="<%= pluralize(tactivity.comments.count, 'comment') %>" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>"><i class="bi bi-chat-left-text"></i> <%= tactivity.comments.count %></a>
       &middot;
     <% end %>
     <% if tactivity.space_id and (@membership.admin? or tactivity.timetable.scheduling_by_all) %>
-      <a class="pagelet-trigger <% if image %>text-white<% else %>text-dark<% end %>" data-confirm="Are you sure you want to unschedule this activity?" title="Unschedule" data-method="post" href="/tactivities/<%= tactivity.id %>/unschedule"><i class="bi bi-calendar-minus"></i></a>
+      <a class="pagelet-trigger" data-confirm="Are you sure you want to unschedule this activity?" title="Unschedule" data-method="post" href="/tactivities/<%= tactivity.id %>/unschedule"><i class="bi bi-calendar-minus"></i></a>
       &middot;
     <% end %>
-    <a class="<% if image %>text-white<% else %>text-dark<% end %>" title="Edit" href="/tactivities/<%= tactivity.id %>/edit"><i class="bi bi-pencil-fill"></i></a>
+    <a title="Edit" href="/tactivities/<%= tactivity.id %>/edit"><i class="bi bi-pencil-fill"></i></a>
   </div>
 </div>

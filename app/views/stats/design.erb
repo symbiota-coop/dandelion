@@ -1305,19 +1305,19 @@
         <div class="row g-3">
           <% [['Morning yoga', 'Ruby', '5'], ['Sharing circle', 'Sam', nil]].each do |name, by, img| %>
             <div class="col-sm-6">
-              <div class="tactivity position-relative" style="<%= img ? "background: linear-gradient(rgba(var(--bs-black-rgb), 0.5), rgba(var(--bs-black-rgb), 0.5)), url('/images/dandelions/#{img}.jpeg'); background-size: cover; background-position: center" : 'background: var(--bs-white); border: 2px solid var(--bs-body-color)' %>">
+              <div class="tactivity<%= ' tactivity-image' if img %>"<% if img %> style="--tactivity-image: url('/images/dandelions/<%= img %>.jpeg')"<% end %>>
                 <div class="position-absolute" style="bottom: .5rem; left: .5rem">
-                  <h3 class="mt-0 mb-0"><a class="<%= img ? 'text-white' : 'text-dark' %>" href="#components"><%= name %></a></h3>
-                  <span class="<%= img ? 'text-white' : 'text-dark' %>">by <a class="<%= img ? 'text-white' : 'text-dark' %>" href="#components"><%= by %></a></span>
+                  <h3 class="mt-0 mb-0"><a href="#components"><%= name %></a></h3>
+                  <span>by <a href="#components"><%= by %></a></span>
                 </div>
                 <div class="position-absolute" style="right: .5rem; bottom: .5rem">
-                  <a class="<%= img ? 'text-white' : 'text-dark' %>" href="#components"><i class="bi bi-pencil-fill"></i></a>
+                  <a href="#components"><i class="bi bi-pencil-fill"></i></a>
                 </div>
               </div>
             </div>
           <% end %>
         </div>
-        <div class="spec">A gathering's activities (timetables/_tactivity.erb), dragged into a table-striped grid of times by spaces · 8rem tall, 16rem wide in the grid · with an image, it's darkened by black at 50% under white text; without, white with a 2px --bs-body-color border</div>
+        <div class="spec">A gathering's activities (timetables/_tactivity.erb), dragged into a table-striped grid of times by spaces · 8rem tall, 16rem wide in the grid · white with a 2px --bs-body-color border and --bs-dark text · .tactivity-image takes the image from --tactivity-image, darkened by black at 50% under white text</div>
       <% end %>
 
       <% design_subsection 'Map markers', col: 'col-lg-6' do %>
