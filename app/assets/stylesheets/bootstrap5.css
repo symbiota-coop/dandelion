@@ -681,7 +681,7 @@ progress {
 .container-lg,
 .container-md,
 .container-sm {
-  --bs-gutter-x: 1.875rem;
+  --bs-gutter-x: 2rem;
   --bs-gutter-y: 0;
   width: 100%;
   padding-right: calc(var(--bs-gutter-x) * 0.5);
@@ -4234,8 +4234,8 @@ textarea.form-control-lg {
 }
 
 .card {
-  --bs-card-spacer-y: 1.25rem;
-  --bs-card-spacer-x: 1.25rem;
+  --bs-card-spacer-y: 1rem;
+  --bs-card-spacer-x: 1rem;
   --bs-card-title-spacer-y: 0.5rem;
   --bs-card-title-color: ;
   --bs-card-subtitle-color: ;
@@ -4245,7 +4245,7 @@ textarea.form-control-lg {
   --bs-card-box-shadow: ;
   --bs-card-inner-border-radius: calc(0.75rem - (var(--bs-border-width)));
   --bs-card-cap-padding-y: 0.75rem;
-  --bs-card-cap-padding-x: 1.25rem;
+  --bs-card-cap-padding-x: 1rem;
   --bs-card-cap-bg: rgba(var(--bs-body-color-rgb), 0.03);
   --bs-card-cap-color: ;
   --bs-card-height: ;
@@ -5259,7 +5259,7 @@ textarea.form-control-lg {
   --bs-toast-zindex: 1090;
   --bs-toast-padding-x: 0.75rem;
   --bs-toast-padding-y: 0.5rem;
-  --bs-toast-spacing: 1.875rem;
+  --bs-toast-spacing: 2rem;
   --bs-toast-max-width: 21.875rem;
   --bs-toast-font-size: 0.875rem;
   --bs-toast-color: ;

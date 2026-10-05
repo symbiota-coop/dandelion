@@ -37,7 +37,7 @@ $min-contrast-ratio: 2.2; // white text on the primary green and on orange (2.24
 $link-decoration: none;
 $link-hover-decoration: underline;
 $grid-gutter-width: .75rem;
-$container-padding-x: 1.875rem; // the whole gutter, so containers keep half of it (.9375rem) each side
+$container-padding-x: 2rem; // split between the two sides, so containers keep base (1rem) each side
 $container-max-widths: (sm: 540px, md: 720px, lg: 960px, xl: 1140px); // px, to fit inside the px breakpoints
 // One radius scale: controls (inputs and buttons alike, at each size) on the base, surfaces on lg, sheets on xl
 $border-radius: .5rem; // inputs, buttons, alerts, toasts, pagination
@@ -45,10 +45,10 @@ $border-radius-sm: .375rem; // form-control-sm and btn-sm
 $border-radius-lg: .75rem; // cards, modals, menus and panels; form-control-lg and btn-lg
 $border-radius-xl: 1rem; // sheets and marketing cards
 $card-border-radius: $border-radius-lg;
-$card-spacer-y: 1.25rem;
-$card-spacer-x: 1.25rem;
+$card-spacer-y: 1rem;
+$card-spacer-x: 1rem;
 $card-cap-padding-y: .75rem;
-$card-cap-padding-x: 1.25rem;
+$card-cap-padding-x: 1rem;
 $table-bg: transparent;
 $hr-opacity: 1;
 $input-group-addon-bg: $gray-200;
