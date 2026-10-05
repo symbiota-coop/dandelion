@@ -28,7 +28,7 @@
 
   <!-- COLOUR -->
   <% design_section 'colour' do %>
-    <% design_subsection 'Theme', 'A ramp generated from one value with <code>oklch()</code>. Components use the 500 for fills, 600 for hover, 100 for alert, toast and badge backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints. The 400 is .06 lighter than the 500, or half way to the 200 when the 500 is too light for that, and the 300 is halfway between the 200 and 400, so the steps stay in order however light the colour. Every theme colour is a solid step of this ramp; the only translucent one is the focus ring.'.html_safe do %>
+    <% design_subsection 'Theme', 'A ramp generated from one value with <code>oklch()</code>. Components use the 500 for fills, 600 for hover, 100 for alert, toast and badge backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints. The 400 is .06 lighter than the 500, or half way to the 200 when the 500 is too light for that, and the 300 is halfway between the 200 and 400, so the steps stay in order however light the colour. Every theme colour is a solid step of this ramp; the only translucent ones are the focus ring and .badge-overlay (the 500 at 70%, over images).'.html_safe do %>
       <%= partial :'stats/design/ramp', locals: {
             prefix: '--theme',
             label: '--theme-*',
@@ -816,7 +816,7 @@
       <div class="row g-5">
         <div class="col-lg-7 d-flex flex-column gap-3">
           <%= partial :chart, locals: { data: { 'May' => 12, 'June' => 19, 'July' => 15, 'August' => 27, 'September' => 31, 'October' => 24 }, projection: 10 } %>
-          <div class="spec">Bar (_chart.erb): monthly counts in --theme-500, with the current month's projection stacked on top at 50% (make_projection estimates it from the days so far; here it's fixed)</div>
+          <div class="spec">Bar (_chart.erb): monthly counts in --theme-500, with the current month's projection stacked on top in --theme-300 (make_projection estimates it from the days so far; here it's fixed)</div>
         </div>
         <div class="col-lg-5 d-flex flex-column gap-3">
           <canvas id="dg-doughnut"></canvas>
