@@ -28,7 +28,7 @@
     <i data-bs-toggle="tooltip" title="Someone is in the process of completing an order. If they don't complete it soon, the order will be removed." class="bi bi-spin bi-arrow-repeat"></i>
   <% end %>
   <% if event.sold_out_cache %>
-    <div class="mt-1">
+    <div class="<%= defined?(full_width) && !event.capacity ? 'd-inline ms-1' : 'mt-1' %>">
       <span class="badge text-bg-danger">
         <% if event.sold_out_due_to_sales_end_cache %>
           Sales ended
