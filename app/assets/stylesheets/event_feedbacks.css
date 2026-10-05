@@ -11,8 +11,8 @@
   margin: 0 0.1rem;
 }
 
-.feedback-stars .bi-star-fill.text-warning {
-  color: var(--color-orange-400) !important;
+.feedback-stars .bi-star-fill.chosen {
+  color: var(--color-orange-400);
 }
 
 .feedback-stars .bi-star-fill:hover {

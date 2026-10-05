@@ -1261,12 +1261,12 @@
             <p class="small text-body-secondary mb-3">Your star rating is always public and contributes towards the host's average.</p>
             <div class="feedback-stars" role="radiogroup" aria-label="Star rating">
               <% 1.upto(5) do |i| %>
-                <i class="bi bi-star-fill<%= ' text-warning' if i <= 4 %>" data-rating="<%= i %>" aria-label="<%= i %> out of 5 stars"></i>
+                <i class="bi bi-star-fill<%= ' chosen' if i <= 4 %>" data-rating="<%= i %>" aria-label="<%= i %> out of 5 stars"></i>
               <% end %>
             </div>
           </div>
         </div>
-        <div class="spec">.average-rating (event_feedbacks/_average_rating.erb): the average at --font-size-2xl, the count in --bs-secondary-color, a star per point · public answers beside a bi-quote, at .readable · .read-more (app.js) cuts a reply at its first line break and adds a Read more link at --font-size-xs, which shows the rest · the feedback form (event_feedbacks/build.erb, styled by event_feedbacks.css): five 2.75rem stars on a --bs-tertiary-bg panel, --bs-gray-300 until chosen, then --color-orange-400</div>
+        <div class="spec">.average-rating (event_feedbacks/_average_rating.erb): the average at --font-size-2xl, the count in --bs-secondary-color, a star per point · public answers beside a bi-quote, at .readable · .read-more (app.js) cuts a reply at its first line break and adds a Read more link at --font-size-xs, which shows the rest · the feedback form (event_feedbacks/build.erb, styled by event_feedbacks.css): five 2.75rem stars on a --bs-tertiary-bg panel, --bs-gray-300 until chosen, then --color-orange-400 with .chosen</div>
       <% end %>
 
       <% design_subsection 'Image wall', col: 'col-lg-5' do %>
