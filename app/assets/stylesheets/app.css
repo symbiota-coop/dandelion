@@ -1643,7 +1643,8 @@ ul.pagination {
 
 /* Organisation, gathering and activity tiles (_block.erb): 10rem high, so the
    title is clamped to the lines that fit, and long words break rather than
-   running out of the tile. Tiles without an image get the lavender wash */
+   running out of the tile. The clamp leaves a line empty at the bottom: 5 lines
+   at --font-size-lg, 4 at --font-size-xl. Tiles without an image get the lavender wash */
 .block-fill {
   background: linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-paper) 50%);
   border: 1px solid var(--hairline);
@@ -1663,6 +1664,8 @@ ul.pagination {
 @media (min-width: 992px) {
   .block-title {
     font-size: var(--font-size-xl);
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
   }
 }
 
