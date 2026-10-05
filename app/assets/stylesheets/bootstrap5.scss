@@ -136,9 +136,9 @@ $pagination-hover-bg: $gray-200; // like hovered pills and nav links
 $pagination-hover-border-color: transparent;
 $pagination-focus-color: #000;
 $pagination-focus-bg: transparent;
-$pagination-active-color: #000;
-$pagination-active-bg: transparent;
-$pagination-active-border-color: $gray-600;
+$pagination-active-color: #fff; // the active page in the theme colour, like the active pill and dropdown item
+$pagination-active-bg: var(--theme-500);
+$pagination-active-border-color: var(--theme-500);
 $pagination-disabled-color: $gray-600;
 $pagination-disabled-bg: transparent;
 $pagination-disabled-border-color: transparent;

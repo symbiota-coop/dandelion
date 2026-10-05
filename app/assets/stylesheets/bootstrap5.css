@@ -4607,9 +4607,9 @@ textarea.form-control-lg {
   --bs-pagination-focus-color: #000;
   --bs-pagination-focus-bg: transparent;
   --bs-pagination-focus-box-shadow: 0 0 0 2px rgba(0, 175, 94, 0.6);
-  --bs-pagination-active-color: #000;
-  --bs-pagination-active-bg: transparent;
-  --bs-pagination-active-border-color: #757372;
+  --bs-pagination-active-color: #fff;
+  --bs-pagination-active-bg: var(--theme-500);
+  --bs-pagination-active-border-color: var(--theme-500);
   --bs-pagination-disabled-color: #757372;
   --bs-pagination-disabled-bg: transparent;
   --bs-pagination-disabled-border-color: transparent;

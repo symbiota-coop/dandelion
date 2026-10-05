@@ -993,10 +993,6 @@ p.action a {
 
 .pagination {
   --bs-pagination-focus-box-shadow: var(--focus-ring);
-  /* The active page in the theme colour, like the active pill and dropdown item */
-  --bs-pagination-active-color: var(--bs-white);
-  --bs-pagination-active-bg: var(--theme-500);
-  --bs-pagination-active-border-color: var(--theme-500);
 }
 
 .accordion {
