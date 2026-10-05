@@ -87,7 +87,7 @@
         <% end %>
         <div class="input-group my-1">
           <%= text_field_tag :discount_code, id: 'discount_code', class: 'form-control', style: 'width: 5em' %>
-          <button class="btn btn-outline-secondary" style="padding: 0 0.75rem" type="button" onclick="applyDiscountCode($('#discount_code').val())">Apply</button>
+          <button class="btn btn-outline-secondary" type="button" onclick="applyDiscountCode($('#discount_code').val())">Apply</button>
         <% end %>
       </div>
     </td>
