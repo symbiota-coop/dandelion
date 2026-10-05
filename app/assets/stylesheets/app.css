@@ -941,6 +941,15 @@ p.action a {
   --bs-btn-focus-box-shadow: 0 0 0 var(--bs-focus-ring-width) rgba(var(--bs-btn-focus-shadow-rgb), var(--bs-focus-ring-opacity));
 }
 
+/* Bootstrap leaves a bare .btn's active colours unset, so a pressed one took a
+   currentColor (black) border; it keeps its own colours instead. :where() so
+   any variant class still sets them */
+:where(.btn) {
+  --bs-btn-active-color: var(--bs-btn-color);
+  --bs-btn-active-bg: var(--bs-btn-bg);
+  --bs-btn-active-border-color: var(--bs-btn-border-color);
+}
+
 .btn.btn-lg {
   line-height: 1.3333333;
 }
@@ -1754,8 +1763,7 @@ ul.pagination {
 
 /* Organisation, gathering and activity tiles (_block.erb): 10rem high, so the
    title is clamped to the lines that fit, and long words break rather than
-   running out of the tile. The clamp leaves a line empty at the bottom: 5 lines on phones,
-   halfway between --font-size-lg and -xl (xl breaks a ten-letter name in two columns), and 4 at --font-size-xl from 992px.
+   running out of the tile. The clamp to 4 lines leaves a line empty at the bottom.
    Tiles without an image get the lavender wash */
 .block-fill {
   background: linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-paper) 50%);
@@ -1763,22 +1771,14 @@ ul.pagination {
 }
 
 .block-title {
-  font-size: calc((var(--font-size-lg) + var(--font-size-xl)) / 2);
+  font-size: var(--font-size-xl);
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 5;
-  line-clamp: 5;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
   overflow: hidden;
   overflow-wrap: anywhere;
   hyphens: auto;
-}
-
-@media (min-width: 992px) {
-  .block-title {
-    font-size: var(--font-size-xl);
-    -webkit-line-clamp: 4;
-    line-clamp: 4;
-  }
 }
 
 /* The whole tile is a link: the title's .stretched-link covers it, and the links and icons

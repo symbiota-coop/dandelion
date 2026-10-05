@@ -34,13 +34,13 @@
 
   <div class="col-12 col-lg-auto">
 
-    <ul class="ps-0 mb-3 d-flex align-items-center">
+    <ul class="ps-0 mb-3 d-flex flex-wrap row-gap-2 align-items-center">
       <li class="list-inline-item">
         <label class="mb-0 text-nowrap">View as</label>
       </li>
       <% view_options.each do |opt| %>
         <li class="list-inline-item">
-          <a data-bs-toggle="tooltip" title="<%= opt[:label] %> view" class="btn <%= 'btn-outline-primary' if opt[:active] %>" href="<%= view_url(opt[:key], path: (path if defined?(path))) %>">
+          <a data-bs-toggle="tooltip" title="<%= opt[:label] %> view" class="btn text-nowrap <%= 'btn-outline-primary' if opt[:active] %>" href="<%= view_url(opt[:key], path: (path if defined?(path))) %>">
             <i class="bi <%= opt[:icon] %>"></i> <span class="d-none d-lg-inline"><%= opt[:label] %></span>
           </a>
         </li>
