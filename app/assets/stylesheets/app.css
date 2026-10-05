@@ -1732,7 +1732,7 @@ table.dataTable.table-sm > thead > tr > th[class*="dt-order"] .dt-column-order {
 
 .table-hr td {
   border: 0 !important;
-  border-bottom: 0.1rem solid var(--bs-gray-200) !important;
+  border-bottom: 1px solid var(--bs-gray-200) !important;
 }
 
 body .table > tfoot > tr > th {
