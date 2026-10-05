@@ -12,6 +12,7 @@ $gray-600: #757372;
 $gray-700: #504f4d;
 $gray-800: #3a3938;
 $gray-900: #252423;
+$body-emphasis-color: $gray-900; // not Bootstrap's black: no text on the site is pure black
 
 $blue: #00af5e;
 // Status colours: bg-*, text-*, btn-*, alert-* and friends all follow these
