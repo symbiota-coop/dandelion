@@ -536,9 +536,10 @@
   opacity: 1;
 }
 
-/* A group's chevron points up while its submenu is open, flipping at once rather than turning */
+/* A group's chevron turns to point up while its submenu is open */
 .sidebar .nav-link .caret {
   display: inline-block;
+  transition: transform var(--transition-fast);
 }
 
 .sidebar .nav-link[aria-expanded="true"] .caret {
