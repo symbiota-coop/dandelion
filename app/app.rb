@@ -297,6 +297,8 @@ module Dandelion
 
     get '/design' do
       @title = 'Design guide'
+      @og_image = "#{ENV['BASE_URI']}/images/design.png"
+      @og_desc = 'The visual language of Dandelion: colour, type, spacing and components, rendered from the live CSS'
       erb :design
     end
 
