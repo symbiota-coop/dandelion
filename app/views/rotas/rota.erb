@@ -3,14 +3,14 @@
   <%= @rota.name %>
 </h2>
 <% if @membership.admin? %>
-  <a style="border-bottom: 1px dotted; text-decoration: none" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>/edit">
+  <a class="underline-dotted" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>/edit">
     Edit rota
   </a> &middot;
-  <a style="border-bottom: 1px dotted; text-decoration: none" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>/create_shift">
+  <a class="underline-dotted" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>/create_shift">
     Add someone to a shift
   </a> &middot;
 <% end %>
-<a style="border-bottom: 1px dotted; text-decoration: none" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>.csv">
+<a class="underline-dotted" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>.csv">
   Export as CSV
 </a>
 

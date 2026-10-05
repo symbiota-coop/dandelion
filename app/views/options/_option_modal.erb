@@ -7,7 +7,7 @@
 <div class="modal-body">
   <ul class="search-result-list">
     <% @option.members.each_with_index { |account,i| %>
-    <li <% if i == 0 %> style="border-top: 0" <% end %>>
+    <li<% if i == 0 %> class="border-top-0"<% end %>>
       <%= partial 'accounts/search_result', locals: { account: account } %>
     </li>
     <% } %>

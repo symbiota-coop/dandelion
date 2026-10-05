@@ -3,7 +3,7 @@
   <%= @timetable.name %>
 </h2>
 <% if @membership.admin? %>
-  <a style="border-bottom: 1px dotted; text-decoration: none" href="/g/<%= @gathering.slug %>/timetables/<%= @timetable.id %>/edit">
+  <a class="underline-dotted" href="/g/<%= @gathering.slug %>/timetables/<%= @timetable.id %>/edit">
     Edit timetable
   </a>
 <% end %>

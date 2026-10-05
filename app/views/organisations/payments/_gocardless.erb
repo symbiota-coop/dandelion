@@ -5,7 +5,7 @@
       Go to <code>Developers</code> > <code>Create</code> > <code>Access token</code> and create an access token with <code>Read-write access</code>
       <br />
       Go to <code>Developers</code> > <code>Create</code> > <code>Webhook endpoint</code> and add
-      <span style="text-decoration: underline dotted"><%=ENV['BASE_URI']%>/o/<%= @organisation.slug %>/gocardless_webhook</span>
+      <span class="underline-dotted"><%=ENV['BASE_URI']%>/o/<%= @organisation.slug %>/gocardless_webhook</span>
       <br />
       (We recommending leaving <code>Secret (optional)</code> blank then copying the auto-generated secret on the next screen)
     </p>

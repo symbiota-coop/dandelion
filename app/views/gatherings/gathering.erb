@@ -30,7 +30,7 @@
   </div>
   <div class="col-lg-8 order-lg-1">
     <div class="mb-3">
-      <div data-pagelet-url="/g/<%= @gathering.slug %>/subscribe" style="display: inline">
+      <div data-pagelet-url="/g/<%= @gathering.slug %>/subscribe" class="d-inline">
         <%= partial :'gatherings/subscribe', locals: { membership: @membership } %>
       </div>
       <% if @membership && @membership.hide_from_sidebar %>

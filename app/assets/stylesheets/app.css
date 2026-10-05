@@ -2830,6 +2830,30 @@ td .tactivity-accept {
   color: var(--color-orange-400)
 }
 
+/* Panels that stick just below the fixed header as the page scrolls */
+.sticky-under-header {
+  position: sticky;
+  top: var(--sticky-top);
+}
+
+/* A note or link under a form field (an f.*_block), pulled up into the field's mb-3 so it reads as the field's own */
+.field-note {
+  margin-top: calc(-1 * var(--space-base));
+}
+
+/* Quiet links that read as part of a sentence, like the edit links in a rota's or timetable's intro; also plain text to copy */
+.underline-dotted {
+  text-decoration: underline dotted;
+  text-underline-offset: 0.2em;
+}
+
+/* The large photo at the top of a profile and an application: white-framed, so it shows on any background */
+.profile-photo {
+  width: 12.5rem;
+  background: var(--bs-white);
+  border: 0.1875rem solid var(--bs-white);
+}
+
 /* Avatars (accounts/_square.erb, size: :xs to :2xl, :sm by default): square, in rem so they scale with the text */
 .avatar {
   aspect-ratio: 1 / 1;

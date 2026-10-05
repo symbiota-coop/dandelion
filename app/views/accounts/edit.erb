@@ -7,7 +7,7 @@
     <% if via %>
       <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
       <div class="alert alert-primary d-flex align-items-start">
-        <i class="bi bi-stars me-3 mt-1 fs-2" style="opacity: 0.85"></i>
+        <i class="bi bi-stars me-3 mt-1 fs-2 opacity-75"></i>
         <div>
           <p class="lead mb-2">
             Thanks for your interest in <%= instance_variable_get("@#{r}").name %>!
@@ -21,7 +21,7 @@
     <% elsif @account.sign_ins_count == 1 %>
 
       <div class="alert alert-primary d-flex align-items-start">
-        <i class="bi bi-stars me-3 mt-1 fs-2" style="opacity: 0.85"></i>
+        <i class="bi bi-stars me-3 mt-1 fs-2 opacity-75"></i>
         <div>
           <% if params[:sign_in_token] %>
             <p class="lead mb-2">
@@ -59,7 +59,7 @@
     <%= f.text_block :username %>
     <%= f.email_block :email %>
     <% if !@account.email_confirmed? %>
-      <p style="margin-top: -0.75rem"><a data-method="post" href="/confirm_email">Resend confirmation email</a></p>
+      <p class="field-note"><a data-method="post" href="/confirm_email">Resend confirmation email</a></p>
     <% end %>
     <%= f.password_block :password %>
     <div class="my-3">

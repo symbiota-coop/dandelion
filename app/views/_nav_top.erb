@@ -30,9 +30,9 @@
   <% if current_account %>
     <% if admin? && request.path == '/' && (contribution_data = MonthlyContributionsCalculator.contribution_data) %>
       <li class="nav-item d-none d-lg-inline">
-        <a href="javascript:;" class="nav-link opacity-50" style="cursor: default">
+        <span class="nav-link opacity-50">
           <%= contribution_data[:current].format(no_cents: true) %> (<%= m contribution_data[:projected], contribution_data[:currency] %>)
-        </a>
+        </span>
       </li>
     <% end %>
   <% end %>
