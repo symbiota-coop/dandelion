@@ -733,7 +733,7 @@ body.lavender-wash #content {
 
 body.canvas,
 body.canvas #content {
-  background-color: var(--bs-gray-100);
+  background-color: var(--bs-tertiary-bg);
 }
 
 #content {
