@@ -168,6 +168,8 @@
   --color-yellow-400: oklch(from var(--color-yellow-500) calc(l + min(0.06, (0.88 - l) / 2)) c h);
   --color-yellow-600: oklch(from var(--color-yellow-500) calc(l - 0.05) c h);
   --color-yellow-800: oklch(from var(--color-yellow-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
+  /* Green, the default --theme-500, for things that stay green whatever the theme (map pins and clusters) */
+  --color-green-500: #00af5e;
 }
 
 /* ==========================================================================

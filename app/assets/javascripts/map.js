@@ -33,10 +33,10 @@ window.DandelionMap = {
     };
   },
 
-  // Clusters turn from the theme to orange to red as they grow
+  // Clusters turn from green to orange to red as they grow
   get clusterStyles () {
     return [
-      this.generateClusterStyle('var(--theme-500)'),
+      this.generateClusterStyle('var(--color-green-500)'),
       this.generateClusterStyle('var(--color-orange-500)'),
       this.generateClusterStyle('var(--color-red-500)', 14)
     ];
@@ -56,12 +56,12 @@ window.DandelionMap = {
 
   // Model configurations for map markers
   models: [
-    { name: 'Account', color: 'var(--theme-500)', icon: 'bi bi-person-fill' },
-    { name: 'ActivityApplication', color: 'var(--theme-500)', icon: 'bi bi-person-fill' },
+    { name: 'Account', color: 'var(--color-green-500)', icon: 'bi bi-person-fill' },
+    { name: 'ActivityApplication', color: 'var(--color-green-500)', icon: 'bi bi-person-fill' },
     { name: 'Event', color: 'var(--color-red-400)', icon: 'bi bi-calendar-event' },
-    { name: 'Gathering', color: 'var(--theme-500)', icon: 'bi bi-people-fill' },
+    { name: 'Gathering', color: 'var(--color-green-500)', icon: 'bi bi-people-fill' },
     { name: 'Organisation', color: 'var(--color-red-400)', icon: 'bi bi-flag-fill' },
-    { name: 'Organisationship', color: 'var(--theme-500)', icon: 'bi bi-person-fill' }
+    { name: 'Organisationship', color: 'var(--color-green-500)', icon: 'bi bi-person-fill' }
   ],
 
   dynamicLoadingTimeout: 500,
