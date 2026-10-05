@@ -44,7 +44,7 @@
   font-size: var(--font-size-2xl);
   margin: 0 0 var(--space-sm);
   padding-bottom: var(--space-xs);
-  border-bottom: 2px solid var(--bs-gray-300);
+  border-bottom: 2px solid var(--bs-border-color);
 }
 
 #doc-body h2,
@@ -53,7 +53,7 @@
   font-size: var(--font-size-xl);
   margin: var(--space-xl) 0 var(--space-sm);
   padding-bottom: var(--space-2xs);
-  border-bottom: 1px solid var(--bs-gray-300);
+  border-bottom: 1px solid var(--bs-border-color);
 }
 
 #doc-body h3,
@@ -184,7 +184,7 @@
 
 .doc-toc-mobile {
   margin: 0 0 var(--space-lg);
-  border: 1px solid var(--bs-gray-300);
+  border: 1px solid var(--bs-border-color);
   border-radius: var(--bs-border-radius-lg);
   padding: var(--space-xs) var(--space-sm);
   background: var(--bs-tertiary-bg);
@@ -373,7 +373,7 @@
 .doc-search-result {
   display: block;
   padding: var(--space-sm) 0;
-  border-bottom: 1px solid var(--bs-gray-300);
+  border-bottom: 1px solid var(--bs-border-color);
   color: var(--bs-body-color);
   text-decoration: none;
 }
