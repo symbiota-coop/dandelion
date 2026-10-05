@@ -68,7 +68,8 @@
         })
       }
 
-      var scanLineColor = cssColor('var(--color-red-500)');
+      // Resolved on first use, as cssColor comes from app.js, which is deferred and so not loaded while this runs
+      var scanLineColor;
       function tick() {
         loadingMessage.innerText = "⌛ Loading video..."
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
@@ -84,6 +85,7 @@
             inversionAttempts: "dontInvert",
           });
           if (code) {
+            scanLineColor ||= cssColor('var(--color-red-500)');
             drawLine(code.location.topLeftCorner, code.location.topRightCorner, scanLineColor);
             drawLine(code.location.topRightCorner, code.location.bottomRightCorner, scanLineColor);
             drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, scanLineColor);
