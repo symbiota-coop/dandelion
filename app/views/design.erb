@@ -1121,7 +1121,7 @@
                   <% if t[:group] %>
                     <tr><td colspan="3" class="ticket-group-heading"><%= t[:group] %></td></tr>
                   <% end %>
-                  <tr><td class="pt-0 border-top" colspan="3"></td></tr>
+                  <tr><td class="py-0 border-top" colspan="3"></td></tr>
                   <tr>
                     <td class="border-top-0 align-middle">
                       <span class="ticket-type-name fw-bold"><%= t[:name] %></span>
@@ -1144,7 +1144,7 @@
                       <% end %>
                     </td>
                   </tr>
-                  <tr><td class="text-body-secondary ticket-type-description border-0 pt-0" colspan="3"><div><% if t[:description] %><p><%= t[:description] %></p><% end %></div></td></tr>
+                  <tr><td class="text-body-secondary ticket-type-description border-0 pt-0<% unless t[:description] %> pb-0<% end %>" colspan="3"><div><% if t[:description] %><p><%= t[:description] %></p><% end %></div></td></tr>
                 <% end %>
                 <tr>
                   <td></td>

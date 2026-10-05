@@ -17,7 +17,7 @@
 <% end %>
 <% end %>
 <tr>
-  <td class="pt-0 border-top" colspan="3">
+  <td class="py-0 border-top" colspan="3">
   </td>
 </tr>
 <tr>
@@ -128,7 +128,7 @@
 </tr>
 
 <tr>
-  <td class="text-body-secondary ticket-type-description border-0 pt-0" colspan="3">
+  <td class="text-body-secondary ticket-type-description border-0 pt-0<% unless ticket_type.public_description %> pb-0<% end %>" colspan="3">
     <div class="<% if !ticket_type.price && !ticket_type.range %>mt-3<% end %>">
       <% if ticket_type.public_description %>
         <%== Sanitize.fragment(Rinku.auto_link(md(ticket_type.public_description)), Sanitize::Config::DANDELION) %>
