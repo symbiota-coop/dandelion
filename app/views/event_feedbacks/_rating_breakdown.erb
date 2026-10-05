@@ -1,0 +1,21 @@
+<% counts = event_feedbacks.rated.pluck(:rating).map(&:to_i).tally
+   total = counts.values.sum %>
+<% if total > 0 %>
+  <% average = event_feedbacks.average_rating %>
+  <div class="rating-breakdown">
+    <div class="text-center">
+      <div class="rating-breakdown-average"><%= average %></div>
+      <%= partial :'event_feedbacks/stars', locals: { rating: average.round } %>
+      <div class="small text-body-secondary"><%= pluralize total, 'rating' %></div>
+    </div>
+    <div class="rating-breakdown-bars">
+      <% 5.downto(1) do |stars| count = counts[stars] || 0 %>
+        <div class="rating-breakdown-row" title="<%= pluralize count, "#{stars}-star rating" %>">
+          <span><%= stars %><i class="bi bi-star-fill"></i></span>
+          <div class="progress" role="presentation"><div class="progress-bar" style="width: <%= (100.0 * count / total).round %>%"></div></div>
+          <span class="text-body-secondary text-end"><%= count %></span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

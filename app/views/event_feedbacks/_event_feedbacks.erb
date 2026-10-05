@@ -1,4 +1,4 @@
-<%= partial :'event_feedbacks/average_rating', locals: { event_feedbacks: event_feedbacks } %>
+<%= partial :'event_feedbacks/rating_breakdown', locals: { event_feedbacks: event_feedbacks } %>
 
 <% if !params[:minimal] %>
 
@@ -73,10 +73,22 @@
 <% end %>
 
 <% event_feedbacks = event_feedbacks.and(:rating.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 10) %>
-<table class="table table-borderless mt-3">
+<div class="feedback-list mt-3">
   <% event_feedbacks.each { |event_feedback| account = event_feedback.account %>
-  <tr class="align-middle<% if event_feedback.deleted_at %> opacity-50<% end %>">
-    <td class="w-100">
+  <% answers = event_feedback.deleted_at ? [] : (event_feedback.public_answers || []).map { |_q, a| a if a.present? }.compact %>
+  <article class="feedback-entry<% if event_feedback.deleted_at %> opacity-50<% end %>">
+    <div class="d-flex align-items-center gap-2 mb-1">
+      <% if event_feedback.deleted_at %>
+        <em>Removed</em>
+      <% else %>
+        <%= partial :'event_feedbacks/stars', locals: { rating: event_feedback.rating } %>
+      <% end %>
+      <small class="text-body-secondary"><%= timeago event_feedback.created_at %></small>
+    </div>
+    <% if answers.any? %>
+      <div class="readable mb-1"><%== Sanitize.fragment(answers.join('<br /><br />').gsub("\n", '<br />'), Sanitize::Config::DANDELION) %></div>
+    <% end %>
+    <div class="small">
       <% if !account || event_feedback.anonymous? %>
         Anonymous
       <% elsif account.publicly_visible? %>
@@ -85,19 +97,16 @@
         <%= account.abbrname %>
       <% end %>
       <% if event_feedback.event %>
-        on <a <% if params[:minimal] %>target="_blank"<% end %> href="/e/<%= event_feedback.event.slug %>"><%= event_feedback.event.name %></a>
+        <span class="text-body-secondary">on</span> <a <% if params[:minimal] %>target="_blank"<% end %> href="/e/<%= event_feedback.event.slug %>"><%= event_feedback.event.name %></a>
       <% end %>
-    </td>
-    <td class="text-nowrap"><% if event_feedback.deleted_at %><em>Removed</em><% else %><% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %><% end %></td>
-    <td class="text-nowrap text-end"><small><%= timeago event_feedback.created_at %></small></td>
-  </tr>
-  <% if !event_feedback.deleted_at && event_feedback.public_answers&.any? { |_, a| a.present? } %>
-    <tr>
-      <td class="border-top-0" colspan="3">
-        <%= partial :'event_feedbacks/event_feedback', locals: { event_feedback: event_feedback } %>
-      </td>
-    </tr>
-  <% end %>
+    </div>
+    <% if answers.any? && event_feedback.response && event_feedback.respondable? %>
+      <div class="feedback-reply mt-2">
+        <div class="small fw-semibold mb-1"><i class="bi bi-reply-fill"></i> <%= event_feedback.event.organisation.name %> replied</div>
+        <div class="readable read-more"><%== Sanitize.fragment(Rinku.auto_link(event_feedback.response.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %></div>
+      </div>
+    <% end %>
+  </article>
   <% } %>
-</table>
+</div>
 <%= will_paginate event_feedbacks, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

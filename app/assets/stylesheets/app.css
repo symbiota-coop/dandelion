@@ -2792,6 +2792,81 @@ table.event-details td {
   font-size: var(--font-size-2xl);
 }
 
+/* Public feedback (event_feedbacks/_event_feedbacks.erb): the average beside a bar per star level, then the list */
+.rating-breakdown {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-base);
+}
+
+.rating-breakdown-average {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: var(--space-2xs);
+}
+
+.rating-breakdown-bars {
+  flex: 1;
+  max-width: 20rem;
+}
+
+.rating-breakdown-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--font-size-sm);
+}
+
+.rating-breakdown-row > span {
+  width: 1.75rem;
+  white-space: nowrap;
+}
+
+.rating-breakdown-row .bi-star-fill {
+  font-size: 0.7em;
+  margin-left: 0.1em;
+}
+
+.rating-breakdown-row .progress {
+  flex: 1;
+  height: 0.5rem;
+  background-color: var(--bs-tertiary-bg);
+}
+
+.rating-breakdown-row .progress-bar {
+  background-color: var(--color-orange-400);
+}
+
+.feedback-stars-shown {
+  white-space: nowrap;
+}
+
+.bi.bi-star-fill.star-off {
+  color: var(--bs-tertiary-color);
+  opacity: 0.4;
+}
+
+.feedback-entry {
+  padding-block: var(--space-base);
+  border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+
+.feedback-entry:first-child {
+  padding-top: 0;
+}
+
+.feedback-entry:last-child {
+  border-bottom: none;
+}
+
+.feedback-reply {
+  border-left: 0.25rem solid var(--bs-primary);
+  padding-left: var(--space-sm);
+  margin-left: var(--space-2xs);
+}
+
 /* ==========================================================================
    Newsfeed and cards
    ========================================================================== */
