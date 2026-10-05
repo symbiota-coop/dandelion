@@ -561,7 +561,8 @@ $(function () {
       $list = $('<div class="list-group list-group-flush"></div>')
       $toggle.siblings('.dropdown-menu').find('.dropdown-item, .dropdown-header, .dropdown-divider').each(function () {
         if ($(this).hasClass('dropdown-divider')) return $list.append('<hr class="my-1">')
-        const $item = $(this).clone()
+        // clone(true) keeps the confirm and POST click handlers, or destroy and data-method links would GET
+        const $item = $(this).clone(true)
         if (!$item.hasClass('dropdown-header')) $item.removeClass('dropdown-item').addClass('list-group-item list-group-item-action')
         $list.append($item)
       })
