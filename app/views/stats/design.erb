@@ -38,7 +38,7 @@
               '100' => 'alert, toast and badge background, crumb hover, unread messages',
               '200' => 'progress tracks, blockquote and transcript borders, chart projections',
               '300' => 'bar chart projections',
-              '400' => 'themed AI well end',
+              '400' => 'themed AI well end, Stripe Connect fees in the contributions chart',
               '500' => nil,
               '600' => 'hover',
               '800' => 'text on tints'
@@ -47,11 +47,11 @@
       <div class="small text-body-secondary">Bootstrap's <code>rgba(var(--bs-*-rgb))</code> colours need an rgb triplet, so <code>/theme.css</code> also sets <code>--theme-500-rgb</code>.</div>
     <% end %>
 
-    <% design_subsection 'Lavender', "The default site's AI well and <code>.lavender-wash</code> backgrounds, with the theme ramp's steps derived from --color-lavender-500: the default green turned to hue 300, the same lightness and chroma. Themed pages switch the AI well to the theme.".html_safe do %>
+    <% design_subsection 'Lavender', "The default site's AI well and <code>.lavender-wash</code> backgrounds. Its steps come from --color-lavender-500, the default green turned to hue 300 at the same lightness and chroma, with the theme ramp's formulas.".html_safe do %>
       <%= partial :'stats/design/ramp', locals: {
             prefix: '--color-lavender',
             notes: {
-              '50' => '.lavender-wash, AI well background',
+              '50' => '.lavender-wash, AI well background, features page section wash',
               '100' => 'not used yet',
               '200' => 'not used yet',
               '300' => 'not used yet',
@@ -63,7 +63,7 @@
           } %>
     <% end %>
 
-    <% design_subsection 'Yellow', "For highlighted or rewarded things, through <code>text-bg-yellow</code>: Featured, Co-host, rota points, PATCH routes. Its steps are derived from --color-yellow-500 with the theme ramp's formulas. A yellow 500 is much lighter than the other ramps' (oklch lightness .86, against .63 to .76), so its 200 to 500 sit close together, set apart more by saturation than lightness.".html_safe do %>
+    <% design_subsection 'Yellow', "For highlighted or rewarded things, through <code>text-bg-yellow</code>: Featured, Co-host, rota points, PATCH routes. Its steps come from --color-yellow-500 with the theme ramp's formulas. Yellow's 500 is the lightest (see Warning and danger), so its 200 to 500 sit close together, set apart more by saturation than lightness.".html_safe do %>
       <%= partial :'stats/design/ramp', locals: {
             prefix: '--color-yellow',
             notes: {
@@ -72,26 +72,27 @@
               '200' => 'not used yet',
               '300' => 'not used yet',
               '400' => 'not used yet',
-              '500' => 'contributions chart line and fill; filled text-bg-yellow',
+              '500' => 'contributions chart line and fill; text-bg-yellow on anything but a badge (not used yet)',
               '600' => 'not used yet',
               '800' => 'badge text'
             }
           } %>
     <% end %>
 
-    <% design_subsection 'Warning and danger', "Two families, used the same way as the theme ramp: each variant class (alert-warning, toast-warning, table-warning, btn-warning, text-bg-warning and the danger ones) sets its steps as <code>--variant-50</code> to <code>--variant-800</code>, and each component maps those to its roles once. The 500 is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match. There are no warning buttons yet, so --color-orange-600 is unused. The lavender, yellow, orange and red 500s share the default green's oklch chroma, .169, so they are equally saturated; only lightness varies by hue, so each reads true: red .63, green and lavender .661, orange .76, yellow .86.".html_safe do %>
+    <% design_subsection 'Warning and danger', "Two families, used the same way as the theme ramp: each variant class (alert-warning, toast-warning, table-warning, btn-warning, text-bg-warning and the danger ones) sets the steps it uses as <code>--variant-*</code>, and each component maps those to its roles once. The 500 is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match. The lavender, yellow, orange and red 500s share the default green's oklch chroma, .169, so they are equally saturated; only lightness varies by hue, so each reads true: red .63, green and lavender .661, orange .76, yellow .86.".html_safe do %>
       <% roles = {
            '50' => 'row background',
            '100' => 'alert, toast and badge background',
            '200' => 'row border',
            '300' => 'not used yet',
            '400' => 'not used yet',
-           '500' => 'fill: buttons, filled badges and card headers',
+           '500' => 'fill: buttons, card headers and other text-bg-* elements that aren\'t badges',
            '600' => 'button hover',
-           '800' => 'text and border on tints, badge text'
+           '800' => 'text and links on tints, badge text'
          }
          other_uses = {
            'orange' => {
+             '50' => 'features page section washes',
              '500' => 'ASN stats: bot % of 30 and over',
              '400' => 'star icons, feedback stars, map areas, features page',
              '200' => 'features page divider end'
@@ -106,13 +107,13 @@
               prefix: "--color-#{colour}",
               label: title,
               label_note: "--color-#{colour}-*",
-              notes: roles.merge(other_uses[colour]) { |_, role, uses| "#{role}. Also: #{uses}" }
+              notes: roles.merge(other_uses[colour]) { |_, role, uses| role == 'not used yet' ? uses.upcase_first : "#{role}. Also: #{uses}" }
             } %>
       <% end %>
-      <div class="small text-body-secondary">Alerts and toasts: the 100, flat, as badges. table-warning and table-danger rows: the 50, with the 200 for borders and a mix 30% of the way to it on hover.</div>
+      <div class="small text-body-secondary">Danger badges take the 200, as red's 100 reads pink. table-warning and table-danger rows mix 30% of the way from the 50 to the 200 for hover, stripes and active rows.</div>
     <% end %>
 
-    <% design_subsection 'Greys, black and white', "Bootstrap's own variables, set in bootstrap5.scss to near-neutral greys: Bootstrap's lightness steps with a trace of warmth (oklch hue 75, chroma .00225–.003). Usage: 100 (<code>--bs-tertiary-bg</code>) body.canvas pages, wells and hovered dropdown, autocomplete and list items, and table stripes · 200 (<code>--bs-secondary-bg</code>) hovered nav links, table rows and secondary buttons · 300 table and secondary button borders · 400 input borders and hr · 600 secondary text · 700 input add-ons · 800 search bar · 900 header and sidebar. Body text is <code>--bs-body-color</code>, the same as 900. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows and image overlays. Hairlines (card and dropdown borders, the .chill card header's divider, marketing cards) use <code>--hairline</code>, black at 10%: Bootstrap's <code>--bs-border-color-translucent</code>, set in bootstrap5.scss, so its cards and dropdowns share it; modals and toasts have no border.".html_safe do %>
+    <% design_subsection 'Greys, black and white', "Bootstrap's own variables, set in bootstrap5.scss to near-neutral greys: Bootstrap's lightness steps with a trace of warmth (designed at oklch hue 75, chroma .00225–.003, then rounded to hex). Usage: 100 (<code>--bs-tertiary-bg</code>) body.canvas pages, wells and hovered dropdown, autocomplete and list items, and table stripes · 200 (<code>--bs-secondary-bg</code>) hovered nav links, table rows and secondary buttons, secondary badges and input add-ons · 300 table and secondary button borders · 400 input borders and hr · 500 sidebar sub-menu links and grey borders (comment boxes, the editor) · 600 secondary text · 700 input add-on text · 800 search bar · 900 header and sidebar. Body text is <code>--bs-body-color</code>, the same as 900. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows and image overlays. Hairlines (card, dropdown, autocomplete and cookie banner borders, date tiles, the .chill card header's divider, marketing cards) use <code>--hairline</code>, black at 10%: Bootstrap's <code>--bs-border-color-translucent</code>, set in bootstrap5.scss, so its cards and dropdowns share it.".html_safe do %>
       <div class="row g-3">
         <% %w[--bs-white --bs-gray-100 --bs-gray-200 --bs-gray-300 --bs-gray-400 --bs-gray-500 --bs-gray-600 --bs-gray-700 --bs-gray-800 --bs-gray-900 --bs-black].each do |name| %>
           <%= partial :'stats/design/swatch', locals: { vars: [name], col: 'col-6 col-md-3 col-xl' } %>
@@ -120,12 +121,12 @@
       </div>
     <% end %>
 
-    <% design_subsection 'Accents and surfaces', 'Single colours with one role each. --color-midnight ends the header\'s sunset and is the root of the marketing pages\' purple. --color-paper is where .lavender-wash fades to, and --color-highlight is behind mark.' do %>
+    <% design_subsection 'Accents and surfaces', 'Single colours with one role each.' do %>
       <div class="row g-3 row-cols-2 row-cols-md-3">
         <% [
              [%w[--color-paper], '.lavender-wash end'],
-             [%w[--color-highlight], 'mark'],
-             [%w[--color-midnight], 'header sunset; marketing pages']
+             [%w[--color-highlight], 'mark, .highlight'],
+             [%w[--color-midnight], 'header sunset; root of the marketing pages\' purple']
            ].each do |vars, note| %>
           <%= partial :'stats/design/swatch', locals: { vars: vars, note: note } %>
         <% end %>
@@ -135,7 +136,7 @@
     <% design_subsection 'Other gradients', 'The dark header and sidebar are a sunset: near-black fading to --color-midnight, with the orange-to-yellow --gradient-active as the sun on the active sidebar item, the notification dot and the load bar. Light content marks active states with the theme colour, so each surface has one active colour. --gradient-rainbow is only for .gradient-text headlines on marketing pages and the signed-out home.' do %>
       <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-xl-4">
         <% [
-             { box_class: 'lavender-wash', title: '.lavender-wash', note: 'Lavender to paper. body.lavender-wash on the sign-in, sign-up and auth failure pages; a .lavender-wash div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.' },
+             { box_class: 'lavender-wash', title: '.lavender-wash', note: 'Lavender to paper. body.lavender-wash on the sign-in pages (email, code, Ethereum), sign-up and auth failure; a .lavender-wash div, which also fades to white at the bottom, behind the hero on the marketing pages and the signed-out home.' },
              { fills: ['var(--gradient-active)'], title: '--gradient-active', note: 'Sidebar active item, notification dot, page-load bar.' },
              { fills: ['var(--gradient-rainbow)'], title: '--gradient-rainbow', note: '.gradient-text only.' },
              { fills: ['var(--gradient-header)'], title: '--gradient-header', note: 'The header: 45°, --bs-gray-900 to 66%, then midnight.' }
@@ -215,7 +216,7 @@
              ['body · nav · .btn', '--font-size-sm · .875rem', '<div data-sample>Body text, inputs, tables, buttons (btn-sm too), nav links, tabs, dropdown items and tooltips</div>'],
              ['.small', '.875em of its context', '<span data-sample class="small">Secondary details: a location, a description</span>'],
              ['.badge', '.9375em of its context', '<span data-sample class="badge text-bg-secondary">Badges</span>'],
-             ['.breadcrumb', '--font-size-xs · .75rem', '<ol data-sample class="breadcrumb m-0"><li class="breadcrumb-item">Breadcrumbs</li><li class="breadcrumb-item">and carets</li></ol>']
+             ['.breadcrumb', '--font-size-xs · .75rem', '<ol data-sample class="breadcrumb m-0"><li class="breadcrumb-item">Organisations</li><li class="breadcrumb-item">Breadcrumbs</li></ol>']
            ].each do |name, size, sample| %>
           <div data-spec-row class="py-3 border-top">
             <div class="row align-items-baseline">
@@ -226,7 +227,7 @@
           </div>
         <% end %>
       </div>
-      <div class="small text-body-secondary"><code>.h1</code>–<code>.h5</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. h5 is the smallest heading we use; h6 is the same size, so it's left to user-written descriptions. The heading sizes are set in bootstrap5.scss (<code>$h1-font-size</code>…), so <code>.fs-1</code>–<code>.fs-5</code> make text a heading's size without its weight or font. <code>.small</code> shrinks text to .875em of its context; it's Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is --bs-gray-600: <code>.text-body-secondary</code>, and form-text. <code>.subtle</code> is for links in it, which turn the theme colour on hover.</div>
+      <div class="small text-body-secondary"><code>.h1</code>–<code>.h5</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. h5 is the smallest heading we use; h6 is the same size, so it's left to user-written descriptions. The heading sizes are set in bootstrap5.scss (<code>$h1-font-size</code>…), so <code>.fs-1</code>–<code>.fs-5</code> make text a heading's size without its weight or font. <code>.small</code> is Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is --bs-gray-600: <code>.text-body-secondary</code>, and form-text. <code>.subtle</code> is for links in it, which turn the theme colour on hover.</div>
     <% end %>
   <% end %>
 
@@ -240,7 +241,7 @@
              ['--bs-border-radius', 'Inputs, buttons, button groups, alerts, toasts, pagination, tooltips, sidebar pills; the bottom corners of menus that hang from their input (autocomplete, Select2)'],
              ['--bs-border-radius-lg', 'Cards, modals, menus and panels: dropdowns, cookie banner, AI well, ask box. Also form-control-lg and btn-lg'],
              ['--bs-border-radius-xl', 'Mobile bottom sheet (top corners), marketing cards, chat bubbles'],
-             ['--bs-border-radius-pill', 'Badges, nav crumbs, the header and chat avatars, round buttons and dots']
+             ['--bs-border-radius-pill', 'Badges, nav crumbs, the header avatar, round buttons and dots']
            ].each do |name, note| %>
           <div class="col-6 col-md">
             <div class="bg-body-secondary border mb-2" style="height: 4.5rem; border-radius: var(<%= name %>)"></div>
@@ -252,12 +253,12 @@
       </div>
     <% end %>
 
-    <% design_subsection 'Elevation', "Bootstrap's three shadows, set in <code>bootstrap5.scss</code> and used through its variables or the <code>shadow-sm</code>, <code>shadow</code> and <code>shadow-lg</code> classes. Soft, in px like hairlines: sm is a tight contact shadow (1px) alone, and the base and lg add a wide, faint one under it. Floating surfaces also have a --hairline border, so the shadow can stay light.".html_safe do %>
+    <% design_subsection 'Elevation', "Bootstrap's three shadows, set in <code>bootstrap5.scss</code> and used through its variables or the <code>shadow-sm</code>, <code>shadow</code> and <code>shadow-lg</code> classes. Soft, in px like hairlines: sm is a tight contact shadow (1px) alone, and the base and lg add a wide, faint one under it. Floating menus and panels (dropdowns, autocomplete, the cookie banner) also have a --hairline border, so the shadow can stay light; toasts and the chat panel have the shadow alone.".html_safe do %>
       <div class="bg-body-tertiary rounded p-4">
         <div class="row g-4">
           <% [
-               ['--bs-box-shadow-sm', 'Resting surfaces: header, search, cards, editor toolbar'],
-               ['--bs-box-shadow', 'Floating: dropdowns, autocomplete, cookie banner, chat, hover lift'],
+               ['--bs-box-shadow-sm', 'Resting surfaces: header, search, cards (with shadow-sm), the editor toolbar while stuck'],
+               ['--bs-box-shadow', 'Floating: dropdowns, autocomplete, toasts, cookie banner, chat, hover lift'],
                ['--bs-box-shadow-lg', 'Not used yet']
              ].each do |name, note| %>
             <div class="col-md-4">
@@ -269,7 +270,7 @@
       <div class="small text-body-secondary">The mobile event page's fixed tickets bar keeps its own upward shadow.</div>
     <% end %>
 
-    <% design_subsection 'Spacing', "One scale for padding, margins and gaps, as <code>--space-*</code> in app.css. Bootstrap's spacing utilities are the same scale without sm and xl, so in markup use the utility and in CSS the token. Values off the scale are kept only where they size a control to match another (.375rem, btn-sm's padding), line up with a fixed layout dimension (the header and sidebar) or are px hairlines.".html_safe do %>
+    <% design_subsection 'Spacing', "One scale for padding, margins and gaps, as <code>--space-*</code> in app.css. Bootstrap's spacing utilities are the same scale without sm and xl, so in markup use the utility and in CSS the token. In app.css, values off the scale mostly size a control to match another (.375rem, btn-sm's padding, the nav crumbs' .625rem), line up with a fixed layout dimension (the header, the sidebar, search results' image column) or are px hairlines. docs.css, messages.css and marketing.css still have older off-scale values.".html_safe do %>
       <div class="border-bottom">
         <% [
              ['--space-2xs', '1', 'Label to field, dropdown and autocomplete items, sidebar sub-menu, badges in a row (mb-1, gap-1)'],
@@ -350,7 +351,7 @@
   <!-- COMPONENTS -->
   <% design_section 'components' do %>
 
-    <% design_subsection 'Buttons', 'Primary and danger are flat: their variant\'s 500 over a transparent border, and the 600 on hover. Other fills (progress bars, text-bg-* elements other than badges, like card headers, and p.action) are the same flat 500. The only gradient on a component is the AI well\'s sheen, so it marks AI. btn-warning is styled the same but not used yet. Secondary is quiet: white with a --bs-gray-300 border and body text, --bs-secondary-bg on hover. It\'s for dismissive actions like Cancel, Not now and Disconnect. btn-outline-secondary is only for buttons joined to an input (Apply, Copy) and the donation toggle group. Brand buttons like btn-signal stay flat.'.html_safe do %>
+    <% design_subsection 'Buttons', 'Primary and danger are flat: their variant\'s 500 over a transparent border, and the 600 on hover. Other fills (progress bars, text-bg-* elements other than badges, like card headers, and p.action) are the same flat 500. btn-warning is styled the same but not used yet. Secondary is quiet: white with a --bs-gray-300 border and body text, --bs-secondary-bg on hover. It\'s for dismissive actions like Cancel, Not now and Disconnect. btn-outline-secondary is only for buttons joined to an input (Apply, Remove, Copy) and the donation toggle group. Brand buttons like btn-signal stay flat.'.html_safe do %>
       <div class="border rounded p-4 d-flex flex-wrap gap-3 align-items-center">
         <a class="btn btn-primary" href="#components">Book tickets</a>
         <a class="btn btn-outline-primary" href="#components">Outline primary</a>
@@ -379,19 +380,19 @@
           </thead>
           <tbody>
             <% [
-                 ['text-bg-primary', 'Good, or the main count', ['128', '6/6 points', 'breathwork', 'Kitchen shift']],
+                 ['text-bg-primary', 'Good, or the main count', ['128', '6/6', 'breathwork', 'Kitchen shift']],
                  ['text-bg-secondary', 'Neutral detail', ['Locked', 'Secret', '£5 discount applied']],
                  ['text-bg-warning', 'Needs attention, not yet a problem', ['On hold']],
-                 ['text-bg-danger', 'A problem or a hard limit', ['Sold out', 'Full', 'Rejected, to contact', 'Resign']],
-                 ['text-bg-yellow', 'Highlighted or rewarded', ['Featured', 'Co-host', '2 points']],
+                 ['text-bg-danger', 'A problem or a hard limit', ['Sold out', 'Sales ended', 'Full', 'Rejected, to contact']],
+                 ['text-bg-yellow', 'Highlighted or rewarded', ['Featured', 'Co-host', '<i class="bi bi-hand-index"></i> 2']],
                  ['text-bg-dark', 'Counts in a gathering\'s nav', ['3', '12/20']],
-                 ['text-primary border border-primary', 'Outline: an unselected choice', ['Available', 'Weekend pass', 'London']],
+                 ['text-primary border border-primary', 'Outline: a group label, or an unselected choice', ['Available', 'Weekend pass', 'London']],
                  ['text-bg-stripe', 'Reported by Stripe', ['£1,240']]
                ].each do |klass, meaning, texts| %>
               <tr>
                 <td><code><%= klass %></code></td>
                 <td class="text-body-secondary"><%= meaning %></td>
-                <td><% texts.each do |text| %><span class="badge <%= klass %> me-1"><%= text %></span><% end %></td>
+                <td><% texts.each do |text| %><span class="badge <%= klass %> me-1"><%== text %></span><% end %></td>
               </tr>
             <% end %>
           </tbody>
@@ -406,7 +407,7 @@
           <% flashes.each do |variant, message, link| %>
             <div class="alert alert-<%= variant %> alert-dismissible"><%= message %> <a href="#components"><%= link %></a><button type="button" class="btn-close" aria-label="Close"></button></div>
           <% end %>
-          <div class="spec">Inline, in the page. Padding .875rem 1rem, no border. Links bold and underlined in the alert's link colour. Flashes render as alerts only on pages that set @hide_alert.</div>
+          <div class="spec">Inline, in the page. Padding .875rem 1rem, no border. Links bold and underlined in the alert's link colour. Flashes are toasts, except on the few pages that set @hide_alert (sign in, sign up, subscriptions, the mailer header), which render them inline as alerts with no close button.</div>
         </div>
       <% end %>
 
@@ -508,7 +509,7 @@
             <div style="margin-bottom: 1em"><img style="max-height: 12.5rem" src="/images/dandelions/3.jpeg" alt="" class="mw-100"></div>
             <input type="file" class="form-control" id="dg-file">
           </div>
-          <div class="spec">file_block and image_block (lib/form_builder.rb): a plain form-control file input, with the current file above it once saved: a download link, or for images the image at up to 12.5rem high · app.js rejects files over 10MB before upload</div>
+          <div class="spec">file_block and image_block (lib/form_builder.rb): a plain form-control file input, with the current file above it once saved: a download link, or for images the image at up to 12.5rem high, then a Remove checkbox (and Rotate by for images) · app.js rejects files over 10MB before upload</div>
         </div>
       <% end %>
     </div>
@@ -565,19 +566,19 @@
               flatpickr(el, { inline: true, appendTo: el, mode: 'range', defaultDate: [today, new Date(today.getTime() + 2 * 864e5)] })
             })
           </script>
-          <div class="spec">app.js wires up .datepicker (altFormat Y-m-d) and .datetimepicker (J F Y, H:i, 24-hour; data-flatpickr-min-date, -max-date and -linked-end) · selected days and range ends --theme-500 · on iPhone, a native input (.flatpickr-mobile) at full width</div>
+          <div class="spec">app.js wires up .datepicker (altFormat Y-m-d) and .datetimepicker (J F Y, H:i, 24-hour; data-flatpickr-min-date, -max-date and -linked-end) · selected days and range ends --theme-500 · on phones, a native input (.flatpickr-mobile) at full width</div>
         </div>
       <% end %>
     </div>
 
-    <% design_subsection 'Rich text editor', 'CKEditor 5, from our own build (symbiota-coop/ckeditor5-dandelion). <code>wysiwyg_block</code> renders a textarea.wysiwyg, and app.js swaps in the editor. ckeditor.css styles it and the rich text it produces, and adds two paragraph styles, Lead and Small.'.html_safe do %>
+    <% design_subsection 'Rich text editor', 'CKEditor 5, from our own build (symbiota-coop/ckeditor5-dandelion). <code>wysiwyg_block</code> renders a textarea.wysiwyg, and app.js swaps in the editor. ckeditor.css styles it and the rich text it produces; the build adds two paragraph styles, Lead and Small.'.html_safe do %>
       <div class="border rounded p-4">
         <label for="dg-wysiwyg">Description</label>
         <textarea class="form-control wysiwyg" id="dg-wysiwyg" rows="5"><p>An evening of <strong>breathwork</strong> and sound, for all levels.</p><ul><li>Bring a mat and a blanket</li><li>Doors at 7pm</li></ul></textarea>
       </div>
     <% end %>
 
-    <% design_subsection 'Filter forms', 'The search forms above lists and tables: orders, donations, members, applications. Bootstrap 5 dropped <code>.form-inline</code> and <code>.form-group</code>, so app.css keeps them for these: .form-inline lays the form out in a row from 576px, and each .form-group is a label and its field side by side. <code>.searchForm</code> spaces them and caps fields at 12em; <code>.submitOnChange</code> submits on any change.'.html_safe do %>
+    <% design_subsection 'Filter forms', 'The search forms above lists and tables: orders, donations, members, applications. Bootstrap 5 dropped <code>.form-inline</code> and <code>.form-group</code>, so app.css keeps them for these: .form-inline lays the form out in a row from 576px, and each .form-group is a label and its field side by side. <code>.searchForm</code> spaces them and caps fields at 12em; <code>.submitOnChange</code> submits when a select, date, checkbox or month field changes.'.html_safe do %>
       <div class="border rounded p-4">
         <form class="searchForm form-inline mb-3" onsubmit="return false">
           <div class="form-group">
@@ -629,7 +630,7 @@
           <a href="#components"><i class="bi bi-three-dots"></i></a>
         </div>
       </div>
-      <div class="spec">Fields stack below 576px, with the button below them · the checkbox helper (<code>checkbox 'Deleted'</code>) is a .form-group holding a .form-check-inline · in grid rows instead (events/_search_form.erb), each .form-group takes a col, with the checkboxes beside the button on a second row, inside a .search panel: --bs-tertiary-bg, --bs-box-shadow-sm · .select-placeholder greys a select while its disabled first option, the placeholder, is chosen · popular locations: outline badges, the current one filled</div>
+      <div class="spec">Fields stack below 576px, with the button below them · the checkbox helper (<code>checkbox 'Deleted'</code>) is a .form-group holding a .form-check-inline · in grid rows instead (events/_search_form.erb), each .form-group takes a col, with the checkboxes beside the button on a second row, inside a .search panel: --bs-tertiary-bg, --bs-box-shadow-sm · .select-placeholder greys a select until app.js loads, which then greys any select while its chosen option is a disabled placeholder · popular locations: outline badges, the current one filled</div>
     <% end %>
 
     <div class="row g-5">
@@ -651,7 +652,7 @@
               <button type="button" class="quick-color-btn rounded-circle border p-0<%= ' selected' if i.zero? %>" style="width: 1.625rem; height: 1.625rem; background: <%= color %>; --ring-color: <%= color %>" title="<%= color %>"></button>
             <% end %>
           </div>
-          <div class="spec">_quick_theme_colors.erb, beside the colour field: quick_colors turns the default green evenly round the wheel · 1.625rem circles that grow 10% with a --bs-box-shadow on hover · selected or focused: a white gap, then a ring in the swatch's own colour</div>
+          <div class="spec">_quick_theme_colors.erb, beside the colour field: quick_colors steps from the default green round the wheel in thirteenths, keeping nine, at HSL lightness 50% · 1.625rem circles that grow 10% with a --bs-box-shadow on hover · selected or focused: a white gap, then a ring in the swatch's own colour</div>
         </div>
       <% end %>
     </div>
@@ -751,7 +752,7 @@
           <tr><td>Website</td><td><a href="#components">https://ruby.example.com</a></td></tr>
           <tr><td>Location</td><td>Hackney, London</td></tr>
         </table>
-        <div class="spec">.table-hr, for a profile's or an organisation's details (accounts/_table.erb, organisations/_table.erb): labels bold in a column only as wide as the longest, rows ruled with a --bs-gray-200 line and no other borders</div>
+        <div class="spec">.table-hr, for details (accounts/_table.erb, organisations/_table.erb, events/_info_table.erb, activity and local group pages): labels bold in a column only as wide as the longest, rows ruled with a --bs-gray-200 line and no other borders</div>
       <% end %>
 
       <% design_subsection 'Striped table', col: 'col-lg-6' do %>
@@ -766,7 +767,7 @@
             </tr>
           <% end %>
         </table>
-        <div class="spec">Grids of slots: rotas (rotas/_rota.erb), timetables and the admin dashboard · stripes --bs-tertiary-bg · each cell an avatar-sm or a btn-sm to sign up · roles and slots carry their points as text-bg-yellow badges</div>
+        <div class="spec">Grids of slots: rotas (rotas/_rota.erb), timetables and the admin dashboard; also some admin lists (members, applications, teams, mailers) · stripes --bs-tertiary-bg · each cell an avatar-sm or a btn-sm to sign up · roles and slots carry their points as text-bg-yellow badges</div>
       <% end %>
     </div>
 
@@ -910,7 +911,7 @@
           <% end %>
         </ul>
       </div>
-      <div class="spec">.search-input: up to 32.5rem, form-control-lg, the clear button a 1.5rem --bs-gray-400 circle, --bs-gray-600 on hover · .search-tab: bleeds to the edges of #content, a --bs-gray-400 rule below; tabs weight 600 in --bs-secondary-color, the active one --bs-emphasis-color with a 1px underline of the same, which hover previews. It's the only underlined tab style: .nav-tabs and .nav-pills are for everything else · .search-result-list: each result base top and bottom between --bs-gray-400 rules, the image floated in a 10rem column (5.625rem on mobile), the name an h2</div>
+      <div class="spec">.search-input: up to 32.5rem, form-control-lg, the clear button a 1.5rem --bs-gray-400 circle, --bs-gray-600 on hover · .search-tab: bleeds to the edges of #content, a --bs-gray-400 rule below; tabs weight 600 in --bs-secondary-color, the active one --bs-emphasis-color with a 1px underline of the same, which hover previews. It's the only underlined tab style: .nav-tabs and .nav-pills are for everything else · .search-result-list: each result base top and bottom with a 2px --bs-border-color rule below, the image floated in a 10rem column (5.625rem on mobile), the name an h2</div>
     <% end %>
 
     <div class="row g-5">
@@ -1015,7 +1016,7 @@
       <% end %>
     </div>
 
-    <% design_subsection 'Date and icon tiles', 'The event page\'s date, location and link, as tiles beside the details they stand for. On the site they\'re CSS (.event-detail in app.css, over event_details.css): white, a --hairline border, --bs-box-shadow-sm, .3em corners, 2.5em square; the month a bold, letter-spaced band of --theme-50 in --theme-800 over a semibold day; icons 1.5em in black at 50%. On hover the tile turns solid theme. Emails can\'t rely on that CSS, so they show the same tiles as PNGs from <code>rake icons:generate</code> (app/views/icons), at 2.75em with the tile inset to match: green for the default theme, greys for events and organisations with their own colour.'.html_safe do %>
+    <% design_subsection 'Date and icon tiles', 'The event page\'s date, location and link, as tiles beside the details they stand for. On the site they\'re CSS (.event-detail in app.css, over event_details.css): white, a --hairline border, --bs-box-shadow-sm, .3em corners, 2.5em square; the month a bold, letter-spaced band of --theme-50 in --theme-800 over a semibold day; icons 1.5em in black at 50%. On hover the tile turns solid theme. Emails can\'t rely on that CSS, so they show the same tiles as PNGs from <code>rake icons:generate</code> (app/views/icons), at 2.75em with the tile inset to match: the month band green for the default theme, grey for events and organisations with their own colour (the location and camera tiles are the same in both).'.html_safe do %>
       <% today = Date.today; png_date = "#{today.strftime('%b').downcase}_#{today.strftime('%d')}" %>
       <div class="row g-4">
         <div class="col-lg-6">
@@ -1030,7 +1031,7 @@
             <a href="#components" class="event-detail link"><img src="/images/icons/_link.png" alt=""></a>
             <span>Link</span>
           </div>
-          <div class="spec">Site: .event-detail.calendar-date, .event-detail.location (or the camera for online events) and .event-detail.link · hover one to see it turn solid theme</div>
+          <div class="spec">Site: .event-detail.calendar-date, .event-detail.location (or the camera for online events) and .event-detail.link · hover one</div>
         </div>
         <div class="col-lg-6">
           <% { 'green' => 'Default theme', 'greyscale' => 'Own theme colour' }.each do |scheme, label| %>
@@ -1041,7 +1042,7 @@
               <span class="small text-body-secondary ms-2"><%= label %></span>
             </div>
           <% end %>
-          <div class="spec mt-3">Email: 160px PNGs in app/assets/images/icons/calendar/png and icons/image, picked by _tickets_table.erb</div>
+          <div class="spec mt-3">Email: 160px PNGs in app/assets/images/icons/calendar/png and icons/image, picked by emails/_tickets_table.erb</div>
         </div>
       </div>
     <% end %>
@@ -1075,7 +1076,7 @@
       <div class="spec">Name h2 · labels: Featured text-bg-yellow, Sold out or Sales ended text-bg-danger, Locked text-bg-secondary · tags text-bg-primary, up to 5, with bi-stars when AI-tagged · .icon-list at fs-4, each line's icon hung 2em to the left, with a tooltip naming it</div>
     <% end %>
 
-    <% design_subsection 'Carousel', 'Featured and upcoming events on organisation pages (events/_carousel.erb), with Slick: three to a slide from 992px, two from 576px, then one.' do %>
+    <% design_subsection 'Carousel', 'Featured events and the organisation\'s own carousels (upcoming events, plus past ones with recordings) on organisation pages (events/_carousel.erb), with Slick: three to a slide from 992px, two from 576px, then one.' do %>
       <div class="slick-container" id="dg-slick">
         <div class="slick-responsive row justify-content-center">
           <% [['Sat 4 Oct', nil], ['Sun 5 Oct', 'Sold out'], ['Starts Fri 10 Oct', nil], ['Wed 15 Oct', nil], ['On-demand', nil]].each do |date, label| %>
@@ -1102,7 +1103,7 @@
           })
         })
       </script>
-      <div class="spec">Arrows: 2.5rem white circles with bi-chevron-compact icons, black at 50%, 75% on hover · dates and Sold out as .badge-overlay: the variant's 500 at 70% so the image shows through, square corners · before Slick loads, only the first item shows</div>
+      <div class="spec">Arrows: 2.5rem white circles with black bi-chevron-compact icons, the whole button at 50% opacity, 75% on hover · dates and Sold out as .badge-overlay (see Badges) · before Slick loads, only the first item shows</div>
     <% end %>
 
     <% design_subsection 'Ticket purchase form', 'The Select tickets card on an event page (purchase/_purchase.erb), one row per ticket type from purchase/_ticket_type.erb, then discounts, a donation and the total down the right-hand column. Shown here without purchase.js, so totals don\'t add up.' do %>
@@ -1217,7 +1218,7 @@
               </div>
             </div>
           </div>
-          <div class="spec">Ticket groups: a .ticket-group-heading row, a small uppercase label in --theme-600 above the group's first divider · each type: the name bold at fs-4, a lock icon if it's secret or for members, "3 left" or fewer as a text-bg-secondary badge · price at fs-4: fixed, a form-range for a range (the price shows once dragged), or a £ input group for pay what you like, which enables the quantity · quantity a full-width form-select, 0 to 99 · the description in --bs-secondary-color, its paragraphs without margin · sold out: Join waitlist (btn-sm btn-outline-primary), which opens the waitlist modal (purchase/_ticket_type_waitlist_modal.erb), or a Sold out badge in text-bg-danger, as in event blocks, the carousel and the places-filled bar · a ticket type whose sales have ended says Sales closed in text-bg-secondary · the right-hand column: Apply a code, a membership discount, the donation (1/5/10% of the total, or a set amount for the organisation) and the disabled Total, Credit, Discount and Balance fields from currency_input_row, each a bold label over a 5em input group · below 576px the card's sides narrow to .75rem, cells take table-sm's .5rem with none at the table's edges, and the range hint says just Drag, so the three columns fit a phone</div>
+          <div class="spec">Ticket groups: a .ticket-group-heading row, a small uppercase label in --theme-600 above the group's first divider · each type: the name bold at fs-4, a lock icon if it's secret or for members, "3 left" or fewer as a text-bg-secondary badge · price at fs-4: fixed, a form-range for a range (the price shows once dragged), or a £ input group for pay what you like, which enables the quantity · quantity a full-width form-select, 0 to 99, or to the number left if fewer · the description in --bs-secondary-color, its paragraphs without margin · sold out: Join waitlist (btn-sm btn-outline-primary), which opens the waitlist modal (purchase/_ticket_type_waitlist_modal.erb), or a Sold out badge in text-bg-danger, as in event blocks, the carousel and the places-filled bar · a ticket type whose sales have ended says Sales closed in text-bg-secondary · the right-hand column: Apply a code, a membership discount, the donation (1/5/10% of the total, 1/2.5/5% on large orders, or a set amount for the organisation) and the disabled Total, Credit, Discount and Balance fields from currency_input_row, each a bold label over a 5em input group · below 576px the card's sides narrow to .75rem, cells take table-sm's .5rem with none at the table's edges, and the range hint says just Drag, so the three columns fit a phone</div>
         </div>
       </div>
     <% end %>
@@ -1287,14 +1288,14 @@
             </div>
           </div>
         </div>
-        <div class="spec">.average-rating (event_feedbacks/_average_rating.erb): the average at --font-size-2xl, the count in --bs-secondary-color, a star per point · public answers beside a bi-quote, at .readable · .read-more (app.js) cuts a reply at its first line break and adds a Read more link at --font-size-xs, which shows the rest · the feedback form (event_feedbacks/build.erb, styled by event_feedbacks.css): five 2.75rem stars on a --bs-tertiary-bg panel, --bs-gray-300 until chosen, then --color-orange-400 with .chosen</div>
+        <div class="spec">.average-rating (event_feedbacks/_average_rating.erb): the average at --font-size-2xl, the count in --bs-secondary-color, a star per point · public answers beside a bi-quote, at .readable · .read-more (app.js) cuts a reply at its first line break and adds a Read more link at --font-size-xs, which shows the rest · the feedback form (event_feedbacks/build.erb, styled by event_feedbacks.css): five 2.75rem stars on a --bs-gray-100 panel, radius lg, --bs-gray-300 until chosen, then --color-orange-400 with .chosen</div>
       <% end %>
 
       <% design_subsection 'Image wall', col: 'col-lg-5' do %>
         <div class="image-wall">
           <% %w[ruby hugi tibet ruby hugi tibet ruby].each do |img| %><img class="avatar avatar-sm me-1" src="/images/advisors/<%= img %>.jpg" alt=""><% end %>
         </div>
-        <div class="spec">.image-wall: who chose an option or is interested in an activity (options/_options.erb, comments/_voptions.erb, timetables/tactivity.erb), as avatars that wrap, --space-2xs between rows · a "Show names" link swaps them for names separated by middots</div>
+        <div class="spec">.image-wall: groups of people as avatars that wrap, --space-2xs between rows: who chose an option or is interested in an activity, team and gathering members, attendees, followers · on options, teams and rotas, a "Show names instead of pictures" link reloads them as names separated by middots</div>
       <% end %>
     </div>
 
@@ -1343,7 +1344,7 @@
 
       <% design_subsection 'Map markers', col: 'col-lg-6' do %>
         <div class="d-flex align-items-end flex-wrap gap-4">
-          <% [['var(--theme-500)', 'bi-person-fill', 'People, gatherings'], ['var(--color-red-400)', 'bi-calendar-event', 'Events'], ['var(--color-red-400)', 'bi-flag-fill', 'Organisations']].each do |color, icon, label| %>
+          <% [['var(--theme-500)', 'bi-person-fill', 'People'], ['var(--theme-500)', 'bi-people-fill', 'Gatherings'], ['var(--color-red-400)', 'bi-calendar-event', 'Events'], ['var(--color-red-400)', 'bi-flag-fill', 'Organisations']].each do |color, icon, label| %>
             <div class="text-center">
               <span class="position-relative d-inline-block" style="width: 36px; height: 48px">
                 <svg viewBox="-18 -48 36 48" width="36" height="48" aria-hidden="true"><path fill="<%= color %>" d="M0-48c-9.8 0-17.8 7.9-17.8 17.6C-17.8-14.9 0 0 0 0s17.8-14.9 17.8-30.4C17.8-40.1 9.8-48 0-48z"></path></svg>
@@ -1381,7 +1382,7 @@
             </div>
           </div>
         </div>
-        <div class="spec">Clicking a marker loads /points/:model/:id into Google's InfoWindow, wrapped in .infowindow: a person (points/_account.erb, as here), an organisation or gathering, or an event as its block (ul.map-event, list items at --font-size-sm) · Google draws the white box, its tail and the close button; app.css only sets its font to Plus Jakarta Sans and sizes the close button</div>
+        <div class="spec">Clicking a marker loads /points/:model/:id into Google's InfoWindow, wrapped in .infowindow: a person (points/_account.erb, as here), an organisation or gathering, or an event as its block's text without the image (events/_block_main.erb as ul.map-event, list items at --font-size-sm) · Google draws the white box, its tail and the close button; app.css sets its font to Plus Jakarta Sans, sizes the close button and zeroes .row margins inside</div>
       <% end %>
 
       <% design_subsection 'Email previews', col: 'col-lg-7' do %>
@@ -1443,7 +1444,7 @@
   <% end %>
 
   <!-- THEMING -->
-  <% design_section 'theming', 'Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check, progress bar and stats chart follows. Alerts and toasts use the ramp\'s tints with --theme-800 text on every page. theme.css is only variables: as well as the theme colour, it switches --ai-well-from/-to to the theme ramp\'s 50 and 400, the steps the default AI well takes of lavender. That is deliberate: the default site keeps the AI well lavender, as its own accent. The date tile\'s month follows the theme too (see Date and icon tiles).'.html_safe do %>
+  <% design_section 'theming', 'Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check, progress bar, stats chart, alert and toast tint and date tile month follows. theme.css is only variables: as well as the theme colour, it switches the AI well to the theme ramp (see AI well and ask box), while the default site keeps it lavender as its own accent.'.html_safe do %>
     <div class="row g-3">
       <% ([[nil, nil]] + themed_colors).each do |color, clamped| %>
         <div class="col-md-6 col-xxl-4">
