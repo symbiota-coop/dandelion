@@ -8,18 +8,18 @@
         })
       })
     </script>
-    <% form_tag '', id: 'activities_form', class: 'mx-2 no-submit form-inline' do %>
+    <% form_tag '', id: 'activities_form', class: 'me-lg-2 no-submit form-inline' do %>
       <div class="input-group">
         <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
         <button class="btn btn-primary"><i class="bi bi-search"></i></button>
       </div>
     <% end %>
   </div>
-  <div class="col-12 ms-2 mt-3 col-lg-auto ms-lg-0 mt-lg-0">
-    <% if organisation_admin? %>
-      <a class="btn btn-primary me-2" href="/activities/new?organisation_id=<%= @organisation.id %>">Create an activity</a>
-    <% end %>
-  </div>
+  <% if organisation_admin? %>
+    <div class="col-12 mt-3 col-lg-auto mt-lg-0">
+      <a class="btn btn-primary" href="/activities/new?organisation_id=<%= @organisation.id %>">Create an activity</a>
+    </div>
+  <% end %>
 </div>
 <% activities = @activities.paginate(page: params[:page], per_page: 12) %>
 <%= partial :'activities/blocks', locals: { activities: activities } %>
