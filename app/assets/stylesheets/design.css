@@ -1,11 +1,65 @@
 /* The design guide (/design) */
 
-/* scroll-margin-top keeps sections clear of the fixed header when jumped to from the nav */
+/* scroll-margin-top keeps sections and subsections clear of the fixed header when jumped to from the nav */
 .design-guide > section {
   display: flex;
   flex-direction: column;
   gap: var(--space-2xl);
   scroll-margin-top: 4rem;
+}
+
+.design-guide [id] {
+  scroll-margin-top: 4rem;
+}
+
+/* From lg the nav is a sticky column beside the guide, scrollspied, with each section's subsections under it.
+   Below lg it's hidden and the header's buttons jump to sections */
+@media (min-width: 992px) {
+  .design-layout {
+    display: grid;
+    grid-template-columns: 12rem minmax(0, 1fr);
+    gap: var(--space-xl);
+    align-items: start;
+  }
+}
+
+#design-nav {
+  position: sticky;
+  top: var(--sticky-top);
+  max-height: calc(100vh - var(--sticky-top) - var(--space-base));
+  overflow-y: auto;
+  scrollbar-width: thin;
+  font-size: 0.875rem;
+}
+
+#design-nav .nav-link {
+  padding: var(--space-2xs) var(--space-sm);
+  border-left: 2px solid transparent;
+  color: var(--bs-secondary-color);
+}
+
+#design-nav .nav .nav .nav-link {
+  padding-left: var(--space-lg);
+}
+
+#design-nav .nav-link:hover {
+  color: var(--bs-body-color);
+}
+
+#design-nav .nav-link.active {
+  border-left-color: var(--theme-500);
+  color: var(--bs-body-color);
+}
+
+/* Section headers */
+#design-nav .design-nav-section {
+  margin-top: var(--space-sm);
+  font-weight: 700;
+  color: var(--bs-body-color);
+}
+
+#design-nav .design-nav-section:first-child {
+  margin-top: 0;
 }
 
 /* Captions that spec an example or swatch: values, sizes, classes. Prose notes are .small.text-body-secondary */

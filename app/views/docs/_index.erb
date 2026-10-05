@@ -3,12 +3,12 @@
     <ul class="doc-index-headings">
       <% @doc_page[:headings].each do |heading| %>
         <li>
-          <a href="/docs/<%= @doc_page[:slug] %>#<%= heading[:id] %>" class="doc-link" data-heading-id="<%= heading[:id] %>"><%= heading[:text] %></a>
+          <a href="/docs/<%= @doc_page[:slug] %>#<%= heading[:id] %>" class="doc-link"><%= heading[:text] %></a>
           <% if heading[:h3s].any? %>
             <ul class="doc-index-h3s">
               <% heading[:h3s].each do |h3| %>
                 <li>
-                  <a href="/docs/<%= @doc_page[:slug] %>#<%= h3[:id] %>" class="doc-link" data-heading-id="<%= h3[:id] %>"><%= h3[:text] %></a>
+                  <a href="/docs/<%= @doc_page[:slug] %>#<%= h3[:id] %>" class="doc-link"><%= h3[:text] %></a>
                 </li>
               <% end %>
             </ul>

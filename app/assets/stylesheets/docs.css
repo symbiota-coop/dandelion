@@ -239,7 +239,7 @@
   text-decoration: none;
 }
 
-.doc-link.is-active {
+.doc-link.active {
   border-left-color: var(--theme-500);
   color: var(--bs-body-color);
 }
@@ -250,8 +250,11 @@
   color: var(--bs-secondary-color);
 }
 
+/* Just below the header and #content's padding, as tall as the rest of the viewport */
 #sticky-index {
   position: sticky;
+  top: calc(var(--header-offset) + var(--content-padding));
+  height: calc(100vh - var(--header-offset) - var(--content-padding));
   display: flex;
   flex-direction: column;
   overflow: hidden;

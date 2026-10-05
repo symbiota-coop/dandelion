@@ -3,7 +3,6 @@
 (function() {
   $('#doc-body pre code').each(function() { hljs.highlightElement(this) })
 
-  var $stickyIndex = $('#sticky-index')
   var $layout = $('#docs-layout')
   var $inputs = $('.doc-search-input')
   var $results = $('#doc-search-results')
@@ -13,53 +12,11 @@
   var indexEl = document.getElementById('doc-search-index')
   var docIndex = indexEl ? JSON.parse(indexEl.textContent) : []
 
-  var headerHeight = function() {
-    return $('#header').outerHeight() || 0
-  }
-  var positionStickyIndex = function() {
-    var top = headerHeight() + (parseInt($('.content').css('paddingTop'), 10) || 0)
-    $stickyIndex.css({ top: top, height: 'calc(100vh - ' + top + 'px)' })
-  }
-  positionStickyIndex()
-  $(window).on('resize', positionStickyIndex)
-
-  var scrollThreshold = function() {
-    var heading = $('#doc-body').find('h1, h2, h3')[0]
-    var margin = heading ? parseFloat(window.getComputedStyle(heading).scrollMarginTop) : 0
-    return (margin || headerHeight() + 12) + 8
-  }
-  var updateActiveHeading = function() {
-    var headings = $('#doc-body').find('h1, h2, h3')
-    if (!headings.length) return
-
-    var threshold = scrollThreshold()
-    var current = headings[0]
-    headings.each(function() {
-      if (this.getBoundingClientRect().top - threshold <= 0) current = this
-    })
-    if (!current || !current.id) return
-
-    var $links = $('.doc-link').removeClass('is-active')
-    var $active = $links.filter('[data-heading-id="' + current.id + '"]').addClass('is-active')
-    var el = $active.filter(function() { return $stickyIndex[0] && $.contains($stickyIndex[0], this) })[0]
-    if (!el) return
-    var scrollParent = el.closest('.doc-index-headings') || $stickyIndex[0]
-    var cr = scrollParent.getBoundingClientRect()
-    var er = el.getBoundingClientRect()
-    if (er.top < cr.top) scrollParent.scrollTop -= (cr.top - er.top + 8)
-    else if (er.bottom > cr.bottom) scrollParent.scrollTop += (er.bottom - cr.bottom + 8)
-  }
-
-  var ticking = false
-  $(window).on('scroll', function() {
-    if (ticking) return
-    ticking = true
-    window.requestAnimationFrame(function() {
-      updateActiveHeading()
-      ticking = false
-    })
+  // scrollspy.js is deferred, so it's ready once the DOM is
+  var updateIndex = function() {}
+  $(function() {
+    updateIndex = scrollspy('.doc-link', '#sticky-index .doc-index-headings, #sticky-index')
   })
-  updateActiveHeading()
 
   var parseTerms = function(query) {
     return query.toLowerCase().split(/\s+/).filter(function(term) { return term.length >= MIN_TERM_LENGTH })
@@ -144,7 +101,7 @@
   var stopSearch = function() {
     $layout.removeClass('is-searching')
     $results.empty()
-    updateActiveHeading()
+    updateIndex()
   }
 
   var runSearch = function(q, source) {
@@ -196,7 +153,7 @@
     if (!heading) return
     requestAnimationFrame(function() {
       heading.scrollIntoView()
-      updateActiveHeading()
+      updateIndex()
     })
   })
 })()

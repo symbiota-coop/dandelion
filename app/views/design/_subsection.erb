@@ -1,5 +1,5 @@
 <%# A subsection of the design guide (design_subsection) %>
-<div class="<%= [col, 'd-flex flex-column gap-3'].compact.join(' ') %>">
+<div id="<%= id %>" class="<%= [col, 'd-flex flex-column gap-3'].compact.join(' ') %>">
   <div class="d-flex align-items-baseline flex-wrap gap-2"><h3 class="m-0"><%= title %></h3><% if note %><span class="text-body-secondary"><%= note %></span><% end %></div>
   <%= body %>
 </div>
