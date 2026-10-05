@@ -341,7 +341,7 @@ module Dandelion
         # Validate hex color format: # followed by 3 or 6 hexadecimal characters
         theme_color = clamp_color(requested) if requested.match?(/\A#[0-9A-Fa-f]{3}\z|\A#[0-9A-Fa-f]{6}\z/)
       end
-      theme_css_variables(theme_color)
+      ":root {\n  #{theme_css_variables(theme_color)}\n}"
     end
   end
 end

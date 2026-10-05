@@ -149,12 +149,12 @@ Dandelion::App.helpers do
     colors.reject.with_index { |_, i| i == 1 }[0..-4]
   end
 
-  # theme.css's :root block for a theme colour: its --theme-500 and the rgb triplet Bootstrap's
+  # The declarations in theme.css's :root block for a theme colour: its --theme-500 and the rgb triplet Bootstrap's
   # rgba(var(--bs-*-rgb)) colours need, with the accents that follow them. app.css derives the ramp
   def theme_css_variables(hex)
     color = Chroma.paint(hex)
     rgb = color.rgb
-    File.read(Padrino.root('app/assets/stylesheets/theme.css'))[/:root \{.*?\}/m]
+    File.read(Padrino.root('app/assets/stylesheets/theme.css'))[/:root \{(.*?)\}/m, 1].strip
         .sub(/--theme-500: [^;]+;/, "--theme-500: #{color.to_hex};")
         .sub(/--theme-500-rgb: [^;]+;/, "--theme-500-rgb: #{rgb.r.round}, #{rgb.g.round}, #{rgb.b.round};")
   end

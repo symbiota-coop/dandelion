@@ -1426,7 +1426,7 @@
     <div class="row g-3">
       <% ([[nil, nil]] + themed_colors).each do |color, clamped| %>
         <div class="col-md-6 col-xxl-4">
-          <div class="<%= 'theme-scope' if color %> border rounded p-4 h-100 d-flex flex-column gap-3"<% if color %> style="<%= theme_css_variables(clamped)[/\{(.*)\}/m, 1].squish %>"<% end %>>
+          <div class="<%= 'theme-scope' if color %> border rounded p-4 h-100 d-flex flex-column gap-3"<% if color %> style="<%= theme_css_variables(clamped).squish %>"<% end %>>
             <div class="spec fw-bold">
               <% if color %>
                 THEMED · <%= color %><%= " → #{clamped} (clamped)" if clamped != color %>
