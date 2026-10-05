@@ -1125,8 +1125,9 @@ p.action a {
   padding: var(--space-xs) var(--space-base);
 }
 
-/* Nav menus already separate sections with dividers, so their headers need no line of their own */
-.nav-crumbs .dropdown-header {
+/* Nav menus and the mobile bottom sheet already separate sections with dividers, so their headers need no line of their own */
+.nav-crumbs .dropdown-header,
+.nav-dropdown-sheet .dropdown-header {
   border-bottom: 0;
 }
 

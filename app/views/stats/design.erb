@@ -699,7 +699,7 @@
           <div>
             <%= dropdown_nav [['Orders', nil], ['Link to order confirmation', '#components'], ['Resend tickets', '#components'], nil, ['Delete', '#components']], button_text: 'Actions', container_class: 'btn-group mb-1' %>
           </div>
-          <div class="spec">Joined buttons for a choice of amounts (the purchase form's donation: btn-outline-secondary like the Apply button beside it, the chosen one .active, filled --bs-gray-600) and paired tiers (accounts/_pay.erb) · dropdown_nav in a btn-group is the Actions menu on order and ticket tables: an item with no path is a .dropdown-header, bold --bs-emphasis-color over a --bs-border-color line (none in nav crumbs, whose sections have dividers), and nil a divider</div>
+          <div class="spec">Joined buttons for a choice of amounts (the purchase form's donation: btn-outline-secondary like the Apply button beside it, the chosen one .active, filled --bs-gray-600) and paired tiers (accounts/_pay.erb) · dropdown_nav in a btn-group is the Actions menu on order and ticket tables: an item with no path is a .dropdown-header, bold --bs-emphasis-color over a --bs-border-color line (none in nav crumbs or the mobile bottom sheet, whose sections have dividers), and nil a divider</div>
         </div>
       <% end %>
     </div>
@@ -1003,7 +1003,7 @@
             </div>
             <div class="offcanvas-body p-0">
               <div class="list-group list-group-flush">
-                <div class="list-group-item small text-body-secondary fw-bold mb-0">Organisation</div>
+                <h5 class="dropdown-header">Organisation</h5>
                 <a class="list-group-item list-group-item-action" href="#components"><i class="bi bi-pencil"></i> Edit</a>
                 <a class="list-group-item list-group-item-action" href="#components"><i class="bi bi-people"></i> Members</a>
                 <hr class="my-1">
@@ -1012,7 +1012,7 @@
             </div>
           </div>
         </div>
-        <div class="spec">Below 768px, nav crumbs (dropdown_nav, ul_nav), the notifications and messages dropdowns open in #nav-dropdown-sheet (layouts/application.erb) in place of a dropdown: an offcanvas-bottom as tall as its content up to 80dvh, its top corners --bs-border-radius-xl · app.js copies the menu in as a list-group-flush with no borders, headers small, bold and grey, dividers as an hr · the event stats row opens in it too, as a list of its columns</div>
+        <div class="spec">Below 768px, nav crumbs (dropdown_nav, ul_nav), the notifications and messages dropdowns open in #nav-dropdown-sheet (layouts/application.erb) in place of a dropdown: an offcanvas-bottom as tall as its content up to 80dvh, its top corners --bs-border-radius-xl · app.js copies the menu in as a list-group-flush with no borders, headers as .dropdown-header with no line, as in nav crumbs, dividers as an hr · the event stats row opens in it too, as a list of its columns</div>
       <% end %>
     </div>
 
