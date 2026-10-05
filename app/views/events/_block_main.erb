@@ -1,6 +1,6 @@
 <% map = defined?(custom_class) && custom_class == 'map-event' %>
-<%# The star, edit and hide icons are fs-2, the size of the h2 beside them %>
-<div class="mb-2">
+<%# The line takes the heading's size, so the star, edit and hide icons match it and the badges centre on it %>
+<div class="event-title-line <%= map ? 'fs-4' : 'fs-2' %> mb-2">
   <h4 class="<%= 'h2' unless map %> d-inline me-1">
     <a class="text-body" target="_parent" href="<%= "/e/#{event.slug}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }"%>">
       <%= event.name %>
@@ -10,13 +10,13 @@
   <% if defined?(skip_pagelets) %>
   <% else %>
     <% if current_account %>
-      <div data-with-placeholder class="d-inline fs-2" data-pagelet-url="/events/<%=event.id%>/star?block_edit=1"><i class="bi bi-star opacity-0"></i></div>
+      <div data-with-placeholder class="d-inline" data-pagelet-url="/events/<%=event.id%>/star?block_edit=1"><i class="bi bi-star opacity-0"></i></div>
     <% end %>
     <% if event_admin?(event) %>
-      <a class="text-body block-edit fs-2" style="display: none" target="_parent" href="<%= "/e/#{event.slug}/edit" %>"><i class="bi bi-pencil-fill"></i></a>
+      <a class="text-body block-edit" style="display: none" target="_parent" href="<%= "/e/#{event.slug}/edit" %>"><i class="bi bi-pencil-fill"></i></a>
     <% end %>
     <% if admin? %>
-      <div data-with-placeholder class="d-inline fs-2" data-pagelet-url="/events/<%=event.id%>/hide_from_homepage?block_edit=1"><i class="bi bi-eye-slash-fill opacity-0"></i></div>
+      <div data-with-placeholder class="d-inline" data-pagelet-url="/events/<%=event.id%>/hide_from_homepage?block_edit=1"><i class="bi bi-eye-slash-fill opacity-0"></i></div>
     <% end %>
   <% end %>
 </div>
