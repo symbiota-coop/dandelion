@@ -873,6 +873,12 @@ p.action a {
   background: var(--variant-200) !important;
 }
 
+/* Beside an h1, h2 or h3 an em-sized badge would be nearly heading-sized, so it stays at body size, centred on the heading's line */
+:is(h1, h2, h3, .h1, .h2, .h3) .badge {
+  font-size: 1rem;
+  vertical-align: middle;
+}
+
 .btn-primary .badge {
   color: var(--theme-500);
 }

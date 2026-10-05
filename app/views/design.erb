@@ -385,11 +385,11 @@
       <div class="spec">.btn · .875rem · weight 600 · padding .5rem 1rem (sm .375rem .75rem), the same height as an input · radius .5rem (--bs-border-radius), as inputs</div>
     <% end %>
 
-    <% design_subsection 'Badges', "Bootstrap's <code>.badge</code> with a <code>text-bg-*</code> colour, for counts, statuses, tags and amounts. Sized in em, so a badge scales with the text around it: small in a nav, bigger beside a heading. Pick the colour by what it means.".html_safe do %>
+    <% design_subsection 'Badges', "Bootstrap's <code>.badge</code> with a <code>text-bg-*</code> colour, for counts, statuses, tags and amounts. Sized in em, so a badge scales with the text around it: small in a nav, bigger beside an h4, and at body size (1rem) beside an h1, h2 or h3, where it would otherwise be nearly heading-sized. Pick the colour by what it means.".html_safe do %>
       <div class="border rounded p-4 d-flex flex-column gap-3">
         <h4 class="m-0">Full moon gathering <span class="badge text-bg-yellow">Featured</span> <span class="badge text-bg-secondary">Locked</span></h4>
         <div>Followers <span class="badge text-bg-primary">128</span> · Tagged <a class="badge text-bg-primary" href="#components">breathwork</a> in <span class="badge text-primary border border-primary">Weekend pass</span> · Paid <span class="badge text-bg-secondary">£5 discount applied</span></div>
-        <div class="spec">.badge · .9375em · .4em .85em · pill · weight 600 · primary, secondary, warning, danger and yellow are soft: their variant's 100 behind its 800, so they show on grey as well as white (danger: the 200, as red's 100 reads pink; secondary: --bs-gray-200 and 800); dark, stripe and payment badges are filled · in a selected menu item, sheet item or pill, a primary or secondary badge turns to its 800 with white text, so it sits in the selection · .badge-overlay, for labels over images (the carousel), is filled with its variant's 500 at 70%, white text, square</div>
+        <div class="spec">.badge · .9375em (1rem in h1–h3) · .4em .85em · pill · weight 600 · primary, secondary, warning, danger and yellow are soft: their variant's 100 behind its 800, so they show on grey as well as white (danger: the 200, as red's 100 reads pink; secondary: --bs-gray-200 and 800); dark, stripe and payment badges are filled · in a selected menu item, sheet item or pill, a primary or secondary badge turns to its 800 with white text, so it sits in the selection · .badge-overlay, for labels over images (the carousel), is filled with its variant's 500 at 70%, white text, square</div>
       </div>
       <div class="table-responsive">
         <table class="table table-sm mb-0">
