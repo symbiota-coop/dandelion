@@ -560,6 +560,11 @@
   opacity: 1;
 }
 
+/* text-bg-dark is the sidebar's own gray-900, so dark badges there step up to gray-800 */
+.sidebar .text-bg-dark {
+  background-color: var(--bs-gray-800) !important;
+}
+
 #sidebar {
   z-index: 1021;
 }
