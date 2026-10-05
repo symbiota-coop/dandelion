@@ -1245,6 +1245,12 @@ p.action a {
     scrollbar-width: none;
     direction: rtl;
     justify-content: safe flex-end;
+    /* Only on phones, where the crumbs scroll: on wider screens the mask would clip their dropdowns */
+    mask-image: var(--nav-fade-mask);
+  }
+
+  .nav-crumbs::-webkit-scrollbar {
+    display: none;
   }
 
   .nav-crumbs > .btn-group {
@@ -1651,8 +1657,9 @@ label.remove-image input {
   border-bottom-color: var(--theme-500);
 }
 
-/* Tabs scroll sideways rather than wrap, with no scrollbar: while there's more to scroll one way, that edge fades
-   and an arrow sits over the fade (navWrappers in app.js wraps the .nav-wrapper in a .nav-scroller and adds the arrows) */
+/* Tabs, and breadcrumbs on phones, scroll sideways rather than wrap, with no scrollbar: while there's more to scroll
+   one way, that edge fades and an arrow sits over the fade (navWrappers in app.js wraps the .nav-wrapper or .nav-crumbs
+   in a .nav-scroller and adds the arrows) */
 .nav-scroller {
   position: relative;
 }
@@ -1710,29 +1717,36 @@ label.remove-image input {
   initial-value: 0px;
 }
 
-.nav-wrapper {
+.nav-wrapper,
+.nav-crumbs {
   --clear-start: 0rem;
   --fade-start: 0rem;
   --clear-end: 0rem;
   --fade-end: 0rem;
+  --nav-fade-mask: linear-gradient(to right, transparent var(--clear-start), #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent calc(100% - var(--clear-end)));
+  transition: --clear-start var(--transition-fast), --fade-start var(--transition-fast), --clear-end var(--transition-fast), --fade-end var(--transition-fast);
+}
+
+.nav-wrapper {
   position: relative;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
-  transition: --clear-start var(--transition-fast), --fade-start var(--transition-fast), --clear-end var(--transition-fast), --fade-end var(--transition-fast);
-  mask-image: linear-gradient(to right, transparent var(--clear-start), #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent calc(100% - var(--clear-end)));
+  mask-image: var(--nav-fade-mask);
 }
 
 .nav-wrapper::-webkit-scrollbar {
   display: none;
 }
 
-.nav-wrapper.fade-start {
+.nav-wrapper.fade-start,
+.nav-crumbs.fade-start {
   --clear-start: 1.5rem;
   --fade-start: 3.5rem;
 }
 
-.nav-wrapper.fade-end {
+.nav-wrapper.fade-end,
+.nav-crumbs.fade-end {
   --clear-end: 1.5rem;
   --fade-end: 3.5rem;
 }

@@ -318,7 +318,7 @@
              ['Dropdown items, message previews', 'background'],
              ['Tiles', 'shadow, photo lightens'],
              ['Date and icon tiles', 'fill'],
-             ['Tab scroller', 'edge fades, chevron colour'],
+             ['Tab and crumb scrollers', 'edge fades, chevron colour'],
              ['Sidebar group chevron', 'turns 180° when open']
            ].each do |title, value| %>
           <div class="col">
@@ -1068,7 +1068,7 @@
             </div>
           </div>
         </div>
-        <div class="spec">Below 768px, nav crumbs (dropdown_nav, ul_nav), the notifications and messages dropdowns open in #nav-dropdown-sheet (layouts/application.erb) in place of a dropdown: an offcanvas-bottom as tall as its content up to 80dvh, its top corners --bs-border-radius-xl · app.js copies the menu in as a list-group-flush with no borders, headers as .dropdown-header with no line, as in nav crumbs, dividers as an hr · the event stats row opens in it too, as a list of its columns</div>
+        <div class="spec">Below 768px, nav crumbs scroll sideways like tabs, with the same edge fades and chevrons, and they (dropdown_nav, ul_nav), the notifications and messages dropdowns open in #nav-dropdown-sheet (layouts/application.erb) in place of a dropdown: an offcanvas-bottom as tall as its content up to 80dvh, its top corners --bs-border-radius-xl · app.js copies the menu in as a list-group-flush with no borders, headers as .dropdown-header with no line, as in nav crumbs, dividers as an hr · the event stats row opens in it too, as a list of its columns</div>
       <% end %>
     </div>
 

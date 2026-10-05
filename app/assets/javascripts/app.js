@@ -482,21 +482,23 @@ $(function () {
     navWrappers()
   }
 
-  // Tabs in a .nav-wrapper scroll sideways: while there's more to scroll one way, that edge fades
-  // and an arrow scrolls it on by most of a width. The active tab is brought into view
+  // Tabs in a .nav-wrapper, and breadcrumbs (.nav-crumbs) on phones, scroll sideways: while there's more
+  // to scroll one way, that edge fades and an arrow scrolls it on by most of a width. The active tab is
+  // brought into view. Crumbs scroll right to left, where scrollLeft runs from -max to 0
   function navWrappers () {
-    $('.nav-wrapper').not('[data-nav-wrapper]').attr('data-nav-wrapper', true).each(function () {
+    $('.nav-wrapper, .nav-crumbs').not('[data-nav-wrapper]').attr('data-nav-wrapper', true).each(function () {
       const wrapper = this
       const $scroller = $(wrapper).wrap('<div class="nav-scroller"></div>').parent()
-      const arrows = [['start', 'left', 'Scroll tabs left', -1], ['end', 'right', 'Scroll tabs right', 1]].map(function ([edge, icon, label, direction]) {
+      const arrows = [['start', 'left', 'Scroll left', -1], ['end', 'right', 'Scroll right', 1]].map(function ([edge, icon, label, direction]) {
         return $(`<button type="button" class="nav-scroller-arrow nav-scroller-${edge}" tabindex="-1" aria-label="${label}" style="display: none"><i class="bi bi-chevron-${icon}"></i></button>`)
           .on('click', function () { wrapper.scrollBy({ left: direction * wrapper.clientWidth * 0.75, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }) })
           .appendTo($scroller)
       })
       const update = function () {
         const max = wrapper.scrollWidth - wrapper.clientWidth
-        const start = wrapper.scrollLeft > 1
-        const end = wrapper.scrollLeft < max - 1
+        const rtl = getComputedStyle(wrapper).direction === 'rtl'
+        const start = wrapper.scrollLeft > (rtl ? -max : 0) + 1
+        const end = wrapper.scrollLeft < (rtl ? 0 : max) - 1
         wrapper.classList.toggle('fade-start', start)
         wrapper.classList.toggle('fade-end', end)
         arrows[0].toggle(start)
