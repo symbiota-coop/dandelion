@@ -476,6 +476,47 @@
       <% end %>
     </div>
 
+    <% design_subsection 'Gathering nav', 'The nav at the top of a gathering\'s pages from 768px (gatherings/_nav.erb): Bootstrap\'s .nav-pills on a dark bar, the gathering\'s name first. Teams, timetables and shifts open dropdowns. Below 768px it\'s a crumb that opens a sheet, as for organisations and events.' do %>
+      <div class="border rounded p-4">
+        <div id="gathering-nav" class="bg-dark p-1 rounded">
+          <ul class="nav nav-pills">
+            <li class="nav-item"><a class="nav-link text-white d-flex align-items-center gap-1" href="#components"><span class="fw-semibold">Summer Gathering</span></a></li>
+            <li class="nav-item"><a class="nav-link text-white d-flex align-items-center gap-1" href="#components">Settings</a></li>
+            <li class="nav-item"><a class="active nav-link text-white d-flex align-items-center gap-1" href="#components">Members <span class="badge text-bg-dark">48/60</span></a></li>
+            <li class="nav-item"><a class="nav-link text-white d-flex align-items-center gap-1" href="#components">Applications <span class="badge text-bg-dark">3</span></a></li>
+            <li class="nav-item"><a class="nav-link text-white d-flex align-items-center gap-1" href="#components">Choose &amp; Pay <span class="badge text-bg-dark">£40/£120</span></a></li>
+              <li class="nav-item dropdown">
+                <a data-bs-toggle="dropdown" class="nav-link dropdown-toggle text-white d-flex align-items-center gap-1" href="javascript:;">Teams<i class="bi bi-chevron-down caret"></i></a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#components">Overview</a></li>
+                  <li><a class="dropdown-item" href="#components">Create a team</a></li>
+                  <li><a class="dropdown-item" href="#components">#&nbsp;Kitchen</a></li>
+                  <li><a class="dropdown-item" href="#components">#&nbsp;Sound</a></li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a data-bs-toggle="dropdown" class="nav-link dropdown-toggle text-white d-flex align-items-center gap-1" href="javascript:;">Timetables<i class="bi bi-chevron-down caret"></i></a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#components">Main stage</a></li>
+                  <li><a class="dropdown-item" href="#components">Create a timetable</a></li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a data-bs-toggle="dropdown" class="nav-link dropdown-toggle text-white d-flex align-items-center gap-1" href="javascript:;">Shifts<i class="bi bi-chevron-down caret"></i></a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#components">Overview</a></li>
+                  <li><a class="dropdown-item" href="#components">Setup</a></li>
+                  <li><a class="dropdown-item" href="#components">Create a rota</a></li>
+                </ul>
+              </li>
+            <li class="nav-item"><a class="nav-link text-white d-flex align-items-center gap-1" href="#components">Inventory</a></li>
+            <li class="nav-item"><a class="nav-link text-white d-flex align-items-center gap-1" href="#components">Budget</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="spec">bg-dark bar, p-1 and rounded · links --font-size-xs (.75rem) in white, padding .5rem .75rem · hover, focus and the active page --bs-black · counts and amounts text-bg-dark badges · wraps onto a second line when a gathering has most features on</div>
+    <% end %>
+
     <div class="row g-5">
       <% design_subsection 'Input groups', col: 'col-lg-6' do %>
         <div class="border rounded p-4">
@@ -840,7 +881,7 @@
     <% end %>
 
     <div class="row g-5">
-      <% design_subsection 'Tabs and pills', col: 'col-lg-6' do %>
+      <% design_subsection 'Tabs', col: 'col-lg-6' do %>
         <div class="border rounded p-4 d-flex flex-column gap-4">
           <div class="nav-wrapper">
             <ul class="nav nav-tabs">
@@ -849,12 +890,7 @@
               <% end %>
             </ul>
           </div>
-          <ul class="nav nav-pills">
-            <li class="nav-item"><a class="nav-link active" href="#components">Upcoming</a></li>
-            <li class="nav-item"><a class="nav-link" href="#components">Past</a></li>
-            <li class="nav-item"><a class="nav-link" href="#components">Drafts</a></li>
-          </ul>
-          <div class="spec">.nav · .875rem · no focus ring · .nav-tabs: weight 600 in --bs-secondary-color on a 1px --bs-border-color rule; the active tab --bs-emphasis-color with a 2px --theme-500 underline, which hover and keyboard focus preview in --bs-gray-400 · always in a .nav-wrapper: tabs never wrap but scroll sideways with no scrollbar, while there's more that way, a --bs-secondary-color chevron at that edge scrolls on by three quarters of a width, the tabs clear under it and fading in over the next 2rem, and the active tab scrolled into view · pills: hover and focus dark text on --bs-secondary-bg, active --theme-500 · .tab-content padding 1rem</div>
+          <div class="spec">.nav · .875rem · no focus ring · .nav-tabs: weight 600 in --bs-secondary-color on a 1px --bs-border-color rule; the active tab --bs-emphasis-color with a 2px --theme-500 underline, which hover and keyboard focus preview in --bs-gray-400 · always in a .nav-wrapper: tabs never wrap but scroll sideways with no scrollbar, while there's more that way, a --bs-secondary-color chevron at that edge scrolls on by three quarters of a width, the tabs clear under it and fading in over the next 2rem, and the active tab scrolled into view · .tab-content padding 1rem</div>
         </div>
       <% end %>
 
