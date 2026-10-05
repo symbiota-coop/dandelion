@@ -4,7 +4,7 @@
 .design-guide > section {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: var(--space-2xl);
   scroll-margin-top: 4rem;
 }
 

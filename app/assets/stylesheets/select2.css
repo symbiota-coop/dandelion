@@ -38,8 +38,8 @@
 }
 
 .select2-container--bootstrap-5 .select2-selection--single {
-  padding-top: .5rem;
-  padding-bottom: .5rem;
+  padding-top: var(--space-xs);
+  padding-bottom: var(--space-xs);
 }
 
 /* The theme hard-codes Bootstrap's blue focus glow; use our focus ring, as .form-control does */
@@ -74,7 +74,7 @@
 
 /* With tags, slimmer tags and even padding keep the box about as tall as other fields (typing into an empty box keeps the text inset) */
 .select2-container--bootstrap-5 .select2-selection--multiple:has(.select2-selection__choice) {
-  padding: .25rem .75rem .25rem .25rem;
+  padding: var(--space-2xs) var(--space-sm) var(--space-2xs) var(--space-2xs);
 }
 
 .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {

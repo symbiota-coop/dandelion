@@ -1162,7 +1162,7 @@ p.action a {
   font-family: bootstrap-icons;
   font-size: var(--font-size-xs);
   opacity: 0.5;
-  margin-inline-end: 0.25rem;
+  margin-inline-end: var(--space-2xs);
   align-self: center;
 }
 

@@ -74,16 +74,16 @@ div.wysiwyg img {
 
 div.wysiwyg figcaption {
   font-size: var(--font-size-xs);
-  margin-top: 0.25rem;
+  margin-top: var(--space-2xs);
   text-align: center
 }
 
 .ck-content blockquote,
 blockquote {
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-base);
   font-size: var(--font-size-base);
   border-left: 0.25rem solid var(--theme-200) !important;
-  padding-left: 1rem;
+  padding-left: var(--space-base);
   font-style: italic;
 }
 
@@ -145,5 +145,5 @@ figure.table figure.image {
 }
 
 blockquote p {
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-xs);
 }
