@@ -239,7 +239,7 @@
              ['--bs-border-radius-sm', 'form-control-sm and btn-sm, Select2 tags'],
              ['--bs-border-radius', 'Inputs, buttons, button groups, alerts, toasts, pagination, tooltips, sidebar pills; the bottom corners of menus that hang from their input (autocomplete, Select2)'],
              ['--bs-border-radius-lg', 'Cards, modals, menus and panels: dropdowns, cookie banner, AI well, ask box. Also form-control-lg and btn-lg'],
-             ['--bs-border-radius-xl', 'Mobile bottom sheet (top corners), marketing cards'],
+             ['--bs-border-radius-xl', 'Mobile bottom sheet (top corners), marketing cards, chat bubbles'],
              ['--bs-border-radius-pill', 'Badges, nav crumbs, the header and chat avatars, round buttons and dots']
            ].each do |name, note| %>
           <div class="col-6 col-md">
@@ -989,7 +989,7 @@
             </div>
           </div>
         </div>
-        <div class="spec">messages.css, loaded only by /messages: their bubbles --bs-gray-200 with black text, yours --theme-500 with white text and underlined links, each 1rem round with a tail at the bottom corner, on the left for theirs and the right for yours · their avatar a 1.5rem circle beside the bubble's tail · Read and when, --font-size-xs in --bs-gray-600, under your last message · the reply box is the ask box; Enter sends, Shift+Enter adds a line</div>
+        <div class="spec">messages.css, loaded only by /messages: their bubbles --bs-gray-200 with --bs-body-color text, yours --theme-500 with white text and underlined links, each --bs-border-radius-xl round with a tail at the bottom corner, on the left for theirs and the right for yours · their avatar a 1.5rem circle beside the bubble's tail · Read and when, --font-size-xs in --bs-gray-600, under your last message · the reply box is the ask box; Enter sends, Shift+Enter adds a line</div>
       <% end %>
 
       <% design_subsection 'Mobile bottom sheet', col: 'col-lg-6' do %>
