@@ -536,16 +536,6 @@
   opacity: 1;
 }
 
-/* A group's chevron turns to point up while its submenu is open */
-.sidebar .nav-link .caret {
-  display: inline-block;
-  transition: transform var(--transition-fast);
-}
-
-.sidebar .nav-link[aria-expanded="true"] .caret {
-  transform: rotate(180deg);
-}
-
 .sidebar .sub-menu {
   margin: 0 0 0 2.5625rem;
   padding: var(--space-2xs) 0;

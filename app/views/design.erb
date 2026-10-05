@@ -311,15 +311,14 @@
       </div>
     <% end %>
 
-    <% design_subsection 'Motion', "State changes fade rather than snap: hover, focus, active and open states change over <code>--transition-fast</code> (.15s ease-in-out, Bootstrap's own timing for nav links and buttons). Only colours, shadows, masks and turns move; nothing slides, scales or bounces, and toasts, dropdowns and tab panes appear at once. Under <code>prefers-reduced-motion</code> the token is 0s, so all of it stops, and the tab scroller's chevrons jump rather than scroll smoothly.".html_safe do %>
+    <% design_subsection 'Motion', "State changes fade rather than snap: hover, focus, active and open states change over <code>--transition-fast</code> (.15s ease-in-out, Bootstrap's own timing for nav links and buttons). Only colours, shadows and masks move, plus two slides: sidebar submenus and the teams, activities and local groups in the cards on /accounts/subscriptions open and shut with jQuery's slide over 175ms. Nothing else slides, and nothing scales, turns or bounces; toasts, dropdowns and tab panes appear at once; chevrons that open something (sidebar groups, the cards on /accounts/subscriptions) point down whether it's open or closed. Under <code>prefers-reduced-motion</code> the token is 0s, so all of it stops, and the tab scroller's chevrons jump rather than scroll smoothly.".html_safe do %>
       <div class="row gx-4 row-cols-1 row-cols-md-2 row-cols-xl-3">
         <% [
              ['Links, nav links, tabs', 'colour, underline'],
              ['Dropdown items, message previews', 'background'],
              ['Tiles', 'shadow, photo lightens'],
              ['Date and icon tiles', 'fill'],
-             ['Tab and crumb scrollers', 'edge fades, chevron colour'],
-             ['Sidebar group chevron', 'turns 180° when open']
+             ['Tab and crumb scrollers', 'edge fades, chevron colour']
            ].each do |title, value| %>
           <div class="col">
             <div class="d-flex justify-content-between gap-3 py-2 border-bottom"><span><%= title %></span><code class="text-body-secondary"><%= value %></code></div>
