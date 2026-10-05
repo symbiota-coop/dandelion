@@ -824,10 +824,6 @@ p.action a {
   --bs-alert-link-color: var(--variant-800);
 }
 
-.alert-dismissible .btn-close {
-  padding: 0.875rem;
-}
-
 /* Toasts are drawn like alerts, with no border ($toast-border-width and $alert-border-width are 0) */
 .toast-primary,
 .toast-warning,
