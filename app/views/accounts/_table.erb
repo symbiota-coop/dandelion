@@ -73,10 +73,8 @@
         <td>
           <div class="row justify-content-between g-0">
             <div class="col">
-              <% d = account.days_until_next_birthday %>
-              <span class="<%='highlight' if d == 0%>">
-                <%= account.next_birthday.to_fs(:birthday) %>, <%= d == 0 ? 'today!' : pluralize(d,'day') %>
-              </span>
+              <%= account.next_birthday.strftime('%a') %> <%= account.next_birthday.to_fs(:birthday) %>
+              <%= partial :'accounts/birthday_when', locals: { account: account } %>
             </div>
           </div>
         </td>

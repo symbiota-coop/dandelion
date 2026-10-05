@@ -1,0 +1,8 @@
+<% d = account.days_until_next_birthday %>
+<% if d == 0 %>
+  <span class="badge text-bg-yellow"><i class="bi bi-cake2-fill"></i> Today</span>
+<% elsif d == 1 %>
+  <span class="badge text-bg-primary">Tomorrow</span>
+<% else %>
+  <span class="badge text-bg-secondary">in <%= pluralize(d, 'day') %></span>
+<% end %>

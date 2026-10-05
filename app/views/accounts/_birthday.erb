@@ -1,14 +1,13 @@
-<% d = account.days_until_next_birthday %>
-<div class="row mb-2">
-  <div class="col-auto">
-    <%= partial :'accounts/square', locals: { account: account, size: :xs } %>
-  </div>
-  <div class="col">
-    <a href="/u/<%=account.username%>"><%= account.name %></a>
+<div class="d-flex align-items-center gap-3 mb-2">
+  <%= partial :'accounts/square', locals: { account: account, size: :xs } %>
+  <div class="flex-grow-1">
+    <a href="/u/<%= account.username %>"><%= account.name %></a>
     <% viewer_in_network = current_account && account.network.find(current_account.id) %>
     <% if viewable?(account, :date_of_birth, viewer_in_network: viewer_in_network) %>
-      <br />
-      <span class="<%='highlight' if d == 0%>"><%=account.next_birthday.to_fs(:birthday)%>, <%= d == 0 ? 'today!' : pluralize(d,'day') %></span>
+      <div class="text-body-secondary small"><%= account.next_birthday.strftime('%a') %> <%= account.next_birthday.to_fs(:birthday) %></div>
     <% end %>
   </div>
+  <% if viewable?(account, :date_of_birth, viewer_in_network: viewer_in_network) %>
+    <%= partial :'accounts/birthday_when', locals: { account: account } %>
+  <% end %>
 </div>

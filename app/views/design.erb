@@ -1339,6 +1339,36 @@
     </div>
 
     <div class="row g-5">
+      <% design_subsection 'Upcoming birthdays', col: 'col-lg-6' do %>
+        <div class="card shadow-sm">
+          <h3 class="card-header chill">Upcoming birthdays</h3>
+          <div class="card-body">
+            <div class="mb-3">
+              <% [['maya', 'Maya', 'Mon 5th Oct', 0], ['jonas', 'Jonas', 'Tue 6th Oct', 1], ['amara', 'Amara', 'Sun 11th Oct', 6]].each do |img, name, date, d| %>
+                <div class="d-flex align-items-center gap-3 mb-2">
+                  <img src="/images/samples/<%= img %>.jpg" alt="" class="avatar avatar-xs">
+                  <div class="flex-grow-1">
+                    <a href="#components"><%= name %></a>
+                    <div class="text-body-secondary small"><%= date %></div>
+                  </div>
+                  <% if d == 0 %>
+                    <span class="badge text-bg-yellow"><i class="bi bi-cake2-fill"></i> Today</span>
+                  <% elsif d == 1 %>
+                    <span class="badge text-bg-primary">Tomorrow</span>
+                  <% else %>
+                    <span class="badge text-bg-secondary">in <%= d %> days</span>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+            <a href="#components">All birthdays &rarr;</a>
+          </div>
+        </div>
+        <div class="spec">The home page's card (accounts/_birthday.erb): an avatar-xs, the name, and the weekday and date small in --bs-secondary-color · on the right a badge from accounts/_birthday_when.erb, also used on /birthdays and a gathering's members: text-bg-yellow with a cake for today, text-bg-primary for tomorrow, text-bg-secondary for in n days</div>
+      <% end %>
+    </div>
+
+    <div class="row g-5">
       <% design_subsection 'Ratings and feedback', col: 'col-lg-7' do %>
         <div class="border rounded p-4 d-flex flex-column gap-4">
           <div class="average-rating">
