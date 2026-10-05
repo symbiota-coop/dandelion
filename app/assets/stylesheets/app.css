@@ -840,6 +840,11 @@ p.action a {
   background: var(--variant-100) !important;
 }
 
+/* Red's 100 reads as pink, so danger takes its 200 */
+.badge.text-bg-danger {
+  background: var(--variant-200) !important;
+}
+
 .btn-primary .badge {
   color: var(--theme-500);
 }
