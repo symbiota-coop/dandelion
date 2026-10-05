@@ -37,8 +37,8 @@ $min-contrast-ratio: 2.2; // white text on the primary green and on orange (2.24
 $link-decoration: none;
 $link-hover-decoration: underline;
 $grid-gutter-width: .75rem;
-$container-padding-x: 30px; // the whole gutter, so containers keep 15px padding
-$container-max-widths: (sm: 540px, md: 720px, lg: 960px, xl: 1140px);
+$container-padding-x: 1.875rem; // the whole gutter, so containers keep half of it (.9375rem) each side
+$container-max-widths: (sm: 540px, md: 720px, lg: 960px, xl: 1140px); // px, to fit inside the px breakpoints
 // One radius scale: controls (inputs and buttons alike, at each size) on the base, surfaces on lg, sheets on xl
 $border-radius: .5rem; // inputs, buttons, alerts, toasts, pagination
 $border-radius-sm: .375rem; // form-control-sm and btn-sm
@@ -112,6 +112,14 @@ $alert-padding-x: 1rem;
 $alert-border-width: 0;
 $toast-border-width: 0;
 $tooltip-font-size: .875rem; // --font-size-sm
+// Bootstrap's px widths in rem, so they scale with the root font size like everything else ($modal-xl stays 1140px, to fit the xl breakpoint as the containers do)
+$tooltip-max-width: 12.5rem;
+$toast-max-width: 21.875rem;
+$popover-max-width: 17.25rem;
+$offcanvas-horizontal-width: 25rem;
+$modal-sm: 18.75rem;
+$modal-md: 31.25rem;
+$modal-lg: 50rem;
 $table-cell-padding-y: .75rem;
 $table-cell-padding-x: .75rem;
 $table-cell-padding-y-sm: .5rem;

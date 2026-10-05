@@ -1,6 +1,6 @@
 <td class="text-center">
   <% if event.coordinator %>
-    <%= partial :'accounts/square', locals: { account: event.coordinator, width: '50px' } %>
+    <%= partial :'accounts/square', locals: { account: event.coordinator } %>
     <br>
     <a href="/u/<%= event.coordinator.username %>"><%= event.coordinator.name %></a>
   <% end %>

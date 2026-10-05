@@ -37,7 +37,7 @@
         <td>Organisation</td>
         <td>
           <% if @activity.organisation.image %>
-            <a href="/o/<%= @activity.organisation.slug %>"><img src="<%= u @activity.organisation.image.thumb('500x500#').url %>" style="width: 50px"></a>
+            <a href="/o/<%= @activity.organisation.slug %>"><img src="<%= u @activity.organisation.image.thumb('500x500#').url %>" style="width: 3.125rem"></a>
           <% end %>
           <a href="/o/<%= @activity.organisation.slug %>"><%= @activity.organisation.name %></a>
         </td>
@@ -78,7 +78,7 @@
         <tr>
           <td>QR code</td>
           <td>
-            <a target="_blank" href="/qr.png?url=<%= "#{ENV['BASE_URI']}/o/#{@activity.organisation.slug}/a/#{@activity.slug}" %>"><img src="/qr.png?url=<%= "#{ENV['BASE_URI']}/o/#{@activity.organisation.slug}/a/#{@activity.slug}" %>" style="width: 50px"></a>
+            <a target="_blank" href="/qr.png?url=<%= "#{ENV['BASE_URI']}/o/#{@activity.organisation.slug}/a/#{@activity.slug}" %>"><img src="/qr.png?url=<%= "#{ENV['BASE_URI']}/o/#{@activity.organisation.slug}/a/#{@activity.slug}" %>" style="width: 3.125rem"></a>
           </td>
         </tr>
       <% end %>

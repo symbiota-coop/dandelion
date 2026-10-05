@@ -14,11 +14,11 @@
 
 <div class="design-guide d-flex flex-column gap-5">
 
-  <header class="d-flex flex-column gap-3" style="max-width: 720px">
+  <header class="d-flex flex-column gap-3" style="max-width: 45rem">
     <div class="spec text-uppercase fw-bold">Design guide · v1 · October 2026</div>
     <h1 class="m-0">Dandelion</h1>
     <p class="m-0 readable">The visual language of dandelion.events as it exists in code today. This page is rendered with the site's own <code>app.css</code> and <code>bootstrap5.css</code>, so swatches, type and components are the real thing. The site is Bootstrap 5.3.8, restyled through its variables.</p>
-    <p class="m-0 small text-body-secondary">The root font size is 17px (19px from 1680px, 21px from 1920px), so rem values scale with the viewport. Sizes are in rem (or em, to follow the text); px is kept for 1–2px hairlines, shadows, the containers' 15px side padding (<code>$container-padding-x</code>) and overrides that must line up with Google Maps. Colour values, radii, type sizes and the spacing scale are measured live; other sizes are copied from the stylesheets.</p>
+    <p class="m-0 small text-body-secondary">The root font size is 17px (19px from 1680px, 21px from 1920px), so rem values scale with the viewport. Sizes are in rem (or em, to follow the text); px is kept for 1–2px hairlines, shadows and the focus ring, for breakpoints and the container max-widths that fit inside them, and for overrides that must line up with Google Maps. Avatars take a size class (<code>.avatar-xs</code> to <code>.avatar-2xl</code>), not a width. Colour values, radii, type sizes and the spacing scale are measured live; other sizes are copied from the stylesheets.</p>
     <nav class="d-flex flex-wrap gap-2">
       <% design_sections.each do |id, (title, _)| %>
         <a class="btn btn-outline-primary btn-sm" href="#<%= id %>"><%= title %></a>
@@ -243,7 +243,7 @@
              ['--bs-border-radius-pill', 'Badges, nav crumbs, the header and chat avatars, round buttons and dots']
            ].each do |name, note| %>
           <div class="col-6 col-md">
-            <div class="bg-body-secondary border mb-2" style="height: 72px; border-radius: var(<%= name %>)"></div>
+            <div class="bg-body-secondary border mb-2" style="height: 4.5rem; border-radius: var(<%= name %>)"></div>
             <div class="fw-bold text-break"><%= name %></div>
             <div class="spec"><span data-css-value="<%= name %>"></span></div>
             <div class="small text-body-secondary"><%= note %></div>
@@ -295,7 +295,7 @@
         <% [
              ['Content padding · --content-padding', 'lg · mobile base'],
              ['Grid gutter', 'sm'],
-             ['Container padding', '15px each side'],
+             ['Container padding', '.9375rem each side'],
              ['Card body', '1.25rem'],
              ['Card header', 'sm 1.25rem'],
              ['Field spacing', 'mb-3 · base'],
@@ -322,7 +322,7 @@
           <span class="px-2 d-flex align-items-center gap-2"><img class="d-block rounded-circle" src="/images/advisors/ruby.jpg" alt="" style="width: 1.75rem; height: 1.75rem; object-fit: cover"><span class="d-none d-md-inline" style="font-size: var(--font-size-sm)">Ruby <i class="bi bi-chevron-down"></i></span></span>
         </div>
       </div>
-      <div class="d-flex" style="min-height: 420px">
+      <div class="d-flex" style="min-height: 26.25rem">
         <div class="d-none d-md-block flex-shrink-0 p-2" style="width: var(--sidebar-width); background: var(--bs-gray-900)">
           <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded" style="background: var(--gradient-active)"><i class="bi bi-house fs-4"></i><span>Home</span></div>
           <div class="d-flex align-items-center gap-2 py-2 px-3 text-white rounded"><i class="bi bi-newspaper fs-4" style="opacity: .35"></i><span>Dandelion Daily</span></div>
@@ -338,7 +338,7 @@
           <div class="row g-3 flex-grow-1">
             <% [['col-8', 'col-lg-8 · newsfeed'], ['col-4', 'col-lg-4 · sticky']].each do |col, label| %>
               <div class="<%= col %>">
-                <div class="h-100 border rounded shadow-sm d-flex align-items-center justify-content-center text-center spec" style="background: repeating-linear-gradient(135deg, var(--bs-gray-100) 0 10px, #fff 10px 20px)"><%= label %></div>
+                <div class="h-100 border rounded shadow-sm d-flex align-items-center justify-content-center text-center spec" style="background: repeating-linear-gradient(135deg, var(--bs-gray-100) 0 .625rem, #fff .625rem 1.25rem)"><%= label %></div>
               </div>
             <% end %>
           </div>
@@ -505,10 +505,10 @@
         <div class="border rounded p-4">
           <div class="mb-3">
             <label for="dg-file">Image</label>
-            <div style="margin-bottom: 1em"><img style="max-height: 200px" src="/images/dandelions/3.jpeg" alt="" class="mw-100"></div>
+            <div style="margin-bottom: 1em"><img style="max-height: 12.5rem" src="/images/dandelions/3.jpeg" alt="" class="mw-100"></div>
             <input type="file" class="form-control" id="dg-file">
           </div>
-          <div class="spec">file_block and image_block (lib/form_builder.rb): a plain form-control file input, with the current file above it once saved: a download link, or for images the image at up to 200px high · app.js rejects files over 10MB before upload</div>
+          <div class="spec">file_block and image_block (lib/form_builder.rb): a plain form-control file input, with the current file above it once saved: a download link, or for images the image at up to 12.5rem high · app.js rejects files over 10MB before upload</div>
         </div>
       <% end %>
     </div>
@@ -648,10 +648,10 @@
           <label class="d-block">Theme colour</label>
           <div class="quick-theme-colors mb-3 d-flex flex-wrap align-items-center column-gap-2 row-gap-1">
             <% quick_colors.each_with_index do |color, i| %>
-              <button type="button" class="quick-color-btn rounded-circle border p-0<%= ' selected' if i.zero? %>" style="width: 26px; height: 26px; background: <%= color %>; --ring-color: <%= color %>" title="<%= color %>"></button>
+              <button type="button" class="quick-color-btn rounded-circle border p-0<%= ' selected' if i.zero? %>" style="width: 1.625rem; height: 1.625rem; background: <%= color %>; --ring-color: <%= color %>" title="<%= color %>"></button>
             <% end %>
           </div>
-          <div class="spec">_quick_theme_colors.erb, beside the colour field: quick_colors turns the default green evenly round the wheel · 26px circles that grow 10% with a --bs-box-shadow on hover · selected or focused: a white gap, then a ring in the swatch's own colour</div>
+          <div class="spec">_quick_theme_colors.erb, beside the colour field: quick_colors turns the default green evenly round the wheel · 1.625rem circles that grow 10% with a --bs-box-shadow on hover · selected or focused: a white gap, then a ring in the swatch's own colour</div>
         </div>
       <% end %>
     </div>
@@ -659,7 +659,7 @@
     <div class="row g-5">
       <% design_subsection 'Add block', col: 'col-lg-6' do %>
         <div class="border rounded p-4">
-          <div class="my-1"><img src="/images/dandelions/3.jpeg" alt="" style="width: 50px"> <a href="#components">Symbiota</a></div>
+          <div class="my-1"><img src="/images/dandelions/3.jpeg" alt="" style="width: 3.125rem"> <a href="#components">Symbiota</a></div>
           <div>
             <a href="#components"><i class="bi bi-plus-square-fill"></i></a>
             <a href="#components"><i class="bi bi-dash-square-fill"></i></a>
@@ -761,12 +761,12 @@
             <tr>
               <td><strong><%= slot %></strong></td>
               <% people.each do |img| %>
-                <td><% if img %><img src="/images/advisors/<%= img %>.jpg" alt="" style="width: 50px; aspect-ratio: 1/1"><% else %><a class="btn btn-primary btn-sm mb-1" href="#components">Sign up</a><% end %></td>
+                <td><% if img %><img src="/images/advisors/<%= img %>.jpg" alt="" class="avatar avatar-sm"><% else %><a class="btn btn-primary btn-sm mb-1" href="#components">Sign up</a><% end %></td>
               <% end %>
             </tr>
           <% end %>
         </table>
-        <div class="spec">Grids of slots: rotas (rotas/_rota.erb), timetables and the admin dashboard · stripes --bs-tertiary-bg · each cell a 50px avatar or a btn-sm to sign up · roles and slots carry their points as text-bg-yellow badges</div>
+        <div class="spec">Grids of slots: rotas (rotas/_rota.erb), timetables and the admin dashboard · stripes --bs-tertiary-bg · each cell an avatar-sm or a btn-sm to sign up · roles and slots carry their points as text-bg-yellow badges</div>
       <% end %>
     </div>
 
@@ -789,7 +789,7 @@
             <i data-bs-toggle="tooltip" title="Secret ticket type" class="bi bi-lock"></i>
             <span class="small text-body-secondary align-self-center">hover these</span>
           </div>
-          <div class="spec">data-bs-toggle="tooltip" and a title: app.js has one handler for the whole page, so content loaded later needs no setup. HTML is allowed, and with no title it shows the hidden span after the element (reaction names, timetable descriptions) · .875rem, --bs-emphasis-color at 90%, radius base, max 200px wide · label icons, truncated text and disabled controls, not essential information</div>
+          <div class="spec">data-bs-toggle="tooltip" and a title: app.js has one handler for the whole page, so content loaded later needs no setup. HTML is allowed, and with no title it shows the hidden span after the element (reaction names, timetable descriptions) · .875rem, --bs-emphasis-color at 90%, radius base, max 12.5rem wide · label icons, truncated text and disabled controls, not essential information</div>
         </div>
       <% end %>
 
@@ -961,7 +961,7 @@
       <% design_subsection 'Messages', col: 'col-lg-6' do %>
         <div class="border rounded p-4">
           <div class="d-flex align-items-start mb-3">
-            <img src="/images/advisors/ruby.jpg" alt="" style="display: block; width: 64px; aspect-ratio: 1/1">
+            <img src="/images/advisors/ruby.jpg" alt="" class="avatar avatar-md d-block">
             <div class="flex-grow-1 ms-3">
               <h4 class="my-0"><a class="text-dark" href="#components">Ruby</a></h4>
             </div>
@@ -1230,7 +1230,7 @@
             <% [['ruby', 'Ruby', '2 hours ago', "I'm driving down from Hackney on Friday morning, room for three. Message me!", [['💚', 4, true], ['🙏', 2, false]]],
                 ['hugi', 'Hugi', '1 hour ago', 'Count me in, thank you @Ruby', []]].each do |img, name, time, body, reactions| %>
               <div class="d-flex align-items-start m-0 px-2 pt-2">
-                <span class="me-2"><img src="/images/advisors/<%= img %>.jpg" alt="" style="width: 32px; aspect-ratio: 1/1"></span>
+                <span class="me-2"><img src="/images/advisors/<%= img %>.jpg" alt="" class="avatar avatar-xs"></span>
                 <div class="flex-grow-1 comment">
                   <strong><a href="#components"><%= name %></a></strong>
                   <small class="text-body-secondary"><%= time %></small>
@@ -1246,19 +1246,19 @@
             <% end %>
           </div>
         </div>
-        <div class="spec">A post (comments/_post.erb) is a card with a text-bg-primary header, its subject · each comment: a 32px square avatar, the name bold, the time in --bs-secondary-color, the body linkified · reactions bordered tiles, your own bordered --theme-500, with the reactors' names in a tooltip</div>
+        <div class="spec">A post (comments/_post.erb) is a card with a text-bg-primary header, its subject · each comment: an avatar-xs, the name bold, the time in --bs-secondary-color, the body linkified · reactions bordered tiles, your own bordered --theme-500, with the reactors' names in a tooltip</div>
       <% end %>
 
       <% design_subsection 'Avatars', col: 'col-lg-5' do %>
         <div class="d-flex align-items-end flex-wrap gap-3">
-          <% [32, 50, 64, 75, 100].each_with_index do |px, i| %>
+          <% %w[xs sm md lg xl].each_with_index do |size, i| %>
             <div class="text-center">
-              <img src="/images/advisors/<%= %w[ruby hugi tibet ruby hugi][i] %>.jpg" alt="" style="width: <%= px %>px; aspect-ratio: 1/1" class="<%= 'private' if i == 2 %>">
-              <div class="spec mt-1"><%= px %><%= ' · private' if i == 2 %></div>
+              <img src="/images/advisors/<%= %w[ruby hugi tibet ruby hugi][i] %>.jpg" alt="" class="avatar avatar-<%= size %><%= ' private' if i == 2 %>">
+              <div class="spec mt-1"><%= size %><%= ' · private' if i == 2 %></div>
             </div>
           <% end %>
         </div>
-        <div class="spec mt-3">Square (accounts/_square.erb), except the 1.75rem header avatar and the 1.5rem chat avatars, which are round: the account's thumbnail or Gravatar, with their name in a tooltip · 32px in comments, 50px in lists of people (the most common), 64–100px on cards and profiles · img.private at 50%, full on hover</div>
+        <div class="spec mt-3">Square (accounts/_square.erb), except the 1.75rem header avatar and the 1.5rem chat avatars, which are round: the account's thumbnail or Gravatar, with their name in a tooltip · a size class, from <code>size:</code> (:sm by default): xs 2rem in comments, sm 3.125rem in lists of people (the most common), md 4rem in message threads and map info windows, lg 4.6875rem for team and gathering members, xl 6.25rem in account rows, 2xl 9.375rem beside feedback quotes, fill to take its column's width · img.private at 50%, full on hover</div>
       <% end %>
     </div>
 
@@ -1292,9 +1292,9 @@
 
       <% design_subsection 'Image wall', col: 'col-lg-5' do %>
         <div class="image-wall">
-          <% %w[ruby hugi tibet ruby hugi tibet ruby].each do |img| %><img class="me-1" src="/images/advisors/<%= img %>.jpg" alt="" style="width: 50px; aspect-ratio: 1/1"><% end %>
+          <% %w[ruby hugi tibet ruby hugi tibet ruby].each do |img| %><img class="avatar avatar-sm me-1" src="/images/advisors/<%= img %>.jpg" alt=""><% end %>
         </div>
-        <div class="spec">.image-wall: who chose an option or is interested in an activity (options/_options.erb, comments/_voptions.erb, timetables/tactivity.erb), as 50px avatars that wrap, --space-2xs between rows · a "Show names" link swaps them for names separated by middots</div>
+        <div class="spec">.image-wall: who chose an option or is interested in an activity (options/_options.erb, comments/_voptions.erb, timetables/tactivity.erb), as avatars that wrap, --space-2xs between rows · a "Show names" link swaps them for names separated by middots</div>
       <% end %>
     </div>
 
@@ -1371,7 +1371,7 @@
             <div class="infowindow">
               <table>
                 <tr>
-                  <td class="pe-2"><img src="/images/advisors/ruby.jpg" alt="" style="width: 64px; aspect-ratio: 1/1"></td>
+                  <td class="pe-2"><img src="/images/advisors/ruby.jpg" alt="" class="avatar avatar-md"></td>
                   <td>
                     <h4 class="mt-0"><a href="#components">Ruby</a></h4>
                     <p class="mb-2">Hackney, London</p>

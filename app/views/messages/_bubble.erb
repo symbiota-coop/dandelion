@@ -2,7 +2,7 @@
 <li class="<%= 'reply' unless incoming %>">
   <% if incoming %>
     <div class="widget-chat-media">
-      <%= partial :'accounts/square', locals: { account: @account, style: 'display: block; width: 64px' } %>
+      <%= partial :'accounts/square', locals: { account: @account, klass: 'd-block', size: :md } %>
     </div>
   <% end %>
   <div class="widget-chat-content">

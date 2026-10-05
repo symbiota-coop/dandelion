@@ -9,7 +9,7 @@
        target += base_target
      end %>
 
-  <div class="progress" style="height: 30px">
+  <div class="progress" style="height: 1.875rem">
     <div class="progress-bar" role="progressbar" style="width: <%= "#{w = 100*monthly_contributions/target}%" %>;">
       <% if w > 0 %><%= w.to_f.round %>%<% end %>
     </div>

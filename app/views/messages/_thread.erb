@@ -1,7 +1,7 @@
 <% messages = Message.between(current_account, @account).order('created_at asc') %>
 <% message_receipt = MessageReceipt.find_by(messenger: current_account, messengee: @account) %>
 <div id="messengee" class="d-flex align-items-start mb-3">
-  <%= partial :'accounts/square', locals: { account: @account, style: 'display: block; width: 64px' } %>
+  <%= partial :'accounts/square', locals: { account: @account, klass: 'd-block', size: :md } %>
   <div class="flex-grow-1 ms-3">
     <h4 class="my-0"><a class="text-dark" href="/u/<%= @account.username %>"><%= @account.name %></a></h4>
   </div>

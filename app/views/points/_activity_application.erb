@@ -2,7 +2,7 @@
 <table>
   <tr>
     <td class="pe-2">
-      <%= partial :'accounts/square', locals: { account: account, width: '64px' } %>
+      <%= partial :'accounts/square', locals: { account: account, size: :md } %>
     </td>
     <td>
       <h4 class="mt-0"><a target="_parent" href="/activities/<%= activity_application.activity_id %>/activity_applications/<%= activity_application.id %>"><%= account.name %></a></h4>

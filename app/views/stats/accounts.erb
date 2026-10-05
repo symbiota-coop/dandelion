@@ -15,7 +15,7 @@
     <tr>
       <td>
         <a href="/u/<%= account.username %>">
-          <%= partial :'accounts/square', locals: { account: account, style: 'display: block; width: 100px' } %>
+          <%= partial :'accounts/square', locals: { account: account, klass: 'd-block', size: :xl } %>
         </a>
         <a href="/u/<%= account.username %>"><%= account.name %></a>
       </td>

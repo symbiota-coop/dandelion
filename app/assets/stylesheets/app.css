@@ -2415,12 +2415,12 @@ ul.map-event li {
 
 /* Add margin between events to prevent squashing */
 .fc-event {
-  margin-bottom: 2px !important;
+  margin-bottom: 0.125rem !important;
 }
 
 /* Add some padding to event content */
 .fc-event-main {
-  padding: 1px 2px !important;
+  padding: 0.0625rem 0.125rem !important;
 }
 
 /* Shorten month names and hide Today button on small screens */
@@ -2635,7 +2635,7 @@ table.event-details td {
 }
 
 .slick-placeholder {
-  letter-spacing: -1px
+  letter-spacing: -0.0625rem
 }
 
 .slick-placeholder .slick-dots {
@@ -2832,6 +2832,40 @@ td .tactivity-accept {
 
 .bi.bi-star-fill {
   color: var(--color-orange-400)
+}
+
+/* Avatars (accounts/_square.erb, size: :xs to :2xl, :sm by default): square, in rem so they scale with the text */
+.avatar {
+  aspect-ratio: 1 / 1;
+}
+
+.avatar-xs {
+  width: 2rem;
+}
+
+.avatar-sm {
+  width: 3.125rem;
+}
+
+.avatar-md {
+  width: 4rem;
+}
+
+.avatar-lg {
+  width: 4.6875rem;
+}
+
+.avatar-xl {
+  width: 6.25rem;
+}
+
+.avatar-2xl {
+  width: 9.375rem;
+}
+
+/* As wide as its column: the account grid and search results */
+.avatar-fill {
+  width: 100%;
 }
 
 img.private {

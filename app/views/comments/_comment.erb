@@ -3,7 +3,7 @@
 <% end %>
 <div class="d-flex align-items-start m-0 px-2 pt-2">
   <span class="me-2">
-    <%= partial :'accounts/square', locals: { account: comment.account, width: '32px' } %>
+    <%= partial :'accounts/square', locals: { account: comment.account, size: :xs } %>
   </span>
   <div class="flex-grow-1 comment" data-comment-id="<%= comment.id %>">
     <% if comment_admin?(comment) %>

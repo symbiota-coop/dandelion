@@ -2,7 +2,7 @@
   <h3>Starred</h3>
   <div class="image-wall">
     <% starred.each { |account| %>
-    <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+    <%= partial :'accounts/square', locals: { account: account } %>
     <% } %>
   </div>
   <h3 class="mt-2">Everyone</h3>
@@ -10,7 +10,7 @@
 
 <div class="image-wall">
   <% accounts = accounts.order('image_uid desc').paginate(page: params[:page], per_page: 50); accounts.each { |account| %>
-  <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+  <%= partial :'accounts/square', locals: { account: account } %>
   <% } %>
 </div>
 <div class="mt-3">

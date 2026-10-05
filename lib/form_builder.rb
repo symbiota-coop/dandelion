@@ -224,7 +224,7 @@ module Padrino
               src = URI::Parser.new.escape(url).gsub('(', '%28').gsub(')', '%29')
               content << %(
             <div style="margin-bottom: 1em">
-              <a target="_blank" href="#{url}"><img style="max-height: 200px" src="#{src}"></a>
+              <a target="_blank" href="#{url}"><img style="max-height: 12.5rem" src="#{src}"></a>
             </div>
             )
             end

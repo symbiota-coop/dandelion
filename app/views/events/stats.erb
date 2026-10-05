@@ -9,6 +9,6 @@
 
 <div class="image-wall">
   <% (@event.attendees.and(:has_image => true).shuffle + @event.attendees.and(image_uid: nil).shuffle).each { |account| %>
-  <%= partial :'accounts/square', locals: { account: account, width: '75px' } %>
+  <%= partial :'accounts/square', locals: { account: account, size: :lg } %>
   <% } %>
 </div>

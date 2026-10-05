@@ -1,6 +1,6 @@
 <% account = message.other_party(current_account) %>
 <div class="d-flex align-items-start">
-  <%= partial :'accounts/square', locals: { account: account, content: (account.last_active ? "Active #{time_ago_in_words account.last_active} ago" : 'Never logged in'), style: 'display: block; width: 32px' } %>
+  <%= partial :'accounts/square', locals: { account: account, content: (account.last_active ? "Active #{time_ago_in_words account.last_active} ago" : 'Never logged in'), klass: 'd-block', size: :xs } %>
   <div class="flex-grow-1 ms-3">
     <a class="<%= klass if defined?(klass) %> message-preview p-2 d-block text-dark <% if account.id == message.messenger_id && Message.unread?(account, current_account) %> unread <% end %> text-decoration-none" href="/messages/<%= account.id %>">
       <h5 class="my-0"><%= account.name %></h5>

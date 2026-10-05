@@ -52,7 +52,7 @@
     <div class="row g-0">
       <div class="col-auto me-2"><i class="bi bi-quote"></i></div>
       <div class="col me-3">
-        <%= partial :'accounts/square', locals: { klass: 'float-start me-3 mb-3', account: account, width: '150px' } %>
+        <%= partial :'accounts/square', locals: { klass: 'float-start me-3 mb-3', account: account, size: :'2xl' } %>
         <a class="home-feedback readable" href="/e/<%= event_feedback.event.slug %>">
           <%== Sanitize.fragment(quote, Sanitize::Config::DANDELION) %>
         </a>

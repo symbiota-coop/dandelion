@@ -1,6 +1,6 @@
 <div class="image-wall mb-1">
   <% accounts.each { |account| %>
-  <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+  <%= partial :'accounts/square', locals: { account: account } %>
   <% } %>
 </div>
 <% if add_and_remove %>

@@ -681,7 +681,7 @@ progress {
 .container-lg,
 .container-md,
 .container-sm {
-  --bs-gutter-x: 30px;
+  --bs-gutter-x: 1.875rem;
   --bs-gutter-y: 0;
   width: 100%;
   padding-right: calc(var(--bs-gutter-x) * 0.5);
@@ -5259,8 +5259,8 @@ textarea.form-control-lg {
   --bs-toast-zindex: 1090;
   --bs-toast-padding-x: 0.75rem;
   --bs-toast-padding-y: 0.5rem;
-  --bs-toast-spacing: 30px;
-  --bs-toast-max-width: 350px;
+  --bs-toast-spacing: 1.875rem;
+  --bs-toast-max-width: 21.875rem;
   --bs-toast-font-size: 0.875rem;
   --bs-toast-color: ;
   --bs-toast-bg: rgba(var(--bs-body-bg-rgb), 0.85);
@@ -5324,7 +5324,7 @@ textarea.form-control-lg {
 
 .modal {
   --bs-modal-zindex: 1055;
-  --bs-modal-width: 500px;
+  --bs-modal-width: 31.25rem;
   --bs-modal-padding: 1rem;
   --bs-modal-margin: 0.5rem;
   --bs-modal-color: var(--bs-body-color);
@@ -5483,13 +5483,13 @@ textarea.form-control-lg {
     margin-left: auto;
   }
   .modal-sm {
-    --bs-modal-width: 300px;
+    --bs-modal-width: 18.75rem;
   }
 }
 @media (min-width: 992px) {
   .modal-lg,
   .modal-xl {
-    --bs-modal-width: 800px;
+    --bs-modal-width: 50rem;
   }
 }
 @media (min-width: 1200px) {
@@ -5618,7 +5618,7 @@ textarea.form-control-lg {
 }
 .tooltip {
   --bs-tooltip-zindex: 1080;
-  --bs-tooltip-max-width: 200px;
+  --bs-tooltip-max-width: 12.5rem;
   --bs-tooltip-padding-x: 0.5rem;
   --bs-tooltip-padding-y: 0.25rem;
   --bs-tooltip-margin: ;
@@ -5720,7 +5720,7 @@ textarea.form-control-lg {
 
 .popover {
   --bs-popover-zindex: 1070;
-  --bs-popover-max-width: 276px;
+  --bs-popover-max-width: 17.25rem;
   --bs-popover-font-size: 0.875rem;
   --bs-popover-bg: var(--bs-body-bg);
   --bs-popover-border-width: var(--bs-border-width);
@@ -6143,7 +6143,7 @@ textarea.form-control-lg {
 }
 .offcanvas, .offcanvas-xxl, .offcanvas-xl, .offcanvas-lg, .offcanvas-md, .offcanvas-sm {
   --bs-offcanvas-zindex: 1045;
-  --bs-offcanvas-width: 400px;
+  --bs-offcanvas-width: 25rem;
   --bs-offcanvas-height: 30vh;
   --bs-offcanvas-padding-x: 1rem;
   --bs-offcanvas-padding-y: 1rem;

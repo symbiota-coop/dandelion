@@ -24,9 +24,9 @@
           <i class="bi bi-person-bounding-box fs-4<% if verdict.reason %> text-primary<% end %>"></i>
         <% else %>
           <% if verdict.reason %>
-            <img style="width: 50px; border-bottom: 2px solid var(--theme-500)" src="<%= u account.image_thumb_or_gravatar_url %>">
+            <img class="avatar avatar-sm" style="border-bottom: 2px solid var(--theme-500)" src="<%= u account.image_thumb_or_gravatar_url %>">
           <% else %>
-            <img style="width: 50px;" src="<%= u account.image_thumb_or_gravatar_url %>">
+            <img class="avatar avatar-sm" src="<%= u account.image_thumb_or_gravatar_url %>">
           <% end %>
         <% end %>
       </a>

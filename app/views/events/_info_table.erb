@@ -9,7 +9,7 @@
     </td>
     <td>
       <% if @event.organisation.image %>
-        <a href="/o/<%= @event.organisation.slug %>/events"><img src="<%= u @event.organisation.image.thumb('500x500#').url %>" style="width: 50px"></a>
+        <a href="/o/<%= @event.organisation.slug %>/events"><img src="<%= u @event.organisation.image.thumb('500x500#').url %>" style="width: 3.125rem"></a>
       <% end %>
       <a href="/o/<%= @event.organisation.slug %>/events"><%= @event.organisation.name %></a>
       <% if event_admin? && @event.revenue_sharer && !(organisationship = @event.organisation.organisationships.find_by(:account => @event.revenue_sharer, :stripe_connect_json.ne => nil)) %>
@@ -98,7 +98,7 @@
     <tr>
       <td>QR code</td>
       <td>
-        <a target="_blank" href="/qr.png?url=<%= "#{ENV['BASE_URI']}/e/#{@event.slug}" %>"><img src="/qr.png?url=<%= "#{ENV['BASE_URI']}/e/#{@event.slug}" %>" style="width: 50px"></a>
+        <a target="_blank" href="/qr.png?url=<%= "#{ENV['BASE_URI']}/e/#{@event.slug}" %>"><img src="/qr.png?url=<%= "#{ENV['BASE_URI']}/e/#{@event.slug}" %>" style="width: 3.125rem"></a>
       </td>
     </tr>
   <% end %>

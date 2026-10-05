@@ -28,7 +28,7 @@
   <% if full_view %>
     <% if notification.type == 'commented'; comment = notification.notifiable %>
       <div class="d-flex align-items-start ms-2 my-2">
-        <%= partial :'accounts/square', locals: { account: comment.account, style: 'display: block; width: 32px' } %>
+        <%= partial :'accounts/square', locals: { account: comment.account, klass: 'd-block', size: :xs } %>
         <div class="flex-grow-1 ms-2">
           <%= partial :'comments/body', locals: { comment: comment } %>
           <div data-pagelet-url="/comments/<%= comment.id %>/reactions" class="mt-3">

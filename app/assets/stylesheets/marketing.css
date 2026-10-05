@@ -81,7 +81,7 @@
 
 .section-divider {
   width: 3rem;
-  height: 3px;
+  height: 0.1875rem;
   border-radius: var(--bs-border-radius-pill);
   margin-bottom: 1.5rem;
   background: linear-gradient(90deg, var(--accent), var(--accent-light));
@@ -97,7 +97,7 @@
 }
 
 .marketing-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-0.25rem);
   box-shadow: var(--bs-box-shadow);
 }
 

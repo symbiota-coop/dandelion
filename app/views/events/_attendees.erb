@@ -7,7 +7,7 @@ others_count = no_image_accounts.count + (@event.tickets.complete.and(:email.ne 
 <% if (@event.organisation && (image_accounts_count + others_count) > 0) %>
   <div class="image-wall">
     <% image_accounts.each { |account| %>
-    <%= partial :'accounts/square', locals: { account: account, width: '50px' } %>
+    <%= partial :'accounts/square', locals: { account: account } %>
     <% };  %>
     <% if others_count > 0 %>
       <% if image_accounts_count == 0 %>

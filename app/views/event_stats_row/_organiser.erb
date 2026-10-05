@@ -1,10 +1,10 @@
 <td>
   <% if event.organiser %>
-    <%= partial :'accounts/square', locals: { account: event.organiser, width: '50px' } %>
+    <%= partial :'accounts/square', locals: { account: event.organiser } %>
     <br>
     <a href="/u/<%= event.organiser.username %>"><%= event.organiser.name %></a>
   <% elsif event.revenue_sharer %>
-    <%= partial :'accounts/square', locals: { account: event.revenue_sharer, width: '50px' } %>
+    <%= partial :'accounts/square', locals: { account: event.revenue_sharer } %>
     <br />
     <a href="/u/<%= event.revenue_sharer.username %>"><%= event.revenue_sharer.name %></a>
     <br>

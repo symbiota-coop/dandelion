@@ -16,12 +16,12 @@
   </div>
   <div class="col-lg-4">
     <h3 class="mt-0">Host</h3>
-    <%= partial :'accounts/square', locals: { account: @tactivity.account, width: '75px' } %>
+    <%= partial :'accounts/square', locals: { account: @tactivity.account, size: :lg } %>
     <h3 class="mt-3">Interested</h3>
     <% y = [] %>
     <% @tactivity.attendances.includes(:account).each { |attendance| account = attendance.account; %>
     <% y << capture do %>
-      <%= partial :'accounts/square', locals: { account: account, width: '75px' } %>
+      <%= partial :'accounts/square', locals: { account: account, size: :lg } %>
     <% end %>
     <% } %>
     <div class="image-wall">
