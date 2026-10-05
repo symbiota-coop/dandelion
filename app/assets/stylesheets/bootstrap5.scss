@@ -68,7 +68,7 @@ $body-secondary-bg: $gray-200; // --bs-secondary-bg: hovered nav links, switches
 $body-tertiary-bg: $gray-100; // --bs-tertiary-bg: wells, hovered dropdown and list items
 $input-placeholder-color: rgba($gray-900, .75); // as before $body-secondary-color changed
 $hr-border-color: $gray-400;
-$input-color: #000;
+$input-color: var(--bs-body-color);
 $input-border-color: $gray-400;
 $input-font-size: .875rem; // matches --body-font-size in app.css (Sass needs a literal for its calculations)
 $input-font-size-sm: .875rem; // --font-size-sm, as btn-sm
@@ -127,14 +127,14 @@ $table-cell-padding-x-sm: .5rem;
 $table-border-color: $gray-300;
 $table-hover-bg: $gray-200;
 $table-striped-bg: $gray-100; // lighter than hover, so a hovered row still shows
-$pagination-color: #000;
+$pagination-color: var(--bs-body-color);
 $pagination-bg: transparent;
 $pagination-border-color: transparent;
 $pagination-margin-start: .1875rem;
-$pagination-hover-color: #000;
+$pagination-hover-color: var(--bs-body-color);
 $pagination-hover-bg: $gray-200; // like hovered pills and nav links
 $pagination-hover-border-color: transparent;
-$pagination-focus-color: #000;
+$pagination-focus-color: var(--bs-body-color);
 $pagination-focus-bg: transparent;
 $pagination-active-color: #fff; // the active page in the theme colour, like the active pill and dropdown item
 $pagination-active-bg: var(--theme-500);

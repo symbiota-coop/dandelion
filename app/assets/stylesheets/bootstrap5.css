@@ -2054,7 +2054,7 @@ progress {
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.5;
-  color: #000;
+  color: var(--bs-body-color);
   appearance: none;
   background-color: var(--bs-body-bg);
   background-clip: padding-box;
@@ -2074,7 +2074,7 @@ progress {
   cursor: pointer;
 }
 .form-control:focus {
-  color: #000;
+  color: var(--bs-body-color);
   background-color: var(--bs-body-bg);
   border-color: var(--theme-500);
   outline: 0;
@@ -2101,7 +2101,7 @@ progress {
   padding: 0.5rem 0.75rem;
   margin: -0.5rem -0.75rem;
   margin-inline-end: 0.75rem;
-  color: #000;
+  color: var(--bs-body-color);
   background-color: var(--bs-tertiary-bg);
   pointer-events: none;
   border-color: inherit;
@@ -2204,7 +2204,7 @@ textarea.form-control-lg {
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.5;
-  color: #000;
+  color: var(--bs-body-color);
   appearance: none;
   background-color: var(--bs-body-bg);
   background-image: var(--bs-form-select-bg-img), var(--bs-form-select-bg-icon, none);
@@ -2234,7 +2234,7 @@ textarea.form-control-lg {
 }
 .form-select:-moz-focusring {
   color: transparent;
-  text-shadow: 0 0 0 #000;
+  text-shadow: 0 0 0 var(--bs-body-color);
 }
 
 .form-select-sm {
@@ -4596,15 +4596,15 @@ textarea.form-control-lg {
   --bs-pagination-padding-x: 0.75rem;
   --bs-pagination-padding-y: 0.375rem;
   --bs-pagination-font-size: 1rem;
-  --bs-pagination-color: #000;
+  --bs-pagination-color: var(--bs-body-color);
   --bs-pagination-bg: transparent;
   --bs-pagination-border-width: var(--bs-border-width);
   --bs-pagination-border-color: transparent;
   --bs-pagination-border-radius: var(--bs-border-radius);
-  --bs-pagination-hover-color: #000;
+  --bs-pagination-hover-color: var(--bs-body-color);
   --bs-pagination-hover-bg: #ecebea;
   --bs-pagination-hover-border-color: transparent;
-  --bs-pagination-focus-color: #000;
+  --bs-pagination-focus-color: var(--bs-body-color);
   --bs-pagination-focus-bg: transparent;
   --bs-pagination-focus-box-shadow: 0 0 0 2px rgba(0, 175, 94, 0.6);
   --bs-pagination-active-color: #fff;
