@@ -72,8 +72,8 @@
             data: <%== data.values.to_json %>
           },
           {
-            backgroundColor: cssColor('var(--theme-300)'),
-            borderColor: cssColor('var(--theme-300)'),
+            backgroundColor: cssColor('oklch(from var(--theme-500) l c h / 0.5)'),
+            borderColor: cssColor('oklch(from var(--theme-500) l c h / 0.5)'),
             data: <%== data.size.times.map { |i| i == data.size - 1 ? (defined?(projection) ? projection : nil) : nil }.to_json %>
           }
         ],
