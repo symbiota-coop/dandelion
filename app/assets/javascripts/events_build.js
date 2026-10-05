@@ -222,13 +222,6 @@ $(function () {
       $(this).find('a.next').click(function () {
         const nextTab = $(tabPane).next().attr('id')
         $('#event-build-nav a[href="#' + nextTab + '"]').tab('show')
-
-        // Scroll the tab into view
-        const navWrapper = $('.nav-wrapper')[0]
-        const activeTab = $('#event-build-nav a[href="#' + nextTab + '"]')[0]
-        if (navWrapper && activeTab) {
-          navWrapper.scrollLeft = activeTab.offsetLeft - (navWrapper.clientWidth / 2) + (activeTab.clientWidth / 2)
-        }
       })
     })
     $('.tab-pane:last').find('a.next').remove()

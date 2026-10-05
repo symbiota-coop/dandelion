@@ -14,12 +14,14 @@
   <input type="hidden" name="type" id="type" value="<%= @type %>">
 </form>
 
-<ul class="search-tab">
-  <% { 'Events' => 'events', 'People' => 'accounts', 'Organisations' => 'organisations', 'Gatherings' => 'gatherings' }.each { |k,v| %>
-  <li <% if @type == v %> class="active" <% end %>><a href="javascript:;" onclick="$('#type').val('<%= v %>');
-          $('#search-form').submit()"><%= k %></a></li>
-  <% } %>
-</ul>
+<div class="nav-wrapper">
+  <ul class="nav nav-tabs">
+    <% { 'Events' => 'events', 'People' => 'accounts', 'Organisations' => 'organisations', 'Gatherings' => 'gatherings' }.each { |k,v| %>
+    <li class="nav-item"><a class="nav-link <%= 'active' if @type == v %>" href="javascript:;" onclick="$('#type').val('<%= v %>');
+            $('#search-form').submit()"><%= k %></a></li>
+    <% } %>
+  </ul>
+</div>
 
 <% if @q %>
   <% case @type; when 'accounts' %>

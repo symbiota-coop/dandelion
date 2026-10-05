@@ -1557,10 +1557,6 @@ label.remove-image input {
   padding: var(--space-base);
 }
 
-.nav-tabs > li > a:hover {
-  border-color: var(--bs-secondary-bg) var(--bs-secondary-bg) var(--bs-border-color);
-}
-
 .nav {
   font-size: var(--font-size-sm);
   --bs-nav-link-hover-color: var(--bs-emphasis-color);
@@ -1585,38 +1581,98 @@ label.remove-image input {
   box-shadow: none;
 }
 
-@media (max-width: 767.98px) {
-  .nav-wrapper .nav-tabs {
-    border-bottom: 0;
-    flex-wrap: nowrap;
-  }
-
-  .nav-wrapper .nav-link {
-    white-space: nowrap;
-    padding-top: var(--space-sm);
-    padding-bottom: var(--space-sm);
-  }
-
-  .nav-wrapper {
-    -webkit-overflow-scrolling: touch;
-    overflow-x: scroll;
-    overflow-y: hidden;
-  }
-
-  .nav-wrapper::-webkit-scrollbar {
-    height: 0.375rem;
-    display: block;
-  }
-
-  .nav-wrapper::-webkit-scrollbar-track {
-    background: var(--bs-gray-200);
-  }
-
-  .nav-wrapper::-webkit-scrollbar-thumb {
-    background: var(--bs-gray-500);
-    border-radius: var(--bs-border-radius);
-  }
+/* Tabs are underlined: muted text, the active tab --bs-emphasis-color over a 2px --theme-500 rule, which hover and keyboard focus preview in --bs-gray-400 */
+.nav-tabs {
+  --bs-nav-link-color: var(--bs-secondary-color);
+  --bs-nav-link-padding-x: var(--space-sm);
+  --bs-nav-link-padding-y: var(--space-xs);
+  flex-wrap: nowrap;
+  width: max-content;
+  min-width: 100%;
 }
+
+.nav-tabs .nav-link {
+  font-weight: 600;
+  white-space: nowrap;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+}
+
+.nav-tabs > li > a:hover,
+.nav-tabs > li > a:focus-visible {
+  background: none;
+  border-bottom-color: var(--bs-gray-400);
+}
+
+.nav-tabs > li > a:focus:not(:focus-visible) {
+  background: none;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--bs-emphasis-color);
+  background: none;
+  border-bottom-color: var(--theme-500);
+}
+
+/* Tabs scroll sideways rather than wrap, with no scrollbar: while there's more to scroll one way, that edge fades
+   and an arrow sits over the fade (navWrappers in app.js wraps the .nav-wrapper in a .nav-scroller and adds the arrows) */
+.nav-scroller {
+  position: relative;
+}
+
+.nav-scroller-arrow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--bs-secondary-color);
+}
+
+.nav-scroller-arrow:hover {
+  color: var(--bs-emphasis-color);
+}
+
+.nav-scroller-start {
+  left: 0;
+  text-align: left;
+}
+
+.nav-scroller-end {
+  right: 0;
+  text-align: right;
+}
+
+/* Clear under the arrow, then the tabs fade in over 2rem */
+.nav-wrapper {
+  --clear-start: 0rem;
+  --fade-start: 0rem;
+  --clear-end: 0rem;
+  --fade-end: 0rem;
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, transparent var(--clear-start), #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent calc(100% - var(--clear-end)));
+}
+
+.nav-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-wrapper.fade-start {
+  --clear-start: 1.5rem;
+  --fade-start: 3.5rem;
+}
+
+.nav-wrapper.fade-end {
+  --clear-end: 1.5rem;
+  --fade-end: 3.5rem;
+}
+
 
 /* ==========================================================================
    Pagination
@@ -1907,38 +1963,6 @@ a.ui-button:active,
   text-decoration: none;
   background: var(--bs-gray-600);
   color: var(--bs-white);
-}
-
-.search-tab {
-  list-style-type: none;
-  margin: 0 calc(-1 * var(--content-padding));
-  padding: 0 var(--content-padding);
-  border-bottom: 1px solid var(--bs-gray-400);
-  white-space: nowrap;
-}
-
-.search-tab > li {
-  display: inline-block;
-}
-
-.search-tab > li a {
-  display: block;
-  padding: var(--space-xs);
-  color: var(--bs-secondary-color);
-  text-decoration: none;
-  margin-bottom: -1px;
-  border-bottom: 1px solid transparent;
-  font-weight: 600;
-}
-
-.search-tab > li a:hover,
-.search-tab > li a:focus {
-  border-bottom-color: var(--bs-emphasis-color);
-}
-
-.search-tab > li.active a {
-  color: var(--bs-emphasis-color);
-  border-bottom-color: var(--bs-emphasis-color);
 }
 
 .search-result-list {

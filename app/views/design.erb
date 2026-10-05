@@ -844,9 +844,9 @@
         <div class="border rounded p-4 d-flex flex-column gap-4">
           <div class="nav-wrapper">
             <ul class="nav nav-tabs">
-              <li class="nav-item"><a class="nav-link active" href="#components">Details</a></li>
-              <li class="nav-item"><a class="nav-link" href="#components">Tickets</a></li>
-              <li class="nav-item"><a class="nav-link" href="#components">Emails</a></li>
+              <% ['Basics', 'Description and confirmation', 'Tickets', 'Questions', 'Donations', 'Emails', 'Everything else'].each_with_index do |tab, i| %>
+                <li class="nav-item"><a class="nav-link<% if i.zero? %> active<% end %>" href="#components"><%= tab %></a></li>
+              <% end %>
             </ul>
           </div>
           <ul class="nav nav-pills">
@@ -854,7 +854,7 @@
             <li class="nav-item"><a class="nav-link" href="#components">Past</a></li>
             <li class="nav-item"><a class="nav-link" href="#components">Drafts</a></li>
           </ul>
-          <div class="spec">.nav · .875rem · hover and focus: dark text on --bs-secondary-bg, no focus ring · active pill --theme-500 · .tab-content padding 1rem · in .nav-wrapper, tabs scroll sideways on mobile</div>
+          <div class="spec">.nav · .875rem · no focus ring · .nav-tabs: weight 600 in --bs-secondary-color on a 1px --bs-border-color rule; the active tab --bs-emphasis-color with a 2px --theme-500 underline, which hover and keyboard focus preview in --bs-gray-400 · always in a .nav-wrapper: tabs never wrap but scroll sideways with no scrollbar, while there's more that way, a --bs-secondary-color chevron at that edge scrolls on by three quarters of a width, the tabs clear under it and fading in over the next 2rem, and the active tab scrolled into view · pills: hover and focus dark text on --bs-secondary-bg, active --theme-500 · .tab-content padding 1rem</div>
         </div>
       <% end %>
 
@@ -880,18 +880,20 @@
       <% end %>
     </div>
 
-    <% design_subsection 'Search page', 'The /search page (search.erb), and lists of people like birthdays. A large input with a round clear button, a row of underlined tabs, and results between rules.' do %>
+    <% design_subsection 'Search page', 'The /search page (search.erb), and lists of people like birthdays. A large input with a round clear button, a row of tabs, and results between rules.' do %>
       <div class="border rounded overflow-hidden" style="padding: var(--content-padding)">
         <div class="search-input">
           <a href="#components" class="search-close">×</a>
           <label class="visually-hidden" for="dg-search-page">Search</label>
           <input type="text" class="form-control form-control-lg" id="dg-search-page" autocomplete="off" value="maya">
         </div>
-        <ul class="search-tab">
-          <% %w[Events People Organisations Gatherings].each do |tab| %>
-            <li<% if tab == 'People' %> class="active"<% end %>><a href="#components"><%= tab %></a></li>
-          <% end %>
-        </ul>
+        <div class="nav-wrapper">
+          <ul class="nav nav-tabs">
+            <% %w[Events People Organisations Gatherings].each do |tab| %>
+              <li class="nav-item"><a class="nav-link<% if tab == 'People' %> active<% end %>" href="#components"><%= tab %></a></li>
+            <% end %>
+          </ul>
+        </div>
         <ul class="search-result-list mb-0">
           <% [%w[maya Maya maya@example.com], %w[jonas Jonas jonas@example.com]].each do |img, name, email| %>
             <li>
@@ -912,7 +914,7 @@
           <% end %>
         </ul>
       </div>
-      <div class="spec">.search-input: up to 32.5rem, form-control-lg, the clear button a 1.5rem --bs-gray-400 circle, --bs-gray-600 on hover · .search-tab: bleeds to the edges of #content, a --bs-gray-400 rule below; tabs weight 600 in --bs-secondary-color, the active one --bs-emphasis-color with a 1px underline of the same, which hover previews. It's the only underlined tab style: .nav-tabs and .nav-pills are for everything else · .search-result-list: each result base top and bottom with a 2px --bs-border-color rule below, the image floated in a 10rem column (5.625rem on mobile), the name an h2</div>
+      <div class="spec">.search-input: up to 32.5rem, form-control-lg, the clear button a 1.5rem --bs-gray-400 circle, --bs-gray-600 on hover · the tabs are .nav-tabs · .search-result-list: each result base top and bottom with a 2px --bs-border-color rule below, the image floated in a 10rem column (5.625rem on mobile), the name an h2</div>
     <% end %>
 
     <div class="row g-5">
