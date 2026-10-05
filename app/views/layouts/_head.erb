@@ -19,6 +19,10 @@
   <% end %>
 
   <%= partial :'layouts/dependencies' %>
+  <%# Set by the views' nav partials, which render before the layout %>
+  <% if @theme_color && !theme_css_redundant?(@theme_color) %>
+    <link href="/theme.css?theme_color=<%= CGI.escape(@theme_color) %>" rel="stylesheet">
+  <% end %>
 
   <%= favicon_tag 'logos/black-on-transparent-sq.png' %>
   <%= partial :'layouts/opengraph' %>

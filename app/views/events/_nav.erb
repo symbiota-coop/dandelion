@@ -1,7 +1,5 @@
+<%# layouts/_head links /theme.css, so the toasts above the page are themed before they show %>
 <% @theme_color = resolved_event_theme_color(event) %>
-<% if @theme_color %>
-  <link href="/theme.css?theme_color=<%=CGI.escape(@theme_color)%>" rel="stylesheet">
-<% end %>
 
 <% if event_admin? %>
   <div class="nav-crumbs">
