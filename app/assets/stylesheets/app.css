@@ -2460,6 +2460,11 @@ ul.map-event li {
    Events
    ========================================================================== */
 
+/* Between the description and the price at fs-4 */
+.ticket-type-name {
+  font-size: var(--font-size-base);
+}
+
 .ticket-type-description p {
   margin-bottom: 0;
 }
