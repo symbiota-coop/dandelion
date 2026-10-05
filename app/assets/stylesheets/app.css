@@ -2437,6 +2437,23 @@ ul.map-event li {
   margin-bottom: 0;
 }
 
+/* A ticket group's name heads its rows as plain text; the border above the first ticket type is its divider */
+#ticket-types td.ticket-group-heading {
+  font-family: var(--header-font-family);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--theme-600);
+  padding-top: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: none;
+}
+
+#ticket-types tr:first-child td.ticket-group-heading {
+  padding-top: 0.5rem;
+}
+
 /* On phones the ticket table's three columns are wider than the card, so the card's sides narrow, the cells take
    table-sm's padding, and the outer cells drop theirs, lining the table up with the card's padding */
 @media (max-width: 575.98px) {

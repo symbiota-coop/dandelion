@@ -11,7 +11,7 @@
 <% unless @no_ticket_groups %>
   <% tg = ticket_group_name || 'Other tickets'; if tg != @previous_ticket_group %>
   <tr>
-    <td colspan="3" class="text-bg-primary text-center fw-bold header-font text-uppercase small"><%= tg %></td>
+    <td colspan="3" class="ticket-group-heading"><%= tg %></td>
   </tr>
   <% @previous_ticket_group = ticket_group_name %>
 <% end %>
