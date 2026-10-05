@@ -1237,6 +1237,21 @@ p.action a {
   flex-shrink: 0;
 }
 
+/* Long names (an event's, often) are cut short with an ellipsis, the current item allowed a little more */
+.nav-crumbs .btn {
+  max-width: 20rem;
+  white-space: nowrap;
+}
+
+.nav-crumbs > .btn-group:last-child .btn {
+  max-width: 28rem;
+}
+
+.nav-crumbs .dropdown-nav-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 @media (max-width: 767.98px) {
   /* Right to left so it starts scrolled to the end (the current item), with order putting the items back left to right and safe flex-end keeping a short row on the left */
   .nav-crumbs {
@@ -1266,16 +1281,10 @@ p.action a {
   .nav-crumbs .btn {
     max-width: 12rem;
     font-size: var(--font-size-sm);
-    white-space: nowrap;
   }
 
   .nav-crumbs > .btn-group:last-child .btn {
     max-width: 14rem;
-  }
-
-  .nav-crumbs .dropdown-nav-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 }
 
