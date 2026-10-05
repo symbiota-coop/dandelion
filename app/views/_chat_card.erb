@@ -46,7 +46,7 @@
   <h3 class="card-header chill fw-bold d-lg-none"><%= title %></h3>
   <div class="card-body" id="chat-card-body">
     <div id="chat-container">
-      <div class="d-none d-lg-block p-2 text-bg-primary" style="border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0;">
+      <div class="d-none d-lg-block p-2 text-bg-primary rounded-top">
         <a id="chat-hide" style="<%= 'display:none' if !show_chat %>"        
             class="text-white" href="javascript:;"
             onclick="$('#chat').hide();$(this).hide().next().show();$('#chat-spacer').removeClass('d-lg-block');">
