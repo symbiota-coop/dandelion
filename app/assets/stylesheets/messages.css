@@ -16,7 +16,7 @@
 }
 
 .widget-chat > li + li {
-  margin-top: 0.625rem;
+  margin-top: var(--space-xs);
 }
 
 .widget-chat-media,
@@ -36,20 +36,20 @@
 }
 
 .widget-chat-media + .widget-chat-content {
-  padding-left: 0.625rem;
+  padding-left: var(--space-xs);
 }
 
 .widget-chat-message {
   background: var(--bs-gray-200);
   color: var(--bs-body-color);
-  padding: 0.375rem 0.625rem;
+  padding: var(--space-xs) var(--space-sm);
   position: relative;
   display: inline-block;
   border-radius: var(--bs-border-radius-xl);
 }
 
 .widget-chat-message + .widget-chat-message {
-  margin-top: 0.125rem;
+  margin-top: var(--space-2xs);
 }
 
 .widget-chat-message:before,
@@ -128,8 +128,8 @@
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  padding-left: var(--space-xs);
+  padding-right: var(--space-xs);
 }
 
 #thread-scroll.thread-scroll-prepin {
@@ -137,12 +137,12 @@
 }
 
 #thread-scroll .widget-chat-content {
-  padding-right: 2rem;
+  padding-right: var(--space-xl);
 }
 
 #thread-scroll .reply .widget-chat-content {
   padding-right: 0;
-  padding-left: 2rem;
+  padding-left: var(--space-xl);
 }
 
 #thread-scroll .widget-chat-message {

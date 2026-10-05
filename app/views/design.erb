@@ -269,7 +269,7 @@
       <div class="small text-body-secondary">The mobile event page's fixed tickets bar keeps its own upward shadow.</div>
     <% end %>
 
-    <% design_subsection 'Spacing', "One scale for padding, margins and gaps, as <code>--space-*</code> in app.css. Bootstrap's spacing utilities are the same scale without sm and xl, so in markup use the utility and in CSS the token. In app.css, values off the scale mostly size a control to match another (.375rem, btn-sm's padding, the nav crumbs' .625rem), line up with a fixed layout dimension (the header, the sidebar, search results' image column) or are px hairlines. docs.css, messages.css and marketing.css still have older off-scale values.".html_safe do %>
+    <% design_subsection 'Spacing', "One scale for padding, margins and gaps, as <code>--space-*</code> in app.css. Bootstrap's spacing utilities are the same scale without sm and xl, so in markup use the utility and in CSS the token. In app.css, values off the scale mostly size a control to match another (.375rem, btn-sm's padding, the nav crumbs' .625rem), line up with a fixed layout dimension (the header, the sidebar, search results' image column) or are px hairlines. The page-specific stylesheets are on the scale too, except for the same kinds of value: the docs select's room for its caret and the search icon's inset, and marketing sections' 3.5rem and 5rem, which are layout rather than spacing.".html_safe do %>
       <div class="border-bottom">
         <% [
              ['--space-2xs', '1', 'Label to field, dropdown and autocomplete items, sidebar sub-menu, badges in a row (mb-1, gap-1)'],
