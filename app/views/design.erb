@@ -1077,6 +1077,25 @@
       <div class="spec">Name h2 · labels: Featured text-bg-yellow, Sold out or Sales ended text-bg-danger, Locked text-bg-secondary · tags text-bg-primary, up to 5, with bi-stars when AI-tagged · .icon-list at fs-4, each line's icon hung 2em to the left, with a tooltip naming it</div>
     <% end %>
 
+    <% design_subsection 'Tiles', 'How organisations, gatherings and activities are listed (_block.erb, from organisations/, gatherings/ and activities/_blocks.erb): two to a row, then four from 992px, each 10rem high.' do %>
+      <%# _block.erb only calls image.thumb(...).url, so a stand-in serves the sample photo %>
+      <% sample_image = Struct.new(:url) { def thumb(_size) = self }.new('/images/test-event.jpg') %>
+      <% check = '<i data-bs-toggle="tooltip" title="Gratitude for financially supporting the Dandelion platform 🙏" class="bi bi-patch-check-fill"></i>' %>
+      <div class="row">
+        <% [
+             { title: 'Breathwork Collective', image: sample_image },
+             { title: 'Mira Khanya - Movement Medicine', image: nil, icon: check },
+             { title: 'The Way Forward: Awakened and Embodied Feminine Leadership Gathering - October 12th–14th', image: nil },
+             { title: 'Embercombe', image: sample_image, icon: check }
+           ].each do |tile| %>
+          <div class="col-6 col-lg-3 mb-3">
+            <%= partial :block, locals: { title: tile[:title], image: tile[:image], icon: tile[:icon], view_url: '#components', admin: false } %>
+          </div>
+        <% end %>
+      </div>
+      <div class="spec">Title .block-title: --font-size-lg, --font-size-xl from 992px, clamped to 5 lines, long words break · with an image: the photo under black at 50%, white text · without: .block-fill, the lavender wash (lavender-50 to paper) with a --hairline border, dark text · an icon such as the verified tick follows the title after a &amp;nbsp;, so it keeps to the line with its last word · admins get a pencil on hover, and activities a link to their organisation at the bottom right</div>
+    <% end %>
+
     <% design_subsection 'Carousel', 'Featured events and the organisation\'s own carousels (upcoming events, plus past ones with recordings) on organisation pages (events/_carousel.erb), with Slick: three to a slide from 992px, two from 576px, then one.' do %>
       <div class="slick-container" id="dg-slick">
         <div class="slick-responsive row justify-content-center">
