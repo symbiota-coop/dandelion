@@ -2824,6 +2824,7 @@ table.event-details td {
   align-items: center;
   gap: var(--space-xs);
   font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
 }
 
 .rating-breakdown-row > span {
