@@ -103,6 +103,12 @@ window.DandelionMap = {
   },
 
   fillScreen: function () {
+    // In an embed, the iframe grows to fit its content, so filling it would feed back on itself: size to the screen instead
+    if (window.self !== window.top) {
+      document.getElementById('map-canvas').style.height = Math.round(window.screen.availHeight * 0.7) + 'px';
+      return;
+    }
+
     const mapContainer = document.getElementById('map-container');
     const mapContainerTop = mapContainer.getBoundingClientRect().top;
     const headerHeight = mapContainerTop;
