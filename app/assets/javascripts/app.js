@@ -112,7 +112,7 @@ $(function () {
 
     function styleSelectElement (select) {
       if ($(select).find('option:selected').is(':disabled')) {
-        $(select).css('color', 'var(--bs-gray-600)');
+        $(select).css('color', 'var(--bs-secondary-color)');
       } else {
         $(select).css('color', '');
       }
