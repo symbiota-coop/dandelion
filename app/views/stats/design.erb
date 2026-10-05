@@ -227,7 +227,7 @@
           </div>
         <% end %>
       </div>
-      <div class="small text-body-secondary"><code>.h1</code>–<code>.h5</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. h5 is the smallest heading we use; h6 is the same size, so it's left to user-written descriptions. The heading sizes are set in bootstrap5.scss (<code>$h1-font-size</code>…), so <code>.fs-1</code>–<code>.fs-5</code> make text a heading's size without its weight or font. <code>.small</code> is Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is --bs-gray-600: <code>.text-body-secondary</code>, and form-text. <code>.subtle</code> is for links in it, which turn the theme colour on hover. <code>.underline-dotted</code> is for quiet links that read as part of a sentence (a rota's edit links) and text to copy.</div>
+      <div class="small text-body-secondary"><code>.h1</code>–<code>.h5</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. h5 is the smallest heading we use; h6 is the same size, so it's left to user-written descriptions. The heading sizes are set in bootstrap5.scss (<code>$h1-font-size</code>…), so <code>.fs-1</code>–<code>.fs-5</code> make text a heading's size without its weight or font. <code>.small</code> is Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is <code>--bs-secondary-color</code> (--bs-gray-600), set with <code>.text-body-secondary</code>; form-text takes it too. <code>.subtle</code> is for links in it, which turn the theme colour on hover. <code>.underline-dotted</code> is for quiet links that read as part of a sentence (a rota's edit links) and text to copy.</div>
     <% end %>
   <% end %>
 
@@ -990,7 +990,7 @@
             </div>
           </div>
         </div>
-        <div class="spec">messages.css, loaded only by /messages: their bubbles --bs-gray-200 with --bs-body-color text, yours --theme-500 with white text and underlined links, each --bs-border-radius-xl round with a tail at the bottom corner, on the left for theirs and the right for yours · their avatar a 1.5rem circle beside the bubble's tail · Read and when, --font-size-xs in --bs-gray-600, under your last message · the reply box is the ask box; Enter sends, Shift+Enter adds a line</div>
+        <div class="spec">messages.css, loaded only by /messages: their bubbles --bs-gray-200 with --bs-body-color text, yours --theme-500 with white text and underlined links, each --bs-border-radius-xl round with a tail at the bottom corner, on the left for theirs and the right for yours · their avatar a 1.5rem circle beside the bubble's tail · Read and when, --font-size-xs in --bs-secondary-color, under your last message · the reply box is the ask box; Enter sends, Shift+Enter adds a line</div>
       <% end %>
 
       <% design_subsection 'Mobile bottom sheet', col: 'col-lg-6' do %>
@@ -1416,7 +1416,7 @@
 
     <% design_subsection 'Empty states' do %>
       <div class="border rounded p-4"><p class="mb-0 text-body-secondary">No upcoming events</p></div>
-      <div class="spec">A short "No …" phrase in --bs-secondary-color (.text-body-secondary), left-aligned and without a full stop, where the list or table would be: grey, since it is the absence of content rather than content</div>
+      <div class="spec">A short "No …" phrase in --bs-secondary-color, left-aligned and without a full stop, where the list or table would be: grey, since it is the absence of content rather than content</div>
     <% end %>
 
     <% design_subsection 'p.action', "A centred call to action for docs and email previews, where a .btn class can't be added. Drawn like btn-primary; emails use their own in email.css." do %>
