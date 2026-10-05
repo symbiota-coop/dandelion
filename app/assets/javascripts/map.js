@@ -18,24 +18,27 @@ window.DandelionMap = {
     };
   },
 
-  // Helper function to generate cluster styles
+  // A cluster is a circle in a palette colour with a translucent halo. MarkerClusterer wants an image URL
+  // and Google Maps a plain colour, so the colour is resolved and drawn as an SVG
   generateClusterStyle: function (color, textSize = 16) {
+    const fill = cssColor(color)
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><circle cx="25" cy="25" r="25" fill="${fill}" fill-opacity=".4"/><circle cx="25" cy="25" r="20" fill="${fill}"/></svg>`
     return {
       textColor: 'white',
       textSize: textSize,
       fontFamily: 'Plus Jakarta Sans',
-      url: `/images/cluster-${color}.png`,
+      url: 'data:image/svg+xml,' + encodeURIComponent(svg),
       height: 50,
       width: 50
     };
   },
 
-  // Generate cluster styles using the helper function
+  // Clusters turn from the theme to orange to red as they grow
   get clusterStyles () {
     return [
-      this.generateClusterStyle('green'),
-      this.generateClusterStyle('yellow'),
-      this.generateClusterStyle('red', 14)
+      this.generateClusterStyle('var(--theme-500)'),
+      this.generateClusterStyle('var(--color-orange-500)'),
+      this.generateClusterStyle('var(--color-red-500)', 14)
     ];
   },
 

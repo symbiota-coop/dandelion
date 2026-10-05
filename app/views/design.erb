@@ -1352,14 +1352,17 @@
               <div class="spec mt-1"><%= label %></div>
             </div>
           <% end %>
-          <% [['green', 8], ['yellow', 42], ['red', 130]].each do |color, n| %>
+          <% [['var(--theme-500)', 8], ['var(--color-orange-500)', 42], ['var(--color-red-500)', 130]].each do |color, n| %>
             <div class="text-center">
-              <span class="d-inline-flex align-items-center justify-content-center fw-bold text-white" style="width: 50px; height: 50px; background: url('/images/cluster-<%= color %>.png') center / contain"><%= n %></span>
+              <span class="position-relative d-inline-flex align-items-center justify-content-center fw-bold text-white" style="width: 50px; height: 50px">
+                <svg class="position-absolute top-0 start-0" viewBox="0 0 50 50" width="50" height="50" aria-hidden="true"><circle cx="25" cy="25" r="25" fill="<%= color %>" fill-opacity=".4"></circle><circle cx="25" cy="25" r="20" fill="<%= color %>"></circle></svg>
+                <span class="position-relative"><%= n %></span>
+              </span>
               <div class="spec mt-1">cluster</div>
             </div>
           <% end %>
         </div>
-        <div class="spec mt-3">Google Maps (map.js): map-icons pins in --theme-500 for people and gatherings, --color-red-400 for events and organisations, each with its white Bootstrap icon · clusters green, yellow, then red as they grow, with white Plus Jakarta Sans counts · areas drawn in --color-orange-400, filled at 35%</div>
+        <div class="spec mt-3">Google Maps (map.js): map-icons pins in --theme-500 for people and gatherings, --color-red-400 for events and organisations, each with its white Bootstrap icon · clusters --theme-500, --color-orange-500, then --color-red-500 as they grow, each with a 40% halo, drawn as SVGs since MarkerClusterer takes an image, with white Plus Jakarta Sans counts · areas drawn in --color-orange-400, filled at 35%</div>
       <% end %>
     </div>
 
