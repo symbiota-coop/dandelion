@@ -2621,8 +2621,11 @@ table.event-details td {
   margin-bottom: var(--space-lg)
 }
 
+/* The grid's half-gutter: Bootstrap gives it to .row > *, but Slick moves the items out of the row into its track */
 .slick-container .slick-item {
   display: none;
+  padding-left: calc(var(--bs-gutter-x) * 0.5);
+  padding-right: calc(var(--bs-gutter-x) * 0.5);
 }
 
 .slick-container .slick-item:nth-child(1) {
