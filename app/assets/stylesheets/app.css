@@ -1641,6 +1641,31 @@ ul.pagination {
   }
 }
 
+/* Organisation, gathering and activity tiles (_block.erb): 10rem high, so the
+   title is clamped to the lines that fit, and long words break rather than
+   running out of the tile. Tiles without an image get the lavender wash */
+.block-fill {
+  background: linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-paper) 50%);
+  border: 1px solid var(--hairline);
+}
+
+.block-title {
+  font-size: var(--font-size-lg);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+@media (min-width: 992px) {
+  .block-title {
+    font-size: var(--font-size-xl);
+  }
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);

@@ -1,41 +1,28 @@
+<%# Tiles without an image get a wash (.block-fill) and dark text in place of the darkened photo and white text %>
+<% block_class = 'p-2 d-block block'
+   title_class = image ? 'text-white' : 'text-body'
+   block_style = 'height: 10rem; overflow: hidden;'
+   if image
+     block_style += " background: linear-gradient(rgba(var(--bs-black-rgb), 0.5), rgba(var(--bs-black-rgb), 0.5)), url('#{image.thumb('400x400').url}') center / cover;"
+   else
+     block_class += ' block-fill'
+   end %>
 <% if !defined?(bottom_url) && !admin %>
-  <a target="_parent" href="<%= view_url %>" class="p-2 d-block block"
-     style="
-     text-decoration: none;
-     height: 10rem; overflow: hidden;
-     <% if !image %>border: 0.175rem solid var(--bs-body-color); background: var(--bs-white);<% end %>
-     <% if image %>background: linear-gradient( rgba(var(--bs-black-rgb), 0.5), rgba(var(--bs-black-rgb), 0.5) ), url('<%= image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>
-     ">
-  <% else %>
-    <div class="p-2 d-block block"
-     style="
-     height: 10rem; overflow: hidden;
-     <% if !image %>border: 0.175rem solid var(--bs-body-color); background: var(--bs-white);<% end %>
-     <% if image %>background: linear-gradient( rgba(var(--bs-black-rgb), 0.5), rgba(var(--bs-black-rgb), 0.5) ), url('<%= image.thumb('400x400').url %>'); background-size: cover; background-position: center center;<% end %>
-     ">
-    <% end %>
+  <a target="_parent" href="<%= view_url %>" class="<%= block_class %>" style="text-decoration: none; <%= block_style %>">
+<% else %>
+  <div class="<%= block_class %>" style="<%= block_style %>">
+<% end %>
     <table class="w-100 h-100">
       <tr>
         <td class="align-top">
           <div class="row justify-content-between">
             <div class="col">
-              <h4 class="h2">
-                <% if !defined?(bottom_url) && !admin %>
-                  <span class="<% if image %>text-white<% else %>text-body<% end %>">
-                    <%= title %>
-                  </span>
-                <% else %>
-                  <a class="<% if image %>text-white<% else %>text-body<% end %>" target="_parent" href="<%= view_url %>" onclick="event.stopPropagation();">
-                    <%= title %>
-                  </a>
-                <% end %>
-                <% if defined?(icon) && icon %>
-                  <span class="<% if image %>text-white<% else %>text-body<% end %>">
-                    <%== icon %>
-                  </span>
-                <% end %>
+              <% icon = defined?(icon) ? icon.to_s.strip : '' %>
+              <h4 class="block-title">
+                <%# the icon follows the title with no space between them but a &nbsp;, so it stays on the line with the title's last word %>
+                <% if !defined?(bottom_url) && !admin %><span class="<%= title_class %>"><%= title %></span><% else %><a class="<%= title_class %>" target="_parent" href="<%= view_url %>" onclick="event.stopPropagation();"><%= title %></a><% end %><% unless icon.empty? %>&nbsp;<span class="<%= title_class %>"><%== icon %></span><% end %>
                 <% if admin %>
-                  <a class="<% if image %>text-white<% else %>text-body<% end %> block-edit" style="display: none" href="<%= edit_url %>" onclick="event.stopPropagation();">
+                  <a class="<%= title_class %> block-edit" style="display: none" href="<%= edit_url %>" onclick="event.stopPropagation();">
                     <i class="bi bi-pencil-fill"></i>
                   </a>
                 <% end %>
@@ -48,7 +35,7 @@
       <% if defined?(bottom_url) && bottom_url %>
         <tr>
           <td class="align-bottom text-end">
-            <a class="<% if image %>text-white<% else %>text-body<% end %>" target="_parent" href="<%= bottom_url %>" onclick="event.stopPropagation();">
+            <a class="<%= title_class %>" target="_parent" href="<%= bottom_url %>" onclick="event.stopPropagation();">
               <%= bottom_text %>
             </a>
           </td>
