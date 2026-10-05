@@ -17,7 +17,7 @@ Dandelion::App.helpers do
   end
 
   def currency_input_row(label:, field_name:, field_id:, value: nil)
-    input = number_field_tag field_name, value: value, id: field_id, class: 'form-control', disabled: true
+    input = number_field_tag field_name, value: value, id: field_id, class: 'form-control', style: 'width: 5em', disabled: true
     <<-HTML
       <tr>
         <td></td>

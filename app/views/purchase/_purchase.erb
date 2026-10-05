@@ -1,12 +1,6 @@
 <% if !can_purchase_event_tickets? %>
   <%= partial :'purchase/purchase_gate' %>
 <% else %>
-<style>
-  #totalDisplay, #credit, #fixed-discount, #balance {
-    width: 5em;
-  }
-</style>
-
 <%
 discount_code = nil
 if params[:discount_code]
