@@ -5,6 +5,10 @@
     }
   }
 
+  :root {
+    --chat-height: 400px;
+  }
+
   @media (min-width: 992px) {
     #chat-card {
       border: 0;
@@ -22,13 +26,18 @@
       background: white;
       position: fixed;
       width: 27.5em;
-      bottom: 0.475rem;
-      right: 0.475rem;
+      bottom: var(--space-xs);
+      right: var(--space-xs);
     }
 
     #chat {
-      height: 400px;
+      height: var(--chat-height);
       overflow: auto;
+    }
+
+    /* Room at the foot of the page, so the fixed chat doesn't cover the end of the content */
+    #chat-spacer {
+      margin-bottom: calc(var(--chat-height) + var(--space-xs));
     }
   }
 </style>
@@ -57,4 +66,4 @@
     </div>
   </div>
 </div>
-<div class="d-none <%= 'd-lg-block' if show_chat %>" id="chat-spacer" style="margin-bottom: 410px"></div>
+<div class="d-none <%= 'd-lg-block' if show_chat %>" id="chat-spacer"></div>

@@ -58,6 +58,7 @@ Always ask permission before running tests. Your default posture should be to su
 - Bootstrap 5 with jQuery: use `data-bs-*` attributes, logical spacing/alignment (`ms-*`, `me-*`, `text-end`, `float-start`), `form-select` on selects and `mb-3` between fields. `.form-inline` and `.form-group` are kept in `app.css` for filter forms
 - To show and hide elements from JS, start them hidden with `style="display: none"` and use jQuery `.show()` / `.hide()` / `.toggle()`, not `d-none` with `addClass` / `removeClass`. Bootstrap's `d-*` classes are `!important`, so they override `.hide()` and `.show()` on the same element. Keep `d-none d-md-block` and friends for purely responsive hiding
 - Badges are Bootstrap's `badge` with a `text-bg-*` class: `text-bg-primary`, `-secondary`, `-warning`, `-danger`, `-dark`, plus our `text-bg-yellow` and `text-bg-stripe`. Use them for counts, statuses, tags and amounts alike; for an outline badge use `badge text-primary border border-primary`. There is no `.label` and no `badge-*` colour class
+- Spacing (padding, margins, gaps) comes from one scale: Bootstrap's spacing utilities (`mb-3`, `gap-2`) in markup, and the `--space-*` tokens in `app.css` (`--space-2xs` .25rem to `--space-2xl` 3rem) in CSS. Don't use px or off-scale rem for spacing
 - Success is the theme colour, so use `-primary` (`btn-primary`, `text-bg-primary`, `alert-primary`, `toast-primary`, `text-primary` etc), never `-success`
 - `event_details.css` and `email.css` are inlined into emails, so they can't use CSS custom properties (`var(--x)`)
 

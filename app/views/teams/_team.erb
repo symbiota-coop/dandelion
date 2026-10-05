@@ -1,12 +1,12 @@
 <% if @team.intro %>
-  <div style="margin-bottom: 20px">
+  <div class="mb-3">
     <div class="wysiwyg">
       <%== Sanitize.fragment(Rinku.auto_link(@team.intro), Sanitize::Config::DANDELION) %>
     </div>
   </div>
 <% end %>
 <% if @team.budget %>
-  <div style="margin-bottom: 20px">
+  <div class="mb-3">
     <i class="bi bi-cash-coin"></i> This team has spent <%= m @team.spent, @gathering.currency %> of a budget of <%= m @team.budget, @gathering.currency %>
   </div>
 <% end %>

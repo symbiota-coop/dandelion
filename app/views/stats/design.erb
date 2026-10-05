@@ -18,7 +18,7 @@
     <div class="spec text-uppercase fw-bold">Design guide · v1 · October 2026</div>
     <h1 class="m-0">Dandelion</h1>
     <p class="m-0 readable">The visual language of dandelion.events as it exists in code today. This page is rendered with the site's own <code>app.css</code> and <code>bootstrap5.css</code>, so swatches, type and components are the real thing. The site is Bootstrap 5.3.8, restyled through its variables.</p>
-    <p class="m-0 small text-body-secondary">The root font size is 17px (19px from 1680px, 21px from 1920px), so rem values scale with the viewport. Sizes are in rem (or em, to follow the text); px is kept for 1–2px hairlines, shadows, the containers' 15px side padding (<code>$container-padding-x</code>) and overrides that must line up with Google Maps. Colour values, radii and type sizes are measured live; other sizes are copied from the stylesheets.</p>
+    <p class="m-0 small text-body-secondary">The root font size is 17px (19px from 1680px, 21px from 1920px), so rem values scale with the viewport. Sizes are in rem (or em, to follow the text); px is kept for 1–2px hairlines, shadows, the containers' 15px side padding (<code>$container-padding-x</code>) and overrides that must line up with Google Maps. Colour values, radii, type sizes and the spacing scale are measured live; other sizes are copied from the stylesheets.</p>
     <nav class="d-flex flex-wrap gap-2">
       <% design_sections.each do |id, (title, _)| %>
         <a class="btn btn-outline-primary btn-sm" href="#<%= id %>"><%= title %></a>
@@ -269,16 +269,37 @@
       <div class="small text-body-secondary">The mobile event page's fixed tickets bar keeps its own upward shadow.</div>
     <% end %>
 
-    <% design_subsection 'Spacing' do %>
+    <% design_subsection 'Spacing', "One scale for padding, margins and gaps, as <code>--space-*</code> in app.css. Bootstrap's spacing utilities are the same scale without sm and xl, so in markup use the utility and in CSS the token. Values off the scale are kept only where they size a control to match another (.375rem, btn-sm's padding), line up with a fixed layout dimension (the header and sidebar) or are px hairlines.".html_safe do %>
+      <div class="border-bottom">
+        <% [
+             ['--space-2xs', '1', 'Label to field, dropdown and autocomplete items, sidebar sub-menu, badges in a row (mb-1, gap-1)'],
+             ['--space-xs', '2', 'Nav links, dropdown headers, search tabs, filter form fields, cookie banner buttons'],
+             ['--space-sm', nil, 'Grid gutter, table cells, card headers, notification items, mobile sidebar links'],
+             ['--space-base', '3', 'Between fields (mb-3), mobile --content-padding, dropdown and list items across, alerts across'],
+             ['--space-lg', '4', '--content-padding, below a carousel'],
+             ['--space-xl', nil, 'Dandelion Daily: between article columns and articles'],
+             ['--space-2xl', '5', 'Between page sections (mt-5, mb-5)']
+           ].each do |name, utility, note| %>
+          <div data-spec-row class="py-3 border-top">
+            <div class="row align-items-center g-3">
+              <code class="col-6 col-md-2 spec"><%= name %></code>
+              <div class="col-6 col-md-2"><div data-space-sample class="rounded-1" style="width: var(<%= name %>); height: var(<%= name %>); min-width: 1px; background: var(--theme-500)"></div></div>
+              <code class="col-6 col-md-2 spec"><span data-css-value="<%= name %>"></span> · <span data-space-px></span></code>
+              <code class="col-6 col-md-1 spec"><%= utility ? "*-#{utility}" : '—' %></code>
+              <div class="col-md-5 small text-body-secondary"><%= note %></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
       <div class="row gx-4 row-cols-1 row-cols-md-2 row-cols-xl-3">
         <% [
-             ['Content padding · --content-padding', '1.5rem · mobile 1rem'],
-             ['Grid gutter', '.75rem'],
+             ['Content padding · --content-padding', 'lg · mobile base'],
+             ['Grid gutter', 'sm'],
              ['Container padding', '15px each side'],
              ['Card body', '1.25rem'],
-             ['Card header', '.75rem 1.25rem'],
-             ['Field spacing', 'mb-3'],
-             ['Table cells', '.75rem · sm .5rem'],
+             ['Card header', 'sm 1.25rem'],
+             ['Field spacing', 'mb-3 · base'],
+             ['Table cells', 'sm · table-sm xs'],
              ['Containers', '540 / 720 / 960 / 1140']
            ].each do |title, value| %>
           <div class="col">
@@ -912,7 +933,7 @@
             <li class="ui-menu-item"><div class="ui-menu-item-wrapper">Holotropic breathwork</div></li>
           </ul>
         </div>
-        <div class="spec">Search: offcanvas-top, 2.8125rem, --bs-gray-800, backdrop at .9 · autocomplete (here and on the messages page): flush under its input, so square at the top with the base radius below, and while it's open (.autocomplete-open) the input's bottom corners are square, with no bottom border or focus ring, like Select2, --hairline border, --bs-box-shadow, items .3125rem 1rem, hover --bs-tertiary-bg like dropdown items</div>
+        <div class="spec">Search: offcanvas-top, 2.8125rem, --bs-gray-800, backdrop at .9 · autocomplete (here and on the messages page): flush under its input, so square at the top with the base radius below, and while it's open (.autocomplete-open) the input's bottom corners are square, with no bottom border or focus ring, like Select2, --hairline border, --bs-box-shadow, items --space-2xs across --space-base, hover --bs-tertiary-bg like dropdown items</div>
       <% end %>
 
       <% design_subsection 'Notifications and messages dropdowns', col: 'col-lg-6' do %>
@@ -932,7 +953,7 @@
             <a class="list-group-item list-group-item-action text-center" href="#components">All notifications <i class="bi bi-arrow-right"></i></a>
           </div>
         </div>
-        <div class="spec">.notification-list: list-group-flush, items .625rem 1rem, smaller newsfeed icons · .message-preview: unread --theme-100, hover --bs-tertiary-bg like the notification items</div>
+        <div class="spec">.notification-list: list-group-flush, items --space-sm across --space-base, smaller newsfeed icons · .message-preview: unread --theme-100, hover --bs-tertiary-bg like the notification items</div>
       <% end %>
     </div>
 
@@ -1273,7 +1294,7 @@
         <div class="image-wall">
           <% %w[ruby hugi tibet ruby hugi tibet ruby].each do |img| %><img class="me-1" src="/images/advisors/<%= img %>.jpg" alt="" style="width: 50px; aspect-ratio: 1/1"><% end %>
         </div>
-        <div class="spec">.image-wall: who chose an option or is interested in an activity (options/_options.erb, comments/_voptions.erb, timetables/tactivity.erb), as 50px avatars that wrap, .2rem between rows · a "Show names" link swaps them for names separated by middots</div>
+        <div class="spec">.image-wall: who chose an option or is interested in an activity (options/_options.erb, comments/_voptions.erb, timetables/tactivity.erb), as 50px avatars that wrap, --space-2xs between rows · a "Show names" link swaps them for names separated by middots</div>
       <% end %>
     </div>
 
@@ -1468,9 +1489,13 @@
     $('[data-css-value]').each(function () {
       $(this).text(getComputedStyle(document.documentElement).getPropertyValue($(this).attr('data-css-value')).trim());
     });
-    $('[data-spec-row]').each(function () {
+    $('[data-spec-row]').has('[data-sample]').each(function () {
       var px = parseFloat(getComputedStyle($(this).find('[data-sample]')[0]).fontSize);
       $(this).find('[data-px]').text(Math.round(px * 10) / 10 + 'px');
+    });
+    $('[data-space-sample]').each(function () {
+      var px = parseFloat(getComputedStyle(this).height);
+      $(this).closest('[data-spec-row]').find('[data-space-px]').text(Math.round(px * 10) / 10 + 'px');
     });
   });
 </script>

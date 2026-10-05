@@ -1,6 +1,6 @@
 <% [%w[proposer propose], %w[supporter support]].each { |noun, verb| %>
 <% if @gathering.send("enable_#{noun.pluralize}") %>
-  <div style="margin-bottom: 10px">
+  <div class="mb-2">
     <%= pluralize(mapplication.verdicts.send(noun.pluralize).count, noun) %>
     <% if noun == 'proposer' and @gathering.proposing_delay and (Time.now - mapplication.created_at) < @gathering.proposing_delay.hours %>
       &middot; <small>Proposers accepted in <%= distance_of_time_in_words((mapplication.created_at + @gathering.proposing_delay * 60 * 60), Time.now) %></small>

@@ -89,7 +89,7 @@
     <% if @account.coordinates %>
       <div id="account-map">
         <style>
-          #map-canvas { height: 200px !important; margin-bottom: 1rem; margin-top: 1rem }
+          #map-canvas { height: 200px !important; margin-bottom: var(--space-base); margin-top: var(--space-base) }
         </style>
         <%= partial :'maps/map', locals: { points: [@account] } %>
       </div>

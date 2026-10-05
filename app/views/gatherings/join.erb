@@ -23,7 +23,7 @@
     <% if @gathering.member_limit and @gathering.memberships.count >= @gathering.member_limit %>
       <p><em><%= @gathering.name %> is now full with all <%= @gathering.member_limit %> places taken</em></p>
     <% else %>
-      <% form_for @account, "/g/#{@gathering.slug}/join", style: 'margin-top: 20px', id: 'join' do |f| %>
+      <% form_for @account, "/g/#{@gathering.slug}/join", class: 'mt-3', id: 'join' do |f| %>
         <script>
           $(function () {
             <% if !current_account || @membership %>
