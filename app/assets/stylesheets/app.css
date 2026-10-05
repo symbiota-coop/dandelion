@@ -2695,7 +2695,7 @@ td .tactivity-accept {
 .tactivity {
   position: relative;
   z-index: 99;
-  color: var(--bs-dark);
+  color: var(--bs-body-color);
   background: var(--bs-white);
   border: 2px solid var(--bs-body-color)
 }
