@@ -77,6 +77,11 @@ end
             <%= partial :'purchase/ticket_type', locals: { ticket_type: ticket_type } %>
             <% } %>
 
+            <%# The last ticket type's description has no line under it, so this divides the ticket types from the totals %>
+            <tr>
+              <td class="p-0" colspan="3"></td>
+            </tr>
+
             <%= partial :'purchase/discounts', locals: { discount_code: discount_code } %>
 
             <%= partial :'purchase/suggested_donation' %>

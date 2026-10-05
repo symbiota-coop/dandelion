@@ -1704,8 +1704,9 @@ table.dataTable.table-sm > thead > tr > th[class*="dt-order"] .dt-column-order {
   right: auto;
 }
 
-/* No line under a table's last row: Bootstrap 5 draws each row's line below it, Bootstrap 4 drew them above */
-.table > tbody:last-child > tr:last-child > * {
+/* No line under a table's last row: Bootstrap 5 draws each row's line below it, Bootstrap 4 drew them above.
+   last-of-type, as a hidden input or script after the last row would stop it being the last child */
+.table > tbody:last-child > tr:last-of-type > * {
   border-bottom-width: 0;
 }
 
