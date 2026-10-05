@@ -393,7 +393,7 @@
               <tr>
                 <td><code><%= klass %></code></td>
                 <td class="text-body-secondary"><%= meaning %></td>
-                <td><% texts.each do |text| %><span class="badge <%= klass %> me-1"><%== text %></span><% end %></td>
+                <td><div class="d-flex flex-wrap gap-1"><% texts.each do |text| %><span class="badge <%= klass %>"><%== text %></span><% end %></div></td>
               </tr>
             <% end %>
           </tbody>
