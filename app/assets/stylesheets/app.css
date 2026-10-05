@@ -2461,8 +2461,9 @@ ul.map-event li {
    Events
    ========================================================================== */
 
-/* Between the description and the price at fs-4 */
-.ticket-type-name {
+/* Ticket type names and prices share one size, a step above the description */
+.ticket-type-name,
+.ticket-type-price {
   font-size: var(--font-size-base);
 }
 
