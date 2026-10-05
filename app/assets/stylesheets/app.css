@@ -2473,10 +2473,8 @@ ul.map-event li {
 #ticket-types td.ticket-group-heading {
   font-family: var(--header-font-family);
   font-weight: 700;
-  font-size: 0.9375rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--theme-600);
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
   padding-top: var(--space-lg);
   padding-bottom: var(--space-xs);
   border-bottom: none;
@@ -2484,6 +2482,11 @@ ul.map-event li {
 
 #ticket-types tr:first-child td.ticket-group-heading {
   padding-top: var(--space-xs);
+}
+
+/* Under a group heading, the first divider is a heavier rule in the text colour, underlining the heading */
+#ticket-types tr:has(> td.ticket-group-heading) + tr > td.border-top {
+  border-top: 2px solid var(--bs-emphasis-color) !important;
 }
 
 /* With no group heading above it, the first divider would just underline the card header */
