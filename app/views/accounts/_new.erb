@@ -4,13 +4,15 @@
       <a href="/accounts/sign_in">Already a member? Sign in</a>
     </div>
     <% if !Provider.all.empty? %>
-      <% Provider.all.each do |provider| %>
-        <% if provider.omniauth_name == 'atproto' %>
-          <a class="btn btn-primary mb-1" href="javascript:;" onclick="$('#atproto-signup-form').show().find('input[type=text]').focus();$(this).hide()"><i class="<%= provider.icon %>"></i> Sign up with <%= provider.display_name %></a>
-        <% else %>
-          <a class="btn btn-primary mb-1" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Sign up with <%= provider.display_name %></a>
+      <div class="row g-2 mb-3">
+        <% Provider.all.each do |provider| %>
+          <% if provider.omniauth_name == 'atproto' %>
+            <div class="col-12 col-lg"><a class="btn btn-primary w-100" href="javascript:;" onclick="$('#atproto-signup-form').show().find('input[type=text]').focus();$(this).parent().hide()"><i class="<%= provider.icon %>"></i> Sign up with <%= provider.display_name %></a></div>
+          <% else %>
+            <div class="col-12 col-lg"><a class="btn btn-primary w-100" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Sign up with <%= provider.display_name %></a></div>
+          <% end %>
         <% end %>
-      <% end %>
+      </div>
       <%= partial :'accounts/atproto_form', locals: { id: 'atproto-signup-form', form_class: 'd-flex justify-content-center', button_text: 'Sign up' } %>
     <% end %>
   </div>
