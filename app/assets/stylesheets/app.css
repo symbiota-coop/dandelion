@@ -2120,6 +2120,15 @@ a.ui-button:active,
   .search-result-list .search-result-media + .search-result-content {
     margin-left: 6.5625rem;
   }
+
+  /* People results: the name and buttons sit beside the photo, and the details table goes under both */
+  .search-result-list .search-result-media + .search-result-stacked {
+    margin-left: 0;
+  }
+
+  .search-result-stacked .search-result-details {
+    clear: left;
+  }
 }
 
 .search {

@@ -9,7 +9,7 @@
             <a target="_blank" href="mailto:<%= account.email %>"><%= account.email %></a>
           </div>
           <% if current_account && current_account.id == account.id %>
-            <div class="col-auto">
+            <div class="col-12 col-sm-auto">
               <div data-pagelet-url="/accounts/privacyable/email"></div>
             </div>
           <% end %>
@@ -26,7 +26,7 @@
             <a target="_blank" href="tel:<%= account.phone %>"><%= account.phone %></a>
           </div>
           <% if current_account && current_account.id == account.id %>
-            <div class="col-auto">
+            <div class="col-12 col-sm-auto">
               <div data-pagelet-url="/accounts/privacyable/phone"></div>
             </div>
           <% end %>
@@ -43,7 +43,7 @@
             <a target="_blank" href="<%= account.website %>"><%= account.website %></a>
           </div>
           <% if current_account && current_account.id == account.id %>
-            <div class="col-auto">
+            <div class="col-12 col-sm-auto">
               <div data-pagelet-url="/accounts/privacyable/website"></div>
             </div>
           <% end %>
@@ -60,7 +60,7 @@
             <%= account.age %>
           </div>
           <% if current_account && current_account.id == account.id %>
-            <div class="col-auto">
+            <div class="col-12 col-sm-auto">
               <div data-pagelet-url="/accounts/privacyable/date_of_birth"></div>
             </div>
           <% end %>
@@ -92,7 +92,7 @@
             <%= account.gender %>
           </div>
           <% if current_account && current_account.id == account.id %>
-            <div class="col-auto">
+            <div class="col-12 col-sm-auto">
               <div data-pagelet-url="/accounts/privacyable/gender"></div>
             </div>
           <% end %>
@@ -109,7 +109,7 @@
             <%= account.location %>
           </div>
           <% if current_account && current_account.id == account.id %>
-            <div class="col-auto">
+            <div class="col-12 col-sm-auto">
               <div data-pagelet-url="/accounts/privacyable/location"></div>
             </div>
           <% end %>
@@ -126,7 +126,7 @@
             <%= time_ago_in_words account.last_active %> ago
           </div>
           <% if current_account && current_account.id == account.id %>
-            <div class="col-auto">
+            <div class="col-12 col-sm-auto">
               <div data-pagelet-url="/accounts/privacyable/last_active"></div>
             </div>
           <% end %>
