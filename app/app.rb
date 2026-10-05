@@ -295,6 +295,11 @@ module Dandelion
       erb :contact
     end
 
+    get '/design' do
+      @title = 'Design guide'
+      erb :design
+    end
+
     get '/features' do
       @no_content_padding_bottom = true
       @title = 'Features'

@@ -5,7 +5,7 @@
   <% if label %><div class="mb-1"><span class="fw-bold"><%= label %></span> <span class="text-body-secondary">· <%= label_note %></span></div><% end %>
   <div class="row g-2">
     <% notes.each do |step, note| %>
-      <%= partial :'stats/design/swatch', locals: { vars: ["#{prefix}-#{step}"], title: step, note: note, col: 'col-4 col-md' } %>
+      <%= partial :'design/swatch', locals: { vars: ["#{prefix}-#{step}"], title: step, note: note, col: 'col-4 col-md' } %>
     <% end %>
   </div>
 </div>

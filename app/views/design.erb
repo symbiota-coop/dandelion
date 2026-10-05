@@ -15,8 +15,7 @@
 <div class="design-guide d-flex flex-column gap-5">
 
   <header class="d-flex flex-column gap-3" style="max-width: 45rem">
-    <div class="spec text-uppercase fw-bold">Design guide · v1 · October 2026</div>
-    <h1 class="m-0">Dandelion</h1>
+    <h1 class="m-0">Design guide</h1>
     <p class="m-0 readable">The visual language of dandelion.events as it exists in code today. This page is rendered with the site's own <code>app.css</code> and <code>bootstrap5.css</code>, so swatches, type and components are the real thing. The site is Bootstrap 5.3.8, restyled through its variables.</p>
     <p class="m-0 small text-body-secondary">The root font size is 17px (19px from 1680px, 21px from 1920px), so rem values scale with the viewport. Sizes are in rem (or em, to follow the text); px is kept for 1–2px hairlines, shadows and the focus ring, for breakpoints and the container max-widths that fit inside them, and for overrides that must line up with Google Maps. Avatars take a size class (<code>.avatar-xs</code> to <code>.avatar-2xl</code>), not a width. Colour values, radii, type sizes and the spacing scale are measured live; other sizes are copied from the stylesheets.</p>
     <nav class="d-flex flex-wrap gap-2">
@@ -29,7 +28,7 @@
   <!-- COLOUR -->
   <% design_section 'colour' do %>
     <% design_subsection 'Theme', 'A ramp generated from one value with <code>oklch()</code>. Components use the 500 for fills, 600 for hover, 100 for alert, toast and badge backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints. The 400 is .06 lighter than the 500, or half way to the 200 when the 500 is too light for that, and the 300 is halfway between the 200 and 400, so the steps stay in order however light the colour. Every theme colour is a solid step of this ramp; the only translucent ones are the focus ring and .badge-overlay (the 500 at 70%, over images).'.html_safe do %>
-      <%= partial :'stats/design/ramp', locals: {
+      <%= partial :'design/ramp', locals: {
             prefix: '--theme',
             label: '--theme-*',
             label_note: "Primary and success · follows each organisation's theme",
@@ -48,7 +47,7 @@
     <% end %>
 
     <% design_subsection 'Lavender', "The default site's AI well and <code>.lavender-wash</code> backgrounds. Its steps come from --color-lavender-500, the default green turned to hue 300 at the same lightness and chroma, with the theme ramp's formulas.".html_safe do %>
-      <%= partial :'stats/design/ramp', locals: {
+      <%= partial :'design/ramp', locals: {
             prefix: '--color-lavender',
             notes: {
               '50' => '.lavender-wash, AI well background, features page section wash',
@@ -64,7 +63,7 @@
     <% end %>
 
     <% design_subsection 'Yellow', "For highlighted or rewarded things, through <code>text-bg-yellow</code>: Featured, Co-host, rota points, PATCH routes. Its steps come from --color-yellow-500 with the theme ramp's formulas. Yellow's 500 is the lightest (see Warning and danger), so its 200 to 500 sit close together, set apart more by saturation than lightness.".html_safe do %>
-      <%= partial :'stats/design/ramp', locals: {
+      <%= partial :'design/ramp', locals: {
             prefix: '--color-yellow',
             notes: {
               '50' => 'not used yet',
@@ -103,7 +102,7 @@
            }
          } %>
       <% [%w[Warning orange warning], %w[Danger red danger]].each do |title, colour, variant| %>
-        <%= partial :'stats/design/ramp', locals: {
+        <%= partial :'design/ramp', locals: {
               prefix: "--color-#{colour}",
               label: title,
               label_note: "--color-#{colour}-*",
@@ -116,7 +115,7 @@
     <% design_subsection 'Greys, black and white', "Bootstrap's own variables, set in bootstrap5.scss to near-neutral greys: Bootstrap's lightness steps with a trace of warmth (designed at oklch hue 75, chroma .00225–.003, then rounded to hex). Usage: 100 (<code>--bs-tertiary-bg</code>) body.canvas pages, wells and hovered dropdown, autocomplete and list items, and table stripes · 200 (<code>--bs-secondary-bg</code>) hovered nav links, table rows and secondary buttons, secondary badges and input add-ons · 300 table and secondary button borders · 400 input borders and hr · 500 sidebar sub-menu links and grey borders (comment boxes, the editor) · 600 secondary text · 700 input add-on text · 800 search bar · 900 header and sidebar. Body text (<code>--bs-body-color</code>) and emphasis text (<code>--bs-emphasis-color</code>, Bootstrap's black by default) are the same as 900. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows and image overlays. Hairlines (card, dropdown, autocomplete and cookie banner borders, date tiles, the .chill card header's divider, marketing cards) use <code>--hairline</code>, black at 10%: Bootstrap's <code>--bs-border-color-translucent</code>, set in bootstrap5.scss, so its cards and dropdowns share it.".html_safe do %>
       <div class="row g-3">
         <% %w[--bs-white --bs-gray-100 --bs-gray-200 --bs-gray-300 --bs-gray-400 --bs-gray-500 --bs-gray-600 --bs-gray-700 --bs-gray-800 --bs-gray-900 --bs-black].each do |name| %>
-          <%= partial :'stats/design/swatch', locals: { vars: [name], col: 'col-6 col-md-3 col-xl' } %>
+          <%= partial :'design/swatch', locals: { vars: [name], col: 'col-6 col-md-3 col-xl' } %>
         <% end %>
       </div>
     <% end %>
@@ -128,7 +127,7 @@
              [%w[--color-highlight], 'mark, .highlight'],
              [%w[--color-midnight], 'header sunset; root of the marketing pages\' purple']
            ].each do |vars, note| %>
-          <%= partial :'stats/design/swatch', locals: { vars: vars, note: note } %>
+          <%= partial :'design/swatch', locals: { vars: vars, note: note } %>
         <% end %>
       </div>
     <% end %>
@@ -141,7 +140,7 @@
              { fills: ['var(--gradient-rainbow)'], title: '--gradient-rainbow', note: '.gradient-text only.' },
              { fills: ['var(--gradient-header)'], title: '--gradient-header', note: 'The header: 45°, --bs-gray-900 to 66%, then midnight.' }
            ].each do |swatch| %>
-          <%= partial :'stats/design/swatch', locals: swatch %>
+          <%= partial :'design/swatch', locals: swatch %>
         <% end %>
       </div>
     <% end %>
@@ -154,7 +153,7 @@
              { vars: %w[--color-magenta-500 --color-magenta-200], note: 'section divider: 500 to 200' },
              { fills: 0.step(100, 25).map { |pct| "color-mix(in srgb, var(--color-magenta-500), var(--color-midnight) #{pct}%)" }, title: 'Magenta to midnight', note: 'color-mix, 0–100%' }
            ].each do |swatch| %>
-          <%= partial :'stats/design/swatch', locals: swatch %>
+          <%= partial :'design/swatch', locals: swatch %>
         <% end %>
       </div>
     <% end %>
@@ -171,7 +170,7 @@
              [%w[--color-gocardless --color-gocardless-text], 'GoCardless'],
              [%w[--color-mollie], 'Mollie']
            ].each do |vars, note| %>
-          <%= partial :'stats/design/swatch', locals: { vars: vars, fills: ["var(#{vars.first})"], title: vars.first, note: note } %>
+          <%= partial :'design/swatch', locals: { vars: vars, fills: ["var(#{vars.first})"], title: vars.first, note: note } %>
         <% end %>
       </div>
       <div class="d-flex flex-wrap gap-2 align-items-center">
@@ -320,7 +319,7 @@
           <span class="px-3"><i class="bi bi-search"></i></span>
           <span class="px-3 position-relative"><i class="bi bi-bell"></i><span class="position-absolute top-0 rounded-circle" style="right: .75rem; width: .5rem; height: .5rem; background: var(--gradient-active)"></span></span>
           <span class="px-3"><i class="bi bi-chat-left"></i></span>
-          <span class="px-2 d-flex align-items-center gap-2"><img class="d-block rounded-circle" src="/images/advisors/ruby.jpg" alt="" style="width: 1.75rem; height: 1.75rem; object-fit: cover"><span class="d-none d-md-inline" style="font-size: var(--font-size-sm)">Ruby <i class="bi bi-chevron-down"></i></span></span>
+          <span class="px-2 d-flex align-items-center gap-2"><img class="d-block rounded-circle" src="/images/samples/maya.jpg" alt="" style="width: 1.75rem; height: 1.75rem; object-fit: cover"><span class="d-none d-md-inline" style="font-size: var(--font-size-sm)">Maya <i class="bi bi-chevron-down"></i></span></span>
         </div>
       </div>
       <div class="d-flex" style="min-height: 26.25rem">
@@ -435,7 +434,7 @@
           </div>
           <div class="mb-3">
             <label for="dg-email">Email <span class="fw-normal text-body-secondary">· error</span></label>
-            <input type="text" class="form-control is-invalid" id="dg-email" autocomplete="off" value="ruby@example">
+            <input type="text" class="form-control is-invalid" id="dg-email" autocomplete="off" value="maya@example">
             <div class="invalid-feedback">Email is invalid</div>
           </div>
           <div class="mb-3">
@@ -715,7 +714,7 @@
             </div>
             <div class="d-flex gap-3 align-items-start mb-3">
               <span class="newsfeed-icon"><i class="bi bi-person-fill-add"></i></span>
-              <div><div class="mb-1"><b>Ruby</b> followed you</div><div class="text-body-secondary small">Yesterday</div></div>
+              <div><div class="mb-1"><b>Maya</b> followed you</div><div class="text-body-secondary small">Yesterday</div></div>
             </div>
             <a href="#components">All events →</a>
           </div>
@@ -748,8 +747,8 @@
     <div class="row g-5">
       <% design_subsection 'Key-value table', col: 'col-lg-6' do %>
         <table class="table table-hr mb-0">
-          <tr><td>Email</td><td><a href="#components">ruby@example.com</a></td></tr>
-          <tr><td>Website</td><td><a href="#components">https://ruby.example.com</a></td></tr>
+          <tr><td>Email</td><td><a href="#components">maya@example.com</a></td></tr>
+          <tr><td>Website</td><td><a href="#components">https://maya.example.com</a></td></tr>
           <tr><td>Location</td><td>Hackney, London</td></tr>
         </table>
         <div class="spec">.table-hr, for details (accounts/_table.erb, organisations/_table.erb, events/_info_table.erb, activity and local group pages): labels bold in a column only as wide as the longest, rows ruled with a --bs-gray-200 line and no other borders</div>
@@ -758,11 +757,11 @@
       <% design_subsection 'Striped table', col: 'col-lg-6' do %>
         <table class="table table-striped mb-0">
           <tr><td></td><td><strong>Kitchen</strong><br><span class="badge text-bg-yellow d-inline-block mb-1"><i class="bi bi-hand-index"></i> 2</span></td><td><strong>Welcome desk</strong><br><span class="badge text-bg-yellow d-inline-block mb-1"><i class="bi bi-hand-index"></i> 1</span></td></tr>
-          <% [%w[Friday ruby tibet], ['Saturday', 'hugi', nil], ['Sunday', nil, 'ruby']].each do |slot, *people| %>
+          <% [%w[Friday maya amara], ['Saturday', 'jonas', nil], ['Sunday', nil, 'maya']].each do |slot, *people| %>
             <tr>
               <td><strong><%= slot %></strong></td>
               <% people.each do |img| %>
-                <td><% if img %><img src="/images/advisors/<%= img %>.jpg" alt="" class="avatar avatar-sm"><% else %><a class="btn btn-primary btn-sm mb-1" href="#components">Sign up</a><% end %></td>
+                <td><% if img %><img src="/images/samples/<%= img %>.jpg" alt="" class="avatar avatar-sm"><% else %><a class="btn btn-primary btn-sm mb-1" href="#components">Sign up</a><% end %></td>
               <% end %>
             </tr>
           <% end %>
@@ -884,7 +883,7 @@
         <div class="search-input">
           <a href="#components" class="search-close">×</a>
           <label class="visually-hidden" for="dg-search-page">Search</label>
-          <input type="text" class="form-control form-control-lg" id="dg-search-page" autocomplete="off" value="ruby">
+          <input type="text" class="form-control form-control-lg" id="dg-search-page" autocomplete="off" value="maya">
         </div>
         <ul class="search-tab">
           <% %w[Events People Organisations Gatherings].each do |tab| %>
@@ -892,10 +891,10 @@
           <% end %>
         </ul>
         <ul class="search-result-list mb-0">
-          <% [%w[ruby Ruby ruby@example.com], %w[hugi Hugi hugi@example.com]].each do |img, name, email| %>
+          <% [%w[maya Maya maya@example.com], %w[jonas Jonas jonas@example.com]].each do |img, name, email| %>
             <li>
               <div class="search-result-media h-auto">
-                <img src="/images/advisors/<%= img %>.jpg" alt="" style="display: block; aspect-ratio: 1/1">
+                <img src="/images/samples/<%= img %>.jpg" alt="" style="display: block; aspect-ratio: 1/1">
               </div>
               <div class="search-result-content">
                 <h2><a class="text-body" href="#components"><%= name %></a></h2>
@@ -940,7 +939,7 @@
       <% design_subsection 'Notifications and messages dropdowns', col: 'col-lg-6' do %>
         <div class="dropdown-menu show position-relative align-self-start p-0" style="width: 22rem; max-width: 100%">
           <div class="list-group list-group-flush notification-list">
-            <% [['bi-person-fill-add', '<b>Ruby</b> followed you', '2 hours ago'], ['bi-ticket-detailed-fill', '<b>Sam</b> booked tickets to <b>Ecstatic dance</b>', 'Yesterday']].each do |icon, sentence, time| %>
+            <% [['bi-person-fill-add', '<b>Maya</b> followed you', '2 hours ago'], ['bi-ticket-detailed-fill', '<b>Sam</b> booked tickets to <b>Ecstatic dance</b>', 'Yesterday']].each do |icon, sentence, time| %>
               <a class="list-group-item list-group-item-action d-flex align-items-start gap-2" href="#components">
                 <span class="newsfeed-icon"><i class="bi <%= icon %>"></i></span>
                 <div class="notification-info flex-grow-1">
@@ -962,9 +961,9 @@
       <% design_subsection 'Messages', col: 'col-lg-6' do %>
         <div class="border rounded p-4">
           <div class="d-flex align-items-start mb-3">
-            <img src="/images/advisors/ruby.jpg" alt="" class="avatar avatar-md d-block">
+            <img src="/images/samples/maya.jpg" alt="" class="avatar avatar-md d-block">
             <div class="flex-grow-1 ms-3">
-              <h4 class="my-0"><a class="text-body" href="#components">Ruby</a></h4>
+              <h4 class="my-0"><a class="text-body" href="#components">Maya</a></h4>
             </div>
           </div>
           <div id="thread-scroll">
@@ -972,7 +971,7 @@
               <% [[true, 'Are you coming to the full moon gathering?'], [false, 'Yes! Can I bring a friend?'], [true, 'Of course, see you there 🌕'], [false, 'Thank you <a href="#components">dandelion.events/e/full-moon</a>']].each_with_index do |(incoming, body), i| %>
                 <li class="<%= 'reply' unless incoming %>">
                   <% if incoming %>
-                    <div class="widget-chat-media"><img src="/images/advisors/ruby.jpg" alt=""></div>
+                    <div class="widget-chat-media"><img src="/images/samples/maya.jpg" alt=""></div>
                   <% end %>
                   <div class="widget-chat-content">
                     <div class="widget-chat-message last"><%== body %></div>
@@ -1066,7 +1065,7 @@
               <span class="badge text-bg-primary d-inline-block mb-1"><i class="bi bi-stars"></i> healing</span>
             </div>
             <ul class="icon-list text-body fs-4">
-              <li><i data-bs-toggle="tooltip" title="Host/facilitators" class="bi bi-flag-fill"></i> <a class="text-body" href="#components">Ruby</a> and <a class="text-body" href="#components">Sam</a></li>
+              <li><i data-bs-toggle="tooltip" title="Host/facilitators" class="bi bi-flag-fill"></i> <a class="text-body" href="#components">Maya</a> and <a class="text-body" href="#components">Sam</a></li>
               <li><i data-bs-toggle="tooltip" title="Dates/times" class="bi bi-calendar-event"></i> Sat 4 Oct, 7–10pm</li>
               <li><i data-bs-toggle="tooltip" title="Location" class="bi bi-geo-alt-fill"></i> <a href="#components">Hackney, London</a></li>
             </ul>
@@ -1203,11 +1202,11 @@
                   <div class="modal-body">
                     <div class="mb-3">
                       <label for="dg-waitlist-name">Name</label>
-                      <input type="text" class="form-control" id="dg-waitlist-name" autocomplete="off" value="Ruby">
+                      <input type="text" class="form-control" id="dg-waitlist-name" autocomplete="off" value="Maya">
                     </div>
                     <div class="mb-0">
                       <label for="dg-waitlist-email">Email</label>
-                      <input type="email" class="form-control" id="dg-waitlist-email" autocomplete="off" value="ruby@example.com">
+                      <input type="email" class="form-control" id="dg-waitlist-email" autocomplete="off" value="maya@example.com">
                     </div>
                   </div>
                   <div class="modal-footer">
@@ -1228,10 +1227,10 @@
         <div class="card">
           <h3 class="card-header text-bg-primary">Lift shares from London</h3>
           <div class="card-body p-0 pb-3">
-            <% [['ruby', 'Ruby', '2 hours ago', "I'm driving down from Hackney on Friday morning, room for three. Message me!", [['💚', 4, true], ['🙏', 2, false]]],
-                ['hugi', 'Hugi', '1 hour ago', 'Count me in, thank you @Ruby', []]].each do |img, name, time, body, reactions| %>
+            <% [['maya', 'Maya', '2 hours ago', "I'm driving down from Hackney on Friday morning, room for three. Message me!", [['💚', 4, true], ['🙏', 2, false]]],
+                ['jonas', 'Jonas', '1 hour ago', 'Count me in, thank you @Maya', []]].each do |img, name, time, body, reactions| %>
               <div class="d-flex align-items-start m-0 px-2 pt-2">
-                <span class="me-2"><img src="/images/advisors/<%= img %>.jpg" alt="" class="avatar avatar-xs"></span>
+                <span class="me-2"><img src="/images/samples/<%= img %>.jpg" alt="" class="avatar avatar-xs"></span>
                 <div class="flex-grow-1 comment">
                   <strong><a href="#components"><%= name %></a></strong>
                   <small class="text-body-secondary"><%= time %></small>
@@ -1254,7 +1253,7 @@
         <div class="d-flex align-items-end flex-wrap gap-3">
           <% %w[xs sm md lg xl].each_with_index do |size, i| %>
             <div class="text-center">
-              <img src="/images/advisors/<%= %w[ruby hugi tibet ruby hugi][i] %>.jpg" alt="" class="avatar avatar-<%= size %><%= ' private' if i == 2 %>">
+              <img src="/images/samples/<%= %w[maya jonas amara maya jonas][i] %>.jpg" alt="" class="avatar avatar-<%= size %><%= ' private' if i == 2 %>">
               <div class="spec mt-1"><%= size %><%= ' · private' if i == 2 %></div>
             </div>
           <% end %>
@@ -1273,7 +1272,7 @@
           <div>
             <div class="row g-0 mb-3">
               <div class="col-auto me-2"><i class="bi bi-quote"></i></div>
-              <div class="col readable">A beautiful, gentle evening. Ruby held the space with such care.</div>
+              <div class="col readable">A beautiful, gentle evening. Maya held the space with such care.</div>
             </div>
             <em>Symbiota replied</em>
             <p class="mt-1 mb-0 readable read-more">&mdash; Thank you so much for coming!<br>We loved having you, and we'll be running the next one at the end of the month, with a longer sound bath.</p>
@@ -1293,7 +1292,7 @@
 
       <% design_subsection 'Image wall', col: 'col-lg-5' do %>
         <div class="image-wall">
-          <% %w[ruby hugi tibet ruby hugi tibet ruby].each do |img| %><img class="avatar avatar-sm me-1" src="/images/advisors/<%= img %>.jpg" alt=""><% end %>
+          <% %w[maya jonas amara maya jonas amara maya].each do |img| %><img class="avatar avatar-sm me-1" src="/images/samples/<%= img %>.jpg" alt=""><% end %>
         </div>
         <div class="spec">.image-wall: groups of people as avatars that wrap, --space-2xs between rows: who chose an option or is interested in an activity, team and gathering members, attendees, followers · on options, teams and rotas, a "Show names instead of pictures" link reloads them as names separated by middots</div>
       <% end %>
@@ -1325,7 +1324,7 @@
     <div class="row g-5">
       <% design_subsection 'Timetable', col: 'col-lg-6' do %>
         <div class="row g-3">
-          <% [['Morning yoga', 'Ruby', '5'], ['Sharing circle', 'Sam', nil]].each do |name, by, img| %>
+          <% [['Morning yoga', 'Maya', '5'], ['Sharing circle', 'Sam', nil]].each do |name, by, img| %>
             <div class="col-sm-6">
               <div class="tactivity<%= ' tactivity-image' if img %>"<% if img %> style="--tactivity-image: url('/images/dandelions/<%= img %>.jpeg')"<% end %>>
                 <div class="position-absolute" style="bottom: .5rem; left: .5rem">
@@ -1372,9 +1371,9 @@
             <div class="infowindow">
               <table>
                 <tr>
-                  <td class="pe-2"><img src="/images/advisors/ruby.jpg" alt="" class="avatar avatar-md"></td>
+                  <td class="pe-2"><img src="/images/samples/maya.jpg" alt="" class="avatar avatar-md"></td>
                   <td>
-                    <h4 class="mt-0"><a href="#components">Ruby</a></h4>
+                    <h4 class="mt-0"><a href="#components">Maya</a></h4>
                     <p class="mb-2">Hackney, London</p>
                   </td>
                 </tr>
@@ -1387,7 +1386,7 @@
 
       <% design_subsection 'Email previews', col: 'col-lg-7' do %>
         <div class="email-preview-iframe-container border rounded" style="height: 20rem">
-          <iframe title="Email preview" srcdoc="<%= '<body style="margin: 0; padding: 2rem; font-family: sans-serif; background: #f6f6f6"><div style="max-width: 32rem; margin: 0 auto; background: #fff; padding: 1.5rem; border-radius: 8px"><h2 style="margin-top: 0">Your tickets to Full moon gathering</h2><p>Thanks for booking, Ruby. Your tickets are attached.</p></div></body>' %>"></iframe>
+          <iframe title="Email preview" srcdoc="<%= '<body style="margin: 0; padding: 2rem; font-family: sans-serif; background: #f6f6f6"><div style="max-width: 32rem; margin: 0 auto; background: #fff; padding: 1.5rem; border-radius: 8px"><h2 style="margin-top: 0">Your tickets to Full moon gathering</h2><p>Thanks for booking, Maya. Your tickets are attached.</p></div></body>' %>"></iframe>
         </div>
         <div class="spec">.email-preview-iframe-container, on the ticket, reminder and feedback request email pages (events/ticket_email.erb and friends): the email rendered by its own route into a borderless iframe that fills the container, 80vh tall (20rem here)</div>
       <% end %>
