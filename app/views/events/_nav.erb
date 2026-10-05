@@ -59,9 +59,6 @@
     </div>
   <% end %>
   <% if event.persisted? %>
-    <style>
-      #event_stats thead th { border-top: none }
-    </style>
     <div class="d-none d-md-block">
       <%= partial :'events/event_stats', locals: { events: Event.unscoped.and(:id.in => [event.id]), organisation: (params[:cohost] && Organisation.find_by(slug: params[:cohost])) || event.organisation } %>
     </div>

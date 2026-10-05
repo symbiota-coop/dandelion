@@ -31,14 +31,6 @@
 </script>
 
 <% if !@event  %>
-  <style>
-    #event_stats th:first-child, #event_stats td:first-child { position: sticky; left: 0; width: 15em; min-width: 15em; max-width: 15em; z-index: 999 }
-    #event_stats td:first-child { border-right: 1px solid black }
-
-    #event_stats thead, #event_stats th { background: white }
-    #event_stats tr:nth-child(even) td:first-child { background-color: white }
-    #event_stats tr:nth-child(odd) td:first-child { background-color: var(--bs-gray-200) }
-  </style>
   <script>
     $(function () {
 
@@ -93,7 +85,7 @@
 <% if @event %>
   <%== '<div class="table-responsive mb-3">' %>
 <% end %>
-<table id="event_stats" class="table <% if @event %> mb-0 <% else %> table-striped table-hover <% end %> table-sm small">
+<table id="event_stats" class="table <% if @event %> mb-0 <% else %> table-striped table-hover event-stats-sticky <% end %> table-sm small">
   <thead>
     <tr>
       <th>Name</th>

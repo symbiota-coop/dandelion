@@ -1755,6 +1755,27 @@ body .table > tfoot > tr > th {
   border-bottom: none;
 }
 
+/* Stats for many events (events/_event_stats.erb): the name column stays put when scrolling sideways, so it needs a background. Odd rows take the stripe, which Bootstrap paints over the background as an inset shadow */
+.event-stats-sticky th:first-child,
+.event-stats-sticky td:first-child {
+  position: sticky;
+  left: 0;
+  width: 15em;
+  min-width: 15em;
+  max-width: 15em;
+  z-index: 999;
+}
+
+.event-stats-sticky td:first-child {
+  border-right: 1px solid var(--bs-black);
+  background-color: var(--bs-white);
+}
+
+.event-stats-sticky thead,
+.event-stats-sticky th {
+  background: var(--bs-white);
+}
+
 /* ==========================================================================
    jQuery UI autocomplete
    ========================================================================== */
