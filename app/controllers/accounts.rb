@@ -132,6 +132,11 @@ Dandelion::App.controller do
   get '/accounts/subscriptions' do
     sign_in_code_required!
     @account = current_account
+    @organisationships = @account.organisationships.includes(:organisation).select(&:organisation)
+    @activityships_by_organisation_id = @account.activityships.includes(:activity).select(&:activity).group_by { |activityship| activityship.activity.organisation_id }
+    @local_groupships_by_organisation_id = @account.local_groupships.includes(:local_group).select(&:local_group).group_by { |local_groupship| local_groupship.local_group.organisation_id }
+    @memberships = @account.memberships.includes(:gathering).select(&:gathering)
+    @teamships_by_gathering_id = @account.teamships.includes(:team).select(&:team).group_by(&:gathering_id)
     erb :'accounts/subscriptions'
   end
 

@@ -15,26 +15,32 @@
   </style>
 
   <div id="subscriptions">
-    <% if @account.organisationships.exists? %>
+    <% if @organisationships.any? %>
       <h2 class="my-3">Organisations</h2>
       <ul>
-        <% @account.organisationships.includes(:organisation).each { |organisationship| organisation = organisationship.organisation %>
+        <% @organisationships.each { |organisationship| organisation = organisationship.organisation %>
         <li>
           <a href="/o/<%= organisation.slug %>"><%= organisation.name %></a>
-          <div class="d-inline-block" data-pagelet-url="/o/<%= organisation.slug %>/organisationship"></div>
+          <div class="d-inline-block" data-pagelet-url="/o/<%= organisation.slug %>/organisationship">
+            <%= partial :'organisations/organisationship', locals: { organisation: organisation, organisationship: organisationship } %>
+          </div>
           <ul>
-            <% @account.activityships.includes(:activity).and(:activity_id.in => organisation.activities.pluck(:id)).each { |activityship| activity = activityship.activity %>
+            <% (@activityships_by_organisation_id[organisation.id] || []).each { |activityship| activity = activityship.activity %>
             <li>
-              <a href="/o/<%= activity.organisation.slug %>/a/<%= activity.slug %>"><%= activity.name %></a>
-              <div class="d-inline-block" data-pagelet-url="/activities/<%= activity.id %>/activityship"></div>
+              <a href="/o/<%= organisation.slug %>/a/<%= activity.slug %>"><%= activity.name %></a>
+              <div class="d-inline-block" data-pagelet-url="/activities/<%= activity.id %>/activityship">
+                <%= partial :'activities_and_local_groups/resourceship', locals: { resource: activity, resourceship: activityship, resourceship_name: 'activityship', resource_path: "/activities/#{activity.id}" } %>
+              </div>
             </li>
             <% } %>
           </ul>
           <ul>
-            <% @account.local_groupships.includes(:local_group).and(:local_group_id.in => organisation.local_groups.pluck(:id)).each { |local_groupship| local_group = local_groupship.local_group %>
+            <% (@local_groupships_by_organisation_id[organisation.id] || []).each { |local_groupship| local_group = local_groupship.local_group %>
             <li>
-              <a href="/o/<%= local_group.organisation.slug %>/lg/<%= local_group.slug %>"><%= local_group.name %></a>
-              <div class="d-inline-block" data-pagelet-url="/local_groups/<%= local_group.id %>/local_groupship"></div>
+              <a href="/o/<%= organisation.slug %>/lg/<%= local_group.slug %>"><%= local_group.name %></a>
+              <div class="d-inline-block" data-pagelet-url="/local_groups/<%= local_group.id %>/local_groupship">
+                <%= partial :'activities_and_local_groups/resourceship', locals: { resource: local_group, resourceship: local_groupship, resourceship_name: 'local_groupship', resource_path: "/local_groups/#{local_group.id}" } %>
+              </div>
             </li>
             <% } %>
           </ul>
@@ -42,18 +48,22 @@
         <% } %>
       </ul>
     <% end %>
-    <% if @account.memberships.exists? %>
+    <% if @memberships.any? %>
       <h2 class="my-3">Gatherings</h2>
       <ul>
-        <% @account.memberships.includes(:gathering).each { |membership| gathering = membership.gathering %>
+        <% @memberships.each { |membership| gathering = membership.gathering %>
         <li>
           <a href="/g/<%= gathering.slug %>"><%= gathering.name %></a>
-          <div class="d-inline-block" data-pagelet-url="/g/<%= gathering.slug %>/subscribe"></div>
+          <div class="d-inline-block" data-pagelet-url="/g/<%= gathering.slug %>/subscribe">
+            <%= partial :'gatherings/subscribe', locals: { membership: membership } %>
+          </div>
           <ul>
-            <% @account.teamships.includes(:team).and(:team_id.in => gathering.teams.pluck(:id)).each { |teamship| team = teamship.team %>
+            <% (@teamships_by_gathering_id[gathering.id] || []).each { |teamship| team = teamship.team %>
             <li>
               <a href="/g/<%= gathering.slug %>/teams/<%= team.id %>"><%= team.name %></a>
-              <div class="d-inline-block" data-pagelet-url="/teamships/<%= teamship.id %>/subscribe"></div>
+              <div class="d-inline-block" data-pagelet-url="/teamships/<%= teamship.id %>/subscribe">
+                <%= partial :'teams/subscribe', locals: { teamship: teamship } %>
+              </div>
             </li>
             <% } %>
           </ul>

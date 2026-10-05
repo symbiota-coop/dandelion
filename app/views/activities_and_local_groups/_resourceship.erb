@@ -1,5 +1,5 @@
 <% if current_account %>
-  <% resourceship = current_account.send(:"#{resourceship_name.pluralize}").find_by(:"#{resource.class.name.underscore}" => resource)
+  <% resourceship ||= current_account.send(:"#{resourceship_name.pluralize}").find_by(:"#{resource.class.name.underscore}" => resource)
      state_options = {
        'not_following' => 'Follow',
        'follow_without_subscribing' => 'Following',
