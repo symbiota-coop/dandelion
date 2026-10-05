@@ -877,6 +877,13 @@ p.action a {
   color: var(--theme-500);
 }
 
+/* In a selected menu item (a dropdown, the mobile sheet or a pill), whose fill is the 500, a count turns
+   to its 800 with white text, so it sits in the selection rather than standing out of it as a pale pill */
+:is(.dropdown-item, .list-group-item, .nav-pills .nav-link).active .badge:is(.text-bg-primary, .text-bg-secondary) {
+  color: var(--bs-white) !important;
+  background: var(--variant-800) !important;
+}
+
 /* Labels over images, like the carousel's dates: filled with their variant's 500 at 70%, so the image shows through, and square */
 .badge.badge-overlay:is(.text-bg-primary, .text-bg-danger) {
   color: var(--bs-white) !important;
