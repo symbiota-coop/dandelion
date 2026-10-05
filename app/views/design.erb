@@ -1351,10 +1351,7 @@
                 ['jonas', 'Jonas', 3, '2 weeks ago', false]].each do |img, name, stars, time, quote| %>
               <tr class="align-middle">
                 <td class="w-100">
-                  <div class="d-flex align-items-center gap-2">
-                    <div class="feedback-avatar"><img src="<%= img ? "/images/samples/#{img}.jpg" : '/images/silhouette.png' %>" alt="" class="avatar avatar-sm"></div>
-                    <div><% if img %><a href="#components"><%= name %></a><% else %><%= name %><% end %> on <a href="#components">Full moon gathering</a></div>
-                  </div>
+                  <% if img %><a href="#components"><%= name %></a><% else %><%= name %><% end %> on <a href="#components">Full moon gathering</a>
                 </td>
                 <td class="text-nowrap"><% stars.times do %><i class="bi bi-star-fill"></i><% end %></td>
                 <td class="text-nowrap text-end"><small><%= time %></small></td>
@@ -1383,7 +1380,7 @@
             </div>
           </div>
         </div>
-        <div class="spec">.average-rating (event_feedbacks/_average_rating.erb): the average at --font-size-2xl, the count in --bs-secondary-color, a star per point · the list (event_feedbacks/_event_feedbacks.erb): rows middle-aligned, the name cell taking the spare width so the stars and the right-aligned date sit together on the right, and an avatar-sm in a .feedback-avatar slot before each name, so names line up: the account's picture, or its Gravatar, or /images/silhouette.png, and for anonymous feedback and people who aren't publicly visible the silhouette alone, with no link or name tooltip · public answers beside a bi-quote, in a row under their entry, at .readable · .read-more (app.js) cuts a reply at its first line break and adds a Read more link at --font-size-xs, which shows the rest · the feedback form (event_feedbacks/build.erb, styled by event_feedbacks.css): five 2.75rem stars on a --bs-tertiary-bg panel, radius lg, --bs-gray-300 until chosen, then --color-orange-400 with .chosen</div>
+        <div class="spec">.average-rating (event_feedbacks/_average_rating.erb): the average at --font-size-2xl, the count in --bs-secondary-color, a star per point · the list (event_feedbacks/_event_feedbacks.erb): rows middle-aligned, the name cell taking the spare width so the stars and the right-aligned date sit together on the right · no profile pictures: the name links to the profile, or for people who aren't publicly visible is abbreviated with no link, and anonymous feedback reads Anonymous · public answers beside a bi-quote, in a row under their entry, at .readable · .read-more (app.js) cuts a reply at its first line break and adds a Read more link at --font-size-xs, which shows the rest · the feedback form (event_feedbacks/build.erb, styled by event_feedbacks.css): five 2.75rem stars on a --bs-tertiary-bg panel, radius lg, --bs-gray-300 until chosen, then --color-orange-400 with .chosen</div>
       <% end %>
 
       <% design_subsection 'Image wall', col: 'col-lg-5' do %>

@@ -3113,15 +3113,6 @@ td .tactivity-accept {
   width: 100%;
 }
 
-/* Feedback lists (event_feedbacks/_event_feedbacks.erb): a slot as wide as an sm avatar, so names line up */
-.feedback-avatar {
-  flex: 0 0 3.125rem;
-}
-
-.feedback-avatar img {
-  display: block;
-}
-
 img.private {
   opacity: 0.5
 }
