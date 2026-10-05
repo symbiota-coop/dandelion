@@ -102,7 +102,7 @@ class SearchTest < ActiveSupport::TestCase
     create_event(name: 'Full Page Event Search', prices: [0])
 
     visit '/search?q=Full&type=events'
-    assert page.has_selector?('ul.search-tab li.active', text: 'Events')
+    assert page.has_selector?('.nav-tabs .nav-link.active', text: 'Events')
     assert page.has_content?('Full Page Event Search')
   end
 
@@ -110,7 +110,7 @@ class SearchTest < ActiveSupport::TestCase
     FactoryBot.create(:account, name: 'Full Page Account Search', has_signed_in: true)
 
     visit '/search?q=Full&type=accounts'
-    assert page.has_selector?('ul.search-tab li.active', text: 'People')
+    assert page.has_selector?('.nav-tabs .nav-link.active', text: 'People')
     assert page.has_content?('Full Page Account Search')
   end
 
@@ -118,7 +118,7 @@ class SearchTest < ActiveSupport::TestCase
     create_organisation(name: 'Full Page Organisation Search')
 
     visit '/search?q=Full&type=organisations'
-    assert page.has_selector?('ul.search-tab li.active', text: 'Organisations')
+    assert page.has_selector?('.nav-tabs .nav-link.active', text: 'Organisations')
     assert page.has_content?('Full Page Organisation Search')
   end
 
@@ -126,7 +126,7 @@ class SearchTest < ActiveSupport::TestCase
     create_gathering(:public, name: 'Full Page Gathering Search')
 
     visit '/search?q=Full&type=gatherings'
-    assert page.has_selector?('ul.search-tab li.active', text: 'Gatherings')
+    assert page.has_selector?('.nav-tabs .nav-link.active', text: 'Gatherings')
     assert page.has_content?('Full Page Gathering Search')
   end
 
@@ -164,7 +164,7 @@ class SearchTest < ActiveSupport::TestCase
     visit '/search?q=event:Unquoted'
     # Should stay on search page (partial match doesn't redirect)
     assert_equal '/search', page.current_path
-    assert page.has_selector?('ul.search-tab li.active', text: 'Events')
+    assert page.has_selector?('.nav-tabs .nav-link.active', text: 'Events')
     assert page.has_content?('Unquoted Event Search')
   end
 
