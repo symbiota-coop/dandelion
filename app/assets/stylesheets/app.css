@@ -1058,6 +1058,15 @@ p.action a {
   padding: 0.375rem var(--space-xs)
 }
 
+/* The events and facilitators view switchers (_view_options.erb): white buttons that keep their text colour on hover */
+#view-options .btn {
+  background-color: var(--bs-white);
+}
+
+#view-options .btn:hover {
+  color: inherit;
+}
+
 /* ==========================================================================
    Carets
    ========================================================================== */
