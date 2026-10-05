@@ -536,10 +536,9 @@
   opacity: 1;
 }
 
-/* A group's chevron turns to point up while its submenu is open */
+/* A group's chevron points up while its submenu is open, flipping at once rather than turning */
 .sidebar .nav-link .caret {
   display: inline-block;
-  transition: transform var(--transition-fast);
 }
 
 .sidebar .nav-link[aria-expanded="true"] .caret {
@@ -1798,6 +1797,17 @@ ul.pagination {
     border-radius: var(--bs-border-radius);
     box-shadow: var(--bs-box-shadow-sm);
     overflow: hidden;
+  }
+
+  /* The image fills its half of the card, cropped, when the text is taller than it */
+  .row.block .block-image a {
+    display: block;
+    height: 100%;
+  }
+
+  .row.block .block-image img {
+    height: 100%;
+    object-fit: cover;
   }
 }
 
