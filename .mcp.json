@@ -45,7 +45,7 @@
       ],
       "env": {
         "MAILGUN_API_KEY": "${MAILGUN_API_KEY}",
-        "MAILGUN_API_REGION": "${MAILGUN_API_REGION:-eu}"
+        "MAILGUN_API_REGION": "${MAILGUN_API_REGION}"
       }
     }
   }

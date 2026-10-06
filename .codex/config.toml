@@ -1,3 +1,5 @@
+# Generated from .mcp.json by `rake mcp:sync`. Don't edit this file
+
 [mcp_servers.sentry]
 url = "https://mcp.sentry.dev/mcp"
 
