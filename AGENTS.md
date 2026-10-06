@@ -54,14 +54,18 @@ Always ask permission before running tests. Your default posture should be to su
 
 ## Design
 
+The design guide (`/design`, `app/views/design.erb`) shows the colours, type, spacing, components and their classes. Check it before styling anything, and keep it up to date when you change them. The rules it doesn't spell out:
+
 - Stylesheets are plain CSS. Never edit `bootstrap5.css` (compiled vendor CSS): override Bootstrap in `app.css`, or change its variables in `bootstrap5.scss` and run `rake bootstrap:build` (needs Node). Page-specific styles go in their own file loaded only by those pages (e.g. `docs.css`, `messages.css`)
-- Bootstrap 5 with jQuery: use `data-bs-*` attributes, logical spacing/alignment (`ms-*`, `me-*`, `text-end`, `float-start`), `form-select` on selects and `mb-3` between fields. `.form-inline` and `.form-group` are kept in `app.css` for filter forms
-- To show and hide elements from JS, start them hidden with `style="display: none"` and use jQuery `.show()` / `.hide()` / `.toggle()`, not `d-none` with `addClass` / `removeClass`. Bootstrap's `d-*` classes are `!important`, so they override `.hide()` and `.show()` on the same element. Keep `d-none d-md-block` and friends for purely responsive hiding
-- Badges are Bootstrap's `badge` with a `text-bg-*` class: `text-bg-primary`, `-secondary`, `-warning`, `-danger`, `-dark`, plus our `text-bg-yellow` and `text-bg-stripe`. Use them for counts, statuses, tags and amounts alike; for an outline badge use `badge text-primary border border-primary`. There is no `.label` and no `badge-*` colour class
-- Spacing (padding, margins, gaps) comes from one scale: Bootstrap's spacing utilities (`mb-3`, `gap-2`) in markup, and the `--space-*` tokens in `app.css` (`--space-2xs` .25rem to `--space-2xl` 3rem) in CSS. Don't use px or off-scale rem for spacing
-- Sizes are in rem (or em to follow the text). px only for 1–2px hairlines, shadows, the focus ring, breakpoints (and the container max-widths that fit them) and Google Maps overrides
-- Avatars: `partial :'accounts/square', locals: { account:, size: :xs }`, `:xs` to `:2xl` (default `:sm`) or `:fill`, which sets `.avatar .avatar-<size>`. For a bare `<img>` of an account, use `class="avatar avatar-sm"` rather than a width
-- Success is the theme colour, so use `-primary` (`btn-primary`, `text-bg-primary`, `alert-primary`, `toast-primary`, `text-primary` etc), never `-success`
+- Bootstrap 5 with jQuery: use `data-bs-*` attributes, logical spacing/alignment (`ms-*`, `me-*`, `text-end`, `float-start`), `form-select` on selects and `mb-3` between fields
+- Filter forms above lists and tables use `.form-inline` and `.form-group` (kept in `app.css`) inside `.searchForm`; add `.submitOnChange` to submit when a field changes. Date fields take `.datepicker` or `.datetimepicker`, which `app.js` wires up
+- Tooltips are `data-bs-toggle="tooltip"` and a `title`; `app.js` handles them for the whole page, so content loaded later needs no setup
+- To show and hide elements from JS, start them hidden with `style="display: none"` and use jQuery `.show()` / `.hide()` / `.toggle()`, not `d-none` with `addClass` / `removeClass` (Bootstrap's `d-*` classes are `!important`). Keep `d-none d-md-block` and friends for purely responsive hiding
+- Success is the theme colour, so use `-primary`, never `-success`. Badges are `badge text-bg-*`; there is no `.label` and no `badge-*` colour class
+- Colours, radii and shadows come from tokens (`--theme-*`, `--color-*`, `--bs-gray-*`, `--hairline`, Bootstrap's radius and shadow variables and classes), never hex values, custom values or new translucent tints, so organisation themes follow
+- Motion: state changes fade over `--transition-fast`. Only colours, shadows and masks animate; nothing new slides, scales, turns or bounces
+- Spacing comes from the scale: Bootstrap's spacing utilities in markup, `--space-*` tokens in CSS, never px or off-scale rem. Other sizes are in rem (or em); px only for hairlines, shadows, the focus ring, breakpoints and Google Maps overrides
+- Avatars: `partial :'accounts/square', locals: { account:, size: :xs }` (`:xs` to `:2xl`, default `:sm`, or `:fill`). For a bare `<img>` of an account, use `class="avatar avatar-sm"` rather than a width
 - `event_details.css` and `email.css` are inlined into emails, so they can't use CSS custom properties (`var(--x)`)
 
 ## Dependencies
