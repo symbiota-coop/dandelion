@@ -8,6 +8,6 @@
 :root {
   --theme-500: #00af5e;
   --theme-500-rgb: 0, 175, 94;
-  --ai-well-from: var(--theme-50);
+  --ai-well-from: var(--theme-100);
   --ai-well-to: var(--theme-400);
 }

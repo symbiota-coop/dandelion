@@ -35,8 +35,8 @@
             label: '--theme-*',
             label_note: "Primary and success · follows each organisation's theme",
             notes: {
-              '50' => 'crumbs, newsfeed icons, date tile months, docs transcripts, themed AI well',
-              '100' => 'alert, toast and badge background, crumb hover, unread messages',
+              '50' => 'crumbs, newsfeed icons, date tile months, docs transcripts',
+              '100' => 'alert, toast and badge background, crumb hover, unread messages, themed AI well start',
               '200' => 'progress tracks, blockquote and transcript borders',
               '300' => nil,
               '400' => 'themed AI well end, Stripe Connect fees in the contributions chart',
@@ -52,8 +52,8 @@
       <%= partial :'design/ramp', locals: {
             prefix: '--color-lavender',
             notes: {
-              '50' => '.lavender-wash, AI well background, features page section wash',
-              '100' => 'not used yet',
+              '50' => '.lavender-wash, features page section wash',
+              '100' => 'AI well gradient start',
               '200' => 'not used yet',
               '300' => 'not used yet',
               '400' => 'AI well gradient end',
@@ -1478,7 +1478,7 @@
       </div>
     <% end %>
 
-    <% design_subsection 'AI well and ask box', "The AI well is the only sheen, so the gradient itself marks AI: 135°, <code>--ai-well-from</code> flat to halfway, then to <code>--ai-well-to</code>. That's --color-lavender-50 to --color-lavender-400 on the default site, and the theme's 50 to 400 on themed pages (theme.css). Padding 1rem, radius lg.".html_safe do %>
+    <% design_subsection 'AI well and ask box', "The AI well is the only sheen, so the gradient itself marks AI: 135°, <code>--ai-well-from</code> flat to halfway, then to <code>--ai-well-to</code>. That's --color-lavender-100 to --color-lavender-400 on the default site, and the theme's 100 to 400 on themed pages (theme.css). Padding 1rem, radius lg.".html_safe do %>
       <div class="row g-4 align-items-start">
         <div class="col-lg-6">
           <div class="ai-well"><b>Suggested description</b><br>A gentle evening of breathwork and sound for all levels.</div>

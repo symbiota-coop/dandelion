@@ -56,7 +56,7 @@
   --color-lavender-600: oklch(from var(--color-lavender-500) calc(l - 0.05) c h);
   --color-lavender-800: oklch(from var(--color-lavender-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
   /* The default site's own accent, which themed pages switch to the theme (theme.css) */
-  --ai-well-from: var(--color-lavender-50);
+  --ai-well-from: var(--color-lavender-100);
   --ai-well-to: var(--color-lavender-400);
   --color-paper: #FFFAF3;
   --body-font-family: "Plus Jakarta Sans", sans-serif;
