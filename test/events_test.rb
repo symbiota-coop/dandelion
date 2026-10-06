@@ -406,6 +406,14 @@ class EventsTest < ActiveSupport::TestCase
     assert activity.errors[:website].any?
   end
 
+  test 'location signal group link rejects javascript:' do
+    location = Location.new(name: 'Somewhere', signal_group_link: 'javascript:alert(1)')
+    refute location.valid?
+    assert location.errors[:signal_group_link].any?
+    location.signal_group_link = 'https://signal.group/#abc'
+    assert location.valid?
+  end
+
   test 'an existing bad value does not block saving other fields' do
     create_organisation
     @organisation.set(website: 'javascript:alert(1)')

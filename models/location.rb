@@ -9,5 +9,6 @@ class Location
   field :signal_group_link, type: String
 
   validates_uniqueness_of :name
+  validates_http_url :signal_group_link
 
 end
