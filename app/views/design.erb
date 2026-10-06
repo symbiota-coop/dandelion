@@ -446,15 +446,15 @@
     <div class="row g-5">
       <% design_subsection 'Forms', col: 'col-lg-6' do %>
         <div class="border rounded p-4">
-          <div class="mb-3">
-            <label for="dg-event-name">Event name</label>
-            <input type="text" class="form-control" id="dg-event-name" autocomplete="off" value="Full moon gathering">
-          </div>
-          <div class="mb-3">
-            <label for="dg-email">Email <span class="fw-normal text-body-secondary">· error</span></label>
-            <input type="text" class="form-control is-invalid" id="dg-email" autocomplete="off" value="maya@example">
-            <div class="invalid-feedback">Email is invalid</div>
-          </div>
+          <%# Fields from lib/form_builder.rb, on unsaved records: an event's name, and an account's email with an error added %>
+          <% form_for design_build_event('Full moon gathering'), '#components', onsubmit: 'return false' do |f| %>
+            <%= f.text_block :name %>
+          <% end %>
+          <% account = design_sample_account('Maya Okoro', 'maya', email: 'maya@example') %>
+          <% account.errors.add(:email, 'is invalid') %>
+          <% form_for account, '#components', onsubmit: 'return false' do |f| %>
+            <%= f.text_block :email %>
+          <% end %>
           <div class="mb-3">
             <label for="dg-location">Location <span class="fw-normal text-body-secondary">· focused</span></label>
             <input type="text" class="form-control" id="dg-location" autocomplete="off" placeholder="Search for a place" style="border-color: var(--theme-500); box-shadow: var(--focus-ring)">
