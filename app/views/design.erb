@@ -1102,14 +1102,14 @@
       </div>
     <% end %>
 
-    <% design_subsection 'Event block', 'How events are listed on organisation and search pages (events/_block.erb, with _block_main.erb). From 992px the image sits on the right and the row gets a --bs-tertiary-bg panel with base radius; below that the image stacks on top.' do %>
+    <% design_subsection 'Event block', 'How events are listed on organisation and search pages (events/_block.erb, with _block_main.erb). From 992px the image sits on the right, filling its half (cropped when the text is taller), and the row is a white card with a --hairline border, base radius and --bs-box-shadow-sm; below that the image stacks on top.' do %>
       <div class="row block g-0 align-items-stretch">
-        <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white">
+        <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white block-image">
           <a href="#components"><img class="w-100" src="/images/test-event.jpg" alt=""></a>
         </div>
         <div class="col-lg-6 order-lg-1">
           <div class="ms-1 p-lg-3">
-            <div class="mb-2">
+            <div class="event-title-line fs-2 mb-2">
               <h4 class="h2 d-inline me-1"><a class="text-body" href="#components">Breathwork and sound journey</a></h4>
               <span class="badge text-bg-yellow align-middle me-1">Featured</span>
               <span class="badge text-bg-danger align-middle me-1">Sold out</span>
