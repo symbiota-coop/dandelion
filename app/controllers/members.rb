@@ -13,6 +13,7 @@ Dandelion::App.controller do
     when :html
       erb :'gatherings/members'
     when :csv
+      # By design, any confirmed member (not just admins) can export the full member list including emails
       CSV.generate do |csv|
         row = %w[name firstname lastname email proposed_by accepted_at options requested_contribution paid]
         @gathering.joining_questions_a.each { |q| row << q }
