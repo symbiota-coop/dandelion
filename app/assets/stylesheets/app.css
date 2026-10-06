@@ -269,7 +269,7 @@
 
 .header .navbar-icon {
   min-width: 2.625rem;
-  font-size: 1.125rem;
+  font-size: var(--font-size-lg);
 }
 
 .header .navbar-icon i {
@@ -869,7 +869,7 @@ p.action a {
 
 /* Beside an h1, h2 or h3 an em-sized badge would be nearly heading-sized, so it stays at body size, centred on the heading's line */
 :is(h1, h2, h3, .h1, .h2, .h3) .badge {
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   vertical-align: middle;
 }
 
@@ -879,7 +879,7 @@ p.action a {
 }
 
 .event-title-line .badge {
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   vertical-align: middle;
   margin-inline-end: var(--space-2xs);
 }
@@ -2091,7 +2091,7 @@ a.ui-button:active,
   height: 1.5rem;
   text-align: center;
   line-height: 1.225rem;
-  font-size: 1.125rem;
+  font-size: var(--font-size-lg);
   color: var(--bs-white);
   background: var(--bs-gray-400);
   border-radius: var(--bs-border-radius-pill);
@@ -2593,7 +2593,7 @@ ul.map-event li {
   align-items: center;
   justify-content: center;
   padding: var(--space-xs) var(--space-base);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   border-radius: var(--bs-border-radius);
 }
 
@@ -2907,7 +2907,7 @@ table.event-details td {
   justify-content: center;
   flex-shrink: 0;
   border-radius: 50%;
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   color: var(--theme-500);
   background-color: var(--theme-50);
   width: 2.25em;

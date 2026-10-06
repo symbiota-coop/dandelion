@@ -29,7 +29,7 @@
   max-height: calc(100vh - var(--sticky-top) - var(--space-base));
   overflow-y: auto;
   scrollbar-width: thin;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 #design-nav .nav-link {
