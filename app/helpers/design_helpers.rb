@@ -62,7 +62,7 @@ Dandelion::App.helpers do
   def design_sample_event
     @design_sample_event ||= begin
       event = design_build_event('Breathwork and sound journey', featured: true, sold_out_cache: true)
-      [['Maya Okoro', 'maya'], ['Sam Lee', 'jonas']].each { |name, photo| event.event_facilitations.build(account: design_sample_account(name, photo)) }
+      [['Maya Okoro', 'maya'], ['Jonas Berg', 'jonas']].each { |name, photo| event.event_facilitations.build(account: design_sample_account(name, photo)) }
       %w[breathwork sound healing].each { |name| event.event_tagships.build(event_tag: EventTag.new(name: name)) }
       event
     end

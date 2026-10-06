@@ -982,7 +982,7 @@
           <div class="list-group list-group-flush notification-list">
             <% maya = design_sample_account('Maya Okoro', 'maya') %>
             <% [Notification.new(type: 'created_profile', notifiable: maya, circle: maya, created_at: 2.hours.ago),
-                Notification.new(type: 'joined_team', notifiable: Teamship.new(account: design_sample_account('Sam Lee', 'jonas'), team: Team.new(name: 'Kitchen')), circle: Gathering.new(name: 'Breathwork retreat'), created_at: 1.day.ago)].each do |notification| %>
+                Notification.new(type: 'joined_team', notifiable: Teamship.new(account: design_sample_account('Jonas Berg', 'jonas'), team: Team.new(name: 'Kitchen')), circle: Gathering.new(name: 'Breathwork retreat'), created_at: 1.day.ago)].each do |notification| %>
               <a class="list-group-item list-group-item-action d-flex align-items-start gap-2" href="#components">
                 <%= partial :notification_summary, locals: { notification: notification } %>
               </a>
