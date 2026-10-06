@@ -8,7 +8,7 @@
       "type": "http",
       "url": "https://mcp.render.com/mcp",
       "headers": {
-        "Authorization": "Bearer $RENDER_AUTH_TOKEN"
+        "Authorization": "Bearer ${RENDER_AUTH_TOKEN}"
       }
     },
     "mongodb": {
@@ -17,7 +17,7 @@
         "-y",
         "mongodb-mcp-server",
         "--connectionString",
-        "$MONGODB_CONNECTION_STRING",
+        "${MONGODB_CONNECTION_STRING}",
         "--readOnly"
       ]
     },
@@ -29,7 +29,7 @@
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/",
       "headers": {
-        "Authorization": "Bearer $GITHUB_PAT"
+        "Authorization": "Bearer ${GITHUB_PAT}"
       }
     },
     "cloudflare-api": {
@@ -43,9 +43,9 @@
         "@mailgun/mcp-server"
       ],
       "env": {
-        "MAILGUN_API_KEY": "$MAILGUN_API_KEY",
-        "MAILGUN_API_REGION": "$MAILGUN_API_REGION"
+        "MAILGUN_API_KEY": "${MAILGUN_API_KEY}",
+        "MAILGUN_API_REGION": "${MAILGUN_API_REGION:-eu}"
       }
-    }    
+    }
   }
 }
