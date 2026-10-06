@@ -1059,17 +1059,10 @@
       <% today = Date.today; png_date = "#{today.strftime('%b').downcase}_#{today.strftime('%d')}" %>
       <div class="row g-4">
         <div class="col-lg-6">
-          <div class="d-flex flex-wrap align-items-center gap-2 mb-3" style="font-size: var(--font-size-base)">
-            <span class="event-detail calendar-date">
-              <span class="month"><span class="month-text"><%= today.strftime('%b') %></span></span>
-              <span class="day"><%= today.day %></span>
-            </span>
-            <span class="text-nowrap me-3"><%= today.strftime('%a %-d %b') %></span>
-            <a href="#components" class="event-detail location"><img src="/images/icons/_geo-alt.png" alt=""></a>
-            <span class="me-3">Location</span>
-            <a href="#components" class="event-detail link"><img src="/images/icons/_link.png" alt=""></a>
-            <span>Link</span>
-          </div>
+          <%# events/_details.erb, as on the event page, for the sample event (@event while it renders) %>
+          <% event_was, @event = @event, design_sample_event %>
+          <%= partial :'events/details', locals: { n: 1, events: [@event] } %>
+          <% @event = event_was %>
           <div class="spec">Site: .event-detail.calendar-date, .event-detail.location (or the camera for online events) and .event-detail.link · hover one</div>
         </div>
         <div class="col-lg-6">
