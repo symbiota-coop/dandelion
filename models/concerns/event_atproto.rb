@@ -60,6 +60,8 @@ module EventAtproto
   def atproto_client_for_record
     record_did = atproto_record_did
     return unless record_did
+    # Only ever touch calendar event records, never other records in the repo (posts, profile etc.)
+    return unless atproto_uri.split('/')[3] == ATPROTO_COLLECTION
 
     return organisation.atproto_client if organisation&.atproto_connected? && organisation.atproto_did == record_did
 

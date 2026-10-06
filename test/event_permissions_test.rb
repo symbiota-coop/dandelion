@@ -478,4 +478,17 @@ class EventPermissionsTest < ActiveSupport::TestCase
     assert_equal 'Shared title', other.name
     assert_equal 'new zoom', other.extra_info_for_ticket_email
   end
+
+  test 'atproto_uri is protected from mass assignment' do
+    assert_includes Event.protected_attributes, 'atproto_uri'
+  end
+
+  test 'atproto client is only returned for calendar event records' do
+    create_event
+    @organisation.set(atproto_handle: 'org.bsky.social', atproto_app_password: 'password', atproto_did: 'did:plc:org')
+    @event.atproto_uri = "at://did:plc:org/#{Event::ATPROTO_COLLECTION}/abc"
+    assert @event.atproto_client_for_record
+    @event.atproto_uri = 'at://did:plc:org/app.bsky.feed.post/abc'
+    assert_nil @event.atproto_client_for_record
+  end
 end
