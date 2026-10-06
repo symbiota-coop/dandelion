@@ -20,7 +20,7 @@
         <% end %>
         <% if @gathering.enable_shift_worth %>
           <br />
-          <span data-bs-toggle="tooltip" title="<%=pluralize sprintf('%g', role.worth), 'point'%>" class="badge text-bg-yellow d-inline-block mb-1"><i class="bi bi-hand-index"></i> <%=sprintf('%g', role.worth)%></span>
+          <span data-bs-toggle="tooltip" title="<%=pluralize sprintf('%g', role.worth), 'point'%>" class="badge text-bg-yellow mb-1"><i class="bi bi-hand-index"></i> <%=sprintf('%g', role.worth)%></span>
         <% end %>
       </strong>
     </td>
@@ -46,7 +46,7 @@
         <% end %>
         <% if @gathering.enable_shift_worth %>
           <br />
-          <span data-bs-toggle="tooltip" title="<%=pluralize sprintf('%g', rslot.worth), 'point'%>" class="badge text-bg-yellow d-inline-block mb-1"><i class="bi bi-hand-index"></i> <%=sprintf('%g', rslot.worth)%></span>
+          <span data-bs-toggle="tooltip" title="<%=pluralize sprintf('%g', rslot.worth), 'point'%>" class="badge text-bg-yellow mb-1"><i class="bi bi-hand-index"></i> <%=sprintf('%g', rslot.worth)%></span>
         <% end %>
       </strong>
     </td>

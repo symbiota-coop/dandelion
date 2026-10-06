@@ -873,13 +873,15 @@ p.action a {
   vertical-align: middle;
 }
 
-/* An event block's title line (events/_block_main) is the heading's size, so badges beside the heading stay at body size and align-middle centres them on its line */
+/* An event block's title line (events/_block_main) is the heading's size, so badges beside the heading stay at body size, centred on its line */
 .event-title-line {
   line-height: 1.2;
 }
 
 .event-title-line .badge {
   font-size: 1rem;
+  vertical-align: middle;
+  margin-inline-end: var(--space-2xs);
 }
 
 .btn-primary .badge {

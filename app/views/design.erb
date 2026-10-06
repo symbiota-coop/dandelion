@@ -681,9 +681,9 @@
         </div>
         <div class="popular-locations">
           <span class="d-inline-block mb-1">Popular locations:</span>
-          <a class="badge d-inline-block mb-1 text-bg-primary" href="#components">London</a>
+          <a class="badge mb-1 text-bg-primary" href="#components">London</a>
           <% %w[Bristol Totnes Brighton].each do |place| %>
-            <a class="badge d-inline-block mb-1 text-primary border border-primary" href="#components"><%= place %></a>
+            <a class="badge mb-1 text-primary border border-primary" href="#components"><%= place %></a>
           <% end %>
           <a href="#components"><i class="bi bi-three-dots"></i></a>
         </div>
@@ -815,7 +815,7 @@
 
       <% design_subsection 'Striped table', col: 'col-lg-6' do %>
         <table class="table table-striped mb-0">
-          <tr><td></td><td><strong>Kitchen</strong><br><span class="badge text-bg-yellow d-inline-block mb-1"><i class="bi bi-hand-index"></i> 2</span></td><td><strong>Welcome desk</strong><br><span class="badge text-bg-yellow d-inline-block mb-1"><i class="bi bi-hand-index"></i> 1</span></td></tr>
+          <tr><td></td><td><strong>Kitchen</strong><br><span class="badge text-bg-yellow mb-1"><i class="bi bi-hand-index"></i> 2</span></td><td><strong>Welcome desk</strong><br><span class="badge text-bg-yellow mb-1"><i class="bi bi-hand-index"></i> 1</span></td></tr>
           <% [%w[Friday maya amara], ['Saturday', 'jonas', nil], ['Sunday', nil, 'maya']].each do |slot, *people| %>
             <tr>
               <td><strong><%= slot %></strong></td>
@@ -1111,14 +1111,14 @@
           <div class="ms-1 p-lg-3">
             <div class="event-title-line fs-2 mb-2">
               <h4 class="h2 d-inline me-1"><a class="text-body" href="#components">Breathwork and sound journey</a></h4>
-              <span class="badge text-bg-yellow align-middle me-1">Featured</span>
-              <span class="badge text-bg-danger align-middle me-1">Sold out</span>
+              <span class="badge text-bg-yellow">Featured</span>
+              <span class="badge text-bg-danger">Sold out</span>
             </div>
             <div class="mb-2">
               <% %w[breathwork sound].each do |tag| %>
-                <span class="badge text-bg-primary d-inline-block mb-1"><%= tag %></span>
+                <span class="badge text-bg-primary mb-1"><%= tag %></span>
               <% end %>
-              <span class="badge text-bg-primary d-inline-block mb-1"><i class="bi bi-stars"></i> healing</span>
+              <span class="badge text-bg-primary mb-1"><i class="bi bi-stars"></i> healing</span>
             </div>
             <ul class="icon-list text-body fs-4">
               <li><i data-bs-toggle="tooltip" title="Host/facilitators" class="bi bi-flag-fill"></i> <a class="text-body" href="#components">Maya</a> and <a class="text-body" href="#components">Sam</a></li>
