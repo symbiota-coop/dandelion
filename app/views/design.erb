@@ -1116,13 +1116,15 @@
     <% design_subsection 'Carousel', 'Featured events and the organisation\'s own carousels (upcoming events, plus past ones with recordings) on organisation pages (events/_carousel.erb), with Slick: three to a slide from 992px, two from 576px, then one.' do %>
       <div class="slick-container" id="dg-slick">
         <div class="slick-responsive row justify-content-center">
-          <% [['Sat 4 Oct', nil], ['Sun 5 Oct', 'Sold out'], ['Starts Fri 10 Oct', nil], ['Wed 15 Oct', nil], ['On-demand', nil]].each do |date, label| %>
+          <%# The slides are events/_block_carousel.erb; the wrapper is _carousel.erb's, which caches each slide by event id %>
+          <% saturday = Date.today.next_occurring(:saturday) %>
+          <% [design_sample_event,
+              design_build_event('Sound bath', day: saturday + 1, sold_out_cache: true),
+              design_build_event('Breathwork weekend retreat', day: saturday + 6, days: 2),
+              design_build_event('Ecstatic dance', day: saturday + 11),
+              design_build_event('Breathwork foundations course', evergreen: true)].each do |event| %>
             <div class="col-12 col-sm-6 col-lg-4 slick-item">
-              <div class="m-1 position-relative">
-                <a href="#components"><img class="w-100" src="/images/test-event.jpg" alt=""></a>
-                <span class="badge badge-overlay text-bg-primary position-absolute top-0 end-0"><%= date %></span>
-                <% if label %><span class="badge badge-overlay text-bg-danger position-absolute bottom-0 end-0"><%= label %></span><% end %>
-              </div>
+              <%= partial :'events/block_carousel', locals: { event: event } %>
             </div>
           <% end %>
         </div>

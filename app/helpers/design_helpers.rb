@@ -39,20 +39,31 @@ Dandelion::App.helpers do
     account
   end
 
-  # An unsaved event, with its organisation, facilitators and tags built in memory from the factories, so the guide
-  # renders the real partials. Nothing is saved: build keeps the records in memory, and has_many_through reads an
-  # unsaved record's join documents from memory
+  # The sample events' organisation, unsaved
+  def design_sample_organisation
+    @design_sample_organisation ||= FactoryBot.build(:organisation, name: 'Breathwork Collective', slug: 'breathwork-collective', stripe_pk: nil, stripe_sk: nil)
+  end
+
+  # An unsaved event of the sample organisation's, built from the factory, with the sample photo as a stand-in image.
+  # It starts at 7pm on the given day and runs for three hours, or for the given days; evergreen events have no dates
+  def design_build_event(name, day: Date.today.next_occurring(:saturday), days: nil, **attributes)
+    start_time = day.in_time_zone.change(hour: 19)
+    end_time = days ? start_time + days.days : start_time + 3.hours
+    times = attributes[:evergreen] ? { start_time: nil, end_time: nil } : { start_time: start_time, end_time: end_time }
+    event = FactoryBot.build(:event, organisation: design_sample_organisation, name: name, slug: name.parameterize, location: 'Hackney, London',
+                                     image_width_unmagic: 992, image_height_unmagic: 496, **times, **attributes)
+    image = design_sample_image
+    event.define_singleton_method(:image) { image }
+    event
+  end
+
+  # The guide's main sample event, with facilitators and tags built in memory, so the guide renders the real partials.
+  # Nothing is saved: build keeps the records in memory, and has_many_through reads an unsaved record's join documents from memory
   def design_sample_event
     @design_sample_event ||= begin
-      organisation = FactoryBot.build(:organisation, name: 'Breathwork Collective', slug: 'breathwork-collective', stripe_pk: nil, stripe_sk: nil)
-      start_time = Time.zone.now.next_occurring(:saturday).change(hour: 19)
-      event = FactoryBot.build(:event, organisation: organisation, name: 'Breathwork and sound journey', slug: 'breathwork-and-sound-journey',
-                                       location: 'Hackney, London', start_time: start_time, end_time: start_time + 3.hours,
-                                       featured: true, sold_out_cache: true, image_width_unmagic: 992, image_height_unmagic: 496)
+      event = design_build_event('Breathwork and sound journey', featured: true, sold_out_cache: true)
       [['Maya Okoro', 'maya'], ['Sam Lee', 'jonas']].each { |name, photo| event.event_facilitations.build(account: design_sample_account(name, photo)) }
       %w[breathwork sound healing].each { |name| event.event_tagships.build(event_tag: EventTag.new(name: name)) }
-      image = design_sample_image
-      event.define_singleton_method(:image) { image }
       event
     end
   end
