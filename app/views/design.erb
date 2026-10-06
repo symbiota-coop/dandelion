@@ -1145,40 +1145,21 @@
             <h3 class="card-header text-bg-primary">Select tickets</h3>
             <div class="card-body" id="ticket-types">
               <table class="table mb-0">
-                <% [
-                     { group: 'Weekend', name: 'Standard', price: '£22', qty: true },
-                     { name: 'Solidarity', price: '£8', qty: true, left: 2, description: 'For those on a low income. No questions asked.' },
-                     { group: 'Day passes', name: 'Pay what you can', range: [5, 30], qty: true },
-                     { name: 'Early bird', price: '£15', sold_out: true }
-                   ].each do |t| %>
-                  <% if t[:group] %>
-                    <tr><td colspan="3" class="ticket-group-heading"><%= t[:group] %></td></tr>
-                  <% end %>
-                  <tr><td class="py-0 border-top" colspan="3"></td></tr>
-                  <tr>
-                    <td class="border-top-0 align-middle">
-                      <span class="ticket-type-name fw-bold"><%= t[:name] %></span>
-                      <% if t[:left] %><span class="badge text-bg-secondary align-text-bottom"><%= t[:left] %> left</span><% end %>
-                    </td>
-                    <td class="border-top-0 align-middle ticket-type-price">
-                      <% if t[:range] %>
-                        <span>£<%= t[:range].first %> - £<%= t[:range].last %></span>
-                        <input type="range" class="form-range" min="<%= t[:range].first %>" max="<%= t[:range].last %>" autocomplete="off" aria-label="Price" oninput="$(this).prev().html('£' + this.value); $(this).next().find('.select-a-price-first').css('visibility', 'hidden')">
-                        <div class="text-end small"><em class="select-a-price-first text-nowrap">Drag<span class="d-none d-sm-inline"> the slider</span></em></div>
-                      <% else %>
-                        <%= t[:price] %>
-                      <% end %>
-                    </td>
-                    <td class="border-top-0 align-middle">
-                      <% if t[:sold_out] %>
-                        <div class="text-end"><button type="button" class="btn btn-sm btn-outline-primary">Join waitlist</button></div>
-                      <% else %>
-                        <select class="form-select w-100" aria-label="Quantity"><% 0.upto(10) do |n| %><option><%= n %></option><% end %></select>
-                      <% end %>
-                    </td>
-                  </tr>
-                  <tr><td class="text-body-secondary ticket-type-description border-0 pt-0<% unless t[:description] %> pb-0<% end %>" colspan="3"><div><% if t[:description] %><p><%= t[:description] %></p><% end %></div></td></tr>
+                <%# The rows are purchase/_ticket_type.erb, for unsaved ticket types in two groups, as _purchase.erb renders them %>
+                <% event = design_build_event('Breathwork weekend retreat', allow_ticket_type_waitlists: true) %>
+                <%# No tickets are sold: counts_by_type gives 0 for any type %>
+                <% event.instance_variable_set(:@ticket_counts, Hash.new(0)) %>
+                <% weekend, day_passes = event.ticket_groups.build(name: 'Weekend', capacity: 60), event.ticket_groups.build(name: 'Day passes', capacity: 40) %>
+                <% [event.ticket_types.build(name: 'Standard', price: 22, quantity: 40, ticket_group: weekend),
+                    event.ticket_types.build(name: 'Solidarity', price: 8, quantity: 2, ticket_group: weekend, description: 'For those on a low income. No questions asked.'),
+                    event.ticket_types.build(name: 'Pay what you can', range_min: 5, range_max: 30, quantity: 20, ticket_group: day_passes),
+                    event.ticket_types.build(name: 'Early bird', price: 15, quantity: 0, ticket_group: day_passes)] %>
+                <% event_was, @event = @event, event %>
+                <% @no_ticket_groups, @previous_ticket_group = false, 'Other tickets' %>
+                <% event.ticket_types.each do |ticket_type| %>
+                  <%= partial :'purchase/ticket_type', locals: { ticket_type: ticket_type } %>
                 <% end %>
+                <% @event = event_was %>
                 <tr>
                   <td></td>
                   <td></td>
