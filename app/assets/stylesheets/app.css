@@ -1813,7 +1813,7 @@ ul.pagination {
 }
 
 .block-title {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 4;
@@ -1821,13 +1821,6 @@ ul.pagination {
   overflow: hidden;
   overflow-wrap: anywhere;
   hyphens: auto;
-}
-
-/* From lg the tiles are four to a row rather than two, wide enough for titles a step bigger */
-@media (min-width: 992px) {
-  .block-title {
-    font-size: var(--font-size-xl);
-  }
 }
 
 /* The whole tile is a link: the title's .stretched-link covers it, and the links and icons
