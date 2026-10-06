@@ -3,18 +3,17 @@ url = "https://mcp.sentry.dev/mcp"
 
 [mcp_servers.render]
 url = "https://mcp.render.com/mcp"
-
-[mcp_servers.render.http_headers]
-Authorization = "Bearer $RENDER_AUTH_TOKEN"
+bearer_token_env_var = "RENDER_AUTH_TOKEN"
 
 [mcp_servers.mongodb]
 command = "npx"
 args = [
   "-y",
-  "mongodb-mcp-server",
-  "--connectionString",
-  "$MONGODB_CONNECTION_STRING",
-  "--readOnly",
+  "mongodb-atlas-mcp-remote",
+]
+env_vars = [
+  "MDB_MCP_API_CLIENT_ID",
+  "MDB_MCP_API_CLIENT_SECRET",
 ]
 
 [mcp_servers.stripe]
@@ -22,9 +21,7 @@ url = "https://mcp.stripe.com"
 
 [mcp_servers.github]
 url = "https://api.githubcopilot.com/mcp/"
-
-[mcp_servers.github.http_headers]
-Authorization = "Bearer $GITHUB_PAT"
+bearer_token_env_var = "GITHUB_PAT"
 
 [mcp_servers.cloudflare-api]
 url = "https://mcp.cloudflare.com/mcp"
@@ -35,7 +32,7 @@ args = [
   "-y",
   "@mailgun/mcp-server",
 ]
-
-[mcp_servers.mailgun.env]
-MAILGUN_API_KEY = "$MAILGUN_API_KEY"
-MAILGUN_API_REGION = "$MAILGUN_API_REGION"
+env_vars = [
+  "MAILGUN_API_KEY",
+  "MAILGUN_API_REGION",
+]

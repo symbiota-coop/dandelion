@@ -43,7 +43,4 @@ code.md
 GeoLite2-City.mmdb
 repomix-output.xml
 iframe-test.html
-.cursor/mcp.json
-.codex/config.toml
-.opencode/opencode.json
 .ruby-version

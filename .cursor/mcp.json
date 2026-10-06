@@ -1,0 +1,52 @@
+{
+  "mcpServers": {
+    "sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp"
+    },
+    "render": {
+      "type": "http",
+      "url": "https://mcp.render.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:RENDER_AUTH_TOKEN}"
+      }
+    },
+    "mongodb": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mongodb-atlas-mcp-remote"
+      ],
+      "env": {
+        "MDB_MCP_API_CLIENT_ID": "${env:MDB_MCP_API_CLIENT_ID}",
+        "MDB_MCP_API_CLIENT_SECRET": "${env:MDB_MCP_API_CLIENT_SECRET}"
+      }
+    },
+    "stripe": {
+      "type": "http",
+      "url": "https://mcp.stripe.com"
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${env:GITHUB_PAT}"
+      }
+    },
+    "cloudflare-api": {
+      "type": "http",
+      "url": "https://mcp.cloudflare.com/mcp"
+    },
+    "mailgun": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mailgun/mcp-server"
+      ],
+      "env": {
+        "MAILGUN_API_KEY": "${env:MAILGUN_API_KEY}",
+        "MAILGUN_API_REGION": "${env:MAILGUN_API_REGION}"
+      }
+    }
+  }
+}
