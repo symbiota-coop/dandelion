@@ -8,8 +8,9 @@ module ImportFromCsv
   end
 
   def self.read(upload)
-    path = upload.respond_to?(:path) ? upload.path : upload
-    sanitize(File.binread(path))
+    raise ArgumentError, 'expected an uploaded file' unless upload.is_a?(Tempfile)
+
+    sanitize(File.binread(upload.path))
   end
 
   def self.sanitize(csv)
