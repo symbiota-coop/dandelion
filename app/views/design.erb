@@ -584,19 +584,10 @@
               <option>Waitlist</option>
             </select>
           </div>
-          <div class="mb-3">
-            <label for="dg-select2-tags">Tags</label>
-            <select class="form-select" id="dg-select2-tags" multiple size="1">
-              <% %w[breathwork sound ecstatic-dance meditation].each_with_index do |tag, i| %>
-                <option value="<%= tag %>"<% if i < 2 %> selected<% end %>><%= tag %></option>
-              <% end %>
-            </select>
-            <div class="form-text">Press comma to add a tag or enter to accept a suggestion</div>
-          </div>
+          <%= partial :tags_select, locals: { object: design_sample_event, tag_class: EventTag } %>
           <script>
             $(function () {
               $('#dg-select2-single').select2({ theme: 'bootstrap-5', width: '100%' })
-              $('#dg-select2-tags').select2({ theme: 'bootstrap-5', width: '100%', tags: true, tokenSeparators: [','] })
             })
           </script>
           <div class="spec">select2.css overrides select2-bootstrap-5-theme: as tall as .form-control, --bs-gray-400 border, .form-control's font and radius · focused or open: --theme-500 border and --focus-ring, the box and dropdown glowing as one shape · selected option --theme-500 · tags (_tags_select.erb) sit on the typing row, radius sm</div>
@@ -704,12 +695,12 @@
 
       <% design_subsection 'Theme colour picker', col: 'col-lg-6' do %>
         <div class="border rounded p-4">
-          <label class="d-block">Theme colour</label>
-          <div class="quick-theme-colors mb-3 d-flex flex-wrap align-items-center column-gap-2 row-gap-1">
-            <% quick_colors.each_with_index do |color, i| %>
-              <button type="button" class="quick-color-btn rounded-circle border p-0<%= ' selected' if i.zero? %>" style="width: 1.625rem; height: 1.625rem; background: <%= color %>; --ring-color: <%= color %>" title="<%= color %>"></button>
-            <% end %>
-          </div>
+          <%# In a form with the input it sets, as beside the colour field, so app.js selects the swatch that matches and a click previews that theme on this page %>
+          <form onsubmit="return false">
+            <label class="d-block">Theme colour</label>
+            <input type="hidden" name="design[theme_color]" value="<%= DEFAULT_THEME_COLOR %>">
+            <%= partial :quick_theme_colors, locals: { input_name: 'design[theme_color]' } %>
+          </form>
           <div class="spec">_quick_theme_colors.erb, beside the colour field: quick_colors steps from the default green round the wheel in thirteenths, keeping nine, at HSL lightness 50% · 1.625rem circles that grow 10% with a --bs-box-shadow on hover · selected or focused: a white gap, then a ring in the swatch's own colour</div>
         </div>
       <% end %>
@@ -805,11 +796,7 @@
 
     <div class="row g-5">
       <% design_subsection 'Key-value table', col: 'col-lg-6' do %>
-        <table class="table table-hr mb-0">
-          <tr><td>Email</td><td><a href="#components">maya@example.com</a></td></tr>
-          <tr><td>Website</td><td><a href="#components">https://maya.example.com</a></td></tr>
-          <tr><td>Location</td><td>Hackney, London</td></tr>
-        </table>
+        <%= partial :'accounts/table', locals: { account: design_sample_account('Maya Okoro', 'maya', email: 'maya@example.com', website: 'https://maya.example.com'), include_email: true } %>
         <div class="spec">.table-hr, for details (accounts/_table.erb, organisations/_table.erb, events/_info_table.erb, activity and local group pages): labels bold in a column only as wide as the longest, rows ruled with a --bs-gray-200 line and no other borders</div>
       <% end %>
 
@@ -995,13 +982,11 @@
       <% design_subsection 'Notifications and messages dropdowns', col: 'col-lg-6' do %>
         <div class="dropdown-menu show position-relative align-self-start p-0" style="width: 22rem; max-width: 100%">
           <div class="list-group list-group-flush notification-list">
-            <% [['bi-person-fill-add', '<b>Maya</b> followed you', '2 hours ago'], ['bi-ticket-detailed-fill', '<b>Sam</b> booked tickets to <b>Ecstatic dance</b>', 'Yesterday']].each do |icon, sentence, time| %>
+            <% maya = design_sample_account('Maya Okoro', 'maya') %>
+            <% [Notification.new(type: 'created_profile', notifiable: maya, circle: maya, created_at: 2.hours.ago),
+                Notification.new(type: 'joined_team', notifiable: Teamship.new(account: design_sample_account('Sam Lee', 'jonas'), team: Team.new(name: 'Kitchen')), circle: Gathering.new(name: 'Breathwork retreat'), created_at: 1.day.ago)].each do |notification| %>
               <a class="list-group-item list-group-item-action d-flex align-items-start gap-2" href="#components">
-                <span class="newsfeed-icon"><i class="bi <%= icon %>"></i></span>
-                <div class="notification-info flex-grow-1">
-                  <div class="notification-title"><%== sentence %></div>
-                  <div class="notification-time text-body-secondary"><%= time %></div>
-                </div>
+                <%= partial :notification_summary, locals: { notification: notification } %>
               </a>
             <% end %>
             <a class="message-preview unread p-2 d-block text-body text-decoration-none" href="#components"><b>Alex</b> · See you there! <span class="text-body-secondary small">unread</span></a>
@@ -1304,9 +1289,10 @@
 
       <% design_subsection 'Avatars', col: 'col-lg-5' do %>
         <div class="d-flex align-items-end flex-wrap gap-3">
-          <% %w[xs sm md lg xl].each_with_index do |size, i| %>
+          <% [['Maya Okoro', 'maya'], ['Jonas Berg', 'jonas'], ['Amara Nwosu', 'amara'], ['Maya Okoro', 'maya'], ['Jonas Berg', 'jonas']].each_with_index do |(name, photo), i| %>
+            <% size = %i[xs sm md lg xl][i] %>
             <div class="text-center">
-              <img src="/images/samples/<%= %w[maya jonas amara maya jonas][i] %>.jpg" alt="" class="avatar avatar-<%= size %><%= ' private' if i == 2 %>">
+              <%= partial :'accounts/square', locals: { account: design_sample_account(name, photo, private: i == 2), size: size } %>
               <div class="spec mt-1"><%= size %><%= ' · private' if i == 2 %></div>
             </div>
           <% end %>
@@ -1321,21 +1307,8 @@
           <h3 class="card-header chill">Upcoming birthdays</h3>
           <div class="card-body">
             <div class="mb-3">
-              <% [['maya', 'Maya', 'Mon 5th Oct', 0], ['jonas', 'Jonas', 'Tue 6th Oct', 1], ['amara', 'Amara', 'Sun 11th Oct', 6]].each do |img, name, date, d| %>
-                <div class="d-flex align-items-center gap-3 mb-2">
-                  <img src="/images/samples/<%= img %>.jpg" alt="" class="avatar avatar-xs">
-                  <div class="flex-grow-1">
-                    <a href="#components"><%= name %></a>
-                    <div class="text-body-secondary small"><%= date %></div>
-                  </div>
-                  <% if d == 0 %>
-                    <span class="badge text-bg-yellow"><i class="bi bi-cake2-fill"></i> Today</span>
-                  <% elsif d == 1 %>
-                    <span class="badge text-bg-primary">Tomorrow</span>
-                  <% else %>
-                    <span class="badge text-bg-secondary">in <%= d %> days</span>
-                  <% end %>
-                </div>
+              <% [['Maya Okoro', 'maya', 0], ['Jonas Berg', 'jonas', 1], ['Amara Nwosu', 'amara', 6]].each do |name, photo, days| %>
+                <%= partial :'accounts/birthday', locals: { account: design_sample_account(name, photo, date_of_birth: Date.today + days - 30.years) } %>
               <% end %>
             </div>
             <a href="#components">All birthdays &rarr;</a>
@@ -1406,9 +1379,7 @@
       <% end %>
 
       <% design_subsection 'Image wall', col: 'col-lg-5' do %>
-        <div class="image-wall">
-          <% %w[maya jonas amara maya jonas amara maya].each do |img| %><img class="avatar avatar-sm me-1" src="/images/samples/<%= img %>.jpg" alt=""><% end %>
-        </div>
+        <%= partial :'accounts/add', locals: { accounts: [['Maya Okoro', 'maya'], ['Jonas Berg', 'jonas'], ['Amara Nwosu', 'amara']].cycle.first(7).map { |name, photo| design_sample_account(name, photo) }, add_and_remove: false } %>
         <div class="spec">.image-wall: groups of people as avatars that wrap, --space-2xs between rows: who chose an option or is interested in an activity, team and gathering members, attendees, followers · on options, teams and rotas, a "Show names instead of pictures" link reloads them as names separated by middots</div>
       <% end %>
     </div>
@@ -1487,15 +1458,7 @@
           <div class="gm-style position-relative bg-white mx-auto" style="max-width: 20rem; padding: 12px; border-radius: 8px; box-shadow: 0 2px 7px 1px rgba(var(--bs-black-rgb), .3)">
             <button type="button" class="btn-close position-absolute top-0 end-0 m-2" aria-label="Close"></button>
             <div class="infowindow">
-              <table>
-                <tr>
-                  <td class="pe-2"><img src="/images/samples/maya.jpg" alt="" class="avatar avatar-md"></td>
-                  <td>
-                    <h4 class="mt-0"><a href="#components">Maya</a></h4>
-                    <p class="mb-2">Hackney, London</p>
-                  </td>
-                </tr>
-              </table>
+              <%= partial :'points/account', locals: { account: design_sample_account('Maya Okoro', 'maya', event_tag_names: %w[breathwork sound]) } %>
             </div>
           </div>
         </div>
