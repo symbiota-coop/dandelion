@@ -24,7 +24,10 @@
     },
     "stripe": {
       "type": "http",
-      "url": "https://mcp.stripe.com"
+      "url": "https://mcp.stripe.com",
+      "headers": {
+        "Authorization": "Bearer ${STRIPE_MCP_KEY}"
+      }
     },
     "github": {
       "type": "http",

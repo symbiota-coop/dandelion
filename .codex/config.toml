@@ -20,6 +20,7 @@ env_vars = [
 
 [mcp_servers.stripe]
 url = "https://mcp.stripe.com"
+bearer_token_env_var = "STRIPE_MCP_KEY"
 
 [mcp_servers.github]
 url = "https://api.githubcopilot.com/mcp/"

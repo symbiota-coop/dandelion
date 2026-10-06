@@ -26,7 +26,10 @@
     },
     "stripe": {
       "type": "remote",
-      "url": "https://mcp.stripe.com"
+      "url": "https://mcp.stripe.com",
+      "headers": {
+        "Authorization": "Bearer {env:STRIPE_MCP_KEY}"
+      }
     },
     "github": {
       "type": "remote",
