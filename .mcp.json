@@ -15,11 +15,12 @@
       "command": "npx",
       "args": [
         "-y",
-        "mongodb-mcp-server",
-        "--connectionString",
-        "${MONGODB_CONNECTION_STRING}",
-        "--readOnly"
-      ]
+        "mongodb-atlas-mcp-remote"
+      ],
+      "env": {
+        "MDB_MCP_API_CLIENT_ID": "${MDB_MCP_API_CLIENT_ID}",
+        "MDB_MCP_API_CLIENT_SECRET": "${MDB_MCP_API_CLIENT_SECRET}"
+      }
     },
     "stripe": {
       "type": "http",
