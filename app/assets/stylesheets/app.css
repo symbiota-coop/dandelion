@@ -903,11 +903,6 @@ p.action a {
 }
 
 /* Our own colours, in the form of Bootstrap's text-bg-* */
-.text-bg-yellow {
-  color: var(--bs-white) !important;
-  background-color: var(--color-yellow-500) !important;
-}
-
 .text-bg-stripe {
   color: var(--bs-white) !important;
   background-color: var(--color-stripe) !important;
@@ -1039,10 +1034,6 @@ p.action a {
 
 .pagination {
   --bs-pagination-focus-box-shadow: var(--focus-ring);
-}
-
-.accordion {
-  --bs-accordion-btn-focus-box-shadow: var(--focus-ring);
 }
 
 .form-check-input:checked {
