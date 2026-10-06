@@ -76,6 +76,28 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal 0, attacker.sign_ins.count
   end
 
+  test 'unsubscribe link does not follow an account you do not already follow' do
+    victim = FactoryBot.create(:account)
+    attacker = FactoryBot.create(:account)
+    sign_in_with_rack(victim)
+
+    get "/u/#{attacker.username}/unsubscribe"
+
+    assert last_response.redirect?
+    assert_nil Follow.find_by(follower: victim, followee: attacker)
+  end
+
+  test 'unsubscribe link unsubscribes from an account you follow' do
+    account = FactoryBot.create(:account)
+    followee = FactoryBot.create(:account)
+    follow = Follow.create!(follower: account, followee: followee)
+    sign_in_with_rack(account)
+
+    get "/u/#{followee.username}/unsubscribe"
+
+    assert follow.reload.unsubscribed
+  end
+
   test 'email confirmation link confirms the address' do
     account = FactoryBot.create(:account, email_confirmed: false)
     account.generate_sign_in_token!

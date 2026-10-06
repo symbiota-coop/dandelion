@@ -2,9 +2,11 @@ Dandelion::App.controller do
   get '/u/:username/unsubscribe' do
     sign_in_required!
     @account = Account.find_by(username: params[:username]) || not_found
-    @follow = current_account.follows_as_follower.find_by(followee: @account) || current_account.follows_as_follower.create(followee: @account)
-    @follow.set(unsubscribed: true)
-    flash[:notice] = "You were unsubscribed from #{@account.name}."
+    # A GET can be triggered cross-site (e.g. an <img> in a message), so only touch an existing follow, never create one
+    if (@follow = current_account.follows_as_follower.find_by(followee: @account))
+      @follow.set(unsubscribed: true)
+      flash[:notice] = "You were unsubscribed from #{@account.name}."
+    end
     redirect "/u/#{@account.username}"
   end
 
