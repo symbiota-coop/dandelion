@@ -1832,6 +1832,13 @@ ul.pagination {
   hyphens: auto;
 }
 
+/* From lg the tiles are four to a row rather than two, wide enough for titles a step bigger */
+@media (min-width: 992px) {
+  .block-title {
+    font-size: var(--font-size-xl);
+  }
+}
+
 /* The whole tile is a link: the title's .stretched-link covers it, and the links and icons
    that should stay clickable or keep their tooltip (.tile-above) sit over that.
    Hovered, or with its link keyboard focused, a tile takes a shadow and its photo lightens */
