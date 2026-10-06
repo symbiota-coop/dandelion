@@ -783,14 +783,11 @@
           </tbody>
         </table>
         <div class="spec">Row colours: table-warning flags a row to look at (low delivery rate), table-danger a problem (blocked ASN). Both use the warning and danger 50 and 200</div>
-        <ul class="pagination justify-content-center mb-0">
-          <li class="page-item disabled"><a class="page-link" href="#components">‹</a></li>
-          <li class="page-item active"><a class="page-link" href="#components">1</a></li>
-          <li class="page-item"><a class="page-link" href="#components">2</a></li>
-          <li class="page-item"><a class="page-link" href="#components">3</a></li>
-          <li class="page-item"><a class="page-link" href="#components">›</a></li>
-        </ul>
-        <div class="spec text-center">Active: --theme-500, like the active pill and dropdown item · Hover: --bs-secondary-bg, like pills and nav links</div>
+        <%# will_paginate with BootstrapRenderer, on page 2 of 3: lists show only the arrows (page_links: false), the admin lists the page numbers too %>
+        <% sample_page = WillPaginate::Collection.new(2, 10, 30) %>
+        <%= will_paginate sample_page, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+        <%= will_paginate sample_page, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+        <div class="spec text-center">Lists: the arrows alone · admin lists: page numbers too · Active: --theme-500, like the active pill and dropdown item · Hover: --bs-secondary-bg, like pills and nav links</div>
       <% end %>
     </div>
 
