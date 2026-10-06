@@ -108,16 +108,3 @@
 .select2-container--bootstrap-5 .select2-dropdown--below {
   clip-path: inset(0 -1rem -1rem -1rem);
 }
-
-.select2-choices {
-  box-shadow: none !important;
-}
-
-.select2-container-multi .select2-choices .select2-search-choice {
-  margin-top: var(--space-2xs)
-}
-
-.lookup .select2-choice {
-  height: 2rem !important;
-  line-height: 2rem !important;
-}

@@ -56,12 +56,12 @@
               <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: (balance if balance > Money.new(1 * 100, 'GBP')) %>
             </div>
           </div>
-          <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ms-0 me-1" style="height: 2.125rem">
+          <button data-payment-method="stripe" type="submit" class="btn btn-primary mb-1 ms-0 me-1">
             Contribute via card
             <i class="bi bi-spin bi-slash-lg" style="display: none"></i>
           </button>
           <% if (rt = internal_redirect_uri(params[:return_to])&.to_s) %>
-            <a class="btn btn-secondary mb-1 me-1" style="height: 2.125rem" href="<%= rt.include?('?') ? "#{rt}&contribution_skipped=1" : "#{rt}?contribution_skipped=1" %>">Not now</a>
+            <a class="btn btn-secondary mb-1 me-1" href="<%= rt.include?('?') ? "#{rt}&contribution_skipped=1" : "#{rt}?contribution_skipped=1" %>">Not now</a>
           <% end %>
           <%= hidden_field_tag :payment_method, value: 'stripe', disabled: true %>
         <% end %>
