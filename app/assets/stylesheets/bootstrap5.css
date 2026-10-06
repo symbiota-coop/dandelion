@@ -221,27 +221,27 @@ h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
 }
 
 h1, .h1 {
-  font-size: 2rem;
+  font-size: var(--font-size-3xl);
 }
 
 h2, .h2 {
-  font-size: 1.66rem;
+  font-size: var(--font-size-2xl);
 }
 
 h3, .h3 {
-  font-size: 1.4rem;
+  font-size: var(--font-size-xl);
 }
 
 h4, .h4 {
-  font-size: 1.125rem;
+  font-size: var(--font-size-lg);
 }
 
 h5, .h5 {
-  font-size: 0.875rem;
+  font-size: var(--font-size-base);
 }
 
 h6, .h6 {
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 p {
@@ -567,7 +567,7 @@ progress {
 }
 
 .lead {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: inherit;
 }
 
@@ -3206,7 +3206,7 @@ textarea.form-control-lg {
 .btn-lg, .btn-group-lg > .btn {
   --bs-btn-padding-y: 0.625rem;
   --bs-btn-padding-x: 1rem;
-  --bs-btn-font-size: 1.125rem;
+  --bs-btn-font-size: 1.25rem;
   --bs-btn-border-radius: var(--bs-border-radius-lg);
 }
 
@@ -8186,27 +8186,27 @@ textarea.form-control-lg {
 }
 
 .fs-1 {
-  font-size: 2rem !important;
+  font-size: var(--font-size-3xl) !important;
 }
 
 .fs-2 {
-  font-size: 1.66rem !important;
+  font-size: var(--font-size-2xl) !important;
 }
 
 .fs-3 {
-  font-size: 1.4rem !important;
+  font-size: var(--font-size-xl) !important;
 }
 
 .fs-4 {
-  font-size: 1.125rem !important;
+  font-size: var(--font-size-lg) !important;
 }
 
 .fs-5 {
-  font-size: 0.875rem !important;
+  font-size: var(--font-size-base) !important;
 }
 
 .fs-6 {
-  font-size: 0.875rem !important;
+  font-size: var(--font-size-sm) !important;
 }
 
 .fst-italic {

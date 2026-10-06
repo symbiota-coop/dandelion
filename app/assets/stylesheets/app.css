@@ -61,14 +61,16 @@
   --color-paper: #FFFAF3;
   --body-font-family: "Plus Jakarta Sans", sans-serif;
   --header-font-family: "Hanken Grotesk", "Plus Jakarta Sans", sans-serif;
-  /* Type scale. bootstrap5.scss repeats the heading sizes (3xl to sm) as $h1-font-size to $h6-font-size */
+  /* Type scale: from base up, each step is 1.25 times the last (a major third). The headings use it, h1 at 3xl down to
+     h5 at base and h6 at sm, through $h1-font-size to $h6-font-size in bootstrap5.scss. Below 576px xl to 3xl step by 1.2
+     (a minor third) instead, so page titles fit a phone */
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.4rem;
-  --font-size-2xl: 1.66rem;
-  --font-size-3xl: 2rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5625rem;
+  --font-size-2xl: 1.95rem;
+  --font-size-3xl: 2.44rem;
   --body-font-size: var(--font-size-sm);
   /* Spacing scale, for padding, margins and gaps. Bootstrap's spacing utilities (m-*, p-*, gap-*) are the same scale less
      sm and xl: 1 is 2xs, 2 xs, 3 base, 4 lg, 5 2xl. sm is also the grid gutter ($grid-gutter-width) */
@@ -118,6 +120,14 @@
   :root {
     --header-offset: calc(2 * var(--header-height));
     --content-padding: var(--space-base);
+  }
+}
+
+@media (max-width: 575.98px) {
+  :root {
+    --font-size-xl: 1.44rem;
+    --font-size-2xl: 1.73rem;
+    --font-size-3xl: 2.07rem;
   }
 }
 
@@ -1812,7 +1822,7 @@ ul.pagination {
 }
 
 .block-title {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 4;
