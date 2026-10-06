@@ -841,11 +841,12 @@
 
       <% design_subsection 'Progress and loading', col: 'col-lg-6' do %>
         <div class="border rounded p-4 d-flex flex-column gap-3">
-          <div>
-            <a href="#components">23/80</a>
-            <div class="progress"><div class="progress-bar" role="progressbar" style="width: 29%"></div></div>
-          </div>
-          <div class="progress"><div class="progress-bar" role="progressbar" style="width: 75%">60/80</div></div>
+          <%# events/_progress.erb for two unsaved events with 80 places; their places taken (an aggregate of their tickets) are set by hand %>
+          <% [[23, {}], [60, { full_width: true }]].each do |taken, locals| %>
+            <% event = design_build_event('Full moon gathering', capacity: 80) %>
+            <% event.define_singleton_method(:slots_taken) { taken } %>
+            <div><%= partial :'events/progress', locals: { event: event, **locals } %></div>
+          <% end %>
           <div class="spec">Places filled (events/_progress.erb, _ticket_types_progress.erb), pay and rota progress · --theme-500 on --theme-200 · the count as a link above, or inside the bar where it's full width</div>
           <div class="d-flex align-items-center gap-3">
             <i class="bi bi-spin bi-arrow-repeat fs-4"></i>
