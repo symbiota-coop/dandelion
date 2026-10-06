@@ -15,7 +15,7 @@
       <%== File.read(Padrino.root('app/assets/stylesheets/event_details.css')) %>
       <%== File.read(Padrino.root('app/assets/stylesheets/email.css')) %>
 
-      <% email_theme_color = pmail.organisation.theme_color || '#00AF5E' %>
+      <% email_theme_color = pmail.organisation.theme_color || DEFAULT_THEME_COLOR %>
       <%== EmailHelper.theme_css(email_theme_color) %>
     </style>
   </head>

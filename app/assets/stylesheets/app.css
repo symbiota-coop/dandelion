@@ -32,8 +32,9 @@
 
 :root {
   /* The primary colour. Organisations and events set --theme-500 (and its rgb triplet, which Bootstrap's
-     rgba(var(--bs-*-rgb)) colours need) through /theme.css; the rest of the ramp is derived from it below */
-  --theme-500: #00af5e;
+     rgba(var(--bs-*-rgb)) colours need) through /theme.css; the rest of the ramp is derived from it below.
+     By default it's Dandelion's green (DEFAULT_THEME_COLOR in config/boot.rb) */
+  --theme-500: var(--color-green-500);
   --theme-500-rgb: 0, 175, 94;
   /* so Bootstrap follows it too */
   --bs-primary: var(--theme-500);

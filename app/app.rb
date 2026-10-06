@@ -342,7 +342,7 @@ module Dandelion
 
     get '/theme.css' do
       content_type 'text/css'
-      theme_color = '#00af5e'
+      theme_color = DEFAULT_THEME_COLOR
       if params[:theme_color]
         requested = params[:theme_color].start_with?('#') ? params[:theme_color] : "##{params[:theme_color]}"
         # Validate hex color format: # followed by 3 or 6 hexadecimal characters
