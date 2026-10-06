@@ -14,7 +14,7 @@
   <% if (organisationship = @organisation.organisationships.find_by(:account => current_account, :stripe_connect_json.ne => nil)) %>
     <div class="card my-1">
       <div class="card-body p-3">
-        <div class="mb-1 fs-4">
+        <div class="mb-1 fs-5">
           <i class="bi bi-credit-card"></i>
           Connected to <%= organisationship.stripe_account_name ? "#{organisationship.stripe_account_name}'s Stripe account" : 'Stripe' %>
           (id: <%= organisationship.stripe_user_id %>)

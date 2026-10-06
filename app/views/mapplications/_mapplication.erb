@@ -1,12 +1,12 @@
 <% if mapplication.answers %>
   <div class="mb-5">
     <% mapplication.answers.each { |q,a| if q && a %>
-    <p class="fs-4">
+    <p class="fs-5">
       <strong>
         <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
       </strong>
     </p>
-    <p class="fs-4">
+    <p class="fs-5">
       <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
     </p>
   <% end } if mapplication.answers %>

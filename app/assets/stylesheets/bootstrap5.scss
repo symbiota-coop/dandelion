@@ -22,10 +22,10 @@ $warning: #fb941a; // --color-orange-500 in app.css, oklch(0.76 0.169 62)
 $danger: #dd574e; // --color-red-500 in app.css, oklch(0.63 0.169 27)
 $font-family-sans-serif: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 $font-weight-normal: 500;
-$lead-font-size: 1.25rem; // --font-size-lg, like h4
+$lead-font-size: 1.2rem; // --font-size-lg, like h4
 $lead-font-weight: inherit;
-// Heading sizes are app.css's type scale tokens, so h1–h6, .h1–.h6 and .fs-1 to .fs-6 follow it, including its smaller
-// sizes on phones. h6 only appears in user-written descriptions
+// Heading sizes are app.css's type scale tokens, so h1–h6, .h1–.h6 and .fs-1 to .fs-6 follow it.
+// h6 only appears in user-written descriptions
 $h1-font-size: var(--font-size-3xl);
 $h2-font-size: var(--font-size-2xl);
 $h3-font-size: var(--font-size-xl);
@@ -101,7 +101,7 @@ $btn-padding-x-sm: .75rem;
 $btn-font-size-sm: .875rem; // --font-size-sm
 $btn-padding-y-lg: .625rem;
 $btn-padding-x-lg: 1rem;
-$btn-font-size-lg: 1.25rem; // --font-size-lg
+$btn-font-size-lg: 1.2rem; // --font-size-lg
 $btn-font-weight: 600;
 $badge-font-size: .9375em; // relative, so badges scale with the text around them (Bootstrap default .75em)
 // Soft pills: app.css tints them with their variant's 100 (danger: the 200) and 800

@@ -567,7 +567,7 @@ progress {
 }
 
 .lead {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: inherit;
 }
 
@@ -3206,7 +3206,7 @@ textarea.form-control-lg {
 .btn-lg, .btn-group-lg > .btn {
   --bs-btn-padding-y: 0.625rem;
   --bs-btn-padding-x: 1rem;
-  --bs-btn-font-size: 1.25rem;
+  --bs-btn-font-size: 1.2rem;
   --bs-btn-border-radius: var(--bs-border-radius-lg);
 }
 
