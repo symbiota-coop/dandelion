@@ -22,9 +22,10 @@
     .subscription-toggle { font-size: var(--font-size-sm); color: var(--bs-secondary-color); --link-hover-color: var(--bs-emphasis-color); text-decoration: none }
   </style>
 
-  <div id="subscriptions">
-    <% if @organisationships.length + @memberships.length > 8 %>
-      <input type="search" class="form-control my-3" id="subscriptions-filter" placeholder="Filter by name">
+  <div id="subscriptions" class="mt-5">
+    <% if @organisationships.any? || @memberships.any? %>
+      <h2 class="mb-3">Following</h2>
+      <input type="search" class="form-control mb-3" id="subscriptions-filter" autocomplete="off" placeholder="Filter by name" style="max-width: 20rem">
       <script>
         $(function () {
           $('#subscriptions-filter').on('input', function () {
@@ -35,6 +36,9 @@
               var matchesChild = q && card.find('.subscription-child > a').text().toLowerCase().indexOf(q) !== -1
               card.toggle(matchesParent || !!matchesChild)
               if (matchesChild && !matchesParent) setSubscriptionChildren(card, true)
+            })
+            $('#subscriptions .subscription-section').each(function () {
+              $(this).toggle($(this).find('.card').filter(function () { return this.style.display !== 'none' }).length > 0)
             })
           })
         })
@@ -54,77 +58,81 @@
         })
       })
     </script>
-        <% if @organisationships.any? %>
-      <h2 class="my-3">Organisations</h2>
-      <div class="subscription-cards">
-        <% @organisationships.each { |organisationship| organisation = organisationship.organisation %>
-        <div class="card">
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item subscription-row">
-              <a class="fw-bold" href="/o/<%= organisation.slug %>"><%= organisation.name %></a>
-              <div data-pagelet-url="/o/<%= organisation.slug %>/organisationship">
-                <%= partial :'organisations/organisationship', locals: { organisation: organisation, organisationship: organisationship } %>
-              </div>
-              <% activityships = @activityships_by_organisation_id[organisation.id] || []
-                 local_groupships = @local_groupships_by_organisation_id[organisation.id] || [] %>
-              <% if activityships.any? || local_groupships.any? %>
-                <a href="javascript:;" class="subscription-toggle w-100">
-                  <%= [(pluralize(activityships.length, 'activity') if activityships.any?), (pluralize(local_groupships.length, 'local group') if local_groupships.any?)].compact.join(', ') %>
-                  <i class="bi bi-chevron-down"></i>
-                </a>
-              <% end %>
-            </li>
-            <% activityships.each { |activityship| activity = activityship.activity %>
-            <li class="list-group-item subscription-row subscription-child" style="display: none">
-              <a href="/o/<%= organisation.slug %>/a/<%= activity.slug %>"><%= activity.name %></a>
-              <div data-pagelet-url="/activities/<%= activity.id %>/activityship">
-                <%= partial :'activities_and_local_groups/resourceship', locals: { resource: activity, resourceship: activityship, resourceship_name: 'activityship', resource_path: "/activities/#{activity.id}" } %>
-              </div>
-            </li>
-            <% } %>
-            <% local_groupships.each { |local_groupship| local_group = local_groupship.local_group %>
-            <li class="list-group-item subscription-row subscription-child" style="display: none">
-              <a href="/o/<%= organisation.slug %>/lg/<%= local_group.slug %>"><%= local_group.name %></a>
-              <div data-pagelet-url="/local_groups/<%= local_group.id %>/local_groupship">
-                <%= partial :'activities_and_local_groups/resourceship', locals: { resource: local_group, resourceship: local_groupship, resourceship_name: 'local_groupship', resource_path: "/local_groups/#{local_group.id}" } %>
-              </div>
-            </li>
-            <% } %>
-          </ul>
+    <% if @organisationships.any? %>
+      <div class="subscription-section">
+        <h3 class="my-3">Organisations</h3>
+        <div class="subscription-cards">
+          <% @organisationships.each { |organisationship| organisation = organisationship.organisation %>
+          <div class="card">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item subscription-row">
+                <a class="fw-bold" href="/o/<%= organisation.slug %>"><%= organisation.name %></a>
+                <div data-pagelet-url="/o/<%= organisation.slug %>/organisationship">
+                  <%= partial :'organisations/organisationship', locals: { organisation: organisation, organisationship: organisationship } %>
+                </div>
+                <% activityships = @activityships_by_organisation_id[organisation.id] || []
+                   local_groupships = @local_groupships_by_organisation_id[organisation.id] || [] %>
+                <% if activityships.any? || local_groupships.any? %>
+                  <a href="javascript:;" class="subscription-toggle w-100">
+                    <%= [(pluralize(activityships.length, 'activity') if activityships.any?), (pluralize(local_groupships.length, 'local group') if local_groupships.any?)].compact.join(', ') %>
+                    <i class="bi bi-chevron-down"></i>
+                  </a>
+                <% end %>
+              </li>
+              <% activityships.each { |activityship| activity = activityship.activity %>
+              <li class="list-group-item subscription-row subscription-child" style="display: none">
+                <a href="/o/<%= organisation.slug %>/a/<%= activity.slug %>"><%= activity.name %></a>
+                <div data-pagelet-url="/activities/<%= activity.id %>/activityship">
+                  <%= partial :'activities_and_local_groups/resourceship', locals: { resource: activity, resourceship: activityship, resourceship_name: 'activityship', resource_path: "/activities/#{activity.id}" } %>
+                </div>
+              </li>
+              <% } %>
+              <% local_groupships.each { |local_groupship| local_group = local_groupship.local_group %>
+              <li class="list-group-item subscription-row subscription-child" style="display: none">
+                <a href="/o/<%= organisation.slug %>/lg/<%= local_group.slug %>"><%= local_group.name %></a>
+                <div data-pagelet-url="/local_groups/<%= local_group.id %>/local_groupship">
+                  <%= partial :'activities_and_local_groups/resourceship', locals: { resource: local_group, resourceship: local_groupship, resourceship_name: 'local_groupship', resource_path: "/local_groups/#{local_group.id}" } %>
+                </div>
+              </li>
+              <% } %>
+            </ul>
+          </div>
+          <% } %>
         </div>
-        <% } %>
       </div>
     <% end %>
     <% if @memberships.any? %>
-      <h2 class="my-3">Gatherings</h2>
-      <div class="subscription-cards">
-        <% @memberships.each { |membership| gathering = membership.gathering %>
-        <div class="card">
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item subscription-row">
-              <a class="fw-bold" href="/g/<%= gathering.slug %>"><%= gathering.name %></a>
-              <div data-pagelet-url="/g/<%= gathering.slug %>/subscribe">
-                <%= partial :'gatherings/subscribe', locals: { membership: membership } %>
-              </div>
-              <% teamships = @teamships_by_gathering_id[gathering.id] || [] %>
-              <% if teamships.any? %>
-                <a href="javascript:;" class="subscription-toggle w-100">
-                  <%= pluralize(teamships.length, 'team') %>
-                  <i class="bi bi-chevron-down"></i>
-                </a>
-              <% end %>
-            </li>
-            <% teamships.each { |teamship| team = teamship.team %>
-            <li class="list-group-item subscription-row subscription-child" style="display: none">
-              <a href="/g/<%= gathering.slug %>/teams/<%= team.id %>"><%= team.name %></a>
-              <div data-pagelet-url="/teamships/<%= teamship.id %>/subscribe">
-                <%= partial :'teams/subscribe', locals: { teamship: teamship } %>
-              </div>
-            </li>
-            <% } %>
-          </ul>
+      <div class="subscription-section">
+        <h3 class="my-3">Gatherings</h3>
+        <div class="subscription-cards">
+          <% @memberships.each { |membership| gathering = membership.gathering %>
+          <div class="card">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item subscription-row">
+                <a class="fw-bold" href="/g/<%= gathering.slug %>"><%= gathering.name %></a>
+                <div data-pagelet-url="/g/<%= gathering.slug %>/subscribe">
+                  <%= partial :'gatherings/subscribe', locals: { membership: membership } %>
+                </div>
+                <% teamships = @teamships_by_gathering_id[gathering.id] || [] %>
+                <% if teamships.any? %>
+                  <a href="javascript:;" class="subscription-toggle w-100">
+                    <%= pluralize(teamships.length, 'team') %>
+                    <i class="bi bi-chevron-down"></i>
+                  </a>
+                <% end %>
+              </li>
+              <% teamships.each { |teamship| team = teamship.team %>
+              <li class="list-group-item subscription-row subscription-child" style="display: none">
+                <a href="/g/<%= gathering.slug %>/teams/<%= team.id %>"><%= team.name %></a>
+                <div data-pagelet-url="/teamships/<%= teamship.id %>/subscribe">
+                  <%= partial :'teams/subscribe', locals: { teamship: teamship } %>
+                </div>
+              </li>
+              <% } %>
+            </ul>
+          </div>
+          <% } %>
         </div>
-        <% } %>
       </div>
     <% end %>
   </div>
