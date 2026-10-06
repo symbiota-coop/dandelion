@@ -92,6 +92,12 @@ Dandelion::App.helpers do
 
   def mass_assigning(params, model)
     params = (params || {}).dup
+    # secret_block fields come back blank unless changed, so a blank one keeps the saved value unless Remove was ticked
+    clear_secrets = Array(params.delete('clear_secrets')).map(&:to_s)
+    if model.respond_to?(:secret_fields)
+      model.secret_fields.each { |f| params.delete(f) if params.key?(f) && params[f].nil? && !clear_secrets.include?(f) }
+      clear_secrets.each { |f| params[f] = nil if model.secret_fields.include?(f) }
+    end
     allowed = model.assignable_foreign_keys.map(&:to_s)
     allowed += model.permitted_attributes.map(&:to_s) if model.respond_to?(:permitted_attributes)
     allowed += model.protected_attributes.map(&:to_s) if model.respond_to?(:protected_attributes) # let these through so they raise below

@@ -58,6 +58,27 @@ module Padrino
                                            label_class: label_class, div_class: div_class, required: r)
         end
 
+        # Never sends a saved secret back to the browser: the field starts empty with the last 4 characters as a placeholder,
+        # mass_assigning keeps the saved value when it's left blank, and Remove clears it
+        def secret_block(fieldname, required: false, disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
+          saved = object.send(fieldname)
+          content = password_field(fieldname,
+                                   value: '', autocomplete: 'new-password', 'data-saved' => (true if saved),
+                                   class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
+                                                            'is-invalid'
+                                                          end}", required: (r = (required || model_required(fieldname)) && !saved), disabled: disabled, placeholder: ("••••#{saved.last(4)}" if saved))
+          if saved
+            content += %(
+              <div class="form-check mt-1">
+                <input class="form-check-input" type="checkbox" name="#{field_name(:clear_secrets)}[]" value="#{fieldname}" id="#{field_id(:clear_secrets, fieldname)}">
+                <label class="form-check-label" for="#{field_id(:clear_secrets, fieldname)}">Remove</label>
+              </div>
+            ).html_safe
+          end
+          block_layout(fieldname, content, tip: tip, hint: hint || ('Leave blank to keep the saved value' if saved), container_class: container_class,
+                                           label_class: label_class, div_class: div_class, required: r)
+        end
+
         def slug_block(fieldname, placeholder: nil, required: false, disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
           content = text_field(fieldname,
                                class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?

@@ -289,6 +289,26 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal 'Mollie', EventPaymentMethod.contribution_reminder_label(@organisation)
   end
 
+  test 'secret keys are masked in the edit form and kept when left blank' do
+    create_organisation(mollie_api_key: 'test_molliekey1234')
+    sign_in_with_rack(@account)
+
+    get "/o/#{@organisation.slug}/edit"
+    refute_includes last_response.body, 'test_molliekey1234'
+    assert_includes last_response.body, '••••1234'
+    assert_includes last_response.body, 'data-saved="true"'
+    assert_includes last_response.body, 'name="organisation[clear_secrets][]"'
+
+    post "/o/#{@organisation.slug}/edit", organisation: { mollie_api_key: '' }
+    assert_equal 'test_molliekey1234', @organisation.reload.mollie_api_key
+
+    post "/o/#{@organisation.slug}/edit", organisation: { mollie_api_key: 'test_newkey' }
+    assert_equal 'test_newkey', @organisation.reload.mollie_api_key
+
+    post "/o/#{@organisation.slug}/edit", organisation: { mollie_api_key: '', clear_secrets: ['mollie_api_key'] }
+    assert_nil @organisation.reload.mollie_api_key
+  end
+
   test 'stripe setup session is bound to the organisation' do
     create_organisation
     sign_in_with_rack(@account)

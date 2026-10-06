@@ -153,7 +153,7 @@
               $('#tab-payments .card[id^="payment-"]').each(function () {
                 var card = $(this)
                 var filled = card.find('input:not([type=hidden]), textarea, select').filter(function () {
-                  return $(this).is(':checkbox') ? this.checked : $(this).val()
+                  return $(this).is(':checkbox') ? this.checked : $(this).val() || $(this).data('saved')
                 }).length
                 if (filled) return
                 card.hide()
@@ -205,10 +205,10 @@
               </p>
             </div>
           <% end %>
-          <%= f.text_block :mailgun_api_key %>
+          <%= f.secret_block :mailgun_api_key %>
           <%= f.text_block :mailgun_domain %>
           <%= f.select_block :mailgun_region %>
-          <%= f.text_block :mailgun_webhook_signing_key %>
+          <%= f.secret_block :mailgun_webhook_signing_key %>
         </div>
         <div role="tabpanel" class="tab-pane" id="tab-analytics">
           <%= f.text_block :plausible_analytics_domain %>
@@ -251,7 +251,7 @@
         <% if Padrino.env == :development || @organisation.experimental? %>
           <div role="tabpanel" class="tab-pane" id="tab-experimental">
             <%= f.text_block :stripe_pk %>
-            <%= f.text_block :stripe_sk %>
+            <%= f.secret_block :stripe_sk %>
             <%= f.text_block :stripe_client_id %>
             <%= f.text_area_block :minimal_head %>
             <%= f.text_area_block :events_banner %>

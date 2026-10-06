@@ -32,6 +32,10 @@ class Gathering
     self.and(listed: true).and(:privacy.ne => 'secret')
   end
 
+  def self.secret_fields
+    %w[stripe_sk]
+  end
+
   def self.protected_attributes
     %w[
       account_id redirect_home balance processed_via_dandelion membership_count

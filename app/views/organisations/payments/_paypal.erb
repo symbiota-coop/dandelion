@@ -7,7 +7,7 @@
       and copy the live client ID and secret.
     </p>
     <%= f.text_block :paypal_client_id %>
-    <%= f.text_block :paypal_secret %>
+    <%= f.secret_block :paypal_secret %>
     <% if admin? %>
       <%= f.check_box_block :paypal_sandbox %>
     <% end %>

@@ -71,6 +71,10 @@ class Organisation
     "Provide a one-paragraph summary of the feedback on the events of this organisation, #{name}. Focus on the positives. The feedback:\n\n#{event_feedbacks.joined}"
   end
 
+  def self.secret_fields
+    %w[stripe_sk mollie_api_key paypal_secret gocardless_access_token gocardless_endpoint_secret patreon_api_key mailgun_api_key mailgun_webhook_signing_key]
+  end
+
   def self.protected_attributes
     %w[
       paid_up paid_up_fraction unsanitized_ok experimental

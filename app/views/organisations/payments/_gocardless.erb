@@ -9,8 +9,8 @@
       <br />
       (We recommending leaving <code>Secret (optional)</code> blank then copying the auto-generated secret on the next screen)
     </p>
-    <%= f.text_block :gocardless_access_token %>
-    <%= f.text_block :gocardless_endpoint_secret %>
+    <%= f.secret_block :gocardless_access_token %>
+    <%= f.secret_block :gocardless_endpoint_secret %>
     <%= f.check_box_block :gocardless_instant_bank_pay %>
     <%= f.check_box_block :gocardless_instalments %>
     <%= f.check_box_block :gocardless_subscriptions %>
