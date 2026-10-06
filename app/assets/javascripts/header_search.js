@@ -39,7 +39,7 @@ $(function () {
   }).on('focus', function () {
     $(this).autocomplete('search')
   })
-  $('#header-search').autocomplete('widget').addClass('search-bar-autocomplete animated fadeIn')
+  $('#header-search').autocomplete('widget').addClass('search-bar-autocomplete')
 
   $(document).on('click', '.search-bar-autocomplete a', function () {
     $('#header-search').val($(this).attr('data-value'))

@@ -20,8 +20,7 @@ FRONTEND_DEPENDENCIES = {
     'TypeWatch/3.0.2' => 'jquery.typewatch.min.js',
     'bootstrap-icons/1.13.1' => 'font/bootstrap-icons.min.css',
     'typed.js/2.0.10' => 'typed.min.js',
-    'chartjs-plugin-datalabels/2.0.0' => 'chartjs-plugin-datalabels.min.js',
-    'animate.css/3.7.2' => 'animate.min.css'
+    'chartjs-plugin-datalabels/2.0.0' => 'chartjs-plugin-datalabels.min.js'
   },
   'https://rawcdn.githack.com/' => {
     'mahnunchik/markerclustererplus/736b0e3a7d916fbeb2ee5007494f17a5329b11a8' => 'src/markerclusterer.js',
