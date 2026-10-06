@@ -1103,37 +1103,15 @@
     <% end %>
 
     <% design_subsection 'Event block', 'How events are listed on organisation and search pages (events/_block.erb, with _block_main.erb). From 992px the image sits on the right, filling its half (cropped when the text is taller), and the row is a white card with a --hairline border, base radius and --bs-box-shadow-sm; below that the image stacks on top.' do %>
-      <div class="row block g-0 align-items-stretch">
-        <div class="col-lg-6 order-lg-2 mb-2 mb-lg-0 bg-white block-image">
-          <a href="#components"><img class="w-100" src="/images/test-event.jpg" alt=""></a>
-        </div>
-        <div class="col-lg-6 order-lg-1">
-          <div class="ms-1 p-lg-3">
-            <div class="event-title-line fs-2 mb-2">
-              <h4 class="h2 d-inline me-1"><a class="text-body" href="#components">Breathwork and sound journey</a></h4>
-              <span class="badge text-bg-yellow">Featured</span>
-              <span class="badge text-bg-danger">Sold out</span>
-            </div>
-            <div class="mb-2">
-              <% %w[breathwork sound].each do |tag| %>
-                <span class="badge text-bg-primary mb-1"><%= tag %></span>
-              <% end %>
-              <span class="badge text-bg-primary mb-1"><i class="bi bi-stars"></i> healing</span>
-            </div>
-            <ul class="icon-list text-body fs-4">
-              <li><i data-bs-toggle="tooltip" title="Host/facilitators" class="bi bi-flag-fill"></i> <a class="text-body" href="#components">Maya</a> and <a class="text-body" href="#components">Sam</a></li>
-              <li><i data-bs-toggle="tooltip" title="Dates/times" class="bi bi-calendar-event"></i> Sat 4 Oct, 7–10pm</li>
-              <li><i data-bs-toggle="tooltip" title="Location" class="bi bi-geo-alt-fill"></i> <a href="#components">Hackney, London</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <%# Rendered as on its organisation's events page, so its Featured label shows %>
+      <% organisation_was, @organisation = @organisation, design_sample_event.organisation %>
+      <%= partial :'events/block', locals: { event: design_sample_event, skip_pagelets: true } %>
+      <% @organisation = organisation_was %>
       <div class="spec">Name h2 · labels: Featured text-bg-yellow, Sold out or Sales ended text-bg-danger, Locked text-bg-secondary · tags text-bg-primary, up to 5, with bi-stars when AI-tagged · .icon-list at fs-4, each line's icon hung 2em to the left, with a tooltip naming it</div>
     <% end %>
 
     <% design_subsection 'Tiles', 'How organisations, gatherings and activities are listed (_block.erb, from organisations/, gatherings/ and activities/_blocks.erb): two to a row, then four from 992px, each 10rem high.' do %>
-      <%# _block.erb only calls image.thumb(...).url, so a stand-in serves the sample photo %>
-      <% sample_image = Struct.new(:url) { def thumb(_size) = self }.new('/images/test-event.jpg') %>
+      <% sample_image = design_sample_image %>
       <% check = '<i data-bs-toggle="tooltip" title="Gratitude for financially supporting the Dandelion platform 🙏" class="bi bi-patch-check-fill"></i>' %>
       <div class="row">
         <% [

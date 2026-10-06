@@ -11,7 +11,7 @@
         <td class="align-top">
           <div class="row justify-content-between">
             <div class="col ms-1 p-lg-3">
-              <%= partial :'events/block_main', locals: { event: event } %>
+              <%= partial :'events/block_main', locals: defined?(skip_pagelets) ? { event: event, skip_pagelets: true } : { event: event } %>
               <% if @organisation && event.carousel_text %>
                 <div class="p-1 mb-0 text-body-secondary"><%= event.carousel_text %></div>
               <% end %>
