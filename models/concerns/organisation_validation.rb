@@ -5,6 +5,7 @@ module OrganisationValidation
     validates_presence_of :name, :slug, :currency
     validates_uniqueness_of :slug
     validates_format_of :slug, with: /\A[a-z0-9-]+\z/
+    validates_http_url :website, :become_a_member_url
 
     before_validation do
       %w[name patreon_api_key mailgun_api_key mailgun_webhook_signing_key calendar_import_urls].each do |f|

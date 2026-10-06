@@ -9,6 +9,7 @@ module AccountValidation
 
     validates_format_of :username, with: /\A[a-z0-9_.]+\z/
     validates_uniqueness_of :username
+    validates_http_url :website
 
     validates_uniqueness_of :sign_in_token
     validates_uniqueness_of :ics_key, allow_nil: true

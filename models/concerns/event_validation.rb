@@ -14,6 +14,7 @@ module EventValidation
     validates_uniqueness_of :name, scope: [:start_time, :organisation_id], conditions: -> { where(deleted_at: nil) }, message: 'is invalid: an event with this title and start time already exists for this organisation', unless: -> { duplicate || evergreen? }
     validates_uniqueness_of :name, scope: [:organisation_id], conditions: -> { where(deleted_at: nil, evergreen: true) }, message: 'is invalid: an on-demand course with this title already exists for this organisation', if: -> { evergreen? && !duplicate }
     validates_format_of :slug, with: /\A[a-z0-9-]+\z/, if: :slug
+    validates_http_url :purchase_url, :facebook_event_url, :redirect_url
 
     before_validation do
       if evergreen?
@@ -26,10 +27,6 @@ module EventValidation
       end
 
       self.name = name.strip if name
-      self.purchase_url = purchase_url.strip if purchase_url
-      self.redirect_url = redirect_url.strip if redirect_url
-      self.redirect_url = nil if redirect_url.blank?
-      errors.add(:redirect_url, 'must be a valid http or https URL') if redirect_url && !safe_redirect_url
       self.suggested_donation = suggested_donation.round(2) if suggested_donation
       self.minimum_donation = nil unless suggested_donation
       self.minimum_donation = minimum_donation.round(2) if minimum_donation
@@ -181,14 +178,7 @@ module EventValidation
   end
 
   def safe_redirect_url
-    return unless redirect_url.present?
-
-    uri = begin
-      URI.parse(redirect_url)
-    rescue URI::InvalidURIError, ArgumentError
-      nil
-    end
-    redirect_url if uri.is_a?(URI::HTTP) && uri.host.present?
+    redirect_url if redirect_url && Event.http_url?(redirect_url)
   end
 
   def update_embedding_with_retries

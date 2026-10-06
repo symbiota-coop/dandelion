@@ -122,6 +122,7 @@ class Activity
   validates_presence_of :name, :slug
   validates_uniqueness_of :slug, scope: :organisation_id
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/
+  validates_http_url :website
 
   before_validation do
     errors.add(:organisation, 'cannot be changed') if persisted? && organisation_id_changed?

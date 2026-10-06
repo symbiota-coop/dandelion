@@ -44,6 +44,26 @@ module CoreExtensions
       end
     end
 
+    # Link fields: only http(s), so a javascript: URL can't run script when clicked. A bare domain gets https:// in front
+    def validates_http_url(*fields)
+      before_validation do
+        fields.each do |f|
+          url = send(f)&.strip
+          url = nil if url.blank?
+          url = "https://#{url}" if url && !url.match?(/\A[a-z][a-z0-9+.-]*:/i)
+          send("#{f}=", url)
+          errors.add(f, 'must be a valid http or https URL') if url && send("#{f}_changed?") && !self.class.http_url?(url)
+        end
+      end
+    end
+
+    def http_url?(url)
+      uri = URI.parse(url)
+      uri.is_a?(URI::HTTP) && uri.host.present?
+    rescue URI::InvalidURIError, ArgumentError
+      false
+    end
+
     def admin_fields
       auto_admin_fields
     end

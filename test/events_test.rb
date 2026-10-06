@@ -367,6 +367,53 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal 'https://example.org/thanks', @event.tap { |e| e.redirect_url = 'https://example.org/thanks' }.safe_redirect_url
   end
 
+  test 'link fields reject javascript: and other non-http schemes' do
+    create_event
+    ['javascript:alert(1)', 'JavaScript:alert(1)', ' javascript:alert(1)', 'data:text/html,<script>alert(1)</script>', 'vbscript:msgbox(1)'].each do |url|
+      @event.purchase_url = url
+      @event.facebook_event_url = url
+      refute @event.valid?, url
+      assert @event.errors[:purchase_url].any?, url
+      assert @event.errors[:facebook_event_url].any?, url
+
+      @organisation.website = url
+      @organisation.become_a_member_url = url
+      refute @organisation.valid?, url
+      assert @organisation.errors[:website].any?, url
+      assert @organisation.errors[:become_a_member_url].any?, url
+
+      @account.website = url
+      refute @account.valid?, url
+      assert @account.errors[:website].any?, url
+    end
+  end
+
+  test 'link fields accept http and https and add https:// to a bare domain' do
+    create_event
+    @organisation.update!(website: 'http://example.com', become_a_member_url: 'https://example.com/join')
+    assert_equal 'http://example.com', @organisation.website
+    @account.update!(website: '  www.example.com/me ')
+    assert_equal 'https://www.example.com/me', @account.website
+    @event.update!(purchase_url: 'https://tickets.example.com/x', facebook_event_url: '')
+    assert_equal 'https://tickets.example.com/x', @event.purchase_url
+    assert_nil @event.facebook_event_url
+  end
+
+  test 'activity website rejects javascript:' do
+    create_organisation
+    activity = @organisation.activities.build(name: 'Activity', slug: 'activity', account: @account, website: 'javascript:alert(1)')
+    refute activity.valid?
+    assert activity.errors[:website].any?
+  end
+
+  test 'an existing bad value does not block saving other fields' do
+    create_organisation
+    @organisation.set(website: 'javascript:alert(1)')
+    @organisation.reload
+    @organisation.name = 'New name'
+    assert @organisation.valid?, @organisation.errors.full_messages.to_sentence
+  end
+
   test 'slug uniqueness includes deleted events' do
     create_event
     slug = @event.slug
