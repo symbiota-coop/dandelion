@@ -5,7 +5,7 @@
   </p>
   <p>
     <blockquote>
-      <%= account.feedback_summary %>
+      <%== EmailHelper.untrusted(account.feedback_summary_html) %>
     </blockquote>
   </p>
   <p>

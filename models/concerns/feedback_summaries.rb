@@ -23,6 +23,15 @@ module FeedbackSummaries
     set(feedback_summary: last_paragraph, feedback_summary_last_refreshed_at: Time.now)
   end
 
+  # The model sometimes adds inline markdown (**bold**, *titles*). The summary is one paragraph, so the <p> is dropped
+  # to keep it inline; escape_html leaves any HTML in the text as text
+  def feedback_summary_html
+    return unless feedback_summary
+
+    html = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(escape_html: true)).render(feedback_summary).strip
+    html.delete_prefix('<p>').delete_suffix('</p>').html_safe
+  end
+
   private
 
   def feedback_summary_paragraph
