@@ -1000,26 +1000,25 @@
 
     <div class="row g-5">
       <% design_subsection 'Messages', col: 'col-lg-6' do %>
+        <%# The thread's bubbles are messages/_bubble.erb, with unsaved messages between Maya (@account, the other party, while they render) and you %>
+        <% maya = design_sample_account('Maya Okoro', 'maya') %>
+        <% messages = [[maya, 'Are you coming to the full moon gathering?'], [nil, 'Yes! Can I bring a friend?'], [maya, 'Of course, see you there 🌕'], [nil, 'Thank you https://dandelion.events/e/full-moon']].each_with_index.map do |(messenger, body), i|
+             Message.new(messenger_id: messenger&.id || BSON::ObjectId.new, body: body, created_at: (12 - i).minutes.ago)
+           end %>
         <div class="border rounded p-4">
           <div class="d-flex align-items-start mb-3">
-            <img src="/images/samples/maya.jpg" alt="" class="avatar avatar-md d-block">
+            <%= partial :'accounts/square', locals: { account: maya, klass: 'd-block', size: :md } %>
             <div class="flex-grow-1 ms-3">
-              <h4 class="my-0"><a class="text-body" href="#components">Maya</a></h4>
+              <h4 class="my-0"><a class="text-body" href="#components"><%= maya.name %></a></h4>
             </div>
           </div>
           <div id="thread-scroll">
             <ul class="widget-chat p-1">
-              <% [[true, 'Are you coming to the full moon gathering?'], [false, 'Yes! Can I bring a friend?'], [true, 'Of course, see you there 🌕'], [false, 'Thank you <a href="#components">dandelion.events/e/full-moon</a>']].each_with_index do |(incoming, body), i| %>
-                <li class="<%= 'reply' unless incoming %>">
-                  <% if incoming %>
-                    <div class="widget-chat-media"><img src="/images/samples/maya.jpg" alt=""></div>
-                  <% end %>
-                  <div class="widget-chat-content">
-                    <div class="widget-chat-message last"><%== body %></div>
-                    <% if i == 3 %><div class="widget-chat-status"><b>Read</b> 2 minutes ago</div><% end %>
-                  </div>
-                </li>
+              <% account_was, @account = @account, maya %>
+              <% messages.each_with_index do |message, i| %>
+                <%= partial :'messages/bubble', locals: { message: message, message_receipt: MessageReceipt.new(received_at: 2.minutes.ago), last: i == messages.count - 1 } %>
               <% end %>
+              <% @account = account_was %>
             </ul>
           </div>
           <div class="ask-box mt-3">
