@@ -1025,6 +1025,7 @@ p.action a {
 }
 
 .progress {
+  background-color: var(--theme-200);
   --bs-progress-bar-bg: var(--theme-500);
 }
 
@@ -1240,16 +1241,13 @@ p.action a {
   padding: 0.625rem var(--space-base);
   border: 0;
   border-radius: var(--bs-border-radius-pill);
+  /* Long names (an event's, often) are cut short with an ellipsis, the current item allowed a little more */
+  max-width: 20rem;
+  white-space: nowrap;
 }
 
 .nav-crumbs .caret {
   flex-shrink: 0;
-}
-
-/* Long names (an event's, often) are cut short with an ellipsis, the current item allowed a little more */
-.nav-crumbs .btn {
-  max-width: 20rem;
-  white-space: nowrap;
 }
 
 .nav-crumbs > .btn-group:last-child .btn {
@@ -1779,12 +1777,8 @@ ul.pagination {
 }
 
 /* ==========================================================================
-   Misc components (spin, collapse, progress, row)
+   Misc components (spin, collapse, row)
    ========================================================================== */
-
-.progress {
-  background-color: var(--theme-200);
-}
 
 /* Event blocks (events/_block.erb) are white cards with a hairline border and a soft shadow, one surface with the image */
 @media (min-width: 992px) {
@@ -2561,9 +2555,17 @@ ul.map-event li {
 }
 
 /* FullCalendar's day numbers and headings are anchors without an href, so they'd take the link colour: they're grey labels,
-   leaving colour to the events. Today is marked by its number in a --theme-500 circle, in place of FullCalendar's yellow tint */
+   leaving colour to the events. Today is marked by its number in a --theme-500 circle, in place of FullCalendar's yellow tint.
+   Toolbar buttons look like .btn-secondary, with the active view filled --theme-500 like the active pill */
 #calendar {
   --fc-today-bg-color: transparent;
+  --fc-button-text-color: var(--bs-body-color);
+  --fc-button-bg-color: var(--bs-white);
+  --fc-button-border-color: var(--bs-border-color);
+  --fc-button-hover-bg-color: var(--bs-secondary-bg);
+  --fc-button-hover-border-color: var(--bs-border-color);
+  --fc-button-active-bg-color: var(--theme-500);
+  --fc-button-active-border-color: var(--theme-500);
 }
 
 #calendar :is(a.fc-daygrid-day-number, a.fc-col-header-cell-cushion, a.fc-list-day-text, a.fc-list-day-side-text) {
@@ -2585,18 +2587,7 @@ ul.map-event li {
   font-weight: 600;
 }
 
-/* Toolbar buttons look like .btn-secondary, with the active view filled --theme-500 like the active pill.
-   FullCalendar injects its CSS after ours, so these rules are scoped to #calendar to win */
-#calendar {
-  --fc-button-text-color: var(--bs-body-color);
-  --fc-button-bg-color: var(--bs-white);
-  --fc-button-border-color: var(--bs-border-color);
-  --fc-button-hover-bg-color: var(--bs-secondary-bg);
-  --fc-button-hover-border-color: var(--bs-border-color);
-  --fc-button-active-bg-color: var(--theme-500);
-  --fc-button-active-border-color: var(--theme-500);
-}
-
+/* FullCalendar injects its CSS after ours, so the toolbar's rules are scoped to #calendar to win */
 #calendar .fc-button {
   display: inline-flex;
   align-items: center;
