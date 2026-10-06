@@ -21,7 +21,7 @@ end
   !free_ticket_type.sales_ended? && !@event.sales_closed_due_to_event_end?
 %>
 
-<div class="card shadow-sm <% if @event.no_discounts %>no-discounts<% end %>" id="select-tickets">
+<div class="card <% if @event.no_discounts %>no-discounts<% end %>" id="select-tickets">
 
   <% unless @concise_ticket_form %>
     <h3 class="card-header text-bg-primary"><%= @event.select_tickets_title || 'Select tickets' %></h3>
@@ -200,7 +200,7 @@ end
 
 <%= partial :'purchase/ticket_type_waitlist_modal' if @event.allow_ticket_type_waitlists? %>
 
-<div class="card shadow-sm" id="card-error" style="display: none">
+<div class="card" id="card-error" style="display: none">
   <h3 class="card-header text-bg-danger">There was an error processing the transaction</h3>
   <div class="card-body">
     <p>

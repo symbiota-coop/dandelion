@@ -8,7 +8,7 @@
       </div>
     <% end %>
 
-    <div class="card shadow-sm mb-3 d-lg-none">
+    <div class="card mb-3 d-lg-none">
       <h3 class="card-header chill">Your upcoming events</h3>
       <div class="card-body">
         <%= partial :'events/my_upcoming' %>
@@ -28,7 +28,7 @@
     <div class="sticky-under-header">
       <%= partial :'events/awesome' %>
       <% if current_account.following.and(:hidden => false, :date_of_birth.ne => nil).exists? %>
-        <div class="card shadow-sm mt-3">
+        <div class="card mt-3">
           <h3 class="card-header chill">Upcoming birthdays</h3>
           <div class="card-body">
             <div class="mb-3">

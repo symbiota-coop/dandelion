@@ -1,4 +1,4 @@
-<div id="upcoming-events" class="card shadow-sm d-none d-lg-block">
+<div id="upcoming-events" class="card d-none d-lg-block">
   <h3 class="card-header chill">Your upcoming events</h3>
   <div class="card-body">
     <%= partial :'events/my_upcoming' %>
@@ -6,7 +6,7 @@
 </div>
 
 <% if current_account.recommended_events && current_account.recommended_events.exists? %>
-  <div class="card shadow-sm mt-3">
+  <div class="card mt-3">
     <h3 class="card-header chill">Recommended for you</h3>
     <div class="card-body">
       <%= cp(:'events/recommended', key: "/events/recommended?account_id=#{current_account.id}&timezone=#{current_account.time_zone}", expires: 12.hours.from_now) %>
@@ -14,7 +14,7 @@
     </div>
   </div>
 <% elsif current_account.tickets.exists? %>
-  <div class="card shadow-sm mt-3">
+  <div class="card mt-3">
     <h3 class="card-header chill">Recommended for you</h3>
     <div class="card-body">
       <p class="mb-0"><a href="/recommendations/events">View your personalised recommendations &rarr;</a></p>
@@ -22,7 +22,7 @@
   </div>
 <% end %>
 
-<div class="card shadow-sm mt-3">
+<div class="card mt-3">
   <h3 class="card-header chill">Trending</h3>
   <div class="card-body">
     <%= cp(:'events/trending', key: "/events/trending?timezone=#{current_account.time_zone}", expires: 12.hours.from_now) %>

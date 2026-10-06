@@ -34,7 +34,7 @@
     <% if @order %>
       <%= partial :'events/success' %>
     <% elsif @pending_order %>
-      <div class="card shadow-sm mb-3">
+      <div class="card mb-3">
         <h3 class="card-header text-bg-primary">Confirming your payment</h3>
         <div class="card-body readable">
           <p class="mb-0">We're confirming your payment<%= " with #{@pending_order.payment_provider}" if @pending_order.payment_provider %>... <i class="bi bi-spin bi-slash-lg"></i></p>

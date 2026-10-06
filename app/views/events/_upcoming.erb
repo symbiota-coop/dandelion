@@ -1,5 +1,5 @@
 <% if @event.activity && (events = @event.activity.events.live.publicly_visible.future.and(:id.nin => [@event.id]).with_key_includes).exists? %>
-  <div class="card shadow-sm mt-3">
+  <div class="card mt-3">
     <h3 class="card-header text-bg-primary">Upcoming <%= @event.activity.name %> events</h3>
     <div class="card-body">
       <% events.each { |event| next if event.locked? && !event_admin?(event) %>

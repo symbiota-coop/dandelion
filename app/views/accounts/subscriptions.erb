@@ -58,7 +58,7 @@
       <h2 class="my-3">Organisations</h2>
       <div class="subscription-cards">
         <% @organisationships.each { |organisationship| organisation = organisationship.organisation %>
-        <div class="card shadow-sm">
+        <div class="card">
           <ul class="list-group list-group-flush">
             <li class="list-group-item subscription-row">
               <a class="fw-bold" href="/o/<%= organisation.slug %>"><%= organisation.name %></a>
@@ -99,7 +99,7 @@
       <h2 class="my-3">Gatherings</h2>
       <div class="subscription-cards">
         <% @memberships.each { |membership| gathering = membership.gathering %>
-        <div class="card shadow-sm">
+        <div class="card">
           <ul class="list-group list-group-flush">
             <li class="list-group-item subscription-row">
               <a class="fw-bold" href="/g/<%= gathering.slug %>"><%= gathering.name %></a>

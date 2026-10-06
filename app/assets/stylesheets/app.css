@@ -2890,6 +2890,11 @@ table.event-details td {
    Newsfeed and cards
    ========================================================================== */
 
+/* Cards rest on the page with a soft shadow, so there's no need for shadow-sm on each */
+.card {
+  box-shadow: var(--bs-box-shadow-sm);
+}
+
 /* The card's padding is the space below its content, so a closing paragraph's margin doesn't add to it */
 .card-body > :last-child {
   margin-bottom: 0;

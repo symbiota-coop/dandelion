@@ -1,7 +1,7 @@
 <div class="col-lg-5">
   <div id="purchase">
     <% if current_account && (orders =  @event.orders.complete.and(account: current_account).includes(tickets: :ticket_type)).exists? %>
-      <div class="card shadow-sm mb-3">
+      <div class="card mb-3">
         <h3 class="card-header text-bg-primary">
           <% if @event.past? %>
             Thanks for attending!
@@ -38,7 +38,7 @@
       </div>
     <% end %>
     <% if @event.purchase_url %>
-      <div class="card shadow-sm d-none d-lg-block">
+      <div class="card d-none d-lg-block">
         <h3 class="card-header text-bg-primary"><%= @event.select_tickets_title || 'Select tickets' %></h3>
         <div class="card-body">
           <p><%= @event.select_tickets_intro %></p>
@@ -48,7 +48,7 @@
       </div>
     <% elsif @event.sold_out? && !params[:ticket_type_id] && !@event.ticket_type_waitlists_available? %>
       <% if params[:added_to_waitlist] %>
-        <div class="card shadow-sm">
+        <div class="card">
           <h3 class="card-header text-bg-primary">Thanks!</h3>
           <div class="card-body">
             <p class="lead mb-0">
