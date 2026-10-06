@@ -260,6 +260,12 @@ module CoreExtensions
       define_method(collection_method) do
         # Constantize at runtime instead of at class definition time
         model_class = class_name_string.constantize
+        # An unsaved record's join documents are only in memory, so a query wouldn't find them or their targets:
+        # read the targets from the built join documents instead (e.g. the design guide's sample event's tags)
+        if new_record? && conditions.nil? && (joins = send(through).to_a).any?
+          return joins.filter_map { |join| join.send(fk.delete_suffix('_id')) }
+        end
+
         model_class.and(:id.in => send(ids_method))
       end
     end
