@@ -7,7 +7,7 @@
   cursor: pointer;
   font-size: 2.75rem;
   color: var(--bs-gray-300);
-  transition: color 0.12s ease, transform 0.12s ease;
+  transition: color var(--transition-fast), transform var(--transition-fast);
   margin: 0 0.1rem;
 }
 

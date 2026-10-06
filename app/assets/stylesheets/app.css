@@ -79,7 +79,8 @@
   --space-xl: 2rem;
   --space-2xl: 3rem;
   /* Motion: state changes (hover, focus, active, open) fade over this rather than snapping, as Bootstrap's own nav links
-     and buttons do. Only colours, shadows, masks and turns: nothing slides or bounces. Off under prefers-reduced-motion (below) */
+     and buttons do. Only colours, shadows and masks move, bar the few exceptions the design guide lists (Motion). Off under
+     prefers-reduced-motion (below) */
   --transition-fast: 0.15s ease-in-out;
   /* Layout: the fixed header's row height, the sidebar's widths and #content's padding.
      --header-offset is the height the fixed header covers: one row, two on mobile where its icons wrap below */
@@ -637,7 +638,7 @@
   #sidebar {
     --bs-offcanvas-width: 100%;
     --bs-offcanvas-zindex: 1020;
-    --bs-offcanvas-transition: transform 0.15s ease-in-out;
+    --bs-offcanvas-transition: transform var(--transition-fast);
     top: var(--header-height);
     border-right: 0;
   }
