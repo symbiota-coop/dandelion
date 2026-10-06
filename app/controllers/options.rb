@@ -3,6 +3,7 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
+    params[:option].delete(:cost) if params[:option] && !gathering_admin?
     @option = @gathering.options.build(mass_assigning(params[:option], Option))
     @option.account = current_account
     if @option.save
@@ -57,6 +58,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     @option = @gathering.options.find(params[:id]) || not_found
     @option.cost > 0 ? gathering_admins_only! : membership_required!
+    params[:option].delete(:cost) if params[:option] && !gathering_admin?
     if @option.update_attributes(mass_assigning(params[:option], Option))
       redirect "/g/#{@gathering.slug}/options"
     else

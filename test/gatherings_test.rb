@@ -139,6 +139,29 @@ class GatheringsTest < ActiveSupport::TestCase
     assert_equal member.id, shift.membership.account_id
   end
 
+  test 'members cannot create paid options or make free options paid' do
+    create_gathering
+    member = FactoryBot.create(:account)
+    @gathering.memberships.create!(account: member)
+    free_option = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: member)
+
+    sign_in_with_rack(member)
+    post "/g/#{@gathering.slug}/options/new", option: { name: 'Cabin', type: 'Accommodation', cost: 100 }
+    post "/g/#{@gathering.slug}/options/#{free_option.id}/edit", option: { name: 'Tent', cost: 100 }
+
+    assert_equal 0, @gathering.options.find_by(name: 'Cabin').cost
+    assert_equal 0, free_option.reload.cost
+  end
+
+  test 'admins can create paid options' do
+    create_gathering
+
+    sign_in_with_rack(@account)
+    post "/g/#{@gathering.slug}/options/new", option: { name: 'Cabin', type: 'Accommodation', cost: 100 }
+
+    assert_equal 100, @gathering.options.find_by(name: 'Cabin').cost
+  end
+
   test 'inventory item cannot be assigned a team from another gathering' do
     create_two_gatherings
     other_team = @other_gathering.teams.create!(name: 'Kitchen', account: @other_account)
