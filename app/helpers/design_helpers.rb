@@ -33,7 +33,7 @@ Dandelion::App.helpers do
   # An unsaved account, built from the factory, with one of the sample photos (maya, jonas or amara) as its image.
   # Signed in, so it's publicly visible, unless private: true
   def design_sample_account(name, photo, private: false, **attributes)
-    account = FactoryBot.build(:account, name: name, username: name.parameterize, has_signed_in: !private, location: 'Hackney, London', **attributes)
+    account = FactoryBot.build(:account, name: name, username: name.parameterize(separator: '_'), has_signed_in: !private, location: 'Hackney, London', **attributes)
     image = design_sample_image("/images/samples/#{photo}.jpg")
     account.define_singleton_method(:image) { image }
     account
@@ -41,7 +41,7 @@ Dandelion::App.helpers do
 
   # The sample events' organisation, unsaved
   def design_sample_organisation
-    @design_sample_organisation ||= FactoryBot.build(:organisation, name: 'Breathwork Collective', slug: 'breathwork-collective', stripe_pk: nil, stripe_sk: nil)
+    @design_sample_organisation ||= FactoryBot.build(:organisation, name: 'Breathwork Collective', slug: 'breathwork-collective')
   end
 
   # An unsaved event of the sample organisation's, built from the factory, with the sample photo as a stand-in image.
