@@ -1523,6 +1523,15 @@ input.flatpickr-mobile {
   box-sizing: border-box;
 }
 
+/* In an input group, share the row with the addon rather than taking its full width */
+.input-group > input[type="date"].form-control,
+.input-group > input[type="datetime-local"].form-control,
+.input-group > input.flatpickr-mobile {
+  flex: 1 1 auto;
+  width: 1%;
+  min-width: 0;
+}
+
 .searchForm .form-group,
 .searchForm .form-check {
   margin-bottom: var(--space-2xs);
