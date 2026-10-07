@@ -183,7 +183,8 @@ class DadminTest < ActiveSupport::TestCase
 
   test 'a javascript: URL in a record is shown as text, not linked' do
     sign_in_as_admin
-    create_event(facebook_event_url: 'javascript:alert(1)')
+    create_event
+    @event.set(facebook_event_url: 'javascript:alert(1)') # skips validation, as for records saved before it
     create_event(as: :linked, facebook_event_url: 'https://example.com/event')
     get '/dadmin/index/Event'
     refute_includes last_response.body, 'href="javascript:alert(1)"'
