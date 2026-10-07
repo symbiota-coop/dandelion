@@ -1532,6 +1532,12 @@ input.flatpickr-mobile {
   min-width: 0;
 }
 
+/* Flatpickr puts its visible input before the hidden original, so Bootstrap squares its end corners */
+.input-group:not(.has-validation) > .form-control.form-control:nth-last-child(2):has(+ input[type="hidden"]) {
+  border-top-right-radius: var(--bs-border-radius);
+  border-bottom-right-radius: var(--bs-border-radius);
+}
+
 .searchForm .form-group,
 .searchForm .form-check {
   margin-bottom: var(--space-2xs);
