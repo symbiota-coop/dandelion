@@ -159,7 +159,7 @@
         <% if event_feedback.event %>
           <a href="/e/<%= event_feedback.event.slug %>"><%= event_feedback.event.name %></a>
           <% if defined?(organisation_name) && event_feedback.event.organisation %>
-            <div class="small"><a href="/o/<%= event_feedback.event.organisation.slug %>"><%= event_feedback.event.organisation.name %></a></div>
+            <div class="small mt-1"><a href="/o/<%= event_feedback.event.organisation.slug %>"><%= event_feedback.event.organisation.name %></a></div>
           <% end %>
         <% end %>
       </td>
