@@ -1980,7 +1980,8 @@ body .table > tfoot > tr > th {
   border-bottom: none;
 }
 
-/* Stats for many events (events/_event_stats.erb): the name column stays put when scrolling sideways, so it needs a background. Odd rows take the stripe, which Bootstrap paints over the background as an inset shadow */
+/* Stats for many events (events/_event_stats.erb): the name column stays put when scrolling sideways, so it needs a background. Odd rows take the stripe, which Bootstrap paints over the background as an inset shadow.
+   The background is set through --bs-table-bg, as DataTables' table.table.dataTable cells rule paints that over ours */
 .event-stats-sticky th:first-child,
 .event-stats-sticky td:first-child {
   position: sticky;
@@ -1993,11 +1994,14 @@ body .table > tfoot > tr > th {
 
 .event-stats-sticky td:first-child {
   border-right: 1px solid var(--bs-black);
-  background-color: var(--bs-white);
 }
 
-.event-stats-sticky thead,
+.event-stats-sticky td:first-child,
 .event-stats-sticky th {
+  --bs-table-bg: var(--bs-white);
+}
+
+.event-stats-sticky thead {
   background: var(--bs-white);
 }
 
