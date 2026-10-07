@@ -77,7 +77,7 @@
   <% event_feedbacks.each { |event_feedback| account = event_feedback.account %>
   <% answers = event_feedback.deleted_at ? [] : (event_feedback.public_answers || []).map { |_q, a| a if a.present? }.compact %>
   <article class="feedback-entry<% if event_feedback.deleted_at %> opacity-50<% end %>">
-    <div class="d-flex align-items-center gap-2 mb-1">
+    <div class="d-flex align-items-center gap-2 mb-2">
       <% if event_feedback.deleted_at %>
         <em>Removed</em>
       <% else %>
@@ -86,7 +86,7 @@
       <small class="text-body-secondary"><%= timeago event_feedback.created_at %></small>
     </div>
     <% if answers.any? %>
-      <div class="readable mb-1"><%== Sanitize.fragment(answers.join('<br /><br />').gsub("\n", '<br />'), Sanitize::Config::DANDELION) %></div>
+      <div class="readable mb-2"><%== Sanitize.fragment(answers.join('<br /><br />').gsub("\n", '<br />'), Sanitize::Config::DANDELION) %></div>
     <% end %>
     <div class="small">
       <% if !account || event_feedback.anonymous? %>
