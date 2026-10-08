@@ -1,0 +1,21 @@
+<%# step: 1 to 3. organisation: to tick payments once a payment method is set up (it can be skipped) %>
+<% steps = ['Create your organisation', 'Set up payments', 'Create your first event'] %>
+<% icons = %w[bi-flag-fill bi-credit-card bi-calendar-event] %>
+<div class="onboarding-callout mb-3">
+  <i class="bi <%= icons[step - 1] %> onboarding-callout-icon"></i>
+  <div>
+    <h2 class="onboarding-callout-title"><%= title %></h2>
+    <p class="text-body-secondary"><%= text %></p>
+    <ol class="onboarding-steps">
+      <% steps.each_with_index do |name, i| %>
+        <% if i + 1 == step %>
+          <li class="current" aria-current="step"><i class="bi bi-arrow-right-circle-fill"></i> <%= name %></li>
+        <% elsif i + 1 < step && (i != 1 || organisation&.payment_method?) %>
+          <li class="done"><i class="bi bi-check-circle-fill"></i> <%= name %></li>
+        <% else %>
+          <li><i class="bi bi-circle"></i> <%= name %></li>
+        <% end %>
+      <% end %>
+    </ol>
+  </div>
+</div>

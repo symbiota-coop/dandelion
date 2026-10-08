@@ -3123,6 +3123,54 @@ td .tactivity-accept {
   border-radius: var(--bs-border-radius-lg);
 }
 
+/* Onboarding steps after sign up: the sign-up pages' lavender wash, so they read as one journey. Only for onboarding */
+.onboarding-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-base);
+  padding: var(--space-lg);
+  border: 1px solid var(--hairline);
+  border-radius: var(--bs-border-radius-lg);
+  background: linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-paper) 50%);
+}
+
+.onboarding-callout-icon {
+  color: var(--color-lavender-500);
+  font-size: var(--font-size-2xl);
+  line-height: 1;
+}
+
+.onboarding-callout-title {
+  margin-bottom: var(--space-2xs);
+  font-size: var(--font-size-xl);
+}
+
+.onboarding-callout p:last-child {
+  margin-bottom: 0;
+}
+
+/* The journey's steps: done ticked in lavender, the current one bold, the rest grey */
+.onboarding-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-lg);
+  margin: var(--space-sm) 0 0;
+  padding: var(--space-sm) 0 0;
+  border-top: 1px solid var(--hairline);
+  list-style: none;
+  color: var(--bs-secondary-color);
+  font-size: var(--font-size-sm);
+}
+
+.onboarding-steps .done i {
+  color: var(--color-lavender-500);
+}
+
+.onboarding-steps .current {
+  color: var(--color-lavender-800);
+  font-weight: 700;
+}
+
 .shorturl {
   display: inline;
   height: auto;

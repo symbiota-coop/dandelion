@@ -6,36 +6,28 @@
   <% if via || @account.sign_ins_count == 1 %>
     <% if via %>
       <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
-      <div class="alert alert-primary d-flex align-items-start">
-        <i class="bi bi-stars me-3 mt-1 fs-2 opacity-75"></i>
+      <div class="onboarding-callout mb-3">
+        <i class="bi bi-stars onboarding-callout-icon"></i>
         <div>
-          <p class="lead mb-2">
-            Thanks for your interest in <%= instance_variable_get("@#{r}").name %>!
-          </p>
-          <p class="mb-0">
-            Complete your profile to get the most out of Dandelion:
-          </p>
+          <h2 class="onboarding-callout-title">Thanks for your interest in <%= instance_variable_get("@#{r}").name %>!</h2>
+          <p class="text-body-secondary">Complete your profile to get the most out of Dandelion:</p>
         </div>
       </div>
       <% break; end; } %>
     <% elsif @account.sign_ins_count == 1 %>
 
-      <div class="alert alert-primary d-flex align-items-start">
-        <i class="bi bi-stars me-3 mt-1 fs-2 opacity-75"></i>
+      <div class="onboarding-callout mb-3">
+        <i class="bi bi-stars onboarding-callout-icon"></i>
         <div>
           <% if params[:sign_in_token] %>
-            <p class="lead mb-2">
-              Welcome! You've just signed in for the first time and activated your Dandelion account.
-            </p>
-            <p class="mb-0">
+            <h2 class="onboarding-callout-title">Welcome! You've just signed in for the first time and activated your Dandelion account.</h2>
+            <p class="text-body-secondary">
               Your privacy is important to us. Choose what you share using the toggles on the right.<br>
               On this page you can also make your profile private and visible only to you, or delete your account.
             </p>
           <% else %>
-            <p class="lead mb-2">
-              Welcome to Dandelion!
-            </p>
-            <p class="mb-0">
+            <h2 class="onboarding-callout-title">Welcome to Dandelion!</h2>
+            <p class="text-body-secondary">
               Your privacy is important to us. Choose what you share using the toggles on the right.
             </p>
           <% end %>

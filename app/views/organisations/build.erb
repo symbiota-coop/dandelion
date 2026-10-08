@@ -6,7 +6,7 @@
 
         introJs().setOptions({
           steps: [{
-            title: "Nice one!",
+            title: 'Nice one!',
             intro: "You've created your first organisation 🎉"
           }, {
             element: $('#content button.dropdown-toggle')[0],
@@ -97,20 +97,7 @@
   <div class="container">
 
     <% if @organisation.new_record? && current_account.organisations(true).empty? %>
-      <div class="alert alert-primary d-flex align-items-start">
-        <i class="bi bi-flag-fill me-3 mt-1 fs-2 opacity-75"></i>
-        <div>
-          <p class="lead mb-2">
-            Let's create your first organisation!
-          </p>
-          <p class="mb-2">
-            All events on Dandelion exist under an organisation.
-          </p>
-          <p class="mb-0">
-            Enter the organisation name and customise the URL.
-          </p>
-        </div>
-      </div>
+      <%= partial :onboarding_callout, locals: { step: 1, organisation: nil, title: "Let's create your first organisation", text: 'All events on Dandelion exist under an organisation. Enter the organisation name and customise the URL.' } %>
     <% end %>
 
     <div class="tab-content <%= 'mt-3' if @organisation.persisted? %>">
@@ -129,9 +116,7 @@
       <% if @organisation.persisted? %>
         <div role="tabpanel" class="tab-pane" id="tab-payments">
           <% if params[:created] %>
-            <div class="alert alert-primary">
-              <p class="m-0">To accept payments, now add details for Stripe or another payment processor.</p>
-            </div>
+            <%= partial :onboarding_callout, locals: { step: 2, organisation: @organisation, title: 'Set up payments', text: 'To accept payments, add details for Stripe or another payment processor.' } %>
           <% else %>
             <% if !@organisation.payment_method? %>
               <div class="alert alert-warning">

@@ -1478,6 +1478,23 @@
       </div>
     <% end %>
 
+    <% design_subsection 'Onboarding callout', 'Welcomes and next steps for people who have just signed up, so they read as one journey with the sign-up pages: their lavender wash (--color-lavender-50 to --color-paper at 135°, flat from halfway) with a hairline border, radius lg and padding 1.5rem, a --color-lavender-500 icon, an xl title and a secondary line. The organiser journey (the _onboarding_callout partial: create your organisation and set up payments in organisations/build.erb, then create your first event in events_build/build.erb) ends with its checklist: done steps ticked in lavender, the current one bold in --color-lavender-800, the rest grey; payments is only ticked once the organisation has a payment method. The first-sign-in and "Thanks for your interest" welcomes on the profile page (accounts/edit.erb) have no checklist. Only for onboarding, so it stays distinctive; other notices are alerts.' do %>
+      <div class="row g-4 align-items-start">
+        <div class="col-lg-7">
+          <%= partial :onboarding_callout, locals: { step: 2, organisation: nil, title: 'Set up payments', text: 'To accept payments, add details for Stripe or another payment processor.' } %>
+        </div>
+        <div class="col-lg-5">
+          <div class="onboarding-callout">
+            <i class="bi bi-stars onboarding-callout-icon"></i>
+            <div>
+              <h2 class="onboarding-callout-title">Welcome to Dandelion!</h2>
+              <p class="text-body-secondary">Your privacy is important to us. Choose what you share using the toggles on the right.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
     <% design_subsection 'AI well and ask box', "The AI well is the only sheen, so the gradient itself marks AI: 135°, <code>--ai-well-from</code> flat to halfway, then to <code>--ai-well-to</code>. That's --color-lavender-100 to --color-lavender-400 on the default site, and the theme's 100 to 400 on themed pages (theme.css). Padding 1rem, radius lg.".html_safe do %>
       <div class="row g-4 align-items-start">
         <div class="col-lg-6">
