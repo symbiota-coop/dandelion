@@ -2163,16 +2163,6 @@ a.ui-button:active,
   margin-left: 11.25rem;
 }
 
-.search-result-list h3 {
-  margin: 0 0 var(--space-2xs);
-  font-size: var(--font-size-base);
-  font-weight: 600;
-}
-
-.search-result-list h3 a {
-  color: var(--bs-emphasis-color);
-}
-
 @media (max-width: 767.98px) {
   .search-result-list .search-result-media {
     width: 5.625rem;
