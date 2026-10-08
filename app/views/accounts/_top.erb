@@ -13,6 +13,11 @@
         </h1>
       </div>
     <% end %>
+    <% if (info_tags = partial(:'accounts/info_tags', locals: { account: account })).strip.length > 0 %>
+      <div class="mb-2 text-center text-lg-start">
+        <%= info_tags %>
+      </div>
+    <% end %>
     <%= partial :'accounts/buttons', locals: { account: account, modal: (true if defined?(modal)) } %>
     <% if !defined?(modal) || (defined?(modal) && !modal) %>
       <% if current_account && (current_account.admin? || current_account.can_reset_passwords?) %>
@@ -29,9 +34,6 @@ var temp = $('<input>');
       <% end %>
     <% end %>
     <%= partial :'accounts/unhide', locals: { account: account } %>
-    <div class="mt-1">
-      <%= partial :'accounts/info_tags', locals: {account: account} %>
-    </div>
     <div class="mt-2">
       <%= partial :'accounts/table', locals: { account: account } %>
     </div>
