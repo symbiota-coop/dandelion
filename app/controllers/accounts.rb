@@ -97,7 +97,14 @@ Dandelion::App.controller do
     validate_recaptcha unless recaptcha_skip_secret_valid?
     link_omniauth_provider(@account) if session['omniauth.auth'] && params[:omniauth_signup]
 
-    saved = @account.save
+    saved = begin
+      @account.save
+    rescue Mongo::Error::OperationFailure => e
+      # A concurrent signup (e.g. a double tap) can insert the same email after our uniqueness check
+      raise unless e.code == 11_000 && @account.email && Account.find_by(email: @account.email.downcase.strip)
+
+      false
+    end
     existing_account = !saved && @account.email && Account.find_by(email: @account.email.downcase.strip)
     session.delete('omniauth.auth') if saved || existing_account || !params[:omniauth_signup]
 

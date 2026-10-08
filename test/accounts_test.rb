@@ -319,6 +319,22 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal '/accounts/sign_in', page.current_path
   end
 
+  test 'existing account created by a concurrent signup' do
+    # the race only reaches the unique index, which the test database may not have
+    Account.collection.indexes.create_one({ email: 1 }, unique: true) unless Account.collection.indexes.any? { |index| index['unique'] && index['key'] == { 'email' => 1 } }
+    existing_account = FactoryBot.create(:account)
+
+    # the other request inserts the account after this one's uniqueness check, so the insert hits the unique index
+    uniqueness = Account.validators_on(:email).find { |validator| validator.is_a?(Mongoid::Validatable::UniquenessValidator) }
+    uniqueness.stub(:validate_each, nil) do
+      visit '/accounts/new'
+      fill_signup_form(FactoryBot.build_stubbed(:account, email: existing_account.email))
+
+      assert page.has_content?("There's already an account registered under that email address")
+      assert_equal '/accounts/sign_in', page.current_path
+    end
+  end
+
   test 'existing account with organisation_id' do
     create_organisation
     existing_account = FactoryBot.create(:account)
