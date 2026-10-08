@@ -87,6 +87,31 @@ class AccountsTest < ActiveSupport::TestCase
     assert_nil Follow.find_by(follower: victim, followee: attacker)
   end
 
+  test 'network notifications reuse a notification cache created by a concurrent request' do
+    account = FactoryBot.create(:account)
+    AccountNotificationCache.create!(account: account, account_ids: [account.id], expires_at: 1.day.from_now)
+
+    # the has_one read misses the cache another request has just created, so the insert hits the unique index
+    duplicate_key = -> { raise Mongo::Error::OperationFailure.new('E11000 duplicate key error', nil, code: 11_000) }
+    notifications = account.stub(:account_notification_cache, nil) do
+      account.stub(:create_account_notification_cache, duplicate_key) do
+        account.network_notifications
+      end
+    end
+    assert_includes notifications.selector.to_s, account.id.to_s
+  end
+
+  test 'network notifications re-raise other operation failures' do
+    account = FactoryBot.create(:account)
+
+    not_primary = -> { raise Mongo::Error::OperationFailure.new('not primary', nil, code: 10_107) }
+    account.stub(:account_notification_cache, nil) do
+      account.stub(:create_account_notification_cache, not_primary) do
+        assert_raises(Mongo::Error::OperationFailure) { account.network_notifications }
+      end
+    end
+  end
+
   test 'unsubscribe link unsubscribes from an account you follow' do
     account = FactoryBot.create(:account)
     followee = FactoryBot.create(:account)

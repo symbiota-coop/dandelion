@@ -147,7 +147,13 @@ module AccountAssociations
 
   def network_notifications
     # Use cached IDs if available and valid, otherwise refresh cache
-    cache = account_notification_cache || create_account_notification_cache
+    cache = account_notification_cache || begin
+      create_account_notification_cache
+    rescue Mongo::Error::OperationFailure => e # protect against race condition
+      raise unless e.code == 11_000
+
+      AccountNotificationCache.find_by(account_id: id)
+    end
     unless cache.cache_valid?
       cache.refresh!
       cache.reload
