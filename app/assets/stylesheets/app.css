@@ -1078,7 +1078,7 @@ p.action a {
   box-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-white), 0 0 0 calc(var(--bs-focus-ring-width) * 2) var(--ring-color);
 }
 
-/* Signal's brand blue, through Bootstrap's button variables. Brand buttons stay flat, without our gradient */
+/* Signal's brand blue, through Bootstrap's button variables. Brand buttons stay flat */
 .btn-signal {
   --bs-btn-color: var(--bs-white);
   --bs-btn-bg: var(--color-signal);
@@ -2234,7 +2234,6 @@ a.ui-button:active,
   background: var(--gradient-active) !important;
 }
 
-.header .with-label:before,
 .pace .pace-progress {
   border-radius: var(--bs-border-radius);
 }
@@ -2878,7 +2877,7 @@ table.event-details td {
 
 .feedback-entry {
   padding-block: var(--space-base);
-  border-bottom: 1px solid var(--bs-border-color-translucent);
+  border-bottom: 1px solid var(--hairline);
 }
 
 .feedback-entry:first-child {
@@ -3121,7 +3120,7 @@ td .tactivity-accept {
    Misc
    ========================================================================== */
 
-/* The only sheen, so it marks AI: 135°, its 50 flat to halfway, then to its 400. Lavender on the default site, the theme on themed pages */
+/* The only sheen, so it marks AI: 135°, its 100 flat to halfway, then to its 400. Lavender on the default site, the theme on themed pages */
 .ai-well {
   background-image: linear-gradient(135deg, var(--ai-well-from) 50%, var(--ai-well-to));
   padding: var(--space-base);
