@@ -82,8 +82,8 @@
   <% if @organisation.persisted? %>
     <div class="nav-wrapper">
       <ul id="organisation-build-nav" class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="nav-item"><a class="nav-link active" href="#tab-basics" role="tab" data-bs-toggle="tab">Basics</a></li>
-        <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-payments" role="tab" data-bs-toggle="tab">Payments</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' unless params[:created] %>" href="#tab-basics" role="tab" data-bs-toggle="tab">Basics</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link <%= 'active' if params[:created] %>" href="#tab-payments" role="tab" data-bs-toggle="tab">Payments</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-emails" role="tab" data-bs-toggle="tab">Emails</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-mailgun" role="tab" data-bs-toggle="tab">Mailgun</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link" href="#tab-analytics" role="tab" data-bs-toggle="tab">Analytics</a></li>
@@ -101,7 +101,7 @@
     <% end %>
 
     <div class="tab-content <%= 'mt-3' if @organisation.persisted? %>">
-      <div role="tabpanel" class="tab-pane active" id="tab-basics">
+      <div role="tabpanel" class="tab-pane <%= 'active' unless params[:created] %>" id="tab-basics">
         <%= f.text_block :name %>
         <div class="slugify">
           <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/o/" %>
@@ -114,7 +114,7 @@
         <% end %>
       </div>
       <% if @organisation.persisted? %>
-        <div role="tabpanel" class="tab-pane" id="tab-payments">
+        <div role="tabpanel" class="tab-pane <%= 'active' if params[:created] %>" id="tab-payments">
           <% if params[:created] %>
             <%= partial :onboarding_callout, locals: { step: 2, organisation: @organisation, title: 'Set up payments', text: 'To accept payments, add details for Stripe or another payment processor.' } %>
           <% else %>
