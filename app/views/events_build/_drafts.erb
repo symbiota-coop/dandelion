@@ -14,7 +14,7 @@ end
         <% drafts.each do |draft| %>
           <li>
             <%
-        uri = URI(draft.url)
+        uri = HttpUrl.parse(draft.url) || HttpUrl.parse("#{ENV['BASE_URI']}/events/new")
         params = Rack::Utils.parse_query(uri.query || '')
         params['draft_id'] = draft.id
         uri.query = Rack::Utils.build_query(params)

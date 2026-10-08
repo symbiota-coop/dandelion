@@ -42,7 +42,7 @@
         <h3 class="card-header text-bg-primary"><%= @event.select_tickets_title || 'Select tickets' %></h3>
         <div class="card-body">
           <p><%= @event.select_tickets_intro %></p>
-          <a target="_blank" href="<%= @event.purchase_url %>" class="btn btn-outline-primary w-100 mb-3"><%= @event.rsvp_button_text || "Book via #{URI(@event.purchase_url).host.gsub('www.','')}" %></a>
+          <a target="_blank" href="<%= @event.purchase_url %>" class="btn btn-outline-primary w-100 mb-3"><%= @event.rsvp_button_text || "Book via #{HttpUrl.host(@event.purchase_url)}" %></a>
           <p><%= @event.select_tickets_outro %></p>
         </div>
       </div>
@@ -70,7 +70,7 @@
   <div id="get-tickets-sidebar" class="d-none d-md-none sticky-under-header">
     <a <% if @event.purchase_url %>target="_blank" href="<%= @event.purchase_url %>"<% else %>href="javascript:;" onclick="$(window).scrollTop($('#purchase').offset()['top'] - $('#header').height() - 17)"<% end %> class="btn btn-primary w-100">
       <% if @event.purchase_url %>
-        <%= @event.rsvp_button_text || "Book via #{URI(@event.purchase_url).host.gsub('www.','')}" %>
+        <%= @event.rsvp_button_text || "Book via #{HttpUrl.host(@event.purchase_url)}" %>
       <% else %>
         Get tickets
       <% end %>

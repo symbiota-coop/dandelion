@@ -33,7 +33,7 @@
                   <% end %>
                   <p class="mb-0 text-body-secondary">
                     <a target="_blank" class="text-body-secondary" href="<%= og['url'] %>">
-                      <%= URI(og['url']).host.gsub('www.', '') %>
+                      <%= HttpUrl.host(og['url']) %>
                     </a>
                     &middot;
                     <a target="_blank" class="text-body-secondary" href="https://bsky.app/profile/<%= account.atproto_handle %>/post/<%= og['hash'] %>">

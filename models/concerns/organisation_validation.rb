@@ -55,12 +55,7 @@ module OrganisationValidation
       end
 
       if patreon_api_key.present?
-        patreon_host = begin
-          url = patreon_api_key.match?(%r{\Ahttps?://}i) ? patreon_api_key : "https://#{patreon_api_key}"
-          URI.parse(url).host&.downcase
-        rescue URI::InvalidURIError
-          nil
-        end
+        patreon_host = HttpUrl.parse(HttpUrl.normalize(patreon_api_key))&.host&.downcase
         patreon_page_url = patreon_host == 'patreon.com' || patreon_host&.end_with?('.patreon.com')
         if patreon_api_key.match?(%r{\Ahttps?://}i) || patreon_page_url
           errors.add(:patreon_api_key, 'must be a creator access token, not a Patreon page URL')

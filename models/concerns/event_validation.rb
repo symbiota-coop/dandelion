@@ -178,7 +178,7 @@ module EventValidation
   end
 
   def safe_redirect_url
-    redirect_url if redirect_url && Event.http_url?(redirect_url)
+    redirect_url if redirect_url && HttpUrl.valid?(redirect_url)
   end
 
   def update_embedding_with_retries

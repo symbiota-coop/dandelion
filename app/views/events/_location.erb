@@ -1,6 +1,6 @@
     <% if event.location == 'Online' %>
   Online
-<% elsif event.location.match?(%r{\Ahttps?://\S+\z}i) %>
+<% elsif HttpUrl.valid?(event.location) %>
   <span class="compact-urls"><a target="_blank" href="<%= event.location %>"><%= event.location %></a></span>
 <% else %>
   <a target="_blank" href="https://www.google.com/maps?q=<%= event.location %>"><%= event.location %></a>

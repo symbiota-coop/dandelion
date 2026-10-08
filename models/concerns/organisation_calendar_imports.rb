@@ -222,7 +222,7 @@ module OrganisationCalendarImports
 
     previous_theme_color = event.theme_color
 
-    location_text_is_http_url = location_text.present? && Event.http_url?(location_text.strip)
+    location_text_is_http_url = location_text.present? && HttpUrl.valid?(location_text.strip)
 
     # Luma often puts the public event URL in LOCATION when the street address is gated ("Register to
     # see address"); GEO still reflects the real venue. Reverse-geocode GEO for a city label when we can.
@@ -248,7 +248,7 @@ module OrganisationCalendarImports
       location: import_location,
       start_time: start_time,
       end_time: end_time,
-      purchase_url: (source_url if source_url && Event.http_url?(source_url)),
+      purchase_url: (source_url if source_url && HttpUrl.valid?(source_url)),
       calendar_import_feed_url: feed_url,
       calendar_import_uid: uid,
       calendar_import_source_url: source_url,
@@ -414,10 +414,9 @@ module OrganisationCalendarImports
   end
 
   def luma_event_page_url?(url)
-    uri = URI.parse(url)
-    return false unless uri.scheme.to_s.downcase.in?(%w[http https])
+    return false unless (uri = HttpUrl.parse(url))
 
-    host = uri.host.to_s.downcase.sub(/\Awww\./, '')
+    host = uri.host.downcase.delete_prefix('www.')
     return false unless LUMA_PAGE_HOSTS.include?(host)
 
     return true if host == 'lu.ma'
@@ -431,7 +430,5 @@ module OrganisationCalendarImports
 
     seg = segments.first.downcase
     seg.match?(/\A[a-z0-9-]+\z/i)
-  rescue URI::InvalidURIError
-    false
   end
 end

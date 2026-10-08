@@ -37,7 +37,7 @@ module AccountAtproto
 
       link_data = {
         'url' => external['uri'],
-        'title' => external['title'] || URI(external['uri']).host,
+        'title' => external['title'] || HttpUrl.host(external['uri']),
         'description' => external['description'],
         'image' => external['thumb'],
         'hash' => post['uri'].split('/').last, # Use post URI as identifier

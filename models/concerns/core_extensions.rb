@@ -48,20 +48,11 @@ module CoreExtensions
     def validates_http_url(*fields)
       before_validation do
         fields.each do |f|
-          url = send(f)&.strip
-          url = nil if url.blank?
-          url = "https://#{url}" if url && !url.match?(/\A[a-z][a-z0-9+.-]*:/i)
+          url = HttpUrl.normalize(send(f))
           send("#{f}=", url)
-          errors.add(f, 'must be a valid http or https URL') if url && send("#{f}_changed?") && !self.class.http_url?(url)
+          errors.add(f, 'must be a valid http or https URL') if url && !HttpUrl.valid?(url)
         end
       end
-    end
-
-    def http_url?(url)
-      uri = URI.parse(url)
-      uri.is_a?(URI::HTTP) && uri.host.present?
-    rescue URI::InvalidURIError, ArgumentError
-      false
     end
 
     def admin_fields

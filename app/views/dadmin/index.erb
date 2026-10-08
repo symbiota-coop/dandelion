@@ -62,7 +62,7 @@
                 <% else %>
                   <%= value %>
                 <% end %>
-              <% elsif fieldname.to_s.end_with?('_url') && value.to_s.match?(%r{\Ahttps?://}i) %>
+              <% elsif fieldname.to_s.end_with?('_url') && HttpUrl.valid?(value) %>
                 <%# Only link web addresses: a javascript: URL here would run in the admin's session %>
                 <a href="<%= value %>" target="_blank" rel="noopener"><%= value %></a>
               <% elsif value.is_a?(Time) || value.is_a?(Date) %>

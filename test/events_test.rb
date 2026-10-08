@@ -414,12 +414,20 @@ class EventsTest < ActiveSupport::TestCase
     assert location.valid?
   end
 
-  test 'an existing bad value does not block saving other fields' do
+  test 'non-ASCII http urls are accepted' do
+    assert HttpUrl.valid?('https://example.com/café')
+    assert HttpUrl.valid?('https://bücher.de/')
+    assert_not HttpUrl.valid?('javascript:alert("é")')
+    assert_not HttpUrl.valid?('https://example.com/a b')
+    assert_equal 'bücher.de', HttpUrl.host('https://www.bücher.de/x')
+
     create_organisation
-    @organisation.set(website: 'javascript:alert(1)')
-    @organisation.reload
-    @organisation.name = 'New name'
+    @organisation.website = 'example.com/café'
     assert @organisation.valid?, @organisation.errors.full_messages.to_sentence
+    assert_equal 'https://example.com/café', @organisation.website
+
+    @organisation.website = 'coming soon'
+    assert_not @organisation.valid?
   end
 
   test 'slug uniqueness includes deleted events' do

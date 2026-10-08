@@ -194,16 +194,17 @@
       <% elsif order.affiliate.is_a?(Organisation) %>
         <a href="/o/<%= order.affiliate.slug %>"><%= order.affiliate.name %></a><br />
       <% end; end %>
-      <% if order.http_referrer && !"#{URI(order.http_referrer).host}#{URI(order.http_referrer).path}".in?(["#{URI(ENV['BASE_URI']).host}/events/#{order.event_id}", "#{URI(ENV['BASE_URI']).host}/e/#{order.event.slug}"])  %>
+      <% referrer = HttpUrl.parse(order.http_referrer); base_host = URI(ENV['BASE_URI']).host %>
+      <% if referrer && !"#{referrer.host}#{referrer.path}".in?(["#{base_host}/events/#{order.event_id}", "#{base_host}/e/#{order.event.slug}"]) %>
         <a href="<%=order.http_referrer%>">
-          <% if URI(order.http_referrer).host == URI(ENV['BASE_URI']).host %>
-            <% if (match = URI(order.http_referrer).path.match(%r{\A/events/([a-z0-9]+)\Z})) && event = Event.find(match[1]) %>
+          <% if referrer.host == base_host %>
+            <% if (match = referrer.path.match(%r{\A/events/([a-z0-9]+)\Z})) && event = Event.find(match[1]) %>
               <%=event.name %>
             <% else %>
-              <%= URI(order.http_referrer).path %>
+              <%= referrer.path %>
             <% end %>
           <% else %>
-            <%= URI(order.http_referrer).host %><%= URI(order.http_referrer).path.truncate(30) %>
+            <%= referrer.host %><%= referrer.path.truncate(30) %>
           <% end %>
         </a>
         <br />

@@ -22,8 +22,7 @@ class PmailLink
 
   before_validation do
     if url
-      uri = begin; URI.parse(url); rescue StandardError; nil; end
-      errors.add(:url, 'is invalid') unless uri.is_a?(URI::HTTP) && uri.host.present?
+      errors.add(:url, 'is invalid') unless HttpUrl.valid?(url)
       errors.add(:url, 'cannot contain sign_in_token') if url.include?('sign_in_token=')
     end
   end
@@ -38,9 +37,8 @@ class PmailLink
   end
 
   def event
-    return unless url
+    return unless (uri = HttpUrl.parse(url))
 
-    uri = URI.parse(url)
     result = "#{uri.scheme}://#{uri.host}#{uri.path}"
 
     return unless (match = result.match(%r{\A#{ENV['BASE_URI']}/e/([a-z0-9-]+)\Z}))
