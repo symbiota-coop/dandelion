@@ -30,6 +30,21 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert page.has_content? 'To accept payments, add details for Stripe or another payment processor.'
   end
 
+  test 'mailgun_domain is reduced to a hostname and must not be the API address' do
+    create_organisation
+    @organisation.assign_attributes(mailgun_api_key: 'key-123', mailgun_region: 'US', mailgun_domain: ' https://MG.example.com/ ')
+    assert @organisation.valid?
+    assert_equal 'mg.example.com', @organisation.mailgun_domain
+
+    @organisation.mailgun_domain = 'https://api.mailgun.net'
+    assert !@organisation.valid?
+    assert_includes @organisation.errors[:mailgun_domain], "must be your sending domain from Mailgun's Domains page, not Mailgun's API address"
+
+    @organisation.mailgun_domain = 'not a domain'
+    assert !@organisation.valid?
+    assert_includes @organisation.errors[:mailgun_domain], 'must be a domain like mg.example.com'
+  end
+
   test 'editing an organisation' do
     create_organisation
     sign_in(@account)

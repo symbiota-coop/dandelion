@@ -19,6 +19,14 @@ module OrganisationValidation
       end
       errors.add(:affiliate_credit_percentage, 'must be between 1 and 100') if affiliate_credit_percentage && (affiliate_credit_percentage < 1 || affiliate_credit_percentage > 100)
 
+      if mailgun_domain
+        self.mailgun_domain = mailgun_domain.strip.downcase.sub(%r{\A[a-z]+://}, '').split('/').first
+        if !mailgun_domain || !mailgun_domain.match?(/\A[a-z0-9-]+(\.[a-z0-9-]+)+\z/)
+          errors.add(:mailgun_domain, 'must be a domain like mg.example.com')
+        elsif mailgun_domain.match?(/\Aapi(\.eu)?\.mailgun\.net\z/)
+          errors.add(:mailgun_domain, "must be your sending domain from Mailgun's Domains page, not Mailgun's API address")
+        end
+      end
       errors.add(:mailgun_domain, 'must not be a sandbox domain') if mailgun_domain && mailgun_domain.starts_with?('sandbox') && mailgun_domain.ends_with?('mailgun.org')
 
       errors.add(:mailgun_domain, 'must be provided if other Mailgun details have been provided') if (mailgun_api_key || mailgun_region) && !mailgun_domain

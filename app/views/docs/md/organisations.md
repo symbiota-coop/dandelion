@@ -68,6 +68,8 @@ We offer a free gift of 1 email per month for up to 1000 subscribers. Beyond tha
 
 After sending a free gift email, open and click rates appear on the sent message page under Mailer. Organisations with their own Mailgun account also get a link through to Mailgun analytics.
 
+To link your account, enter your Mailgun API key, region and sending domain (e.g. `mg.example.com`, from `Sending` > `Domains` in Mailgun). The domain is your own sending domain, not Mailgun's API address (`api.mailgun.net`).
+
 For per-link click tracking (including desktop/mobile/tablet), configure a Mailgun `Clicked` webhook to your organisation's webhook URL (shown under Mailgun settings) and paste the HTTP webhook signing key from [API security](https://app.mailgun.com/settings/api_security).
 
 ## Community event submissions
