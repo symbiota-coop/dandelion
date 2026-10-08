@@ -6,12 +6,14 @@
   <p class="stars">
     <%= event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating %>
   </p>
-  <table>
-    <% event_feedback.answers.each { |q,a| %>
-    <tr>
-      <th><%= q %></th>
-      <td><%= a %></td>
-    </tr>
-    <% } %>
-  </table>
+  <% if event_feedback.answers %>
+    <table>
+      <% event_feedback.answers.each { |q,a| %>
+      <tr>
+        <th><%= q %></th>
+        <td><%= a %></td>
+      </tr>
+      <% } %>
+    </table>
+  <% end %>
 </div>
