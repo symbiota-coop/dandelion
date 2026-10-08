@@ -27,7 +27,7 @@ class OrganisationsTest < ActiveSupport::TestCase
     fill_in 'Organisation name', with: organisation.name
     fill_in 'URL', with: organisation.slug
     click_button 'Save and continue'
-    assert page.has_content? 'To accept payments, now add details for Stripe or another payment processor.'
+    assert page.has_content? 'To accept payments, add details for Stripe or another payment processor.'
   end
 
   test 'editing an organisation' do
@@ -36,7 +36,7 @@ class OrganisationsTest < ActiveSupport::TestCase
     visit "/o/#{@organisation.slug}/edit"
     fill_in 'Organisation name', with: FactoryBot.build_stubbed(:organisation).name
     click_button 'Update organisation'
-    assert page.has_content? "Now let's create an event under your new organisation."
+    assert page.has_content? "Now let's create an event under your new organisation"
   end
 
   test 'creating an organisation via referral link sets referrer' do
