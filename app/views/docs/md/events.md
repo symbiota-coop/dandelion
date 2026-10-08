@@ -4,12 +4,7 @@
 
 Check out the video below, which does assume you have a [Stripe](https://stripe.com/) account.
 
-<div class="raw-html-embed">
-  <div class="ratio ratio-16x9 mb-3">
-    <iframe src="https://player.vimeo.com/video/1030013082?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write" title="How to create an event on Dandelion" allowfullscreen="">
-    </iframe>
-  </div>
-  <script src="https://player.vimeo.com/api/player.js"></script></div>
+<div class="raw-html-embed"><video src="/videos/how_to_create_an_event.mp4" poster="/videos/how_to_create_an_event.jpg" controls preload="none" playsinline class="w-100 rounded mb-3" title="How to create an event on Dandelion"></video></div>
 
 > Hi, I'm going to show you how easy it is to set up an event on Dandelion. Start by clicking 'List an event'.
 >

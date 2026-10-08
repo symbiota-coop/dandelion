@@ -23,7 +23,7 @@ Capybara.register_driver :cuprite do |app|
   options[:js_errors] = false
   options[:timeout] = 60
   options[:process_timeout] = 30
-  options[:window_size] = [1280, 720]
+  options[:window_size] = ENV['CREATE_VIDEO'] ? [1920, 1080] : [1280, 720]
   options[:headless] = true
   options[:browser_options] = {}
   options[:browser_options]['no-sandbox'] = nil if Process.uid.zero? # Chromium won't start as root (e.g. cloud agent containers) otherwise
@@ -44,7 +44,7 @@ module ActiveSupport
       reset!
       if ENV['CREATE_VIDEO']
         FileUtils.rm_f(Dir.glob("#{Capybara.save_path}/*.{png,mp4}"))
-        @step = 1
+        @video_steps = []
         @client = OpenAI::Client.new
       end
     end

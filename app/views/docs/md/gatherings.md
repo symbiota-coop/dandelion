@@ -6,12 +6,7 @@ This feature was originally developed to support camps at European Burning Man e
 
 Check out the video below, which does assume you have a [Stripe](https://stripe.com/) account.
 
-<div class="raw-html-embed"><div class="ratio ratio-16x9 mb-3">
-  <iframe src="https://player.vimeo.com/video/1030016108?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write" title="How to create a gathering on Dandelion" allowfullscreen="">
-  </iframe>
-</div>
-<script src="https://player.vimeo.com/api/player.js"></script>
-</div>
+<div class="raw-html-embed"><video src="/videos/how_to_create_a_gathering.mp4" poster="/videos/how_to_create_a_gathering.jpg" controls preload="none" playsinline class="w-100 rounded mb-3" title="How to create a gathering on Dandelion"></video></div>
 
 > Dandelion Gatherings are highly co-created gatherings typically lasting between 2 days and 2 weeks, for 20 to 200 people.
 >
