@@ -50,6 +50,7 @@ jobs:
           mkdir -p ~/.codex
           printf '%s' "$CODEX_AUTH_JSON" > ~/.codex/auth.json
           chmod 600 ~/.codex/auth.json
+          sha256sum ~/.codex/auth.json > ~/.codex/auth.json.sha256
 
       - name: Run bug review
         if: steps.setup.outputs.has_commits == 'true'
@@ -99,3 +100,19 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
           exit "$codex_status"
+
+      # ChatGPT refresh tokens are single-use, so once Codex refreshes its login the secret's copy is dead.
+      # Save the refreshed auth.json back to the secret (GITHUB_TOKEN can't write secrets, hence the PAT).
+      - name: Save refreshed Codex login
+        if: always() && steps.setup.outputs.has_commits == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.CODEX_AUTH_SECRET_WRITER }}
+        run: |
+          if sha256sum --check --status ~/.codex/auth.json.sha256; then
+            echo "Codex login unchanged."
+          elif [ -z "$GH_TOKEN" ]; then
+            echo "::warning::Codex refreshed its login but CODEX_AUTH_SECRET_WRITER is not set, so CODEX_AUTH_JSON is now stale."
+          else
+            gh secret set CODEX_AUTH_JSON --repo "$GITHUB_REPOSITORY" < ~/.codex/auth.json
+            echo "Saved refreshed Codex login to CODEX_AUTH_JSON."
+          fi
