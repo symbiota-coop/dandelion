@@ -193,8 +193,9 @@ module Searchable
         end
 
         if build_records
+          # instantiate (not new) so the records count as saved, like a query's, and their associations query the database
           results.map do |hash|
-            new(hash.select { |k, _v| fields.keys.include?(k.to_s) })
+            instantiate(hash.select { |k, _v| fields.keys.include?(k.to_s) })
           end
         else
           results.map { |doc| { id: doc[:_id] } }

@@ -7,10 +7,11 @@ class SearchTest < ActiveSupport::TestCase
   class CapturingCollection
     attr_reader :pipelines, :kwargs_list
 
-    def initialize(error: nil)
+    def initialize(error: nil, documents: [])
       @pipelines = []
       @kwargs_list = []
       @error = error
+      @documents = documents
       @calls = 0
     end
 
@@ -20,7 +21,7 @@ class SearchTest < ActiveSupport::TestCase
       @calls += 1
       raise @error if @error && @calls == 1
 
-      []
+      @documents
     end
   end
 
@@ -314,5 +315,20 @@ class SearchTest < ActiveSupport::TestCase
 
     assert_equal 96, error.code
     assert_equal 1, collection.pipelines.length
+  end
+
+  test 'built search results count as saved, so their through associations query the database' do
+    account = FactoryBot.create(:account)
+    followee = FactoryBot.create(:account)
+    Follow.create!(follower: account, followee: followee)
+    collection = CapturingCollection.new(documents: [Account.collection.find(_id: account.id).first])
+
+    results = Account.stub(:collection, collection) do
+      Account.search(account.name, Account.unscoped, build_records: true, regex_search: false)
+    end
+
+    result = results.first
+    assert result.persisted?
+    assert_equal followee, result.network.find(followee.id)
   end
 end

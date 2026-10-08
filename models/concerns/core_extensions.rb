@@ -257,7 +257,7 @@ module CoreExtensions
     def has_many_through(name, through:, class_name: nil, foreign_key: nil, conditions: nil) # rubocop:disable Naming/PredicatePrefix
       class_name_string = class_name || name.to_s.singularize.camelize
 
-      fk = foreign_key || "#{class_name_string.underscore}_id"
+      fk = (foreign_key || "#{class_name_string.underscore}_id").to_s
 
       ids_method = "#{name.to_s.singularize}_ids"
       collection_method = name
