@@ -18,7 +18,7 @@
       urlParams.forEach(function(value, key) {
         // Skip parameters that are already handled by the form
         if (key !== 'minimal' && key !== 'carousel_ids[]' && key !== 'near' && key !== 'display') {
-          form.append('<input type="hidden" name="' + key + '" value="' + value + '">');
+          form.append($('<input type="hidden">').attr({ name: key, value: value }));
         }
       });
     }
