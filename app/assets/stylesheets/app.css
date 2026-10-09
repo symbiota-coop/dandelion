@@ -2149,6 +2149,11 @@ a.ui-button:active,
     margin-left: 0;
   }
 
+  /* A new block formatting context keeps the full-width buttons beside the floated photo rather than under it */
+  .search-result-stacked .search-result-header {
+    display: flow-root;
+  }
+
   .search-result-stacked .search-result-details {
     clear: left;
   }

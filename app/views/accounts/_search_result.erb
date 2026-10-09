@@ -3,10 +3,12 @@
 </div>
 <div class="search-result-content search-result-stacked">
 
-  <h2>
-    <a class="text-body" href="/u/<%= account.username %>"><%= account.name %></a>
-  </h2>
-  <%= partial :'accounts/buttons', locals: { account: account } %>
+  <div class="search-result-header">
+    <h2>
+      <a class="text-body" href="/u/<%= account.username %>"><%= account.name %></a>
+    </h2>
+    <%= partial :'accounts/buttons', locals: { account: account } %>
+  </div>
   <div class="search-result-details pt-2">
     <% if defined?(facilitator_info) && facilitator_info %>
       <%= partial :'accounts/facilitator_info', locals: { account: account } %>
