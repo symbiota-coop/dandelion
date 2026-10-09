@@ -176,7 +176,7 @@
 }
 
 /* ==========================================================================
-   Loader: a bar along the top and a spinner, on slow ajax GETs and while leaving the page (app.js)
+   Loader: a bar along the top and a spinner, on slow ajax GETs and while leaving the page (loader.js)
    ========================================================================== */
 
 .loader {
@@ -189,11 +189,11 @@
   z-index: 2000;
   top: 0;
   left: 0;
-  width: 0;
+  width: 100%;
   height: 0.125rem;
   background: var(--gradient-active);
-  border-radius: var(--bs-border-radius);
-  transition: width 0.2s ease-out;
+  transform: scaleX(0);
+  transform-origin: left;
 }
 
 .loader-spinner {
