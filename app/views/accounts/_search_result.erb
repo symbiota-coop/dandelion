@@ -1,30 +1,34 @@
-<div class="search-result-media h-auto me-3">
-  <%= partial :'accounts/square', locals: { account: account, klass: 'd-block', size: :fill } %>
-</div>
-<div class="search-result-content search-result-stacked">
-
-  <h2>
-    <a class="text-body" href="/u/<%= account.username %>"><%= account.name %></a>
-  </h2>
-  <%= partial :'accounts/buttons', locals: { account: account } %>
-  <div class="search-result-details pt-2">
-    <% if defined?(facilitator_info) && facilitator_info %>
-      <%= partial :'accounts/facilitator_info', locals: { account: account } %>
-    <% else %>
-      <%= partial :'accounts/table', locals: { account: account, birthday: defined?(birthday) } %>
-    <% end %>
+<div class="search-result-person">
+  <div class="search-result-media h-auto me-3">
+    <%= partial :'accounts/square', locals: { account: account, klass: 'd-block', size: :fill } %>
   </div>
+  <div class="search-result-content search-result-stacked">
 
-  <% if defined?(facilitator_info) && facilitator_info %>
+    <div class="search-result-header">
+      <h2>
+        <a class="text-body" href="/u/<%= account.username %>"><%= account.name %></a>
+      </h2>
+      <%= partial :'accounts/buttons', locals: { account: account } %>
+    </div>
+    <div class="search-result-details pt-2">
+      <% if defined?(facilitator_info) && facilitator_info %>
+        <%= partial :'accounts/facilitator_info', locals: { account: account } %>
+      <% else %>
+        <%= partial :'accounts/table', locals: { account: account, birthday: defined?(birthday) } %>
+      <% end %>
+    </div>
 
-    <% if account.feedback_summary %>
-      <div class="mt-2">
-        <div class="mb-1 readable" data-bs-toggle="tooltip" title="AI-generated summary ✨">
-          <%= account.feedback_summary_html %>
+    <% if defined?(facilitator_info) && facilitator_info %>
+
+      <% if account.feedback_summary %>
+        <div class="mt-2">
+          <div class="mb-1 readable" data-bs-toggle="tooltip" title="AI-generated summary ✨">
+            <%= account.feedback_summary_html %>
+          </div>
         </div>
-      </div>
+      <% end %>
+
     <% end %>
 
-  <% end %>
-
+  </div>
 </div>
