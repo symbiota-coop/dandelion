@@ -100,7 +100,7 @@ Dandelion::App.helpers do
     case host
     when 'cdnjs.cloudflare.com'
       fetch_cdnjs_dependency(path)
-    when 'rawcdn.githack.com'
+    when 'cdn.jsdelivr.net'
       fetch_github_dependency(path)
     end
   rescue URI::InvalidURIError
@@ -162,11 +162,9 @@ Dandelion::App.helpers do
   end
 
   def fetch_github_dependency(path)
-    # GitHub format: 'user/repo/commit' => 'files'
-    parts = path.split('/')
-    user = parts[0]
-    repo = parts[1]
-    commit = parts[2]
+    # jsDelivr GitHub format: 'user/repo@commit' => 'files'
+    user, repo_and_commit = path.split('/')
+    repo, commit = repo_and_commit.split('@')
 
     client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
     data = client.commit("#{user}/#{repo}", commit)

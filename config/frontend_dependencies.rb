@@ -22,12 +22,12 @@ FRONTEND_DEPENDENCIES = {
     'typed.js/2.0.10' => 'typed.min.js',
     'chartjs-plugin-datalabels/2.0.0' => 'chartjs-plugin-datalabels.min.js'
   },
-  'https://rawcdn.githack.com/' => {
-    'mahnunchik/markerclustererplus/736b0e3a7d916fbeb2ee5007494f17a5329b11a8' => 'src/markerclusterer.js',
-    'scottdejonge/map-icons/dbf6fd7caedd60d11b5bfb5f267a114a6847d012' => 'dist/js/map-icons.js dist/css/map-icons.min.css',
-    'scottgonzalez/jquery-ui-extensions/fb7fd7df3d70e0288394f07bfe78262b548c30d6' => 'src/autocomplete/jquery.ui.autocomplete.html.js',
-    'mdbassit/Coloris/a00946eb69780d2ba3b906c3f4535b03f987cc05' => 'dist/coloris.min.js dist/coloris.min.css',
-    'symbiota-coop/ckeditor5-dandelion/e9616f73489fd5d4fb2b143ed5d1e17e6fd467f0' => 'build/ckeditor.js'
+  'https://cdn.jsdelivr.net/gh/' => {
+    'mahnunchik/markerclustererplus@736b0e3a7d916fbeb2ee5007494f17a5329b11a8' => 'src/markerclusterer.js',
+    'scottdejonge/map-icons@dbf6fd7caedd60d11b5bfb5f267a114a6847d012' => 'dist/js/map-icons.js dist/css/map-icons.min.css',
+    'scottgonzalez/jquery-ui-extensions@fb7fd7df3d70e0288394f07bfe78262b548c30d6' => 'src/autocomplete/jquery.ui.autocomplete.html.js',
+    'mdbassit/Coloris@a00946eb69780d2ba3b906c3f4535b03f987cc05' => 'dist/coloris.min.js dist/coloris.min.css',
+    'symbiota-coop/ckeditor5-dandelion@e9616f73489fd5d4fb2b143ed5d1e17e6fd467f0' => 'build/ckeditor.js'
   },
   '/javascripts/' => {
     'ext' => 'autosize.js countUp.umd.js jquery-deparam.js linkify.min.js linkify-jquery.min.js',

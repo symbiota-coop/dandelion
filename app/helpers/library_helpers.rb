@@ -2,7 +2,7 @@ Dandelion::App.helpers do
   def library_csv(name)
     require 'csv'
     CSV.parse(
-      Faraday.get("https://rawcdn.githack.com/stephenreid321/stephenreid/master/data/#{name}.csv").body,
+      Faraday.get("https://cdn.jsdelivr.net/gh/stephenreid321/stephenreid@master/data/#{name}.csv").body,
       headers: true
     ).map do |row|
       row.to_h
@@ -17,7 +17,7 @@ Dandelion::App.helpers do
   def library_image_url(path)
     return unless path
 
-    "https://rawcdn.githack.com/stephenreid321/stephenreid/master/app/assets#{path}"
+    "https://cdn.jsdelivr.net/gh/stephenreid321/stephenreid@master/app/assets#{path}"
   end
 
   def library_books

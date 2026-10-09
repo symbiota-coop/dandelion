@@ -11,7 +11,7 @@
 
 @font-face {
   font-family: 'Hanken Grotesk';
-  src: url('https://rawcdn.githack.com/marcologous/hanken-grotesk/1ab416e82130b2d3ddb7710abf7ceabf07156a13/fonts/variable/HankenGrotesk-Italic%5Bwght%5D.ttf') format('truetype');
+  src: url('https://cdn.jsdelivr.net/gh/marcologous/hanken-grotesk@1ab416e82130b2d3ddb7710abf7ceabf07156a13/fonts/variable/HankenGrotesk-Italic%5Bwght%5D.ttf') format('truetype');
   font-weight: 100 900;
   font-style: italic;
   font-display: swap;
@@ -22,7 +22,7 @@
 /* App */
 @font-face {
   font-family: 'Hanken Grotesk';
-  src: url('https://rawcdn.githack.com/marcologous/hanken-grotesk/1ab416e82130b2d3ddb7710abf7ceabf07156a13/fonts/variable/HankenGrotesk%5Bwght%5D.ttf') format('truetype');
+  src: url('https://cdn.jsdelivr.net/gh/marcologous/hanken-grotesk@1ab416e82130b2d3ddb7710abf7ceabf07156a13/fonts/variable/HankenGrotesk%5Bwght%5D.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
