@@ -92,7 +92,7 @@ module Padrino
           content = %(<span class="stem">#{stem}</span>) + text_field(fieldname,
                                                                       class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
                                                                                                'is-invalid'
-                                                                                             end} shorturl", required: (r = required || model_required(fieldname)), disabled: disabled, placeholder: placeholder) + (object.persisted? && object.send(fieldname) ? %(<a href="javascript:;"><i class="bi bi-link-45deg"></i></a>) : '')
+                                                                                             end} shorturl", required: (r = required || model_required(fieldname)), disabled: disabled, placeholder: placeholder) + (object.persisted? && object.send(fieldname) ? %(<a href="javascript:;" data-bs-toggle="tooltip" title="Click to copy"><i class="bi bi-link-45deg"></i></a>) : '')
           block_layout(fieldname, content, tip: tip, hint: hint, container_class: container_class,
                                            label_class: label_class, div_class: div_class, required: r)
         end

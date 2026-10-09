@@ -687,9 +687,9 @@
         <div class="border rounded p-4">
           <div class="mb-3">
             <label for="dg-shorturl">Short URL</label>
-            <div><span class="stem">https://dandelion.events/o/</span><input type="text" class="form-control shorturl" id="dg-shorturl" autocomplete="off" value="symbiota"> <a href="#components"><i class="bi bi-link-45deg"></i></a></div>
+            <div><span class="stem">https://dandelion.events/o/</span><input type="text" class="form-control shorturl" id="dg-shorturl" autocomplete="off" value="symbiota"> <a href="javascript:;" data-bs-toggle="tooltip" title="Click to copy"><i class="bi bi-link-45deg"></i></a></div>
           </div>
-          <div class="spec">shorturl_block (lib/form_builder.rb), for slugs on the build pages: the address's stem as text, then an inline input with only a dotted --bs-gray-400 underline and no focus ring, 15em wide, so it reads as part of the address · a link icon once saved · in .slugify, it fills in from the name</div>
+          <div class="spec">shorturl_block (lib/form_builder.rb), for slugs on the build pages: the address's stem as text, then an inline input with only a dotted --bs-gray-400 underline and no focus ring, 15em wide, so it reads as part of the address · a link icon once saved, which copies the address (Click to copy, then Copied!) and hides while the slug is edited · in .slugify, it fills in from the name</div>
         </div>
       <% end %>
 

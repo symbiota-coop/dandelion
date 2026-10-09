@@ -158,18 +158,9 @@ $(function () {
       if (brIndex !== -1) {
         const beforeBr = html.substring(0, brIndex)
 
-        // Store the full content
+        // Keep the full content for the Read more link below
         $element.data('full-content', html)
-
-        // Set initial truncated content with ellipsis
         $element.html(beforeBr + '<br /><a href="javascript:;" class="read-more-toggle">Read more</a>')
-
-        // Add click handler - expand permanently
-        $element.on('click', '.read-more-toggle', function (e) {
-          e.preventDefault()
-          // Expand to show full content
-          $element.html($element.data('full-content'))
-        })
       }
     })
 
@@ -206,24 +197,6 @@ $(function () {
       })
       title.keyup(function () {
         if (start_length == 0 && slug.data('focus') != true) { slug.val(title.val().toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')) }
-      })
-    })
-
-    $('input[type=text].shorturl').once('shorturl').each(function () {
-      const input = $(this)
-      const stem = $(this).prev()
-      const link = $(this).next()
-      link.attr('data-bs-toggle', 'tooltip')
-      link.attr('title', 'Click to copy')
-      link.click(function () {
-        navigator.clipboard.writeText(stem.text() + input.val())
-        link.tooltip('dispose')
-        link.attr('title', 'Copied!')
-        link.tooltip().tooltip('show')
-        return false
-      })
-      input.keydown(function () {
-        link.hide()
       })
     })
 
@@ -401,6 +374,26 @@ $(function () {
       $link.tab('show')
     }
   }
+
+  // Expand a .read-more for good
+  $(document).on('click', '.read-more-toggle', function (e) {
+    e.preventDefault()
+    const $element = $(this).closest('.read-more')
+    $element.html($element.data('full-content'))
+  })
+
+  // A saved short URL's link icon copies the whole address. Editing the slug hides it, as it no longer matches
+  $(document).on('click', 'input.shorturl + a', function (e) {
+    e.preventDefault()
+    const $input = $(this).prev()
+    navigator.clipboard.writeText($input.prev('.stem').text() + $input.val())
+    const tooltip = bootstrap.Tooltip.getOrCreateInstance(this)
+    tooltip.setContent({ '.tooltip-inner': 'Copied!' })
+    tooltip.show()
+  })
+  $(document).on('keydown', 'input.shorturl', function () {
+    $(this).next('a').hide()
+  })
 
   $(document).on('click', '[data-check-url]', function () {
     $(this).removeClass('with-label')
