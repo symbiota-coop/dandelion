@@ -1,0 +1,11 @@
+<% if @event.past? %>
+  <% if @event.recording? %>
+    <div class="alert alert-primary">
+      <p class="mb-0">Access a recording of this event that started on <%=@event.start_time.to_date%> 🍿</p>
+    </div>
+  <% elsif !@event.show_after_start_time? %>
+    <div class="alert alert-danger">
+      <p class="mb-0">This event started <%= time_ago_in_words @event.start_time %> ago</p>
+    </div>
+  <% end %>
+<% end %>

@@ -429,10 +429,6 @@ $(function () {
       return false
     }
 
-    if (config.timeAgo && !config.embedded) {
-      if (!confirm('This event started ' + config.timeAgo + ' ago. Press OK to continue, or Cancel to go back.')) { return false }
-    }
-
     if (!config.signedIn && !config.embedded) {
       if (!confirm('You entered your email address as ' + $('#account_email').val() + '. Press OK to continue, or Cancel to go back.')) { return false }
     }

@@ -30,17 +30,7 @@ end
   <div class="<% unless @concise_ticket_form %>card-body<% end %>">
 
     <% unless @concise_ticket_form %>
-      <% if @event.past? %>
-        <% if @event.recording? %>
-          <div class="alert alert-primary">
-            <p class="mb-0">Access a recording of this event that started on <%=@event.start_time.to_date%> 🍿</p>
-          </div>
-        <% elsif !@event.show_after_start_time? %>
-          <div class="alert alert-danger">
-            <p class="mb-0">This event started <%= time_ago_in_words @event.start_time %> ago</p>
-          </div>
-        <% end %>
-      <% end %>
+      <%= partial :'purchase/started' %>
       <% if @event.select_tickets_intro %>
         <table class="table table-borderless mb-0">
           <tr>
@@ -130,6 +120,10 @@ end
     <% end %>
   </h3>
   <div class="card-body" id="details">
+    <%# The concise form has no ticket table above, so it says here when the event started %>
+    <% if @concise_ticket_form %>
+      <%= partial :'purchase/started' %>
+    <% end %>
     <script>
       $(function () {
         $('#account_name').attr('required', 'required')
@@ -235,8 +229,7 @@ end
     donationsToDandelion: !!@event.donations_to_dandelion?,
     platformDonationMethods: EventPaymentMethod.platform_donation_names,
     cardMethods: EventPaymentMethod.all.select(&:card).map(&:name),
-    recaptchaEnabled: !!ENV['RECAPTCHA_SITE_KEY'],
-    timeAgo: (@event.past? && !@event.recording? && !@event.show_after_start_time? ? time_ago_in_words(@event.start_time) : nil)
+    recaptchaEnabled: !!ENV['RECAPTCHA_SITE_KEY']
   }
 %>
 <script type="application/json" id="purchase-config">
