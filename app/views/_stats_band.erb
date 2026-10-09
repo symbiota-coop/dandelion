@@ -20,9 +20,10 @@
                                               else
                                                 [worth.round, 0, '']
                                               end
-  # Running totals at each month boundary, so the last minus the first is the last 12 months
-  tickets_last_year = s[:ticket_totals].length > 1 ? s[:ticket_totals].last - s[:ticket_totals].first : 0
-  events_last_year = s[:event_totals].length > 1 ? s[:event_totals].last - s[:event_totals].first : 0
+  # The sparklines are illustrative, not real figures: running totals only ever look like a straight line up, so
+  # these rise in uneven steps, as months do. Tickets and events get different shapes
+  ticket_sparkline = [100, 103, 111, 113, 122, 136, 139, 141, 156, 163, 166, 182, 190]
+  event_sparkline = [100, 108, 110, 112, 124, 127, 140, 142, 145, 158, 161, 163, 176]
   rating = s[:average_rating]
   # Whole stars, then a half star from .25, rounding up from .75
   stars = (rating ? 5.times.map { |i| rating - i } : []).map do |left|
@@ -113,9 +114,9 @@
     <div class="stats-band-cell">
       <div class="stats-band-value"><span data-count-up="<%= ticket_count %>"><%= ticket_count.to_fs(:delimited) %></span></div>
       <div class="stats-band-label">tickets sold</div>
-      <% if tickets_last_year.positive? %>
-        <div class="stats-band-visual" data-sparkline="<%= s[:ticket_totals].join(',') %>" role="img" aria-label="Tickets sold in total over the last 12 months"></div>
-        <div class="stats-band-context"><%= tickets_last_year.to_fs(:delimited) %> in the last 12 months</div>
+      <div class="stats-band-visual" data-sparkline="<%= ticket_sparkline.join(',') %>" aria-hidden="true"></div>
+      <% if s[:tickets_last_year].positive? %>
+        <div class="stats-band-context"><%= s[:tickets_last_year].to_fs(:delimited) %> in the last 12 months</div>
       <% end %>
     </div>
   <% end %>
@@ -124,8 +125,7 @@
     <div class="stats-band-cell">
       <div class="stats-band-value"><%= symbol %><span data-count-up="<%= worth_value %>" data-decimals="<%= worth_decimals %>"><%= worth_decimals.zero? ? worth_value.to_fs(:delimited) : worth_value %></span><%= worth_suffix %>+</div>
       <div class="stats-band-label">in ticket sales</div>
-      <div class="stats-band-visual"><span class="zero">0% fees</span></div>
-      <div class="stats-band-context">Paid straight to organisers</div>
+      <div class="stats-band-visual"><span class="zero">0% platform fees</span></div>
     </div>
   <% end %>
 
@@ -133,9 +133,7 @@
     <div class="stats-band-cell">
       <div class="stats-band-value"><span data-count-up="<%= s[:event_count] %>"><%= s[:event_count].to_fs(:delimited) %></span></div>
       <div class="stats-band-label">events listed</div>
-      <% if events_last_year.positive? %>
-        <div class="stats-band-visual" data-sparkline="<%= s[:event_totals].join(',') %>" role="img" aria-label="Events listed in total over the last 12 months"></div>
-      <% end %>
+      <div class="stats-band-visual" data-sparkline="<%= event_sparkline.join(',') %>" aria-hidden="true"></div>
       <% if s[:organisation_count].positive? %>
         <div class="stats-band-context">by <%= s[:organisation_count].to_fs(:delimited) %> <%= s[:organisation_count] == 1 ? 'organisation' : 'organisations' %></div>
       <% end %>
