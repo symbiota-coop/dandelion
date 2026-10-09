@@ -5,9 +5,7 @@ $(function () {
   function offsetToolbars () {
     const headerHeight = fixedHeaderHeight()
     editors.forEach(function (editor) {
-      if (editor.ui && editor.ui.view && editor.ui.view.stickyPanel) {
-        editor.ui.view.stickyPanel.viewportTopOffset = headerHeight
-      }
+      editor.ui.viewportOffset = { top: headerHeight }
     })
   }
 
@@ -17,8 +15,8 @@ $(function () {
     $('textarea.wysiwyg').once('wysiwyg').each(function () {
       const textarea = this
       ClassicEditor.create(textarea, {
-        toolbar: {
-          viewportTopOffset: fixedHeaderHeight()
+        ui: {
+          viewportOffset: { top: fixedHeaderHeight() }
         },
         simpleUpload: {
           uploadUrl: '/upload'

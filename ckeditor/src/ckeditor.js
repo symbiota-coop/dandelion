@@ -1,80 +1,70 @@
 /**
- * @license Copyright (c) 2003-2021, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2023, CKSource Holding sp. z o.o. All rights reserved.
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
  */
 
-// The editor creator to use.
-import ClassicEditorBase from '@ckeditor/ckeditor5-editor-classic/src/classiceditor'
+// Dandelion's CKEditor 5 build, on CKEditor 37.1.0: the last version without the Powered by CKEditor badge, which
+// 38 added for open source use. Run `rake ckeditor:build` to write app/assets/javascripts/ext/ckeditor.js
 
-import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials'
-import UploadAdapter from '@ckeditor/ckeditor5-adapter-ckfinder/src/uploadadapter'
-import Autoformat from '@ckeditor/ckeditor5-autoformat/src/autoformat'
-import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold'
-import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic'
-import BlockQuote from '@ckeditor/ckeditor5-block-quote/src/blockquote'
-import CKFinder from '@ckeditor/ckeditor5-ckfinder/src/ckfinder'
-import EasyImage from '@ckeditor/ckeditor5-easy-image/src/easyimage'
-import Heading from '@ckeditor/ckeditor5-heading/src/heading'
-import Image from '@ckeditor/ckeditor5-image/src/image'
-import ImageCaption from '@ckeditor/ckeditor5-image/src/imagecaption'
-import ImageStyle from '@ckeditor/ckeditor5-image/src/imagestyle'
-import ImageToolbar from '@ckeditor/ckeditor5-image/src/imagetoolbar'
-import ImageUpload from '@ckeditor/ckeditor5-image/src/imageupload'
-import Indent from '@ckeditor/ckeditor5-indent/src/indent'
-import Link from '@ckeditor/ckeditor5-link/src/link'
-import LinkImage from '@ckeditor/ckeditor5-link/src/linkimage'
-import List from '@ckeditor/ckeditor5-list/src/list'
-import MediaEmbed from '@ckeditor/ckeditor5-media-embed/src/mediaembed'
-import Paragraph from '@ckeditor/ckeditor5-paragraph/src/paragraph'
-import PasteFromOffice from '@ckeditor/ckeditor5-paste-from-office/src/pastefromoffice'
-import Table from '@ckeditor/ckeditor5-table/src/table'
-import TableToolbar from '@ckeditor/ckeditor5-table/src/tabletoolbar'
-import TextTransformation from '@ckeditor/ckeditor5-typing/src/texttransformation'
-import CloudServices from '@ckeditor/ckeditor5-cloud-services/src/cloudservices'
-import Alignment from '@ckeditor/ckeditor5-alignment/src/alignment'
-import Font from '@ckeditor/ckeditor5-font/src/font'
-import SimpleUploadAdapter from '@ckeditor/ckeditor5-upload/src/adapters/simpleuploadadapter'
-import ImageResize from '@ckeditor/ckeditor5-image/src/imageresize'
-import HtmlEmbed from '@ckeditor/ckeditor5-html-embed/src/htmlembed'
-import CodeBlock from '@ckeditor/ckeditor5-code-block/src/codeblock'
-import HorizontalLine from '@ckeditor/ckeditor5-horizontal-line/src/horizontalline';
+import { ClassicEditor as ClassicEditorBase } from '@ckeditor/ckeditor5-editor-classic'
+
+import { Alignment } from '@ckeditor/ckeditor5-alignment'
+import { Autoformat } from '@ckeditor/ckeditor5-autoformat'
+import { Bold, Italic } from '@ckeditor/ckeditor5-basic-styles'
+import { BlockQuote } from '@ckeditor/ckeditor5-block-quote'
+import { CodeBlock } from '@ckeditor/ckeditor5-code-block'
+import { Essentials } from '@ckeditor/ckeditor5-essentials'
+import { FontBackgroundColor, FontColor } from '@ckeditor/ckeditor5-font'
+import { Heading } from '@ckeditor/ckeditor5-heading'
+import { HorizontalLine } from '@ckeditor/ckeditor5-horizontal-line'
+import { HtmlEmbed } from '@ckeditor/ckeditor5-html-embed'
+import { ImageCaption, ImageResize, ImageStyle, ImageToolbar, ImageUpload } from '@ckeditor/ckeditor5-image'
+// Not exported from the package root in 37
+import ImageBlock from '@ckeditor/ckeditor5-image/src/imageblock'
+import { Indent } from '@ckeditor/ckeditor5-indent'
+import { Link, LinkImage } from '@ckeditor/ckeditor5-link'
+import { List } from '@ckeditor/ckeditor5-list'
+import { MediaEmbed } from '@ckeditor/ckeditor5-media-embed'
+import { Paragraph } from '@ckeditor/ckeditor5-paragraph'
+import { PasteFromOffice } from '@ckeditor/ckeditor5-paste-from-office'
+import { Table, TableToolbar } from '@ckeditor/ckeditor5-table'
+import { TextTransformation } from '@ckeditor/ckeditor5-typing'
+import { SimpleUploadAdapter } from '@ckeditor/ckeditor5-upload'
 
 export default class ClassicEditor extends ClassicEditorBase { }
 
 // Plugins to include in the build.
 ClassicEditor.builtinPlugins = [
-	Essentials,
-	UploadAdapter,
+	Alignment,
 	Autoformat,
-	Bold,
-	Italic,
 	BlockQuote,
-	CKFinder,
-	CloudServices,
-	EasyImage,
+	Bold,
+	CodeBlock,
+	Essentials,
+	FontBackgroundColor,
+	FontColor,
 	Heading,
-	Image,
+	HorizontalLine,
+	HtmlEmbed,
+	// Block images only (figure.image), as in CKEditor 27, so content keeps the same shape
+	ImageBlock,
 	ImageCaption,
+	ImageResize,
 	ImageStyle,
 	ImageToolbar,
 	ImageUpload,
 	Indent,
+	Italic,
 	Link,
 	LinkImage,
 	List,
 	MediaEmbed,
 	Paragraph,
 	PasteFromOffice,
+	SimpleUploadAdapter,
 	Table,
 	TableToolbar,
-	TextTransformation,
-	Alignment,
-	Font,
-	SimpleUploadAdapter,
-	ImageResize,
-	HtmlEmbed,
-	CodeBlock,
-	HorizontalLine
+	TextTransformation
 ]
 
 // Editor configuration.
@@ -120,9 +110,9 @@ ClassicEditor.defaultConfig = {
 		]
 	},
 	image: {
-		styles: [
-			'alignLeft', 'alignCenter', 'alignRight'
-		],
+		styles: {
+			options: ['alignLeft', 'alignCenter', 'alignRight']
+		},
 		toolbar: ['imageStyle:alignLeft', 'imageStyle:alignCenter', 'imageStyle:alignRight', 'linkImage']
 	},
 	table: {
@@ -141,7 +131,7 @@ ClassicEditor.defaultConfig = {
 				mode: 'manual',
 				label: 'Open in a new tab',
 				attributes: {
-					target: '_blank',
+					target: '_blank'
 				}
 			}
 		}
