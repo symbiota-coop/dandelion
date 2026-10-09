@@ -80,4 +80,10 @@ $(function () {
       }
     })
   }
+
+  // Close the sidebar as the user leaves the page, so it isn't open when they press back
+  $(window).on('beforeunload', function () {
+    const sidebar = bootstrap.Offcanvas.getInstance('#sidebar')
+    if (sidebar) sidebar.hide()
+  })
 })

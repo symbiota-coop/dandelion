@@ -24,6 +24,51 @@ function hideTooltips () {
   $('.tooltip').remove()
 }
 
+// Loads a live preview of a questions field (#x_questions shows in #questions-preview, with #questions-spinner while loading),
+// half a second after typing stops and whenever options.refreshOn changes. options.extraParams adds to the query
+function initQuestionsPreview (inputSelector, previewUrl, options) {
+  options = options || {}
+  const fieldName = inputSelector.replace(/^#\w+?_/, '').replace(/_/g, '-')
+  const previewSelector = '#' + fieldName + '-preview'
+  const spinnerSelector = '#' + fieldName + '-spinner'
+  let timer
+  function load () {
+    if (!previewUrl) return
+    const params = { questions: $(inputSelector).val() }
+    if (typeof options.extraParams === 'function') {
+      $.extend(params, options.extraParams())
+    }
+    $(previewSelector).load(previewUrl + '?' + $.param(params), function () {
+      $(spinnerSelector).hide()
+    })
+  }
+  $(inputSelector).on('input', function () {
+    $(spinnerSelector).show()
+    clearTimeout(timer)
+    timer = setTimeout(load, 500)
+  })
+  if (options.refreshOn) {
+    $(options.refreshOn).on('change', function () {
+      $(spinnerSelector).show()
+      load()
+    })
+  }
+  load()
+}
+
+// Runs fn now and again after every ajax request, to set up content loaded later (see $.fn.once below).
+// Call it once the page has loaded
+function onContentLoaded (fn) {
+  fn()
+  $(document).on('ajaxComplete', function () { fn() })
+}
+
+// The height of the fixed #header, which sticky elements sit below
+function fixedHeaderHeight () {
+  const header = document.getElementById('header')
+  return header ? header.getBoundingClientRect().height : 0
+}
+
 // The elements not yet set up under this key, now marked as set up, so code that runs after every ajax request
 // sets each element up once: $('.linkify').once('linkify').linkify(). The mark is a class (once-linkify) rather than
 // a data attribute because flatpickr copies classes, not data attributes, onto the alt input it adds
