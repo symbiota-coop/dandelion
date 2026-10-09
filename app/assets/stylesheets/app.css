@@ -91,7 +91,7 @@
   --sidebar-width: 14.375rem;
   --sidebar-width-minified: 3.75rem;
   --content-padding: var(--space-lg);
-  /* Where sticky panels and the page-load spinner sit: just below the header */
+  /* Where sticky panels sit: just below the header */
   --sticky-top: calc(var(--header-offset) + 1rem);
   /* Our palette: every colour in our stylesheets comes from here or from Bootstrap's variables
      (greys are Bootstrap's --bs-gray-100 to 900), except the marketing pages' rose and magenta, in marketing.css */
@@ -173,41 +173,6 @@
   --color-yellow-800: oklch(from var(--color-yellow-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
   /* Green, the default --theme-500, for things that stay green whatever the theme (map pins and clusters) */
   --color-green-500: #00af5e;
-}
-
-/* ==========================================================================
-   Loader: a bar along the top and a spinner, on slow ajax GETs and while leaving the page (loader.js)
-   ========================================================================== */
-
-.loader {
-  pointer-events: none;
-  user-select: none;
-}
-
-.loader-bar {
-  position: fixed;
-  z-index: 2000;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 0.125rem;
-  background: var(--gradient-active);
-  transform: scaleX(0);
-  transform-origin: left;
-}
-
-.loader-spinner {
-  position: fixed;
-  z-index: 2000;
-  top: var(--sticky-top);
-  right: 1rem;
-  width: 1.25rem;
-  height: 1.25rem;
-  border: solid 0.125rem transparent;
-  border-top-color: var(--bs-black);
-  border-left-color: var(--bs-black);
-  border-radius: var(--bs-border-radius-pill);
-  animation: spin 400ms linear infinite;
 }
 
 /* ==========================================================================

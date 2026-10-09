@@ -49,9 +49,4 @@
   });
 </script>
 
-<% if ENV['CREATE_VIDEO'] %>
-  <script>
-    window.noLoader = true;
-  </script>
-<% end %>
 <script src="<%= cachebust('/javascripts/ext/bootstrap.bundle.min.js') %>" defer></script>

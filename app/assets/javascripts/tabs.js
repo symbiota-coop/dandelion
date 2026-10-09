@@ -71,7 +71,6 @@ $(function () {
 
   $(window).on('beforeunload', function (e) {
     if (!navTabsFormSubmitting && navTabsFormTouched && $('form:has(.nav-tabs)').length) {
-      // loader.js sees this and doesn't start the loader, since the page may stay
       e.preventDefault()
       e.returnValue = ''
       return ''
