@@ -6,6 +6,7 @@ module OrganisationValidation
     validates_uniqueness_of :slug
     validates_format_of :slug, with: /\A[a-z0-9-]+\z/
     validates_http_url :website, :become_a_member_url, :terms_and_conditions_url
+    validates_numericality_of :fixed_contribution_gbp, :percent_requested, greater_than_or_equal_to: 0, allow_nil: true
 
     before_validation do
       %w[name patreon_api_key mailgun_api_key mailgun_webhook_signing_key calendar_import_urls].each do |f|

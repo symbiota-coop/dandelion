@@ -343,6 +343,28 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_nil @organisation.reload.mollie_api_key
   end
 
+  test 'organisation admins cannot set contribution or platform-only fields' do
+    create_organisation
+    sign_in_with_rack(@account)
+
+    %w[percent_requested hide_from_homepage allow_iframes psychedelic allow_purchase_url no_referrer].each do |f|
+      error = assert_raises(RuntimeError) { post "/o/#{@organisation.slug}/edit", organisation: { f => f == 'percent_requested' ? '-1000' : '1' } }
+      assert_match(/are protected/, error.message)
+    end
+    @organisation.reload
+    assert_nil @organisation.percent_requested
+    refute @organisation.hide_from_homepage
+  end
+
+  test 'contribution amounts cannot be negative' do
+    create_organisation
+    @organisation.percent_requested = -1
+    @organisation.fixed_contribution_gbp = -1
+    refute @organisation.valid?
+    assert @organisation.errors[:percent_requested].any?
+    assert @organisation.errors[:fixed_contribution_gbp].any?
+  end
+
   test 'stripe setup session is bound to the organisation' do
     create_organisation
     sign_in_with_rack(@account)

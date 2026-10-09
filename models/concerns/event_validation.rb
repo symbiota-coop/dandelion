@@ -15,6 +15,7 @@ module EventValidation
     validates_uniqueness_of :name, scope: [:organisation_id], conditions: -> { where(deleted_at: nil, evergreen: true) }, message: 'is invalid: an on-demand course with this title already exists for this organisation', if: -> { evergreen? && !duplicate }
     validates_format_of :slug, with: /\A[a-z0-9-]+\z/, if: :slug
     validates_http_url :purchase_url, :facebook_event_url, :redirect_url, :terms_and_conditions_url
+    validates_numericality_of :fixed_contribution_gbp, :cap_gbp, greater_than_or_equal_to: 0, allow_nil: true
 
     before_validation do
       if evergreen?

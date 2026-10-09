@@ -479,6 +479,25 @@ class EventPermissionsTest < ActiveSupport::TestCase
     assert_equal 'new zoom', other.extra_info_for_ticket_email
   end
 
+  test 'event admins cannot set the contribution to Dandelion' do
+    create_event(prices: [0])
+    sign_in_with_rack(@account)
+
+    [{ fixed_contribution_gbp: '-1000' }, { cap_gbp: '-1000' }].each do |event_params|
+      error = assert_raises(RuntimeError) { post "/e/#{@event.slug}/edit", event: event_params }
+      assert_match(/are protected/, error.message)
+    end
+    @event.reload
+    assert_nil @event.fixed_contribution_gbp
+    assert_nil @event.cap_gbp
+
+    @event.cap_gbp = -1
+    @event.fixed_contribution_gbp = -1
+    refute @event.valid?
+    assert @event.errors[:cap_gbp].any?
+    assert @event.errors[:fixed_contribution_gbp].any?
+  end
+
   test 'atproto_uri is protected from mass assignment' do
     assert_includes Event.protected_attributes, 'atproto_uri'
   end
