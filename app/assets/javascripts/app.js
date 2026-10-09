@@ -123,7 +123,7 @@ $(function () {
     $('[id=comment_body]').not('[data-tributed]').attr('data-tributed', true).each(function () {
       const tribute = new Tribute({
         values: function (text, callback) {
-          $.get('/network?q=' + text, function (data) {
+          $.get('/network?q=' + encodeURIComponent(text), function (data) {
             callback(data)
           })
         },
@@ -135,24 +135,18 @@ $(function () {
     })
 
     $('.tagify').not('[data-tagified]').attr('data-tagified', true).each(function () {
-      $(this).html($(this).html().replace(/\[@([\w\s'-.]+)\]\(@(\w+)\)/g, '<a href="/u/$2">$1</a>'))
+      $(this).html($(this).html().replace(/\[@([\w\s'.-]+)\]\(@(\w+)\)/g, '<a href="/u/$2">$1</a>'))
     })
 
     $('abbr.timeago').not('[data-timeago-done]').attr('data-timeago-done', true).timeago()
 
     $('.linkify').not('[data-linkified]').attr('data-linkified', true).linkify({ target: { url: '_blank' } })
 
-    $('.compact-urls').not('[data-compact-urls]').attr('data-compact-urls', true).each(function () {
-      $(this).html($(this).html().replace(/<a (.*)>(.*)<\/a>/, function (match, p1, p2) {
-        const parts = p2.split('/')
-        let t
-        if (p2.match(/^(http|https):\/\//) && p2.length > 50 && parts.length > 3) {
-          t = parts[0] + '//' + parts[2] + '/...'
-        } else {
-          t = p2
-        }
-        return '<a ' + p1 + '>' + t + '</a>'
-      }))
+    // Shorten long URLs shown as link text to their origin, e.g. https://example.com/...
+    $('.compact-urls').not('[data-compact-urls]').attr('data-compact-urls', true).find('a').each(function () {
+      const text = $(this).text()
+      const parts = text.split('/')
+      if (/^https?:\/\//.test(text) && text.length > 50 && parts.length > 3) $(this).text(parts[0] + '//' + parts[2] + '/...')
     })
 
     $('.nl2br').not('[data-nl2br]').attr('data-nl2br', true).each(function () {
@@ -339,22 +333,23 @@ $(function () {
   })
   ajaxCompleted()
 
-  // Confirm [data-confirm] and destroy links, then send data-method="post" and destroy links as a POST.
+  // Confirm [data-confirm] and destroy links (whose path ends in destroy), then send data-method="post" and destroy links as a POST.
   // This listens in the capture phase, so it runs before any other click handler, and a cancelled click reaches none of them
   document.addEventListener('click', function (e) {
     if (!e.target.closest) return
-    const confirmable = e.target.closest('[data-confirm], a[href*="destroy"]')
+    const anchor = e.target.closest('a[href]')
+    const destroyLink = anchor && /destroy$/.test(new URL(anchor.href, window.location.origin).pathname) ? anchor : null
+    const confirmable = e.target.closest('[data-confirm]') || destroyLink
     if (confirmable && !confirm(confirmable.getAttribute('data-confirm') || 'Are you sure?')) {
       e.preventDefault()
       e.stopPropagation()
       return
     }
 
-    const link = e.target.closest('a[data-method="post"], a[href*="destroy"]')
+    const link = destroyLink || e.target.closest('a[data-method="post"]')
     if (!link) return
     // pagelets.js sends pagelet-trigger links inside a pagelet itself
     if (link.classList.contains('pagelet-trigger') && link.closest('[data-pagelet-url]')) return
-    if (link.getAttribute('data-method') !== 'post' && !/destroy$/.test(new URL(link.href, window.location.origin).pathname)) return
     e.preventDefault()
     $('<form>', { method: 'post', action: link.href }).hide().appendTo(document.body)[0].submit()
   }, true)
@@ -395,7 +390,9 @@ $(function () {
   Coloris({ alpha: false })
 
   // Open the photo a /g/:slug#photo-:id link points to
-  if (window.location.hash.startsWith('#photo-')) $("[data-bs-target='" + window.location.hash + "']").click()
+  if (window.location.hash.startsWith('#photo-')) {
+    $('[data-bs-target]').filter(function () { return $(this).attr('data-bs-target') === window.location.hash }).trigger('click')
+  }
 
   function showTabFromHash () {
     const hash = window.location.hash
@@ -532,6 +529,12 @@ $(function () {
     })
   })
 
+  // Downloads fire beforeunload but never leave the page, so pagehide would never hide the loader
+  let downloadClicked = false
+  $(document).on('click', 'a[href]', function () {
+    downloadClicked = this.hasAttribute('download') || /\.(csv|pdf|ics)$/.test(this.pathname)
+  })
+
   $(window).on('beforeunload', function (e) {
     const sidebar = bootstrap.Offcanvas.getInstance('#sidebar')
     if (sidebar) sidebar.hide()
@@ -542,7 +545,11 @@ $(function () {
       return ''
     }
 
-    startLoader() // as the user starts navigating away from the page
+    if (downloadClicked) {
+      downloadClicked = false
+    } else {
+      startLoader() // as the user starts navigating away from the page
+    }
   })
 
   // Hide the loader as the user leaves the page, so it doesn't show when they press back
