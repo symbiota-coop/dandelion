@@ -15,13 +15,34 @@
   margin-bottom: var(--space-sm);
 }
 
+/* On mobile the search is a filled pill and the page select is drawn as the page's title, a heading with a caret, so they don't read as two of the same field */
+.docs-header .doc-search-input {
+  background-color: var(--bs-tertiary-bg);
+  border-radius: var(--bs-border-radius-pill);
+}
+
+.docs-header .doc-search .bi-search {
+  left: var(--space-sm);
+}
+
+.docs-header .doc-search .doc-search-input {
+  padding-left: 2.25rem;
+}
+
 .docs-header-select .form-select:not([size]):not([multiple]) {
   font-family: var(--header-font-family);
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-2xl);
   font-weight: bold;
+  width: auto;
+  max-width: 100%;
+  field-sizing: content;
   height: auto;
-  padding: var(--space-2xs) 2.25rem var(--space-2xs) var(--space-xs);
+  padding: 0 2.25rem 0 0;
   margin: 0 0 var(--space-xs);
+  border-color: transparent;
+  background-color: transparent;
+  background-position: right 0.25rem center;
+  text-overflow: ellipsis;
 }
 
 #doc-body h1,
