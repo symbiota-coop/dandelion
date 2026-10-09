@@ -24,6 +24,13 @@ function hideTooltips () {
   $('.tooltip').remove()
 }
 
+// The elements not yet set up under this key, now marked as set up, so code that runs after every ajax request
+// sets each element up once: $('.linkify').once('linkify').linkify(). The mark is a class (once-linkify) rather than
+// a data attribute because flatpickr copies classes, not data attributes, onto the alt input it adds
+$.fn.once = function (key) {
+  return this.not('.once-' + key).addClass('once-' + key)
+}
+
 $.currencySymbol = function (currency) {
   try {
     const parts = new Intl.NumberFormat('en', { style: 'currency', currency: currency })

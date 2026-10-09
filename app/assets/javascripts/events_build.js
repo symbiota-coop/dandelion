@@ -71,7 +71,7 @@ $(function () {
   }
 
   function initDatetimepickers ($scope) {
-    $scope.find('.datetimepicker').not('.flatpickr-registered').addClass('flatpickr-registered').each(function () {
+    $scope.find('.datetimepicker').once('flatpickr').each(function () {
       if (this._flatpickr) return
       $(this).flatpickr({
         altInput: true,

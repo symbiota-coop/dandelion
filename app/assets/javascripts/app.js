@@ -81,22 +81,21 @@ $(function () {
   }
 
   function ajaxCompleted () {
-    $('select').not('[data-select-styled]').attr('data-select-styled', true).each(function () {
+    $('select').once('select-style').each(function () {
       styleSelectElement(this)
       $(this).removeClass('select-placeholder')
     })
 
-    $('form.add-placeholders label[for]').not('[data-placeholders-added]').attr('data-placeholders-added', true).each(function () {
+    $('form.add-placeholders label[for]').once('placeholders').each(function () {
       const input = $(this).next().children().first()
       if (!$(input).attr('placeholder')) { $(input).attr('placeholder', $.trim($(this).text())) }
     })
 
-    // use classes here, because flatpickr copies classes (resulting in multiple calls) but not data attributes
-    $('.datepicker').not('.flatpickr-registered').addClass('flatpickr-registered').flatpickr({
+    $('.datepicker').once('flatpickr').flatpickr({
       altInput: true,
       altFormat: 'Y-m-d'
     })
-    $('.datetimepicker').not('.flatpickr-registered').addClass('flatpickr-registered').each(function () {
+    $('.datetimepicker').once('flatpickr').each(function () {
       var opts = {
         altInput: true,
         altFormat: 'J F Y, H:i',
@@ -120,7 +119,7 @@ $(function () {
       }
     })
 
-    $('[id=comment_body]').not('[data-tributed]').attr('data-tributed', true).each(function () {
+    $('[id=comment_body]').once('tribute').each(function () {
       const tribute = new Tribute({
         values: function (text, callback) {
           $.get('/network?q=' + encodeURIComponent(text), function (data) {
@@ -134,24 +133,24 @@ $(function () {
       tribute.attach(this)
     })
 
-    $('.tagify').not('[data-tagified]').attr('data-tagified', true).each(function () {
+    $('.tagify').once('tagify').each(function () {
       $(this).html($(this).html().replace(/\[@([\w\s'.-]+)\]\(@(\w+)\)/g, '<a href="/u/$2">$1</a>'))
     })
 
-    $('.linkify').not('[data-linkified]').attr('data-linkified', true).linkify({ target: { url: '_blank' } })
+    $('.linkify').once('linkify').linkify({ target: { url: '_blank' } })
 
     // Shorten long URLs shown as link text to their origin, e.g. https://example.com/...
-    $('.compact-urls').not('[data-compact-urls]').attr('data-compact-urls', true).find('a').each(function () {
+    $('.compact-urls').once('compact-urls').find('a').each(function () {
       const text = $(this).text()
       const parts = text.split('/')
       if (/^https?:\/\//.test(text) && text.length > 50 && parts.length > 3) $(this).text(parts[0] + '//' + parts[2] + '/...')
     })
 
-    $('.nl2br').not('[data-nl2br]').attr('data-nl2br', true).each(function () {
+    $('.nl2br').once('nl2br').each(function () {
       $(this).html($(this).html().replace(/(?:\r\n|\r|\n)/g, '<br>'))
     })
 
-    $('.read-more').not('[data-read-more-processed]').attr('data-read-more-processed', true).each(function () {
+    $('.read-more').once('read-more').each(function () {
       const $element = $(this)
       const html = $element.html()
       const brIndex = html.indexOf('<br')
@@ -174,22 +173,22 @@ $(function () {
       }
     })
 
-    $('textarea[id=comment_body], textarea.autosize').not('[data-autosized]').attr('data-autosized', true).each(function () {
+    $('textarea[id=comment_body], textarea.autosize').once('autosize').each(function () {
       autosize(this)
     })
 
     if (typeof iframely !== 'undefined') {
-      $('oembed[url]').not('[data-embedded]').attr('data-embedded', true).each(function () {
+      $('oembed[url]').once('iframely').each(function () {
         iframely.load(this, $(this).attr('url'))
         if ($(this).parent().is('figure.media')) { $(this).parent().removeClass('media') }
       })
     }
 
-    $('.links-blank').not('[data-links-blank-done]').attr('data-links-blank-done', true).each(function () {
+    $('.links-blank').once('links-blank').each(function () {
       $('a[href^=http]', this).attr('target', '_blank')
     })
 
-    $('select.lookup').not('[data-lookup-initialized]').attr('data-lookup-initialized', true).each(function () {
+    $('select.lookup').once('lookup').each(function () {
       $(this).lookup({
         lookup_url: $(this).attr('data-lookup-url'),
         placeholder: $(this).attr('placeholder'),
@@ -197,7 +196,7 @@ $(function () {
       })
     })
 
-    $('input[type=text].slug, div.slugify input[type=text].shorturl').not('[data-slug-initialized]').attr('data-slug-initialized', true).each(function () {
+    $('input[type=text].slug, div.slugify input[type=text].shorturl').once('slug').each(function () {
       const slug = $(this)
       const start_length = slug.val().length
       const pos = $.inArray(this, $('input', this.form)) - 1
@@ -210,7 +209,7 @@ $(function () {
       })
     })
 
-    $('input[type=text].shorturl').not('[data-shorturl-initialized]').attr('data-shorturl-initialized', true).each(function () {
+    $('input[type=text].shorturl').once('shorturl').each(function () {
       const input = $(this)
       const stem = $(this).prev()
       const link = $(this).next()
@@ -228,7 +227,7 @@ $(function () {
       })
     })
 
-    $('textarea.wysiwyg').not('[data-wysiwyg-initialized]').attr('data-wysiwyg-initialized', true).each(function () {
+    $('textarea.wysiwyg').once('wysiwyg').each(function () {
       const textarea = this
       ClassicEditor.create(textarea, {
         toolbar: {
@@ -283,7 +282,7 @@ $(function () {
       })
     })
 
-    $('.colorpicker').not('[data-coloris]').attr('data-coloris', true)
+    $('.colorpicker').attr('data-coloris', true)
 
     showTabFromHash()
     navWrappers()
@@ -293,7 +292,7 @@ $(function () {
   // to scroll one way, that edge fades and an arrow scrolls it on by most of a width. The active tab is
   // brought into view. Crumbs scroll right to left, where scrollLeft runs from -max to 0
   function navWrappers () {
-    $('.nav-wrapper, .nav-crumbs').not('[data-nav-wrapper]').attr('data-nav-wrapper', true).each(function () {
+    $('.nav-wrapper, .nav-crumbs').once('nav-wrapper').each(function () {
       const wrapper = this
       const $scroller = $(wrapper).wrap('<div class="nav-scroller"></div>').parent()
       const arrows = [['start', 'left', 'Scroll left', -1], ['end', 'right', 'Scroll right', 1]].map(function ([edge, icon, label, direction]) {
