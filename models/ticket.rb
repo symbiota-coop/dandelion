@@ -188,6 +188,15 @@ class Ticket
     average_rating: nil, rating_count: 0
   }.freeze
 
+  # Sample figures, for the design guide and for any stats missing or zero on development
+  HOME_PAGE_STATS_SAMPLE = {
+    ticket_count: 204_333, worth_gbp_integer: 7_450_000,
+    ticket_totals: [95_833, 101_933, 107_333, 114_533, 123_433, 133_233, 141_533, 148_433, 155_833, 166_033, 177_833, 190_433, 204_333],
+    event_count: 18_400,
+    event_totals: [12_040, 12_460, 12_850, 13_310, 13_820, 14_380, 14_860, 15_290, 15_760, 16_350, 16_990, 17_680, 18_400],
+    organisation_count: 1200, average_rating: 4.6, rating_count: 9300
+  }.freeze
+
   def self.home_page_stats
     raw = Stash.find_by(key: 'public_home_ticket_stats')&.value
     return HOME_PAGE_STATS_DEFAULTS if raw.blank?
