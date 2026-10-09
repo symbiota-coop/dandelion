@@ -136,8 +136,8 @@
 
   <% if rating && s[:rating_count].positive? %>
     <div class="stats-band-cell stats-band-cell-wide">
-      <div class="stats-band-value"><span data-count-up="<%= s[:rating_count] %>"><%= s[:rating_count].to_fs(:delimited) %></span></div>
-      <div class="stats-band-label">attendee <%= s[:rating_count] == 1 ? 'review' : 'reviews' %></div>
+      <div class="stats-band-value"><span data-count-up="<%= rating %>" data-decimals="1"><%= rating %></span><span class="fs-6 text-body-secondary fw-normal"> / 5</span></div>
+      <div class="stats-band-label">average attendee review</div>
       <div class="stats-band-visual">
         <span class="stars" aria-hidden="true"><% stars.each do |star| %><i class="bi <%= star %>"></i><% end %></span>
       </div>
