@@ -10,7 +10,6 @@ FRONTEND_DEPENDENCIES = {
     'tributejs@3.5.3' => 'dist/tribute.min.js dist/tribute.min.css',
     'select2@4.1.0' => 'dist/js/select2.full.min.js dist/css/select2.min.css',
     'select2-bootstrap-5-theme@1.3.0' => 'dist/select2-bootstrap-5-theme.min.css',
-    'sticky-table-headers@0.1.24' => 'js/jquery.stickytableheaders.min.js',
     'iframe-resizer@4.2.10' => 'js/iframeResizer.contentWindow.min.js',
     'slick-carousel@1.8.1' => 'slick/slick.min.js slick/slick.min.css slick/slick-theme.min.css',
     'chart.js@3.5.1' => 'dist/chart.js',

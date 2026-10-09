@@ -59,13 +59,8 @@
               else
                 $('tfoot th').eq(index).html(sum);
             });
-            // Resize the floating header's columns to match the redrawn table
-            $(window).trigger('resize.stickyTableHeaders')
           })
           table.columns(eventStatsZeroColumns()).visible(false)
-          // Float the header only now, so its copy of the header has the same columns as the table
-          if ($(window).width() > 992)
-            $('#event_stats').stickyTableHeaders({zIndex: 9999})
           table.draw();
         }
       })
