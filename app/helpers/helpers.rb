@@ -239,15 +239,20 @@ Dandelion::App.helpers do
   end
 
   def cachebust(path)
+    (digest = asset_digest(path)) ? "#{path}?#{digest}" : path
+  end
+
+  # The digest cachebust puts after a public file's path, or nil if there's no such file
+  def asset_digest(path)
     # Files don't change after a production deploy, so skip the mtime check there
-    return "#{path}?#{CACHEBUST_DIGESTS[path][1]}" if Padrino.env == :production && CACHEBUST_DIGESTS[path]
+    return CACHEBUST_DIGESTS[path][1] if Padrino.env == :production && CACHEBUST_DIGESTS[path]
 
     file = File.join(settings.public_folder, path)
-    return path unless File.exist?(file)
+    return unless File.exist?(file)
 
     mtime = File.mtime(file)
     cached = CACHEBUST_DIGESTS[path]
     cached = CACHEBUST_DIGESTS[path] = [mtime, Digest::MD5.file(file).hexdigest[0..7]] unless cached && cached[0] == mtime
-    "#{path}?#{cached[1]}"
+    cached[1]
   end
 end

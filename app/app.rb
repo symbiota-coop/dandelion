@@ -42,10 +42,17 @@ module Dandelion
 
     set :public_folder, Padrino.root('app', 'assets')
 
-    # Versioned asset URLs (cachebust's ?digest) never change, so browsers may keep them for a year.
-    # Only set for files that exist, so a 404 from mid-deploy is never kept
+    # Versioned asset URLs (cachebust's ?digest) never change, so browsers and Cloudflare may keep them for a year.
+    # Only when the digest is this file's: mid-deploy, a page from the new instance can ask the old one for
+    # app.js?<new digest>, and the old file must not be kept under the new URL. Nor is a 404 ever kept
     def static!(options = {})
-      cache_control :public, :immutable, max_age: 1.year.to_i if !request.query_string.empty? && static_file?(request.path_info)
+      if !request.query_string.empty? && static_file?(request.path_info)
+        if request.query_string == asset_digest(request.path_info)
+          cache_control :public, :immutable, max_age: 1.year.to_i
+        else
+          cache_control :no_store
+        end
+      end
       super
     end
     set :default_builder, 'BootstrapFormBuilder'
