@@ -24,13 +24,12 @@ FRONTEND_DEPENDENCIES = {
     'autosize@4.0.2' => 'dist/autosize.min.js',
     'countup.js@2.1.0' => 'dist/countUp.umd.js',
     'jquery-deparam@0.5.3' => 'jquery-deparam.js',
-    'linkifyjs@2.1.9' => 'dist/linkify.min.js dist/linkify-jquery.min.js'
+    'linkifyjs@2.1.9' => 'dist/linkify.min.js dist/linkify-jquery.min.js',
+    '@melloware/coloris@0.25.0' => 'dist/umd/coloris.min.js dist/coloris.min.css'
   },
   'https://cdn.jsdelivr.net/gh/' => {
     'mahnunchik/markerclustererplus@736b0e3a7d916fbeb2ee5007494f17a5329b11a8' => 'src/markerclusterer.js',
     'scottdejonge/map-icons@dbf6fd7caedd60d11b5bfb5f267a114a6847d012' => 'dist/js/map-icons.js dist/css/map-icons.min.css',
-    'scottgonzalez/jquery-ui-extensions@fb7fd7df3d70e0288394f07bfe78262b548c30d6' => 'src/autocomplete/jquery.ui.autocomplete.html.js',
-    'mdbassit/Coloris@a00946eb69780d2ba3b906c3f4535b03f987cc05' => 'dist/coloris.min.js dist/coloris.min.css',
     'symbiota-coop/ckeditor5-dandelion@e9616f73489fd5d4fb2b143ed5d1e17e6fd467f0' => 'build/ckeditor.js'
   },
   '/' => {
