@@ -863,7 +863,9 @@
           <div class="spec">Bar (_chart.erb): monthly counts in --theme-500, with the current month's projection stacked on top in the 500 at 50% (make_projection estimates it from the days so far; here it's fixed)</div>
         </div>
         <div class="col-lg-5 d-flex flex-column gap-3">
-          <canvas id="dg-doughnut"></canvas>
+          <div>
+            <canvas id="dg-doughnut"></canvas>
+          </div>
           <script>
             $(function () {
               new Chart(document.getElementById('dg-doughnut').getContext('2d'), {
