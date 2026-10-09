@@ -96,69 +96,41 @@ Dandelion::App.helpers do
   end
 
   def fetch_frontend_dependency(base_url, path)
-    host = URI.parse(base_url.to_s.sub(/\Agit\+/, ''))&.host&.downcase
-    case host
-    when 'cdnjs.cloudflare.com'
-      fetch_cdnjs_dependency(path)
-    when 'cdn.jsdelivr.net'
+    uri = URI.parse(base_url.to_s)
+    return unless uri.host&.downcase == 'cdn.jsdelivr.net'
+
+    case uri.path
+    when '/npm/'
+      fetch_npm_dependency(path)
+    when '/gh/'
       fetch_github_dependency(path)
     end
   rescue URI::InvalidURIError
     nil
   end
 
-  def fetch_cdnjs_dependency(path)
-    # cdnjs format: 'library/version' => 'files'
-    parts = path.split('/')
-    library_name = parts[0]
-    version = parts[1]
+  def fetch_npm_dependency(path)
+    # jsDelivr npm format: 'package@version' => 'files' (the package may be scoped: '@scope/package@version')
+    name, _, version = path.rpartition('@')
 
-    response = Faraday.get("https://api.cdnjs.com/libraries/#{library_name}")
-    return { name: library_name, version: version, source: 'cdnjs' } unless response.status == 200
+    response = Faraday.get("https://registry.npmjs.org/#{name.sub('/', '%2F')}")
+    return { name: name, version: version, source: 'npm' } unless response.status == 200
 
     data = JSON.parse(response.body)
-    versions = data['versions']
-    repo_url = data.dig('repository', 'url')
-
-    # Try to get release date from GitHub
-    release_date = fetch_github_release_date(repo_url, version)
+    released_at = data.dig('time', version)
 
     {
-      name: library_name,
+      name: name,
       version: version,
-      version_bump_cells: version_bump_cells(version, versions),
-      release_date: release_date,
-      source: 'cdnjs',
+      version_bump_cells: version_bump_cells(version, data['versions']&.keys&.reject { |v| v.include?('-') }),
+      release_date: released_at && Time.parse(released_at),
+      source: 'npm',
       homepage: data['homepage'],
-      repository: repo_url,
+      repository: data.dig('repository', 'url')&.sub(/\Agit\+/, '')&.sub(%r{\A(git|ssh)://(git@)?}, 'https://')&.sub(/\.git\z/, ''),
       description: data['description']&.split('.')&.first
     }
   rescue StandardError
-    { name: library_name, version: version, source: 'cdnjs' }
-  end
-
-  def fetch_github_release_date(repo_url, version)
-    github_repo = github_repo_from_url(repo_url)
-    return nil unless github_repo
-
-    client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
-
-    # Try common tag formats: v1.2.3, 1.2.3
-    %W[v#{version} #{version}].each do |tag|
-      ref = client.ref(github_repo, "tags/#{tag}")
-      # Annotated tags have type 'tag', lightweight tags point directly to 'commit'
-      release_date = if ref.object.type == 'tag'
-                       client.tag(github_repo, ref.object.sha).tagger&.date
-                     else
-                       client.commit(github_repo, ref.object.sha).commit.committer.date
-                     end
-      return release_date if release_date
-    rescue Octokit::NotFound
-      next
-    end
-    nil
-  rescue StandardError
-    nil
+    { name: name, version: version, source: 'npm' }
   end
 
   def fetch_github_dependency(path)
@@ -181,22 +153,6 @@ Dandelion::App.helpers do
     }
   rescue StandardError
     { name: "#{user}/#{repo}", version: commit[0..6], source: 'github' }
-  end
-
-  def github_repo_from_url(repo_url)
-    repo_url = repo_url.to_s.sub(/\Agit\+/, '')
-    return nil if repo_url.empty?
-
-    scp_match = repo_url.match(%r{\Agit@github\.com:(?<owner>[^/]+)/(?<repo>[^/?#]+?)(?:\.git)?\z}i)
-    return "#{scp_match[:owner]}/#{scp_match[:repo]}" if scp_match
-
-    uri = URI.parse(repo_url)
-    return nil unless uri&.host&.downcase == 'github.com'
-
-    owner, repo = uri.path.to_s.split('/').reject(&:empty?)
-    return nil if owner.nil? || repo.nil?
-
-    "#{owner}/#{repo.sub(/\.git$/, '')}"
   end
 
   def fetch_gem_info(gem_name)

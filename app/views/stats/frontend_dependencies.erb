@@ -17,8 +17,8 @@
       <% @dependencies.each do |dep| %>
         <tr data-file-urls="<%= dep[:file_urls]&.to_json %>">
           <td>
-            <% if dep[:source] == 'cdnjs' %>
-              <a href="https://cdnjs.com/libraries/<%= dep[:name] %>" target="_blank"><%= dep[:name] %></a>
+            <% if dep[:source] == 'npm' %>
+              <a href="https://www.jsdelivr.com/package/npm/<%= dep[:name] %>" target="_blank"><%= dep[:name] %></a>
             <% elsif dep[:homepage] %>
               <a href="<%= dep[:homepage] %>" target="_blank"><%= dep[:name] %></a>
             <% else %>

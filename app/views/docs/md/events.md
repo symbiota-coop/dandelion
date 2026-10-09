@@ -389,7 +389,7 @@ Put this in your head to set the iframe to the correct height:
 
 ```html
 <script src="//code.jquery.com/jquery-latest.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.2.10/iframeResizer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/iframe-resizer@4.2.10/js/iframeResizer.min.js"></script>
 <script>
   $(function () {
     $('.dandelion-auto-height').iFrameResize({log: true, checkOrigin: false, heightCalculationMethod : 'taggedElement'})
