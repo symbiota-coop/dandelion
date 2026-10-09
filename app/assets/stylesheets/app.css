@@ -783,17 +783,17 @@ p.action a {
   text-decoration: underline
 }
 
-/* Alerts are flat tints, like badges: their variant's 100, with its 800 for text and links */
+/* Alerts are tints, like badges: their variant's 100, with its 800 for text and links and a 1px border in its 200, like toasts */
 .alert-primary,
 .alert-warning,
 .alert-danger {
   --bs-alert-color: var(--variant-800);
   --bs-alert-bg: var(--variant-100);
+  --bs-alert-border-color: var(--variant-200);
   --bs-alert-link-color: var(--variant-800);
 }
 
-/* Toasts are tinted like alerts, their variant's 100 with its 800 for text, but float, so they take a border in its 200
-   to set them off from the page ($alert-border-width is 0; toasts keep Bootstrap's 1px) */
+/* Toasts are tinted and bordered like alerts: their variant's 100, with its 800 for text and a border in its 200 */
 .toast-primary,
 .toast-warning,
 .toast-danger {

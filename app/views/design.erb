@@ -37,7 +37,7 @@
             notes: {
               '50' => 'crumbs, newsfeed icons, date tile months, docs transcripts',
               '100' => 'alert, toast and badge background, crumb hover, unread messages, themed AI well start',
-              '200' => 'progress tracks, toast, blockquote and transcript borders',
+              '200' => 'progress tracks, alert, toast, blockquote and transcript borders',
               '300' => nil,
               '400' => 'themed AI well end, Stripe Connect fees in the contributions chart',
               '500' => nil,
@@ -84,7 +84,7 @@
       <% roles = {
            '50' => 'row background',
            '100' => 'alert, toast and badge background',
-           '200' => 'row and toast border',
+           '200' => 'row, alert and toast border',
            '300' => 'not used yet',
            '400' => 'not used yet',
            '500' => 'fill: buttons, card headers and other text-bg-* elements that aren\'t badges',
@@ -427,7 +427,7 @@
           <% flashes.each do |variant, message, link| %>
             <div class="alert alert-<%= variant %> alert-dismissible"><%= message %> <a href="#components"><%= link %></a><button type="button" class="btn-close" aria-label="Close"></button></div>
           <% end %>
-          <div class="spec">Inline, in the page. Padding .75rem 1rem (sm base, like card headers), no border. Links bold and underlined in the alert's link colour. Flashes are toasts, except on the few pages that set @hide_alert (sign in, sign up, subscriptions, the mailer header), which render them inline as alerts with no close button.</div>
+          <div class="spec">Inline, in the page. Padding .75rem 1rem (sm base, like card headers), and a 1px border in the variant's 200, like toasts. Links bold and underlined in the alert's link colour. Flashes are toasts, except on the few pages that set @hide_alert (sign in, sign up, subscriptions, the mailer header), which render them inline as alerts with no close button.</div>
         </div>
       <% end %>
 
@@ -441,7 +441,7 @@
               </div>
             </div>
           <% end %>
-          <div class="spec">Flash messages, fixed at the top centre (_alert.erb). The same flat tints as alerts, plus a 1px border in the variant's 200 and a --bs-box-shadow. Notices fade after 3s, errors and warnings after 6s.</div>
+          <div class="spec">Flash messages, fixed at the top centre (_alert.erb). The same tints and 1px border in the variant's 200 as alerts, plus a --bs-box-shadow. Notices fade after 3s, errors and warnings after 6s.</div>
         </div>
       <% end %>
     </div>
