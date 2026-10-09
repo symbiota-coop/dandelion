@@ -13,7 +13,7 @@ $(function () {
   // Intro tour on new org creation
   if (config.showIntro && $(window).width() > 992) {
     if (typeof introJs !== 'undefined') {
-      introJs().setOptions({
+      introJs.tour().setOptions({
         steps: [{
           title: 'Great job!',
           intro: "Now let's create an event under your new organisation."
