@@ -373,57 +373,6 @@ $(function () {
     $('.colorpicker').not('[data-coloris]').attr('data-coloris', true)
     Coloris({ alpha: false });
 
-    // Quick theme color circles
-    $('.quick-theme-colors').not('[data-quick-colors-init]').attr('data-quick-colors-init', true).each(function () {
-      const $container = $(this)
-      const inputName = $container.data('input-name')
-      const $form = $container.closest('form')
-      const $input = $form.find('input[name="' + inputName + '"]')
-      if (!$input.length) return
-
-      const normalizeHex = (hex) => {
-        if (!hex) return ''
-        hex = String(hex).replace(/^#/, '').toLowerCase()
-        if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2]
-        return hex
-      }
-      const updateQuickColorSelection = () => {
-        const val = normalizeHex($input.val())
-        if (!val) {
-          $container.find('.quick-color-btn').removeClass('selected')
-          return
-        }
-        $container.find('.quick-color-btn').each(function () {
-          $(this).toggleClass('selected', normalizeHex($(this).data('color')) === val)
-        })
-      }
-      const updateThemeCSS = () => {
-        const hex = normalizeHex($input.val())
-        const $oldLink = $('link[href^="/theme.css"]')
-        if (hex && hex !== '00af5e') {
-          const href = '/theme.css?theme_color=' + encodeURIComponent('#' + hex)
-          if ($oldLink.length && $oldLink.attr('href') === href) return
-          const $newLink = $('<link>', { rel: 'stylesheet', href: href })
-          $newLink.on('load', function () { $oldLink.remove() })
-          $newLink.appendTo('head')
-        } else {
-          $oldLink.remove()
-        }
-      }
-      updateQuickColorSelection()
-      $input.on('change', function () {
-        updateQuickColorSelection()
-        updateThemeCSS()
-      })
-      $container.find('.quick-color-btn').click(function () {
-        const color = $(this).data('color')
-        if (color) {
-          $input.val(color)
-          $input.trigger('change')
-        }
-      })
-    })
-
     showTabFromHash()
     navWrappers()
   }
@@ -469,13 +418,6 @@ $(function () {
     ajaxCompleted()
   })
   ajaxCompleted()
-
-  $(document).on('keydown', '.docs-deepwiki .ask-box textarea', function (e) {
-    if (e.key !== 'Enter' || e.shiftKey) return
-    e.preventDefault()
-    if (!$.trim(this.value)) return
-    $(this).closest('form').submit()
-  })
 
   function showTabFromHash () {
     const hash = window.location.hash

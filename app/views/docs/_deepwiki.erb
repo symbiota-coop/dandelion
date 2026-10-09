@@ -11,3 +11,12 @@
     </div>
   <% end %>
 </div>
+<script>
+  // Enter asks, Shift+Enter adds a line
+  $('#deepwiki-question').on('keydown', function (e) {
+    if (e.key !== 'Enter' || e.shiftKey) return
+    e.preventDefault()
+    if (!$.trim(this.value)) return
+    $(this.form).submit()
+  })
+</script>

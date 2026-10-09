@@ -695,7 +695,7 @@
 
       <% design_subsection 'Theme colour picker', col: 'col-lg-6' do %>
         <div class="border rounded p-4">
-          <%# In a form with the input it sets, as beside the colour field, so app.js selects the swatch that matches and a click previews that theme on this page %>
+          <%# In a form with the input it sets, as beside the colour field, so the partial's script selects the swatch that matches and a click previews that theme on this page %>
           <form onsubmit="return false">
             <label class="d-block">Theme colour</label>
             <input type="hidden" name="design[theme_color]" value="<%= DEFAULT_THEME_COLOR %>">
