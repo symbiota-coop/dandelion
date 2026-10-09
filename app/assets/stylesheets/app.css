@@ -80,10 +80,13 @@
   --space-lg: 1.5rem;
   --space-xl: 2rem;
   --space-2xl: 3rem;
-  /* Motion: state changes (hover, focus, active, open) fade over this rather than snapping, as Bootstrap's own nav links
-     and buttons do. Only colours, shadows and masks move, bar the few exceptions the design guide lists (Motion). Off under
-     prefers-reduced-motion (below) */
+  /* Motion: state changes (hover, focus, active, open) fade over --transition-fast rather than snapping, as Bootstrap's
+     own nav links and buttons do. Things that float (dropdown menus, the confirm popover, flash toasts) fade in over
+     --transition-enter, an ease-out, settling --space-2xs into place; modals keep Bootstrap's slide, and chevrons turn
+     to show open or shut. Nothing bounces, loops or reveals on scroll; the design guide (Motion) lists the rest. Both
+     are 0s under prefers-reduced-motion (below) */
   --transition-fast: 0.15s ease-in-out;
+  --transition-enter: 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   /* Layout: the fixed header's row height, the sidebar's widths and #content's padding.
      --header-offset is the height the fixed header covers: one row, two on mobile where its icons wrap below */
   --header-height: 2.8125rem;
@@ -301,6 +304,7 @@
 
   :root {
     --transition-fast: 0s;
+    --transition-enter: 0s;
   }
 }
 
@@ -788,17 +792,32 @@ p.action a {
   --bs-alert-link-color: var(--variant-800);
 }
 
-/* Toasts are drawn like alerts, with no border ($toast-border-width and $alert-border-width are 0) */
+/* Toasts are tinted like alerts, their variant's 100 with its 800 for text, but float, so they take a border in its 200
+   to set them off from the page ($alert-border-width is 0; toasts keep Bootstrap's 1px) */
 .toast-primary,
 .toast-warning,
 .toast-danger {
   --bs-toast-color: var(--variant-800);
   --bs-toast-bg: var(--variant-100);
+  --bs-toast-border-color: var(--variant-200);
 }
 
 .flash-toasts .toast {
   width: max-content;
   max-width: min(90vw, 40rem);
+}
+
+/* Flash toasts arrive already shown, so they fade in as the page loads, dropping --space-2xs into place like dropdown
+   menus. Bootstrap's .fade fades them out when they close */
+.flash-toasts .toast.fade {
+  transition: opacity var(--transition-enter), translate var(--transition-enter);
+}
+
+@starting-style {
+  .flash-toasts .toast.show {
+    opacity: 0;
+    translate: 0 calc(-1 * var(--space-2xs));
+  }
 }
 
 /* ==========================================================================
@@ -1065,6 +1084,15 @@ p.action a {
   font-size: 0.693rem;
 }
 
+/* A chevron on something that opens in place (a sidebar group) turns to point up while it's open */
+.sidebar .nav-link .caret {
+  transition: rotate var(--transition-fast);
+}
+
+.sidebar .nav-link[aria-expanded="true"] .caret {
+  rotate: 180deg;
+}
+
 .dropdown-toggle:after {
   display: none;
 }
@@ -1124,10 +1152,33 @@ p.action a {
   box-shadow: var(--bs-box-shadow);
 }
 
+/* It fades in and out like a dropdown menu, settling --space-2xs into place, rather than Bootstrap's plain linear fade.
+   translate rather than transform, which Popper uses to position it */
+.confirm-popover.fade {
+  transition: opacity var(--transition-enter), translate var(--transition-enter);
+}
+
+.confirm-popover.fade:not(.show) {
+  translate: 0 calc(-1 * var(--space-2xs));
+}
+
 /* Menus float just below their trigger, with no arrow: a hairline border and a shadow set them off */
 .dropdown .dropdown-menu.show {
   display: block;
   margin-top: var(--space-2xs) !important;
+}
+
+/* Menus fade in, dropping --space-2xs into place, and shut at once. translate rather than transform, which Popper uses to
+   position them */
+.dropdown-menu.show {
+  transition: opacity var(--transition-enter), translate var(--transition-enter);
+}
+
+@starting-style {
+  .dropdown-menu.show {
+    opacity: 0;
+    translate: 0 calc(-1 * var(--space-2xs));
+  }
 }
 
 .dropdown .dropdown-menu {

@@ -5264,7 +5264,7 @@ textarea.form-control-lg {
   --bs-toast-font-size: 0.875rem;
   --bs-toast-color: ;
   --bs-toast-bg: rgba(var(--bs-body-bg-rgb), 0.85);
-  --bs-toast-border-width: 0;
+  --bs-toast-border-width: var(--bs-border-width);
   --bs-toast-border-color: var(--bs-border-color-translucent);
   --bs-toast-border-radius: var(--bs-border-radius);
   --bs-toast-box-shadow: var(--bs-box-shadow);

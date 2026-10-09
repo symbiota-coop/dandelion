@@ -37,7 +37,7 @@
             notes: {
               '50' => 'crumbs, newsfeed icons, date tile months, docs transcripts',
               '100' => 'alert, toast and badge background, crumb hover, unread messages, themed AI well start',
-              '200' => 'progress tracks, blockquote and transcript borders',
+              '200' => 'progress tracks, toast, blockquote and transcript borders',
               '300' => nil,
               '400' => 'themed AI well end, Stripe Connect fees in the contributions chart',
               '500' => nil,
@@ -84,7 +84,7 @@
       <% roles = {
            '50' => 'row background',
            '100' => 'alert, toast and badge background',
-           '200' => 'row border',
+           '200' => 'row and toast border',
            '300' => 'not used yet',
            '400' => 'not used yet',
            '500' => 'fill: buttons, card headers and other text-bg-* elements that aren\'t badges',
@@ -254,7 +254,7 @@
       </div>
     <% end %>
 
-    <% design_subsection 'Elevation', "Bootstrap's three shadows, set in <code>bootstrap5.scss</code> and used through its variables or the <code>shadow-sm</code>, <code>shadow</code> and <code>shadow-lg</code> classes. Soft, in px like hairlines: sm is a tight contact shadow (1px) alone, and the base and lg add a wide, faint one under it. Floating menus and panels (dropdowns, autocomplete, the cookie banner) also have a --hairline border, so the shadow can stay light; toasts and the chat panel have the shadow alone.".html_safe do %>
+    <% design_subsection 'Elevation', "Bootstrap's three shadows, set in <code>bootstrap5.scss</code> and used through its variables or the <code>shadow-sm</code>, <code>shadow</code> and <code>shadow-lg</code> classes. Soft, in px like hairlines: sm is a tight contact shadow (1px) alone, and the base and lg add a wide, faint one under it. Floating menus and panels (dropdowns, autocomplete, the cookie banner) also have a --hairline border, so the shadow can stay light; toasts have a border in their variant's 200, and the chat panel has the shadow alone.".html_safe do %>
       <div class="bg-body-tertiary rounded p-4">
         <div class="row g-4">
           <% [
@@ -311,14 +311,17 @@
       </div>
     <% end %>
 
-    <% design_subsection 'Motion', "State changes fade rather than snap: hover, focus, active and open states change over <code>--transition-fast</code> (.15s ease-in-out, Bootstrap's own timing for nav links and buttons). Only colours, shadows and masks move, plus two slides: sidebar submenus and the teams, activities and local groups in the cards on /accounts/subscriptions open and shut with jQuery's slide over 175ms. Nothing else slides, and nothing scales, turns or bounces, bar a few older exceptions: on mobile the sidebar slides in and the menu button's bars turn into a cross, the quick theme colours grow 10% and the feedback stars 8% on hover, and the marketing pages' cards lift. Toasts, dropdowns and tab panes appear at once; chevrons that open something (sidebar groups, the cards on /accounts/subscriptions) point down whether it's open or closed. From 768px, page loads cross-fade over .15s (a view transition), with the header, sidebar and flash toasts held still. Under <code>prefers-reduced-motion</code> the token is 0s and view transitions are off, so all of it stops, and the tab scroller's chevrons jump rather than scroll smoothly.".html_safe do %>
+    <% design_subsection 'Motion', "Motion shows where things come from and go, and is otherwise kept out of the way. State changes fade rather than snap: hover, focus, active and open states change over <code>--transition-fast</code> (.15s ease-in-out, Bootstrap's own timing for nav links and buttons). Things that float fade in over <code>--transition-enter</code> (.2s, an ease-out), settling --space-2xs into place: dropdown menus (which shut at once), the confirm popover and flash toasts. Modals keep Bootstrap's entrance: the backdrop and dialog fade over .15s as the dialog slides 50px down over .3s. Sidebar submenus and the teams, activities and local groups in the cards on /accounts/subscriptions open and shut with jQuery's slide over 175ms, and their chevrons turn to point up while open. Beyond that only colours, shadows and masks move, bar a few older exceptions: on mobile the sidebar slides in and the menu button's bars turn into a cross, the quick theme colours grow 10% and the feedback stars 8% on hover, and the marketing pages' cards lift. Nothing bounces, loops or reveals on scroll, and nothing else moves more than --space-2xs. Tab panes appear at once. From 768px, page loads cross-fade over .15s (a view transition), with the header, sidebar and flash toasts held still. Under <code>prefers-reduced-motion</code> both tokens are 0s and view transitions are off, so all of it stops, and the tab scroller's chevrons jump rather than scroll smoothly.".html_safe do %>
       <div class="row gx-4 row-cols-1 row-cols-md-2 row-cols-xl-3">
         <% [
              ['Links, nav links, tabs', 'colour, underline'],
              ['Dropdown items, message previews', 'background'],
              ['Tiles', 'shadow, photo lightens'],
              ['Date and icon tiles', 'fill'],
-             ['Tab and crumb scrollers', 'edge fades, chevron colour']
+             ['Tab and crumb scrollers', 'edge fades, chevron colour'],
+             ['Dropdown menus, confirm popover, flash toasts', 'fade in, settle'],
+             ['Modals', 'Bootstrap fade and slide'],
+             ['Sidebar groups, subscription cards', 'slide, chevron turns']
            ].each do |title, value| %>
           <div class="col">
             <div class="d-flex justify-content-between gap-3 py-2 border-bottom"><span><%= title %></span><code class="text-body-secondary"><%= value %></code></div>
@@ -438,7 +441,7 @@
               </div>
             </div>
           <% end %>
-          <div class="spec">Flash messages, fixed at the top centre (_alert.erb). The same flat tints as alerts, with no border, plus a --bs-box-shadow. Notices fade after 3s, errors and warnings after 6s.</div>
+          <div class="spec">Flash messages, fixed at the top centre (_alert.erb). The same flat tints as alerts, plus a 1px border in the variant's 200 and a --bs-box-shadow. Notices fade after 3s, errors and warnings after 6s.</div>
         </div>
       <% end %>
     </div>

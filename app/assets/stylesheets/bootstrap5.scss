@@ -63,7 +63,7 @@ $enable-rfs: false;
 $box-shadow-sm: 0 1px 2px rgba(#000, .06);
 $box-shadow: 0 1px 2px rgba(#000, .04), 0 4px 12px rgba(#000, .08);
 $box-shadow-lg: 0 2px 4px rgba(#000, .04), 0 12px 32px rgba(#000, .12);
-// The hairline (--hairline in app.css): cards, dropdowns and popovers take their borders from it (modals and toasts have none)
+// The hairline (--hairline in app.css): cards, dropdowns and popovers take their borders from it (modals have none, and toasts take their variant's 200)
 $border-color-translucent: rgba(#000, .1);
 $body-secondary-color: $gray-600; // text-body-secondary and form-text
 $body-secondary-bg: $gray-200; // --bs-secondary-bg: hovered nav links, switches when off
@@ -112,7 +112,6 @@ $badge-border-radius: 50rem;
 $alert-padding-y: .75rem; // --space-sm, like card headers
 $alert-padding-x: 1rem;
 $alert-border-width: 0;
-$toast-border-width: 0;
 $tooltip-font-size: .875rem; // --font-size-sm
 // Bootstrap's px widths in rem, so they scale with the root font size like everything else ($modal-xl stays 1140px, to fit the xl breakpoint as the containers do)
 $tooltip-max-width: 12.5rem;

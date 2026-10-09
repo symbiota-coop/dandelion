@@ -20,6 +20,8 @@
     .subscription-row .btn { --bs-btn-padding-y: .25rem; --bs-btn-padding-x: var(--space-xs); --bs-btn-font-size: var(--font-size-sm); --bs-btn-border-radius: var(--bs-border-radius-sm); margin-bottom: 0 !important }
     .subscription-child { padding-inline-start: var(--space-lg); font-size: var(--font-size-sm) }
     .subscription-toggle { font-size: var(--font-size-sm); color: var(--bs-secondary-color); --link-hover-color: var(--bs-emphasis-color); text-decoration: none }
+    .subscription-toggle .bi { display: inline-block; transition: rotate var(--transition-fast) }
+    .subscription-toggle.open .bi { rotate: 180deg }
   </style>
 
   <div id="subscriptions" class="mt-5">
