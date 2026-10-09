@@ -42,20 +42,25 @@
     <div class="row g-0">
       <div class="col-auto me-2"><i class="bi bi-quote"></i></div>
       <div class="col me-3">
-        <%= partial :'accounts/square', locals: { klass: 'float-start me-3 mb-3', account: account, size: :'2xl' } %>
-        <a class="home-feedback readable" href="/e/<%= event_feedback.event.slug %>">
-          <%== Sanitize.fragment(quote, Sanitize::Config::DANDELION) %>
-        </a>
+        <div class="row g-0">
+          <div class="col-12 col-sm-auto mb-3 mb-sm-0 me-sm-3">
+            <%= partial :'accounts/square', locals: { account: account, size: :'2xl' } %>
+          </div>
+          <div class="col">
+            <a class="home-feedback readable" href="/e/<%= event_feedback.event.slug %>">
+              <%== Sanitize.fragment(quote, Sanitize::Config::DANDELION) %>
+            </a>
 
-        <div class="my-2 text-nowrap fs-2">
-          <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
+            <div class="my-2 text-nowrap fs-2">
+              <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
+            </div>
+
+            <p class="mb-5">
+              <a href="/u/<%= account.username %>"><%= account.name %></a> on <a href="/e/<%= event_feedback.event.slug %>"><%= event_feedback.event.name %></a>
+              <small><%= timeago event_feedback.created_at %></small>
+            </p>
+          </div>
         </div>
-
-        <p class="mb-5">
-          <a href="/u/<%= account.username %>"><%= account.name %></a> on <a href="/e/<%= event_feedback.event.slug %>"><%= event_feedback.event.name %></a>
-          <small><%= timeago event_feedback.created_at %></small>
-        </p>
-
       </div>
     </div>
   </div>
