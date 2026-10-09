@@ -14,23 +14,20 @@
   <div class="col-lg-9">
     <div class="docs-main">
       <div class="d-lg-none docs-header">
+        <%= partial :'docs/select' %>
         <%= partial :'docs/search', locals: { input_id: 'doc-search-mobile' } %>
-        <div class="docs-header-select">
-          <%= partial :'docs/select' %>
-        </div>
       </div>
 
       <div id="doc-search-results" class="doc-search-results"></div>
 
-      <% if @doc_page[:headings].any? %>
-        <details class="doc-toc-mobile d-lg-none">
-          <summary>On this page</summary>
-          <%= partial :'docs/index' %>
-        </details>
-      <% end %>
-
       <div id="doc-body">
-        <h1 class="d-none d-lg-block" id="<%= @doc_page[:slug] %>"><%= @doc_page[:name] %></h1>
+        <h1 id="<%= @doc_page[:slug] %>"><%= @doc_page[:name] %></h1>
+        <% if @doc_page[:headings].any? %>
+          <details class="doc-toc-mobile d-lg-none">
+            <summary>On this page</summary>
+            <%= partial :'docs/index' %>
+          </details>
+        <% end %>
         <%== @doc_page[:html_body] %>
       </div>
 

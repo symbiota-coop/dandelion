@@ -11,17 +11,22 @@
   color: var(--bs-body-color);
 }
 
+/* Mobile: a page select and the search share a row above the page's h1 */
 .docs-header {
+  display: flex;
+  gap: var(--space-xl);
   margin-bottom: var(--space-sm);
 }
 
-.docs-header-select .form-select:not([size]):not([multiple]) {
-  font-family: var(--header-font-family);
-  font-size: var(--font-size-xl);
-  font-weight: bold;
-  height: auto;
-  padding: var(--space-2xs) 2.25rem var(--space-2xs) var(--space-xs);
-  margin: 0 0 var(--space-xs);
+.docs-header .doc-search {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.docs-header .doc-index-select {
+  flex: 0 1 auto;
+  width: auto;
+  max-width: 35%;
 }
 
 #doc-body h1,
