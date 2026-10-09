@@ -310,7 +310,7 @@ Dandelion::App.controller do
   end
 
   get '/geolocate' do
-    MaxMind::GeoIP2::Reader.new(database: 'GeoLite2-City.mmdb').city(ip_from_cloudflare).to_json
+    MaxMinder.reader.city(ip_from_cloudflare).to_json
   rescue StandardError => e
     e.to_s
   end

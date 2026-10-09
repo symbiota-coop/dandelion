@@ -52,6 +52,7 @@ Money.rounding_mode = BigDecimal::ROUND_HALF_UP
 if Padrino.env == :production
   begin
     MaxMinder.download
+    MaxMinder.reader
   rescue StandardError => e
     ErrorReporting.capture_exception(e)
   end

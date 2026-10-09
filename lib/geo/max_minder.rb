@@ -1,4 +1,10 @@
 module MaxMinder
+  # One reader for the process, read into memory: safe to share across threads and, unlike
+  # the default file mode, after Puma forks. Opened at boot so workers share its memory.
+  def self.reader
+    @reader ||= (MaxMind::GeoIP2::Reader.new(database: 'GeoLite2-City.mmdb', mode: MaxMind::DB::MODE_MEMORY) if File.exist?('GeoLite2-City.mmdb'))
+  end
+
   def self.upload
     uri = URI.parse('https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz')
     request = Net::HTTP::Get.new(uri)
