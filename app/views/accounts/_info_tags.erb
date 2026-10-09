@@ -8,6 +8,6 @@
 <% if (e = Event.past.and(:id.in => account.event_facilitations.pluck(:event_id)).count) > 0 %>
   <span class="mt-1 mt-lg-0 badge text-bg-primary">Facilitated <%= pluralize(e,'event') %></span>
 <% end %>
-<% if current_account && (follow = Follow.find_by(follower: account, followee: current_account)) %>
-  <span class="mt-1 mt-lg-0 badge text-bg-primary"><%= follow.unsubscribed ? 'Follows you' : 'Follows and subscribes to you' %></span>
+<% if current_account && Follow.and(follower: account, followee: current_account).exists? %>
+  <span class="mt-1 mt-lg-0 badge text-bg-primary">Follows you</span>
 <% end %>
