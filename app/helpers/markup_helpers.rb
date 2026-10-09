@@ -75,7 +75,7 @@ Dandelion::App.helpers do
   end
 
   def timeago(time)
-    %(<abbr class="timeago" title="#{time.iso8601}">#{time}</abbr>).html_safe
+    %(<relative-time datetime="#{time.iso8601}" tense="past" threshold="P100Y">#{time}</relative-time>).html_safe
   end
 
   def youtube_embed_url(url)

@@ -16,7 +16,11 @@
       <% url = cachebust(url) if base_url == '/' %>
       <% case ext %>
       <% when :js %>
-        <script src="<%= url %>" defer></script>
+        <% if FRONTEND_MODULES.include?(path.rpartition('@').first) %>
+          <script src="<%= url %>" type="module"></script>
+        <% else %>
+          <script src="<%= url %>" defer></script>
+        <% end %>
       <% when :css %>
         <link rel="stylesheet" href="<%= url %>">
       <% end %>

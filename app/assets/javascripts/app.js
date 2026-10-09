@@ -138,8 +138,6 @@ $(function () {
       $(this).html($(this).html().replace(/\[@([\w\s'.-]+)\]\(@(\w+)\)/g, '<a href="/u/$2">$1</a>'))
     })
 
-    $('abbr.timeago').not('[data-timeago-done]').attr('data-timeago-done', true).timeago()
-
     $('.linkify').not('[data-linkified]').attr('data-linkified', true).linkify({ target: { url: '_blank' } })
 
     // Shorten long URLs shown as link text to their origin, e.g. https://example.com/...

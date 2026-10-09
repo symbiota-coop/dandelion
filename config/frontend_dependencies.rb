@@ -1,7 +1,7 @@
 FRONTEND_DEPENDENCIES = {
   'https://cdn.jsdelivr.net/npm/' => {
     'jquery-ui@1.13.2' => 'dist/jquery-ui.min.js dist/themes/base/jquery-ui.min.css',
-    'timeago@1.4.3' => 'jquery.timeago.min.js',
+    '@github/relative-time-element@5.3.1' => 'dist/bundle.js',
     'flatpickr@4.6.13' => 'dist/flatpickr.min.js dist/flatpickr.min.css',
     'datatables.net@3.1.2' => 'js/dataTables.min.js',
     'datatables.net-bs5@3.1.2' => 'js/dataTables.bootstrap5.min.js css/dataTables.bootstrap5.min.css',
@@ -28,3 +28,6 @@ FRONTEND_DEPENDENCIES = {
     'javascripts' => 'utils.js pagelets.js map.js places.js cookie_consent.js sidebar.js header_search.js scrollspy.js app.js'
   }
 }
+
+# Packages whose files are ES modules, loaded with type="module"
+FRONTEND_MODULES = %w[@github/relative-time-element].freeze

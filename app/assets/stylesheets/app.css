@@ -2286,6 +2286,13 @@ a.text-primary:focus {
   color: var(--theme-600) !important
 }
 
+/* Relative times (the timeago helper) carry their full date as a title, so they're marked like Bootstrap's abbr[title] */
+relative-time[title] {
+  text-decoration: underline dotted;
+  cursor: help;
+  text-decoration-skip-ink: none;
+}
+
 /* Headings are bold (below); small text inside them isn't */
 h1 small,
 h2 small,
