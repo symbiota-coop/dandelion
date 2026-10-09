@@ -307,8 +307,6 @@ $(function () {
       })
     })
 
-    if (window.location.hash.startsWith('#photo-')) { $("[data-bs-target='" + window.location.hash + "']").not('[data-photo-clicked]').attr('data-photo-clicked', true).click() }
-
     $('textarea.wysiwyg').not('[data-wysiwyg-initialized]').attr('data-wysiwyg-initialized', true).each(function () {
       const textarea = this
       ClassicEditor.create(textarea, {
@@ -371,7 +369,6 @@ $(function () {
     })
 
     $('.colorpicker').not('[data-coloris]').attr('data-coloris', true)
-    Coloris({ alpha: false });
 
     showTabFromHash()
     navWrappers()
@@ -418,6 +415,12 @@ $(function () {
     ajaxCompleted()
   })
   ajaxCompleted()
+
+  // Coloris opens on any [data-coloris] field, including ones loaded later, so it only needs configuring once
+  Coloris({ alpha: false })
+
+  // Open the photo a /g/:slug#photo-:id link points to
+  if (window.location.hash.startsWith('#photo-')) $("[data-bs-target='" + window.location.hash + "']").click()
 
   function showTabFromHash () {
     const hash = window.location.hash
