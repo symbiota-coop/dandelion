@@ -41,6 +41,13 @@ module Dandelion
     }
 
     set :public_folder, Padrino.root('app', 'assets')
+
+    # Versioned asset URLs (cachebust's ?digest) never change, so browsers may keep them for a year.
+    # Only set for files that exist, so a 404 from mid-deploy is never kept
+    def static!(options = {})
+      cache_control :public, :immutable, max_age: 1.year.to_i if !request.query_string.empty? && static_file?(request.path_info)
+      super
+    end
     set :default_builder, 'BootstrapFormBuilder'
     set :protection, except: :frame_options
 
