@@ -3,7 +3,7 @@
 <% require_check_box = @event.terms_and_conditions_check_box_for_purchase %>
 <% if terms %>
   <p class="mb-1 fw-bold">Terms and conditions</p>
-  <textarea class="form-control mb-2" style="height: 8em" readonly><%=terms%></textarea>
+  <textarea class="form-control bg-body-tertiary mb-2" style="height: 8em" readonly><%=terms%></textarea>
   <% if require_check_box %>
     <div class="form-check mb-1">
       <%= check_box_tag :accepted_terms, id: 'accepted-terms', class: 'form-check-input' %>
