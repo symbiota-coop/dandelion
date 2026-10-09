@@ -332,6 +332,34 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal false, @local_group.local_groupships.find_by(account: buyer).unsubscribed
   end
 
+  test 'a mistyped email domain is booked after confirming' do
+    create_event(prices: [0])
+
+    visit "/e/#{@event.slug}"
+    fill_in 'account_name', with: 'Typo User'
+    fill_in 'account_email', with: 'someone@gmial.com'
+    message = accept_confirm { click_button 'RSVP' }
+    assert_includes message, 'You entered your email address as someone@gmial.com'
+    assert page.has_content? 'Thanks for booking'
+    assert Account.find_by(email: 'someone@gmial.com')
+  end
+
+  test 'a mistyped email domain goes back to the form after cancelling' do
+    create_event(prices: [0])
+
+    visit "/e/#{@event.slug}"
+    fill_in 'account_name', with: 'Typo User'
+    fill_in 'account_email', with: 'someone@gmial.com'
+    dismiss_confirm { click_button 'RSVP' }
+    assert page.has_no_content? 'Thanks for booking'
+    assert_nil Account.find_by(email: 'someone@gmial.com')
+
+    fill_in 'account_email', with: 'someone@gmail.com'
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
+    assert Account.find_by(email: 'someone@gmail.com')
+  end
+
   # ═══════════════════════════════════════════════════════════════════════════
   # Purchase access
   # ═══════════════════════════════════════════════════════════════════════════

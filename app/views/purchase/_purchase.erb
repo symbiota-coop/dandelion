@@ -224,7 +224,6 @@ end
     contractAddress: (@event.currency == 'USD' ? Token.object('BREAD').contract_address : @event.token.try(:contract_address)),
     networkId: @event.chain.try(:network_id),
     networkName: @event.chain.try(:name),
-    signedIn: !!current_account,
     embedded: !!params[:ticket_form_only],
     donationsToDandelion: !!@event.donations_to_dandelion?,
     platformDonationMethods: EventPaymentMethod.platform_donation_names,
