@@ -2,7 +2,8 @@
 
 <img src="https://github.com/symbiota-coop/dandelion/actions/workflows/ruby.yml/badge.svg">
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/symbiota-coop/dandelion)
+[![Ask DeepWiki](https://img.shields.io/badge/Ask-DeepWiki-blue)](https://deepwiki.com/symbiota-coop/dandelion)
+<!-- DeepWiki refreshes the wiki weekly when its badge is in the README; deepwiki.com/badge.svg itself doesn't load on GitHub, so it is kept here: [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/symbiota-coop/dandelion) -->
 
 Check out the canonical install at https://dandelion.events \
 Created by [Stephen Reid](https://stephenreid.net) \
