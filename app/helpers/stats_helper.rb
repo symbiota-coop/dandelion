@@ -111,12 +111,14 @@ Dandelion::App.helpers do
 
     data = JSON.parse(response.body)
     released_at = data.dig('time', version)
+    latest_released_at = data.dig('time', data.dig('dist-tags', 'latest'))
 
     {
       name: name,
       version: version,
       version_bump_cells: version_bump_cells(version, data['versions']&.keys&.reject { |v| v.include?('-') }),
       release_date: released_at && Time.parse(released_at),
+      latest_release_date: latest_released_at && Time.parse(latest_released_at),
       source: 'npm',
       homepage: data['homepage'],
       repository: data.dig('repository', 'url')&.sub(/\Agit\+/, '')&.sub(%r{\A(git|ssh)://(git@)?}, 'https://')&.sub(/\.git\z/, ''),
