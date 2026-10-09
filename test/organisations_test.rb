@@ -268,6 +268,25 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_empty member.unsubscribed_organisation_ids_cache || []
   end
 
+  test 'creating an organisation cannot delete or adopt a stored file via retained_image or image_uid' do
+    account = FactoryBot.create(:account)
+    organisation = FactoryBot.build_stubbed(:organisation)
+    uid = Dragonfly.app.store('victim')
+    retained = Dragonfly::Serializer.json_b64_encode('uid' => uid)
+
+    sign_in_with_rack(account)
+    post '/o/new', organisation: {
+      name: organisation.name, slug: organisation.slug,
+      image: Rack::Test::UploadedFile.new('app/assets/images/telegram.png', 'image/png'),
+      retained_image: retained, image_uid: uid
+    }
+
+    assert_equal 'victim', Dragonfly.app.fetch(uid).data
+    saved_organisation = Organisation.find_by(slug: organisation.slug)
+    assert saved_organisation
+    assert saved_organisation.image_uid != uid
+  end
+
   test 'organisation tier edit rejects organisation_id from params' do
     create_organisation
     organisation_tier = @organisation.organisation_tiers.create!(name: 'Gold', threshold: 100, discount: 10)

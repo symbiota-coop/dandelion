@@ -109,6 +109,15 @@ Dandelion::App.helpers do
       [rel.name, "#{rel.name.to_s.singularize}_ids"].map(&:to_s)
     end
     params.reject! { |k, _| foreign_keys.include?(k.to_s) && !allowed.include?(k.to_s) }
+    # Only the file itself and remove_<attachment> may come from a form. retained_<attachment>= deletes or adopts any
+    # storage key it's given, <attachment>_uid= points at someone else's file, and <attachment>_url= fetches any URL
+    if model.respond_to?(:dragonfly_attachment_classes)
+      dragonfly_keys = model.dragonfly_attachment_classes.flat_map do |klass|
+        a = klass.attribute.to_s
+        ["retained_#{a}", "#{a}_url", "#{a}_uid", "#{a}_name"] + klass.magic_attributes.map { |m| "#{a}_#{m}" }
+      end
+      params.reject! { |k, _| dragonfly_keys.include?(k.to_s) }
+    end
     if model.respond_to?(:permitted_attributes)
       permitted = model.permitted_attributes.map(&:to_s)
       unpermitted = params.keys.reject { |k| permitted.include?(k.to_s) }

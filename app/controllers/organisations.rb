@@ -94,7 +94,7 @@ Dandelion::App.controller do
 
   get '/o/new' do
     sign_in_required!
-    @organisation = Organisation.new(mass_assigning(params[:organisation], Organisation))
+    @organisation = Organisation.new
     @organisation.account = current_account
     @organisation.currency ||= preferred_currency
     erb :'organisations/build'
