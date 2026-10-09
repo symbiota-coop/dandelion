@@ -176,37 +176,27 @@
 }
 
 /* ==========================================================================
-   Pace loader
+   Loader: a bar along the top and a spinner, on slow ajax GETs and while leaving the page (app.js)
    ========================================================================== */
 
-.pace {
+.loader {
   pointer-events: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
   user-select: none;
 }
 
-.pace .pace-progress {
+.loader-bar {
   position: fixed;
   z-index: 2000;
   top: 0;
-  right: 100%;
-  width: 100%;
+  left: 0;
+  width: 0;
   height: 0.125rem;
+  background: var(--gradient-active);
+  border-radius: var(--bs-border-radius);
+  transition: width 0.2s ease-out;
 }
 
-.pace .pace-progress-inner {
-  display: block;
-  position: absolute;
-  right: 0;
-  width: 6.25rem;
-  height: 100%;
-  opacity: 1;
-  transform: rotate(3deg) translate(0, -0.25rem);
-}
-
-.pace .pace-activity {
-  display: block;
+.loader-spinner {
   position: fixed;
   z-index: 2000;
   top: var(--sticky-top);
@@ -218,10 +208,6 @@
   border-left-color: var(--bs-black);
   border-radius: var(--bs-border-radius-pill);
   animation: spin 400ms linear infinite;
-}
-
-.pace-inactive {
-  display: none;
 }
 
 /* ==========================================================================
@@ -2218,14 +2204,9 @@ a.ui-button:active,
    ========================================================================== */
 
 .sidebar .nav-link.active,
-.header .with-label:before,
-.pace .pace-progress {
+.header .with-label:before {
   color: var(--bs-white) !important;
   background: var(--gradient-active) !important;
-}
-
-.pace .pace-progress {
-  border-radius: var(--bs-border-radius);
 }
 
 /* ==========================================================================

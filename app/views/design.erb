@@ -311,7 +311,7 @@
       </div>
     <% end %>
 
-    <% design_subsection 'Motion', "State changes fade rather than snap: hover, focus, active and open states change over <code>--transition-fast</code> (.15s ease-in-out, Bootstrap's own timing for nav links and buttons). Only colours, shadows and masks move, plus two slides: sidebar submenus and the teams, activities and local groups in the cards on /accounts/subscriptions open and shut with jQuery's slide over 175ms. Nothing else slides, and nothing scales, turns or bounces, bar a few older exceptions: on mobile the sidebar slides in and the menu button's bars turn into a cross, the quick theme colours grow 10% and the feedback stars 8% on hover, and the marketing pages' cards lift. Toasts, dropdowns and tab panes appear at once; chevrons that open something (sidebar groups, the cards on /accounts/subscriptions) point down whether it's open or closed. From 768px, page loads cross-fade over .15s (a view transition), with the header, sidebar and flash toasts held still. Under <code>prefers-reduced-motion</code> the token is 0s and view transitions are off, so all of it stops, and the tab scroller's chevrons jump rather than scroll smoothly.".html_safe do %>
+    <% design_subsection 'Motion', "State changes fade rather than snap: hover, focus, active and open states change over <code>--transition-fast</code> (.15s ease-in-out, Bootstrap's own timing for nav links and buttons). Only colours, shadows and masks move, plus two slides: sidebar submenus and the teams, activities and local groups in the cards on /accounts/subscriptions open and shut with jQuery's slide over 175ms. Nothing else slides, and nothing scales, turns or bounces, bar a few older exceptions: on mobile the sidebar slides in and the menu button's bars turn into a cross, the loader's bar grows along the top, the quick theme colours grow 10% and the feedback stars 8% on hover, and the marketing pages' cards lift. Toasts, dropdowns and tab panes appear at once; chevrons that open something (sidebar groups, the cards on /accounts/subscriptions) point down whether it's open or closed. From 768px, page loads cross-fade over .15s (a view transition), with the header, sidebar and flash toasts held still. Under <code>prefers-reduced-motion</code> the token is 0s and view transitions are off, so all of it stops, and the tab scroller's chevrons jump rather than scroll smoothly.".html_safe do %>
       <div class="row gx-4 row-cols-1 row-cols-md-2 row-cols-xl-3">
         <% [
              ['Links, nav links, tabs', 'colour, underline'],
@@ -851,7 +851,7 @@
             <span class="d-inline-block rounded" style="width: 6.25rem; height: .125rem; background: var(--gradient-active)"></span>
             <span class="placeholder col-4"></span>
           </div>
-          <div class="spec">.bi-spin turns any icon (an order in progress) · Pace, on every page load and ajax: a 2px --gradient-active bar along the top, and a black spinner at --sticky-top on the right · .placeholder, a faint grey line that pagelets show while they load</div>
+          <div class="spec">.bi-spin turns any icon (an order in progress) · .loader (app.js), on ajax GETs still going after half a second and while leaving a page: a 2px --gradient-active bar along the top that creeps towards 90% and fills when done, and a black spinner at --sticky-top on the right · .placeholder, a faint grey line that pagelets show while they load</div>
         </div>
       <% end %>
     </div>

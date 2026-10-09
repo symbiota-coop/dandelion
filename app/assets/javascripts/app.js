@@ -629,21 +629,63 @@ $(function () {
     navTabsFormTouched = true
   })
 
+  // Loader: a bar along the top and a spinner, while an ajax GET has taken more than half a second and while leaving the page
+  const $loader = window.noLoader ? $() : $('<div class="loader" style="display: none"><div class="loader-bar"></div><div class="loader-spinner"></div></div>').appendTo('body')
+  const $loaderBar = $loader.find('.loader-bar')
+  let loaderWidth = 0
+  let loaderTrickle = null
+  let loaderRequests = 0
+
+  function setLoaderWidth (width) {
+    loaderWidth = width
+    $loaderBar.css('width', width + '%')
+  }
+
+  function startLoader () {
+    if (loaderTrickle) return
+    $loader.stop(true).css('opacity', '').show()
+    setLoaderWidth(10)
+    // Creep towards 90% until it's done
+    loaderTrickle = setInterval(function () { setLoaderWidth(loaderWidth + (90 - loaderWidth) * 0.1) }, 300)
+  }
+
+  function stopLoader () {
+    if (!loaderTrickle) return
+    clearInterval(loaderTrickle)
+    loaderTrickle = null
+    setLoaderWidth(100)
+    $loader.delay(200).fadeOut(150, function () { setLoaderWidth(0) })
+  }
+
+  $(document).on('ajaxSend', function (e, xhr, settings) {
+    if (settings.type !== 'GET') return
+    loaderRequests++
+    const timer = setTimeout(startLoader, 500)
+    xhr.always(function () {
+      clearTimeout(timer)
+      if (--loaderRequests === 0) stopLoader()
+    })
+  })
+
   $(window).on('beforeunload', function (e) {
     const sidebar = bootstrap.Offcanvas.getInstance('#sidebar')
     if (sidebar) sidebar.hide()
-    $('.pace-inactive').show() // start spinner as user starts navigating away from page
 
     if (!navTabsFormSubmitting && navTabsFormTouched && $('form:has(.nav-tabs)').length) {
       e.preventDefault()
       e.returnValue = ''
       return ''
     }
+
+    startLoader() // as the user starts navigating away from the page
   })
 
+  // Hide the loader as the user leaves the page, so it doesn't show when they press back
   $(window).on('pagehide', function () {
-    $('.pace-progress').hide()
-    $('.pace-inactive').hide() // hide spinner as user leaves page so it doesn't show when pressing back button    
+    clearInterval(loaderTrickle)
+    loaderTrickle = null
+    $loader.stop(true).hide()
+    setLoaderWidth(0)
   })
 
   // Keep dropdowns open when clicking inside them
@@ -655,8 +697,4 @@ $(function () {
   $(document).on('autocompleteopen autocompleteclose', function (e) {
     $(e.target).toggleClass('autocomplete-open', e.type === 'autocompleteopen')
   })
-
-  if (typeof Pace !== 'undefined') {
-    Pace.stop()
-  }
 })

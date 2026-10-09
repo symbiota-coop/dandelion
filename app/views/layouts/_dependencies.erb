@@ -39,10 +39,9 @@
   <script src="<%= f %>" defer></script>
 <% end %>
 
-<% unless ENV['CREATE_VIDEO'] %>
+<% if ENV['CREATE_VIDEO'] %>
   <script>
-    window.paceOptions = { ajax: { trackWebSockets: false, ignoreURLs: [/mcp\.deepwiki\.com/] }, restartOnPushState: false };
+    window.noLoader = true;
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.0/pace.min.js" defer></script>
 <% end %>
 <script src="<%= cachebust('/javascripts/ext/bootstrap.bundle.min.js') %>" defer></script>
