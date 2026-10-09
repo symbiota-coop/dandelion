@@ -1,4 +1,13 @@
 <link rel="stylesheet" href="<%= cachebust('/stylesheets/messages.css') %>">
+<script>
+  // Called by the thread and send partials, which pagelets reload without this page
+  function scrollMessageThreadToBottom () {
+    const thread = document.getElementById('thread-scroll')
+    if (!thread) return
+    thread.scrollTop = thread.scrollHeight
+    thread.classList.remove('thread-scroll-prepin')
+  }
+</script>
 <div class="row">
   <div id="preview-panel" class="col-lg-3 <% if @account %>d-none d-lg-block <% end %>">
 

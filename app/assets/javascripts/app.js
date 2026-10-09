@@ -1,10 +1,3 @@
-function scrollMessageThreadToBottom () {
-  const thread = document.getElementById('thread-scroll')
-  if (!thread) return
-  thread.scrollTop = thread.scrollHeight
-  thread.classList.remove('thread-scroll-prepin')
-}
-
 function initQuestionsPreview (inputSelector, previewUrl, options) {
   options = options || {}
   const fieldName = inputSelector.replace(/^#\w+?_/, '').replace(/_/g, '-')
