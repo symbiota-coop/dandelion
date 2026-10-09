@@ -98,7 +98,9 @@
     align-items: center;
   }
   /* The sparkline grows into any height a neighbouring cell's longer figure gives the row */
-  .stats-band-visual[data-sparkline] { flex: 1 0 2rem; height: auto; }
+  .stats-band-visual[data-sparkline] { flex: 1 0 2rem; height: auto; position: relative; }
+  /* Taken out of the flow, or its aspect ratio sets the row's height from the cell's width */
+  .stats-band-visual[data-sparkline] svg { position: absolute; inset: 0; }
   .stats-band-visual svg { width: 100%; height: 100%; overflow: visible; }
   .stats-band-visual .line { fill: none; stroke: var(--theme-500); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
   .stats-band-visual .area { fill: var(--theme-100); }
