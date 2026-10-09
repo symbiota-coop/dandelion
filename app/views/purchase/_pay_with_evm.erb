@@ -8,10 +8,7 @@
     <% if @event.organisation.evm_address && @event.chain.name == 'Celo' %>
       <div class="qr mb-3">
         <p class="mb-1">or use this QR code with Valora:</p>
-        <div id="qrcode"></div>
-        <script type="text/javascript">
-          new QRCode(document.getElementById("qrcode"), "celo://wallet/pay?address=<%=@event.organisation.evm_address%>");
-        </script>
+        <img src="/qr.png?url=<%= CGI.escape("celo://wallet/pay?address=#{@event.organisation.evm_address}") %>" alt="QR code" style="width: 16rem">
       </div>
     <% end %>
     <p>Making a manual transaction? You will find pasting these details easier if you 'Expand view' first.</p>
