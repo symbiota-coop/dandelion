@@ -24,10 +24,9 @@
                                               else
                                                 [worth.round, 0, '']
                                               end
-  # The sparklines are illustrative, not real figures: running totals only ever look like a straight line up, so
-  # these rise in uneven steps, as months do. Tickets and events get different shapes
+  # The sparkline is illustrative, not real figures: running totals only ever look like a straight line up, so
+  # this rises in uneven steps, as months do
   ticket_sparkline = [100, 103, 111, 113, 122, 136, 139, 141, 156, 163, 166, 182, 190]
-  event_sparkline = [100, 108, 110, 112, 124, 127, 140, 142, 145, 158, 161, 163, 176]
   rating = s[:average_rating]
   # Whole stars, then a half star from .25, rounding up from .75
   stars = (rating ? 5.times.map { |i| rating - i } : []).map do |left|
@@ -42,7 +41,6 @@
   cells = [
     ticket_count.positive?,
     worth_value.positive?,
-    s[:event_count].positive?,
     rating && s[:rating_count].positive?
   ].count(true)
 %>
@@ -109,7 +107,6 @@
     padding: var(--space-2xs) var(--space-sm);
     font-size: var(--font-size-sm);
   }
-  .stats-band-context { font-size: var(--font-size-sm); color: var(--bs-secondary-color); }
 </style>
 
 <div class="stats-band-container">
@@ -119,9 +116,6 @@
       <div class="stats-band-value"><span data-count-up="<%= ticket_count %>"><%= ticket_count.to_fs(:delimited) %></span></div>
       <div class="stats-band-label">tickets sold</div>
       <div class="stats-band-visual" data-sparkline="<%= ticket_sparkline.join(',') %>" aria-hidden="true"></div>
-      <% if s[:tickets_last_year].positive? %>
-        <div class="stats-band-context"><%= s[:tickets_last_year].to_fs(:delimited) %> in the last 12 months</div>
-      <% end %>
     </div>
   <% end %>
 
@@ -133,25 +127,13 @@
     </div>
   <% end %>
 
-  <% if s[:event_count].positive? %>
-    <div class="stats-band-cell">
-      <div class="stats-band-value"><span data-count-up="<%= s[:event_count] %>"><%= s[:event_count].to_fs(:delimited) %></span></div>
-      <div class="stats-band-label">events listed</div>
-      <div class="stats-band-visual" data-sparkline="<%= event_sparkline.join(',') %>" aria-hidden="true"></div>
-      <% if s[:organisation_count].positive? %>
-        <div class="stats-band-context">by <%= s[:organisation_count].to_fs(:delimited) %> <%= s[:organisation_count] == 1 ? 'organisation' : 'organisations' %></div>
-      <% end %>
-    </div>
-  <% end %>
-
   <% if rating && s[:rating_count].positive? %>
     <div class="stats-band-cell">
-      <div class="stats-band-value"><span data-count-up="<%= rating %>" data-decimals="1"><%= rating %></span><span class="fs-6 text-body-secondary fw-normal"> / 5</span></div>
-      <div class="stats-band-label">average rating</div>
+      <div class="stats-band-value"><span data-count-up="<%= s[:rating_count] %>"><%= s[:rating_count].to_fs(:delimited) %></span></div>
+      <div class="stats-band-label">attendee <%= s[:rating_count] == 1 ? 'review' : 'reviews' %></div>
       <div class="stats-band-visual">
         <span class="stars" aria-hidden="true"><% stars.each do |star| %><i class="bi <%= star %>"></i><% end %></span>
       </div>
-      <div class="stats-band-context">from <%= s[:rating_count].to_fs(:delimited) %> attendee <%= s[:rating_count] == 1 ? 'review' : 'reviews' %></div>
     </div>
   <% end %>
 </section>

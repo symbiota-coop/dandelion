@@ -183,15 +183,12 @@ class Ticket
   end
 
   HOME_PAGE_STATS_DEFAULTS = {
-    ticket_count: 0, worth_gbp_integer: 0, tickets_last_year: 0,
-    event_count: 0, organisation_count: 0,
-    average_rating: nil, rating_count: 0
+    ticket_count: 0, worth_gbp_integer: 0, average_rating: nil, rating_count: 0
   }.freeze
 
   # Sample figures, for the design guide and the home on development
   HOME_PAGE_STATS_SAMPLE = {
-    ticket_count: 204_333, worth_gbp_integer: 7_450_000, tickets_last_year: 108_500,
-    event_count: 18_400, organisation_count: 1200, average_rating: 4.6, rating_count: 9300
+    ticket_count: 204_333, worth_gbp_integer: 7_450_000, average_rating: 4.6, rating_count: 9300
   }.freeze
 
   def self.home_page_stats
@@ -209,14 +206,10 @@ class Ticket
       m += Money.new(o.value * 100, o.currency)
     rescue StandardError
     end
-    events = Event.live.publicly_visible
     rated = EventFeedback.rated
     stats = {
       ticket_count: count,
       worth_gbp_integer: Float('%.3g' % m).to_i,
-      tickets_last_year: self.and(:created_at.gte => 12.months.ago).count,
-      event_count: events.count,
-      organisation_count: events.distinct(:organisation_id).count,
       average_rating: rated.avg(:rating)&.round(1),
       rating_count: rated.count
     }
