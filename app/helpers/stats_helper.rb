@@ -97,14 +97,7 @@ Dandelion::App.helpers do
 
   def fetch_frontend_dependency(base_url, path)
     uri = URI.parse(base_url.to_s)
-    return unless uri.host&.downcase == 'cdn.jsdelivr.net'
-
-    case uri.path
-    when '/npm/'
-      fetch_npm_dependency(path)
-    when '/gh/'
-      fetch_github_dependency(path)
-    end
+    fetch_npm_dependency(path) if uri.host&.downcase == 'cdn.jsdelivr.net' && uri.path == '/npm/'
   rescue URI::InvalidURIError
     nil
   end
@@ -131,28 +124,6 @@ Dandelion::App.helpers do
     }
   rescue StandardError
     { name: name, version: version, source: 'npm' }
-  end
-
-  def fetch_github_dependency(path)
-    # jsDelivr GitHub format: 'user/repo@commit' => 'files'
-    user, repo_and_commit = path.split('/')
-    repo, commit = repo_and_commit.split('@')
-
-    client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
-    data = client.commit("#{user}/#{repo}", commit)
-    repo_data = client.repository("#{user}/#{repo}")
-    commit_date = data.commit.committer.date
-
-    {
-      name: "#{user}/#{repo}",
-      version: commit[0..6],
-      commit_date: commit_date,
-      source: 'github',
-      homepage: "https://github.com/#{user}/#{repo}",
-      description: repo_data.description&.truncate(80)
-    }
-  rescue StandardError
-    { name: "#{user}/#{repo}", version: commit[0..6], source: 'github' }
   end
 
   def fetch_gem_info(gem_name)

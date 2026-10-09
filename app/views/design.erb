@@ -620,7 +620,7 @@
       <% end %>
     </div>
 
-    <% design_subsection 'Rich text editor', 'CKEditor 5, from our own build (symbiota-coop/ckeditor5-dandelion). <code>wysiwyg_block</code> renders a textarea.wysiwyg, and app.js swaps in the editor. ckeditor.css styles it and the rich text it produces; the build adds two paragraph styles, Lead and Small.'.html_safe do %>
+    <% design_subsection 'Rich text editor', 'CKEditor 5, from our own build in ckeditor/: change ckeditor/src/ckeditor.js and run <code>rake ckeditor:build</code> (needs Node) to write ext/ckeditor.js. <code>wysiwyg_block</code> renders a textarea.wysiwyg, and app.js swaps in the editor. ckeditor.css styles it and the rich text it produces; the build adds three paragraph styles, Lead, Small and Action.'.html_safe do %>
       <div class="border rounded p-4">
         <label for="dg-wysiwyg">Description</label>
         <textarea class="form-control wysiwyg" id="dg-wysiwyg" rows="5"><p>An evening of <strong>breathwork</strong> and sound, for all levels.</p><ul><li>Bring a mat and a blanket</li><li>Doors at 7pm</li></ul></textarea>

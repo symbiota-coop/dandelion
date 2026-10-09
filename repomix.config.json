@@ -2,6 +2,7 @@
   "ignore": {
     "customPatterns": [
       "app/assets/javascripts/ext/**/*",
+      "ckeditor/yarn.lock",
       "**/*.svg",
       "**/*.txt",
       "GPLv3-LICENSE.md"

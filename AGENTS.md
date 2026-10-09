@@ -49,6 +49,7 @@ Always ask permission before running tests. Your default posture should be to su
 
 - You can find documentation at app/views/docs/md. Keep it up to date.
 - Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
+- CKEditor is our own build in `ckeditor/`. Never edit `app/assets/javascripts/ext/ckeditor.js`: change `ckeditor/src/ckeditor.js` and run `rake ckeditor:build` (needs Node)
 - `lib/form_builder.rb` defines the `_block` helpers like `text_block`, `wysiwyg_block` etc. `lib/param_helpers.rb` runs `blanks_to_nils!` on `params` so we can just do `if params[:x]` (no need for `if params[:x].present?`).
 - Do not use `.presence`
 - Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` — no `before_action`, strong params, or `render`

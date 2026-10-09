@@ -27,7 +27,7 @@
           </td>
           <td><code><%= dep[:version] %></code></td>
           <%= partial 'stats/version_bump_cells', locals: { cells: dep[:version_bump_cells] } %>
-          <% date = dep[:release_date] || dep[:commit_date] %>
+          <% date = dep[:release_date] %>
           <td data-order="<%= date&.to_i || 0 %>">
             <% if date %>
               <span title="<%= date.strftime('%Y-%m-%d %H:%M:%S UTC') %>">

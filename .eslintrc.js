@@ -10,6 +10,7 @@ module.exports = {
     jquery: true
   },
   ignorePatterns: [
-    'app/assets/javascripts/ext/**/*.js'
+    'app/assets/javascripts/ext/**/*.js',
+    'ckeditor/**/*.js'
   ]
 }

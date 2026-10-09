@@ -86,7 +86,7 @@ Dandelion::App.controller do
     threads.each(&:join)
 
     # Sort by date (oldest first, nils at top)
-    @dependencies.sort_by! { |d| d[:release_date] || d[:commit_date] || Time.at(0) }
+    @dependencies.sort_by! { |d| d[:release_date] || Time.at(0) }
 
     erb :'stats/frontend_dependencies'
   end
