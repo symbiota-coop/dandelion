@@ -1,8 +1,9 @@
 // Ask before going ahead with a click on a [data-confirm] element or a destroy link (whose path ends in destroy).
-// With a mouse or trackpad, in a popover beside the element: the question (data-confirm, or Are you sure?), Cancel,
+// Unless the main pointer is a finger, in a popover beside the element: the question (data-confirm, or Are you sure?), Cancel,
 // and a button named after the element (data-confirm-label, or its own text or title when short, or Confirm), red for
 // destroy links and danger buttons, otherwise primary. Confirming clicks the element again, and that click goes through.
-// On touch screens the browser's own confirm() is better: centred, dimming the page, with big buttons.
+// On touch screens (pointer: coarse) the browser's own confirm() is better: centred, dimming the page, with big buttons.
+// Testing for touch rather than a mouse means browsers with no pointer at all (headless Chrome in CI) get the popover
 // These listen on window in the capture phase, so they run before every other handler, including app.js's on document,
 // and a click held for confirming reaches none of them
 (function () {
@@ -72,7 +73,7 @@
     const confirmable = e.target.closest('[data-confirm]') || destroyLink
     if (!confirmable || confirmable === confirmed) return
 
-    const native = !window.matchMedia('(hover: hover) and (pointer: fine)').matches
+    const native = window.matchMedia('(pointer: coarse)').matches
     if (native && confirm(confirmable.getAttribute('data-confirm') || 'Are you sure?')) return
     e.preventDefault()
     e.stopPropagation()
