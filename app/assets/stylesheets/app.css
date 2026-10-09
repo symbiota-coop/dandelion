@@ -2034,6 +2034,21 @@ body .table > tfoot > tr > th {
   z-index: 1;
 }
 
+/* A shadow off the name column's right edge, over the columns scrolling under it. It's on a pseudo-element, as Bootstrap and DataTables paint stripes and hover as the cells' own inset box-shadow, and each cell is clipped at its top and bottom so the column reads as one */
+.event-stats-sticky th:first-child,
+.event-stats-sticky td:first-child {
+  clip-path: inset(0 -2rem 0 0);
+}
+
+.event-stats-sticky th:first-child::after,
+.event-stats-sticky td:first-child::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: var(--bs-box-shadow);
+  pointer-events: none;
+}
+
 .event-stats-sticky thead th {
   position: sticky;
   top: var(--header-offset);
