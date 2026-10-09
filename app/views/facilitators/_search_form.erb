@@ -1,10 +1,6 @@
 <script>
   $(function () {
-
-    if (typeof google !== 'undefined') {
-      var autocomplete = new google.maps.places.Autocomplete($('#events-search-near')[0]);
-    }
-
+    placeAutocomplete('#events-search-near')
   })
 </script>
 

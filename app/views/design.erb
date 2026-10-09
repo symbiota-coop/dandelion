@@ -1404,24 +1404,18 @@
         <div class="d-flex align-items-end flex-wrap gap-4">
           <% [['var(--color-green-500)', 'bi-person-fill', 'People'], ['var(--color-green-500)', 'bi-people-fill', 'Gatherings'], ['var(--color-red-400)', 'bi-calendar-event', 'Events'], ['var(--color-red-400)', 'bi-flag-fill', 'Organisations']].each do |color, icon, label| %>
             <div class="text-center">
-              <span class="position-relative d-inline-block" style="width: 36px; height: 48px">
-                <svg viewBox="-18 -48 36 48" width="36" height="48" aria-hidden="true"><path fill="<%= color %>" d="M0-48c-9.8 0-17.8 7.9-17.8 17.6C-17.8-14.9 0 0 0 0s17.8-14.9 17.8-30.4C17.8-40.1 9.8-48 0-48z"></path></svg>
-                <i class="bi <%= icon %> position-absolute start-50 translate-middle-x text-white" style="top: 8px; font-size: 18px"></i>
-              </span>
+              <div class="map-marker d-inline-block" style="--map-marker-color: <%= color %>"><i class="bi <%= icon %>"></i></div>
               <div class="spec mt-1"><%= label %></div>
             </div>
           <% end %>
-          <% [['var(--color-green-500)', 8], ['var(--color-orange-500)', 42], ['var(--color-red-500)', 130]].each do |color, n| %>
+          <% [['sm', 8], ['md', 42], ['lg', 130]].each do |size, n| %>
             <div class="text-center">
-              <span class="position-relative d-inline-flex align-items-center justify-content-center fw-bold text-white" style="width: 50px; height: 50px">
-                <svg class="position-absolute top-0 start-0" viewBox="0 0 50 50" width="50" height="50" aria-hidden="true"><circle cx="25" cy="25" r="25" fill="<%= color %>" fill-opacity=".4"></circle><circle cx="25" cy="25" r="20" fill="<%= color %>"></circle></svg>
-                <span class="position-relative"><%= n %></span>
-              </span>
+              <div class="map-cluster map-cluster-<%= size %> mx-auto" style="transform: none"><%= n %></div>
               <div class="spec mt-1">cluster</div>
             </div>
           <% end %>
         </div>
-        <div class="spec mt-3">Google Maps (map.js): map-icons pins in --color-green-500 (the default green, whatever the theme) for people and gatherings, --color-red-400 for events and organisations, each with its white Bootstrap icon · clusters --color-green-500, --color-orange-500, then --color-red-500 as they grow, each with a 40% halo, drawn as SVGs since MarkerClusterer takes an image, with white Plus Jakarta Sans counts · areas drawn in --color-orange-400, filled at 35%</div>
+        <div class="spec mt-3">Google Maps (map.js): advanced markers drawn in HTML, so they take the tokens directly · .map-marker pins in --color-green-500 (the default green, whatever the theme) for people and gatherings, --color-red-400 for events and organisations, set through --map-marker-color, each with its white Bootstrap icon · .map-cluster-sm, -md and -lg clusters (under 10, under 100, then more) in --color-green-500, --color-orange-500, then --color-red-500, each with a 40% halo and a white Plus Jakarta Sans count · .map-loading fades either to half while its details load · areas drawn in --color-orange-400, filled at 35% · location fields (places.js placeAutocomplete) suggest places in the jQuery UI autocomplete menu, with Google Maps attribution under it</div>
       <% end %>
     </div>
 

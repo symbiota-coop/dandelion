@@ -186,6 +186,61 @@ class AccountsTest < ActiveSupport::TestCase
     assert page.has_content?(name)
   end
 
+  # Stands in for the Places library, so places.js can be tested without a Google Maps key. places.js only asks
+  # for the library as someone types, so this can replace importLibrary once the page has loaded. The setter
+  # ignores the real API, which assigns its own importLibrary when it finishes loading
+  FAKE_PLACES_JS = <<~JS.freeze
+    const importLibrary = async function (name) {
+      if (name !== 'places') throw new Error('Not faked: ' + name)
+      return {
+        AutocompleteSessionToken: class {},
+        AutocompleteSuggestion: {
+          fetchAutocompleteSuggestions: async function (request) {
+            const places = ['Stockholm, Sweden', 'Stockport, UK'].filter(place => place.toLowerCase().startsWith(request.input.toLowerCase()))
+            return { suggestions: places.map(place => ({ placePrediction: { text: { toString: () => place } } })) }
+          }
+        }
+      }
+    }
+    Object.defineProperty(google.maps, 'importLibrary', { get: () => importLibrary, set: () => {} })
+  JS
+
+  test 'suggesting places for a location' do
+    account = FactoryBot.create(:account)
+    sign_in(account)
+    visit '/accounts/edit'
+    execute_script FAKE_PLACES_JS
+
+    # Typed rather than filled in, since fill_in blurs the field, which cancels jQuery UI's search
+    location = find_field('Location')
+    location.set('')
+    location.send_keys('Stock')
+    assert page.has_css?('.places-autocomplete li', text: 'Stockport, UK')
+    # Enter with the menu open and nothing highlighted closes the menu rather than submitting the form
+    location.send_keys(:enter)
+    assert page.has_no_css?('.places-autocomplete li', visible: true)
+    assert page.has_no_content?('Your account was updated successfully')
+
+    location.send_keys('h')
+    find('.places-autocomplete li', text: 'Stockholm, Sweden').click
+    assert_equal 'Stockholm, Sweden', location.value
+    click_button 'Save profile'
+    assert page.has_content?('Your account was updated successfully')
+    assert_equal 'Stockholm, Sweden', account.reload.location
+  end
+
+  test 'picking a place on the map page saves it as the location' do
+    account = FactoryBot.create(:account, location: nil)
+    sign_in(account)
+    visit '/map'
+    execute_script FAKE_PLACES_JS
+
+    find_field('location').send_keys('Stockh')
+    find('.places-autocomplete li', text: 'Stockholm, Sweden').click
+    assert page.has_content?('Your profile location: Stockholm, Sweden')
+    assert_equal 'Stockholm, Sweden', account.reload.location
+  end
+
   # ═══════════════════════════════════════════════════════════════════════════
   # New Account Creation with Context
   # ═══════════════════════════════════════════════════════════════════════════

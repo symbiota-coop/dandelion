@@ -131,13 +131,7 @@
         </div>
         <script>
           $(function () {
-            if (typeof google !== 'undefined') {
-              var autocomplete = new google.maps.places.Autocomplete($('#gathering_location')[0]);
-              $('#gathering_location').keydown(function (e) {
-                if (e.which == 13 && $('.pac-container:visible').length)
-                  return false;
-              });
-            }
+            placeAutocomplete('#gathering_location')
           })
         </script>
         <%= f.text_block :location %>

@@ -11,13 +11,9 @@
     <% form_tag '/accounts/update_location', class: 'mb-3', style: ('display: none' if current_account.location) do %>
       <script>
         $(function () {
-
-          if (typeof google !== 'undefined') {
-            var autocomplete = new google.maps.places.Autocomplete($('#location')[0]);
-            google.maps.event.addListener(autocomplete, 'place_changed', function () {
-              $('#location')[0].form.submit()
-            });
-          }
+          placeAutocomplete('#location', {
+            select: function () { $('#location')[0].form.submit() }
+          })
         })
       </script>
       <%= text_field_tag :location, id: 'location', class: 'form-control', placeholder: 'Enter your location' %>

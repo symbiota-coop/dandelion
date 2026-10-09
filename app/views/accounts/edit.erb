@@ -59,14 +59,10 @@
     </div>
     <script>
       $(function () {
-        if (typeof google !== 'undefined') {
-          var autocomplete = new google.maps.places.Autocomplete($('#account_location')[0]);
-          $('#account_location').keydown(function (e) {
-            $('#account-map').hide()
-            if (e.which == 13 && $('.pac-container:visible').length)
-              return false;
-          });
-        }
+        placeAutocomplete('#account_location')
+        $('#account_location').keydown(function () {
+          $('#account-map').hide()
+        });
       })
     </script>
     <%= f.image_block :image, rotate: false %>

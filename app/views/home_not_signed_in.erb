@@ -88,16 +88,16 @@
       var $mapContainer = $('#homepage-map');
       var mapLoaded = false;
 
-      if (typeof google === 'undefined') {
-        $mapContainer.hide();
-        return;
-      }
-
       var observer = new IntersectionObserver(function (entries) {
         if (entries[0].isIntersecting && !mapLoaded) {
           mapLoaded = true;
           observer.disconnect();
-          $mapContainer.load($mapContainer.data('lazy-map'));
+          // Hide the map if Google Maps can't load (e.g. it's blocked)
+          google.maps.importLibrary('maps').then(function () {
+            $mapContainer.load($mapContainer.data('lazy-map'));
+          }).catch(function () {
+            $mapContainer.hide();
+          });
         }
       }, { rootMargin: '200px' });
 

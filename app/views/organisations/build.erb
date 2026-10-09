@@ -41,13 +41,7 @@
 <script>
   $(function () {
 
-    if (typeof google !== 'undefined') {
-      var autocomplete = new google.maps.places.Autocomplete($('#organisation_location')[0]);
-      $('#organisation_location').keydown(function (e) {
-        if (e.which == 13 && $('.pac-container:visible').length)
-          return false;
-      })
-    }
+    placeAutocomplete('#organisation_location')
 
     autosize($('#organisation_minimal_head')[0])
     autosize($('#organisation_terms_and_conditions')[0])

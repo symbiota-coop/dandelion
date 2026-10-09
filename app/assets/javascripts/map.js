@@ -1,45 +1,15 @@
 // Map functionality
 window.DandelionMap = {
-  // Configuration settings - lazy loaded to avoid referencing google before it's available
-  get mapOptions () {
-    return {
-      mapTypeId: google.maps.MapTypeId.ROADMAP,
-      mapTypeControl: false,
-      scaleControl: true,
-      streetViewControl: false,
-      fullscreenControl: false,
-      maxZoom: 16,
-      minZoom: 1,
-      gestureHandling: 'greedy',
-      clickableIcons: false,
-      scrollwheel: true,
-      draggable: true,
-      disableDoubleClickZoom: false
-    };
-  },
-
-  // A cluster is a circle in a palette colour with a translucent halo. MarkerClusterer wants an image URL
-  // and Google Maps a plain colour, so the colour is resolved and drawn as an SVG
-  generateClusterStyle: function (color, textSize = 16) {
-    const fill = cssColor(color)
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><circle cx="25" cy="25" r="25" fill="${fill}" fill-opacity=".4"/><circle cx="25" cy="25" r="20" fill="${fill}"/></svg>`
-    return {
-      textColor: 'white',
-      textSize: textSize,
-      fontFamily: 'Plus Jakarta Sans',
-      url: 'data:image/svg+xml,' + encodeURIComponent(svg),
-      height: 50,
-      width: 50
-    };
-  },
-
-  // Clusters turn from green to orange to red as they grow
-  get clusterStyles () {
-    return [
-      this.generateClusterStyle('var(--color-green-500)'),
-      this.generateClusterStyle('var(--color-orange-500)'),
-      this.generateClusterStyle('var(--color-red-500)', 14)
-    ];
+  mapOptions: {
+    mapTypeControl: false,
+    scaleControl: true,
+    streetViewControl: false,
+    fullscreenControl: false,
+    maxZoom: 16,
+    minZoom: 1,
+    gestureHandling: 'greedy',
+    clickableIcons: false,
+    disableDoubleClickZoom: false
   },
 
   // Google Maps needs a plain colour, so resolve --color-orange-400 when a polygon is drawn
@@ -54,7 +24,7 @@ window.DandelionMap = {
     }
   },
 
-  // Model configurations for map markers
+  // Model configurations for map markers: app.css draws a .map-marker pin in the colour, with the icon on it
   models: [
     { name: 'Account', color: 'var(--color-green-500)', icon: 'bi bi-person-fill' },
     { name: 'ActivityApplication', color: 'var(--color-green-500)', icon: 'bi bi-person-fill' },
@@ -65,10 +35,6 @@ window.DandelionMap = {
   ],
 
   dynamicLoadingTimeout: 500,
-
-  clusterConfig: {
-    zoomOnClick: false
-  },
 
   // Helper functions for bounds validation and fallback
   validateBounds: function (bounds) {
@@ -87,7 +53,7 @@ window.DandelionMap = {
   },
 
   setDefaultView: function () {
-    window.map.setCenter(new google.maps.LatLng(0, 35));
+    window.map.setCenter({ lat: 0, lng: 35 });
     window.map.setZoom(0);
   },
 
@@ -116,16 +82,14 @@ window.DandelionMap = {
     const minHeight = window.innerHeight * 0.5;
     const finalHeight = Math.max(remainingHeight, minHeight);
     document.getElementById('map-canvas').style.height = finalHeight + 'px';
-
-    // Trigger map resize if map exists
-    if (window.map) {
-      google.maps.event.trigger(window.map, 'resize');
-    }
   },
 
-  // Initialize map with given configuration
-  initializeMap: function (config) {
-    if (typeof google === 'undefined') {
+  // Initialize map with given configuration. The Maps libraries load on demand (see layouts/_dependencies.erb)
+  initializeMap: async function (config) {
+    try {
+      await Promise.all([google.maps.importLibrary('maps'), google.maps.importLibrary('marker')]);
+    } catch (error) {
+      console.error('Error loading Google Maps:', error);
       $('#map-container').html('<div class="alert alert-warning"><p class="mb-0">Please enable cookies and refresh the page to view the map</p></div>');
       return;
     }
@@ -139,9 +103,8 @@ window.DandelionMap = {
       $(window).on('resize', function () { self.fillScreen(); });
     }
 
-    var mapOptions = Object.assign({}, this.mapOptions);
-
-    window.map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+    // Advanced markers need a map ID
+    window.map = new google.maps.Map(document.getElementById('map-canvas'), Object.assign({ mapId: config.mapId }, this.mapOptions));
     var bounds = new google.maps.LatLngBounds();
 
     // Initialize info window
@@ -180,25 +143,24 @@ window.DandelionMap = {
       var point = points[i];
       var modelConfig = this.models.find(model => model.name == point.model_name);
 
-      var marker = new mapIcons.Marker({
-        model_name: point.model_name,
-        id: point.id,
-        n: point.n,
-        position: new google.maps.LatLng(point.lat, point.lng),
-        icon: {
-          path: mapIcons.shapes.MAP_PIN,
-          fillColor: cssColor(modelConfig.color),
-          fillOpacity: 1,
-          strokeColor: '',
-          strokeWeight: 0
-        },
-        map_icon_label: '<span class="' + modelConfig.icon + '"></span>'
+      var pin = document.createElement('div');
+      pin.className = 'map-marker';
+      pin.style.setProperty('--map-marker-color', modelConfig.color);
+      pin.innerHTML = '<i class="' + modelConfig.icon + '"></i>';
+
+      var marker = new google.maps.marker.AdvancedMarkerElement({
+        position: { lat: point.lat, lng: point.lng },
+        content: pin,
+        gmpClickable: true
       });
+      marker.modelName = point.model_name;
+      marker.pointId = point.id;
+      marker.n = point.n;
 
       // Add click listener
       this.addMarkerClickListener(marker, infowindow);
 
-      bounds.extend(marker.getPosition());
+      bounds.extend(marker.position);
 
       markers.push(marker);
     }
@@ -208,37 +170,27 @@ window.DandelionMap = {
 
   addMarkerClickListener: function (marker, infowindow) {
     var self = this;
-    google.maps.event.addListener(marker, 'click', function () {
+    marker.addEventListener('gmp-click', function () {
       var timeout = self.dynamicLoadingTimeout;
       setTimeout(function () {
         clearTimeout(window.mapTimer);
       }, timeout);
 
-      // Store original icon and label for restoration
-      var originalIcon = marker.getIcon();
-
-      // Change to loading icon
-      marker.setIcon({
-        path: mapIcons.shapes.MAP_PIN,
-        fillColor: originalIcon.fillColor,
-        fillOpacity: 0.5,
-        strokeColor: '',
-        strokeWeight: 0
-      });
+      // Fade the marker while its details load
+      marker.classList.add('map-loading');
 
       infowindow.close();
 
-      $.get('/points/' + marker.model_name + '/' + marker.id)
+      $.get('/points/' + marker.modelName + '/' + marker.pointId)
         .done(function (data) {
           infowindow.setContent('<div class="infowindow">' + data + '</div>');
-          infowindow.open(window.map, marker);
+          infowindow.open({ map: window.map, anchor: marker });
         })
         .fail(function (xhr, status, error) {
           console.error('Error loading marker data:', error);
         })
         .always(function () {
-          // Restore original icon and label
-          marker.setIcon(originalIcon);
+          marker.classList.remove('map-loading');
         });
     });
   },
@@ -267,64 +219,77 @@ window.DandelionMap = {
     return polygons;
   },
 
+  // A cluster is a .map-cluster circle (app.css) that turns from green to orange to red as it grows
+  renderCluster: function (cluster) {
+    var count = cluster.count;
+    var circle = document.createElement('div');
+    circle.className = 'map-cluster ' + (count < 10 ? 'map-cluster-sm' : count < 100 ? 'map-cluster-md' : 'map-cluster-lg');
+    circle.textContent = count;
+
+    return new google.maps.marker.AdvancedMarkerElement({
+      position: cluster.position,
+      content: circle,
+      gmpClickable: true,
+      zIndex: 1000 + count
+    });
+  },
+
   setupClustering: function (markers, infowindow) {
-    var markerClusterer = new MarkerClusterer(window.map, markers, Object.assign({}, this.clusterConfig, {
-      styles: this.clusterStyles
-    }));
-
-    // Store reference globally for dynamic updates
-    window.markerClusterer = markerClusterer;
-
     var self = this;
-    google.maps.event.addListener(markerClusterer, 'clusterclick', function (cluster) {
-      if (window.map.getZoom() === window.map.maxZoom) {
-        self.handleClusterClick(cluster, infowindow);
-      } else {
-        window.map.setCenter(cluster.getCenter());
-        window.map.setZoom(window.map.getZoom() + 2);
+    window.markerClusterer = new markerClusterer.MarkerClusterer({
+      map: window.map,
+      markers: markers,
+      renderer: { render: function (cluster) { return self.renderCluster(cluster); } },
+      // At the closest zoom, the points in a cluster share a place, so list them all rather than zooming
+      onClusterClick: function (event, cluster) {
+        if (window.map.getZoom() >= self.mapOptions.maxZoom) {
+          self.handleClusterClick(cluster, infowindow);
+        } else {
+          window.map.setCenter(cluster.position);
+          window.map.setZoom(window.map.getZoom() + 2);
+        }
       }
     });
   },
 
   handleClusterClick: function (cluster, infowindow) {
-    var markers = cluster.getMarkers();
+    var markers = cluster.markers.slice();
     markers.sort(function (a, b) {
       return a.n - b.n;
     });
 
     infowindow.close();
-    infowindow.setPosition(cluster.getCenter());
+    infowindow.setPosition(cluster.position);
 
     setTimeout(function () {
       clearTimeout(window.mapTimer);
     }, this.dynamicLoadingTimeout);
 
-    // Change cluster opacity to indicate loading
-    var clusterIcon = cluster.clusterIcon_;
-    if (clusterIcon && clusterIcon.div_) {
-      clusterIcon.div_.style.opacity = '0.5';
+    // Fade the cluster while its details load
+    var clusterMarker = cluster.marker;
+    if (clusterMarker) {
+      clusterMarker.classList.add('map-loading');
     }
 
     var content = '';
     var requests = markers.map(function (marker) {
-      return $.get('/points/' + marker.model_name + '/' + marker.id)
+      return $.get('/points/' + marker.modelName + '/' + marker.pointId)
         .done(function (data) {
           content += '<div class="mb-3">' + data + '</div>';
         })
         .fail(function (xhr, status, error) {
-          console.error('Error loading marker data for ' + marker.model_name + '/' + marker.id + ':', error);
+          console.error('Error loading marker data for ' + marker.modelName + '/' + marker.pointId + ':', error);
         });
     });
 
     $.when.apply($, requests).done(function () {
       infowindow.setContent('<div class="infowindow">' + (content.length > 0 ? content : '<em>Nothing to show</em>') + '</div>');
-      infowindow.open(window.map);
+      infowindow.open({ map: window.map });
     }).fail(function () {
       console.error('Error loading cluster marker data');
     }).always(function () {
-      // Restore cluster opacity
-      if (clusterIcon && clusterIcon.div_) {
-        clusterIcon.div_.style.opacity = '1';
+      if (clusterMarker) {
+        clusterMarker.classList.remove('map-loading');
       }
     });
   },
@@ -380,7 +345,7 @@ window.DandelionMap = {
           urlParams = $.deparam(urlParts[1]);
         }
 
-        queryParams = $.deparam(window.location.search.substring(1));
+        var queryParams = $.deparam(window.location.search.substring(1));
 
         // Merge url parameters with dynamic request parameters
         var requestParams = jQuery.extend({}, urlParams, queryParams, q, { display: 'map' });
@@ -398,11 +363,9 @@ window.DandelionMap = {
             success: function (data) {
               self.updateMapWithNewData(data, config, isFirstLoad);
               isFirstLoad = false;
-              window.map.setOptions(self.mapOptions);
             },
             error: function (xhr, status, error) {
               console.error('Failed to load map data:', error);
-              window.map.setOptions(self.mapOptions);
             }
           });
         }, timeout);
@@ -413,11 +376,6 @@ window.DandelionMap = {
   },
 
   updateMapWithNewData: function (data, config, isFirstLoad) {
-    // Clear existing markers and clusters
-    if (window.markerClusterer) {
-      window.markerClusterer.clearMarkers();
-    }
-
     // Create new markers from JSON data
     var bounds = new google.maps.LatLngBounds();
     var markers = [];
@@ -425,10 +383,9 @@ window.DandelionMap = {
       markers = this.createMarkers(data.points, window.mapInfoWindow, bounds);
     }
 
-    // Setup new clustering
-    if (markers.length > 0) {
-      this.setupClustering(markers, window.mapInfoWindow);
-    }
+    // Swap the clusterer's markers for the new ones
+    window.markerClusterer.clearMarkers(true);
+    window.markerClusterer.addMarkers(markers);
 
     // Update points warning
     if (data.pointsCount > (config.pointsLimit || 1000)) {

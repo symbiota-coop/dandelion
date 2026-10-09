@@ -25,14 +25,11 @@ FRONTEND_DEPENDENCIES = {
     'countup.js@2.1.0' => 'dist/countUp.umd.js',
     'jquery-deparam@0.5.3' => 'jquery-deparam.js',
     'linkifyjs@2.1.9' => 'dist/linkify.min.js dist/linkify-jquery.min.js',
+    '@googlemaps/markerclusterer@2.6.2' => 'dist/index.min.js',
     '@melloware/coloris@0.25.0' => 'dist/umd/coloris.min.js dist/coloris.min.css'
-  },
-  'https://cdn.jsdelivr.net/gh/' => {
-    'mahnunchik/markerclustererplus@736b0e3a7d916fbeb2ee5007494f17a5329b11a8' => 'src/markerclusterer.js',
-    'scottdejonge/map-icons@dbf6fd7caedd60d11b5bfb5f267a114a6847d012' => 'dist/js/map-icons.js dist/css/map-icons.min.css'
   },
   '/' => {
     'javascripts/ext' => 'ckeditor.js',
-    'javascripts' => 'pagelets.js jquery.lookup.js map.js currencySymbol.js serializeObject.js cookie_consent.js sidebar.js header_search.js scrollspy.js app.js'
+    'javascripts' => 'pagelets.js jquery.lookup.js map.js places.js currencySymbol.js serializeObject.js cookie_consent.js sidebar.js header_search.js scrollspy.js app.js'
   }
 }

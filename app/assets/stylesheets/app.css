@@ -2448,25 +2448,83 @@ ul.map-event li {
   font-size: var(--font-size-sm) !important
 }
 
-/* Google Maps and the map-icons markers draw in pixels, so these overrides stay in px to line up with them */
+/* Google Maps draws in pixels, so these overrides, the markers and the clusters stay in px to line up with it */
 #map-canvas button[title=Close] {
   height: 36px !important;
   margin-top: -8px !important;
   margin-right: 2px !important;
 }
 
-.map-icon-label .bi {
+/* A pin (map.js sets --map-marker-color for its model), with its white Bootstrap icon. Google anchors it at its point */
+.map-marker {
+  width: 36px;
+  height: 48px;
+  padding-top: 8px;
+  text-align: center;
   color: var(--bs-white);
-  font-size: 20px !important;
-  position: relative;
-  top: -18px
+  font-size: 18px;
+  line-height: 1;
+  background: var(--map-marker-color);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-18 -48 36 48'%3E%3Cpath d='M0-48c-9.8 0-17.8 7.9-17.8 17.6C-17.8-14.9 0 0 0 0s17.8-14.9 17.8-30.4C17.8-40.1 9.8-48 0-48z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
-.map-icon-label .map-icon {
-  color: var(--bs-white);
-  font-size: 22px !important;
+/* A cluster: a circle with a 40% halo, centred on its point, turning from green to orange to red as it grows */
+.map-cluster {
+  --map-cluster-color: var(--color-green-500);
   position: relative;
-  top: -4px
+  isolation: isolate;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(50%);
+  color: var(--bs-white);
+  font-family: var(--body-font-family);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.map-cluster::before,
+.map-cluster::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  background: var(--map-cluster-color);
+}
+
+.map-cluster::before {
+  inset: 0;
+  opacity: 0.4;
+}
+
+.map-cluster::after {
+  inset: 5px;
+}
+
+.map-cluster-md {
+  --map-cluster-color: var(--color-orange-500);
+}
+
+.map-cluster-lg {
+  --map-cluster-color: var(--color-red-500);
+  font-size: 14px;
+}
+
+/* A marker or cluster whose details are loading */
+.map-loading {
+  opacity: 0.5;
+}
+
+/* Google requires attribution under place suggestions shown without a map (places.js) */
+.places-autocomplete::after {
+  content: 'Google Maps';
+  display: block;
+  padding: var(--space-2xs) var(--space-base) 0;
+  text-align: end;
+  font-size: var(--font-size-xs);
+  color: var(--bs-secondary-color);
 }
 
 .infowindow .row {

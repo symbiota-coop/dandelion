@@ -299,13 +299,7 @@ $(function () {
       })
   }
 
-  // Google Places Autocomplete for location
-  if (typeof google !== 'undefined') {
-    const autocomplete = new google.maps.places.Autocomplete($('#event_location')[0])
-    $('#event_location').keydown(function (e) {
-      if (e.which === 13 && $('.pac-container:visible').length) return false
-    })
-  }
+  placeAutocomplete('#event_location')
 
   // Ensure end_time can't be before start_time
   $('#event_start_time').change(function () {
