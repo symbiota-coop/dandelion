@@ -15,7 +15,6 @@ FRONTEND_DEPENDENCIES = {
     'chart.js@3.5.1' => 'dist/chart.js',
     'intro.js@6.0.0' => 'minified/intro.min.js minified/introjs.min.css',
     'bootstrap-icons@1.13.1' => 'font/bootstrap-icons.min.css',
-    'typed.js@2.0.10' => 'lib/typed.min.js',
     'chartjs-plugin-datalabels@2.0.0' => 'dist/chartjs-plugin-datalabels.min.js',
     'autosize@4.0.2' => 'dist/autosize.min.js',
     'countup.js@2.1.0' => 'dist/countUp.umd.js',
