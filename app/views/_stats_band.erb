@@ -60,6 +60,8 @@
   }
   @container (max-width: 47.99rem) {
     .stats-band-cell:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    /* The reviews cell only shows once the cells are in one row */
+    .stats-band .stats-band-cell-wide { display: none; }
   }
   @container (min-width: 48rem) {
     .stats-band { grid-template-columns: repeat(var(--cells), minmax(0, 1fr)); }
@@ -128,7 +130,7 @@
   <% end %>
 
   <% if rating && s[:rating_count].positive? %>
-    <div class="stats-band-cell">
+    <div class="stats-band-cell stats-band-cell-wide">
       <div class="stats-band-value"><span data-count-up="<%= s[:rating_count] %>"><%= s[:rating_count].to_fs(:delimited) %></span></div>
       <div class="stats-band-label">attendee <%= s[:rating_count] == 1 ? 'review' : 'reviews' %></div>
       <div class="stats-band-visual">
