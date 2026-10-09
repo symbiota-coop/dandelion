@@ -371,8 +371,6 @@ $(function () {
       })
     })
 
-    $('input.typeWatch').not('[data-typewatch-initialized]').attr('data-typewatch-initialized', true).typeWatch({ wait: 500, callback: function () { $(this.form).submit() } })
-
     $('form.submitOnChange').not('[data-submit-on-change-initialized]').attr('data-submit-on-change-initialized', true).each(function () {
       $('select, .flatpickr-input, input[type=checkbox], input[type=month]', this).change(function () {
         $(this.form).submit()
@@ -660,6 +658,12 @@ $(function () {
     loaderTrickle = null
     $loader.stop(true).hide()
     setLoaderWidth(0)
+  })
+
+  // Submit a .typeWatch field's form once typing has paused for half a second
+  $(document).on('input', 'input.typeWatch', function () {
+    clearTimeout(this.typeWatchTimer)
+    this.typeWatchTimer = setTimeout(() => $(this.form).submit(), 500)
   })
 
   // Keep dropdowns open when clicking inside them
