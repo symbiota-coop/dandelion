@@ -1480,7 +1480,7 @@
       <div class="spec">A short "No …" phrase in --bs-secondary-color, left-aligned and without a full stop, where the list or table would be: grey, since it is the absence of content rather than content</div>
     <% end %>
 
-    <% design_subsection 'Principles', 'No platform fees, the co-op and open data, on the signed-out home and /donate (_badges.erb). Each is a 7rem white circle with a --hairline border and --bs-box-shadow-sm, like the date and icon tiles, holding its black line drawing (gift-cycle.png, the gift and arrows from gift.png without the hand; coop.png; opendata.png), then its line of text. Laid out by its own width with container queries: three centred columns from 36rem, otherwise a list with the circle beside the text.' do %>
+    <% design_subsection 'Principles', 'No platform fees, the co-op and open data, on the signed-out home and /donate (_badges.erb). Each is a 7rem white circle with a --hairline border and --bs-box-shadow-sm, like the date and icon tiles, holding its black line drawing (gift-cycle.png, the gift and arrows from gift.png without the hand; coop.png; opendata.png), then its line of text. Laid out by its own width with container queries: three centred columns from 36rem, otherwise a list with the circle beside the text. <code>columns: true</code> keeps the three columns at any width, the circles shrinking to fit and the text at --font-size-xs, as in the donation modal.'.html_safe do %>
       <div class="row">
         <div class="col-lg-8"><%= partial :badges %></div>
         <div class="col-lg-4"><%= partial :badges %></div>

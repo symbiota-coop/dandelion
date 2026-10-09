@@ -25,9 +25,14 @@
     .principle { flex-direction: column; text-align: center; }
     .principle-break { display: inline; }
   }
+  /* columns: true keeps the three columns however narrow (as in the donation modal), the circles shrinking to fit */
+  .principles-columns .principles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-base); }
+  .principles-columns .principle { flex-direction: column; text-align: center; }
+  .principles-columns .principle p { font-size: var(--font-size-xs); }
+  .principles-columns .principle-icon { width: 100%; max-width: 7rem; height: auto; aspect-ratio: 1; }
 </style>
 
-<div class="principles-container">
+<div class="principles-container<% if defined?(columns) && columns %> principles-columns<% end %>">
   <div class="principles">
     <div class="principle">
       <div class="principle-icon"><img src="/images/gift-cycle.png" alt=""></div>
