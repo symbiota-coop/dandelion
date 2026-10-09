@@ -1,0 +1,4 @@
+<%= partial :'events/star', locals: { event: event, event_star: event_star, block_edit: true } %>
+<% if event_admin?(event) %>
+  <a class="text-body block-edit" target="_parent" href="<%= "/e/#{event.slug}/edit" %>"><i class="bi bi-pencil-fill"></i></a>
+<% end %>

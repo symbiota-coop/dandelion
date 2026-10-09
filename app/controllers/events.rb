@@ -369,6 +369,12 @@ Dandelion::App.controller do
     partial :'events/star', locals: { event: @event, event_star: @event_star, block_edit: params[:block_edit] }
   end
 
+  get '/events/:id/block_controls' do
+    sign_in_required!
+    @event = Event.find(params[:id]) || not_found
+    partial :'events/block_controls', locals: { event: @event, event_star: @event.event_stars.find_by(account: current_account) }
+  end
+
   post '/events/:id/do_star' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
