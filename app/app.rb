@@ -51,6 +51,9 @@ module Dandelion
       set_time_zone
       fix_params!
       Sentry.set_tags(xhr: request.xhr? ? 'true' : 'false')
+      # XHR responses are pagelets and partials that must be fresh, and often share a URL with the full page,
+      # so the browser mustn't store them (a stored partial could be shown in place of the page on back navigation)
+      cache_control :no_store if request.xhr?
       if params[:sign_in_token]
         sign_in_via_token
       elsif params[:api_key] && request.path.match?(%r{\A/z(/|\.|\z)})

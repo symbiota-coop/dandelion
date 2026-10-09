@@ -28,12 +28,6 @@ $(function () {
     }
   })
 
-  // Cache busting for all AJAX requests
-  $.ajaxPrefilter(function (options) {
-    const cacheBuster = '_t=' + Date.now()
-    options.data = options.data ? options.data + '&' + cacheBuster : cacheBuster
-  })
-
   // ─────────────────────────────────────────────────────────────
   // Helper Functions
   // ─────────────────────────────────────────────────────────────
