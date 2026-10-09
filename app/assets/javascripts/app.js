@@ -211,7 +211,7 @@ $(function () {
       })
     })
 
-    $('.linkify').not('[data-linkified]').attr('data-linkified', true).linkify()
+    $('.linkify').not('[data-linkified]').attr('data-linkified', true).linkify({ target: { url: '_blank' } })
 
     $('.compact-urls').not('[data-compact-urls]').attr('data-compact-urls', true).each(function () {
       $(this).html($(this).html().replace(/<a (.*)>(.*)<\/a>/, function (match, p1, p2) {
