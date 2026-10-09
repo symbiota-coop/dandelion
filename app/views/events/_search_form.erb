@@ -13,7 +13,7 @@
     <span class="popular-locations-container">
       <% popular_locations.each_with_index do |location, index| %>
         <span class="location-item"<% if index >= show_more_limit %> style="display: none"<% end %>>
-          <a class="badge mb-1 <% if @location && @location == location %> text-bg-primary <% else %> text-primary border border-primary <% end %>" href="/locations/<%= location.name %>"><%= location.name %></a>
+          <a class="btn btn-sm mb-1 <%= @location && @location == location ? 'btn-primary' : 'btn-outline-primary' %>" href="/locations/<%= location.name %>"><%= location.name %></a>
         </span>
       <% end %>
       <% if popular_locations.size > show_more_limit %>

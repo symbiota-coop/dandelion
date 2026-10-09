@@ -672,14 +672,14 @@
         </div>
         <div class="popular-locations">
           <span class="d-inline-block mb-1">Popular locations:</span>
-          <a class="badge mb-1 text-bg-primary" href="#components">London</a>
+          <a class="btn btn-sm mb-1 btn-primary" href="#components">London</a>
           <% %w[Bristol Totnes Brighton].each do |place| %>
-            <a class="badge mb-1 text-primary border border-primary" href="#components"><%= place %></a>
+            <a class="btn btn-sm mb-1 btn-outline-primary" href="#components"><%= place %></a>
           <% end %>
           <a href="#components"><i class="bi bi-three-dots"></i></a>
         </div>
       </div>
-      <div class="spec">Fields stack below 576px, with the button below them · the checkbox helper (<code>checkbox 'Deleted'</code>) is a .form-group holding a .form-check-inline · in grid rows instead (events/_search_form.erb), each .form-group takes a col, with the checkboxes beside the button on a second row, inside a .search panel: --bs-tertiary-bg, --bs-box-shadow-sm · .select-placeholder greys a select until forms.js loads, which then greys any select while its chosen option is a disabled placeholder · popular locations: outline badges, the current one filled</div>
+      <div class="spec">Fields stack below 576px, with the button below them · the checkbox helper (<code>checkbox 'Deleted'</code>) is a .form-group holding a .form-check-inline · in grid rows instead (events/_search_form.erb), each .form-group takes a col, with the checkboxes beside the button on a second row, inside a .search panel: --bs-tertiary-bg, --bs-box-shadow-sm · .select-placeholder greys a select until forms.js loads, which then greys any select while its chosen option is a disabled placeholder · popular locations: btn-sm btn-outline-primary, the current one btn-primary</div>
     <% end %>
 
     <div class="row g-5">
