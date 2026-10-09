@@ -1,8 +1,8 @@
 <% location.set(events_count: events.count) %>
 
 <h1 class="mb-3" style="line-height: 1 !important">
-  <span class="d-block mb-1"><%= location.name %></span>
-  <span class="text-body-secondary fs-4 fw-normal">
+  <span class="d-block mb-2"><%= location.name %></span>
+  <span class="d-block text-body-secondary fs-4 fw-normal lh-base">
     Check out <%= pluralize(events.count, 'upcoming event') %> near <%= location.query %> on Dandelion
   </span>
 </h1>
