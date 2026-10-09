@@ -78,7 +78,8 @@ module Dandelion
       @og_desc = "Find and host #{ADJECTIVES.join(' · ')} events and co-created gatherings"
       @og_image = "#{ENV['BASE_URI']}/images/link.png"
       if current_account
-        current_account.set(last_active: Time.now)
+        # Pagelets and polls are XHR, so skipping them saves a write on most requests; page loads keep it current
+        current_account.set(last_active: Time.now) unless request.xhr?
         Sentry.set_user(id: current_account.id.to_s, email: current_account.email)
       end
     end
