@@ -1,20 +1,11 @@
 <style>
-  .grid-sizer, .grid-item {  width: 100% }
   @media (min-width: 768px) {
-    .grid-sizer, .grid-item {  width: 50% }
+    .feedback-columns { columns: 2; column-gap: 0 }
   }
-  .grid-item img { padding: 0.1rem }
+  .feedback-columns-item { break-inside: avoid }
+  .feedback-columns-item img { padding: 0.1rem }
 </style>
-<script>
-  $(window).on('load', function () {
-    $('.grid').masonry({
-      itemSelector: '.grid-item',
-      columnWidth: '.grid-sizer',
-      percentPosition: true
-    })
-  })
-</script>
-<div class="grid mt-5">
+<div class="feedback-columns mt-5">
   <% 
   # Use aggregation to join with accounts and events at database level
   # Step 1: Find eligible accounts (this should be fast with proper indexes)
@@ -46,8 +37,7 @@
   next if account.name.include?('_')
   quote = event_feedback.public_answers.map { |q,a| a if a.present? }.compact.join('<br /><br />').gsub("\n", '<br />')
   next if quote.length > 500 %>
-  <div class="grid-sizer"></div>
-  <div class="grid-item">
+  <div class="feedback-columns-item">
 
     <div class="row g-0">
       <div class="col-auto me-2"><i class="bi bi-quote"></i></div>

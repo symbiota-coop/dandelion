@@ -15,7 +15,6 @@ FRONTEND_DEPENDENCIES = {
     'chart.js@3.5.1' => 'dist/chart.js',
     'intro.js@6.0.0' => 'minified/intro.min.js minified/introjs.min.css',
     'qrcodejs@1.0.0' => 'qrcode.min.js',
-    'masonry-layout@4.0.0' => 'dist/masonry.pkgd.min.js',
     'jquery.typewatch@3.0.2' => 'jquery.typewatch.min.js',
     'bootstrap-icons@1.13.1' => 'font/bootstrap-icons.min.css',
     'typed.js@2.0.10' => 'lib/typed.min.js',
