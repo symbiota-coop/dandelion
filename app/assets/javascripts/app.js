@@ -33,20 +33,11 @@ $(function () {
   syncFixedHeaderHeight()
   $(window).on('resize', syncFixedHeaderHeight)
 
-  // Confirm [data-confirm] and destroy links (whose path ends in destroy), then send data-method="post" and destroy links as a POST.
-  // This listens in the capture phase, so it runs before any other click handler, and a cancelled click reaches none of them
+  // Send data-method="post" and destroy links as a POST, once confirm.js has confirmed them.
+  // This listens in the capture phase, so it runs before any other click handler
   document.addEventListener('click', function (e) {
     if (!e.target.closest) return
-    const anchor = e.target.closest('a[href]')
-    const destroyLink = anchor && /destroy$/.test(new URL(anchor.href, window.location.origin).pathname) ? anchor : null
-    const confirmable = e.target.closest('[data-confirm]') || destroyLink
-    if (confirmable && !confirm(confirmable.getAttribute('data-confirm') || 'Are you sure?')) {
-      e.preventDefault()
-      e.stopPropagation()
-      return
-    }
-
-    const link = destroyLink || e.target.closest('a[data-method="post"]')
+    const link = destroyLinkFor(e.target) || e.target.closest('a[data-method="post"]')
     if (!link) return
     // pagelets.js sends pagelet-trigger links inside a pagelet itself
     if (link.classList.contains('pagelet-trigger') && link.closest('[data-pagelet-url]')) return

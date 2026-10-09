@@ -1110,6 +1110,20 @@ p.action a {
   width: 18.75rem;
 }
 
+/* The popover confirm.js shows to confirm [data-confirm] elements and destroy links: a floating panel like a dropdown menu
+   (hairline border, base shadow, radius lg, no arrow), above dropdown menus (z-index 9999) so it can ask beside their items */
+.confirm-popover {
+  --bs-popover-zindex: 10000;
+  --bs-popover-max-width: 18.75rem;
+  --bs-popover-font-size: var(--font-size-sm);
+  --bs-popover-border-radius: var(--bs-border-radius-lg);
+  --bs-popover-inner-border-radius: var(--bs-border-radius-lg);
+  --bs-popover-body-padding-x: var(--space-base);
+  --bs-popover-body-padding-y: var(--space-sm);
+  --bs-popover-body-color: var(--bs-emphasis-color);
+  box-shadow: var(--bs-box-shadow);
+}
+
 /* Menus float just below their trigger, with no arrow: a hairline border and a shadow set them off */
 .dropdown .dropdown-menu.show {
   display: block;

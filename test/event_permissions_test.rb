@@ -176,9 +176,8 @@ class EventPermissionsTest < ActiveSupport::TestCase
     event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
     sign_in(manager)
     visit "/events/#{event.id}/delete"
-    accept_confirm do
-      click_link 'Delete event and attempt to refund all orders'
-    end
+    click_link 'Delete event and attempt to refund all orders'
+    click_button 'Delete event'
     assert_equal "/o/#{org.slug}/events", current_path
     assert page.has_content?('The event was deleted')
     assert event.reload.deleted?
@@ -201,9 +200,8 @@ class EventPermissionsTest < ActiveSupport::TestCase
     event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
     sign_in(org.account)
     visit "/events/#{event.id}/delete"
-    accept_confirm do
-      click_link 'Delete event and attempt to refund all orders'
-    end
+    click_link 'Delete event and attempt to refund all orders'
+    click_button 'Delete event'
     assert_equal "/o/#{org.slug}/events", current_path
     assert event.reload.deleted?
   end

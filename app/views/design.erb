@@ -854,6 +854,18 @@
           <div class="spec">.bi-spin turns any icon (an order in progress) · .placeholder, a faint grey line that pagelets show while they load</div>
         </div>
       <% end %>
+
+      <% design_subsection 'Confirming', col: 'col-lg-6' do %>
+        <div class="border rounded p-4 d-flex flex-column gap-4">
+          <div class="d-flex flex-wrap align-items-center gap-2 pt-5">
+            <a class="btn btn-primary" href="#confirming" data-confirm="Are you sure you want to leave the gathering?">Leave gathering</a>
+            <a class="btn btn-danger" href="#confirming" data-confirm="Delete this event and attempt to refund all its orders?" data-confirm-label="Delete event">Delete event and refund all orders</a>
+            <a class="fs-4" href="#confirming" data-confirm="Unschedule this activity?" title="Unschedule"><i class="bi bi-calendar-minus"></i></a>
+            <span class="small text-body-secondary">click these</span>
+          </div>
+          <div class="spec">data-confirm (and every link whose path ends in destroy, asking Are you sure?): with a mouse or trackpad, confirm.js holds the click and asks in a popover above the element, then lets the click through. On touch screens it uses the browser's confirm(), which is centred with big buttons; call neither yourself · a floating panel like a dropdown menu, at most 18.75rem wide · Cancel (btn-secondary) and a btn-sm named after the action: data-confirm-label, or the element's own text or title when it's 24 characters or fewer, or Confirm. btn-danger for destroy links and danger elements, otherwise btn-primary · focus goes to the action; Escape, Cancel or a click elsewhere closes it · ask a real question with the consequence in it, not Are you sure?</div>
+        </div>
+      <% end %>
     </div>
 
     <% design_subsection 'Charts', 'Chart.js, with white bold value labels from chartjs-plugin-datalabels.' do %>

@@ -15,6 +15,12 @@ function cssColor (value) {
   return a === 255 ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${Math.round(a / 2.55) / 100})`
 }
 
+// The link a click was on, if its path ends in destroy. confirm.js asks before following these, and app.js sends them as a POST
+function destroyLinkFor (target) {
+  const anchor = target.closest('a[href]')
+  return anchor && /destroy$/.test(new URL(anchor.href, window.location.origin).pathname) ? anchor : null
+}
+
 // Hide every tooltip, including any whose element a pagelet has just replaced
 function hideTooltips () {
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
