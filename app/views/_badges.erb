@@ -1,38 +1,57 @@
-<div class="row justify-content-center align-items-center">
-  <div class="col-4">
-    <div class="mb-3 p-4">
-      <img src="/images/gift.png" class="w-100" style="aspect-ratio: 339/385;">
+<style>
+  /* Laid out by its own width (container queries), not the window's: a list with the icon beside the text when
+     narrow (as on /donate), three centred columns when there's room */
+  .principles-container { container-type: inline-size; }
+  .principles { display: grid; gap: var(--space-lg); }
+  .principle { display: flex; align-items: center; gap: var(--space-base); }
+  .principle-icon {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 7rem;
+    height: 7rem;
+    border-radius: 50%;
+    background: var(--bs-white);
+    border: 1px solid var(--hairline);
+    box-shadow: var(--bs-box-shadow-sm);
+    color: var(--bs-emphasis-color);
+    font-size: 3.25rem;
+  }
+  .principle-icon img { width: 100%; height: 100%; padding: var(--space-sm); }
+  .principle p { margin-bottom: 0; text-wrap: balance; }
+  /* Line breaks for the centred columns only: in the list the text runs on beside the icon */
+  .principle-break { display: none; }
+  @container (min-width: 36rem) {
+    .principles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .principle { flex-direction: column; text-align: center; }
+    .principle-break { display: inline; }
+  }
+</style>
+
+<div class="principles-container">
+  <div class="principles">
+    <div class="principle">
+      <div class="principle-icon"><i class="bi bi-gift"></i></div>
+      <p>
+        <a target="_blank" href="/docs/events#fees-and-payouts">No platform fees</a>:
+        we seek to inspire a culture of gifting
+      </p>
     </div>
-  </div>
-  <div class="col-4">
-    <div class="m-3 p-1 rounded-circle">
-      <img src="/images/coop.png" class="w-100" style="aspect-ratio: 115/116;">
+    <div class="principle">
+      <div class="principle-icon"><img src="/images/coop.png" alt="Co-operatives UK certified member"></div>
+      <p>
+        Run by a <a target="_blank" href="https://symbiota.coop/">not-for-profit<br class="principle-break">
+          worker&nbsp;co-operative</a>
+      </p>
     </div>
-  </div>
-  <div class="col-4">
-    <div class="mb-3 p-4">
-      <img src="/images/opendata.png" class="w-100" style="aspect-ratio: 570/569;">
+    <div class="principle">
+      <div class="principle-icon"><i class="bi bi-database"></i></div>
+      <p>
+        <a target="_blank" href="https://github.com/symbiota-coop/dandelion">Fair&nbsp;source</a>
+        and
+        <a target="_blank" href="https://overreacted.io/open-social/">open&nbsp;data</a> on&nbsp;ATProto
+      </p>
     </div>
-  </div>
-</div>
-<div class="row justify-content-center align-items-center">
-  <div class="col-4">
-    <p class="text-center">
-      <a target="_blank" href="/docs/events#fees-and-payouts">No platform fees</a>:
-      we seek to inspire a culture of gifting
-    </p>
-  </div>
-  <div class="col-4">
-    <p class="text-center">
-      Run by a <a target="_blank" href="https://symbiota.coop/">not-for-profit<br />
-        worker&nbsp;co-operative</a>
-    </p>
-  </div>
-  <div class="col-4">
-    <p class="text-center">
-      <a target="_blank" href="https://github.com/symbiota-coop/dandelion">Fair&nbsp;source</a>
-      and  
-      <a target="_blank" href="https://overreacted.io/open-social/">open&nbsp;data</a> on&nbsp;ATProto
-    </p>
   </div>
 </div>
