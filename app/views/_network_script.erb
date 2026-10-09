@@ -1,10 +1,11 @@
 <% {
-     'https://cdn.jsdelivr.net/npm/' => {
-       'cytoscape@3.9.4' => 'dist/cytoscape.min.js'
-     },
+     # cytoscape-cola picks up window.cola when it loads, so WebCola comes first
      'https://cdn.jsdelivr.net/gh/' => {
-       'tgdwyer/WebCola@aab7e61cd9580c4c89180cc0a30594e12743a242/WebCola' => 'cola.min.js',
-       'cytoscape/cytoscape.js-cola@8c78f9d5c11ff6162b7d902f0639e1f787277b9f' => 'cytoscape-cola.js'
+       'tgdwyer/WebCola@aab7e61cd9580c4c89180cc0a30594e12743a242/WebCola' => 'cola.min.js'
+     },
+     'https://cdn.jsdelivr.net/npm/' => {
+       'cytoscape@3.9.4' => 'dist/cytoscape.min.js',
+       'cytoscape-cola@2.3.1' => 'cytoscape-cola.js'
      }
    }.each do |base_url, libs| %>
   <% libs.each do |path, files| %>

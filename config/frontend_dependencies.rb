@@ -20,7 +20,11 @@ FRONTEND_DEPENDENCIES = {
     'jquery.typewatch@3.0.2' => 'jquery.typewatch.min.js',
     'bootstrap-icons@1.13.1' => 'font/bootstrap-icons.min.css',
     'typed.js@2.0.10' => 'lib/typed.min.js',
-    'chartjs-plugin-datalabels@2.0.0' => 'dist/chartjs-plugin-datalabels.min.js'
+    'chartjs-plugin-datalabels@2.0.0' => 'dist/chartjs-plugin-datalabels.min.js',
+    'autosize@4.0.2' => 'dist/autosize.min.js',
+    'countup.js@2.1.0' => 'dist/countUp.umd.js',
+    'jquery-deparam@0.5.3' => 'jquery-deparam.js',
+    'linkifyjs@2.1.9' => 'dist/linkify.min.js dist/linkify-jquery.min.js'
   },
   'https://cdn.jsdelivr.net/gh/' => {
     'mahnunchik/markerclustererplus@736b0e3a7d916fbeb2ee5007494f17a5329b11a8' => 'src/markerclusterer.js',
@@ -29,8 +33,7 @@ FRONTEND_DEPENDENCIES = {
     'mdbassit/Coloris@a00946eb69780d2ba3b906c3f4535b03f987cc05' => 'dist/coloris.min.js dist/coloris.min.css',
     'symbiota-coop/ckeditor5-dandelion@e9616f73489fd5d4fb2b143ed5d1e17e6fd467f0' => 'build/ckeditor.js'
   },
-  '/javascripts/' => {
-    'ext' => 'autosize.js countUp.umd.js jquery-deparam.js linkify.min.js linkify-jquery.min.js',
-    nil => 'pagelets.js jquery.lookup.js map.js currencySymbol.js serializeObject.js cookie_consent.js sidebar.js header_search.js scrollspy.js app.js'
+  '/' => {
+    'javascripts' => 'pagelets.js jquery.lookup.js map.js currencySymbol.js serializeObject.js cookie_consent.js sidebar.js header_search.js scrollspy.js app.js'
   }
 }

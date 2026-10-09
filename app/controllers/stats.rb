@@ -75,9 +75,7 @@ Dandelion::App.controller do
           dep = fetch_frontend_dependency(base_url, path)
           if dep
             # Build file URLs for size calculation
-            file_urls = files.split.map do |f|
-              path.nil? ? "#{base_url}#{f}" : "#{base_url}#{path}/#{f}"
-            end
+            file_urls = files.split.map { |f| "#{base_url}#{path}/#{f}" }
             dep[:file_urls] = file_urls
             mutex.synchronize { @dependencies << dep }
           end

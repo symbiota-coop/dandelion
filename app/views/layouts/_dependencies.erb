@@ -10,10 +10,10 @@
 
 <% FRONTEND_DEPENDENCIES.each do |base_url, libs| %>
   <% libs.each do |path, files| %>
-    <% files.split(' ').each do |f| %>
-      <% url = path.nil? ? "#{base_url}#{f}" : "#{base_url}#{path}/#{f}" %>
+    <% files.split.each do |f| %>
+      <% url = "#{base_url}#{path}/#{f}" %>
       <% ext = f.split('.').last.to_sym %>
-      <% url = cachebust(url) if base_url == '/javascripts/' %>
+      <% url = cachebust(url) if base_url == '/' %>
       <% case ext %>
       <% when :js %>
         <script src="<%= url %>" defer></script>
