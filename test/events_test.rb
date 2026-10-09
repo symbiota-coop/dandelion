@@ -406,6 +406,16 @@ class EventsTest < ActiveSupport::TestCase
     assert activity.errors[:website].any?
   end
 
+  test 'terms and conditions url rejects javascript:' do
+    create_event
+    @event.terms_and_conditions_url = 'javascript:alert(1)'
+    refute @event.valid?
+    assert @event.errors[:terms_and_conditions_url].any?
+    @organisation.terms_and_conditions_url = 'javascript:alert(1)'
+    refute @organisation.valid?
+    assert @organisation.errors[:terms_and_conditions_url].any?
+  end
+
   test 'location signal group link rejects javascript:' do
     location = Location.new(name: 'Somewhere', signal_group_link: 'javascript:alert(1)')
     refute location.valid?
