@@ -370,24 +370,6 @@ $(function () {
       })
     })
 
-    $('.labelize').not('[data-labelize-initialized]').attr('data-labelize-initialized', true).each(function () {
-      $('div.form-check', this).each(function () {
-        const div = this
-        $(div).hide()
-        const button = $('<a href="javascript:;" class="d-inline-block mb-1 me-1"><span class="badge text-primary border border-primary">' + $(this).find('label').text() + '</span></a>').insertAfter(this)
-        if ($('input[type=checkbox]:checked', div).length > 0) { $('span', button).removeClass('text-primary border border-primary').addClass('text-bg-primary') }
-        $(button).click(function () {
-          if ($('input[type=checkbox]:checked', div).length > 0) {
-            $('input[type=checkbox]', div).prop('checked', false)
-            $('span', button).removeClass('text-bg-primary').addClass('text-primary border border-primary')
-          } else {
-            $('input[type=checkbox]', div).prop('checked', true)
-            $('span', button).removeClass('text-primary border border-primary').addClass('text-bg-primary')
-          }
-        })
-      })
-    })
-
     $('.colorpicker').not('[data-coloris]').attr('data-coloris', true)
     Coloris({ alpha: false });
 
@@ -437,7 +419,6 @@ $(function () {
         const color = $(this).data('color')
         if (color) {
           $input.val(color)
-          if ($input.data('colorpicker')) $input.colorpicker('setValue', color)
           $input.trigger('change')
         }
       })
@@ -657,11 +638,6 @@ $(function () {
   $(document).on('input', 'input.typeWatch', function () {
     clearTimeout(this.typeWatchTimer)
     this.typeWatchTimer = setTimeout(() => $(this.form).submit(), 500)
-  })
-
-  // Keep dropdowns open when clicking inside them
-  $(document).on('click', '[data-dropdown-close="false"]', function (e) {
-    e.stopPropagation()
   })
 
   // Mark an input while its autocomplete menu is open, so app.css can square its bottom corners onto the menu
