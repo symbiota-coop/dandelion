@@ -75,66 +75,15 @@ $(function () {
   syncFixedHeaderHeight()
   $(window).on('resize', syncFixedHeaderHeight)
 
+  // Grey a select while its chosen option is a disabled placeholder
+  function styleSelectElement (select) {
+    $(select).css('color', $(select).find('option:selected').is(':disabled') ? 'var(--bs-secondary-color)' : '')
+  }
+
   function ajaxCompleted () {
-
-    function styleSelectElement (select) {
-      if ($(select).find('option:selected').is(':disabled')) {
-        $(select).css('color', 'var(--bs-secondary-color)');
-      } else {
-        $(select).css('color', '');
-      }
-    }
-
     $('select').not('[data-select-styled]').attr('data-select-styled', true).each(function () {
-      styleSelectElement(this);
-      $(this).removeClass('select-placeholder');
-      $(this).change(function () {
-        styleSelectElement(this);
-      })
-    })
-
-    $('.either-or input[type="checkbox"]').not('[data-either-or-registered]').attr('data-either-or-registered', true).change(function () {
-      if (this.checked) {
-        $('.either-or input[type="checkbox"]').not(this).prop('checked', false);
-      }
-    });
-
-    $('input[type=file]').not('[data-file-size-check]').attr('data-file-size-check', true).change(function () {
-      if (this.files.length > 0 && this.files[0].size > 10e6) {
-        alert('That file is too large, the maximum file size is 10MB. Please resize it before uploading.')
-        $(this).val('')
-      }
-    })
-
-    // Confirm dialogs (coordinates with other handlers via .no-trigger)
-    $('[data-confirm], a[href*="destroy"]').not('[data-confirm-registered]').attr('data-confirm-registered', true).click(function () {
-      const $el = $(this)
-      $el.removeClass('no-trigger')
-      const message = $el.data('confirm') || 'Are you sure?'
-      if (!confirm(message)) {
-        $el.addClass('no-trigger')
-        return false
-      }
-    })
-
-    // POST method override (data-method="post", or paths ending in destroy)
-    $('a[data-method="post"], a[href*="destroy"]').not('[data-method-registered]').attr('data-method-registered', true).click(function (event) {
-      const $el = $(this)
-      if ($el.hasClass('no-trigger')) return false
-      // pagelet-trigger links inside a pagelet are handled by pagelets.js
-      if ($el.hasClass('pagelet-trigger') && $el.closest('[data-pagelet-url]').length) return
-
-      let shouldPost = $el.data('method') === 'post'
-      if (!shouldPost && this.href) {
-        try {
-          const path = new URL(this.href, window.location.origin).pathname
-          if (/destroy$/.test(path)) shouldPost = true
-        } catch (e) {}
-      }
-      if (!shouldPost) return
-
-      event.preventDefault()
-      $('<form>', { method: 'post', action: this.href }).hide().appendTo(document.body)[0].submit()
+      styleSelectElement(this)
+      $(this).removeClass('select-placeholder')
     })
 
     $('form.add-placeholders label[for]').not('[data-placeholders-added]').attr('data-placeholders-added', true).each(function () {
@@ -189,27 +138,7 @@ $(function () {
       $(this).html($(this).html().replace(/\[@([\w\s'-.]+)\]\(@(\w+)\)/g, '<a href="/u/$2">$1</a>'))
     })
 
-    $('[id=comment_subject], [id=comment_body]').not('[data-show-comment-options-on-focus]').attr('data-show-comment-options-on-focus', true).focus(function () {
-      $(this.form).find('.comment-options').show()
-    })
-
-    $('.block').not('[data-block-hover], .infowindow .block').attr('data-block-hover', true).hover(
-      function () {
-        $('.block-edit', this).show()
-      },
-      function () {
-        $('.block-edit', this).hide()
-      }
-    )
-
     $('abbr.timeago').not('[data-timeago-done]').attr('data-timeago-done', true).timeago()
-
-    $('[data-account-username]').not('#modal [data-account-username]').not('[data-modalized]').attr('data-modalized', true).click(function () {
-      $('#modal .modal-content').load('/u/' + $(this).attr('data-account-username'), function () {
-        $('#modal').modal('show')
-        hideTooltips()
-      })
-    })
 
     $('.linkify').not('[data-linkified]').attr('data-linkified', true).linkify({ target: { url: '_blank' } })
 
@@ -362,12 +291,6 @@ $(function () {
       })
     })
 
-    $('form.submitOnChange').not('[data-submit-on-change-initialized]').attr('data-submit-on-change-initialized', true).each(function () {
-      $('select, .flatpickr-input, input[type=checkbox], input[type=month]', this).change(function () {
-        $(this.form).submit()
-      })
-    })
-
     $('.colorpicker').not('[data-coloris]').attr('data-coloris', true)
 
     showTabFromHash()
@@ -416,6 +339,58 @@ $(function () {
   })
   ajaxCompleted()
 
+  // Confirm [data-confirm] and destroy links, then send data-method="post" and destroy links as a POST.
+  // This listens in the capture phase, so it runs before any other click handler, and a cancelled click reaches none of them
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest) return
+    const confirmable = e.target.closest('[data-confirm], a[href*="destroy"]')
+    if (confirmable && !confirm(confirmable.getAttribute('data-confirm') || 'Are you sure?')) {
+      e.preventDefault()
+      e.stopPropagation()
+      return
+    }
+
+    const link = e.target.closest('a[data-method="post"], a[href*="destroy"]')
+    if (!link) return
+    // pagelets.js sends pagelet-trigger links inside a pagelet itself
+    if (link.classList.contains('pagelet-trigger') && link.closest('[data-pagelet-url]')) return
+    if (link.getAttribute('data-method') !== 'post' && !/destroy$/.test(new URL(link.href, window.location.origin).pathname)) return
+    e.preventDefault()
+    $('<form>', { method: 'post', action: link.href }).hide().appendTo(document.body)[0].submit()
+  }, true)
+
+  $(document).on('change', 'select', function () {
+    styleSelectElement(this)
+  })
+
+  // Before the submitOnChange handler below, so the form submits with the other box already unticked
+  $(document).on('change', '.either-or input[type="checkbox"]', function () {
+    if (this.checked) $('.either-or input[type="checkbox"]').not(this).prop('checked', false)
+  })
+
+  $(document).on('change', 'form.submitOnChange select, form.submitOnChange .flatpickr-input, form.submitOnChange input[type=checkbox], form.submitOnChange input[type=month]', function () {
+    $(this.form).submit()
+  })
+
+  $(document).on('change', 'input[type=file]', function () {
+    if (this.files.length > 0 && this.files[0].size > 10e6) {
+      alert('That file is too large, the maximum file size is 10MB. Please resize it before uploading.')
+      $(this).val('')
+    }
+  })
+
+  $(document).on('focusin', '[id=comment_subject], [id=comment_body]', function () {
+    $(this.form).find('.comment-options').show()
+  })
+
+  $(document).on('click', '[data-account-username]', function () {
+    if ($(this).closest('#modal').length) return
+    $('#modal .modal-content').load('/u/' + $(this).attr('data-account-username'), function () {
+      $('#modal').modal('show')
+      hideTooltips()
+    })
+  })
+
   // Coloris opens on any [data-coloris] field, including ones loaded later, so it only needs configuring once
   Coloris({ alpha: false })
 
@@ -452,7 +427,6 @@ $(function () {
       $list = $('<div class="list-group list-group-flush"></div>')
       $toggle.siblings('.dropdown-menu').find('.dropdown-item, .dropdown-header, .dropdown-divider').each(function () {
         if ($(this).hasClass('dropdown-divider')) return $list.append('<hr class="my-1">')
-        // clone(true) keeps the confirm and POST click handlers, or destroy and data-method links would GET
         const $item = $(this).clone(true)
         if (!$item.hasClass('dropdown-header')) $item.removeClass('dropdown-item').addClass('list-group-item list-group-item-action')
         $list.append($item)

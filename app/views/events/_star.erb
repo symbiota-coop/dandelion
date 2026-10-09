@@ -1,7 +1,7 @@
 <% if current_account %>
   <% if !defined?(event_star); event_star = event.event_stars.find_by(account: current_account); end %>
     <% if !event_star %>
-      <a data-bs-toggle="tooltip" title="Star this event (shows in your upcoming events)" class="pagelet-trigger text-body <% if defined?(block_edit) && block_edit %> block-edit <% end %>" style="<% if defined?(block_edit) && block_edit %> display: none; <% end %> text-decoration: none" data-method="post" href="/events/<%=event.id%>/do_star">
+      <a data-bs-toggle="tooltip" title="Star this event (shows in your upcoming events)" class="pagelet-trigger text-body <% if defined?(block_edit) && block_edit %> block-edit <% end %>" style="text-decoration: none" data-method="post" href="/events/<%=event.id%>/do_star">
         <i class="bi bi-star"></i>
       </a>
     <% else %>

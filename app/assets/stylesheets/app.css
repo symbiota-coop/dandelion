@@ -1843,6 +1843,16 @@ ul.pagination {
   z-index: 2;
 }
 
+/* Edit, star and hide links on a block show while it's hovered or has keyboard focus inside it,
+   but not on blocks in a map's InfoWindow */
+.block-edit {
+  display: none;
+}
+
+.block:not(.infowindow .block):is(:hover, :focus-within) .block-edit {
+  display: revert;
+}
+
 /* The photo's black at 50% is an inset shadow over it, so it can fade with the hover shadow */
 .tile-image {
   box-shadow: inset 0 0 0 50rem rgba(var(--bs-black-rgb), 0.5);

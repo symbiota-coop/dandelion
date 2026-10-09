@@ -155,12 +155,6 @@ $(function () {
 
   $(document).on('click', '[data-pagelet-url] a.pagelet-trigger', function () {
     const $link = $(this)
-
-    if ($link.hasClass('no-trigger')) {
-      $link.removeClass('no-trigger')
-      return false
-    }
-
     const pagelet = $link.closest('[data-pagelet-url]')
     setPageletLoading(pagelet)
 

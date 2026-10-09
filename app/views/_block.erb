@@ -20,7 +20,7 @@
               <%# the icon follows the title with no space between them but a &nbsp;, so it stays on the line with the title's last word %>
               <a class="<%= title_class %> tile-link stretched-link" target="_parent" href="<%= view_url %>"><%= title %></a><% unless icon.empty? %>&nbsp;<span class="<%= title_class %> tile-above"><%== icon %></span><% end %>
               <% if admin %>
-                <a class="<%= title_class %> block-edit tile-above" style="display: none" href="<%= edit_url %>">
+                <a class="<%= title_class %> block-edit tile-above" href="<%= edit_url %>">
                   <i class="bi bi-pencil-fill"></i>
                 </a>
               <% end %>
