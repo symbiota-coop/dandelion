@@ -72,11 +72,18 @@ The design guide (`/design`, `app/views/design.erb`) shows the colours, type, sp
 
 ## Dependencies
 
-Ruby gems: 
+Cooldown: never use a gem or JS package version released less than 7 days ago. This guards against supply-chain attacks on freshly published versions. If a version that was just released can't be found, that's why: wait until it's a week old rather than removing or shortening the cooldown.
+
+- Gems: the Gemfile's source has `cooldown: 7`, so Bundler enforces it
+- `rake bootstrap:build` runs `npm install` with `--before` set to 7 days ago
+- `ckeditor/` installs from its `yarn.lock`. Yarn 1 has no cooldown, so when refreshing the lockfile (`yarn upgrade`), check the new versions' release dates (`npm view <package> time`) and pin back any that are under a week old
+- When adding or bumping a CDN package in `config/frontend_dependencies.rb`, or a version in a rake task, pick a version at least 7 days old
+
+Ruby gems:
 
 @Gemfile
 
 Frontend dependencies:
 
 @app/views/layouts/_dependencies.erb
-@lib/frontend_dependencies.rb
+@config/frontend_dependencies.rb
