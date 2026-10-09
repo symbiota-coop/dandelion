@@ -2459,13 +2459,21 @@ ul.map-event li {
 .map-marker {
   width: 36px;
   height: 48px;
-  padding-top: 8px;
+  padding-top: 10px;
   text-align: center;
   color: var(--bs-white);
   font-size: 18px;
   line-height: 1;
   background: var(--map-marker-color);
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-18 -48 36 48'%3E%3Cpath d='M0-48c-9.8 0-17.8 7.9-17.8 17.6C-17.8-14.9 0 0 0 0s17.8-14.9 17.8-30.4C17.8-40.1 9.8-48 0-48z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* The icon is an 18px square, centred a little below the middle of the pin's head (17.6px down) so it looks centred in the teardrop */
+.map-marker .bi,
+.map-marker .bi::before {
+  display: block;
+  line-height: 1;
+  vertical-align: top;
 }
 
 /* A cluster: a circle with a 40% halo, centred on its point, turning from green to orange to red as it grows */
