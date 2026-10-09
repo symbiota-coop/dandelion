@@ -25,8 +25,8 @@
                                                 [worth.round, 0, '']
                                               end
   # The sparkline is illustrative, not real figures: running totals only ever look like a straight line up, so
-  # this rises in uneven steps, as months do
-  ticket_sparkline = [100, 103, 111, 113, 122, 136, 139, 141, 156, 163, 166, 182, 190]
+  # this rises in uneven steps, as months do, that grow as it goes
+  ticket_sparkline = [100, 106, 106, 116, 117, 130, 130, 147, 149, 171, 172, 202, 242]
   rating = s[:average_rating]
   # Whole stars, then a half star from .25, rounding up from .75
   stars = (rating ? 5.times.map { |i| rating - i } : []).map do |left|
