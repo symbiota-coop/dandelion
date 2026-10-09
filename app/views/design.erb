@@ -52,14 +52,14 @@
       <%= partial :'design/ramp', locals: {
             prefix: '--color-lavender',
             notes: {
-              '50' => '.lavender-wash, features page section wash',
+              '50' => '.lavender-wash, image-less tiles (.block-fill), onboarding callout, features page section wash',
               '100' => 'AI well gradient start',
               '200' => 'not used yet',
               '300' => 'not used yet',
               '400' => 'AI well gradient end',
-              '500' => 'not used yet',
+              '500' => 'onboarding callout icon and done steps',
               '600' => 'features and Luma pages: purple divider end, call-to-action glow',
-              '800' => 'not used yet'
+              '800' => 'onboarding checklist: the current step'
             }
           } %>
     <% end %>
@@ -114,7 +114,7 @@
       <div class="small text-body-secondary">Danger badges take the 200, as red's 100 reads pink. table-warning and table-danger rows mix 30% of the way from the 50 to the 200 for hover, stripes and active rows.</div>
     <% end %>
 
-    <% design_subsection 'Greys, black and white', "Bootstrap's own variables, set in bootstrap5.scss to near-neutral greys: Bootstrap's lightness steps with a trace of warmth (designed at oklch hue 75, chroma .00225–.003, then rounded to hex). Usage: 100 (<code>--bs-tertiary-bg</code>) body.canvas pages, wells and hovered dropdown, autocomplete and list items, and table stripes · 200 (<code>--bs-secondary-bg</code>) hovered nav links, table rows and secondary buttons, secondary badges and input add-ons · 300 (<code>--bs-border-color</code>) table and secondary button borders · 400 input borders and hr · 500 sidebar sub-menu links and grey borders (comment boxes, the editor) · 600 secondary text · 700 input add-on text · 800 search bar · 900 header and sidebar. Body text (<code>--bs-body-color</code>) and emphasis text (<code>--bs-emphasis-color</code>, set to 900 in bootstrap5.scss in place of Bootstrap's black) are the same as 900. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows and image overlays. Hairlines (card, dropdown, autocomplete and cookie banner borders, date tiles, the .chill card header's divider, marketing cards) use <code>--hairline</code>, black at 10%: Bootstrap's <code>--bs-border-color-translucent</code>, set in bootstrap5.scss, so its cards and dropdowns share it.".html_safe do %>
+    <% design_subsection 'Greys, black and white', "Bootstrap's own variables, set in bootstrap5.scss to near-neutral greys: Bootstrap's lightness steps with a trace of warmth (designed at oklch hue 75, chroma .00225–.003, then rounded to hex). Usage: 100 (<code>--bs-tertiary-bg</code>) body.canvas pages, wells and hovered dropdown, autocomplete and list items, and table stripes · 200 (<code>--bs-secondary-bg</code>) hovered nav links, table rows and secondary buttons, secondary badges and input add-ons · 300 (<code>--bs-border-color</code>) table and secondary button borders · 400 input borders and hr · 500 sidebar sub-menu links and grey borders (comment boxes, the editor) · 600 secondary text and the sidebar's minify button · 700 input add-on text · 800 search bar, sidebar dividers and dark badges in the sidebar · 900 header and sidebar. Body text (<code>--bs-body-color</code>) and emphasis text (<code>--bs-emphasis-color</code>, set to 900 in bootstrap5.scss in place of Bootstrap's black) are the same as 900. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows and image overlays. Hairlines (card, dropdown, autocomplete and cookie banner borders, event blocks, image-less tiles, date tiles, the onboarding callout, feedback entries, the .chill card header's divider, marketing cards) use <code>--hairline</code>, black at 10%: Bootstrap's <code>--bs-border-color-translucent</code>, set in bootstrap5.scss, so its cards and dropdowns share it.".html_safe do %>
       <div class="row g-3">
         <% %w[--bs-white --bs-gray-100 --bs-gray-200 --bs-gray-300 --bs-gray-400 --bs-gray-500 --bs-gray-600 --bs-gray-700 --bs-gray-800 --bs-gray-900 --bs-black].each do |name| %>
           <%= partial :'design/swatch', locals: { vars: [name], col: 'col-6 col-md-3 col-xl' } %>
@@ -125,7 +125,7 @@
     <% design_subsection 'Accents and surfaces', 'Single colours with one role each.' do %>
       <div class="row g-3 row-cols-2 row-cols-md-3">
         <% [
-             [%w[--color-paper], '.lavender-wash end'],
+             [%w[--color-paper], 'end of the lavender wash: .lavender-wash, .block-fill, onboarding callout'],
              [%w[--color-highlight], 'mark, .highlight'],
              [%w[--color-midnight], 'header sunset; root of the marketing pages\' purple']
            ].each do |vars, note| %>
@@ -311,7 +311,7 @@
       </div>
     <% end %>
 
-    <% design_subsection 'Motion', "State changes fade rather than snap: hover, focus, active and open states change over <code>--transition-fast</code> (.15s ease-in-out, Bootstrap's own timing for nav links and buttons). Only colours, shadows and masks move, plus two slides: sidebar submenus and the teams, activities and local groups in the cards on /accounts/subscriptions open and shut with jQuery's slide over 175ms. Nothing else slides, and nothing scales, turns or bounces, bar a few older exceptions: on mobile the sidebar slides in and the menu button's bars turn into a cross, the quick theme colours grow 10% and the feedback stars 8% on hover, and the marketing pages' cards lift. Toasts, dropdowns and tab panes appear at once; chevrons that open something (sidebar groups, the cards on /accounts/subscriptions) point down whether it's open or closed. Under <code>prefers-reduced-motion</code> the token is 0s, so all of it stops, and the tab scroller's chevrons jump rather than scroll smoothly.".html_safe do %>
+    <% design_subsection 'Motion', "State changes fade rather than snap: hover, focus, active and open states change over <code>--transition-fast</code> (.15s ease-in-out, Bootstrap's own timing for nav links and buttons). Only colours, shadows and masks move, plus two slides: sidebar submenus and the teams, activities and local groups in the cards on /accounts/subscriptions open and shut with jQuery's slide over 175ms. Nothing else slides, and nothing scales, turns or bounces, bar a few older exceptions: on mobile the sidebar slides in and the menu button's bars turn into a cross, the quick theme colours grow 10% and the feedback stars 8% on hover, and the marketing pages' cards lift. Toasts, dropdowns and tab panes appear at once; chevrons that open something (sidebar groups, the cards on /accounts/subscriptions) point down whether it's open or closed. From 768px, page loads cross-fade over .15s (a view transition), with the header, sidebar and flash toasts held still. Under <code>prefers-reduced-motion</code> the token is 0s and view transitions are off, so all of it stops, and the tab scroller's chevrons jump rather than scroll smoothly.".html_safe do %>
       <div class="row gx-4 row-cols-1 row-cols-md-2 row-cols-xl-3">
         <% [
              ['Links, nav links, tabs', 'colour, underline'],
@@ -1228,7 +1228,7 @@
               </div>
             </div>
           </div>
-          <div class="spec">Ticket groups: a .ticket-group-heading row, a bold 1.25rem heading at line-height 1.2 with .25rem below it, its group's first divider a 2px rule in --bs-emphasis-color · each type: the name bold at --font-size-base (.ticket-type-name), a lock icon if it's secret or for members, "3 left" or fewer as a text-bg-secondary badge · price at the same --font-size-base (.ticket-type-price), not bold: fixed, a form-range for a range (the price shows once dragged), or a £ input group for pay what you like, which enables the quantity · quantity a full-width form-select, 0 to 99, or to the number left if fewer · the description in --bs-secondary-color, its paragraphs without margin · sold out: Join waitlist (btn-sm btn-outline-primary), which opens the waitlist modal (purchase/_ticket_type_waitlist_modal.erb), or a Sold out badge in text-bg-danger, as in event blocks, the carousel and the places-filled bar · a ticket type whose sales have ended says Sales closed in text-bg-secondary · the right-hand column: Apply a code, a membership discount, the donation (1/5/10% of the total, 1/2.5/5% on large orders, or a set amount for the organisation) and the disabled Total, Credit, Discount and Balance fields from currency_input_row, each a bold label over a 5em input group · below 576px the card's sides narrow to .75rem, cells take table-sm's .5rem with none at the table's edges, and the range hint says just Drag, so the three columns fit a phone</div>
+          <div class="spec">Ticket groups: a .ticket-group-heading row, a bold --font-size-lg (1.2rem) heading at line-height 1.2 with .25rem below it, its group's first divider a 2px rule in --bs-emphasis-color · each type: the name bold at --font-size-base (.ticket-type-name), a lock icon if it's secret or for members, "3 left" or fewer as a text-bg-secondary badge · price at the same --font-size-base (.ticket-type-price), not bold: fixed, a form-range for a range (the price shows once dragged), or a £ input group for pay what you like, which enables the quantity · quantity a full-width form-select, 0 to 99, or to the number left if fewer · the description in --bs-secondary-color, its paragraphs without margin · sold out: Join waitlist (btn-sm btn-outline-primary), which opens the waitlist modal (purchase/_ticket_type_waitlist_modal.erb), or a Sold out badge in text-bg-danger, as in event blocks, the carousel and the places-filled bar · a ticket type whose sales have ended says Sales closed in text-bg-secondary · the right-hand column: Apply a code, a membership discount, the donation (1/5/10% of the total, 1/2.5/5% on large orders, or a set amount for the organisation) and the disabled Total, Credit, Discount and Balance fields from currency_input_row, each a bold label over a 5em input group · below 576px the card's sides narrow to .75rem, cells take table-sm's .5rem with none at the table's edges, and the range hint says just Drag, so the three columns fit a phone</div>
         </div>
       </div>
     <% end %>

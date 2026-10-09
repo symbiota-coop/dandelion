@@ -1078,7 +1078,7 @@ p.action a {
   box-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-white), 0 0 0 calc(var(--bs-focus-ring-width) * 2) var(--ring-color);
 }
 
-/* Signal's brand blue, through Bootstrap's button variables. Brand buttons stay flat, without our gradient */
+/* Signal's brand blue, through Bootstrap's button variables. Brand buttons stay flat */
 .btn-signal {
   --bs-btn-color: var(--bs-white);
   --bs-btn-bg: var(--color-signal);
@@ -2163,16 +2163,6 @@ a.ui-button:active,
   margin-left: 11.25rem;
 }
 
-.search-result-list h3 {
-  margin: 0 0 var(--space-2xs);
-  font-size: var(--font-size-base);
-  font-weight: 600;
-}
-
-.search-result-list h3 a {
-  color: var(--bs-emphasis-color);
-}
-
 @media (max-width: 767.98px) {
   .search-result-list .search-result-media {
     width: 5.625rem;
@@ -2234,7 +2224,6 @@ a.ui-button:active,
   background: var(--gradient-active) !important;
 }
 
-.header .with-label:before,
 .pace .pace-progress {
   border-radius: var(--bs-border-radius);
 }
@@ -2692,7 +2681,7 @@ ul.map-event li {
 #ticket-types td.ticket-group-heading {
   font-family: var(--header-font-family);
   font-weight: 700;
-  font-size: 1.25rem;
+  font-size: var(--font-size-lg);
   letter-spacing: -0.02em;
   line-height: 1.2;
   padding-top: var(--space-lg);
@@ -2878,7 +2867,7 @@ table.event-details td {
 
 .feedback-entry {
   padding-block: var(--space-base);
-  border-bottom: 1px solid var(--bs-border-color-translucent);
+  border-bottom: 1px solid var(--hairline);
 }
 
 .feedback-entry:first-child {
@@ -3121,7 +3110,7 @@ td .tactivity-accept {
    Misc
    ========================================================================== */
 
-/* The only sheen, so it marks AI: 135°, its 50 flat to halfway, then to its 400. Lavender on the default site, the theme on themed pages */
+/* The only sheen, so it marks AI: 135°, its 100 flat to halfway, then to its 400. Lavender on the default site, the theme on themed pages */
 .ai-well {
   background-image: linear-gradient(135deg, var(--ai-well-from) 50%, var(--ai-well-to));
   padding: var(--space-base);
