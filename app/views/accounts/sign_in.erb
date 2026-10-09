@@ -11,9 +11,9 @@
             <% if !Provider.all.empty? %>
               <% Provider.all.each { |provider| %>
                 <% if provider.omniauth_name == 'atproto' %>
-                  <div class="col-12 col-lg"><a class="btn btn-primary w-100" id="atproto-btn" href="javascript:;" onclick="$('#atproto-form').show().find('input[type=text]').focus();$(this).parent().hide()"><i class="<%= provider.icon %>"></i> Sign in with <%= provider.display_name %></a></div>
+                  <div class="col-12 col-lg"><a class="btn btn-primary w-100" id="atproto-btn" href="javascript:;" onclick="$('#atproto-form').show().find('input[type=text]').focus();$(this).parent().hide()"><i class="<%= provider.icon %>"></i> <span class="visually-hidden">Sign in with </span><%= provider.display_name %></a></div>
                 <% else %>
-                  <div class="col-12 col-lg"><a class="btn btn-primary w-100" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Sign in with <%= provider.display_name %></a></div>
+                  <div class="col-12 col-lg"><a class="btn btn-primary w-100" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> <span class="visually-hidden">Sign in with </span><%= provider.display_name %></a></div>
                 <% end %>
               <% } %>
             <% end %>

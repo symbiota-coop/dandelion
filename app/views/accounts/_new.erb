@@ -7,9 +7,9 @@
       <div class="row g-2 mb-3">
         <% Provider.all.each do |provider| %>
           <% if provider.omniauth_name == 'atproto' %>
-            <div class="col-12 col-lg"><a class="btn btn-primary w-100" href="javascript:;" onclick="$('#atproto-signup-form').show().find('input[type=text]').focus();$(this).parent().hide()"><i class="<%= provider.icon %>"></i> Sign up with <%= provider.display_name %></a></div>
+            <div class="col-12 col-lg"><a class="btn btn-primary w-100" href="javascript:;" onclick="$('#atproto-signup-form').show().find('input[type=text]').focus();$(this).parent().hide()"><i class="<%= provider.icon %>"></i> <span class="visually-hidden">Sign up with </span><%= provider.display_name %></a></div>
           <% else %>
-            <div class="col-12 col-lg"><a class="btn btn-primary w-100" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> Sign up with <%= provider.display_name %></a></div>
+            <div class="col-12 col-lg"><a class="btn btn-primary w-100" href="/auth/<%= provider.omniauth_name %>"><i class="<%= provider.icon %>"></i> <span class="visually-hidden">Sign up with </span><%= provider.display_name %></a></div>
           <% end %>
         <% end %>
       </div>
