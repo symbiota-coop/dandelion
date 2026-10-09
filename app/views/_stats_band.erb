@@ -18,8 +18,9 @@
                                               else
                                                 [worth.round, 0, '']
                                               end
-  tickets_last_year = s[:tickets_by_month].sum
-  events_last_year = s[:events_by_month].sum
+  # Running totals at each month boundary, so the last minus the first is the last 12 months
+  tickets_last_year = s[:ticket_totals].length > 1 ? s[:ticket_totals].last - s[:ticket_totals].first : 0
+  events_last_year = s[:event_totals].length > 1 ? s[:event_totals].last - s[:event_totals].first : 0
   rating = s[:average_rating]
   # Whole stars, then a half star from .25, rounding up from .75
   stars = (rating ? 5.times.map { |i| rating - i } : []).map do |left|
@@ -111,7 +112,7 @@
       <div class="stats-band-value"><span data-count-up="<%= ticket_count %>"><%= ticket_count.to_fs(:delimited) %></span></div>
       <div class="stats-band-label">tickets sold</div>
       <% if tickets_last_year.positive? %>
-        <div class="stats-band-visual" data-sparkline="<%= s[:tickets_by_month].join(',') %>" role="img" aria-label="Tickets sold per month, last 12 months"></div>
+        <div class="stats-band-visual" data-sparkline="<%= s[:ticket_totals].join(',') %>" role="img" aria-label="Tickets sold in total over the last 12 months"></div>
         <div class="stats-band-context"><%= tickets_last_year.to_fs(:delimited) %> in the last 12 months</div>
       <% end %>
     </div>
@@ -131,7 +132,7 @@
       <div class="stats-band-value"><span data-count-up="<%= s[:event_count] %>"><%= s[:event_count].to_fs(:delimited) %></span></div>
       <div class="stats-band-label">events listed</div>
       <% if events_last_year.positive? %>
-        <div class="stats-band-visual" data-sparkline="<%= s[:events_by_month].join(',') %>" role="img" aria-label="Events per month, last 12 months"></div>
+        <div class="stats-band-visual" data-sparkline="<%= s[:event_totals].join(',') %>" role="img" aria-label="Events listed in total over the last 12 months"></div>
       <% end %>
       <% if s[:organisation_count].positive? %>
         <div class="stats-band-context">by <%= s[:organisation_count].to_fs(:delimited) %> <%= s[:organisation_count] == 1 ? 'organisation' : 'organisations' %></div>

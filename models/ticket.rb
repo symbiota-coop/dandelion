@@ -183,8 +183,8 @@ class Ticket
   end
 
   HOME_PAGE_STATS_DEFAULTS = {
-    ticket_count: 0, worth_gbp_integer: 0, tickets_by_month: [],
-    event_count: 0, events_by_month: [], organisation_count: 0,
+    ticket_count: 0, worth_gbp_integer: 0, ticket_totals: [],
+    event_count: 0, event_totals: [], organisation_count: 0,
     average_rating: nil, rating_count: 0
   }.freeze
 
@@ -197,10 +197,10 @@ class Ticket
     HOME_PAGE_STATS_DEFAULTS
   end
 
-  # The 12 complete months before this one, oldest first
-  def self.home_page_stats_months
+  # The starts of the 12 complete months before this one, then the start of this one: 13 points, oldest first
+  def self.home_page_stats_month_boundaries
     this_month = Date.today.beginning_of_month
-    12.downto(1).map { |i| (this_month - i.months)...(this_month - (i - 1).months) }
+    12.downto(0).map { |i| this_month - i.months }
   end
 
   def self.refresh_home_page_stats!
@@ -214,9 +214,9 @@ class Ticket
     stats = {
       ticket_count: count,
       worth_gbp_integer: Float('%.3g' % m).to_i,
-      tickets_by_month: home_page_stats_months.map { |r| self.and(:created_at.gte => r.begin, :created_at.lt => r.end).count },
+      ticket_totals: home_page_stats_month_boundaries.map { |date| self.and(:created_at.lt => date).count },
       event_count: events.count,
-      events_by_month: home_page_stats_months.map { |r| events.and(:start_time.gte => r.begin, :start_time.lt => r.end).count },
+      event_totals: home_page_stats_month_boundaries.map { |date| events.and(:start_time.lt => date).count },
       organisation_count: events.distinct(:organisation_id).count,
       average_rating: rated.avg(:rating)&.round(1),
       rating_count: rated.count
