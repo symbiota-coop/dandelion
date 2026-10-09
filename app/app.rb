@@ -52,7 +52,8 @@ module Dandelion
     set :protection, except: :frame_options
 
     before do
-      next if request.path == '/mcp'
+      # Health checks hit the instance directly, so they must skip the BASE_URI redirect (and page views)
+      next if ['/mcp', '/health'].include?(request.path)
 
       redirect "#{ENV['BASE_URI']}#{request.fullpath}" if ENV['REDIRECT_BASE'] && ENV['BASE_URI'] && (ENV['BASE_URI'] != "#{request.scheme}://#{request.env['HTTP_HOST']}")
       set_time_zone
@@ -115,6 +116,11 @@ module Dandelion
     ###
 
     head '/' do
+      200
+    end
+
+    # Render's health check: only route traffic to an instance once it's serving
+    get '/health' do
       200
     end
 
