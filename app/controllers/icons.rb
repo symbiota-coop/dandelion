@@ -16,7 +16,11 @@ Dandelion::App.controller do
   end
 
   get '/icons/image/:image' do
+    image = params[:image].to_s
+    # Only names of the icons in app/assets/images/icons, so the parameter can't reach other files
+    halt 404 unless image.match?(/\A[a-z0-9-]+\z/) && File.exist?(Padrino.root('app', 'assets', 'images', 'icons', "#{image}.svg"))
+
     content_type 'image/svg+xml'
-    partial :'icons/image', locals: { image: params[:image] }
+    partial :'icons/image', locals: { image: image }
   end
 end

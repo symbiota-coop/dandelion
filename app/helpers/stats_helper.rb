@@ -106,7 +106,7 @@ Dandelion::App.helpers do
     # jsDelivr npm format: 'package@version' => 'files' (the package may be scoped: '@scope/package@version')
     name, _, version = path.rpartition('@')
 
-    response = Faraday.get("https://registry.npmjs.org/#{name.sub('/', '%2F')}")
+    response = Faraday.get("https://registry.npmjs.org/#{name.gsub('/', '%2F')}")
     return { name: name, version: version, source: 'npm' } unless response.status == 200
 
     data = JSON.parse(response.body)
