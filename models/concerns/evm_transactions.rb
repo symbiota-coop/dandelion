@@ -3,6 +3,7 @@ module EvmTransactions
 
   included do
     before_validation :strip_evm_address
+    validates_format_of :evm_address, with: /\A0x[0-9a-f]{40}\z/i, allow_nil: true
   end
 
   def strip_evm_address

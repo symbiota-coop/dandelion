@@ -16,7 +16,12 @@ function runEvmPaymentFlow (config, data, options) {
   $('#owed').hide()
   const displayUnit = config.currency === 'USD' ? 'BREAD' : config.currency
   $('#pay-with-evm').show()
-  $('#pay-with-evm').find('.card-body p.lead.please').html('Send EXACTLY <strong>' + data.value + ' ' + displayUnit + '</strong> to <strong>' + config.evmAddress + '</strong>')
+  $('#pay-with-evm').find('.card-body p.lead.please').empty().append(
+    'Send EXACTLY ',
+    $('<strong>').text(data.value + ' ' + displayUnit),
+    ' to ',
+    $('<strong>').text(config.evmAddress)
+  )
   const offset = $('#pay-with-evm').offset()
   window.scrollTo(0, offset.top - $('#header').height() - 10)
 
