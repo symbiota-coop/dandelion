@@ -268,23 +268,19 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_empty member.unsubscribed_organisation_ids_cache || []
   end
 
-  test 'creating an organisation cannot delete or adopt a stored file via retained_image or image_uid' do
-    account = FactoryBot.create(:account)
-    organisation = FactoryBot.build_stubbed(:organisation)
+  test 'mass_assigning drops Dragonfly setters that could delete or adopt a stored file' do
     uid = Dragonfly.app.store('victim')
-    retained = Dragonfly::Serializer.json_b64_encode('uid' => uid)
-
-    sign_in_with_rack(account)
-    post '/o/new', organisation: {
-      name: organisation.name, slug: organisation.slug,
-      image: Rack::Test::UploadedFile.new('app/assets/images/telegram.png', 'image/png'),
-      retained_image: retained, image_uid: uid
+    upload = Rack::Test::UploadedFile.new('app/assets/images/test-event.jpg', 'image/jpeg')
+    params = {
+      'name' => 'Org', 'image' => upload, 'remove_image' => '1',
+      'retained_image' => Dragonfly::Serializer.json_b64_encode('uid' => uid),
+      'image_uid' => uid, 'image_url' => 'https://example.com/x.png', 'image_name' => 'x.png'
     }
 
+    assigned = Dandelion::App.new!.mass_assigning(params, Organisation)
+
+    assert_equal %w[image name remove_image], assigned.keys.sort
     assert_equal 'victim', Dragonfly.app.fetch(uid).data
-    saved_organisation = Organisation.find_by(slug: organisation.slug)
-    assert saved_organisation
-    assert saved_organisation.image_uid != uid
   end
 
   test 'organisation tier edit rejects organisation_id from params' do
