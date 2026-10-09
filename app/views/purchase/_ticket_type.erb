@@ -35,7 +35,7 @@
     <% if ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>
     <% elsif availability > 0 %>
       <% if !@event.organisation.hide_few_left && !@event.hide_few_left && (wiser_remaining = ticket_type.wiser_remaining) <= 3 %>
-        <span class="badge text-bg-secondary align-text-bottom"><%= wiser_remaining %> left</span>
+        <span class="badge text-bg-secondary"><%= wiser_remaining %> left</span>
       <% end %>
     <% end %>
 
