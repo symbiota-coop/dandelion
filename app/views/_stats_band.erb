@@ -47,7 +47,7 @@
 %>
 <% if cells.positive? %>
 <style>
-  /* Laid out by its own width (container queries), not the window's, so it fits beside the sidebar */
+  /* Padding and type sized by its own width (container queries), not the window's, so it fits beside the sidebar */
   .stats-band-container { container-type: inline-size; }
   .stats-band {
     display: grid;
@@ -59,12 +59,13 @@
     box-shadow: var(--bs-box-shadow-sm);
     overflow: hidden;
   }
-  @container (max-width: 47.99rem) {
+  /* One row, and the reviews cell, by the screen's width: the band's own width dips at each breakpoint as its column
+     narrows, which would hide and show the cell over and over as the window widens */
+  @media (max-width: 767.98px) {
     .stats-band-cell:last-child:nth-child(odd) { grid-column: 1 / -1; }
-    /* The reviews cell only shows once the cells are in one row */
     .stats-band .stats-band-cell-wide { display: none; }
   }
-  @container (min-width: 48rem) {
+  @media (min-width: 768px) {
     .stats-band { grid-template-columns: repeat(var(--cells), minmax(0, 1fr)); }
   }
   .stats-band-cell {
