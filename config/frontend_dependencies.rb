@@ -27,6 +27,6 @@ FRONTEND_DEPENDENCIES = {
   },
   '/' => {
     'javascripts/ext' => 'ckeditor.js',
-    'javascripts' => 'pagelets.js jquery.lookup.js map.js places.js currencySymbol.js deparam.js serializeObject.js cookie_consent.js sidebar.js header_search.js scrollspy.js app.js'
+    'javascripts' => 'utils.js pagelets.js map.js places.js cookie_consent.js sidebar.js header_search.js scrollspy.js app.js'
   }
 }
