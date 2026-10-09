@@ -7,7 +7,8 @@
       else
         Ticket.home_page_stats
       end
-  currency = visitor_currency
+  # On development, kronor, to show a currency code's longer figure
+  currency = Padrino.env == :development ? 'SEK' : visitor_currency
   symbol = money_symbol(currency)
   worth = Money.new(s[:worth_gbp_integer] * 100, 'GBP').exchange_to(currency).to_f
   ticket_count = s[:ticket_count]
@@ -96,6 +97,8 @@
     display: flex;
     align-items: center;
   }
+  /* The sparkline grows into any height a neighbouring cell's longer figure gives the row */
+  .stats-band-visual[data-sparkline] { flex: 1 0 2rem; height: auto; }
   .stats-band-visual svg { width: 100%; height: 100%; overflow: visible; }
   .stats-band-visual .line { fill: none; stroke: var(--theme-500); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
   .stats-band-visual .area { fill: var(--theme-100); }
