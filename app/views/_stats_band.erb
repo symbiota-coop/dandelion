@@ -1,8 +1,12 @@
 <%
-  # stats: sample figures in place of the stashed ones, for the design guide
-  s = defined?(stats) && stats ? Ticket::HOME_PAGE_STATS_DEFAULTS.merge(stats) : Ticket.home_page_stats
-  # On development, sample figures stand in for any that are missing or zero, so all four cells show
-  s = s.to_h { |k, v| [k, v.blank? || v.try(:zero?) ? Ticket::HOME_PAGE_STATS_SAMPLE[k] : v] } if Padrino.env == :development
+  # stats: sample figures in place of the stashed ones, for the design guide. On development, always the sample figures
+  s = if defined?(stats) && stats
+        Ticket::HOME_PAGE_STATS_DEFAULTS.merge(stats)
+      elsif Padrino.env == :development
+        Ticket::HOME_PAGE_STATS_SAMPLE
+      else
+        Ticket.home_page_stats
+      end
   currency = visitor_currency
   symbol = money_symbol(currency)
   worth = Money.new(s[:worth_gbp_integer] * 100, 'GBP').exchange_to(currency).to_f

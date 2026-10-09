@@ -188,7 +188,7 @@ class Ticket
     average_rating: nil, rating_count: 0
   }.freeze
 
-  # Sample figures, for the design guide and for any stats missing or zero on development
+  # Sample figures, for the design guide and the home on development
   HOME_PAGE_STATS_SAMPLE = {
     ticket_count: 204_333, worth_gbp_integer: 7_450_000, tickets_last_year: 108_500,
     event_count: 18_400, organisation_count: 1200, average_rating: 4.6, rating_count: 9300
