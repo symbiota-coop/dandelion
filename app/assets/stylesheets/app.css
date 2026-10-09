@@ -83,8 +83,9 @@
   /* Motion: state changes (hover, focus, active, open) fade over --transition-fast rather than snapping, as Bootstrap's
      own nav links and buttons do. Things that float (dropdown menus, the confirm popover, flash toasts) fade in over
      --transition-enter, an ease-out, settling --space-2xs into place; modals keep Bootstrap's slide, and chevrons turn
-     to show open or shut. Nothing bounces, loops or reveals on scroll; the design guide (Motion) lists the rest. Both
-     are 0s under prefers-reduced-motion (below) */
+     to show open or shut. Nothing bounces or reveals on scroll, and only loading indicators (.bi-spin, .placeholder-glow)
+     loop; the design guide (Motion) lists the rest. Both are 0s under prefers-reduced-motion (below), which leaves the
+     loading indicators running */
   --transition-fast: 0.15s ease-in-out;
   --transition-enter: 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   /* Layout: the fixed header's row height, the sidebar's widths and #content's padding.

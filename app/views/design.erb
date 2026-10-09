@@ -311,7 +311,7 @@
       </div>
     <% end %>
 
-    <% design_subsection 'Motion', "Motion shows where things come from and go, and is otherwise kept out of the way. State changes fade rather than snap: hover, focus, active and open states change over <code>--transition-fast</code> (.15s ease-in-out, Bootstrap's own timing for nav links and buttons). Things that float fade in over <code>--transition-enter</code> (.2s, an ease-out), settling --space-2xs into place: dropdown menus (which shut at once), the confirm popover and flash toasts. Modals keep Bootstrap's entrance: the backdrop and dialog fade over .15s as the dialog slides 50px down over .3s. Sidebar submenus and the teams, activities and local groups in the cards on /accounts/subscriptions open and shut with jQuery's slide over 175ms, and their chevrons turn to point up while open. Beyond that only colours, shadows and masks move, bar a few older exceptions: on mobile the sidebar slides in and the menu button's bars turn into a cross, the quick theme colours grow 10% and the feedback stars 8% on hover, and the marketing pages' cards lift. Nothing bounces, loops or reveals on scroll, and nothing else moves more than --space-2xs. Tab panes appear at once. From 768px, page loads cross-fade over .15s (a view transition), with the header, sidebar and flash toasts held still. Under <code>prefers-reduced-motion</code> both tokens are 0s and view transitions are off, so all of it stops, and the tab scroller's chevrons jump rather than scroll smoothly.".html_safe do %>
+    <% design_subsection 'Motion', "Motion shows where things come from and go, and is otherwise kept out of the way. State changes fade rather than snap: hover, focus, active and open states change over <code>--transition-fast</code> (.15s ease-in-out, Bootstrap's own timing for nav links and buttons). Things that float fade in over <code>--transition-enter</code> (.2s, an ease-out), settling --space-2xs into place: dropdown menus (which shut at once), the confirm popover and flash toasts. Modals keep Bootstrap's entrance: the backdrop and dialog fade over .15s as the dialog slides 50px down over .3s. Sidebar submenus and the teams, activities and local groups in the cards on /accounts/subscriptions open and shut with jQuery's slide over 175ms, and their chevrons turn to point up while open. Beyond that only colours, shadows and masks move, bar a few older exceptions: on mobile the sidebar slides in and the menu button's bars turn into a cross, the quick theme colours grow 10% and the feedback stars 8% on hover, and the marketing pages' cards lift; don't add more. Nothing bounces or reveals on scroll, and nothing else moves more than --space-2xs. Only loading indicators loop: the .bi-spin spinner, the .placeholder-glow pulse and CKEditor's upload bar. Tab panes appear at once. From 768px, page loads cross-fade over .15s (a view transition), with the header, sidebar and flash toasts held still. Under <code>prefers-reduced-motion</code> both tokens are 0s and view transitions are off, so state changes snap and the tab scroller's chevrons jump rather than scroll smoothly; the loading indicators keep going, so a wait still shows.".html_safe do %>
       <div class="row gx-4 row-cols-1 row-cols-md-2 row-cols-xl-3">
         <% [
              ['Links, nav links, tabs', 'colour, underline'],
@@ -849,12 +849,10 @@
           <% end %>
           <div class="spec">Places filled (events/_progress.erb, _ticket_types_progress.erb), pay and rota progress · --theme-500 on --theme-200 · the count as a link above, or inside the bar where it's full width</div>
           <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-spin bi-arrow-repeat fs-4"></i>
-            <span class="d-inline-block border border-2 rounded-circle" style="width: 1.25rem; height: 1.25rem; border-color: var(--bs-black) transparent transparent var(--bs-black) !important; animation: spin 400ms linear infinite"></span>
-            <span class="d-inline-block rounded" style="width: 6.25rem; height: .125rem; background: var(--gradient-active)"></span>
-            <span class="placeholder col-4"></span>
+            <i class="bi bi-spin bi-slash-lg fs-4"></i>
+            <span class="placeholder-glow col-4"><span class="placeholder w-100"></span></span>
           </div>
-          <div class="spec">.bi-spin turns any icon (an order in progress) · .placeholder, a faint grey line that pagelets show while they load</div>
+          <div class="spec">.bi-spin turns an icon once every 2s: bi-slash-lg, while pagelets, payments, sends and uploads are waited on · .placeholder, a faint grey line that pagelet placeholders show while they load, pulsing inside .placeholder-glow</div>
         </div>
       <% end %>
 
