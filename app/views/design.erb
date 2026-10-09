@@ -1491,6 +1491,11 @@
       </div>
     <% end %>
 
+    <% design_subsection 'Stats band', 'Headline numbers on the signed-out home (_stats_band.erb), under the hero. Shown here with sample figures; on the home they come from Ticket.home_page_stats, which the daily late:errands task refreshes.' do %>
+      <%= partial :stats_band, locals: { stats: { ticket_count: 204_333, worth_gbp_integer: 7_450_000, tickets_by_month: [6100, 5400, 7200, 8900, 9800, 8300, 6900, 7400, 10_200, 11_800, 12_600, 13_900], event_count: 18_400, events_by_month: [420, 390, 460, 510, 560, 480, 430, 470, 590, 640, 690, 720], organisation_count: 1200, average_rating: 4.6, rating_count: 9300 } } %>
+      <div class="spec">One card cut into cells by 1px gaps over --hairline: a --hairline border, radius lg, --bs-box-shadow-sm · laid out by its own width with container queries, so it fits beside the sidebar: two cells to a row, an odd last cell taking the full width, then one row of all of them from 48rem · each cell white, padding 1rem (1.5rem from 36rem), --theme-50 on hover over --transition-fast · the figure in the header font, bold, --font-size-2xl (3xl from 60rem), tabular figures, over a semibold label, a 2rem visual and a small line of context in --bs-secondary-color · visuals: a sparkline of the last 12 complete months (a 2px --theme-500 line over --theme-100), a --theme-50 pill in --theme-800, or the rating's stars in --color-orange-400 (half from .25, whole from .75) · ticket sales are in the visitor's currency, in m or k · a cell whose figure is zero is left out · figures count up with countUp.js as the band scrolls into view, not under prefers-reduced-motion</div>
+    <% end %>
+
     <% design_subsection 'AI well and ask box', "The AI well is the only sheen, so the gradient itself marks AI: 135°, <code>--ai-well-from</code> flat to halfway, then to <code>--ai-well-to</code>. That's --color-lavender-100 to --color-lavender-400 on the default site, and the theme's 100 to 400 on themed pages (theme.css). Padding 1rem, radius lg.".html_safe do %>
       <div class="row g-4 align-items-start">
         <div class="col-lg-6">

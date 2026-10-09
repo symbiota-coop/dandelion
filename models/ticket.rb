@@ -182,14 +182,25 @@ class Ticket
     self.and(:id.in => self.and(:percentage_discount.ne => nil).pluck(:id) + self.and(:percentage_discount_monthly_donor.ne => nil).pluck(:id))
   end
 
+  HOME_PAGE_STATS_DEFAULTS = {
+    ticket_count: 0, worth_gbp_integer: 0, tickets_by_month: [],
+    event_count: 0, events_by_month: [], organisation_count: 0,
+    average_rating: nil, rating_count: 0
+  }.freeze
+
   def self.home_page_stats
     raw = Stash.find_by(key: 'public_home_ticket_stats')&.value
-    return { ticket_count: 0, worth_gbp_integer: 0 } if raw.blank?
+    return HOME_PAGE_STATS_DEFAULTS if raw.blank?
 
-    h = JSON.parse(raw)
-    { ticket_count: h['ticket_count'].to_i, worth_gbp_integer: h['worth_gbp_integer'].to_i }
+    HOME_PAGE_STATS_DEFAULTS.merge(JSON.parse(raw).symbolize_keys.slice(*HOME_PAGE_STATS_DEFAULTS.keys))
   rescue JSON::ParserError
-    { ticket_count: 0, worth_gbp_integer: 0 }
+    HOME_PAGE_STATS_DEFAULTS
+  end
+
+  # The 12 complete months before this one, oldest first
+  def self.home_page_stats_months
+    this_month = Date.today.beginning_of_month
+    12.downto(1).map { |i| (this_month - i.months)...(this_month - (i - 1).months) }
   end
 
   def self.refresh_home_page_stats!
@@ -198,7 +209,18 @@ class Ticket
       m += Money.new(o.value * 100, o.currency)
     rescue StandardError
     end
-    stats = { ticket_count: count, worth_gbp_integer: Float('%.3g' % m).to_i }
+    events = Event.live.publicly_visible
+    rated = EventFeedback.rated
+    stats = {
+      ticket_count: count,
+      worth_gbp_integer: Float('%.3g' % m).to_i,
+      tickets_by_month: home_page_stats_months.map { |r| self.and(:created_at.gte => r.begin, :created_at.lt => r.end).count },
+      event_count: events.count,
+      events_by_month: home_page_stats_months.map { |r| events.and(:start_time.gte => r.begin, :start_time.lt => r.end).count },
+      organisation_count: events.distinct(:organisation_id).count,
+      average_rating: rated.avg(:rating)&.round(1),
+      rating_count: rated.count
+    }
     Stash.find_or_initialize_by(key: 'public_home_ticket_stats').tap do |stash|
       stash.value = stats.to_json
       stash.save!

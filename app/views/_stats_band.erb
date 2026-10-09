@@ -1,0 +1,185 @@
+<%
+  # stats: sample figures in place of the stashed ones, for the design guide
+  s = defined?(stats) && stats ? Ticket::HOME_PAGE_STATS_DEFAULTS.merge(stats) : Ticket.home_page_stats
+  currency = visitor_currency
+  symbol = money_symbol(currency)
+  worth = Money.new(s[:worth_gbp_integer] * 100, 'GBP').exchange_to(currency).to_f
+  ticket_count = s[:ticket_count]
+  if ENV['CREATE_VIDEO']
+    ticket_count = 204_333
+    worth = 8_740_000
+    symbol = '€'
+  end
+  # Ticket sales in millions or thousands: [figure, decimal places, suffix]
+  worth_value, worth_decimals, worth_suffix = if worth >= 1_000_000
+                                                [(worth / 1_000_000).round(1), 1, 'm']
+                                              elsif worth >= 1000
+                                                [(worth / 1000).round, 0, 'k']
+                                              else
+                                                [worth.round, 0, '']
+                                              end
+  tickets_last_year = s[:tickets_by_month].sum
+  events_last_year = s[:events_by_month].sum
+  rating = s[:average_rating]
+  # Whole stars, then a half star from .25, rounding up from .75
+  stars = (rating ? 5.times.map { |i| rating - i } : []).map do |left|
+    if left >= 0.75
+      'bi-star-fill'
+    elsif left >= 0.25
+      'bi-star-half'
+    else
+      'bi-star'
+    end
+  end
+  cells = [
+    ticket_count.positive?,
+    worth_value.positive?,
+    s[:event_count].positive?,
+    rating && s[:rating_count].positive?
+  ].count(true)
+%>
+<% if cells.positive? %>
+<style>
+  /* Laid out by its own width (container queries), not the window's, so it fits beside the sidebar */
+  .stats-band-container { container-type: inline-size; }
+  .stats-band {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
+    border-radius: var(--bs-border-radius-lg);
+    box-shadow: var(--bs-box-shadow-sm);
+    overflow: hidden;
+  }
+  @container (max-width: 47.99rem) {
+    .stats-band-cell:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  }
+  @container (min-width: 48rem) {
+    .stats-band { grid-template-columns: repeat(var(--cells), minmax(0, 1fr)); }
+  }
+  .stats-band-cell {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    padding: var(--space-base);
+    background: var(--bs-white);
+    transition: background-color var(--transition-fast);
+  }
+  @container (min-width: 36rem) {
+    .stats-band-cell { padding: var(--space-lg); }
+  }
+  .stats-band-cell:hover { background: var(--theme-50); }
+  .stats-band-value {
+    font-family: var(--header-font-family);
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+  @container (min-width: 60rem) {
+    .stats-band-value { font-size: var(--font-size-3xl); }
+  }
+  .stats-band-label { font-weight: 600; }
+  .stats-band-visual {
+    height: 2rem;
+    margin: var(--space-xs) 0;
+    display: flex;
+    align-items: center;
+  }
+  .stats-band-visual svg { width: 100%; height: 100%; overflow: visible; }
+  .stats-band-visual .line { fill: none; stroke: var(--theme-500); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .stats-band-visual .area { fill: var(--theme-100); }
+  .stats-band-visual .stars { font-size: var(--font-size-lg); color: var(--color-orange-400); letter-spacing: 0.05em; }
+  .stats-band-visual .zero {
+    font-family: var(--header-font-family);
+    font-weight: 700;
+    color: var(--theme-800);
+    background: var(--theme-50);
+    border-radius: var(--bs-border-radius-pill);
+    padding: var(--space-2xs) var(--space-sm);
+    font-size: var(--font-size-sm);
+  }
+  .stats-band-context { font-size: var(--font-size-sm); color: var(--bs-secondary-color); }
+</style>
+
+<div class="stats-band-container">
+<section class="stats-band" style="--cells: <%= cells %>" aria-label="Dandelion in numbers">
+  <% if ticket_count.positive? %>
+    <div class="stats-band-cell">
+      <div class="stats-band-value"><span data-count-up="<%= ticket_count %>"><%= ticket_count.to_fs(:delimited) %></span></div>
+      <div class="stats-band-label">tickets sold</div>
+      <% if tickets_last_year.positive? %>
+        <div class="stats-band-visual" data-sparkline="<%= s[:tickets_by_month].join(',') %>" role="img" aria-label="Tickets sold per month, last 12 months"></div>
+        <div class="stats-band-context"><%= tickets_last_year.to_fs(:delimited) %> in the last 12 months</div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if worth_value.positive? %>
+    <div class="stats-band-cell">
+      <div class="stats-band-value"><%= symbol %><span data-count-up="<%= worth_value %>" data-decimals="<%= worth_decimals %>"><%= worth_decimals.zero? ? worth_value.to_fs(:delimited) : worth_value %></span><%= worth_suffix %>+</div>
+      <div class="stats-band-label">in ticket sales</div>
+      <div class="stats-band-visual"><span class="zero">0% fees</span></div>
+      <div class="stats-band-context">Paid straight to organisers. <a href="/docs/events#fees-and-payouts">How payouts work</a></div>
+    </div>
+  <% end %>
+
+  <% if s[:event_count].positive? %>
+    <div class="stats-band-cell">
+      <div class="stats-band-value"><span data-count-up="<%= s[:event_count] %>"><%= s[:event_count].to_fs(:delimited) %></span></div>
+      <div class="stats-band-label">events listed</div>
+      <% if events_last_year.positive? %>
+        <div class="stats-band-visual" data-sparkline="<%= s[:events_by_month].join(',') %>" role="img" aria-label="Events per month, last 12 months"></div>
+      <% end %>
+      <% if s[:organisation_count].positive? %>
+        <div class="stats-band-context">by <%= s[:organisation_count].to_fs(:delimited) %> <%= s[:organisation_count] == 1 ? 'organisation' : 'organisations' %></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if rating && s[:rating_count].positive? %>
+    <div class="stats-band-cell">
+      <div class="stats-band-value"><span data-count-up="<%= rating %>" data-decimals="1"><%= rating %></span><span class="fs-6 text-body-secondary fw-normal"> / 5</span></div>
+      <div class="stats-band-label">average rating</div>
+      <div class="stats-band-visual">
+        <span class="stars" aria-hidden="true"><% stars.each do |star| %><i class="bi <%= star %>"></i><% end %></span>
+      </div>
+      <div class="stats-band-context">from <%= s[:rating_count].to_fs(:delimited) %> attendee <%= s[:rating_count] == 1 ? 'review' : 'reviews' %></div>
+    </div>
+  <% end %>
+</section>
+</div>
+
+<script>
+  $(function () {
+    // Sparklines: a line over a soft area, from the monthly values
+    $('.stats-band [data-sparkline]').each(function () {
+      var values = $(this).data('sparkline').split(',').map(Number)
+      var max = Math.max.apply(null, values)
+      var min = Math.min.apply(null, values) * 0.8
+      var w = 120
+      var h = 32
+      var line = values.map(function (v, i) {
+        return [(i / (values.length - 1)) * w, h - ((v - min) / (max - min)) * h].join(',')
+      }).join(' ')
+      $(this).html('<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
+        '<polygon class="area" points="0,' + h + ' ' + line + ' ' + w + ',' + h + '"/>' +
+        '<polyline class="line" vector-effect="non-scaling-stroke" points="' + line + '"/></svg>')
+    })
+
+    // Count up once the band scrolls into view, unless motion is reduced (or for the how-to video)
+    if (<%= ENV['CREATE_VIDEO'] ? 'true' : 'false' %> || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return
+        observer.unobserve(entry.target)
+        var $el = $(entry.target)
+        new countUp.CountUp(entry.target, Number($el.data('count-up')), { decimalPlaces: Number($el.data('decimals') || 0) }).start()
+      })
+    })
+    $('.stats-band [data-count-up]').each(function () { observer.observe(this) })
+  })
+</script>
+<% end %>
