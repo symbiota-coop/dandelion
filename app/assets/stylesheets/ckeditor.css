@@ -8,7 +8,7 @@
 }
 
 .ck-heading_paragraph_lead {
-  font-size: var(--font-size-sm) !important
+  font-size: var(--font-size-base) !important
 }
 
 .ck-heading_paragraph_small {
@@ -57,7 +57,7 @@ div.wysiwyg img {
 #tab-description .ck.ck-editor .ck.ck-editor__editable.ck-content {
   font-family: var(--body-font-family) !important;
   letter-spacing: normal !important;
-  font-size: var(--font-size-base) !important;
+  font-size: var(--font-size-md) !important;
   line-height: 1.5;
   color: var(--bs-body-color);
 }
@@ -81,7 +81,7 @@ div.wysiwyg figcaption {
 .ck-content blockquote,
 blockquote {
   margin-bottom: var(--space-base);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   border-left: 0.25rem solid var(--theme-200) !important;
   padding-left: var(--space-base);
   font-style: italic;

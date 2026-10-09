@@ -30,8 +30,8 @@ $h1-font-size: var(--font-size-3xl);
 $h2-font-size: var(--font-size-2xl);
 $h3-font-size: var(--font-size-xl);
 $h4-font-size: var(--font-size-lg);
-$h5-font-size: var(--font-size-base);
-$h6-font-size: var(--font-size-sm);
+$h5-font-size: var(--font-size-md);
+$h6-font-size: var(--font-size-base);
 $line-height-base: 1.5;
 
 // Keep Bootstrap 4's look and behaviour where Bootstrap 5 changed the defaults
@@ -73,7 +73,7 @@ $hr-border-color: $gray-400;
 $input-color: var(--bs-body-color);
 $input-border-color: $gray-400;
 $input-font-size: .875rem; // matches --body-font-size in app.css (Sass needs a literal for its calculations)
-$input-font-size-sm: .875rem; // --font-size-sm, as btn-sm
+$input-font-size-sm: .875rem; // --font-size-base, as btn-sm
 // Fields and buttons share their vertical padding, so they're the same height side by side (about 2.4rem, 2.1rem small)
 $input-btn-padding-y: .5rem;
 $input-btn-padding-y-sm: .375rem;
@@ -95,10 +95,10 @@ $form-switch-padding-start: 0;
 $form-switch-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3.3' cy='.35' fill='rgba(0,0,0,.35)'/%3e%3ccircle r='3.3' fill='%23fff'/%3e%3c/svg%3e");
 $form-switch-focus-bg-image: $form-switch-bg-image;
 $form-switch-checked-bg-image: $form-switch-bg-image;
-$btn-font-size: .875rem; // --font-size-sm
+$btn-font-size: .875rem; // --font-size-base
 $btn-padding-x: 1rem;
 $btn-padding-x-sm: .75rem;
-$btn-font-size-sm: .875rem; // --font-size-sm
+$btn-font-size-sm: .875rem; // --font-size-base
 $btn-padding-y-lg: .625rem;
 $btn-padding-x-lg: 1rem;
 $btn-font-size-lg: 1.2rem; // --font-size-lg
@@ -111,7 +111,7 @@ $badge-font-weight: 600;
 $badge-border-radius: 50rem;
 $alert-padding-y: .75rem; // --space-sm, like card headers
 $alert-padding-x: 1rem;
-$tooltip-font-size: .875rem; // --font-size-sm
+$tooltip-font-size: .875rem; // --font-size-base
 // Bootstrap's px widths in rem, so they scale with the root font size like everything else ($modal-xl stays 1140px, to fit the xl breakpoint as the containers do)
 $tooltip-max-width: 12.5rem;
 $toast-max-width: 21.875rem;

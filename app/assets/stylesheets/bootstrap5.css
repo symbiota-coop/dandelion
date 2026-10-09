@@ -237,11 +237,11 @@ h4, .h4 {
 }
 
 h5, .h5 {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
 }
 
 h6, .h6 {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
 }
 
 p {
@@ -8202,11 +8202,11 @@ textarea.form-control-lg {
 }
 
 .fs-5 {
-  font-size: var(--font-size-base) !important;
+  font-size: var(--font-size-md) !important;
 }
 
 .fs-6 {
-  font-size: var(--font-size-sm) !important;
+  font-size: var(--font-size-base) !important;
 }
 
 .fst-italic {

@@ -61,7 +61,7 @@
 }
 
 .article-content {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   line-height: 1.6;
   color: var(--bs-body-color);
 }

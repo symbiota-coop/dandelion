@@ -204,17 +204,17 @@
       </div>
     </div>
 
-    <% design_subsection 'Scale', 'From --font-size-base up, each step is 1.2 times the last (a minor third), so every heading is bigger than the one below and h5 sits a step above body text.' do %>
+    <% design_subsection 'Scale', '--font-size-base is body text. From --font-size-md up, each step is 1.2 times the last (a minor third), so every heading is bigger than the one below and h5 sits a step above body text.' do %>
       <div class="border-bottom">
         <% [
              ['h1 · .fs-1', '--font-size-3xl · 2.07rem', '<h1 data-sample class="m-0">Gatherings near you</h1>'],
              ['h2 · .fs-2', '--font-size-2xl · 1.73rem', '<h2 data-sample class="m-0">Gatherings near you</h2>'],
              ['h3 · .fs-3', '--font-size-xl · 1.44rem', '<h3 data-sample class="m-0">Your upcoming events</h3>'],
              ['h4 · .fs-4', '--font-size-lg · 1.2rem', '<h4 data-sample class="m-0">Upcoming birthdays</h4>'],
-             ['h5 · .fs-5', '--font-size-base · 1rem', '<h5 data-sample class="m-0">Ticket types</h5>'],
+             ['h5 · .fs-5', '--font-size-md · 1rem', '<h5 data-sample class="m-0">Ticket types</h5>'],
              ['.lead', '--font-size-lg · 1.2rem', '<p data-sample class="lead m-0">An introductory line, like a sold-out card&#39;s</p>'],
-             ['.readable', '--font-size-base · 1rem', '<div data-sample class="readable">Long-form copy such as event descriptions sets at 1rem.</div>'],
-             ['body · nav · .btn', '--font-size-sm · .875rem', '<div data-sample>Body text, inputs, tables, buttons (btn-sm too), nav links, tabs, dropdown items and tooltips</div>'],
+             ['.readable', '--font-size-md · 1rem', '<div data-sample class="readable">Long-form copy such as event descriptions sets at 1rem.</div>'],
+             ['body · nav · .btn', '--font-size-base · .875rem', '<div data-sample>Body text, inputs, tables, buttons (btn-sm too), nav links, tabs, dropdown items and tooltips</div>'],
              ['.small', '.875em of its context', '<span data-sample class="small">Secondary details: a location, a description</span>'],
              ['.badge', '.9375em of its context', '<span data-sample class="badge text-bg-secondary">Badges</span>'],
              ['.breadcrumb', '--font-size-xs · .75rem', '<ol data-sample class="breadcrumb m-0"><li class="breadcrumb-item">Organisations</li><li class="breadcrumb-item">Breadcrumbs</li></ol>']
@@ -228,7 +228,7 @@
           </div>
         <% end %>
       </div>
-      <div class="small text-body-secondary"><code>.h1</code>–<code>.h5</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. h5 is the smallest heading we use, a step above body text; h6, at --font-size-sm, is left to user-written descriptions. bootstrap5.scss sets the heading sizes (<code>$h1-font-size</code>…) to these tokens, so <code>.fs-1</code>–<code>.fs-5</code> make text a heading's size without its weight or font. <code>.small</code> is Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is <code>--bs-secondary-color</code> (--bs-gray-600), set with <code>.text-body-secondary</code>; form-text takes it too. <code>.subtle</code> is for links in it, which turn the theme colour on hover. <code>.underline-dotted</code> is for quiet links that read as part of a sentence (a rota's edit links) and text to copy.</div>
+      <div class="small text-body-secondary"><code>.h1</code>–<code>.h5</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. h5 is the smallest heading we use, a step above body text; h6, at --font-size-base, is left to user-written descriptions. bootstrap5.scss sets the heading sizes (<code>$h1-font-size</code>…) to these tokens, so <code>.fs-1</code>–<code>.fs-5</code> make text a heading's size without its weight or font. <code>.small</code> is Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is <code>--bs-secondary-color</code> (--bs-gray-600), set with <code>.text-body-secondary</code>; form-text takes it too. <code>.subtle</code> is for links in it, which turn the theme colour on hover. <code>.underline-dotted</code> is for quiet links that read as part of a sentence (a rota's edit links) and text to copy.</div>
     <% end %>
   <% end %>
 
@@ -340,7 +340,7 @@
           <span class="px-3"><i class="bi bi-search"></i></span>
           <span class="px-3 position-relative"><i class="bi bi-bell"></i><span class="position-absolute top-0 rounded-circle" style="right: .75rem; width: .5rem; height: .5rem; background: var(--gradient-active)"></span></span>
           <span class="px-3"><i class="bi bi-chat-left"></i></span>
-          <span class="px-2 d-flex align-items-center gap-2"><img class="d-block rounded-circle" src="/images/samples/maya.jpg" alt="" style="width: 1.75rem; height: 1.75rem; object-fit: cover"><span class="d-none d-md-inline" style="font-size: var(--font-size-sm)">Maya <i class="bi bi-chevron-down"></i></span></span>
+          <span class="px-2 d-flex align-items-center gap-2"><img class="d-block rounded-circle" src="/images/samples/maya.jpg" alt="" style="width: 1.75rem; height: 1.75rem; object-fit: cover"><span class="d-none d-md-inline" style="font-size: var(--font-size-base)">Maya <i class="bi bi-chevron-down"></i></span></span>
         </div>
       </div>
       <div class="d-flex" style="min-height: 26.25rem">
@@ -1245,7 +1245,7 @@
               </div>
             </div>
           </div>
-          <div class="spec">Ticket groups: a .ticket-group-heading row, a bold --font-size-lg (1.2rem) heading at line-height 1.2 with .25rem below it, its group's first divider a 2px rule in --bs-emphasis-color · each type: the name bold at --font-size-base (.ticket-type-name), a lock icon if it's secret or for members, "3 left" or fewer as a text-bg-secondary badge · price at the same --font-size-base (.ticket-type-price), not bold: fixed, a form-range for a range (the price shows once dragged), or a £ input group for pay what you like, which enables the quantity · quantity a full-width form-select, 0 to 99, or to the number left if fewer · the description in --bs-secondary-color, its paragraphs without margin · sold out: Join waitlist (btn-sm btn-outline-primary), which opens the waitlist modal (purchase/_ticket_type_waitlist_modal.erb), or a Sold out badge in text-bg-danger, as in event blocks, the carousel and the places-filled bar · a ticket type whose sales have ended says Sales closed in text-bg-secondary · the right-hand column: Apply a code, a membership discount, the donation (1/5/10% of the total, 1/2.5/5% on large orders, or a set amount for the organisation) and the disabled Total, Credit, Discount and Balance fields from currency_input_row, each a bold label over a 5em input group · below 576px the card's sides narrow to .75rem, cells take table-sm's .5rem with none at the table's edges, and the range hint says just Drag, so the three columns fit a phone</div>
+          <div class="spec">Ticket groups: a .ticket-group-heading row, a bold --font-size-lg (1.2rem) heading at line-height 1.2 with .25rem below it, its group's first divider a 2px rule in --bs-emphasis-color · each type: the name bold at --font-size-md (.ticket-type-name), a lock icon if it's secret or for members, "3 left" or fewer as a text-bg-secondary badge · price at the same --font-size-md (.ticket-type-price), not bold: fixed, a form-range for a range (the price shows once dragged), or a £ input group for pay what you like, which enables the quantity · quantity a full-width form-select, 0 to 99, or to the number left if fewer · the description in --bs-secondary-color, its paragraphs without margin · sold out: Join waitlist (btn-sm btn-outline-primary), which opens the waitlist modal (purchase/_ticket_type_waitlist_modal.erb), or a Sold out badge in text-bg-danger, as in event blocks, the carousel and the places-filled bar · a ticket type whose sales have ended says Sales closed in text-bg-secondary · the right-hand column: Apply a code, a membership discount, the donation (1/5/10% of the total, 1/2.5/5% on large orders, or a set amount for the organisation) and the disabled Total, Credit, Discount and Balance fields from currency_input_row, each a bold label over a 5em input group · below 576px the card's sides narrow to .75rem, cells take table-sm's .5rem with none at the table's edges, and the range hint says just Drag, so the three columns fit a phone</div>
         </div>
       </div>
     <% end %>
@@ -1394,7 +1394,7 @@
           }).render()
         })
       </script>
-      <div class="spec">Day numbers and headings --bs-secondary-color, since FullCalendar makes them href-less anchors that would otherwise take the link colour · today's number white on a --theme-500 circle, with no day tint · toolbar buttons like .btn-secondary, the active view filled --theme-500 like the active pill · prev and next borderless · on mobile the title drops to --font-size-base and Today hides</div>
+      <div class="spec">Day numbers and headings --bs-secondary-color, since FullCalendar makes them href-less anchors that would otherwise take the link colour · today's number white on a --theme-500 circle, with no day tint · toolbar buttons like .btn-secondary, the active view filled --theme-500 like the active pill · prev and next borderless · on mobile the title drops to --font-size-md and Today hides</div>
     <% end %>
 
     <div class="row g-5">
@@ -1446,7 +1446,7 @@
             </div>
           </div>
         </div>
-        <div class="spec">Clicking a marker loads /points/:model/:id into Google's InfoWindow, wrapped in .infowindow: a person (points/_account.erb, as here), an organisation or gathering, or an event as its block's text without the image (events/_block_main.erb as ul.map-event, list items at --font-size-sm) · Google draws the white box, its tail and the close button; app.css sets its font to Plus Jakarta Sans, sizes the close button and zeroes .row margins inside</div>
+        <div class="spec">Clicking a marker loads /points/:model/:id into Google's InfoWindow, wrapped in .infowindow: a person (points/_account.erb, as here), an organisation or gathering, or an event as its block's text without the image (events/_block_main.erb as ul.map-event, list items at --font-size-base) · Google draws the white box, its tail and the close button; app.css sets its font to Plus Jakarta Sans, sizes the close button and zeroes .row margins inside</div>
       <% end %>
 
       <% design_subsection 'Email previews', col: 'col-lg-7' do %>

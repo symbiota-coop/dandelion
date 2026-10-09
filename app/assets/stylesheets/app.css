@@ -61,16 +61,16 @@
   --color-paper: #FFFAF3;
   --body-font-family: "Plus Jakarta Sans", sans-serif;
   --header-font-family: "Hanken Grotesk", "Plus Jakarta Sans", sans-serif;
-  /* Type scale: from base up, each step is 1.2 times the last (a minor third). The headings use it, h1 at 3xl down to
-     h5 at base and h6 at sm, through $h1-font-size to $h6-font-size in bootstrap5.scss */
+  /* Type scale: base is body text. From md up, each step is 1.2 times the last (a minor third). The headings use it, h1
+     at 3xl down to h5 at md and h6 at base, through $h1-font-size to $h6-font-size in bootstrap5.scss */
   --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
+  --font-size-base: 0.875rem;
+  --font-size-md: 1rem;
   --font-size-lg: 1.2rem;
   --font-size-xl: 1.44rem;
   --font-size-2xl: 1.73rem;
   --font-size-3xl: 2.07rem;
-  --body-font-size: var(--font-size-sm);
+  --body-font-size: var(--font-size-base);
   /* Spacing scale, for padding, margins and gaps. Bootstrap's spacing utilities (m-*, p-*, gap-*) are the same scale less
      sm and xl: 1 is 2xs, 2 xs, 3 base, 4 lg, 5 2xl. sm is also the grid gutter ($grid-gutter-width) */
   --space-2xs: 0.25rem;
@@ -211,7 +211,7 @@
   height: var(--header-height);
   padding-left: var(--space-base);
   padding-right: var(--space-base);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   line-height: 1.25rem;
 }
 
@@ -378,7 +378,7 @@
   padding: 0;
   background: var(--bs-gray-800);
   color: var(--bs-white);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   border-radius: 0;
   box-shadow: none;
 }
@@ -464,7 +464,7 @@
 .sidebar .nav {
   --bs-nav-link-padding-x: var(--space-sm);
   --bs-nav-link-padding-y: var(--space-xs);
-  --bs-nav-link-font-size: var(--font-size-sm);
+  --bs-nav-link-font-size: var(--font-size-base);
   --bs-nav-link-color: var(--bs-white);
   --bs-nav-link-hover-color: var(--bs-white);
   --bs-nav-pills-border-radius: var(--bs-border-radius);
@@ -499,7 +499,7 @@
 .sidebar .sub-menu {
   margin: 0 0 0 2.5625rem;
   padding: var(--space-2xs) 0;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
 }
 
 .sidebar .sub-menu a {
@@ -639,7 +639,7 @@
   right: 0;
   left: 0;
   bottom: 0;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   width: auto;
 }
 
@@ -840,7 +840,7 @@ p.action a {
 
 /* Beside an h1, h2 or h3 an em-sized badge would be nearly heading-sized, so it stays at body size, centred on the heading's line */
 :is(h1, h2, h3, .h1, .h2, .h3) .badge {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   vertical-align: middle;
 }
 
@@ -850,7 +850,7 @@ p.action a {
 }
 
 .event-title-line .badge {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   vertical-align: middle;
   margin-inline-end: var(--space-2xs);
 }
@@ -894,7 +894,7 @@ p.action a {
 }
 
 .popular-locations {
-  font-size: var(--font-size-sm)
+  font-size: var(--font-size-base)
 }
 
 /* ==========================================================================
@@ -1115,7 +1115,7 @@ p.action a {
   float: none;
   right: auto;
   margin-top: 0;
-  --bs-dropdown-font-size: var(--font-size-sm);
+  --bs-dropdown-font-size: var(--font-size-base);
   --bs-dropdown-link-active-bg: var(--theme-500);
   border-radius: var(--bs-border-radius-lg);
   box-shadow: var(--bs-box-shadow);
@@ -1143,7 +1143,7 @@ p.action a {
 .confirm-popover {
   --bs-popover-zindex: 10000;
   --bs-popover-max-width: 18.75rem;
-  --bs-popover-font-size: var(--font-size-sm);
+  --bs-popover-font-size: var(--font-size-base);
   --bs-popover-border-radius: var(--bs-border-radius-lg);
   --bs-popover-inner-border-radius: var(--bs-border-radius-lg);
   --bs-popover-body-padding-x: var(--space-base);
@@ -1189,7 +1189,7 @@ p.action a {
 
 .dropdown-header {
   border-bottom: 1px solid var(--bs-border-color);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   color: var(--bs-emphasis-color);
   padding: var(--space-xs) var(--space-base);
 }
@@ -1234,7 +1234,7 @@ p.action a {
 .nav-crumbs > .btn-group + .btn-group.nav-crumbs-sibling::before {
   content: "\00B7";
   font-family: inherit;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   font-weight: bold;
 }
 
@@ -1304,7 +1304,7 @@ p.action a {
 
   .nav-crumbs .btn {
     max-width: 12rem;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-base);
   }
 
   .nav-crumbs > .btn-group:last-child .btn {
@@ -1648,7 +1648,7 @@ label.remove-image input {
 }
 
 .nav {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   --bs-nav-link-hover-color: var(--bs-emphasis-color);
 }
 
@@ -2079,7 +2079,7 @@ body .table > tfoot > tr > th {
 /* jQuery UI puts the menu flush under its input, so it's square at the top, where it joins it, with the base radius below, like Select2's dropdowns */
 .ui-autocomplete {
   border: 1px solid var(--hairline) !important;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   padding: var(--space-base) 0;
   box-shadow: var(--bs-box-shadow);
   border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius);
@@ -2450,7 +2450,7 @@ small.form-text {
 }
 
 .readable {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   line-height: 1.5;
 }
 
@@ -2533,7 +2533,7 @@ small.form-text {
    ========================================================================== */
 
 ul.map-event li {
-  font-size: var(--font-size-sm) !important
+  font-size: var(--font-size-base) !important
 }
 
 /* Google Maps draws in pixels, so these overrides, the markers and the clusters stay in px to line up with it */
@@ -2737,7 +2737,7 @@ ul.map-event li {
   align-items: center;
   justify-content: center;
   padding: var(--space-xs) var(--space-base);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   border-radius: var(--bs-border-radius);
 }
 
@@ -2786,7 +2786,7 @@ ul.map-event li {
 /* Shorten month names and hide Today button on small screens */
 @media (max-width: 767.98px) {
   .fc-toolbar-title {
-    font-size: var(--font-size-base) !important;
+    font-size: var(--font-size-md) !important;
   }
 
   .fc-button-group {
@@ -2805,7 +2805,7 @@ ul.map-event li {
 /* Ticket type names and prices share one size, a step above the description */
 .ticket-type-name,
 .ticket-type-price {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
 }
 
 .ticket-type-description p {
@@ -2873,7 +2873,7 @@ ul.map-event li {
 }
 
 table.event-details td {
-  font-size: var(--font-size-base)
+  font-size: var(--font-size-md)
 }
 
 /* The date and icon tiles, coloured for the site over event_details.css's layout. Emails show the
@@ -2967,7 +2967,7 @@ table.event-details td {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   font-variant-numeric: tabular-nums;
 }
 
@@ -3056,7 +3056,7 @@ table.event-details td {
   justify-content: center;
   flex-shrink: 0;
   border-radius: 50%;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   color: var(--theme-500);
   background-color: var(--theme-50);
   width: 2.25em;
@@ -3177,7 +3177,7 @@ td .tactivity-accept {
 
 .tactivity a,
 .tactivity span {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   color: inherit
 }
 
@@ -3206,7 +3206,7 @@ td .tactivity-accept {
 
 .cookie-consent h2 {
   margin: 0 0 var(--space-2xs);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
 }
 
 .cookie-consent p {
@@ -3288,7 +3288,7 @@ td .tactivity-accept {
   border-top: 1px solid var(--hairline);
   list-style: none;
   color: var(--bs-secondary-color);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
 }
 
 .onboarding-steps .done i {
@@ -3443,7 +3443,7 @@ p.action a {
   display: inline-block;
   padding: var(--space-xs) var(--space-base);
   border: 1px solid transparent;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   font-weight: 600;
   line-height: 1.5;
   color: var(--bs-white);
