@@ -94,6 +94,8 @@ module Dandelion
       next unless route
 
       route_path = route.original_path.to_s.sub(/\(\.:format\)\?\z/, '')
+      # Padrino gives the root route an empty path
+      route_path = '/' if route_path.empty?
       name = "#{request.request_method} #{route_path}"
 
       ext = File.extname(request.path)
