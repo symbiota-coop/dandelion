@@ -1,4 +1,38 @@
+RUNNING_COMMIT_TIMES = {} # rubocop:disable Style/MutableConstant
+
 Dandelion::App.helpers do
+  # When the running commit was made: from the local git history if the deploy has it, otherwise from GitHub.
+  # Looked up once per process, as the commit can't change without a restart
+  def running_commit_time(commit)
+    return RUNNING_COMMIT_TIMES[commit] if RUNNING_COMMIT_TIMES.key?(commit)
+
+    RUNNING_COMMIT_TIMES[commit] = begin
+      require 'open3'
+      output, status = Open3.capture2('git', '-C', Padrino.root, 'show', '-s', '--format=%cI', commit, err: File::NULL)
+      if status.success? && !output.strip.empty?
+        Time.iso8601(output.strip)
+      else
+        Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN']).commit('symbiota-coop/dandelion', commit).commit.committer.date
+      end
+    rescue StandardError
+      nil
+    end
+  end
+
+  # A compact age like 8m, 2h, 3d or 1y
+  def short_time_ago(time)
+    seconds = [Time.now - time, 0].max
+    if seconds < 1.hour
+      "#{(seconds / 1.minute).floor}m"
+    elsif seconds < 1.day
+      "#{(seconds / 1.hour).floor}h"
+    elsif seconds < 365.days
+      "#{(seconds / 1.day).floor}d"
+    else
+      "#{(seconds / 365.days).floor}y"
+    end
+  end
+
   def sentry_span_entries
     sentry_span_source_files.flat_map do |file_path|
       sentry_spans_in_file(file_path)
