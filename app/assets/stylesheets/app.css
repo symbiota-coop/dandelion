@@ -528,6 +528,14 @@
   opacity: 1;
 }
 
+/* A label over a group of links; a divider when the sidebar is minified */
+.sidebar .nav-header {
+  padding: var(--space-base) var(--space-sm) var(--space-2xs);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--bs-gray-500);
+}
+
 /* text-bg-dark is the sidebar's own gray-900, so dark badges there step up to gray-800 */
 .sidebar .text-bg-dark {
   background-color: var(--bs-gray-800) !important;
@@ -584,6 +592,14 @@
     display: none;
   }
   .page-sidebar-minified .sidebar .sub-menu {
+    display: none;
+  }
+  .page-sidebar-minified .sidebar .nav-header {
+    margin: var(--space-xs);
+    padding: 0;
+    border-top: 1px solid var(--bs-gray-800);
+  }
+  .page-sidebar-minified .sidebar .nav-header span {
     display: none;
   }
   .page-sidebar-minified .content {
