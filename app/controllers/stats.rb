@@ -194,8 +194,8 @@ Dandelion::App.controller do
   end
 
   get '/stats/traces' do
-    # Sorted in Mongo, as the list is paginated: by time (newest first by default), duration or spans
-    @sort = %w[duration spans].include?(params[:sort]) ? params[:sort] : 'time'
+    # Sorted in Mongo, as the list is paginated: by duration (slowest first by default), time or spans
+    @sort = %w[time spans].include?(params[:sort]) ? params[:sort] : 'duration'
     @sort_dir = params[:dir] == 'asc' ? 'asc' : 'desc'
     @traces = Trace.order({ 'time' => :created_at, 'duration' => :duration_ms, 'spans' => :span_count }[@sort] => @sort_dir)
     @traces = @traces.and(name: params[:name]) if params[:name]
