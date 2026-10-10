@@ -51,8 +51,6 @@ module EventFields
     field :cohosts_ids_cache, type: Array
     field :carousel_ids, type: Array
     field :theme_color, type: String
-    # Gemini embeddings, replaced by voyage_embedding. Remove once unset in production
-    field :embedding, type: Array
     field :voyage_embedding, type: Array
     field :atproto_uri, type: String
     field :calendar_import_feed_url, type: String

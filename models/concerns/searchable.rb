@@ -97,7 +97,7 @@ module Searchable
         suffix_stages = []
         suffix_stages << { '$match': remaining_selector } if remaining_selector.any?
         suffix_stages << { '$limit': limit } if limit
-        suffix_stages << { '$unset' => ['embedding', EMBEDDING_FIELD] } if build_records && fields.key?(EMBEDDING_FIELD)
+        suffix_stages << { '$unset' => [EMBEDDING_FIELD] } if build_records && fields.key?(EMBEDDING_FIELD)
         suffix_stages << { '$project': { _id: 1 } } unless build_records
 
         # Try to get embedding for vector search if enabled and model has embedding field

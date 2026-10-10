@@ -57,7 +57,7 @@ module EventScopes
     end
 
     def without_heavy_fields
-      without(:description, :extra_info_for_ticket_email, :embedding, :voyage_embedding)
+      without(:description, :extra_info_for_ticket_email, :voyage_embedding)
     end
 
     def in_person
@@ -108,7 +108,7 @@ module EventScopes
       pipeline << { '$limit' => limit } if limit
 
       event_ids = collection.aggregate(pipeline).map { |hash| hash['_id'] }
-      base_query.without(:embedding, :voyage_embedding, :extra_info_for_ticket_email).with_key_includes.in_id_order(event_ids)
+      base_query.without(:voyage_embedding, :extra_info_for_ticket_email).with_key_includes.in_id_order(event_ids)
     end
 
     def in_id_order(ids)
