@@ -189,6 +189,7 @@ Dandelion::App.controller do
     @percentile = %w[p50 p99 p100].include?(params[:percentile]) ? params[:percentile] : 'p99'
     @min_s = params[:min_s] ? params[:min_s].to_f : 2
     @summaries = Trace.summary.select { |summary| summary[:"#{@percentile}_ms"] > @min_s * 1000 }
+    @search_summaries = Trace.search_summary
     erb :'stats/transactions'
   end
 

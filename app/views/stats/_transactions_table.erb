@@ -1,0 +1,38 @@
+<%# A table of durations: a section of transactions (linking to their traces), or of searches by pipeline %>
+<div class="table-responsive mt-4">
+  <table class="transactions-table table table-hover">
+    <thead>
+      <tr>
+        <%# The section names the first column, so it reads as the table's heading %>
+        <th>
+          <%= title %>
+          <% if summaries.size > 10 %><small class="fw-normal text-body-secondary ms-1">10 of <%= summaries.size %></small><% end %>
+        </th>
+        <%# On phones, of the percentiles only the one filtered by %>
+        <% %w[p50 p99 p100].each do |percentile| %>
+          <th class="text-end <%= 'd-none d-md-table-cell' unless percentile == @percentile %>"><%= percentile %></th>
+        <% end %>
+        <th class="text-end">Total</th>
+        <th class="text-end">Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% summaries.first(10).each do |summary| %>
+        <tr>
+          <td>
+            <% if link %>
+              <a href="/stats/traces?<%= transaction_query(summary[:name], summary[:xhr]) %>"><code><%= wrap_at_separators(summary[:name]) %></code></a>
+            <% else %>
+              <%= summary[:name] %>
+            <% end %>
+          </td>
+          <% %w[p50 p99 p100].each do |percentile| %>
+            <td class="text-end text-nowrap <%= 'd-none d-md-table-cell' unless percentile == @percentile %>" data-order="<%= summary[:"#{percentile}_ms"] %>"><%= format_duration(summary[:"#{percentile}_ms"]) %></td>
+          <% end %>
+          <td class="text-end text-nowrap" data-order="<%= summary[:total_ms] %>"><%= format_duration(summary[:total_ms]) %></td>
+          <td class="text-end"><%= summary[:count] %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

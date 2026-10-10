@@ -18,6 +18,9 @@ class Trace
   # The spans (see Trace.compact_spans) as JSON compressed with zstd, about a fifth the size of storing them as
   # documents, which matters most in Mongo's cache, where documents are held uncompressed. Read them with #spans
   field :spans_zstd, type: BSON::Binary
+  # The pipeline (search.pipeline) and time of each Atlas Search query (search.query span), for Trace.search_summary,
+  # which can't read them from the compressed spans. Left out of traces without one
+  field :search_spans, type: Array
 
   validates_presence_of :name, :started_at
 
@@ -29,6 +32,7 @@ class Trace
   def self.create_from_sentry_transaction(event)
     trace_context = event.contexts[:trace] || {}
     spans = compact_spans(JSON.parse(JSON.generate(event.spans || [])), event.start_timestamp.to_f)
+    search_spans = spans.filter_map { |span| (pipeline = span.dig('data', 'search.pipeline')) && { 'pipeline' => pipeline, 'ms' => span['ms'] } }
 
     create(
       name: event.transaction,
@@ -42,7 +46,8 @@ class Trace
       started_at: Time.at(event.start_timestamp),
       duration_ms: ((event.timestamp.to_f - event.start_timestamp.to_f) * 1000).round(2),
       span_count: spans.count,
-      spans_zstd: pack_spans(spans)
+      spans_zstd: pack_spans(spans),
+      search_spans: (search_spans unless search_spans.empty?)
     )
   end
 
@@ -100,18 +105,38 @@ class Trace
   def self.summary
     collection.aggregate([
                            { '$match' => criteria.selector },
-                           { '$group' => {
-                             _id: { name: '$name', xhr: '$xhr' },
-                             count: { '$sum' => 1 },
-                             total_ms: { '$sum' => '$duration_ms' },
-                             percentiles_ms: { '$percentile' => { input: '$duration_ms', p: [0.5, 0.99], method: 'approximate' } },
-                             p100_ms: { '$max' => '$duration_ms' }
-                           } },
+                           { '$group' => { _id: { name: '$name', xhr: '$xhr' } }.merge(duration_stats('$duration_ms')) },
                            { '$sort' => { total_ms: -1 } }
                          ], hint: SUMMARY_INDEX.stringify_keys).map do |row|
-      { name: row['_id']['name'], xhr: row['_id']['xhr'], count: row['count'], total_ms: row['total_ms'],
-        p50_ms: row['percentiles_ms'][0], p99_ms: row['percentiles_ms'][1], p100_ms: row['p100_ms'] }
+      { name: row['_id']['name'], xhr: row['_id']['xhr'] }.merge(duration_stats_row(row))
     end
+  end
+
+  # The same for Atlas Search queries, per pipeline (see Searchable): text, vector, or text_fallback when the vector
+  # search timed out. An index on search_spans.pipeline means only traces with a search are read
+  def self.search_summary
+    collection.aggregate([
+                           { '$match' => criteria.and('search_spans.pipeline' => { '$type' => 'string' }).selector },
+                           { '$unwind' => '$search_spans' },
+                           { '$group' => { _id: '$search_spans.pipeline' }.merge(duration_stats('$search_spans.ms')) },
+                           { '$sort' => { total_ms: -1 } }
+                         ]).map do |row|
+      { name: row['_id'] }.merge(duration_stats_row(row))
+    end
+  end
+
+  # $group fields for the count, total, p50, p99 and p100 of a field of times in ms, read by duration_stats_row
+  def self.duration_stats(field)
+    {
+      count: { '$sum' => 1 },
+      total_ms: { '$sum' => field },
+      percentiles_ms: { '$percentile' => { input: field, p: [0.5, 0.99], method: 'approximate' } },
+      p100_ms: { '$max' => field }
+    }
+  end
+
+  def self.duration_stats_row(row)
+    { count: row['count'], total_ms: row['total_ms'], p50_ms: row['percentiles_ms'][0], p99_ms: row['percentiles_ms'][1], p100_ms: row['p100_ms'] }
   end
 
   # This trace's spans as rows in tree order (each followed by its children, siblings in order of start), for
