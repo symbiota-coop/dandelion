@@ -55,9 +55,9 @@ Sentry.init do |config|
   # Saves each request to the traces collection, and sends to Sentry the ones SentrySampleProfiler profiled.
   # A request too short for the profiler to take a sample (about 10 ms) has no profile, so it isn't sent.
   # Errors and logs always go to Sentry. Requests that matched no route (static files and unknown paths) are still named
-  # by their URL, so they're neither saved nor sent; a 404 from inside a route is.
+  # by their URL, so they're neither saved nor sent; a 404 from inside a route is. Nor are Render's health checks.
   config.before_send_transaction = lambda do |event, _hint|
-    next if event.transaction_info&.dig(:source) == :url
+    next if event.transaction_info&.dig(:source) == :url || event.transaction == 'GET /health'
 
     begin
       Trace.create_from_sentry_transaction(event)
