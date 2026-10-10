@@ -34,6 +34,8 @@ Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Mongo
 - Never use Mongoid `.or` — it ORs against whatever is already in the selector (`Event.live.or(featured: true)` means live or featured). Use `self.and('$or' => [...])` so the OR is just another AND-ed filter (`Event.live.and('$or' => [...])` means live and (this or that))
 - Use `scope.and` rather than `scope.where`
 - Mongo indexes are created directly in the database, and are not defined in model files
+- Back every `validates_uniqueness_of` with a unique index. If the validation allows nil, give the index `partialFilterExpression: { field: { $type: '<BSON type>' } }` (e.g. `'string'`, `'objectId'`), never `$exists: true`: Mongoid can store explicit nulls (`tactivities.space_id` has dozens), and an `$exists` index treats them as duplicates of each other
+- The planner can't use a `$type`-filtered index for a plain `{ field: x }` query, since the query doesn't imply the filter, and `validates_uniqueness_of` itself runs one (unscoped, on create and whenever the field changes). So every `$type`-filtered unique index needs a plain non-unique index on the same fields beside it (e.g. `slug_1` beside `slug_1_unique` on events), unless another plain index already starts with them (e.g. `session_id_1__id_1` on orders). Never drop a plain index when adding a filtered unique one. Check with the slow query log or `$indexStats` (an index with 0 ops is serving nothing)
 
 ## Tests
 
