@@ -3,8 +3,7 @@
 <h2>Traces</h2>
 <p class="text-body-secondary">Transactions and their spans, saved by Sentry's <code>before_send_transaction</code>.</p>
 
-<%# The Delete old traces link sits close under the filters, so the form keeps no margin of its own when it's there %>
-<% form_tag '', method: 'get', class: "submitOnChange searchForm form-inline #{@releases.size > 1 ? 'mb-0' : 'mb-3'}" do %>
+<% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
   <div class="form-group">
     <label>Transaction</label>
     <%= select_tag :name, options: [['All', '']] + Trace.distinct(:name).sort, selected: params[:name], class: 'form-select', id: 'trace-name' %>
@@ -23,15 +22,13 @@
 <% end %>
 
 <%# Every release but the oldest has traces before it to delete %>
-<% if @releases.size > 1 %>
+<% if @releases.size > 1 || Padrino.env == :development %>
   <p class="small mb-3"><a href="javascript:;" id="delete-traces-toggle">Delete old traces</a></p>
   <div id="delete-traces" class="mb-3" style="display: none">
-    <% form_tag '/stats/traces/delete_before', method: 'post' do %>
-      <label for="delete-traces-release" class="form-label">Delete traces from commits before</label>
-      <div class="d-flex flex-wrap gap-2">
-        <%= select_tag :release, options: @releases[0..-2].map { |release, time| ["#{release[0..6]} (#{time.strftime('%b %d %H:%M')})", release] }, class: 'form-select w-auto', id: 'delete-traces-release' %>
-        <%= submit_tag 'Delete', class: 'btn btn-danger', 'data-confirm' => 'Delete every trace saved by an earlier commit?' %>
-      </div>
+    <% form_tag '/stats/traces/delete_before', method: 'post', class: 'd-flex flex-wrap align-items-center gap-2' do %>
+      <label for="delete-traces-release" class="mb-0">Delete traces from commits before</label>
+      <%= select_tag :release, options: @releases[0..-2].map { |release, time| ["#{release[0..6]} (#{time.strftime('%b %d %H:%M')})", release] }, class: 'form-select w-auto', id: 'delete-traces-release' %>
+      <%= submit_tag 'Delete', class: 'btn btn-danger', 'data-confirm' => 'Delete every trace saved by an earlier commit?' %>
     <% end %>
   </div>
 <% end %>
