@@ -181,7 +181,8 @@ class TicketType
   def ticket_group_places_remaining
     return unless ticket_group_id
 
-    group = event.ticket_groups.detect { |ticket_group| ticket_group.id == ticket_group_id } if event
+    # From to_a, as in Event#slots_taken
+    group = event.ticket_groups.to_a.detect { |ticket_group| ticket_group.id == ticket_group_id } if event
     group ||= ticket_group
     group&.places_remaining
   end

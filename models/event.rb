@@ -284,11 +284,15 @@ class Event
     remove_instance_variable(:@ticket_counts) if defined?(@ticket_counts)
   end
 
+  # Ticket types are looked up from to_a rather than with ticket_types.detect: Mongoid only keeps an association's
+  # documents once something has iterated all of them, and detect stops early, so each detect queried again.
+  # Called for every ticket type on an event page, that was hundreds of queries for an event with dozens of types
   def slots_taken
+    ticket_types_by_id = ticket_types.to_a.index_by(&:id)
     ticket_counts.sum do |type_id, count|
       next count unless type_id
 
-      ticket_type = ticket_types.detect { |tt| tt.id == type_id }
+      ticket_type = ticket_types_by_id[type_id]
       count * (ticket_type ? ticket_type.slots : 1)
     end
   end

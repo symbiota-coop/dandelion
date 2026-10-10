@@ -32,12 +32,12 @@ class TicketGroup
   def slots_taken
     return tickets.and(made_available_at: nil).slots_taken unless event
 
-    type_ids = event.ticket_types.select { |ticket_type| ticket_type.ticket_group_id == id }.map(&:id)
+    # From to_a, as in Event#slots_taken
+    ticket_types_by_id = event.ticket_types.to_a.select { |ticket_type| ticket_type.ticket_group_id == id }.index_by(&:id)
     event.ticket_counts.sum do |type_id, count|
-      next 0 unless type_ids.include?(type_id)
+      next 0 unless (ticket_type = ticket_types_by_id[type_id])
 
-      ticket_type = event.ticket_types.detect { |tt| tt.id == type_id }
-      count * (ticket_type ? ticket_type.slots : 1)
+      count * ticket_type.slots
     end
   end
 
