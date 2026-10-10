@@ -186,8 +186,8 @@ module EventValidation
     attempts = 0
     begin
       attempts += 1
-      embedding = OpenRouter.embedding(to_public_markdown)
-      set(embedding: embedding)
+      embedding = OpenRouter.embedding(to_public_markdown, input_type: 'search_document')
+      set(voyage_embedding: embedding)
     rescue StandardError => e
       retry if attempts < 3
       ErrorReporting.capture_exception(e)

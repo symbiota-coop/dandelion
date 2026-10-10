@@ -172,14 +172,14 @@ Dandelion::App.controller do
 
   get '/e/:slug', provides: %i[html ics json jpg], prerender: true do
     session[:via] = params[:via] if params[:via]
-    @event = Event.with_key_includes.without(:embedding).find_by(slug: params[:slug])
+    @event = Event.with_key_includes.without(:embedding, :voyage_embedding).find_by(slug: params[:slug])
     if !@event && params[:slug] =~ /[A-Z]/
-      @event = Event.with_key_includes.without(:embedding).find_by(slug: params[:slug].downcase)
+      @event = Event.with_key_includes.without(:embedding, :voyage_embedding).find_by(slug: params[:slug].downcase)
       redirect "/e/#{@event.slug}" if @event
     end
     unless @event
       id = params[:slug]
-      @event = Event.with_key_includes.without(:embedding).find(id) || not_found
+      @event = Event.with_key_includes.without(:embedding, :voyage_embedding).find(id) || not_found
       redirect request.url.gsub(id, @event.slug) if @event.slug
     end
 

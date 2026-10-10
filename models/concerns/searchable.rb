@@ -4,6 +4,9 @@ module Searchable
   # Hard cap on vector-enhanced search; beyond this we run text-only Atlas Search instead.
   VECTOR_EMBEDDING_TIMEOUT_SECONDS = 1.0
   VECTOR_AGGREGATE_MAX_TIME_MS = 1_000
+  # The field holding OpenRouter embeddings (see OpenRouter::EMBEDDING_DEFAULTS) and the Atlas Vector Search index on it
+  EMBEDDING_FIELD = 'voyage_embedding'.freeze
+  VECTOR_INDEX = 'voyage_vector_index'.freeze
   # Atlas Search (mongot) timeout. Distinct from MongoDB MaxTimeMSExpired (code 50).
   MONGOT_TIMEOUT_CODE = 65_160
 
@@ -94,14 +97,14 @@ module Searchable
         suffix_stages = []
         suffix_stages << { '$match': remaining_selector } if remaining_selector.any?
         suffix_stages << { '$limit': limit } if limit
-        suffix_stages << { '$unset' => %w[embedding] } if build_records && fields.key?('embedding')
+        suffix_stages << { '$unset' => ['embedding', EMBEDDING_FIELD] } if build_records && fields.key?(EMBEDDING_FIELD)
         suffix_stages << { '$project': { _id: 1 } } unless build_records
 
         # Try to get embedding for vector search if enabled and model has embedding field
         query_vector = nil
-        if vector_weight && vector_weight > 0 && fields.key?('embedding')
+        if vector_weight && vector_weight > 0 && fields.key?(EMBEDDING_FIELD)
           query_vector = begin
-            OpenRouter.embedding(query, timeout: VECTOR_EMBEDDING_TIMEOUT_SECONDS)
+            OpenRouter.embedding(query, input_type: 'search_query', timeout: VECTOR_EMBEDDING_TIMEOUT_SECONDS)
           rescue StandardError
             nil
           end
@@ -121,8 +124,8 @@ module Searchable
             num_candidates = 20 * fetch_limit
 
             vector_search_stage = {
-              index: 'vector_index',
-              path: 'embedding',
+              index: VECTOR_INDEX,
+              path: EMBEDDING_FIELD,
               queryVector: query_vector,
               numCandidates: num_candidates,
               limit: fetch_limit

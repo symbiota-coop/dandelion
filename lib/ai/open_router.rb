@@ -5,6 +5,14 @@ class OpenRouter
     context_window_size: 1_000_000,
     reasoning_effort: 'low'
   }.freeze
+  # voyage-4-large at 1024 dimensions: better retrieval than gemini-embedding-001 at a third of its dimensions, and
+  # about twice as fast to embed a search query. The Voyage 4 models share an embedding space, so switching between
+  # them keeps existing vectors comparable; another model or dimension count means re-embedding every event and
+  # rebuilding Searchable::VECTOR_INDEX
+  EMBEDDING_DEFAULTS = {
+    model: 'voyageai/voyage-4-large',
+    dimensions: 1024
+  }.freeze
   PROMPT_LOG_LIMIT = 10_000
 
   class << self
@@ -93,11 +101,14 @@ class OpenRouter
     result
   end
 
-  def embedding(input, full_response: false, model: 'google/gemini-embedding-001', timeout: nil)
+  # input_type is search_query for a search and search_document for what it searches; Voyage embeds them differently
+  def embedding(input, full_response: false, model: EMBEDDING_DEFAULTS[:model], dimensions: EMBEDDING_DEFAULTS[:dimensions], input_type: nil, timeout: nil)
     payload = {
       model: model,
-      input: input
+      input: input,
+      dimensions: dimensions
     }
+    payload[:input_type] = input_type if input_type
 
     response = api_post('/api/v1/embeddings', payload, timeout: timeout)
 

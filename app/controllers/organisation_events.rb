@@ -88,7 +88,7 @@ Dandelion::App.controller do
         map_json(@events)
       else
         # Regular JSON response for events
-        @events = @events.without(:extra_info_for_ticket_email, :embedding)
+        @events = @events.without(:extra_info_for_ticket_email, :embedding, :voyage_embedding)
         @events = @events.live
 
         if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
