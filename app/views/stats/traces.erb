@@ -49,7 +49,6 @@
               <th><%= title %></th>
             <% end %>
           <% end %>
-          <th class="d-none d-md-table-cell">Status</th>
           <th class="d-none d-md-table-cell">Commit</th>
         </tr>
       </thead>
@@ -62,12 +61,10 @@
               <% if trace.xhr %>
                 <span class="badge text-bg-secondary ms-1">XHR</span>
               <% end %>
-              <%# On phones the status goes here, in place of its column %>
-              <span class="d-md-none"><%= partial :'stats/trace_status', locals: { trace: trace } %></span>
+              <%= partial :'stats/trace_status', locals: { trace: trace } %>
             </td>
             <td class="text-end text-nowrap"><%= trace.duration_ms.round %> ms</td>
             <td class="text-end d-none d-md-table-cell"><%= trace.span_count %></td>
-            <td class="d-none d-md-table-cell"><%= partial :'stats/trace_status', locals: { trace: trace } %></td>
             <td class="d-none d-md-table-cell">
               <% if trace.release %>
                 <a target="_blank" href="https://github.com/symbiota-coop/dandelion/commit/<%= trace.release %>"><code><%= trace.release[0..6] %></code></a>
