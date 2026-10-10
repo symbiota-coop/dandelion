@@ -3,14 +3,13 @@
 <h2>Transactions</h2>
 <p class="text-body-secondary">Durations of the saved traces, by transaction (other than the /stats pages), most total time first.</p>
 
-<% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
-  <div class="form-group">
-    <%= select_tag :percentile, options: %w[p50 p99 p100], selected: @percentile, class: 'form-select' %>
-  </div>
-  <div class="form-group">
-    <label>over</label>
-    <%= number_field_tag :min_s, class: 'form-control', style: 'width: 5rem', value: @min_s.to_s.delete_suffix('.0'), step: 'any', min: 0, autocomplete: 'off' %>
-    <label class="ms-1">seconds</label>
+<%# A flex row rather than .form-inline, which stacks its fields on phones: this one is short enough to fit %>
+<% form_tag '', method: 'get', class: 'submitOnChange d-flex flex-wrap align-items-center gap-2 mb-3' do %>
+  <%= select_tag :percentile, options: %w[p50 p99 p100], selected: @percentile, class: 'form-select w-auto' %>
+  <div class="d-flex align-items-center gap-1">
+    <label for="min_s" class="mb-0">over</label>
+    <%= number_field_tag :min_s, id: 'min_s', class: 'form-control', style: 'width: 4rem', value: @min_s.to_s.delete_suffix('.0'), step: 'any', min: 0, autocomplete: 'off' %>
+    <label for="min_s" class="mb-0">seconds</label>
   </div>
   <%= submit_tag 'Filter', class: 'btn btn-primary' %>
 <% end %>
