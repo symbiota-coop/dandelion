@@ -423,6 +423,27 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert_includes ticket_type.errors[:slots], 'must not be < 0'
   end
 
+  test 'availability of every ticket type reads the ticket types once rather than once per type sold' do
+    create_event(prices: [0] * 10, capacity: 100)
+    @event.ticket_types.each { |ticket_type| ticket_type.tickets.create!(event: @event, payment_completed: true) }
+    event = Event.find(@event.id)
+    commands = []
+    subscriber = Object.new
+    subscriber.define_singleton_method(:started) { |e| commands << e.command }
+    subscriber.define_singleton_method(:succeeded) { |_| nil }
+    subscriber.define_singleton_method(:failed) { |_| nil }
+    Mongoid.default_client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
+
+    # As the event page's structured data does: each type's availability while iterating the types
+    availability = event.ticket_types.map(&:number_of_tickets_available_in_single_purchase)
+
+    assert_equal 10, availability.size
+    assert_equal 90, event.places_remaining
+    assert_operator commands.count { |c| c['find'] == 'ticket_types' }, :<=, 2
+  ensure
+    Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber) if subscriber
+  end
+
   test 'event places remaining uses slots rather than ticket count' do
     create_event(prices: [0], capacity: 10)
     ticket_type = @event.ticket_types.first
