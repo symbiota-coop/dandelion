@@ -1,5 +1,5 @@
 <h2>Traces</h2>
-<p class="text-body-secondary">Sampled transactions and their spans, newest first. Saved by Sentry's <code>before_send_transaction</code> in place of sending them to Sentry.</p>
+<p class="text-body-secondary">Transactions and their spans, saved by Sentry's <code>before_send_transaction</code>.</p>
 
 <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
   <div class="form-group">
@@ -14,6 +14,8 @@
     <label>At least (ms)</label>
     <%= number_field_tag :min_ms, class: 'form-control', value: params[:min_ms], autocomplete: 'off' %>
   </div>
+  <%= hidden_field_tag :sort, value: @sort %>
+  <%= hidden_field_tag :dir, value: @sort_dir %>
   <%= submit_tag 'Search', class: 'btn btn-primary' %>
 <% end %>
 
@@ -24,6 +26,7 @@
 <script>
   $(function () {
     $('#trace-name').select2({ theme: 'bootstrap-5', width: '20rem' })
+    $('#traces-table').on('click', 'th[data-href]', function () { window.location = $(this).data('href') })
   })
 </script>
 
@@ -31,13 +34,23 @@
   <p class="text-body-secondary">No traces saved yet</p>
 <% else %>
   <div class="table-responsive">
-    <table class="table table-hover">
+    <%# Sortable headers have DataTables' markup and classes, for its sort icons; clicking one reloads the page sorted by it %>
+    <table id="traces-table" class="dataTable table table-hover">
       <thead>
         <tr>
-          <th>Time</th>
-          <th>Transaction</th>
-          <th class="text-end">Duration</th>
-          <th class="text-end">Spans</th>
+          <% [[:time, 'Time', nil], [nil, 'Transaction', nil], [:duration, 'Duration', 'text-end'], [:spans, 'Spans', 'text-end']].each do |key, title, th_class| %>
+            <% if key %>
+              <% sorted = @sort == key.to_s %>
+              <th class="<%= th_class %> dt-orderable-asc dt-orderable-desc <%= "dt-ordering-#{@sort_dir}" if sorted %>" data-href="?<%= Rack::Utils.build_query(params.slice('name', 'xhr', 'min_ms').merge('sort' => key.to_s, 'dir' => sorted && @sort_dir == 'desc' ? 'asc' : 'desc')) %>">
+                <div class="dt-column-header">
+                  <div class="dt-column-title"><%= title %></div>
+                  <div class="dt-column-order" role="button" tabindex="0"></div>
+                </div>
+              </th>
+            <% else %>
+              <th><%= title %></th>
+            <% end %>
+          <% end %>
           <th>Status</th>
           <th>Commit</th>
         </tr>
