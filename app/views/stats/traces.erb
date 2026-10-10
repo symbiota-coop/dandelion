@@ -1,7 +1,25 @@
 <link rel="stylesheet" href="<%= cachebust('/stylesheets/traces.css') %>">
 
-<h2>Traces</h2>
-<p class="text-body-secondary">Transactions and their spans, saved by Sentry's <code>before_send_transaction</code>.</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <h2 class="mb-0">Traces</h2>
+  <%# Every release but the oldest has traces before it to delete %>
+  <% if @releases.size > 1 %>
+    <button type="button" class="btn btn-secondary btn-sm" id="delete-traces-toggle"><i class="bi bi-trash"></i> Delete old traces</button>
+  <% end %>
+</div>
+<p class="text-body-secondary mt-2">Transactions and their spans, saved by Sentry's <code>before_send_transaction</code>.</p>
+
+<% if @releases.size > 1 %>
+  <div id="delete-traces" class="mb-3" style="display: none">
+    <% form_tag '/stats/traces/delete_before', method: 'post' do %>
+      <label for="delete-traces-release" class="form-label">Delete traces from commits before</label>
+      <div class="d-flex flex-wrap gap-2">
+        <%= select_tag :release, options: @releases[0..-2].map { |release, time| ["#{release[0..6]} (#{time.strftime('%b %d %H:%M')})", release] }, class: 'form-select w-auto', id: 'delete-traces-release' %>
+        <%= submit_tag 'Delete', class: 'btn btn-danger', 'data-confirm' => 'Delete every trace saved by an earlier commit?' %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
 
 <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
   <div class="form-group">
@@ -24,6 +42,7 @@
 <script>
   $(function () {
     $('#trace-name').select2({ theme: 'bootstrap-5', width: '20rem' })
+    $('#delete-traces-toggle').click(function () { $('#delete-traces').toggle() })
     $('#traces-table').on('click', 'th[data-href]', function () { window.location = $(this).data('href') })
   })
 </script>
@@ -74,15 +93,4 @@
     </table>
   </div>
   <%= will_paginate @traces, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
-<% end %>
-
-<%# Every release but the oldest has traces before it to delete %>
-<% if @releases.size > 1 %>
-  <% form_tag '/stats/traces/delete_before', method: 'post', class: 'form-inline mt-5' do %>
-    <div class="form-group">
-      <label>Delete traces from commits before</label>
-      <%= select_tag :release, options: @releases[0..-2].map { |release, time| ["#{release[0..6]} (#{time.strftime('%b %d %H:%M')})", release] }, class: 'form-select' %>
-    </div>
-    <%= submit_tag 'Delete', class: 'btn btn-danger', 'data-confirm' => 'Delete every trace saved by an earlier commit?' %>
-  <% end %>
 <% end %>
