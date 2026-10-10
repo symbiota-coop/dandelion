@@ -22,15 +22,15 @@
   <% @summaries.each { |summary| sections[transaction_section(summary)] << summary } %>
   <% sections.each do |title, summaries| %>
     <% next if summaries.empty? %>
-    <h5 class="mt-4">
-      <%= title %>
-      <% if summaries.size > 10 %><small class="text-body-secondary">10 of <%= summaries.size %></small><% end %>
-    </h5>
-    <div class="table-responsive">
+    <div class="table-responsive mt-4">
       <table class="transactions-table table table-hover">
         <thead>
           <tr>
-            <th>Transaction</th>
+            <%# The section names the first column, so it reads as the table's heading %>
+            <th>
+              <%= title %>
+              <% if summaries.size > 10 %><small class="fw-normal text-body-secondary ms-1">10 of <%= summaries.size %></small><% end %>
+            </th>
             <%# On phones, of the percentiles only the one filtered by %>
             <% %w[p50 p99 p100].each do |percentile| %>
               <th class="text-end <%= 'd-none d-md-table-cell' unless percentile == @percentile %>"><%= percentile %></th>
