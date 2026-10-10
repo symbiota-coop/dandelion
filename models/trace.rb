@@ -13,7 +13,6 @@ class Trace
   field :url, type: String
   field :http_method, type: String
   field :release, type: String
-  field :tags, type: Hash
   field :xhr, type: Boolean
   field :started_at, type: Time
   field :duration_ms, type: Float
@@ -22,12 +21,17 @@ class Trace
 
   validates_presence_of :name, :started_at
 
+  # Span data that repeats what a span's op and description already say
+  REDUNDANT_SPAN_DATA = %w[db.system db.name db.operation db.collection.name db.duration_ms].freeze
+
+  # How far back a merged span tree looks (see Trace.span_tree)
+  SPAN_TREE_WINDOW = 3.hours
+
   # Called from Sentry's before_send_transaction, on Sentry's background thread.
   # Keeps what the span tree needs and leaves out the request's headers and cookies.
   def self.create_from_sentry_transaction(event)
     trace_context = event.contexts[:trace] || {}
-    spans = JSON.parse(JSON.generate(event.spans || [])).sort_by { |span| span['start_timestamp'].to_f }
-    add_self_times(spans)
+    spans = compact_spans(JSON.parse(JSON.generate(event.spans || [])), event.start_timestamp.to_f)
 
     create(
       name: event.transaction,
@@ -39,7 +43,6 @@ class Trace
       http_method: event.request&.method,
       account_id: event.user&.dig(:id),
       release: event.release,
-      tags: JSON.parse(JSON.generate(event.tags || {})),
       xhr: event.tags&.dig(:xhr) == 'true',
       started_at: Time.at(event.start_timestamp),
       duration_ms: ((event.timestamp.to_f - event.start_timestamp.to_f) * 1000).round(2),
@@ -48,11 +51,23 @@ class Trace
     )
   end
 
-  # A span's self time is its duration less its children's, so self times don't overlap and sum to at most the transaction's
-  def self.add_self_times(spans)
+  # Sentry's spans in order of start, cut down to what the span trees use: ids, op and description, start (ms into the
+  # transaction), time and self time (time less the children's, so self times don't overlap), and status and data
+  # when they add anything. A span with no status is ok
+  def self.compact_spans(spans, start_timestamp)
+    span_ms = ->(span) { (span['timestamp'].to_f - span['start_timestamp'].to_f) * 1000 }
     children_ms = Hash.new(0)
-    spans.each { |span| children_ms[span['parent_span_id']] += span_ms(span) }
-    spans.each { |span| span['self_ms'] = [span_ms(span) - children_ms[span['span_id']], 0].max.round(3) }
+    spans.each { |span| children_ms[span['parent_span_id']] += span_ms.call(span) }
+
+    spans.sort_by { |span| span['start_timestamp'].to_f }.map do |span|
+      data = span['data']&.except(*REDUNDANT_SPAN_DATA)
+      {
+        'id' => span['span_id'], 'parent_id' => span['parent_span_id'], 'op' => span['op'], 'description' => span['description'],
+        'start_ms' => ((span['start_timestamp'].to_f - start_timestamp) * 1000).round(3), 'ms' => span_ms.call(span).round(3),
+        'self_ms' => [span_ms.call(span) - children_ms[span['span_id']], 0].max.round(3),
+        'status' => (span['status'] unless span['status'] == 'ok'), 'data' => (data unless data.blank?)
+      }.compact
+    end
   end
 
   # The HTTP status if the request didn't succeed, or for traces without one, Sentry's status if it isn't ok
@@ -92,21 +107,20 @@ class Trace
 
   # This trace's spans as a tree, siblings in order of start, each with its data and status
   def span_tree
-    Trace.trace_span_tree(started_at, spans || [])
+    Trace.trace_span_tree(spans || [])
   end
 
   # Spans whose parent isn't in the list (children of the transaction itself) are at the top
-  def self.trace_span_tree(started_at, spans)
-    span_ids = spans.to_set { |span| span['span_id'] }
-    children = spans.group_by { |span| span['parent_span_id'] if span_ids.include?(span['parent_span_id']) }
-    children.transform_values! { |siblings| siblings.map { |span| span['span_id'] } }
-    spans_by_id = spans.index_by { |span| span['span_id'] }
-    start = [started_at.to_f, *spans.map { |span| span['start_timestamp'].to_f }].min
+  def self.trace_span_tree(spans)
+    span_ids = spans.to_set { |span| span['id'] }
+    children = spans.group_by { |span| span['parent_id'] if span_ids.include?(span['parent_id']) }
+    children.transform_values! { |siblings| siblings.map { |span| span['id'] } }
+    spans_by_id = spans.index_by { |span| span['id'] }
 
     flatten_tree(children, nil) do |span_id|
       span = spans_by_id[span_id]
       { op: span['op'], description: span['description'], data: span['data'], status: span['status'], per_trace: 1,
-        ms: span_ms(span), self_ms: span['self_ms'].to_f, offset_ms: (span['start_timestamp'].to_f - start) * 1000 }
+        ms: span['ms'], self_ms: span['self_ms'], offset_ms: span['start_ms'] }
     end
   end
 
@@ -117,11 +131,11 @@ class Trace
     traces = 0
     nodes = {}
     # Streamed from a cursor, so only the merged tree is held in memory
-    collection.find(criteria.selector).projection(started_at: 1, spans: 1).each do |doc|
+    collection.find(criteria.selector).projection(spans: 1).each do |doc|
       traces += 1
       paths = {}
       first_offsets = {}
-      trace_span_tree(doc['started_at'], doc['spans'] || []).each do |row|
+      trace_span_tree(doc['spans'] || []).each do |row|
         path = paths[row[:id]] = paths.fetch(row[:parent_id], []) + [[row[:op], row[:description]]]
         node = nodes[path] ||= { count: 0, ms: 0.0, self_ms: 0.0, offset_ms: 0.0, traces: 0 }
         node[:count] += 1
@@ -165,9 +179,5 @@ class Trace
       keys.zip(values).to_h.merge(%i[per_trace ms self_ms].to_h { |key| [key, rows.sum { |row| row[key] }] })
     end
     totals.sort_by { |row| -row[:self_ms] }
-  end
-
-  def self.span_ms(span)
-    (span['timestamp'].to_f - span['start_timestamp'].to_f) * 1000
   end
 end

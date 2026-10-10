@@ -18,50 +18,58 @@
       · p50 <%= format_duration(@summary[:p50_ms]) %>
       · p99 <%= format_duration(@summary[:p99_ms]) %>
       · p100 <%= format_duration(@summary[:max_ms]) %>
-      · <span data-bs-toggle="tooltip" title="The average request's time less the time in its top-level spans"><%= [@summary[:avg_ms] - @span_tree.select { |row| row[:depth].zero? }.sum { |row| row[:ms] }, 0].max.round %> ms outside any span</span>
+      <% if @recent_summary %>
+        · <span data-bs-toggle="tooltip" title="Over the last <%= Trace::SPAN_TREE_WINDOW.inspect %>, the average request's time less the time in its top-level spans"><%= [@recent_summary[:avg_ms] - @span_tree.select { |row| row[:depth].zero? }.sum { |row| row[:ms] }, 0].max.round %> ms outside any span</span>
+      <% end %>
     </p>
 
-    <h5 class="mt-4">Per request, by op</h5>
-    <p class="text-body-secondary small">Self time is a span's time less its children's (a partial's own work, not the queries and partials inside it), so it adds up across ops; whatever's left of the mean was spent outside any span.</p>
-    <%= partial :'stats/span_ops', locals: { rows: @span_tree } %>
+    <% if !@recent_summary %>
+      <p class="text-body-secondary">No traces in the last <%= Trace::SPAN_TREE_WINDOW.inspect %>, so no breakdown by span</p>
+    <% else %>
+      <p class="text-body-secondary">The breakdowns below are averaged over the <%= pluralize(@recent_summary[:count], 'trace') %> from the last <%= Trace::SPAN_TREE_WINDOW.inspect %>.</p>
 
-    <h5 class="mt-4">Per request, as a tree</h5>
-    <p class="text-body-secondary small">The same traces' spans merged: spans with the same op and description in the same place in the tree are one row. A bar starts where the span first starts on average and is as long as its time per request.</p>
-    <%= partial :'stats/span_tree', locals: { rows: @span_tree, total_ms: @summary[:avg_ms], per_request: true, sort: 'ms', sort_dir: -1 } %>
+      <h5 class="mt-4">Per request, by op</h5>
+      <p class="text-body-secondary small">Self time is a span's time less its children's (a partial's own work, not the queries and partials inside it), so it adds up across ops; whatever's left of the mean was spent outside any span.</p>
+      <%= partial :'stats/span_ops', locals: { rows: @span_tree } %>
 
-    <h5 class="mt-4">Per request, by span</h5>
-    <div class="table-responsive">
-      <table id="span-breakdown-table" class="table table-sm table-hover">
-        <thead>
-          <tr>
-            <th>Op</th>
-            <th>Description</th>
-            <th class="text-end">Per request</th>
-            <th class="text-end">Time each</th>
-            <th class="text-end">Time per request</th>
-            <th class="text-end">Self time per request</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% Trace.span_totals(@span_tree, :op, :description).each do |row| %>
+      <h5 class="mt-4">Per request, as a tree</h5>
+      <p class="text-body-secondary small">The same traces' spans merged: spans with the same op and description in the same place in the tree are one row. A bar starts where the span first starts on average and is as long as its time per request.</p>
+      <%= partial :'stats/span_tree', locals: { rows: @span_tree, total_ms: @recent_summary[:avg_ms], per_request: true, sort: 'ms', sort_dir: -1 } %>
+
+      <h5 class="mt-4">Per request, by span</h5>
+      <div class="table-responsive">
+        <table id="span-breakdown-table" class="table table-sm table-hover">
+          <thead>
             <tr>
-              <td><code><%= row[:op] %></code></td>
-              <td class="small"><%= row[:description] %></td>
-              <td class="text-end text-nowrap" data-order="<%= row[:per_trace] %>"><%= format('%.2f', row[:per_trace]) %></td>
-              <td class="text-end text-nowrap" data-order="<%= row[:ms] / row[:per_trace] %>"><%= (row[:ms] / row[:per_trace]).round(1) %> ms</td>
-              <td class="text-end text-nowrap" data-order="<%= row[:ms] %>"><%= row[:ms].round(1) %> ms</td>
-              <td class="text-end text-nowrap" data-order="<%= row[:self_ms] %>"><%= row[:self_ms].round(1) %> ms</td>
+              <th>Op</th>
+              <th>Description</th>
+              <th class="text-end">Per request</th>
+              <th class="text-end">Time each</th>
+              <th class="text-end">Time per request</th>
+              <th class="text-end">Self time per request</th>
             </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            <% Trace.span_totals(@span_tree, :op, :description).each do |row| %>
+              <tr>
+                <td><code><%= row[:op] %></code></td>
+                <td class="small"><%= row[:description] %></td>
+                <td class="text-end text-nowrap" data-order="<%= row[:per_trace] %>"><%= format('%.2f', row[:per_trace]) %></td>
+                <td class="text-end text-nowrap" data-order="<%= row[:ms] / row[:per_trace] %>"><%= (row[:ms] / row[:per_trace]).round(1) %> ms</td>
+                <td class="text-end text-nowrap" data-order="<%= row[:ms] %>"><%= row[:ms].round(1) %> ms</td>
+                <td class="text-end text-nowrap" data-order="<%= row[:self_ms] %>"><%= row[:self_ms].round(1) %> ms</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
 
-    <script>
-      $(function () {
-        $('#span-breakdown-table').DataTable({ paging: false, searching: false, info: false, order: [[4, 'desc']] })
-      })
-    </script>
+      <script>
+        $(function () {
+          $('#span-breakdown-table').DataTable({ paging: false, searching: false, info: false, order: [[4, 'desc']] })
+        })
+      </script>
+    <% end %>
   <% end %>
 <% else %>
   <h2>Transactions</h2>

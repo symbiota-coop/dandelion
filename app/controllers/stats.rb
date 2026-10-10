@@ -190,7 +190,10 @@ Dandelion::App.controller do
       @traces = @traces.and(xhr: params[:xhr] == '1') if params[:xhr]
       # By name alone, so without an XHR filter it covers the XHR and other traces together, as the span tree does
       @summary = @traces.summary(by_xhr: false).first
-      @span_tree = @traces.span_tree
+      # The span tree reads every span, so it's limited to recent traces, with their own summary for its averages
+      recent_traces = @traces.and(:created_at.gte => Trace::SPAN_TREE_WINDOW.ago)
+      @recent_summary = recent_traces.summary(by_xhr: false).first
+      @span_tree = recent_traces.span_tree
     else
       # Only transactions whose p50, p99 or p100 is over a number of seconds, by default p99 over 2
       @percentile = %w[p50 p99 p100].include?(params[:percentile]) ? params[:percentile] : 'p99'
@@ -206,7 +209,7 @@ Dandelion::App.controller do
     @traces = @traces.and(name: params[:name]) if params[:name]
     @traces = @traces.and(xhr: params[:xhr] == '1') if params[:xhr]
     @traces = @traces.slower_than(params[:min_ms].to_f) if params[:min_ms]
-    @traces = @traces.only(:name, :status, :http_status, :url, :http_method, :account_id, :tags, :xhr, :release, :started_at, :duration_ms, :span_count, :created_at).paginate(page: params[:page], per_page: 50)
+    @traces = @traces.only(:name, :status, :http_status, :url, :http_method, :account_id, :xhr, :release, :started_at, :duration_ms, :span_count, :created_at).paginate(page: params[:page], per_page: 50)
     erb :'stats/traces'
   end
 
