@@ -1,4 +1,4 @@
-<%# A span tree (see Trace.span_tree and Trace#span_tree, span_tree.js and traces.css): rows that open and shut, headers that sort, and bars on a timeline of total_ms or longer. per_request adds a column for how often each span runs (for a merged tree); sort and sort_dir say how the rows are ordered %>
+<%# A span tree (see Trace.span_tree and Trace#span_tree, span_tree.js and traces.css): rows that open and shut, headers that sort, and bars on a timeline of total_ms or longer. per_request adds a column for how often each span runs (for a merged tree); sort and sort_dir say how the rows are ordered. On phones only the span and its time show %>
 <% total_ms = [total_ms, *rows.map { |row| row[:offset_ms] + row[:ms] }, 1].max %>
 <div class="table-responsive">
   <%# Headers have DataTables' markup and classes (dataTable, dt-orderable-*, dt-ordering-*), so they get its sort icons %>
@@ -7,10 +7,10 @@
       <tr>
         <% [
              ['name', 'Span', nil, nil],
-             (['per', 'Per request', 'text-end', 'How many times the span runs in an average request'] if per_request),
+             (['per', 'Per request', 'text-end d-none d-md-table-cell', 'How many times the span runs in an average request'] if per_request),
              ['ms', 'Time', 'text-end', nil],
-             ['self', 'Self time', 'text-end', "The span's time less its children's"],
-             ['start', 'Start', 'w-25', nil]
+             ['self', 'Self time', 'text-end d-none d-md-table-cell', "The span's time less its children's"],
+             ['start', 'Start', 'w-25 d-none d-md-table-cell', nil]
            ].compact.each do |key, title, th_class, tooltip| %>
           <th class="<%= th_class %> dt-orderable-asc dt-orderable-desc" data-sort="<%= key %>">
             <div class="dt-column-header">
@@ -34,7 +34,7 @@
               <% end %>
               <span class="span-tree-text">
                 <code><%= row[:op] %></code>
-                <span class="small" data-bs-toggle="<%= 'tooltip' if row[:data] %>" title="<%= row[:data]&.map { |k, v| "#{k}: #{v}" }&.join("\n") %>"><%= row[:description] %></span>
+                <span class="small" data-bs-toggle="<%= 'tooltip' if row[:data] %>" title="<%= row[:data]&.map { |k, v| "#{k}: #{v}" }&.join("\n") %>"><%= wrap_at_separators(row[:description]) %></span>
                 <% if row[:status] && row[:status] != 'ok' %>
                   <span class="badge text-bg-danger ms-1"><%= row[:status] %></span>
                 <% end %>
@@ -42,11 +42,11 @@
             </div>
           </td>
           <% if per_request %>
-            <td class="text-end"><%= format('%.2f', row[:per_trace]) %></td>
+            <td class="text-end d-none d-md-table-cell"><%= format('%.2f', row[:per_trace]) %></td>
           <% end %>
           <td class="text-end text-nowrap"><%= row[:ms].round(1) %> ms</td>
-          <td class="text-end text-nowrap"><%= row[:self_ms].round(1) %> ms</td>
-          <td class="align-middle">
+          <td class="text-end text-nowrap d-none d-md-table-cell"><%= row[:self_ms].round(1) %> ms</td>
+          <td class="align-middle d-none d-md-table-cell">
             <div class="progress position-relative" role="presentation">
               <div class="progress-bar position-absolute h-100 <%= 'bg-secondary' if row[:op].to_s.start_with?('db.') %>" style="inset-inline-start: <%= (100.0 * row[:offset_ms] / total_ms).round(2) %>%; width: <%= [100.0 * row[:ms] / total_ms, 0.3].max.round(2) %>%"></div>
             </div>

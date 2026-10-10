@@ -180,9 +180,15 @@ tr.collapsed .span-tree-count .bi {
     width: 4.5rem;
   }
 
+  /* Span trees step in less at each level */
+  .span-tree-label {
+    --span-tree-step: var(--space-base);
+  }
+
   /* table-sm's padding, so the columns fit a phone */
   .transactions-table > :not(caption) > * > *,
-  #span-breakdown-table > :not(caption) > * > * {
+  #span-breakdown-table > :not(caption) > * > *,
+  #traces-table > :not(caption) > * > * {
     padding-inline: var(--space-xs);
   }
 }
