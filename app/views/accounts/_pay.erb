@@ -45,9 +45,14 @@
                   $('.oc-tier').hover(function() { $(this).children().addClass('bg-primary-hover text-white border-white') }, function() { $(this).children().removeClass('bg-primary-hover text-white border-white') })
                 });
               </script>
+              <style>
+                @media (max-width: 575.98px) {
+                  .oc-tier .btn:last-child { margin-left: 0; border-radius: var(--bs-btn-border-radius) }
+                }
+              </style>
               <% [['Seed 🌱', 5, 'https://buy.stripe.com/fZedUhdmW1jC3VCaEG'], ['Butterfly 🦋', 10, 'https://buy.stripe.com/3cs8zXaaKd2k63K147'], ['Bee 🐝', 20, 'https://buy.stripe.com/fZe17vdmWgew4ZGcMQ']].each { |name,amount,url| %>
               <div class="btn-group oc-tier mb-1" role="group">
-                <a target="_blank" class="btn btn-outline-primary" href="<%=url%>"><%=name%></a>
+                <a target="_blank" class="btn btn-outline-primary d-none d-sm-inline-block" href="<%=url%>"><%=name%></a>
                 <a target="_blank" class="btn btn-outline-primary" href="<%=url%>">£<%=amount%></a>
               </div>
               <% } %>
