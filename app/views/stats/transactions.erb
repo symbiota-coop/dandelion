@@ -90,8 +90,8 @@
   <% if @summaries.empty? %>
     <p class="text-body-secondary">No transactions with a <%= @percentile %> over <%= @min_s.to_s.delete_suffix('.0') %> seconds</p>
   <% else %>
-    <% sections = { 'GET' => [], 'POST' => [], 'XHR' => [], 'Other' => [] } %>
-    <% @summaries.each { |summary| sections[summary[:xhr] ? 'XHR' : (%w[GET POST] & [summary[:name].split.first]).first || 'Other'] << summary } %>
+    <% sections = { 'GET' => [], 'POST' => [], 'XHR' => [], 'Jobs' => [], 'Other' => [] } %>
+    <% @summaries.each { |summary| sections[transaction_section(summary)] << summary } %>
     <% sections.each do |title, summaries| %>
       <% next if summaries.empty? %>
       <h5 class="mt-4">

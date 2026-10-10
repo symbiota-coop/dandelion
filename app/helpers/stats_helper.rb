@@ -40,6 +40,17 @@ Dandelion::App.helpers do
     query
   end
 
+  # Which section of /stats/transactions a transaction goes in: XHR, GET or POST, Jobs for background jobs (named by
+  # their class and method, not an HTTP method and path), or Other
+  def transaction_section(summary)
+    method = summary[:name][/\A[A-Z]+(?= |\z)/]
+    if summary[:xhr] then 'XHR'
+    elsif %w[GET POST].include?(method) then method
+    elsif method then 'Other'
+    else 'Jobs'
+    end
+  end
+
   # A duration in ms in the largest unit that keeps it above 1: 78 ms, 44.1 s, 12.5 min, 3.2 h
   def format_duration(ms)
     if ms < 1000 then "#{ms.round} ms"
