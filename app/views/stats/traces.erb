@@ -66,9 +66,7 @@
             <td class="text-end text-nowrap"><%= trace.duration_ms.round %> ms</td>
             <td class="text-end d-none d-md-table-cell"><%= trace.span_count %></td>
             <td class="d-none d-md-table-cell">
-              <% if trace.release %>
-                <a target="_blank" href="https://github.com/symbiota-coop/dandelion/commit/<%= trace.release %>"><code><%= trace.release[0..6] %></code></a>
-              <% end %>
+              <%= commit_link(trace.release) if trace.release %>
             </td>
           </tr>
         <% end %>

@@ -1,12 +1,12 @@
-RUNNING_COMMIT_TIMES = {} # rubocop:disable Style/MutableConstant
+COMMIT_TIMES = {} # rubocop:disable Style/MutableConstant
 
 Dandelion::App.helpers do
-  # When the running commit was made: from the local git history if the deploy has it, otherwise from GitHub.
-  # Looked up once per process, as the commit can't change without a restart
-  def running_commit_time(commit)
-    return RUNNING_COMMIT_TIMES[commit] if RUNNING_COMMIT_TIMES.key?(commit)
+  # When a commit was made: from the local git history if the deploy has it, otherwise from GitHub.
+  # Looked up once per process, as a commit's time never changes
+  def commit_time(commit)
+    return COMMIT_TIMES[commit] if COMMIT_TIMES.key?(commit)
 
-    RUNNING_COMMIT_TIMES[commit] = begin
+    COMMIT_TIMES[commit] = begin
       require 'open3'
       output, status = Open3.capture2('git', '-C', Padrino.root, 'show', '-s', '--format=%cI', commit, err: File::NULL)
       if status.success? && !output.strip.empty?
@@ -22,7 +22,16 @@ Dandelion::App.helpers do
   # The releases traces were saved by, with when each was committed, newest first. Releases whose commit time can't be
   # found are left out
   def trace_releases
-    Trace.distinct(:release).compact.filter_map { |release| (time = running_commit_time(release)) && [release, time] }.sort_by { |_release, time| time }.reverse
+    Trace.distinct(:release).compact.filter_map { |release| (time = commit_time(release)) && [release, time] }.sort_by { |_release, time| time }.reverse
+  end
+
+  def commit_url(commit)
+    "https://github.com/symbiota-coop/dandelion/commit/#{commit}"
+  end
+
+  # A commit's short hash, linking to it on GitHub
+  def commit_link(commit)
+    %(<a target="_blank" href="#{ERB::Util.html_escape(commit_url(commit))}"><code>#{ERB::Util.html_escape(commit[0..6])}</code></a>).html_safe
   end
 
   # A compact age like 8m, 2h, 3d or 1y

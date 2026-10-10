@@ -6,10 +6,8 @@ class Trace
   belongs_to_without_parent_validation :account, optional: true, inverse_of: nil
 
   field :name, type: String
-  field :op, type: String
   field :status, type: String
   field :http_status, type: Integer
-  field :trace_id, type: String
   field :url, type: String
   field :http_method, type: String
   field :release, type: String
@@ -34,10 +32,8 @@ class Trace
 
     create(
       name: event.transaction,
-      op: trace_context[:op],
       status: trace_context[:status],
       http_status: trace_context[:data]&.dig(Sentry::Span::DataConventions::HTTP_STATUS_CODE),
-      trace_id: trace_context[:trace_id],
       url: event.request&.url,
       http_method: event.request&.method,
       account_id: event.user&.dig(:id),
@@ -98,7 +94,7 @@ class Trace
   # Also serves a transaction's traces sorted by duration on /stats/traces
   SUMMARY_INDEX = { name: 1, xhr: 1, duration_ms: -1 }.freeze
 
-  # Count, total and mean, p50, p99 and max (p100) duration per transaction: per name and whether it's XHR (pagelets
+  # Count, total, p50, p99 and p100 (max) duration per transaction: per name and whether it's XHR (pagelets
   # share routes with pages). Most total time first.
   # Reads only fields in SUMMARY_INDEX, so with that index (which must exist: it's hinted) the spans aren't loaded.
   def self.summary
@@ -109,12 +105,12 @@ class Trace
                              count: { '$sum' => 1 },
                              total_ms: { '$sum' => '$duration_ms' },
                              percentiles_ms: { '$percentile' => { input: '$duration_ms', p: [0.5, 0.99], method: 'approximate' } },
-                             max_ms: { '$max' => '$duration_ms' }
+                             p100_ms: { '$max' => '$duration_ms' }
                            } },
                            { '$sort' => { total_ms: -1 } }
                          ], hint: SUMMARY_INDEX.stringify_keys).map do |row|
-      { name: row['_id']['name'], xhr: row['_id']['xhr'], count: row['count'], total_ms: row['total_ms'], avg_ms: row['total_ms'] / row['count'],
-        p50_ms: row['percentiles_ms'][0], p99_ms: row['percentiles_ms'][1], max_ms: row['max_ms'] }
+      { name: row['_id']['name'], xhr: row['_id']['xhr'], count: row['count'], total_ms: row['total_ms'],
+        p50_ms: row['percentiles_ms'][0], p99_ms: row['percentiles_ms'][1], p100_ms: row['p100_ms'] }
     end
   end
 

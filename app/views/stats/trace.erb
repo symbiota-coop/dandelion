@@ -15,7 +15,7 @@
     · <a href="/u/<%= @trace.account.username %>"><%= @trace.account.name %></a>
   <% end %>
   <% if @trace.release %>
-    · <a target="_blank" href="https://github.com/symbiota-coop/dandelion/commit/<%= @trace.release %>"><code><%= @trace.release[0..6] %></code></a>
+    · <%= commit_link(@trace.release) %>
   <% end %>
 </p>
 <% if @trace.url %>

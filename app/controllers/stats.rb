@@ -188,8 +188,7 @@ Dandelion::App.controller do
     # Only transactions whose p50, p99 or p100 is over a number of seconds, by default p99 over 2
     @percentile = %w[p50 p99 p100].include?(params[:percentile]) ? params[:percentile] : 'p99'
     @min_s = params[:min_s] ? params[:min_s].to_f : 2
-    key = { 'p50' => :p50_ms, 'p99' => :p99_ms, 'p100' => :max_ms }[@percentile]
-    @summaries = Trace.summary.select { |summary| summary[key] > @min_s * 1000 }
+    @summaries = Trace.summary.select { |summary| summary[:"#{@percentile}_ms"] > @min_s * 1000 }
     erb :'stats/transactions'
   end
 
@@ -208,8 +207,8 @@ Dandelion::App.controller do
 
   # Deletes the traces of every release committed before the given one
   post '/stats/traces/delete_before' do
-    commit_time = running_commit_time(params[:release]) || halt(400)
-    releases = trace_releases.select { |_release, time| time < commit_time }.map(&:first)
+    before = commit_time(params[:release]) || halt(400)
+    releases = trace_releases.select { |_release, time| time < before }.map(&:first)
     count = Trace.and(:release.in => releases).delete_all
     flash[:notice] = "Deleted #{pluralize(count, 'trace')} from before #{params[:release][0..6]}"
     redirect '/stats/traces'

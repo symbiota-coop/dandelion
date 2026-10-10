@@ -6,13 +6,13 @@
 </li>
 <%# In development there's no RENDER_GIT_COMMIT, so the local HEAD stands in for it %>
 <% if (commit = ENV['RENDER_GIT_COMMIT'] || (`git -C #{Padrino.root} rev-parse HEAD 2>/dev/null`.strip if Padrino.env == :development)) %>
-  <% commit_time = running_commit_time(commit) %>
+  <% committed_at = commit_time(commit) %>
   <li class="nav-item">
-    <a id="running-commit" class="nav-link d-flex align-items-center gap-2" target="_blank" href="https://github.com/symbiota-coop/dandelion/commit/<%= commit %>">
+    <a id="running-commit" class="nav-link d-flex align-items-center gap-2" target="_blank" href="<%= commit_url(commit) %>">
       <i class="bi bi-git"></i>
-      <% if commit_time %>
+      <% if committed_at %>
         <span>
-          <span class="badge text-bg-dark"><%= short_time_ago(commit_time) %></span>
+          <span class="badge text-bg-dark"><%= short_time_ago(committed_at) %></span>
           <span class="badge text-bg-dark running-commit-hash" style="display: none"><%= commit[0..6] %></span>
         </span>
       <% else %>
