@@ -3,7 +3,8 @@
 <h2>Traces</h2>
 <p class="text-body-secondary">Transactions and their spans, saved by Sentry's <code>before_send_transaction</code>.</p>
 
-<% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
+<%# The Delete old traces link sits close under the filters, so the form keeps no margin of its own when it's there %>
+<% form_tag '', method: 'get', class: "submitOnChange searchForm form-inline #{@releases.size > 1 ? 'mb-0' : 'mb-3'}" do %>
   <div class="form-group">
     <label>Transaction</label>
     <%= select_tag :name, options: [['All', '']] + Trace.distinct(:name).sort, selected: params[:name], class: 'form-select', id: 'trace-name' %>
