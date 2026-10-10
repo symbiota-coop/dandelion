@@ -184,6 +184,38 @@ Dandelion::App.controller do
     erb :'stats/sentry_spans'
   end
 
+  get '/stats/transactions' do
+    if params[:name]
+      @traces = Trace.and(name: params[:name])
+      @traces = @traces.and(xhr: params[:xhr] == '1') if params[:xhr]
+      # By name alone, so without an XHR filter it covers the XHR and other traces together, as the span tree does
+      @summary = @traces.summary(by_xhr: false).first
+      @span_tree = @traces.span_tree
+    else
+      # Only transactions whose p50, p99 or p100 is over a number of seconds, by default p99 over 2
+      @percentile = %w[p50 p99 p100].include?(params[:percentile]) ? params[:percentile] : 'p99'
+      @min_s = params[:min_s] ? params[:min_s].to_f : 2
+      key = { 'p50' => :p50_ms, 'p99' => :p99_ms, 'p100' => :max_ms }[@percentile]
+      @summaries = Trace.summary.select { |summary| summary[key] > @min_s * 1000 }
+    end
+    erb :'stats/transactions'
+  end
+
+  get '/stats/traces' do
+    @traces = Trace.order('created_at desc')
+    @traces = @traces.and(name: params[:name]) if params[:name]
+    @traces = @traces.and(xhr: params[:xhr] == '1') if params[:xhr]
+    @traces = @traces.slower_than(params[:min_ms].to_f) if params[:min_ms]
+    @traces = @traces.only(:name, :status, :http_status, :url, :http_method, :account_id, :tags, :xhr, :release, :started_at, :duration_ms, :span_count, :created_at).paginate(page: params[:page], per_page: 50)
+    erb :'stats/traces'
+  end
+
+  get '/stats/traces/:id' do
+    @trace = Trace.find(params[:id]) || not_found
+    @span_tree = @trace.span_tree
+    erb :'stats/trace'
+  end
+
   get '/stats/routes' do
     route_pattern = /^(\s*)(get|post|put|delete|patch|options|head)\s+['"]([^'"]+)['"]/
 

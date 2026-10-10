@@ -1,0 +1,30 @@
+<link rel="stylesheet" href="<%= cachebust('/stylesheets/traces.css') %>">
+<script src="<%= cachebust('/javascripts/span_tree.js') %>"></script>
+
+<p><a href="/stats/traces"><i class="bi bi-arrow-left"></i> Traces</a></p>
+
+<h2><code><%= @trace.name %></code></h2>
+<p class="text-body-secondary">
+  <%= @trace.started_at.strftime('%b %d, %Y %H:%M:%S') %>
+  · <strong><%= @trace.duration_ms.round %> ms</strong>
+  · <%= pluralize(@trace.span_count, 'span') %>
+  <% if @trace.failure %>
+    · <%= partial :'stats/trace_status', locals: { trace: @trace } %>
+  <% end %>
+  <% if @trace.account %>
+    · <a href="/u/<%= @trace.account.username %>"><%= @trace.account.name %></a>
+  <% end %>
+  <% if @trace.release %>
+    · <a target="_blank" href="https://github.com/symbiota-coop/dandelion/commit/<%= @trace.release %>"><code><%= @trace.release[0..6] %></code></a>
+  <% end %>
+</p>
+<% if @trace.url %>
+  <p><code><%= @trace.http_method %> <%= @trace.url %></code></p>
+<% end %>
+
+<% if @span_tree.empty? %>
+  <p class="text-body-secondary">No spans</p>
+<% else %>
+  <%= partial :'stats/span_ops', locals: { rows: @span_tree } %>
+  <%= partial :'stats/span_tree', locals: { rows: @span_tree, total_ms: @trace.duration_ms, per_request: false, sort: 'start', sort_dir: 1 } %>
+<% end %>

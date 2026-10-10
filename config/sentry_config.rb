@@ -12,8 +12,30 @@ module ErrorReporting
   end
 end
 
+# Every request is traced and saved to Mongo (see before_send_transaction below), and viewed at /stats/transactions
+# and /stats/traces. SENTRY_SAMPLE_RATE is the share also sent to Sentry, each with a profile, 0 unless set.
+SENTRY_SAMPLE_RATE = ENV['SENTRY_SAMPLE_RATE'].to_f
+
+# Profiles the requests picked for Sentry, deciding as each one starts (so only they pay for profiling).
+# before_send_transaction then sends just the transactions with a profile
+class SentrySampleProfiler < Sentry::Vernier::Profiler
+  def set_initial_sample_decision(transaction_sampled)
+    super
+    @sampled &&= Random.rand < SENTRY_SAMPLE_RATE
+  end
+end
+
+# Discards everything, so development can trace (which Sentry only does with a DSN) without sending anything
+class SentryNullTransport < Sentry::Transport
+  def send_envelope(_envelope); end
+end
+
 Sentry.init do |config|
   config.dsn = ENV['SENTRY_DSN']
+  if !config.dsn && Padrino.env == :development
+    config.dsn = 'http://development@localhost/0'
+    config.transport.transport_class = SentryNullTransport
+  end
   config.environment = ENV['RACK_ENV']
   if (commit = ENV['RENDER_GIT_COMMIT'])
     config.release = commit
@@ -22,9 +44,28 @@ Sentry.init do |config|
   config.send_default_pii = true
   config.enable_logs = true
   config.enabled_patches = [:logger]
-  config.profiles_sample_rate = (ENV['SENTRY_PROFILES_SAMPLE_RATE'] || 0.01).to_f
-  config.traces_sample_rate = (ENV['SENTRY_TRACES_SAMPLE_RATE'] || 0.01).to_f
-  config.profiler_class = Sentry::Vernier::Profiler
+  config.traces_sample_rate = 1.0
+  # Keep every transaction, whatever its status. Sentry drops redirects and some 4xx by default, which would lose
+  # nearly every form POST (they redirect when they succeed)
+  config.trace_ignore_status_codes = []
+  # SentrySampleProfiler picks which requests to profile, so here profiling is just on or off
+  config.profiles_sample_rate = SENTRY_SAMPLE_RATE.positive? ? 1.0 : 0.0
+  config.profiler_class = SentrySampleProfiler
+
+  # Saves each request to the traces collection, and sends to Sentry the ones SentrySampleProfiler profiled.
+  # A request too short for the profiler to take a sample (about 10 ms) has no profile, so it isn't sent.
+  # Errors and logs always go to Sentry. Requests that matched no route (static files and unknown paths) are still named
+  # by their URL, so they're neither saved nor sent; a 404 from inside a route is.
+  config.before_send_transaction = lambda do |event, _hint|
+    next if event.transaction_info&.dig(:source) == :url
+
+    begin
+      Trace.create_from_sentry_transaction(event)
+    rescue StandardError => e
+      ErrorReporting.capture_exception(e)
+    end
+    event if event.profile
+  end
 
   config.before_send = lambda do |event, hint|
     exception = hint[:exception]
@@ -61,6 +102,7 @@ unless defined?(SentryMongoCommandSubscriber)
 
     def started(event)
       return unless Sentry.initialized?
+      return if collection_for(event) == 'traces'
 
       parent_span = Sentry.get_current_scope&.get_span
       return unless parent_span

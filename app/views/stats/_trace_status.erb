@@ -1,0 +1,4 @@
+<%# A trace's HTTP status when it didn't succeed: grey for a redirect, red for an error. Nothing when it did %>
+<% if (failure = trace.failure) %>
+  <span class="badge <%= (300..399).cover?(trace.http_status) ? 'text-bg-secondary' : 'text-bg-danger' %>"><%= failure %></span>
+<% end %>

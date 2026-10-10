@@ -1,0 +1,173 @@
+/* Span trees on /stats/transactions and /stats/traces/:id, drawn like Sentry's trace view (see span_tree.js).
+   Each level is a step: a guide per level above the row, then the row's toggle (a pill counting its children)
+   or a leaf's dot. A line runs down from each open toggle through its children's guides, and each child joins it
+   with an elbow. The cell's padding moves inside, so the lines run unbroken from row to row. */
+.span-tree-label {
+  --span-tree-step: var(--space-xl);
+  /* A toggle or leaf is wider than a step, so a pill fits and the label after it lines up with its siblings' */
+  --span-tree-node: calc(var(--span-tree-step) + var(--space-lg));
+  /* The middle of the first line of text, where elbows join and pills and dots sit */
+  --span-tree-mid: calc(var(--space-2xs) + 0.75em);
+  display: flex;
+  align-items: stretch;
+}
+
+.span-tree-guide {
+  flex: 0 0 var(--span-tree-step);
+  position: relative;
+}
+
+.span-tree-toggle,
+.span-tree-leaf {
+  flex: 0 0 var(--span-tree-node);
+  position: relative;
+}
+
+/* A pill too wide for its space (a count in the hundreds) pushes its label along rather than running into it */
+.span-tree-toggle {
+  flex-basis: auto;
+  min-width: var(--span-tree-node);
+  padding-inline-end: var(--space-xs);
+}
+
+.span-tree-text {
+  padding-block: var(--space-2xs);
+}
+
+/* No borders between rows, and the label fills its cell however tall the row is (a cell given any height lets
+   its child's height: 100% work), so the lines run unbroken from row to row */
+.span-tree tbody td {
+  border-bottom-width: 0;
+}
+
+.span-tree tbody td:has(> .span-tree-label) {
+  height: 1px;
+}
+
+.span-tree-label {
+  height: 100%;
+}
+
+/* The line down the middle of a guide: through the row (│ and ├), or stopping at the elbow (└) */
+.span-tree-guide.line::before,
+.span-tree-guide.tee::before,
+.span-tree-guide.elbow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  inset-inline-start: 50%;
+  border-inline-start: 1px solid var(--bs-border-color);
+}
+
+.span-tree-guide.elbow::before {
+  bottom: auto;
+  height: var(--span-tree-mid);
+}
+
+/* The elbow: from the line to the end of the guide, then on under the pill or to the dot */
+.span-tree-guide.tee::after,
+.span-tree-guide.elbow::after,
+.span-tree-guide.tee + .span-tree-toggle::before,
+.span-tree-guide.elbow + .span-tree-toggle::before,
+.span-tree-guide.tee + .span-tree-leaf::before,
+.span-tree-guide.elbow + .span-tree-leaf::before {
+  content: '';
+  position: absolute;
+  top: var(--span-tree-mid);
+  inset-inline: 50% 0;
+  border-top: 1px solid var(--bs-border-color);
+}
+
+.span-tree-guide.tee + .span-tree-toggle::before,
+.span-tree-guide.elbow + .span-tree-toggle::before,
+.span-tree-guide.tee + .span-tree-leaf::before,
+.span-tree-guide.elbow + .span-tree-leaf::before {
+  inset-inline: 0 auto;
+  width: calc(var(--span-tree-step) / 2);
+}
+
+/* A nested leaf's dot, where its elbow ends (top-level rows have no line to end) */
+.span-tree-guide + .span-tree-leaf::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--span-tree-mid) - 0.1875rem);
+  inset-inline-start: calc(var(--span-tree-step) / 2 - 0.1875rem);
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background: var(--bs-border-color);
+}
+
+/* The toggle: a pill over the line, with the line running on from under it to the children while it's open */
+.span-tree-toggle {
+  --link-hover-color: var(--bs-emphasis-color);
+  display: flex;
+  align-items: flex-start;
+  padding-inline-start: var(--space-2xs);
+  color: var(--bs-secondary-color);
+}
+
+.span-tree-toggle,
+.span-tree-toggle:hover,
+.span-tree-toggle:focus {
+  text-decoration: none;
+}
+
+.span-tree-toggle::after {
+  content: '';
+  position: absolute;
+  top: var(--span-tree-mid);
+  bottom: 0;
+  inset-inline-start: calc(var(--span-tree-step) / 2);
+  border-inline-start: 1px solid var(--bs-border-color);
+}
+
+tr.collapsed .span-tree-toggle::after {
+  display: none;
+}
+
+.span-tree-count {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  height: 1.25rem;
+  margin-top: calc(var(--span-tree-mid) - 0.625rem);
+  padding-inline: var(--space-xs) var(--space-2xs);
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius-pill);
+  background: var(--bs-body-bg);
+  font-size: var(--font-size-xs);
+  line-height: 1;
+  white-space: nowrap;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.span-tree-toggle:hover .span-tree-count {
+  color: var(--bs-emphasis-color);
+  border-color: var(--bs-gray-500);
+}
+
+.span-tree-count .bi {
+  display: inline-block;
+  transition: rotate var(--transition-fast);
+}
+
+tr.collapsed .span-tree-count .bi {
+  rotate: -90deg;
+}
+
+/* The transactions page's sections are separate tables, so their columns get fixed widths to line up */
+.transactions-table {
+  table-layout: fixed;
+}
+
+.transactions-table th:not(:first-child) {
+  width: 6rem;
+}
+
+.transactions-table td:first-child {
+  overflow-wrap: anywhere;
+}

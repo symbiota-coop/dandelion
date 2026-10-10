@@ -1,0 +1,69 @@
+<h2>Traces</h2>
+<p class="text-body-secondary">Sampled transactions and their spans, newest first. Saved by Sentry's <code>before_send_transaction</code> in place of sending them to Sentry.</p>
+
+<% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
+  <div class="form-group">
+    <label>Transaction</label>
+    <%= select_tag :name, options: [['All', '']] + Trace.distinct(:name).sort, selected: params[:name], class: 'form-select', id: 'trace-name' %>
+  </div>
+  <div class="form-group">
+    <label>XHR</label>
+    <%= select_tag :xhr, options: [['All', ''], ['Yes', '1'], ['No', '0']], selected: params[:xhr], class: 'form-select' %>
+  </div>
+  <div class="form-group">
+    <label>At least (ms)</label>
+    <%= number_field_tag :min_ms, class: 'form-control', value: params[:min_ms], autocomplete: 'off' %>
+  </div>
+  <%= submit_tag 'Search', class: 'btn btn-primary' %>
+<% end %>
+
+<% if params[:name] %>
+  <p><a href="/stats/transactions?<%= transaction_query(params[:name], (params[:xhr] == '1' if params[:xhr])) %>">Averages for <code><%= params[:name] %></code></a></p>
+<% end %>
+
+<script>
+  $(function () {
+    $('#trace-name').select2({ theme: 'bootstrap-5', width: '20rem' })
+  })
+</script>
+
+<% if @traces.empty? %>
+  <p class="text-body-secondary">No traces saved yet</p>
+<% else %>
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Transaction</th>
+          <th class="text-end">Duration</th>
+          <th class="text-end">Spans</th>
+          <th>Status</th>
+          <th>Commit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @traces.each do |trace| %>
+          <tr>
+            <td class="text-nowrap"><%= trace.started_at.strftime('%b %d %H:%M:%S') %></td>
+            <td>
+              <a href="/stats/traces/<%= trace.id %>"><code><%= trace.name %></code></a>
+              <% if trace.xhr %>
+                <span class="badge text-bg-secondary ms-1">XHR</span>
+              <% end %>
+            </td>
+            <td class="text-end text-nowrap"><%= trace.duration_ms.round %> ms</td>
+            <td class="text-end"><%= trace.span_count %></td>
+            <td><%= partial :'stats/trace_status', locals: { trace: trace } %></td>
+            <td>
+              <% if trace.release %>
+                <a target="_blank" href="https://github.com/symbiota-coop/dandelion/commit/<%= trace.release %>"><code><%= trace.release[0..6] %></code></a>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= will_paginate @traces, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+<% end %>

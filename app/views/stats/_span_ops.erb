@@ -1,0 +1,21 @@
+<%# Spans and self time by op for a span tree; counts in a merged tree are per request %>
+<div class="table-responsive">
+  <table class="table table-sm w-auto">
+    <thead>
+      <tr>
+        <th>Op</th>
+        <th class="text-end">Spans</th>
+        <th class="text-end">Self time</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% Trace.span_totals(rows, :op).each do |row| %>
+        <tr>
+          <td><code><%= row[:op] %></code></td>
+          <td class="text-end"><%= row[:per_trace].is_a?(Float) ? row[:per_trace].round(1) : row[:per_trace] %></td>
+          <td class="text-end text-nowrap"><%= row[:self_ms].round(1) %> ms</td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -33,6 +33,22 @@ Dandelion::App.helpers do
     end
   end
 
+  # The query string for a transaction: its name, and whether it's XHR when that's known
+  def transaction_query(name, xhr)
+    query = "name=#{CGI.escape(name)}"
+    query += "&xhr=#{xhr ? 1 : 0}" unless xhr.nil?
+    query
+  end
+
+  # A duration in ms in the largest unit that keeps it above 1: 78 ms, 44.1 s, 12.5 min, 3.2 h
+  def format_duration(ms)
+    if ms < 1000 then "#{ms.round} ms"
+    elsif ms < 60_000 then "#{(ms / 1000.0).round(1)} s"
+    elsif ms < 3_600_000 then "#{(ms / 60_000.0).round(1)} min"
+    else "#{(ms / 3_600_000.0).round(1)} h"
+    end
+  end
+
   def sentry_span_entries
     sentry_span_source_files.flat_map do |file_path|
       sentry_spans_in_file(file_path)

@@ -1,0 +1,127 @@
+<link rel="stylesheet" href="<%= cachebust('/stylesheets/traces.css') %>">
+<script src="<%= cachebust('/javascripts/span_tree.js') %>"></script>
+
+<% if params[:name] %>
+  <% xhr = (params[:xhr] == '1' if params[:xhr]) %>
+  <p><a href="/stats/transactions"><i class="bi bi-arrow-left"></i> Transactions</a></p>
+  <h2>
+    <code><%= params[:name] %></code>
+    <% if xhr %><span class="badge text-bg-secondary">XHR</span><% end %>
+  </h2>
+
+  <% if !@summary %>
+    <p class="text-body-secondary">No traces of this transaction</p>
+  <% else %>
+    <p class="text-body-secondary">
+      <a href="/stats/traces?<%= transaction_query(params[:name], xhr) %>"><%= pluralize(@summary[:count], 'trace') %></a>
+      · <strong><%= format_duration(@summary[:total_ms]) %></strong> in total
+      · p50 <%= format_duration(@summary[:p50_ms]) %>
+      · p99 <%= format_duration(@summary[:p99_ms]) %>
+      · p100 <%= format_duration(@summary[:max_ms]) %>
+      · <span data-bs-toggle="tooltip" title="The average request's time less the time in its top-level spans"><%= [@summary[:avg_ms] - @span_tree.select { |row| row[:depth].zero? }.sum { |row| row[:ms] }, 0].max.round %> ms outside any span</span>
+    </p>
+
+    <h5 class="mt-4">Per request, by op</h5>
+    <p class="text-body-secondary small">Self time is a span's time less its children's (a partial's own work, not the queries and partials inside it), so it adds up across ops; whatever's left of the mean was spent outside any span.</p>
+    <%= partial :'stats/span_ops', locals: { rows: @span_tree } %>
+
+    <h5 class="mt-4">Per request, as a tree</h5>
+    <p class="text-body-secondary small">The same traces' spans merged: spans with the same op and description in the same place in the tree are one row. A bar starts where the span first starts on average and is as long as its time per request.</p>
+    <%= partial :'stats/span_tree', locals: { rows: @span_tree, total_ms: @summary[:avg_ms], per_request: true, sort: 'ms', sort_dir: -1 } %>
+
+    <h5 class="mt-4">Per request, by span</h5>
+    <div class="table-responsive">
+      <table id="span-breakdown-table" class="table table-sm table-hover">
+        <thead>
+          <tr>
+            <th>Op</th>
+            <th>Description</th>
+            <th class="text-end">Per request</th>
+            <th class="text-end">Time each</th>
+            <th class="text-end">Time per request</th>
+            <th class="text-end">Self time per request</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% Trace.span_totals(@span_tree, :op, :description).each do |row| %>
+            <tr>
+              <td><code><%= row[:op] %></code></td>
+              <td class="small"><%= row[:description] %></td>
+              <td class="text-end text-nowrap" data-order="<%= row[:per_trace] %>"><%= format('%.2f', row[:per_trace]) %></td>
+              <td class="text-end text-nowrap" data-order="<%= row[:ms] / row[:per_trace] %>"><%= (row[:ms] / row[:per_trace]).round(1) %> ms</td>
+              <td class="text-end text-nowrap" data-order="<%= row[:ms] %>"><%= row[:ms].round(1) %> ms</td>
+              <td class="text-end text-nowrap" data-order="<%= row[:self_ms] %>"><%= row[:self_ms].round(1) %> ms</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      $(function () {
+        $('#span-breakdown-table').DataTable({ paging: false, searching: false, info: false, order: [[4, 'desc']] })
+      })
+    </script>
+  <% end %>
+<% else %>
+  <h2>Transactions</h2>
+  <p class="text-body-secondary">Durations of the saved traces, by transaction, most total time first.</p>
+
+  <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
+    <div class="form-group">
+      <%= select_tag :percentile, options: %w[p50 p99 p100], selected: @percentile, class: 'form-select' %>
+    </div>
+    <div class="form-group">
+      <label>over</label>
+      <%= number_field_tag :min_s, class: 'form-control', style: 'width: 5rem', value: @min_s.to_s.delete_suffix('.0'), step: 'any', min: 0, autocomplete: 'off' %>
+      <label class="ms-1">seconds</label>
+    </div>
+    <%= submit_tag 'Filter', class: 'btn btn-primary' %>
+  <% end %>
+
+  <% if @summaries.empty? %>
+    <p class="text-body-secondary">No transactions with a <%= @percentile %> over <%= @min_s.to_s.delete_suffix('.0') %> seconds</p>
+  <% else %>
+    <% sections = { 'GET' => [], 'POST' => [], 'XHR' => [], 'Other' => [] } %>
+    <% @summaries.each { |summary| sections[summary[:xhr] ? 'XHR' : (%w[GET POST] & [summary[:name].split.first]).first || 'Other'] << summary } %>
+    <% sections.each do |title, summaries| %>
+      <% next if summaries.empty? %>
+      <h5 class="mt-4">
+        <%= title %>
+        <% if summaries.size > 10 %><small class="text-body-secondary">10 of <%= summaries.size %></small><% end %>
+      </h5>
+      <div class="table-responsive">
+        <table class="transactions-table table table-hover">
+          <thead>
+            <tr>
+              <th>Transaction</th>
+              <th class="text-end">p50</th>
+              <th class="text-end">p99</th>
+              <th class="text-end">p100</th>
+              <th class="text-end">Total</th>
+              <th class="text-end">Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% summaries.first(10).each do |summary| %>
+              <tr>
+                <td><a href="/stats/transactions?<%= transaction_query(summary[:name], summary[:xhr]) %>"><code><%= summary[:name] %></code></a></td>
+                <td class="text-end text-nowrap" data-order="<%= summary[:p50_ms] %>"><%= format_duration(summary[:p50_ms]) %></td>
+                <td class="text-end text-nowrap" data-order="<%= summary[:p99_ms] %>"><%= format_duration(summary[:p99_ms]) %></td>
+                <td class="text-end text-nowrap" data-order="<%= summary[:max_ms] %>"><%= format_duration(summary[:max_ms]) %></td>
+                <td class="text-end text-nowrap" data-order="<%= summary[:total_ms] %>"><%= format_duration(summary[:total_ms]) %></td>
+                <td class="text-end"><%= summary[:count] %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+
+    <script>
+      $(function () {
+        $('.transactions-table').DataTable({ paging: false, searching: false, info: false, autoWidth: false, order: [[4, 'desc']] })
+      })
+    </script>
+  <% end %>
+<% end %>
