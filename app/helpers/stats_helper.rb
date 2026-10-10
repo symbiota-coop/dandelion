@@ -41,7 +41,7 @@ Dandelion::App.helpers do
 
   def sentry_span_source_files
     root_path = Padrino.root.to_s
-    ignored_dirs = %w[.git .bundle log tmp vendor node_modules public]
+    ignored_dirs = %w[.git .bundle .claude log tmp vendor node_modules public]
 
     files = []
     Find.find(root_path) do |file_path|
