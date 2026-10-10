@@ -95,7 +95,8 @@ class Trace
     self.and(:duration_ms.gte => min_ms)
   end
 
-  SUMMARY_INDEX = { name: 1, xhr: 1, created_at: -1, duration_ms: 1 }.freeze
+  # Also serves a transaction's traces sorted by duration on /stats/traces
+  SUMMARY_INDEX = { name: 1, xhr: 1, duration_ms: -1 }.freeze
 
   # Count, total and mean, p50, p99 and max (p100) duration per transaction: per name and whether it's XHR (pagelets
   # share routes with pages). Most total time first.
