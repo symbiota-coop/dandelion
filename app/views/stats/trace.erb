@@ -25,6 +25,80 @@
 <% if @span_tree.empty? %>
   <p class="text-body-secondary">No spans</p>
 <% else %>
-  <%= partial :'stats/span_ops', locals: { rows: @span_tree } %>
-  <%= partial :'stats/span_tree', locals: { rows: @span_tree, total_ms: @trace.duration_ms, per_request: false, sort: 'start', sort_dir: 1 } %>
+  <%# Spans and self time by op, most self time first. Self times don't overlap, so they add up across ops %>
+  <div class="table-responsive">
+    <table class="table table-sm w-auto">
+      <thead>
+        <tr>
+          <th>Op</th>
+          <th class="text-end">Spans</th>
+          <th class="text-end">Self time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @span_tree.group_by { |row| row[:op] }.map { |op, rows| [op, rows.size, rows.sum { |row| row[:self_ms] }] }.sort_by { |_, _, self_ms| -self_ms }.each do |op, count, self_ms| %>
+          <tr>
+            <td><code><%= op %></code></td>
+            <td class="text-end"><%= count %></td>
+            <td class="text-end text-nowrap"><%= self_ms.round(1) %> ms</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <%# The span tree (see span_tree.js and traces.css): rows that open and shut, headers that sort, and bars on a timeline of the trace's duration or longer. Rows come in order of start. On phones only the span and its time show %>
+  <% total_ms = [@trace.duration_ms, *@span_tree.map { |row| row[:offset_ms] + row[:ms] }, 1].max %>
+  <div class="table-responsive">
+    <%# Headers have DataTables' markup and classes (dataTable, dt-orderable-*, dt-ordering-*), so they get its sort icons %>
+    <table class="span-tree dataTable table table-sm table-hover" data-sort="start" data-sort-dir="1">
+      <thead>
+        <tr>
+          <% [
+               ['name', 'Span', nil, nil],
+               ['ms', 'Time', 'text-end', nil],
+               ['self', 'Self time', 'text-end d-none d-md-table-cell', "The span's time less its children's"],
+               ['start', 'Start', 'w-25 d-none d-md-table-cell', nil]
+             ].each do |key, title, th_class, tooltip| %>
+            <th class="<%= th_class %> dt-orderable-asc dt-orderable-desc" data-sort="<%= key %>">
+              <div class="dt-column-header">
+                <div class="dt-column-title" data-bs-toggle="<%= 'tooltip' if tooltip %>" title="<%= tooltip %>"><%= title %></div>
+                <div class="dt-column-order" role="button" tabindex="0"></div>
+              </div>
+            </th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% @span_tree.each do |row| %>
+          <tr class="<%= 'collapsed' if row[:children].positive? %>" style="<%= 'display: none' if row[:depth].positive? %>" data-id="<%= row[:id] %>" data-parent="<%= row[:parent_id] %>" data-name="<%= "#{row[:op]} #{row[:description]}" %>" data-ms="<%= row[:ms] %>" data-self="<%= row[:self_ms] %>" data-start="<%= row[:offset_ms] %>">
+            <td class="py-0">
+              <div class="span-tree-label">
+                <% row[:depth].times do %><span class="span-tree-guide"></span><% end %>
+                <% if row[:children].positive? %>
+                  <a href="javascript:;" class="span-tree-toggle"><span class="span-tree-count"><%= row[:children] %><i class="bi bi-chevron-down"></i></span></a>
+                <% else %>
+                  <span class="span-tree-leaf"></span>
+                <% end %>
+                <span class="span-tree-text">
+                  <code><%= row[:op] %></code>
+                  <span class="small" data-bs-toggle="<%= 'tooltip' if row[:data] %>" title="<%= row[:data]&.map { |k, v| "#{k}: #{v}" }&.join("\n") %>"><%= wrap_at_separators(row[:description]) %></span>
+                  <% if row[:status] && row[:status] != 'ok' %>
+                    <span class="badge text-bg-danger ms-1"><%= row[:status] %></span>
+                  <% end %>
+                </span>
+              </div>
+            </td>
+            <td class="text-end text-nowrap"><%= row[:ms].round(1) %> ms</td>
+            <td class="text-end text-nowrap d-none d-md-table-cell"><%= row[:self_ms].round(1) %> ms</td>
+            <td class="align-middle d-none d-md-table-cell">
+              <div class="progress position-relative" role="presentation">
+                <div class="progress-bar position-absolute h-100 <%= 'bg-secondary' if row[:op].to_s.start_with?('db.') %>" style="inset-inline-start: <%= (100.0 * row[:offset_ms] / total_ms).round(2) %>%; width: <%= [100.0 * row[:ms] / total_ms, 0.3].max.round(2) %>%"></div>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 <% end %>

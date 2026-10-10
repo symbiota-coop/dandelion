@@ -185,22 +185,11 @@ Dandelion::App.controller do
   end
 
   get '/stats/transactions' do
-    if params[:name]
-      @traces = Trace.and(name: params[:name])
-      @traces = @traces.and(xhr: params[:xhr] == '1') if params[:xhr]
-      # By name alone, so without an XHR filter it covers the XHR and other traces together, as the span tree does
-      @summary = @traces.summary(by_xhr: false).first
-      # The span tree reads every span, so it's limited to recent traces, with their own summary for its averages
-      recent_traces = @traces.and(:created_at.gte => Trace::SPAN_TREE_WINDOW.ago)
-      @recent_summary = recent_traces.summary(by_xhr: false).first
-      @span_tree = recent_traces.span_tree
-    else
-      # Only transactions whose p50, p99 or p100 is over a number of seconds, by default p99 over 2
-      @percentile = %w[p50 p99 p100].include?(params[:percentile]) ? params[:percentile] : 'p99'
-      @min_s = params[:min_s] ? params[:min_s].to_f : 2
-      key = { 'p50' => :p50_ms, 'p99' => :p99_ms, 'p100' => :max_ms }[@percentile]
-      @summaries = Trace.summary.select { |summary| summary[key] > @min_s * 1000 }
-    end
+    # Only transactions whose p50, p99 or p100 is over a number of seconds, by default p99 over 2
+    @percentile = %w[p50 p99 p100].include?(params[:percentile]) ? params[:percentile] : 'p99'
+    @min_s = params[:min_s] ? params[:min_s].to_f : 2
+    key = { 'p50' => :p50_ms, 'p99' => :p99_ms, 'p100' => :max_ms }[@percentile]
+    @summaries = Trace.summary.select { |summary| summary[key] > @min_s * 1000 }
     erb :'stats/transactions'
   end
 

@@ -1,7 +1,7 @@
-// Span trees (.span-tree tables on /stats/transactions and /stats/traces/:id), drawn like Sentry's trace view,
+// Span trees (.span-tree tables on /stats/traces/:id), drawn like Sentry's trace view,
 // with branches that open and shut and headers that sort.
 // Rows carry data-id and data-parent, and each row's label has one .span-tree-guide per level above it
-// (see stats/_span_tree.erb and traces.css).
+// (see stats/trace.erb and traces.css).
 
 // Sets each guide's connector: a line runs down from each parent past its children, and each child joins it
 // with an elbow, ├ or, for the last child, └ where the line stops. Which child is last depends on the order,

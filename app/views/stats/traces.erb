@@ -21,10 +21,6 @@
   <%= submit_tag 'Search', class: 'btn btn-primary' %>
 <% end %>
 
-<% if params[:name] %>
-  <p><a href="/stats/transactions?<%= transaction_query(params[:name], (params[:xhr] == '1' if params[:xhr])) %>">Averages for <code><%= params[:name] %></code></a></p>
-<% end %>
-
 <script>
   $(function () {
     $('#trace-name').select2({ theme: 'bootstrap-5', width: '20rem' })

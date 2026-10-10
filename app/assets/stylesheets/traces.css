@@ -1,4 +1,4 @@
-/* Span trees on /stats/transactions and /stats/traces/:id, drawn like Sentry's trace view (see span_tree.js).
+/* Span trees on /stats/traces/:id, drawn like Sentry's trace view (see span_tree.js).
    Each level is a step: a guide per level above the row, then the row's toggle (a pill counting its children)
    or a leaf's dot. A line runs down from each open toggle through its children's guides, and each child joins it
    with an elbow. The cell's padding moves inside, so the lines run unbroken from row to row. */
@@ -187,7 +187,6 @@ tr.collapsed .span-tree-count .bi {
 
   /* table-sm's padding, so the columns fit a phone */
   .transactions-table > :not(caption) > * > *,
-  #span-breakdown-table > :not(caption) > * > *,
   #traces-table > :not(caption) > * > * {
     padding-inline: var(--space-xs);
   }
