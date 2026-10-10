@@ -195,3 +195,11 @@ tr.collapsed .span-tree-count .bi {
 .transactions-table td:first-child {
   overflow-wrap: anywhere;
 }
+
+/* The transaction filter's select2 is 20rem wide (traces.erb), but on phones the filter form stacks its fields
+   full width, so it does too. Select2 sets its width inline, hence !important */
+@media (max-width: 575.98px) {
+  #trace-name + .select2-container {
+    width: 100% !important;
+  }
+}
