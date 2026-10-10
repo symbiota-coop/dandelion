@@ -17,7 +17,9 @@ class Trace
   field :started_at, type: Time
   field :duration_ms, type: Float
   field :span_count, type: Integer
-  field :spans, type: Array
+  # The spans (see Trace.compact_spans) as JSON compressed with zstd, about a fifth the size of storing them as
+  # documents, which matters most in Mongo's cache, where documents are held uncompressed. Read them with #spans
+  field :spans_zstd, type: BSON::Binary
 
   validates_presence_of :name, :started_at
 
@@ -47,8 +49,20 @@ class Trace
       started_at: Time.at(event.start_timestamp),
       duration_ms: ((event.timestamp.to_f - event.start_timestamp.to_f) * 1000).round(2),
       span_count: spans.count,
-      spans: spans
+      spans_zstd: pack_spans(spans)
     )
+  end
+
+  def self.pack_spans(spans)
+    BSON::Binary.new(Zstd.compress(JSON.generate(spans)))
+  end
+
+  def self.unpack_spans(spans_zstd)
+    spans_zstd ? JSON.parse(Zstd.decompress(spans_zstd.data)) : []
+  end
+
+  def spans
+    Trace.unpack_spans(spans_zstd)
   end
 
   # Sentry's spans in order of start, cut down to what the span trees use: the parent's position in the list (none for
@@ -112,7 +126,7 @@ class Trace
 
   # This trace's spans as a tree, siblings in order of start, each with its data and status
   def span_tree
-    Trace.trace_span_tree(spans || [])
+    Trace.trace_span_tree(spans)
   end
 
   # Spans without a parent (children of the transaction itself) are at the top
@@ -133,11 +147,11 @@ class Trace
     traces = 0
     nodes = {}
     # Streamed from a cursor, so only the merged tree is held in memory
-    collection.find(criteria.selector).projection(spans: 1).each do |doc|
+    collection.find(criteria.selector).projection(spans_zstd: 1).each do |doc|
       traces += 1
       paths = {}
       first_offsets = {}
-      trace_span_tree(doc['spans'] || []).each do |row|
+      trace_span_tree(unpack_spans(doc['spans_zstd'])).each do |row|
         path = paths[row[:id]] = paths.fetch(row[:parent_id], []) + [[row[:op], row[:description]]]
         node = nodes[path] ||= { count: 0, ms: 0.0, self_ms: 0.0, offset_ms: 0.0, traces: 0 }
         node[:count] += 1
