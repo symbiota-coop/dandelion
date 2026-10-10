@@ -16,6 +16,10 @@ end
 # and /stats/traces. SENTRY_SAMPLE_RATE is the share also sent to Sentry, each with a profile, 0 unless set.
 SENTRY_SAMPLE_RATE = ENV['SENTRY_SAMPLE_RATE'].to_f
 
+# Frequent requests whose traces say nothing: Render's health checks, and theme.css, which builds a few lines of CSS
+# from a colour (its only spans are the signed-in account's lookup in the before filter)
+UNTRACED_TRANSACTIONS = ['GET /health', 'GET /theme.css'].freeze
+
 # Profiles the requests picked for Sentry, deciding as each one starts (so only they pay for profiling).
 # before_send_transaction then sends just the transactions with a profile
 class SentrySampleProfiler < Sentry::Vernier::Profiler
@@ -55,9 +59,9 @@ Sentry.init do |config|
   # Saves each request to the traces collection, and sends to Sentry the ones SentrySampleProfiler profiled.
   # A request too short for the profiler to take a sample (about 10 ms) has no profile, so it isn't sent.
   # Errors and logs always go to Sentry. Requests that matched no route (static files and unknown paths) are still named
-  # by their URL, so they're neither saved nor sent; a 404 from inside a route is. Nor are Render's health checks.
+  # by their URL, so they're neither saved nor sent; a 404 from inside a route is. Nor are UNTRACED_TRANSACTIONS.
   config.before_send_transaction = lambda do |event, _hint|
-    next if event.transaction_info&.dig(:source) == :url || event.transaction == 'GET /health'
+    next if event.transaction_info&.dig(:source) == :url || UNTRACED_TRANSACTIONS.include?(event.transaction)
 
     begin
       Trace.create_from_sentry_transaction(event)
