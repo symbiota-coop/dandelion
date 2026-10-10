@@ -1,8 +1,7 @@
 Dandelion::App.helpers do
   def partial(*args)
     partial_name = args.first.to_s
-    Sentry.with_child_span(op: 'template.render', description: partial_name) do |span|
-      span&.set_data('template.name', partial_name)
+    Sentry.with_child_span(op: 'template.render', description: partial_name) do
       super(*args)
     end
   end

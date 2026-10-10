@@ -51,20 +51,25 @@ class Trace
     )
   end
 
-  # Sentry's spans in order of start, cut down to what the span trees use: ids, op and description, start (ms into the
-  # transaction), time and self time (time less the children's, so self times don't overlap), and status and data
-  # when they add anything. A span with no status is ok
+  # Sentry's spans in order of start, cut down to what the span trees use: the parent's position in the list (none for
+  # children of the transaction itself), op and description, start (ms into the transaction), time, self time (time
+  # less the children's, so self times don't overlap) when it isn't the whole time, and status and data when they add
+  # anything. A span's id is its position, and a span with no status is ok
   def self.compact_spans(spans, start_timestamp)
     span_ms = ->(span) { (span['timestamp'].to_f - span['start_timestamp'].to_f) * 1000 }
     children_ms = Hash.new(0)
     spans.each { |span| children_ms[span['parent_span_id']] += span_ms.call(span) }
 
-    spans.sort_by { |span| span['start_timestamp'].to_f }.map do |span|
+    spans = spans.sort_by { |span| span['start_timestamp'].to_f }
+    positions = spans.each_with_index.to_h { |span, i| [span['span_id'], i] }
+    spans.map do |span|
       data = span['data']&.except(*REDUNDANT_SPAN_DATA)
+      ms = span_ms.call(span).round(3)
+      self_ms = [span_ms.call(span) - children_ms[span['span_id']], 0].max.round(3)
       {
-        'id' => span['span_id'], 'parent_id' => span['parent_span_id'], 'op' => span['op'], 'description' => span['description'],
-        'start_ms' => ((span['start_timestamp'].to_f - start_timestamp) * 1000).round(3), 'ms' => span_ms.call(span).round(3),
-        'self_ms' => [span_ms.call(span) - children_ms[span['span_id']], 0].max.round(3),
+        'parent' => positions[span['parent_span_id']], 'op' => span['op'], 'description' => span['description'],
+        'start_ms' => ((span['start_timestamp'].to_f - start_timestamp) * 1000).round(3), 'ms' => ms,
+        'self_ms' => (self_ms unless self_ms == ms),
         'status' => (span['status'] unless span['status'] == 'ok'), 'data' => (data unless data.blank?)
       }.compact
     end
@@ -110,17 +115,14 @@ class Trace
     Trace.trace_span_tree(spans || [])
   end
 
-  # Spans whose parent isn't in the list (children of the transaction itself) are at the top
+  # Spans without a parent (children of the transaction itself) are at the top
   def self.trace_span_tree(spans)
-    span_ids = spans.to_set { |span| span['id'] }
-    children = spans.group_by { |span| span['parent_id'] if span_ids.include?(span['parent_id']) }
-    children.transform_values! { |siblings| siblings.map { |span| span['id'] } }
-    spans_by_id = spans.index_by { |span| span['id'] }
+    children = spans.each_index.group_by { |i| spans[i]['parent'] }
 
-    flatten_tree(children, nil) do |span_id|
-      span = spans_by_id[span_id]
+    flatten_tree(children, nil) do |i|
+      span = spans[i]
       { op: span['op'], description: span['description'], data: span['data'], status: span['status'], per_trace: 1,
-        ms: span['ms'], self_ms: span['self_ms'], offset_ms: span['start_ms'] }
+        ms: span['ms'], self_ms: span['self_ms'] || span['ms'], offset_ms: span['start_ms'] }
     end
   end
 
