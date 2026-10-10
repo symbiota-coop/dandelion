@@ -40,6 +40,12 @@ Dandelion::App.helpers do
     query
   end
 
+  # Text (a transaction's name, a span's op or description), escaped, that can break after each slash or dot rather
+  # than anywhere (GET /accounts/:id/ show_feedback, template. render), so it wraps cleanly in narrow table columns
+  def wrap_at_separators(text)
+    ERB::Util.html_escape(text).gsub(%r{[/.]}, '\\0<wbr>').html_safe
+  end
+
   # Which section of /stats/transactions a transaction goes in: XHR, GET or POST, Jobs for background jobs (named by
   # their class and method, not an HTTP method and path), or Other
   def transaction_section(summary)

@@ -43,21 +43,21 @@
             <tr>
               <th>Op</th>
               <th>Description</th>
-              <th class="text-end">Per request</th>
-              <th class="text-end">Time each</th>
+              <th class="text-end d-none d-md-table-cell">Per request</th>
+              <th class="text-end d-none d-md-table-cell">Time each</th>
               <th class="text-end">Time per request</th>
-              <th class="text-end">Self time per request</th>
+              <th class="text-end d-none d-md-table-cell">Self time per request</th>
             </tr>
           </thead>
           <tbody>
             <% Trace.span_totals(@span_tree, :op, :description).each do |row| %>
               <tr>
-                <td><code><%= row[:op] %></code></td>
-                <td class="small"><%= row[:description] %></td>
-                <td class="text-end text-nowrap" data-order="<%= row[:per_trace] %>"><%= format('%.2f', row[:per_trace]) %></td>
-                <td class="text-end text-nowrap" data-order="<%= row[:ms] / row[:per_trace] %>"><%= (row[:ms] / row[:per_trace]).round(1) %> ms</td>
+                <td><code><%= wrap_at_separators(row[:op]) %></code></td>
+                <td class="small"><%= wrap_at_separators(row[:description]) %></td>
+                <td class="text-end text-nowrap d-none d-md-table-cell" data-order="<%= row[:per_trace] %>"><%= format('%.2f', row[:per_trace]) %></td>
+                <td class="text-end text-nowrap d-none d-md-table-cell" data-order="<%= row[:ms] / row[:per_trace] %>"><%= (row[:ms] / row[:per_trace]).round(1) %> ms</td>
                 <td class="text-end text-nowrap" data-order="<%= row[:ms] %>"><%= row[:ms].round(1) %> ms</td>
-                <td class="text-end text-nowrap" data-order="<%= row[:self_ms] %>"><%= row[:self_ms].round(1) %> ms</td>
+                <td class="text-end text-nowrap d-none d-md-table-cell" data-order="<%= row[:self_ms] %>"><%= row[:self_ms].round(1) %> ms</td>
               </tr>
             <% end %>
           </tbody>
@@ -103,9 +103,10 @@
           <thead>
             <tr>
               <th>Transaction</th>
-              <th class="text-end">p50</th>
-              <th class="text-end">p99</th>
-              <th class="text-end">p100</th>
+              <%# On phones, of the percentiles only the one filtered by %>
+              <% %w[p50 p99 p100].each do |percentile| %>
+                <th class="text-end <%= 'd-none d-md-table-cell' unless percentile == @percentile %>"><%= percentile %></th>
+              <% end %>
               <th class="text-end">Total</th>
               <th class="text-end">Count</th>
             </tr>
@@ -113,10 +114,10 @@
           <tbody>
             <% summaries.first(10).each do |summary| %>
               <tr>
-                <td><a href="/stats/transactions?<%= transaction_query(summary[:name], summary[:xhr]) %>"><code><%= summary[:name] %></code></a></td>
-                <td class="text-end text-nowrap" data-order="<%= summary[:p50_ms] %>"><%= format_duration(summary[:p50_ms]) %></td>
-                <td class="text-end text-nowrap" data-order="<%= summary[:p99_ms] %>"><%= format_duration(summary[:p99_ms]) %></td>
-                <td class="text-end text-nowrap" data-order="<%= summary[:max_ms] %>"><%= format_duration(summary[:max_ms]) %></td>
+                <td><a href="/stats/transactions?<%= transaction_query(summary[:name], summary[:xhr]) %>"><code><%= wrap_at_separators(summary[:name]) %></code></a></td>
+                <% { 'p50' => :p50_ms, 'p99' => :p99_ms, 'p100' => :max_ms }.each do |percentile, key| %>
+                  <td class="text-end text-nowrap <%= 'd-none d-md-table-cell' unless percentile == @percentile %>" data-order="<%= summary[key] %>"><%= format_duration(summary[key]) %></td>
+                <% end %>
                 <td class="text-end text-nowrap" data-order="<%= summary[:total_ms] %>"><%= format_duration(summary[:total_ms]) %></td>
                 <td class="text-end"><%= summary[:count] %></td>
               </tr>

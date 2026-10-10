@@ -159,13 +159,32 @@ tr.collapsed .span-tree-count .bi {
   rotate: -90deg;
 }
 
-/* The transactions page's sections are separate tables, so their columns get fixed widths to line up */
+/* The transactions page's sections are separate tables, so their columns get fixed widths to line up.
+   Below 768px they show one percentile, in narrower columns, so the name keeps most of the width. The layout is
+   automatic there: hidden cells leave the grid, and a fixed layout would share their width with DataTables'
+   empty extra <col>s rather than the name */
 .transactions-table {
   table-layout: fixed;
 }
 
 .transactions-table th:not(:first-child) {
   width: 6rem;
+}
+
+@media (max-width: 767.98px) {
+  .transactions-table {
+    table-layout: auto;
+  }
+
+  .transactions-table th:not(:first-child) {
+    width: 4.5rem;
+  }
+
+  /* table-sm's padding, so the columns fit a phone */
+  .transactions-table > :not(caption) > * > *,
+  #span-breakdown-table > :not(caption) > * > * {
+    padding-inline: var(--space-xs);
+  }
 }
 
 .transactions-table td:first-child {

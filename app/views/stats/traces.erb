@@ -38,7 +38,7 @@
     <table id="traces-table" class="dataTable table table-hover">
       <thead>
         <tr>
-          <% [[:time, 'Time', nil], [nil, 'Transaction', nil], [:duration, 'Duration', 'text-end'], [:spans, 'Spans', 'text-end']].each do |key, title, th_class| %>
+          <% [[:time, 'Time', nil], [nil, 'Transaction', nil], [:duration, 'Duration', 'text-end'], [:spans, 'Spans', 'text-end d-none d-md-table-cell']].each do |key, title, th_class| %>
             <% if key %>
               <% sorted = @sort == key.to_s %>
               <th class="<%= th_class %> dt-orderable-asc dt-orderable-desc <%= "dt-ordering-#{@sort_dir}" if sorted %>" data-href="?<%= Rack::Utils.build_query(params.slice('name', 'xhr', 'min_ms').merge('sort' => key.to_s, 'dir' => sorted && @sort_dir == 'desc' ? 'asc' : 'desc')) %>">
@@ -52,7 +52,7 @@
             <% end %>
           <% end %>
           <th>Status</th>
-          <th>Commit</th>
+          <th class="d-none d-md-table-cell">Commit</th>
         </tr>
       </thead>
       <tbody>
@@ -60,15 +60,15 @@
           <tr>
             <td class="text-nowrap"><%= trace.started_at.strftime('%b %d %H:%M:%S') %></td>
             <td>
-              <a href="/stats/traces/<%= trace.id %>"><code><%= trace.name %></code></a>
+              <a href="/stats/traces/<%= trace.id %>"><code><%= wrap_at_separators(trace.name) %></code></a>
               <% if trace.xhr %>
                 <span class="badge text-bg-secondary ms-1">XHR</span>
               <% end %>
             </td>
             <td class="text-end text-nowrap"><%= trace.duration_ms.round %> ms</td>
-            <td class="text-end"><%= trace.span_count %></td>
+            <td class="text-end d-none d-md-table-cell"><%= trace.span_count %></td>
             <td><%= partial :'stats/trace_status', locals: { trace: trace } %></td>
-            <td>
+            <td class="d-none d-md-table-cell">
               <% if trace.release %>
                 <a target="_blank" href="https://github.com/symbiota-coop/dandelion/commit/<%= trace.release %>"><code><%= trace.release[0..6] %></code></a>
               <% end %>
