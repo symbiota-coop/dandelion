@@ -83,7 +83,12 @@ Dandelion::App.helpers do
     # Deduplicate events by name and location, keeping only the first result for each combination
     results = results.uniq { |e| [e.name, e.location] } if model_class == Event
 
-    instance_variable_set(var_name, results.paginate(page: params[:page], per_page: 20))
+    page = results.paginate(page: params[:page], per_page: 20)
+    # Reload the page's events with their key associations, so event cards missing from the fragment cache
+    # don't each query their organisation, tags, facilitators and cohosts
+    page.replace(Event.with_key_includes.without(:voyage_embedding).in_id_order(page.map(&:id))) if model_class == Event
+
+    instance_variable_set(var_name, page)
   end
 
   def parse_search_query(q)
