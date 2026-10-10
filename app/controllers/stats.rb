@@ -202,7 +202,17 @@ Dandelion::App.controller do
     @traces = @traces.and(xhr: params[:xhr] == '1') if params[:xhr]
     @traces = @traces.slower_than(params[:min_ms].to_f) if params[:min_ms]
     @traces = @traces.only(:name, :status, :http_status, :url, :http_method, :account_id, :xhr, :release, :started_at, :duration_ms, :span_count, :created_at).paginate(page: params[:page], per_page: 50)
+    @releases = trace_releases
     erb :'stats/traces'
+  end
+
+  # Deletes the traces of every release committed before the given one
+  post '/stats/traces/delete_before' do
+    commit_time = running_commit_time(params[:release]) || halt(400)
+    releases = trace_releases.select { |_release, time| time < commit_time }.map(&:first)
+    count = Trace.and(:release.in => releases).delete_all
+    flash[:notice] = "Deleted #{pluralize(count, 'trace')} from before #{params[:release][0..6]}"
+    redirect '/stats/traces'
   end
 
   get '/stats/traces/:id' do

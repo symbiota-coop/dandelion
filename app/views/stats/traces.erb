@@ -77,3 +77,14 @@
   </div>
   <%= will_paginate @traces, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
 <% end %>
+
+<%# Every release but the oldest has traces before it to delete %>
+<% if @releases.size > 1 %>
+  <% form_tag '/stats/traces/delete_before', method: 'post', class: 'form-inline mt-5' do %>
+    <div class="form-group">
+      <label>Delete traces from commits before</label>
+      <%= select_tag :release, options: @releases[0..-2].map { |release, time| ["#{release[0..6]} (#{time.strftime('%b %d %H:%M')})", release] }, class: 'form-select' %>
+    </div>
+    <%= submit_tag 'Delete', class: 'btn btn-danger', 'data-confirm' => 'Delete every trace saved by an earlier commit?' %>
+  <% end %>
+<% end %>

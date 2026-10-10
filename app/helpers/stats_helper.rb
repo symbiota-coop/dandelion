@@ -19,6 +19,12 @@ Dandelion::App.helpers do
     end
   end
 
+  # The releases traces were saved by, with when each was committed, newest first. Releases whose commit time can't be
+  # found are left out
+  def trace_releases
+    Trace.distinct(:release).compact.filter_map { |release| (time = running_commit_time(release)) && [release, time] }.sort_by { |_release, time| time }.reverse
+  end
+
   # A compact age like 8m, 2h, 3d or 1y
   def short_time_ago(time)
     seconds = [Time.now - time, 0].max
