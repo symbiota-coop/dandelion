@@ -503,8 +503,13 @@ class Event
     existing_index_names.include?(index_name) ? hint(index_name) : all
   end
 
+  # Not cached while the collection doesn't exist (listing its indexes raises NamespaceNotFound), as in a fresh test database
   def self.existing_index_names
     @existing_index_names ||= collection.indexes.map { |index| index['name'] }
+  rescue Mongo::Error::OperationFailure => e
+    raise unless e.code == 26
+
+    []
   end
 
   def self.reset_existing_index_names!
