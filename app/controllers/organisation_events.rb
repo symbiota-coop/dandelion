@@ -13,10 +13,10 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/events_block' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     # A pagelet: the organisation page loads it, and pagelets.js loads its pagination links, both by XHR.
-    # Crawlers follow those links directly, so send them to the page instead
-    redirect "/o/#{@organisation.slug}" unless request.xhr?
+    # Crawlers follow those links directly, so turn them away before doing any work
+    halt 400 unless request.xhr?
+    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     @events = @organisation.events_including_cohosted.publicly_visible.future_current_evergreen.without_heavy_fields.with_key_includes
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     partial :'organisations/events_block'

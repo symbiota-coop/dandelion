@@ -392,11 +392,10 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_nil @organisation.reload.stripe_customer_id
   end
 
-  test 'events block redirects requests that are not XHR to the organisation page' do
+  test 'events block rejects requests that are not XHR' do
     create_event
     get "/o/#{@organisation.slug}/events_block?events_page=2"
-    assert_equal 302, last_response.status
-    assert_equal "/o/#{@organisation.slug}", URI(last_response.location).path
+    assert_equal 400, last_response.status
 
     get "/o/#{@organisation.slug}/events_block", {}, { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }
     assert last_response.ok?
