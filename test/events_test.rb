@@ -645,6 +645,22 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal [@event.id, cohosted_event.id].sort, @organisation.events_including_cohosted.pluck(:id).sort
   end
 
+  test 'events_including_cohosted hints the hosts index only where it exists' do
+    create_event
+    Event.reset_existing_index_names!
+    assert_nil @organisation.events_including_cohosted.options[:hint]
+
+    Event.collection.indexes.create_one({ hosts_ids_cache: 1, deleted_at: 1, secret: 1, start_time: 1 }, name: Event::HOSTS_INDEX)
+    Event.reset_existing_index_names!
+    events = @organisation.events_including_cohosted.publicly_visible.future_current_evergreen
+    assert_equal Event::HOSTS_INDEX, events.options[:hint]
+    assert_equal [@event.id], events.pluck(:id)
+    assert_equal 1, events.count
+  ensure
+    Event.collection.indexes.drop_one(Event::HOSTS_INDEX) if Event.collection.indexes.any? { |index| index['name'] == Event::HOSTS_INDEX }
+    Event.reset_existing_index_names!
+  end
+
   test 'hosts cache sync finds and repairs a stale hosts_ids_cache' do
     create_event
     cohost = FactoryBot.create(:organisation)

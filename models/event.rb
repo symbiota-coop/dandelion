@@ -492,6 +492,25 @@ class Event
     set(hidden_from_homepage: true) if name_forbidden || location_forbidden || (organisation && organisation.hide_from_homepage?)
   end
 
+  # The index behind Organisation#events_including_cohosted
+  HOSTS_INDEX = 'hosts_ids_cache_1_deleted_at_1_secret_1_start_time_1'.freeze
+
+  # Hints MongoDB to use an index, skipping query planning: for queries whose plans the planner can't keep cached, like
+  # events_including_cohosted, whose best plan differs between small and large organisations. Indexes are created
+  # directly in the database, so the hint is only given where the index exists (not in tests or most development
+  # databases): hinting a missing index makes the query fail. Which indexes exist is checked once per process
+  def self.hinted(index_name)
+    existing_index_names.include?(index_name) ? hint(index_name) : all
+  end
+
+  def self.existing_index_names
+    @existing_index_names ||= collection.indexes.map { |index| index['name'] }
+  end
+
+  def self.reset_existing_index_names!
+    @existing_index_names = nil
+  end
+
   def hosts_ids_for(cohosts_ids)
     [organisation_id, *cohosts_ids].compact.uniq
   end
