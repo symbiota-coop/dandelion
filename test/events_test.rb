@@ -634,6 +634,17 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal [@organisation.id], @event.reload.hosts_ids_cache
   end
 
+  test 'events_including_cohosted returns hosted and cohosted events but not deleted ones' do
+    create_event
+    create_event(as: :deleted_event)
+    @deleted_event.destroy
+    cohosted_event = FactoryBot.create(:event)
+    cohosted_event.cohostships.create!(organisation: @organisation)
+    FactoryBot.create(:event)
+
+    assert_equal [@event.id, cohosted_event.id].sort, @organisation.events_including_cohosted.pluck(:id).sort
+  end
+
   test 'hosts cache sync finds and repairs a stale hosts_ids_cache' do
     create_event
     cohost = FactoryBot.create(:organisation)
