@@ -8,7 +8,8 @@
   </div>
 <% end %>
 
-<% if events.exists? %>
+<% events = events.to_a %>
+<% if events.any? %>
   <div class="mb-3">
     <div class="row" id="events">
       <% events.each { |event|
