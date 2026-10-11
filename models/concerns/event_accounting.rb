@@ -234,7 +234,7 @@ module EventAccounting
   end
 
   def donation_revenue_less_application_fees_paid_to_dandelion(skip_transferred: false)
-    instance_var = skip_transferred ? :@donation_revenue_without_transferred : :@donation_revenue
+    instance_var = skip_transferred ? :@donation_revenue_less_application_fees_without_transferred : :@donation_revenue_less_application_fees
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
       donations = skip_transferred ? self.donations.and(transferred: false) : self.donations
