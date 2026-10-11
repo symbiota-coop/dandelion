@@ -1,30 +1,4 @@
-COMMIT_TIMES = {} # rubocop:disable Style/MutableConstant
-
 Dandelion::App.helpers do
-  # When a commit was made: from the local git history if the deploy has it, otherwise from GitHub.
-  # Looked up once per process, as a commit's time never changes
-  def commit_time(commit)
-    return COMMIT_TIMES[commit] if COMMIT_TIMES.key?(commit)
-
-    COMMIT_TIMES[commit] = begin
-      require 'open3'
-      output, status = Open3.capture2('git', '-C', Padrino.root, 'show', '-s', '--format=%cI', commit, err: File::NULL)
-      if status.success? && !output.strip.empty?
-        Time.iso8601(output.strip)
-      else
-        Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN']).commit('symbiota-coop/dandelion', commit).commit.committer.date
-      end
-    rescue StandardError
-      nil
-    end
-  end
-
-  # The releases traces were saved by, with when each was committed, newest first. Releases whose commit time can't be
-  # found are left out
-  def trace_releases
-    Trace.distinct(:release).compact.filter_map { |release| (time = commit_time(release)) && [release, time] }.sort_by { |_release, time| time }.reverse
-  end
-
   def commit_url(commit)
     "https://github.com/symbiota-coop/dandelion/commit/#{commit}"
   end

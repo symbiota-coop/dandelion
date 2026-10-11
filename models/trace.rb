@@ -13,6 +13,8 @@ class Trace
   field :user_agent, type: String
   field :http_method, type: String
   field :release, type: String
+  # When the release was committed (see Trace.commit_time), so listing releases by age needs no lookups
+  field :release_committed_at, type: Time
   field :xhr, type: Boolean
   field :started_at, type: Time
   field :duration_ms, type: Float
@@ -45,6 +47,7 @@ class Trace
       http_method: event.request&.method,
       account_id: event.user&.dig(:id),
       release: event.release,
+      release_committed_at: (commit_time(event.release) if event.release),
       xhr: event.tags&.dig(:xhr) == 'true',
       started_at: Time.at(event.start_timestamp),
       duration_ms: ((event.timestamp.to_f - event.start_timestamp.to_f) * 1000).round(2),
@@ -52,6 +55,39 @@ class Trace
       spans_zstd: pack_spans(spans),
       search_spans: (search_spans unless search_spans.empty?)
     )
+  end
+
+  COMMIT_TIMES = {} # rubocop:disable Style/MutableConstant
+
+  # When a commit was made: from the local git history if the deploy has it, otherwise from GitHub.
+  # Looked up once per process, as a commit's time never changes
+  def self.commit_time(commit)
+    return COMMIT_TIMES[commit] if COMMIT_TIMES.key?(commit)
+
+    COMMIT_TIMES[commit] = begin
+      require 'open3'
+      output, status = Open3.capture2('git', '-C', Padrino.root, 'show', '-s', '--format=%cI', commit, err: File::NULL)
+      if status.success? && !output.strip.empty?
+        Time.iso8601(output.strip)
+      else
+        Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN']).commit('symbiota-coop/dandelion', commit).commit.committer.date
+      end
+    rescue StandardError
+      nil
+    end
+  end
+
+  # Serves Trace.releases with a DISTINCT_SCAN, so it reads one index entry per release
+  RELEASES_INDEX = { release: 1, release_committed_at: -1 }.freeze
+
+  # The releases traces were saved by, with when each was committed, newest first. Releases whose commit time
+  # wasn't found are left out
+  def self.releases
+    collection.aggregate([
+                           { '$sort' => RELEASES_INDEX.stringify_keys },
+                           { '$group' => { _id: '$release', committed_at: { '$first' => '$release_committed_at' } } }
+                         ]).filter_map { |row| [row['_id'], row['committed_at']] if row['_id'] && row['committed_at'] }
+                           .sort_by { |_release, time| time }.reverse
   end
 
   # Query parameters whose values can sign someone in or grant access (sign_in_token, api_key, ics_key, OAuth codes...)
