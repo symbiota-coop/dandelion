@@ -401,4 +401,18 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert last_response.ok?
     assert_includes last_response.body, @event.name
   end
+
+  test 'embedded events list shows at most 100 events, then links to all events' do
+    create_organisation
+    FactoryBot.create_list(:event, 100, organisation: @organisation)
+    get "/o/#{@organisation.slug}/events?minimal=true&from=2026-01-01"
+    assert last_response.ok?
+    assert_not_includes last_response.body, 'See all events'
+
+    FactoryBot.create(:event, organisation: @organisation)
+    get "/o/#{@organisation.slug}/events?minimal=true&from=2026-01-01"
+    assert last_response.ok?
+    assert_equal 100, last_response.body.scan('class="mb-4"').length
+    assert_includes last_response.body, "href=\"/o/#{@organisation.slug}/events?from=2026-01-01\" target=\"_blank\">See all events"
+  end
 end

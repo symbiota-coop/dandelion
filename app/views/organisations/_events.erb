@@ -6,12 +6,18 @@
   <% unless params[:no_listings] %>
     <% if !params[:minimal] || params[:past] %>
       <% @events = @events.paginate(page: params[:page], per_page: (params[:per_page] || 20)) %>
-    <% end %>
-    <%= partial :'events/blocks', locals: { events: @events } %>
-    <% if !params[:minimal] || params[:past] %>
+      <%= partial :'events/blocks', locals: { events: @events } %>
       <div class="mt-3">
         <%= will_paginate @events, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
       </div>
+    <% else %>
+      <% events, more_events = capped_events(@events) %>
+      <%= partial :'events/blocks', locals: { events: events } %>
+      <% if more_events %>
+        <div class="mt-3">
+          <a class="btn btn-primary" href="<%= all_events_url(@organisation) %>" target="<%= params[:minimal] ? '_blank' : '_self' %>">See all events</a>
+        </div>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>

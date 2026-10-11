@@ -2,8 +2,9 @@
   <% if @carousels %>
     <h2 class="text-center">All events</h2>
   <% end %>
+  <% events, more_events = capped_events(@events) %>
   <div class="row">
-    <% previous_event = nil; event_count = 0; @events.each { |event|    
+    <% previous_event = nil; event_count = 0; events.each { |event|
     next unless event.has_image?
     next if event.locked? && !event_admin?(event)
     next if !params[:show_events_with_same_name] && previous_event && previous_event.name == event.name && !previous_event.sold_out?
@@ -19,6 +20,11 @@
   <% elsif params[:show_more] && event_count > 6 %>
     <div class="text-center mt-3">
       <a onclick="$('.event-block').show(); $(this).hide();" href="javascript:;">Show more</a>
+    </div>
+  <% end %>
+  <% if more_events %>
+    <div class="text-center mt-3">
+      <a class="btn btn-primary" href="<%= all_events_url(@organisation) %>" target="<%= params[:minimal] ? '_blank' : '_self' %>">See all events</a>
     </div>
   <% end %>
 </div>

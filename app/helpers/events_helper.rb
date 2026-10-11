@@ -65,6 +65,19 @@ Dandelion::App.helpers do
     end
   end
 
+  # For lists that aren't paginated (the grid, and the list in an embed): the first 100 events, and whether there are
+  # more, since rendering hundreds of event cards takes many seconds. events may be an array (random or trending order)
+  def capped_events(events, limit: 100)
+    events = events.is_a?(Array) ? events.first(limit + 1) : events.limit(limit + 1).to_a
+    [events.first(limit), events.length > limit]
+  end
+
+  # The paginated list of an organisation's events, with the current filters
+  def all_events_url(organisation)
+    query = request.GET.except('display', 'minimal', 'page', 'per_page', '_t')
+    "/o/#{organisation.slug}/events#{"?#{query.to_query}" unless query.empty?}"
+  end
+
   def apply_random_or_trending_order(events, from)
     case params[:order]
     when 'random'
