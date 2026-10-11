@@ -11,9 +11,6 @@ module AccountValidation
     validates_uniqueness_of :username
     validates_http_url :website
 
-    validates_uniqueness_of :sign_in_token
-    validates_uniqueness_of :ics_key, allow_nil: true
-
     before_validation do
       unless username
         u = Haikunator.haikunate(0).underscore

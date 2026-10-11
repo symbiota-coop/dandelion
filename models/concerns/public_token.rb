@@ -4,8 +4,6 @@ module PublicToken
   included do
     field :token, type: String
 
-    validates_uniqueness_of :token, allow_nil: true
-
     before_validation do
       # Only mint on create so later saves do not backfill tokens onto legacy
       # records (those stay reachable by Mongo id).
@@ -29,13 +27,7 @@ module PublicToken
   end
 
   def mint_token
-    loop do
-      generated = SecureRandom.uuid
-      unless self.class.and(token: generated).exists?
-        self.token = generated
-        break
-      end
-    end
+    self.token = SecureRandom.uuid
   end
 
   # Records created before tokens were introduced fall back to their Mongo id,

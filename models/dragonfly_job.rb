@@ -9,5 +9,5 @@ class DragonflyJob
   field :uid, type: String
 
   validates_presence_of :signature, :uid
-  validates_uniqueness_of :signature, :uid
+  validates_uniqueness_of :signature
 end
