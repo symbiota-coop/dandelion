@@ -5,14 +5,13 @@
 
 <%# Plain text throughout, the links in the meta line muted like the rest of it. The URL shows only when it says
     more than the transaction's name: its path and query, for routes with params %>
-<h2><%= @trace.name %></h2>
+<h2><%= @trace.name %> · <%= @trace.started_at.to_fs(:short_no_year) %><% if @trace.xhr %> <span class="badge mb-1 text-bg-secondary">XHR</span><% end %></h2>
 <% path = @trace.url && @trace.url.sub(%r{\A[a-z]+://[^/]+}, '') %>
 <% if path && path != @trace.name.split(' ', 2).last %>
   <p class="text-body-secondary text-break mb-1"><%= path %></p>
 <% end %>
 <p class="text-body-secondary">
-  <%= @trace.started_at %>
-  · <%= @trace.duration_ms.round %> ms
+  <%= @trace.duration_ms.round %> ms
   <% if @trace.failure %>
     · <%= partial :'stats/trace_status', locals: { trace: @trace } %>
   <% end %>
