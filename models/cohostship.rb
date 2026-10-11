@@ -41,12 +41,14 @@ class Cohostship
   end
 
   after_create do
-    event.set(cohosts_ids_cache: ((event.cohosts_ids_cache || []) + [organisation.id]).uniq)
+    cohosts_ids = ((event.cohosts_ids_cache || []) + [organisation.id]).uniq
+    event.set(cohosts_ids_cache: cohosts_ids, hosts_ids_cache: event.hosts_ids_for(cohosts_ids))
     event.sync_carousel_ids!
   end
 
   after_destroy do
-    event.set(cohosts_ids_cache: (event.cohosts_ids_cache || []) - [organisation.id])
+    cohosts_ids = (event.cohosts_ids_cache || []) - [organisation.id]
+    event.set(cohosts_ids_cache: cohosts_ids, hosts_ids_cache: event.hosts_ids_for(cohosts_ids))
     event.sync_carousel_ids! unless event.flagged_for_destroy?
   end
 

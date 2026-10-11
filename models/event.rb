@@ -492,6 +492,25 @@ class Event
     set(hidden_from_homepage: true) if name_forbidden || location_forbidden || (organisation && organisation.hide_from_homepage?)
   end
 
+  def hosts_ids_for(cohosts_ids)
+    [organisation_id, *cohosts_ids].compact.uniq
+  end
+
+  # Checks hosts_ids_cache against organisation_id and cohosts_ids_cache, so run check_cohosts_cache_sync first
+  def self.check_hosts_cache_sync(fix: false)
+    out_of_sync = []
+
+    Event.unscoped.only(:name, :organisation_id, :cohosts_ids_cache, :hosts_ids_cache).each do |event|
+      expected = event.hosts_ids_for(event.cohosts_ids_cache)
+      next if event.hosts_ids_cache && event.hosts_ids_cache.map(&:to_s).sort == expected.map(&:to_s).sort
+
+      out_of_sync << { event: event, current: (event.hosts_ids_cache || []).map(&:to_s), expected: expected.map(&:to_s) }
+      event.set(hosts_ids_cache: expected) if fix
+    end
+
+    out_of_sync
+  end
+
   def self.check_cohosts_cache_sync(fix: false)
     out_of_sync = []
 
@@ -526,7 +545,8 @@ class Event
 
         next unless fix
 
-        event.set(cohosts_ids_cache: expected_ids.map { |id| BSON::ObjectId.from_string(id) })
+        cohosts_ids = expected_ids.map { |id| BSON::ObjectId.from_string(id) }
+        event.set(cohosts_ids_cache: cohosts_ids, hosts_ids_cache: event.hosts_ids_for(cohosts_ids))
       end
     end
 

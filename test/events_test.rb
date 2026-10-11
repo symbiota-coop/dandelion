@@ -622,6 +622,33 @@ class EventsTest < ActiveSupport::TestCase
     assert_empty Array(@event.carousel_ids)
   end
 
+  test 'hosts_ids_cache holds the organisation and its cohosts' do
+    create_event
+    assert_equal [@organisation.id], @event.hosts_ids_cache
+
+    cohost = FactoryBot.create(:organisation)
+    @event.cohostships.create!(organisation: cohost)
+    assert_equal [@organisation.id, cohost.id], @event.reload.hosts_ids_cache
+
+    @event.cohostships.find_by(organisation: cohost).destroy
+    assert_equal [@organisation.id], @event.reload.hosts_ids_cache
+  end
+
+  test 'hosts cache sync finds and repairs a stale hosts_ids_cache' do
+    create_event
+    cohost = FactoryBot.create(:organisation)
+    @event.cohostships.create!(organisation: cohost)
+    @event.unset(:hosts_ids_cache)
+
+    out_of_sync = Event.check_hosts_cache_sync
+    assert_equal([@event.id], out_of_sync.map { |entry| entry[:event].id })
+    assert_nil @event.reload.hosts_ids_cache
+
+    Event.check_hosts_cache_sync(fix: true)
+    assert_equal [@organisation.id, cohost.id], @event.reload.hosts_ids_cache
+    assert_empty Event.check_hosts_cache_sync
+  end
+
   test 'removing a tag or carouselship clears carousel ids' do
     create_event
     tag = FactoryBot.create(:event_tag)

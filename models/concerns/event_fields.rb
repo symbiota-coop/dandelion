@@ -49,6 +49,8 @@ module EventFields
     field :gocardless_instalment_count, type: Integer
     field :match_phrase, type: String
     field :cohosts_ids_cache, type: Array
+    # The organisation and the cohosts, so Organisation#events_including_cohosted can match one field rather than an $or
+    field :hosts_ids_cache, type: Array
     field :carousel_ids, type: Array
     field :theme_color, type: String
     field :voyage_embedding, type: Array

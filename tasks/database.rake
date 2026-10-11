@@ -72,6 +72,33 @@ namespace :db do
     end
   end
 
+  desc 'Find events where hosts_ids_cache is out of sync (FIX=1 to repair). Run cohosts_cache_sync first'
+  task hosts_cache_sync: :environment do
+    fix = ENV['FIX'] == '1'
+
+    puts "\n🔍 Checking hosts_ids_cache sync for all events...\n"
+    puts "⚠️  Mode: #{fix ? '🔧 FIXING out of sync caches' : '👀 Dry run (set FIX=1 to repair)'}\n"
+    puts '=' * 90
+
+    out_of_sync = Event.check_hosts_cache_sync(fix: fix)
+
+    if out_of_sync.empty?
+      puts "\n✅ All events have synced hosts_ids_cache.\n\n"
+    else
+      out_of_sync.first(20).each do |entry|
+        puts "\n📅 #{entry[:event].name} (#{entry[:event].id})"
+        puts "   Current:  #{entry[:current]}"
+        puts "   Expected: #{entry[:expected]}"
+      end
+      puts "\n   ...and #{out_of_sync.length - 20} more" if out_of_sync.length > 20
+
+      puts "\n#{'=' * 90}"
+      puts "📊 Found #{out_of_sync.length} event(s) with out of sync hosts_ids_cache"
+      puts(fix ? '🎉 All caches have been repaired!' : '👉 Run with FIX=1 to repair them')
+      puts
+    end
+  end
+
   desc 'Find MongoDB collections without an associated Mongoid model'
   task orphan_collections: :environment do
     db = Mongoid.default_client.database
