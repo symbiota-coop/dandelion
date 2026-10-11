@@ -16,15 +16,19 @@
   <% if @trace.failure %>
     · <%= partial :'stats/trace_status', locals: { trace: @trace } %>
   <% end %>
-  <% if @trace.account %>
-    · <a class="text-reset" href="/u/<%= @trace.account.username %>"><%= @trace.account.name %></a>
-  <% end %>
   <% if @trace.release %>
     · <a class="text-reset" target="_blank" href="<%= commit_url(@trace.release) %>"><%= @trace.release[0..6] %></a>
   <% end %>
 </p>
-<% if @trace.user_agent %>
-  <p class="text-body-secondary"><small><%= @trace.user_agent %></small></p>
+<%# Who made the request: their account and browser %>
+<% if @trace.account || @trace.user_agent %>
+  <p class="text-body-secondary"><small>
+    <% if @trace.account %>
+      <a class="text-reset" href="/u/<%= @trace.account.username %>"><%= @trace.account.name %></a>
+      <% if @trace.user_agent %>·<% end %>
+    <% end %>
+    <%= @trace.user_agent %>
+  </small></p>
 <% end %>
 
 <% if @span_tree.empty? %>
