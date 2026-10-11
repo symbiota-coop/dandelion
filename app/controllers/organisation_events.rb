@@ -17,7 +17,7 @@ Dandelion::App.controller do
     # Crawlers follow those links directly, so turn them away before doing any work
     halt 400 unless request.xhr?
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @events = @organisation.events_including_cohosted.publicly_visible.future_current_evergreen.without_heavy_fields.with_key_includes
+    @events = @organisation.events_including_cohosted.hinted(Event::HOSTS_INDEX).publicly_visible.future_current_evergreen.without_heavy_fields.with_key_includes
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     partial :'organisations/events_block'
   end

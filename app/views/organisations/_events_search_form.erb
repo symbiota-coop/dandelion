@@ -4,7 +4,7 @@
   })
 </script>
 
-<% @future_and_current_event_ids = @organisation.events_including_cohosted.live.publicly_visible.future_current_evergreen.pluck(:id) %>
+<% @future_and_current_event_ids = @organisation.events_including_cohosted.hinted(Event::HOSTS_INDEX).live.publicly_visible.future_current_evergreen.pluck(:id) %>
 
 <% @carousel_buttons = @organisation.carousels.and(button: true).exists? %>
 <% if @carousel_buttons %>

@@ -75,7 +75,7 @@ module OrganisationAssociations
   end
 
   def events_including_cohosted
-    Event.unscoped.and(hosts_ids_cache: id).and(deleted_at: nil).hinted(Event::HOSTS_INDEX)
+    Event.unscoped.and(hosts_ids_cache: id).and(deleted_at: nil)
   end
 
   def featured_events
