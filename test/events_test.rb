@@ -662,6 +662,25 @@ class EventsTest < ActiveSupport::TestCase
     Event.reset_existing_index_names!
   end
 
+  test 'trending ranks events by their paid orders in the last week, then the soonest of the rest' do
+    create_event(as: :quiet_soon, start_time: 2.days.from_now, end_time: 3.days.from_now)
+    create_event(as: :quiet_later, start_time: 5.days.from_now, end_time: 6.days.from_now)
+    create_event(as: :busy, start_time: 10.days.from_now, end_time: 11.days.from_now)
+    create_event(as: :busier, start_time: 20.days.from_now, end_time: 21.days.from_now)
+    [@busy, @busier, @busier].each do |event|
+      Order.create!(event: event, account: FactoryBot.create(:account), value: 10, payment_completed: true, currency: 'GBP')
+    end
+    Order.create!(event: @quiet_later, account: FactoryBot.create(:account), value: 10, payment_completed: true, currency: 'GBP').set(created_at: 2.weeks.ago)
+    Order.create!(event: @quiet_soon, account: FactoryBot.create(:account), value: 10, payment_completed: false, currency: 'GBP')
+    events = Event.and(:id.in => [@quiet_soon.id, @quiet_later.id, @busy.id, @busier.id])
+
+    assert_equal [@busier.id, @busy.id, @quiet_soon.id, @quiet_later.id], events.trending.map(&:id)
+    assert_equal [@busier.id, @busy.id, @quiet_soon.id], events.trending(limit: 3).map(&:id)
+
+    @quiet_later.set(trending: true)
+    assert_equal [@quiet_later.id, @busier.id], events.trending(limit: 2).map(&:id)
+  end
+
   test 'hosts cache sync finds and repairs a stale hosts_ids_cache' do
     create_event
     cohost = FactoryBot.create(:organisation)

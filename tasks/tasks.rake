@@ -3,8 +3,8 @@ namespace :hourly do
     now = Time.now
     puts 'feedback requests'
     feedback_window_start = now - (Event::MAX_FEEDBACK_HOURS_AFTER + 1).hours
-    feedback_events = Event.live.and(:sent_feedback_requests_at => nil, :end_time.ne => nil, :end_time.lte => now + 1.hour, :end_time.gte => feedback_window_start)
-    puts "feedback requests: checking #{feedback_events.count} event(s) within the supported scheduling window"
+    feedback_events = Event.live.and(:sent_feedback_requests_at => nil, :end_time.ne => nil, :end_time.lte => now + 1.hour, :end_time.gte => feedback_window_start).to_a
+    puts "feedback requests: checking #{feedback_events.length} event(s) within the supported scheduling window"
     feedback_events.each do |event|
       next unless event.feedback_due_within?(1.hour, now)
 
