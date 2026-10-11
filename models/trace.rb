@@ -8,7 +8,9 @@ class Trace
   field :name, type: String
   field :status, type: String
   field :http_status, type: Integer
+  # With the query string, its secret values filtered (see Trace.url_with_query)
   field :url, type: String
+  field :user_agent, type: String
   field :http_method, type: String
   field :release, type: String
   field :xhr, type: Boolean
@@ -38,7 +40,8 @@ class Trace
       name: event.transaction,
       status: trace_context[:status],
       http_status: trace_context[:data]&.dig(Sentry::Span::DataConventions::HTTP_STATUS_CODE),
-      url: event.request&.url,
+      url: url_with_query(event.request),
+      user_agent: event.request&.headers&.dig('User-Agent'),
       http_method: event.request&.method,
       account_id: event.user&.dig(:id),
       release: event.release,
@@ -49,6 +52,21 @@ class Trace
       spans_zstd: pack_spans(spans),
       search_spans: (search_spans unless search_spans.empty?)
     )
+  end
+
+  # Query parameters whose values can sign someone in or grant access (sign_in_token, api_key, ics_key, OAuth codes...)
+  SECRET_QUERY_PARAM = /token|key|secret|password|code|state|signature/i
+
+  # Sentry's request url leaves out the query string, which tells apart e.g. the pages of a paginated list
+  def self.url_with_query(request)
+    return unless request&.url
+    return request.url if request.query_string.blank?
+
+    query = request.query_string.split('&').map do |pair|
+      name, value = pair.split('=', 2)
+      value && CGI.unescape(name).match?(SECRET_QUERY_PARAM) ? "#{name}=[Filtered]" : pair
+    end
+    "#{request.url}?#{query.join('&')}"
   end
 
   def self.pack_spans(spans)

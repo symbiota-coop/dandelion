@@ -21,6 +21,9 @@
 <% if @trace.url %>
   <p><code><%= @trace.http_method %> <%= @trace.url %></code></p>
 <% end %>
+<% if @trace.user_agent %>
+  <p class="text-body-secondary"><small><%= @trace.user_agent %></small></p>
+<% end %>
 
 <% if @span_tree.empty? %>
   <p class="text-body-secondary">No spans</p>
