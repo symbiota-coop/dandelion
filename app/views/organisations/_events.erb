@@ -15,7 +15,7 @@
       <%= partial :'events/blocks', locals: { events: events } %>
       <% if more_events %>
         <div class="mt-3">
-          <a class="btn btn-primary" href="<%= all_events_url(@organisation) %>" target="<%= params[:minimal] ? '_blank' : '_self' %>">See all events</a>
+          <a href="<%= all_events_url(@organisation) %>" target="<%= params[:minimal] ? '_blank' : '_self' %>">See all events <i class="bi bi-arrow-right"></i></a>
         </div>
       <% end %>
     <% end %>
