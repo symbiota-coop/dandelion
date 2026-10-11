@@ -2884,7 +2884,8 @@ ul.map-event li {
   background: var(--bs-white);
 }
 
-#carousel-buttons-container .btn {
+/* Rows of filter buttons above lists (carousels, popular locations) */
+.filter-buttons .btn {
   --bs-btn-padding-y: var(--space-2xs);
   --bs-btn-padding-x: var(--space-xs);
 }

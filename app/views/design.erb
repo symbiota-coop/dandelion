@@ -387,6 +387,16 @@
       <div class="spec">.btn · .875rem · weight 600 · padding .5rem 1rem (sm .375rem .75rem), the same height as an input · radius .5rem (--bs-border-radius), as inputs</div>
     <% end %>
 
+    <% design_subsection 'Filter buttons', 'A row of buttons above a list, each narrowing it to one choice: carousels on an organisation\'s events page, popular locations on /events. Wrap the row in <code>.filter-buttons</code>.'.html_safe do %>
+      <div class="border rounded p-4 filter-buttons">
+        <a class="btn mb-1 btn-primary" href="#components">psychedelics</a>
+        <% %w[nature sound meditation community].each do |name| %>
+          <a class="btn mb-1 btn-outline-primary" href="#components"><%= name %></a>
+        <% end %>
+      </div>
+      <div class="spec">.filter-buttons .btn: full-size btn (radius .5rem) with tighter padding, --space-2xs × --space-xs · btn-outline-primary, the current choice btn-primary · mb-1 so wrapped rows don't touch</div>
+    <% end %>
+
     <% design_subsection 'Badges', "Bootstrap's <code>.badge</code> with a <code>text-bg-*</code> colour, for counts, statuses, tags and amounts. Sized in em, so a badge scales with the text around it: small in a nav, bigger beside an h4, and at body size (1rem) beside an h1, h2 or h3, where it would otherwise be nearly heading-sized. Pick the colour by what it means.".html_safe do %>
       <div class="border rounded p-4 d-flex flex-column gap-3">
         <h4 class="m-0">Full moon gathering <span class="badge mb-1 text-bg-yellow">Featured</span> <span class="badge mb-1 text-bg-secondary">Locked</span></h4>
@@ -673,16 +683,16 @@
             </div>
           </form>
         </div>
-        <div class="popular-locations">
+        <div class="popular-locations filter-buttons">
           <span class="d-inline-block mb-1">Popular locations:</span>
-          <a class="btn btn-sm mb-1 btn-primary" href="#components">London</a>
+          <a class="btn mb-1 btn-primary" href="#components">London</a>
           <% %w[Bristol Totnes Brighton].each do |place| %>
-            <a class="btn btn-sm mb-1 btn-outline-primary" href="#components"><%= place %></a>
+            <a class="btn mb-1 btn-outline-primary" href="#components"><%= place %></a>
           <% end %>
           <a href="#components"><i class="bi bi-three-dots"></i></a>
         </div>
       </div>
-      <div class="spec">Fields stack below 576px, with the button below them · the checkbox helper (<code>checkbox 'Deleted'</code>) is a .form-group holding a .form-check-inline · in grid rows instead (events/_search_form.erb), each .form-group takes a col, with the checkboxes beside the button on a second row, inside a .search panel: --bs-tertiary-bg, --bs-box-shadow-sm · .select-placeholder greys a select until forms.js loads, which then greys any select while its chosen option is a disabled placeholder · popular locations: btn-sm btn-outline-primary, the current one btn-primary</div>
+      <div class="spec">Fields stack below 576px, with the button below them · the checkbox helper (<code>checkbox 'Deleted'</code>) is a .form-group holding a .form-check-inline · in grid rows instead (events/_search_form.erb), each .form-group takes a col, with the checkboxes beside the button on a second row, inside a .search panel: --bs-tertiary-bg, --bs-box-shadow-sm · .select-placeholder greys a select until forms.js loads, which then greys any select while its chosen option is a disabled placeholder · popular locations: .filter-buttons (see Filter buttons)</div>
     <% end %>
 
     <div class="row g-5">

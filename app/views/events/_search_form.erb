@@ -6,14 +6,14 @@
 
 
 <% unless params[:search] %>
-  <div class="mb-3 popular-locations">
+  <div class="mb-3 popular-locations filter-buttons">
     <% popular_locations = Location.order('events_count desc').to_a %>
     <% show_more_limit = @location ? popular_locations.size : 10 %>
     <span class="d-inline-block mb-1">Popular locations:</span>
     <span class="popular-locations-container">
       <% popular_locations.each_with_index do |location, index| %>
         <span class="location-item"<% if index >= show_more_limit %> style="display: none"<% end %>>
-          <a class="btn btn-sm mb-1 <%= @location && @location == location ? 'btn-primary' : 'btn-outline-primary' %>" href="/locations/<%= location.name %>"><%= location.name %></a>
+          <a class="btn mb-1 <%= @location && @location == location ? 'btn-primary' : 'btn-outline-primary' %>" href="/locations/<%= location.name %>"><%= location.name %></a>
         </span>
       <% end %>
       <% if popular_locations.size > show_more_limit %>

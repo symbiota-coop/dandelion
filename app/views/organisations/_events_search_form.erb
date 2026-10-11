@@ -8,7 +8,7 @@
 
 <% @carousel_buttons = @organisation.carousels.and(button: true).exists? %>
 <% if @carousel_buttons %>
-  <div id="carousel-buttons-container">
+  <div id="carousel-buttons-container" class="filter-buttons">
     <%= partial :'organisations/carousel_buttons' %>
   </div>
 <% end %>
