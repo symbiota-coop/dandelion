@@ -66,9 +66,9 @@ Dandelion::App.helpers do
   end
 
   # For lists that aren't paginated (the grid, and the list in an embed): the first 100 events, and whether there are
-  # more, since rendering hundreds of event cards takes many seconds. events may be an array (random or trending order)
+  # more, since rendering hundreds of event cards takes many seconds. events may be EventIds (random or trending order)
   def capped_events(events, limit: 100)
-    events = events.is_a?(Array) ? events.first(limit + 1) : events.limit(limit + 1).to_a
+    events = events.is_a?(EventIds) ? events.paginate(page: 1, per_page: limit + 1).to_a : events.limit(limit + 1).to_a
     [events.first(limit), events.length > limit]
   end
 
@@ -82,16 +82,16 @@ Dandelion::App.helpers do
     case params[:order]
     when 'random'
       event_ids = events.pluck(:id)
-      return [] if event_ids.empty?
+      return EventIds.new if event_ids.empty?
 
       sampled_ids = events.collection.aggregate([
                                                   { '$match' => { '_id' => { '$in' => event_ids } } },
                                                   { '$sample' => { size: event_ids.length } },
                                                   { '$project' => { '_id' => 1 } }
                                                 ]).map { |hash| hash['_id'] }
-      events.in_id_order(sampled_ids)
+      EventIds.new(sampled_ids)
     when 'trending'
-      events.trending(from)
+      EventIds.new(events.trending_ids(from))
     else
       events
     end

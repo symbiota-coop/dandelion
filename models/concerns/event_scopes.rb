@@ -65,6 +65,12 @@ module EventScopes
     end
 
     def trending(from = Date.today, limit: 100)
+      ids = trending_ids(from, limit: limit)
+      without(:voyage_embedding, :extra_info_for_ticket_email).with_key_includes.in_id_order(ids)
+    end
+
+    # The ids of upcoming homepage events (within the current scope), most trending first
+    def trending_ids(from = Date.today, limit: 100)
       base_query = if self == Event
                      live.publicly_visible.browsable.future(from).and(has_image: true).and(hidden_from_homepage: false)
                    else
@@ -91,7 +97,7 @@ module EventScopes
         ranked_ids += others.pluck(:id)
       end
 
-      base_query.without(:voyage_embedding, :extra_info_for_ticket_email).with_key_includes.in_id_order(ranked_ids)
+      ranked_ids
     end
 
     def in_id_order(ids)

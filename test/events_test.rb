@@ -683,6 +683,16 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal [@quiet_later.id, @busier.id], events.trending(limit: 2).map(&:id)
   end
 
+  test 'EventIds pages through events in the given order, loading only the page' do
+    events = 5.times.map { |i| create_event(as: :"event#{i}") }
+    ids = EventIds.new([events[3], events[0], events[4], events[1], events[2]].map(&:id))
+
+    page = ids.paginate(page: 2, per_page: 2)
+    assert_equal [events[4], events[1]], page.to_a
+    assert_equal 5, page.total_entries
+    assert_equal 3, page.total_pages
+  end
+
   test 'hosts cache sync finds and repairs a stale hosts_ids_cache' do
     create_event
     cohost = FactoryBot.create(:organisation)
