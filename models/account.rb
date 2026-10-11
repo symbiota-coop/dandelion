@@ -97,8 +97,9 @@ class Account
     ]).and(:last_active.gt => 1.year.ago)
   end
 
+  # The time it was made in base 36, padded to 7 characters, then 16 random letters and digits
   def self.generate_sign_in_token
-    "#{Time.now.to_i}-#{SecureRandom.hex(16)}"
+    "#{Time.now.to_i.to_s(36).rjust(7, '0')}#{SecureRandom.alphanumeric(16)}"
   end
 
   def ensure_ics_key!
@@ -108,19 +109,12 @@ class Account
     ics_key
   end
 
-  def unique_sign_in_token
-    loop do
-      token = Account.generate_sign_in_token
-      return token unless Account.and(sign_in_token: token).exists?
-    end
-  end
-
   def generate_sign_in_token
-    self.sign_in_token = unique_sign_in_token
+    self.sign_in_token = Account.generate_sign_in_token
   end
 
   def generate_sign_in_token!
-    set(sign_in_token: unique_sign_in_token)
+    set(sign_in_token: Account.generate_sign_in_token)
   end
 
   def sign_in_token_for_email
@@ -133,11 +127,12 @@ class Account
   def sign_in_token_expired?
     return true if sign_in_token.blank?
 
-    # Extract timestamp from token (format: timestamp-randomtoken)
-    parts = sign_in_token.split('-', 2)
-    return true if parts.length != 2
-
-    timestamp = parts[0].to_i
+    # Tokens made before 11 Oct 2026 are timestamp-hex. Drop this branch once they have all expired
+    timestamp = if sign_in_token.include?('-')
+                  sign_in_token.split('-', 2).first.to_i
+                else
+                  sign_in_token[0, 7].to_i(36)
+                end
     return true if timestamp.zero?
 
     # Check if token is older than 24 hours
