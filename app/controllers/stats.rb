@@ -217,6 +217,15 @@ Dandelion::App.controller do
     redirect '/stats/traces'
   end
 
+  # The slowest trace of a transaction, linked from its p100 on /stats/transactions (and its p99, when that's the
+  # same trace). Found on click rather than in Trace.summary, which reads only the index, not the traces' ids
+  get '/stats/traces/slowest' do
+    traces = Trace.and(name: params[:name])
+    traces = traces.and(xhr: params[:xhr] == '1') if params[:xhr]
+    trace = traces.order(duration_ms: :desc).only(:_id).first || not_found
+    redirect "/stats/traces/#{trace.id}"
+  end
+
   get '/stats/traces/:id' do
     @trace = Trace.find(params[:id]) || not_found
     @span_tree = @trace.span_tree

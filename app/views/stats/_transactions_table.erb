@@ -26,8 +26,15 @@
               <%= summary[:name] %>
             <% end %>
           </td>
+          <%# p100 is a single trace, the slowest, and so is p99 when it matches p100 (always, under 100 traces) %>
           <% %w[p50 p99 p100].each do |percentile| %>
-            <td class="text-end text-nowrap <%= 'd-none d-md-table-cell' unless percentile == @percentile %>" data-order="<%= summary[:"#{percentile}_ms"] %>"><%= format_duration(summary[:"#{percentile}_ms"]) %></td>
+            <td class="text-end text-nowrap <%= 'd-none d-md-table-cell' unless percentile == @percentile %>" data-order="<%= summary[:"#{percentile}_ms"] %>">
+              <% if link && percentile != 'p50' && summary[:"#{percentile}_ms"] == summary[:p100_ms] %>
+                <a href="/stats/traces/slowest?<%= transaction_query(summary[:name], summary[:xhr]) %>"><%= format_duration(summary[:"#{percentile}_ms"]) %></a>
+              <% else %>
+                <%= format_duration(summary[:"#{percentile}_ms"]) %>
+              <% end %>
+            </td>
           <% end %>
           <td class="text-end text-nowrap" data-order="<%= summary[:total_ms] %>"><%= format_duration(summary[:total_ms]) %></td>
           <td class="text-end"><%= summary[:count] %></td>
