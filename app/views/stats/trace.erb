@@ -3,24 +3,26 @@
 
 <p><a href="/stats/traces"><i class="bi bi-arrow-left"></i> Traces</a></p>
 
-<h2><code><%= @trace.name %></code></h2>
+<%# Plain text throughout, the links in the meta line muted like the rest of it. The URL shows only when it says
+    more than the transaction's name: its path and query, for routes with params %>
+<h2><%= @trace.name %></h2>
+<% path = @trace.url && @trace.url.sub(%r{\A[a-z]+://[^/]+}, '') %>
+<% if path && path != @trace.name.split(' ', 2).last %>
+  <p class="text-body-secondary text-break mb-1"><%= path %></p>
+<% end %>
 <p class="text-body-secondary">
-  <%= @trace.started_at.strftime('%b %d, %Y %H:%M:%S') %>
-  · <strong><%= @trace.duration_ms.round %> ms</strong>
-  · <%= pluralize(@trace.span_count, 'span') %>
+  <%= @trace.started_at %>
+  · <%= @trace.duration_ms.round %> ms
   <% if @trace.failure %>
     · <%= partial :'stats/trace_status', locals: { trace: @trace } %>
   <% end %>
   <% if @trace.account %>
-    · <a href="/u/<%= @trace.account.username %>"><%= @trace.account.name %></a>
+    · <a class="text-reset" href="/u/<%= @trace.account.username %>"><%= @trace.account.name %></a>
   <% end %>
   <% if @trace.release %>
-    · <%= commit_link(@trace.release) %>
+    · <a class="text-reset" target="_blank" href="<%= commit_url(@trace.release) %>"><%= @trace.release[0..6] %></a>
   <% end %>
 </p>
-<% if @trace.url %>
-  <p><code><%= @trace.http_method %> <%= @trace.url %></code></p>
-<% end %>
 <% if @trace.user_agent %>
   <p class="text-body-secondary"><small><%= @trace.user_agent %></small></p>
 <% end %>

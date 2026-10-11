@@ -5,6 +5,7 @@ Time::DATE_FORMATS.merge!(
   db_local: ->(time) { time.strftime('%Y-%m-%d %H:%M:%S') },
   date: ->(time) { time.to_date.to_s },
   no_year: ->(time) { "#{time.to_date.to_fs(:no_year)}, #{time.to_fs(:time)}" },
+  short_no_year: ->(time) { "#{time.to_date.to_fs(:short_no_year)}, #{time.to_fs(:time)}" },
   month_year: ->(time) { "#{time.to_date.to_fs(:month_year)}, #{time.to_fs(:time)}" },
   time: ->(time) { time.strftime("#{(t = time.hour % 12) == 0 ? 12 : t}:%M#{time.strftime('%p').downcase}") },
   no_double_zeros: lambda { |time|
@@ -19,6 +20,7 @@ Date::DATE_FORMATS.merge!(
   default: ->(date) { date.strftime("%a #{date.day.ordinalize} %b %Y") },
   db_local: ->(date) { date.strftime('%Y-%m-%d') },
   no_year: ->(date) { date.strftime("%a #{date.day.ordinalize} %B") },
+  short_no_year: ->(date) { date.strftime("%a #{date.day.ordinalize} %b") },
   birthday: ->(date) { date.strftime("#{date.day.ordinalize} %b") },
   month_year: ->(date) { date.strftime('%b %Y') },
   post: ->(date) { date.strftime("#{date.day} %b#{" #{date.year}" unless date.year == Date.today.year}") }

@@ -27,7 +27,7 @@
   <div id="delete-traces" class="mb-3" style="display: none">
     <% form_tag '/stats/traces/delete_before', method: 'post', class: 'd-flex flex-wrap align-items-center gap-2' do %>
       <label for="delete-traces-release" class="mb-0">Delete traces from commits before</label>
-      <%= select_tag :release, options: @releases[0..-2].map { |release, time| ["#{release[0..6]} (#{time.strftime('%b %d %H:%M')})", release] }, class: 'form-select w-auto', id: 'delete-traces-release' %>
+      <%= select_tag :release, options: @releases[0..-2].map { |release, time| ["#{release[0..6]} (#{time.in_time_zone.to_fs(:short_no_year)})", release] }, class: 'form-select w-auto', id: 'delete-traces-release' %>
       <%= submit_tag 'Delete', class: 'btn btn-danger', 'data-confirm' => 'Delete every trace saved by an earlier commit?' %>
     <% end %>
   </div>
@@ -71,7 +71,7 @@
       <tbody>
         <% @traces.each do |trace| %>
           <tr>
-            <td class="text-nowrap"><%= trace.started_at.strftime('%b %d %H:%M:%S') %></td>
+            <td class="text-nowrap"><%= trace.started_at.to_fs(:short_no_year) %></td>
             <td>
               <a href="/stats/traces/<%= trace.id %>"><code><%= wrap_at_separators(trace.name) %></code></a>
               <% if trace.xhr %>
