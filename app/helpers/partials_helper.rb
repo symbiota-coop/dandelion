@@ -10,7 +10,8 @@ Dandelion::App.helpers do
     if Padrino.env == :development
       partial(slug, locals: locals)
     else
-      if (fragment = Fragment.find_by(key: key)) && fragment.expires > Time.now
+      fragment = @fragments && @fragments.key?(key) ? @fragments[key] : Fragment.find_by(key: key)
+      if fragment && fragment.expires > Time.now
         fragment.value
       else
         fragment.try(:destroy)
@@ -21,6 +22,11 @@ Dandelion::App.helpers do
         end
       end.html_safe
     end
+  end
+
+  # Loads the fragments for keys in one query, for cp to use rather than querying each key itself
+  def prefetch_fragments(keys)
+    @fragments = keys.index_with(nil).merge(Fragment.and(:key.in => keys).index_by(&:key))
   end
 
   def stash_partial(slug, locals: {}, key: slug)

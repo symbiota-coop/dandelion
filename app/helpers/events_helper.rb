@@ -78,6 +78,10 @@ Dandelion::App.helpers do
     "/o/#{organisation.slug}/events#{"?#{query.to_query}" unless query.empty?}"
   end
 
+  def event_block_cache_key(event)
+    "/events/#{event.id}?organisation_id=#{@organisation.try(:id)}#{event_viewer_timezone_query(event)}&current_account=#{current_account ? 1 : 0}"
+  end
+
   def apply_random_or_trending_order(events, from)
     case params[:order]
     when 'random'

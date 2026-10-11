@@ -415,4 +415,18 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal 100, last_response.body.scan('class="mb-4"').length
     assert_includes last_response.body, "href=\"/o/#{@organisation.slug}/events?from=2026-01-01\" target=\"_blank\">See all events"
   end
+
+  test 'event cards are cached, and served from the cache on the next render' do
+    create_event(as: :event1)
+    create_event(as: :event2)
+    get "/o/#{@organisation.slug}/events", {}, { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }
+    assert last_response.ok?
+    assert_includes last_response.body, @event1.name
+    assert_equal 2, Fragment.count
+
+    Fragment.all.each { |fragment| fragment.set(value: '<p>cached card</p>') }
+    get "/o/#{@organisation.slug}/events", {}, { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }
+    assert_equal 2, last_response.body.scan('cached card').length
+    assert_not_includes last_response.body, @event1.name
+  end
 end
