@@ -48,6 +48,31 @@ class LocalGroupsTest < ActiveSupport::TestCase
     assert_equal original_polygons, (local_group.reload.polygons.map { |polygon| [polygon.id, polygon.coordinates] })
   end
 
+  test 'a polygon with a hole keeps the hole, and members in the hole are not added' do
+    outer = [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]
+    hole = [[4, 4], [4, 6], [6, 6], [6, 4], [4, 4]]
+    local_group = FactoryBot.create(:local_group, geometry: { type: 'Polygon', coordinates: [outer, hole] }.to_json)
+
+    assert_equal({ 'type' => 'Polygon', 'coordinates' => [outer, hole] }, local_group.reload.area)
+    assert_equal [[outer, hole]], local_group.polygons.map(&:coordinates)
+
+    organisation = local_group.organisation
+    inside = FactoryBot.create(:account)
+    inside.set(coordinates: [2, 2])
+    in_hole = FactoryBot.create(:account)
+    in_hole.set(coordinates: [5, 5])
+    assert_equal [local_group], Organisationship.new(organisation: organisation, account: inside).relevant_local_groups.to_a
+    assert_empty Organisationship.new(organisation: organisation, account: in_hole).relevant_local_groups.to_a
+  end
+
+  test 'a self-intersecting polygon is rejected' do
+    bowtie = [[0, 0], [10, 10], [10, 0], [0, 10], [0, 0]]
+    local_group = FactoryBot.build(:local_group, geometry: { type: 'Polygon', coordinates: [bowtie] }.to_json)
+
+    refute local_group.save
+    assert_includes local_group.errors[:geometry], 'is not a valid shape (check for crossing edges and unclosed rings)'
+  end
+
   test 'organisation_id and account_id cannot be reassigned on update' do
     local_group = FactoryBot.create(:local_group)
     assert_cannot_reassign_organisation_or_account(local_group)

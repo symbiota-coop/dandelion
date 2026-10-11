@@ -106,7 +106,7 @@ class Organisationship
   end
 
   def relevant_local_groups
-    organisation.local_groups.geo_spatial(:polygons.intersects_point => account.coordinates)
+    organisation.local_groups.geo_spatial(:area.intersects_point => account.coordinates)
   end
 
   after_create do

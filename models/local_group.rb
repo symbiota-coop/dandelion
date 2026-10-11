@@ -14,6 +14,7 @@ class LocalGroup
   field :name, type: String
   field :intro_text, type: String
   field :geometry, type: String
+  field :area, type: Hash
   field :hide_members, type: Boolean
   field :type, type: String
   field :slug, type: String
@@ -67,8 +68,13 @@ class LocalGroup
       next
     end
 
-    polygon_attributes = g['coordinates'].map do |polygon|
-      { coordinates: (g['type'] == 'Polygon' ? [polygon] : polygon) }
+    # area is the GeoJSON geometry itself, for the organisation_id_1_area_2dsphere index:
+    # a 2dsphere index can't index an array of GeoJSON objects like polygons
+    self.area = { 'type' => g['type'], 'coordinates' => g['coordinates'] }
+
+    # Each polygon keeps all its rings, so holes stay holes
+    polygon_attributes = (g['type'] == 'Polygon' ? [g['coordinates']] : g['coordinates']).map do |polygon|
+      { coordinates: polygon }
     end
 
     # Association assignment is queued with the parent save. Unlike clear or
@@ -78,6 +84,14 @@ class LocalGroup
 
     # Ensure polygons were created and are valid
     errors.add(:geometry, 'is invalid - unable to create valid polygons') if geometry.present? && (polygons.empty? || polygons.any? { |p| !p.valid? })
+
+    # The 2dsphere index rejects shapes MongoDB considers invalid (crossing edges, unclosed rings),
+    # so check the shape with a query that parses it the same way but matches nothing
+    begin
+      LocalGroup.and(_id: nil, area: { '$geoIntersects' => { '$geometry' => area } }).first
+    rescue Mongo::Error::OperationFailure
+      errors.add(:geometry, 'is not a valid shape (check for crossing edges and unclosed rings)')
+    end
   rescue StandardError => e
     errors.add(:geometry, e)
   end

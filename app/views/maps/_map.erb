@@ -20,8 +20,13 @@
         <% polygonable.polygons.each { |polygon| %>
           <% next unless polygon.coordinates.is_a?(Array) && polygon.coordinates[0].is_a?(Array) %>
           polygonPaths.push([
-            <% polygon.coordinates[0].each { |coordinate| %>
-              {lat: <%= coordinate[1] %>, lng: <%= coordinate[0] %>},
+            <% polygon.coordinates.each { |ring| %>
+              <% next unless ring.is_a?(Array) %>
+              [
+                <% ring.each { |coordinate| %>
+                  {lat: <%= coordinate[1] %>, lng: <%= coordinate[0] %>},
+                <% } %>
+              ],
             <% } %>
           ]);
         <% } %>
