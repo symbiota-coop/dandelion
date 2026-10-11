@@ -154,7 +154,7 @@ module EventAccounting
   def credit_applied
     @credit_applied ||= begin
       r = Money.new(0, currency)
-      orders.each { |order| r += Money.new((order.credit_applied || 0) * 100, order.currency) }
+      orders.pluck(:credit_applied, :currency).each { |amount, order_currency| r += Money.new((amount || 0) * 100, order_currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -184,7 +184,7 @@ module EventAccounting
   def fixed_discounts_applied
     @fixed_discounts_applied ||= begin
       r = Money.new(0, currency)
-      orders.each { |order| r += Money.new((order.fixed_discount_applied || 0) * 100, order.currency) }
+      orders.pluck(:fixed_discount_applied, :currency).each { |amount, order_currency| r += Money.new((amount || 0) * 100, order_currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -214,7 +214,7 @@ module EventAccounting
   def discounted_ticket_revenue
     @discounted_ticket_revenue ||= begin
       r = Money.new(0, currency)
-      tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100, ticket.currency) }
+      tickets.complete.pluck(:discounted_price, :currency).each { |price, ticket_currency| r += Money.new((price || 0) * 100, ticket_currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -226,7 +226,7 @@ module EventAccounting
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
       donations = skip_transferred ? self.donations.and(transferred: false) : self.donations
-      donations.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
+      donations.pluck(:amount, :currency).each { |amount, donation_currency| r += Money.new((amount || 0) * 100, donation_currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -238,7 +238,7 @@ module EventAccounting
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
       donations = skip_transferred ? self.donations.and(transferred: false) : self.donations
-      donations.and(application_fee_paid_to_dandelion: false).each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
+      donations.and(application_fee_paid_to_dandelion: false).pluck(:amount, :currency).each { |amount, donation_currency| r += Money.new((amount || 0) * 100, donation_currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -250,7 +250,7 @@ module EventAccounting
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
       tickets = skip_transferred ? self.tickets.and(transferred: false) : self.tickets
-      tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (ticket.organisation_revenue_share || 1), ticket.currency) }
+      tickets.complete.pluck(:discounted_price, :organisation_revenue_share, :currency).each { |price, share, ticket_currency| r += Money.new((price || 0) * 100 * (share || 1), ticket_currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -262,7 +262,7 @@ module EventAccounting
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
       tickets = skip_transferred ? self.tickets.and(transferred: false) : self.tickets
-      tickets.complete.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (1 - (ticket.organisation_revenue_share || 1)), ticket.currency) }
+      tickets.complete.pluck(:discounted_price, :organisation_revenue_share, :currency).each { |price, share, ticket_currency| r += Money.new((price || 0) * 100 * (1 - (share || 1)), ticket_currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
