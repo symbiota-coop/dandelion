@@ -667,6 +667,8 @@ class EventsTest < ActiveSupport::TestCase
     create_event(as: :quiet_later, start_time: 5.days.from_now, end_time: 6.days.from_now)
     create_event(as: :busy, start_time: 10.days.from_now, end_time: 11.days.from_now)
     create_event(as: :busier, start_time: 20.days.from_now, end_time: 21.days.from_now)
+    # trending only ranks events that could be on the homepage
+    [@quiet_soon, @quiet_later, @busy, @busier].each { |event| event.set(browsable: true, has_image: true, hidden_from_homepage: false) }
     [@busy, @busier, @busier].each do |event|
       Order.create!(event: event, account: FactoryBot.create(:account), value: 10, payment_completed: true, currency: 'GBP')
     end
