@@ -24,7 +24,7 @@ Dandelion::App.controller do
 
   get '/o/:slug/events', provides: %i[html ics json] do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
-    @events = @organisation.events_including_cohosted.publicly_visible
+    @events = @organisation.events_including_cohosted.hinted(Event::HOSTS_INDEX).publicly_visible
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
     @events = apply_events_order(@events)
