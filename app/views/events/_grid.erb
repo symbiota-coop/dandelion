@@ -3,6 +3,7 @@
     <h2 class="text-center">All events</h2>
   <% end %>
   <% events, more_events = capped_events(@events) %>
+  <% prefetch_fragments(events.map { |event| event_block_carousel_cache_key(event) }) %>
   <div class="row">
     <% previous_event = nil; event_count = 0; events.each { |event|
     next unless event.has_image?
@@ -11,7 +12,7 @@
     event_count += 1
     %>
     <div class="col-12 col-sm-6 col-lg-4 event-block" style="margin-bottom: var(--space-sm);<%= ' display: none;' if params[:show_more] && event_count > 6 %>">
-      <%= cp(:'events/block_carousel', locals: { event: event }, event: event, key: "/events/#{event.id}/block_carousel?organisation_id=#{@organisation.try(:id)}#{event_viewer_timezone_query(event)}") %>
+      <%= cp(:'events/block_carousel', locals: { event: event }, event: event, key: event_block_carousel_cache_key(event)) %>
     </div>
     <% previous_event = event } %>
   </div>

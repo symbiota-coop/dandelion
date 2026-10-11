@@ -82,6 +82,10 @@ Dandelion::App.helpers do
     "/events/#{event.id}?organisation_id=#{@organisation.try(:id)}#{event_viewer_timezone_query(event)}&current_account=#{current_account ? 1 : 0}"
   end
 
+  def event_block_carousel_cache_key(event)
+    "/events/#{event.id}/block_carousel?organisation_id=#{@organisation.try(:id)}#{event_viewer_timezone_query(event)}"
+  end
+
   def apply_random_or_trending_order(events, from)
     case params[:order]
     when 'random'

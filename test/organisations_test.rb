@@ -429,4 +429,25 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal 2, last_response.body.scan('cached card').length
     assert_not_includes last_response.body, @event1.name
   end
+
+  test 'the events grid and featured carousel serve their event cards from the cache' do
+    create_event(as: :event1, featured: true, has_image: true)
+    create_event(as: :event2, featured: true, has_image: true)
+    [@event1, @event2].each { |event| event.set(has_image: true) }
+    get "/o/#{@organisation.slug}/events?display=grid"
+    assert last_response.ok?
+    assert_equal 2, last_response.body.scan('event-block"').length
+    assert_equal 2, Fragment.count
+    # The carousel's cards share the grid's cache keys
+    get "/o/#{@organisation.slug}/carousels/featured"
+    assert last_response.ok?
+    assert_equal 2, last_response.body.scan('slick-item"').length
+    assert_equal 2, Fragment.count
+
+    Fragment.all.each { |fragment| fragment.set(value: '<p>cached card</p>') }
+    get "/o/#{@organisation.slug}/events?display=grid"
+    assert_equal 2, last_response.body.scan('cached card').length
+    get "/o/#{@organisation.slug}/carousels/featured"
+    assert_equal 2, last_response.body.scan('cached card').length
+  end
 end
