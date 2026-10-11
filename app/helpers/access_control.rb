@@ -218,11 +218,13 @@ Dandelion::App.helpers do
   def order_email_viewer?(order = nil, account = current_account)
     order ||= @order
     cached_permission(:@order_email_viewer_cache, order, account) do
+      # Use @event when it's the order's event: an order loaded through a ticket (as on /events/:id/tickets) would otherwise load it again
+      event = order && (@event && order.event_id == @event.id ? @event : order.event)
       Order.email_viewer?(
         order,
         account,
-        event_email_viewer: (event_email_viewer?(order.event, account) if order&.event),
-        event_admin: (event_admin?(order.event, account) if order&.opt_in_facilitator && order.event)
+        event_email_viewer: (event_email_viewer?(event, account) if event),
+        event_admin: (event_admin?(event, account) if order&.opt_in_facilitator && event)
       )
     end
   end

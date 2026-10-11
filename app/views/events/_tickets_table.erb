@@ -1,13 +1,14 @@
 <% @tickets = @tickets.order('created_at desc')
    @tickets = @tickets.paginate(page: params[:page], per_page: 50)
+   # Load the page once: @tickets is a criteria, so each map or each would query it again
+   tickets_on_page = @tickets.to_a
    # Batch load event feedbacks to avoid N+1 queries
-   ticket_account_ids = @tickets.map(&:account_id).compact
+   ticket_account_ids = tickets_on_page.map(&:account_id).compact
    event_feedbacks_by_account = @event.event_feedbacks.and(:account_id.in => ticket_account_ids).index_by(&:account_id) %>
 <% if event_email_viewer? %>
   <pre>
     <% 
-    tickets_with_accounts = @tickets.includes(:account).to_a
-    email_list = tickets_with_accounts.filter_map do |ticket|
+    email_list = tickets_on_page.filter_map do |ticket|
       name = ticket.name.present? ? ticket.name : (ticket.account&.name)
       email = ticket.email.present? ? ticket.email : (ticket.account&.email)
       next unless name && email
@@ -63,7 +64,7 @@
       <th>Actions</th>
     </tr>
   </thead>
-  <% @tickets.each { |ticket| %>
+  <% tickets_on_page.each { |ticket| %>
   <tr>
     <td>
       <% if ticket.account %>

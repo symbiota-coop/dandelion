@@ -132,18 +132,22 @@ Dandelion::App.helpers do
     end
   end
 
+  # Works from total_entries, which will_paginate counts once, rather than loading the page:
+  # on a Mongoid criteria, each to_a or count runs another query
   def pagination_details(collection, model: nil)
+    total = collection.total_entries
     if collection.total_pages < 2
-      case collection.to_a.length
+      case total
       when 0
         "No #{model.pluralize.downcase} found"
       when 1
         "Displaying <b>1</b> #{model.downcase}"
       else
-        "Displaying <b>all #{collection.count}</b> #{model.pluralize.downcase}"
+        "Displaying <b>all #{total}</b> #{model.pluralize.downcase}"
       end
     else
-      "Displaying #{model.pluralize.downcase} <b>#{collection.offset + 1} - #{collection.offset + collection.to_a.length}</b> of <b>#{collection.count}</b> in total"
+      page_length = (total - collection.offset).clamp(0, collection.per_page)
+      "Displaying #{model.pluralize.downcase} <b>#{collection.offset + 1} - #{collection.offset + page_length}</b> of <b>#{total}</b> in total"
     end
   end
 

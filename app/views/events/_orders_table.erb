@@ -1,8 +1,10 @@
 <% orders = orders.order('created_at desc')
    orders = orders.paginate(page: params[:page], per_page: 50)
+   # Load the page once: orders is a criteria, so each map or each would query it again
+   orders_on_page = orders.to_a
    # Batch load event feedbacks to avoid N+1 queries
    if @event
-     order_account_ids = orders.map(&:account_id).compact
+     order_account_ids = orders_on_page.map(&:account_id).compact
      event_feedbacks_by_account = @event.event_feedbacks.and(:account_id.in => order_account_ids).index_by(&:account_id)
    end %>
 <% if @event %>
@@ -89,7 +91,7 @@
       <th>Actions</th>
     </tr>
   </thead>
-  <% orders.each { |order| %>
+  <% orders_on_page.each { |order| %>
   <tr>
     <td>
       <% if order.account %>

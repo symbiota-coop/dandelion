@@ -466,4 +466,54 @@ class OrdersTest < ActiveSupport::TestCase
     @order.donations.create!(account: @attendee, event: @event, amount: 10)
     refute @order.donation_receipt?
   end
+
+  def add_order_with_ticket(event)
+    attendee = FactoryBot.create(:account)
+    order = event.orders.create!(account: attendee, currency: event.currency, value: 10, payment_completed: true)
+    order.tickets.create!(event: event, account: attendee, ticket_type: event.ticket_types.first, price: 10)
+    attendee
+  end
+
+  # The queries a request runs, as [command, collection] pairs
+  def queries_during
+    commands = []
+    subscriber = Object.new
+    subscriber.define_singleton_method(:started) { |e| commands << [e.command_name, e.command.values.first] }
+    subscriber.define_singleton_method(:succeeded) { |_| nil }
+    subscriber.define_singleton_method(:failed) { |_| nil }
+    Mongoid.default_client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
+    yield
+    commands
+  ensure
+    Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber) if subscriber
+  end
+
+  test 'event tickets and orders pages run the same queries however many orders there are' do
+    create_event(prices: [10])
+    @event.ticket_types.first.update!(quantity: 10)
+    attendees = Array.new(2) { add_order_with_ticket(@event) }
+    sign_in_with_rack(@account)
+
+    counts = lambda do |path|
+      queries = queries_during { get path }
+      assert_equal 200, last_response.status
+      { events: queries.count(%w[find events]), tickets: queries.count(%w[find tickets]), orders: queries.count(%w[find orders]) }
+    end
+
+    tickets_before = counts.call("/events/#{@event.id}/tickets")
+    # Each table loads its page of records once, not again for each map, each and pagination_details
+    assert_operator tickets_before[:tickets], :<=, 2
+    orders_before = counts.call("/events/#{@event.id}/orders")
+    assert_operator orders_before[:orders], :<=, 3
+    get "/events/#{@event.id}/tickets"
+    attendees.each { |attendee| assert_includes last_response.body, attendee.name }
+    assert_includes last_response.body, 'Displaying <b>all 2</b> tickets'
+
+    3.times { add_order_with_ticket(@event) }
+
+    assert_equal tickets_before, counts.call("/events/#{@event.id}/tickets")
+    assert_includes last_response.body, 'Displaying <b>all 5</b> tickets'
+    assert_equal orders_before, counts.call("/events/#{@event.id}/orders")
+    assert_includes last_response.body, 'Displaying <b>all 5</b> orders'
+  end
 end
