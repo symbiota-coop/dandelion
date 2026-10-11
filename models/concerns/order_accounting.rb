@@ -46,18 +46,18 @@ module OrderAccounting
   end
 
   def credit_on_behalf_of_organisation
-    credit_applied - credit_on_behalf_of_revenue_sharer if revenue_sharer && credit_on_behalf_of_revenue_sharer && credit_applied && credit_applied.positive?
+    credit_applied - credit_on_behalf_of_revenue_sharer if revenue_sharer_id && credit_on_behalf_of_revenue_sharer && credit_applied && credit_applied.positive?
   end
 
   def credit_on_behalf_of_revenue_sharer
-    credit_applied * ((discounted_ticket_revenue / (discounted_ticket_revenue + donation_revenue)) * (1 - organisation_revenue_share)).to_f if revenue_sharer && credit_applied && credit_applied.positive? && (discounted_ticket_revenue + donation_revenue).positive?
+    credit_applied * ((discounted_ticket_revenue / (discounted_ticket_revenue + donation_revenue)) * (1 - organisation_revenue_share)).to_f if revenue_sharer_id && credit_applied && credit_applied.positive? && (discounted_ticket_revenue + donation_revenue).positive?
   end
 
   def fixed_discount_on_behalf_of_organisation
-    fixed_discount_applied - fixed_discount_on_behalf_of_revenue_sharer if revenue_sharer && fixed_discount_applied && fixed_discount_applied.positive?
+    fixed_discount_applied - fixed_discount_on_behalf_of_revenue_sharer if revenue_sharer_id && fixed_discount_applied && fixed_discount_applied.positive?
   end
 
   def fixed_discount_on_behalf_of_revenue_sharer
-    fixed_discount_applied * ((discounted_ticket_revenue / (discounted_ticket_revenue + donation_revenue)) * (1 - organisation_revenue_share)).to_f if revenue_sharer && fixed_discount_applied && fixed_discount_applied.positive? && (discounted_ticket_revenue + donation_revenue).positive?
+    fixed_discount_applied * ((discounted_ticket_revenue / (discounted_ticket_revenue + donation_revenue)) * (1 - organisation_revenue_share)).to_f if revenue_sharer_id && fixed_discount_applied && fixed_discount_applied.positive? && (discounted_ticket_revenue + donation_revenue).positive?
   end
 end
