@@ -1,4 +1,4 @@
-<% event_tags = event.event_tags %>
+<% event_tags = event.event_tagships.map(&:event_tag).compact %>
 <% tags_to_display = defined?(limit) ? event_tags.sample(limit) : event_tags.shuffle %>
 
 <span class="tag-container">

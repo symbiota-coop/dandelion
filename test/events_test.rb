@@ -693,6 +693,28 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal 3, page.total_pages
   end
 
+  test 'event cards read tags and cohosts from the joins with_key_includes preloads, without querying' do
+    create_event
+    cohost = FactoryBot.create(:organisation)
+    @event.cohostships.create!(organisation: cohost)
+    tag = FactoryBot.create(:event_tag)
+    @event.event_tagships.create!(event_tag: tag)
+
+    preloaded = Event.and(id: @event.id).with_key_includes.first
+    commands = []
+    subscriber = Object.new
+    subscriber.define_singleton_method(:started) { |e| commands << e.command_name }
+    subscriber.define_singleton_method(:succeeded) { |_| nil }
+    subscriber.define_singleton_method(:failed) { |_| nil }
+    Mongoid.default_client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
+    assert_equal [tag], preloaded.event_tagships.map(&:event_tag)
+    assert_equal [cohost], preloaded.cohostships.map(&:organisation)
+    preloaded.image_source(cohost)
+    assert_empty commands
+  ensure
+    Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber) if subscriber
+  end
+
   test 'hosts cache sync finds and repairs a stale hosts_ids_cache' do
     create_event
     cohost = FactoryBot.create(:organisation)

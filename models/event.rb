@@ -86,7 +86,7 @@ class Event
   end
 
   def image_source(cohost)
-    cohostship = cohost && cohostships.find_by(organisation: cohost)
+    cohostship = cohost && cohostships.detect { |c| c.organisation_id == cohost.id }
     return cohostship if cohostship&.image
     return self if image
 
