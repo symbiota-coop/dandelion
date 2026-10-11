@@ -39,6 +39,13 @@ Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Mongo
 - Random values that can't clash, like `SecureRandom` tokens (`token`, `ics_key`, `sign_in_token`, `DragonflyJob#uid`), still get a unique index, which catches bugs such as copying a record along with its token. But don't add `validates_uniqueness_of` or an `exists?` retry loop for them: each costs a query on every create. Short or derived values can clash, so they keep the validation (`evm_secret` is 4 digits, `DragonflyJob#signature` is a hash of the job)
 - The planner can't use a `$type`-filtered index for a plain `{ field: x }` query, since the query doesn't imply the filter, and `validates_uniqueness_of` itself runs one (unscoped, on create and whenever the field changes). So every `$type`-filtered unique index needs a plain non-unique index on the same fields beside it (e.g. `slug_1` beside `slug_1_unique` on events), unless another plain index already starts with them (e.g. `session_id_1__id_1` on orders). Never drop a plain index when adding a filtered unique one. Don't instead add a `$type` condition to the validation so its query uses the filtered index: it relies on how Mongoid combines two conditions on one field. Check with the slow query log or `$indexStats` (an index with 0 ops is serving nothing)
 
+## Tracing
+
+- Every request is traced, but `before_send_transaction` (`config/sentry_config.rb`) saves it to the `traces` collection (`Trace`) and returns nil: Sentry gets only errors and logs, never transactions or profiles. For performance data, query `traces` (e.g. with the MongoDB MCP), not Sentry: `name` (route), `duration_ms`, `http_status`, `release`, `started_at`
+- Requests matching no route and `GET /health` aren't saved. Mongo queries become spans via `SentryMongoCommandSubscriber`
+- Spans are zstd-compressed in `spans_zstd`, so Mongo queries can't read them; use `Trace#spans` in Ruby. Atlas Search pipelines and timings are also stored uncompressed in `search_spans`
+- Report rescued errors with `ErrorReporting.capture_exception(e, context:, tags:)`
+
 ## Tests
 
 You can use the following command structure to test a single file: `foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb`
