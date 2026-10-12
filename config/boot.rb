@@ -44,6 +44,10 @@ Delayed::Worker.max_attempts = 1
 Delayed::Worker.max_run_time = 15.minutes
 Delayed::Worker.destroy_failed_jobs = false
 
+# Cost 12 takes ~275 ms a hash, and every account the test factory creates hashes a password.
+# The cost is stored in each hash, so hashes made here still verify anywhere
+BCrypt::Engine.cost = BCrypt::Engine::MIN_COST if %i[test development].include?(Padrino.env)
+
 Money.default_currency = ENV['DEFAULT_CURRENCY']
 Money.default_bank = DandelionBank.new
 Money.locale_backend = :currency
