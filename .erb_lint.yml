@@ -11,8 +11,6 @@ linters:
   RequireInputAutocomplete:
     enabled: false
   # Failing on existing templates; to be fixed and re-enabled one at a time
-  ClosingErbTagIndent:
-    enabled: false
   AllowedScriptType:
     enabled: true
     allowed_types:

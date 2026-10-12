@@ -18,7 +18,7 @@ end
         params = Rack::Utils.parse_query(uri.query || '')
         params['draft_id'] = draft.id
         uri.query = Rack::Utils.build_query(params)
-      %>
+            %>
             <i class="bi bi-pencil-square"></i>
             <a href="<%= uri %>">
               <%= draft.name %>

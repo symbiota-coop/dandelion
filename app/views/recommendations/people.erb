@@ -13,8 +13,7 @@ recommended_people = @account.recommended_people || []
     next if @account.follows_as_follower.find_by(followee: k); account = Account.find(k);
     next if !account;
     next if account.private?;
-    p = p + 1
-    %>
+    p = p + 1 %>
     <li<% if i == 0 %> class="border-top-0"<% end %>>
       <div class="search-result-media h-auto">
         <%= partial :'accounts/square', locals: { account: account, klass: 'd-block', size: :fill } %>

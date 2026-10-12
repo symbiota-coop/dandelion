@@ -36,7 +36,8 @@
   account = event_feedback.account
   next if account.name.include?('_')
   quote = event_feedback.public_answers.map { |q,a| a if a.present? }.compact.join('<br /><br />').gsub("\n", '<br />')
-  next if quote.length > 500 %>
+  next if quote.length > 500
+  %>
   <div class="feedback-columns-item">
 
     <div class="row g-0">

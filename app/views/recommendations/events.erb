@@ -16,8 +16,7 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_inc
         next if event.sold_out?
         next if event.created_at < 1.year.ago
         next if event.event_facilitations.find_by(account: current_account);
-        r = r + 1;
-        %>
+        r = r + 1; %>
       <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
         <div class="mb-4">
 
@@ -43,8 +42,7 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_inc
                         <% public_count = people_accounts.count - private_count %>
                         <li><i data-bs-toggle="tooltip" title="People" class="bi bi-person-fill"></i>
                           <% people.each { |k,v| account = people_accounts.find { |a| a.id.to_s == k.to_s }; next unless account;
-                          next if account.private?
-                          %>
+                          next if account.private? %>
                           <a href="/u/<%= account.username %>"><%= account.name %></a>,
                           <span data-bs-toggle="tooltip">
                             <%= pluralize v.count, 'event' %> in common

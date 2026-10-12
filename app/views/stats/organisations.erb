@@ -72,8 +72,7 @@
       orders_sum = org_orders.inject(Money.new(0, 'GBP')) do |sum, o|
         sum + Money.new(o.value * 100, o.currency)
       end
-      orders_sum = orders_sum.exchange_to('GBP') if orders_sum > 0
-    %>
+      orders_sum = orders_sum.exchange_to('GBP') if orders_sum > 0 %>
     <tr>
       <td>
         <a href="/o/<%= organisation.slug %>"><%= organisation.name %></a>
