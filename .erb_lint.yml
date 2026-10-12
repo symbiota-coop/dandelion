@@ -10,7 +10,6 @@ linters:
   # Forces an autocomplete attribute on every input; we add one only where it helps
   RequireInputAutocomplete:
     enabled: false
-  # Failing on existing templates; to be fixed and re-enabled one at a time
   AllowedScriptType:
     enabled: true
     allowed_types:
@@ -45,7 +44,4 @@ linters:
         Enabled: true
         AllowAsExpressionSeparator: true
       Lint/UselessAssignment:
-        Enabled: false
-      # Failing on existing templates; to be fixed and re-enabled one at a time
-      Layout/EndAlignment:
         Enabled: false

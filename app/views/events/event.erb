@@ -93,10 +93,10 @@
           future_events_scope.and(:id.in => matching_event_ids, :start_time.ne => @event.start_time)
         else
           future_events_scope.and(:name => @event.name, :location => @event.location, :start_time.ne => @event.start_time)
-        end
+                        end
         events = ([@event] + future_events).uniq
         n = events.count
-     end %>
+      end %>
 
       <div class="row g-0">
         <div class="col">

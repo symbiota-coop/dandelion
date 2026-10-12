@@ -3,7 +3,7 @@
     questions_a = q.empty? ? [] : q
 else
 questions_a = @event.feedback_questions_a
-end %>
+   end %>
 
 <% questions_a.each_with_index { |q,i| %>
 <%= hidden_field_tag "questions[#{i}]", value: q %>
