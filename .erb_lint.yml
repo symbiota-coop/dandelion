@@ -47,8 +47,6 @@ linters:
       Lint/UselessAssignment:
         Enabled: false
       # Failing on existing templates; to be fixed and re-enabled one at a time
-      Lint/UnusedBlockArgument:
-        Enabled: false
       Lint/RedundantSafeNavigation:
         Enabled: false
       Lint/RedundantTypeConversion:
