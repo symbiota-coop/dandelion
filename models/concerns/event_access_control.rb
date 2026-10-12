@@ -23,8 +23,7 @@ module EventAccessControl
     # Who may change an event's revenue sharer and profit-share settings.
     # Unlike revenue_admin?, cohost admins are excluded: cohosts are not trusted
     # by the host organisation, so trusting them here would let them redirect
-    # the host organisation's ticket revenue. This is also who may remove cohosts
-    # (only host organisation admins and event managers may add them).
+    # the host organisation's ticket revenue.
     def revenue_settings_admin?(event, account, activity_admin: nil, local_group_admin: nil, organisation_admin: nil)
       account &&
         event &&
@@ -34,6 +33,20 @@ module EventAccessControl
           (event.local_group && (local_group_admin || (local_group_admin.nil? && LocalGroup.admin?(event.local_group, account)))) ||
           (event.organisation && Organisation.admin_or_event_manager?(event.organisation, account, organisation_admin: organisation_admin))
         )
+    end
+
+    # Admins and event managers of a cohost organisation become event admins and
+    # can see attendee emails, so only those who can already see them (admins
+    # and event managers of the host organisation) may add cohosts. Otherwise an
+    # activity or local group admin could add their own organisation.
+    def cohost_adder?(event, account, organisation_admin: nil)
+      account && event && event.organisation && Organisation.admin_or_event_manager?(event.organisation, account, organisation_admin: organisation_admin)
+    end
+
+    # Removing a cohost only takes access away, so revenue settings admins
+    # (including activity and local group admins) may remove them.
+    def cohost_remover?(event, account, activity_admin: nil, local_group_admin: nil, organisation_admin: nil)
+      revenue_settings_admin?(event, account, activity_admin: activity_admin, local_group_admin: local_group_admin, organisation_admin: organisation_admin)
     end
 
     def revenue_admin?(event, account, activity_admin: nil, local_group_admin: nil, organisation_admin: nil)

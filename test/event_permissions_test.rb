@@ -154,7 +154,45 @@ class EventPermissionsTest < ActiveSupport::TestCase
     post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: attacker_org.id }
 
     assert last_response.redirect?
+    assert_includes last_response.location, "/e/#{@event.slug}"
     refute @event.cohostships.find_by(organisation: attacker_org)
+    refute Event.email_viewer?(@event.reload, local_group_admin)
+  end
+
+  test 'event page shows activity admins the remove cohost control but not the add one' do
+    create_full_event_hierarchy(skip_local_group: true)
+    activity_admin = FactoryBot.create(:account)
+    @activity.activityships.create!(account: activity_admin, admin: true, unsubscribed: false)
+    @event.cohostships.create!(organisation: FactoryBot.create(:organisation))
+
+    sign_in_with_rack(activity_admin)
+    get "/e/#{@event.slug}"
+
+    assert last_response.ok?
+    refute_includes last_response.body, 'id="add-organisation"'
+    assert_includes last_response.body, 'id="remove-organisation"'
+  end
+
+  test 'event page shows local group admins no add cohost control' do
+    create_full_event_hierarchy(skip_activity: true)
+    local_group_admin = FactoryBot.create(:account)
+    @local_group.local_groupships.create!(account: local_group_admin, admin: true, unsubscribed: false)
+
+    sign_in_with_rack(local_group_admin)
+    get "/e/#{@event.slug}"
+
+    assert last_response.ok?
+    refute_includes last_response.body, 'id="add-organisation"'
+  end
+
+  test 'event page shows host organisation admins the add cohost control' do
+    create_event
+
+    sign_in_with_rack(@account)
+    get "/e/#{@event.slug}"
+
+    assert last_response.ok?
+    assert_includes last_response.body, 'id="add-organisation"'
   end
 
   test 'host event_manager can add a cohost' do

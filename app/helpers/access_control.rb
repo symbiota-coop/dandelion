@@ -168,6 +168,30 @@ Dandelion::App.helpers do
     end
   end
 
+  def event_cohost_adder?(event = nil, account = current_account)
+    event ||= @event
+    cached_permission(:@event_cohost_adder_cache, event, account) do
+      Event.cohost_adder?(
+        event,
+        account,
+        organisation_admin: (organisation_admin?(event.organisation, account) if event&.organisation)
+      )
+    end
+  end
+
+  def event_cohost_remover?(event = nil, account = current_account)
+    event ||= @event
+    cached_permission(:@event_cohost_remover_cache, event, account) do
+      Event.cohost_remover?(
+        event,
+        account,
+        activity_admin: (activity_admin?(event.activity, account) if event&.activity),
+        local_group_admin: (local_group_admin?(event.local_group, account) if event&.local_group),
+        organisation_admin: (organisation_admin?(event.organisation, account) if event&.organisation)
+      )
+    end
+  end
+
   def event_revenue_admins_only!
     kick!(redirect_url: "/e/#{@event.slug}") unless event_revenue_admin?
   end

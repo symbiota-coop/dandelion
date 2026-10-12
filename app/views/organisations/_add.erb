@@ -6,7 +6,8 @@
   <a href="/o/<%= organisation.slug %>/events"><%= organisation.name %></a>
 </div>
 <% } %>
-<% if add || (remove && organisations.exists?) %>
+<% remove &&= organisations.exists? %>
+<% if add || remove %>
   <div>
     <% if add %>
       <a id="add-organisation" href="javascript:;" onclick="$(this).hide().next().show();
@@ -18,7 +19,7 @@
         <% end %>
       </div>
     <% end %>
-    <% if remove && organisations.exists? %>
+    <% if remove %>
       <a id="remove-organisation" href="javascript:;" onclick="$(this).hide().next().show();
         $('#add-organisation').hide()"><i class="bi bi-dash-square-fill"></i></a>
       <div style="display: none">
