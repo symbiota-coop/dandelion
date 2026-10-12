@@ -32,6 +32,11 @@ else
   done
 fi
 
+# ESLint, for linting app/assets/javascripts (package.json)
+if command -v npm >/dev/null; then
+  npm ci --no-audit --no-fund
+fi
+
 if [ ! -f .env ]; then
   cp .env.example .env
 fi

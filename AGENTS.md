@@ -105,6 +105,7 @@ Cooldown: never use a gem or JS package version released less than 7 days ago. T
 
 - Gems: the Gemfile's source has `cooldown: 7`, so Bundler enforces it
 - `rake bootstrap:build` runs `npm install` with `--before` set to 7 days ago
+- The root `package.json` is only ESLint, which CI runs as `npx eslint` over `app/assets/javascripts` (`eslint.config.mjs`). It installs from `package-lock.json` (`npm ci`): pin exact versions, and when adding or bumping one run `npm install --before=<the date a week ago>` so its own dependencies are a week old too
 - `ckeditor/` installs from its `yarn.lock`. Yarn 1 has no cooldown, so when refreshing the lockfile (`yarn upgrade`), check the new versions' release dates (`npm view <package> time`) and pin back any that are under a week old
 - When adding or bumping a CDN package in `config/frontend_dependencies.rb`, or a version in a rake task, pick a version at least 7 days old
 

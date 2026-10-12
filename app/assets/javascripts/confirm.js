@@ -50,7 +50,7 @@
     const stale = bootstrap.Popover.getInstance(el)
     if (stale) stale.dispose()
     $(el).one('shown.bs.popover', function () { confirmButton.trigger('focus') })
-    new bootstrap.Popover(el, { // eslint-disable-line no-new
+    new bootstrap.Popover(el, {
       content: body[0],
       html: true,
       // Just a body: Bootstrap would otherwise show the element's title as a header

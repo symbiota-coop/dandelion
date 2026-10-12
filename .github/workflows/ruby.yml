@@ -32,6 +32,17 @@ jobs:
     - name: Run erb_lint
       run: bundle exec erb_lint --lint-all --fail-level W # W is warning, like RuboCop above; erb_lint 0.9 rejects the word "warning"
 
+    - name: Install Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+
+    - name: Run ESLint
+      run: |
+        npm ci
+        npx eslint
+
   generate-matrix:
     runs-on: ubuntu-latest
     outputs:
