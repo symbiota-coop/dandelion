@@ -9,6 +9,26 @@ CACHEBUST_DIGESTS = {}
 LIBRARY_CACHE = {}
 ADJECTIVES = %w[soulful regenerative metamodern participatory conscious transformative holistic ethical].freeze
 
+# Each test run gets its own database, which test_config.rb drops afterwards, and a free port, so runs at the
+# same time (in one checkout or several) can't wipe each other's data or clash on the port
+if RACK_ENV == 'test'
+  require 'socket'
+  ENV['TEST_DATABASE'] = "dandelion_test_#{Process.pid}"
+  # Capybara binds the port seconds later, so a port the OS picks now could be taken by another run by then.
+  # Instead, each run takes the first free port in its own block of 10, set by its process ID
+  port_free = lambda do |port|
+    TCPServer.new('127.0.0.1', port).close
+    true
+  rescue Errno::EADDRINUSE, Errno::EACCES
+    false
+  end
+  block = 10_000 + ((Process.pid % 4000) * 10)
+  port = (block...(block + 10)).find(&port_free)
+  raise "No free port in #{block}-#{block + 9}" unless port
+  ENV['PORT'] = port.to_s
+  ENV['BASE_URI'] = "http://127.0.0.1:#{ENV['PORT']}"
+end
+
 # Load our dependencies
 require 'rubygems' unless defined?(Gem)
 require 'bundler/setup'

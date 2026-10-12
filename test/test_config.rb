@@ -35,6 +35,20 @@ Capybara.default_driver = :cuprite
 
 # Configure Geocoder for testing (avoid real API calls)
 Geocoder.configure(lookup: :test)
+
+# Drop this run's database (see config/boot.rb) when it ends, and any left by runs that didn't finish
+Mongoid.default_client.database_names.grep(/\Adandelion_test_(\d+)\z/) do |name|
+  pid = Regexp.last_match(1).to_i
+  running = begin
+    Process.kill(0, pid)
+  rescue Errno::ESRCH
+    false
+  rescue Errno::EPERM
+    true
+  end
+  Mongoid.default_client.use(name).database.drop unless running
+end
+Minitest.after_run { Mongoid.default_client.database.drop }
 Geocoder::Lookup::Test.set_default_stub([{ 'coordinates' => [59.3251, 18.0685] }]) # Gamla Stan coords (111 28, Sweden)
 
 module ActiveSupport

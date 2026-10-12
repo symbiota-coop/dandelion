@@ -375,9 +375,10 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'existing account created by a concurrent signup' do
+    # created first, as listing the indexes of a collection that doesn't exist yet raises
+    existing_account = FactoryBot.create(:account)
     # the race only reaches the unique index, which the test database may not have
     Account.collection.indexes.create_one({ email: 1 }, unique: true) unless Account.collection.indexes.any? { |index| index['unique'] && index['key'] == { 'email' => 1 } }
-    existing_account = FactoryBot.create(:account)
 
     # the other request inserts the account after this one's uniqueness check, so the insert hits the unique index
     uniqueness = Account.validators_on(:email).find { |validator| validator.is_a?(Mongoid::Validatable::UniquenessValidator) }

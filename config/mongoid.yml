@@ -8,7 +8,7 @@ development:
 test:
   clients:
     default:
-      database: dandelion_test
+      database: <%= ENV['TEST_DATABASE'] %>
       hosts:
         - localhost:27017
 
