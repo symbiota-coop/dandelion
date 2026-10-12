@@ -16,7 +16,7 @@ is_preview = defined?(preview) && preview
     <% match = $1 %>
     <p><%== Sanitize.fragment(Rinku.auto_link(match.chomp('*')), Sanitize::Config::DANDELION) %></p>
   <% elsif m = q.match(Questions::SELECT_FIELD_REGEX)  %>
-    <% # Select field: Question text <option1, option2, option3> or Question text <option1, option2, option3>* %>
+    <%# Select field: Question text <option1, option2, option3> or Question text <option1, option2, option3>* %>
     <% question_text = m[1] %>
     <% options = m[2].split(',').map(&:strip) %>
     <div class="mb-3">
@@ -24,7 +24,7 @@ is_preview = defined?(preview) && preview
       <%= select_tag "answers[#{i}]", options: [''] + options, selected: (params[:answers][i.to_s] if params[:answers]), required: q.ends_with?('*'), class: 'form-select', disabled: is_preview %>
     </div>
   <% elsif m = q.match(Questions::MULTIPLE_CHECKBOX_FIELD_REGEX)  %>
-    <% # Multiple checkboxes: Question text [option1, option2, option3] or Question text [option1, option2, option3]* %>
+    <%# Multiple checkboxes: Question text [option1, option2, option3] or Question text [option1, option2, option3]* %>
     <% question_text = m[1] %>
     <% options = m[2].split(',').map(&:strip) %>
     <% is_required = q.ends_with?('*') %>
@@ -40,7 +40,7 @@ is_preview = defined?(preview) && preview
       <% end %>
     </div>
   <% elsif m = q.match(Questions::CHECKBOX_FIELD_REGEX)  %>
-    <% # Checkbox: [Question text] %>
+    <%# Checkbox: [Question text] %>
     <div class="form-check">
       <%= check_box_tag "answers[#{i}]", id: "answers-#{i}", class: 'form-check-input', checked: ((params[:answers][i.to_s] == 'true') if params[:answers]), 'data-required': q.ends_with?('*'), disabled: is_preview %>
       <label class="form-check-label fw-bold" for="answers-<%=i%>">
