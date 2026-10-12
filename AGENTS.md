@@ -68,6 +68,12 @@ Always ask permission before running tests. Your default posture should be to su
 - `lib/param_helpers.rb` runs `blanks_to_nils!` on `params`, so blank values are already nil: just do `if params[:x]`, with no `.present?` or `.presence`. Do not use `.presence` elsewhere either
 - You can find documentation at app/views/docs/md. Keep it up to date.
 
+## Security reviews
+
+- Every model runs `sanitize_fields` (`models/concerns/core_extensions.rb`) before validation: it strips tags and drops `<` and `>` from `name`, `title` and `subject` (`CoreExtensions::SANITIZED_FIELDS`). So a view or helper that outputs one of these unescaped (e.g. `dropdown_nav`, `ul_nav`, `"#{x.name}".html_safe`, Tribute's mention menu) is not an XSS on its own. Before reporting one, show a write path that skips validation (`set`, `update_one`, `save(validate: false)`) or a field outside that list, and check `protected_attributes`/`permitted_attributes`, which decide whether a form can set the field at all
+- `<%= %>` escapes by default (Padrino `SafeErubi`); look at `<%==`, `.html_safe` and `raw` for XSS
+- `lib/param_helpers.rb` strips Mongo `$` operators from form params (not from JSON request bodies)
+
 ## Build/vendored code
 
 - CKEditor is our own build in `ckeditor/`, on CKEditor 37.1.0: 38 and later show a Powered by CKEditor badge under the GPL. Never edit `app/assets/javascripts/ext/ckeditor.js`: change `ckeditor/src/ckeditor.js` and run `rake ckeditor:build` (needs Node)
