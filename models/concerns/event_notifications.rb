@@ -78,6 +78,7 @@ module EventNotifications
     (account_id == :all ? attendees.and(unsubscribed: false).and(unsubscribed_reminders: false) : attendees.and(unsubscribed: false).and(unsubscribed_reminders: false).and(id: account_id)).each do |account|
       attendee_orders = event.orders.complete.and(account: account).to_a
       cancellable_order = attendee_orders.find { |order| order.value.nil? || order.value.zero? }
+      cancellable_ticket = (event.tickets.complete.without_order.and(account: account).detect(&:cancellable?) unless cancellable_order)
 
       when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ')
       recipient_vars = EmailFields.recipient_variables(
@@ -87,8 +88,9 @@ module EventNotifications
                                         .merge('when_parts_0' => when_parts[0],
                                                'when_parts_1' => when_parts[1..].join(', '))
 
-      if cancellable_order
-        cancel_rsvp_url = "#{ENV['BASE_URI']}/orders/#{cancellable_order.id}/confirm_cancel?sign_in_token=#{recipient_vars['token']}"
+      if cancellable_order || cancellable_ticket
+        cancel_rsvp_path = cancellable_order ? "/orders/#{cancellable_order.id}" : "/tickets/#{cancellable_ticket.id}"
+        cancel_rsvp_url = "#{ENV['BASE_URI']}#{cancel_rsvp_path}/confirm_cancel?sign_in_token=#{recipient_vars['token']}"
         batch_with_cancel.add_recipient(:to, account.email, recipient_vars.merge('cancel_rsvp_url' => cancel_rsvp_url))
         recipients_with_cancel += 1
       else

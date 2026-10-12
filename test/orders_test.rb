@@ -516,4 +516,49 @@ class OrdersTest < ActiveSupport::TestCase
     assert_equal orders_before, counts.call("/events/#{@event.id}/orders")
     assert_includes last_response.body, 'Displaying <b>all 5</b> orders'
   end
+
+  def create_complimentary_ticket(price: nil)
+    create_event(prices: [10])
+    @attendee = FactoryBot.create(:account)
+    @attendee.tickets.create!(event: @event, ticket_type: @event.ticket_types.first, price: price, complimentary: true)
+  end
+
+  test 'complimentary tickets can be cancelled by their account' do
+    ticket = create_complimentary_ticket
+    assert ticket.cancellable?
+    sign_in_with_rack(@attendee)
+
+    get "/e/#{@event.slug}"
+    assert_includes last_response.body, "/tickets/#{ticket.id}/destroy"
+
+    get "/tickets/#{ticket.id}/confirm_cancel"
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "/tickets/#{ticket.id}/destroy"
+
+    post "/tickets/#{ticket.id}/destroy", from_confirm: '1'
+    assert_equal "http://example.org/e/#{@event.slug}", last_response.location
+    assert_nil Ticket.find(ticket.id)
+  end
+
+  test 'complimentary tickets cannot be cancelled by another account' do
+    ticket = create_complimentary_ticket
+    sign_in_with_rack(FactoryBot.create(:account))
+
+    get "/tickets/#{ticket.id}/confirm_cancel"
+    assert_equal 403, last_response.status
+    post "/tickets/#{ticket.id}/destroy"
+    assert_equal 403, last_response.status
+    assert Ticket.find(ticket.id)
+  end
+
+  test 'priced complimentary tickets and tickets in orders cannot be cancelled as tickets' do
+    ticket = create_complimentary_ticket(price: 10)
+    refute ticket.cancellable?
+    sign_in_with_rack(@attendee)
+    post "/tickets/#{ticket.id}/destroy"
+    assert_equal 403, last_response.status
+
+    create_complete_order_with_ticket
+    refute @ticket.cancellable?
+  end
 end

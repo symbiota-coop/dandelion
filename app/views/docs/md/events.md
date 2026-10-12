@@ -200,6 +200,10 @@ Locked events are hidden from the public. Anyone who can view the event page (ev
 
 Dandelion can send event attendees a reminder email before the event starts. Set **Hours before the event to send the reminder email** in the event's Emails tab (default: 24). Leave blank to skip the reminder. You can also customise the reminder subject and body in your organisation or event settings.
 
+## Attendees cancelling free RSVPs
+
+Attendees can cancel free orders, and free complimentary tickets you've added from the Tickets page, themselves: from the event page, and via the **Cancel your RSVP** link in their ticket and reminder emails. They're emailed to confirm the cancellation, and anyone on the waitlist is told a place is available. Paid orders and tickets can't be cancelled by attendees; see [Refunds](#refunds).
+
 ## Feedback
 
 Attendees receive an email with a request for feedback after the event ends. Set **Hours after the event to send the feedback request email** in the event's Emails tab (maximum: 720 hours, or 30 days). Leave blank to send when the event ends.

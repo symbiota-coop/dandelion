@@ -99,6 +99,7 @@ Dandelion::App.controller do
     @event = @order.event
     halt 403 unless @order.account == current_account
     halt 403 unless @order.value.nil? || @order.value.zero?
+    @destroy_url = "/orders/#{@order.id}/destroy"
     erb :'orders/confirm_cancel'
   end
 
@@ -111,6 +112,32 @@ Dandelion::App.controller do
     @order.destroy
     if params[:from_confirm]
       redirect "/e/#{@order.event.slug}"
+    else
+      redirect back
+    end
+  end
+
+  get '/tickets/:id/confirm_cancel' do
+    sign_in_required!
+    @ticket = Ticket.find(params[:id]) || not_found
+    @event = @ticket.event
+    halt 403 unless @ticket.account == current_account
+    halt 403 unless @ticket.cancellable?
+    @destroy_url = "/tickets/#{@ticket.id}/destroy"
+    erb :'orders/confirm_cancel'
+  end
+
+  post '/tickets/:id/destroy' do
+    sign_in_required!
+    @ticket = Ticket.find(params[:id]) || not_found
+    @event = @ticket.event
+    halt 403 unless @ticket.account == current_account
+    halt 403 unless @ticket.cancellable?
+    @ticket.destroy
+    recipient = { 'email' => current_account.email, 'firstname' => current_account.firstname, 'token' => current_account.sign_in_token_for_email, 'id' => current_account.id.to_s }
+    Order.delay.send_rsvp_cancelled_email(@event.id.to_s, [recipient])
+    if params[:from_confirm]
+      redirect "/e/#{@event.slug}"
     else
       redirect back
     end

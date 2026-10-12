@@ -1,12 +1,16 @@
 <div class="col-lg-5">
   <div id="purchase">
-    <% if current_account && (orders =  @event.orders.complete.and(account: current_account).includes(tickets: :ticket_type)).exists? %>
+    <% if current_account
+         orders = @event.orders.complete.and(account: current_account).includes(tickets: :ticket_type)
+         tickets = @event.tickets.complete.without_order.and(account: current_account).includes(:ticket_type)
+       end %>
+    <% if current_account && (orders.exists? || tickets.exists?) %>
       <div class="card mb-3">
         <h3 class="card-header text-bg-primary">
           <% if @event.past? %>
             Thanks for attending!
           <% else %>
-            Your orders
+            <%= orders.exists? ? 'Your orders' : 'Your tickets' %>
           <% end %>
         </h3>
         <div class="card-body">
@@ -19,7 +23,7 @@
               <p><a href="/events/<%=@event.id%>/give_feedback">Give feedback</a></p>
             <% end %>
           <% end %>
-          <%= partial :'events/orders', locals: { event: @event, orders: orders } %>
+          <%= partial :'events/orders', locals: { event: @event, orders: orders, tickets: tickets } %>
         </div>
         <% pmails = @event.pmails_as_mailable.and(:sent_at.ne => nil).order('sent_at desc') %>
         <% if pmails.exists? %>

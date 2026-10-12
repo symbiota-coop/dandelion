@@ -44,7 +44,7 @@ module TicketNotifications
     batch_message.reply_to(event.email || event.organisation.reply_to)
 
     tickets_table = EmailHelper.render(:_tickets_table, event: event, account: account)
-    batch_message.body_html EmailHelper.html(:tickets, event: event, order: order, account: account, tickets_table: tickets_table, header_image_url: header_image_url)
+    batch_message.body_html EmailHelper.html(:tickets, event: event, order: order, ticket: ticket, account: account, tickets_table: tickets_table, header_image_url: header_image_url)
 
     unless event.no_tickets_pdf
       tickets_pdf_filename = "ticket-#{event.name.parameterize}-#{order.id}.pdf"

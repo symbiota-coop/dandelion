@@ -40,3 +40,20 @@
   </ul>
 </div>
 <% } %>
+<% if defined?(tickets) && tickets.exists? %>
+<div class="<%= 'mt-4' if orders.exists? %>">
+  <h5 class="mb-1">Complimentary <%= tickets.count == 1 ? 'ticket' : 'tickets' %></h5>
+  <ul class="icon-list mt-1 mb-0">
+    <% tickets.each { |ticket| %>
+    <li>
+      <i class="bi bi-ticket-detailed-fill"></i>
+      <%= ticket.ticket_type.try(:name) || 'Ticket' %>
+      <% if ticket.cancellable? %>
+        &middot;
+        <a href="/tickets/<%= ticket.id %>/destroy" data-confirm="Are you sure you want to cancel your RSVP?">Cancel RSVP</a>
+      <% end %>
+    </li>
+    <% } %>
+  </ul>
+</div>
+<% end %>

@@ -123,6 +123,11 @@ class Ticket
     event.refresh_sold_out_cache_and_notify_waitlist if event && !event.flagged_for_destroy?
   end
 
+  # Like free orders, free tickets without an order can be cancelled by their account
+  def cancellable?
+    order_id.nil? && account_id && !email && payment_completed && (discounted_price.nil? || discounted_price.zero?)
+  end
+
   def self.email_viewer?(ticket, account, order_email_viewer: nil)
     account && (!ticket.order || order_email_viewer || (order_email_viewer.nil? && Order.email_viewer?(ticket.order, account)))
   end
@@ -176,6 +181,11 @@ class Ticket
 
   def self.complete
     self.and(payment_completed: true)
+  end
+
+  # Tickets created by admins (complimentary tickets) have no order
+  def self.without_order
+    self.and(order_id: nil)
   end
 
   def self.discounted
