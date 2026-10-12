@@ -22,8 +22,6 @@ linters:
     enabled: false
   CommentSyntax:
     enabled: false
-  ParserErrors:
-    enabled: false
   AllowedScriptType:
     enabled: true
     allowed_types:
