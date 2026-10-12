@@ -2,7 +2,7 @@ source 'https://rubygems.org', cooldown: 7
 
 ruby '3.4.7'
 gem 'activesupport'
-gem 'irb'
+gem 'irb', require: false
 gem 'padrino'
 gem 'puma'
 gem 'rack'
@@ -32,7 +32,7 @@ gem 'better_html'
 gem 'email_address'
 gem 'erb_lint', require: false
 gem 'factory_bot'
-gem 'rubocop'
+gem 'rubocop', require: false
 group :test do
   gem 'capybara'
   gem 'cuprite'
