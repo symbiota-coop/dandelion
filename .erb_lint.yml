@@ -13,15 +13,12 @@ linters:
       - text/plain # held back until cookie consent (cookie_consent.js)
       - application/json
       - application/ld+json
+  # Flags all literal text, for translation, which we don't do
   HardCodedString:
-    enabled: true
-    exclude:
-      - "*.erb"
+    enabled: false
+  # Checks for unsafe interpolation into JavaScript and attributes; 147 offenses (some false positives) to work through
   ErbSafety:
-    enabled: true
-    exclude:
-      - "*.erb"
-    better_html_config: .better-html.yml
+    enabled: false
   Rubocop:
     enabled: true
     rubocop_config:
