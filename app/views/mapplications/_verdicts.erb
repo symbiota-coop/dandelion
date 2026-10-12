@@ -17,7 +17,7 @@
     <% end %>
     <div class="image-wall">
       <% mapplication.verdicts.includes(:account).send(noun.pluralize).each { |verdict| account = verdict.account %>
-      <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/mapplications/<%= mapplication.id %>', function () {
+      <a href="javascript:;" onclick="$('#modal .modal-content').load(<%= "/g/#{@gathering.slug}/mapplications/#{mapplication.id}".to_json %>, function () {
                 $('#modal').modal('show')
               });">
         <% if @gathering.send("anonymise_#{noun.pluralize}") %>

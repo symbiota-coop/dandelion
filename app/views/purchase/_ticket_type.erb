@@ -49,7 +49,7 @@
               max: ticket_type.range_max,
               value: (params[:prices][ticket_type.id.to_s] if params[:prices]),
               data: { interacted: (params[:prices] && params[:prices][ticket_type.id.to_s] ? 'true' : 'false') },
-              oninput: "$(this).attr('data-interacted', 'true'); $(this).prev().html('#{money_symbol(@event.currency)}' + this.value); $(this).next().find('.select-a-price-first').css('visibility','hidden'); var qty = $(this).parent().next().find('[name^=quantities]'); qty.attr('data-price',this.value); if (qty.prop('disabled')) { qty.val(1); }; qty.prop('disabled',false).change();" %>
+              oninput: "$(this).attr('data-interacted', 'true'); $(this).prev().html(#{money_symbol(@event.currency).to_json} + this.value); $(this).next().find('.select-a-price-first').css('visibility','hidden'); var qty = $(this).parent().next().find('[name^=quantities]'); qty.attr('data-price',this.value); if (qty.prop('disabled')) { qty.val(1); }; qty.prop('disabled',false).change();" %>
 
       <% if params[:prices] && params[:prices][ticket_type.id.to_s] %>
         <script>

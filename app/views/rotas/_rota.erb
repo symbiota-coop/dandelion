@@ -71,5 +71,5 @@
   <% end %>
 </table>
 <% if params[:view] != 'names' %>
-  <a onclick="$(this).closest('[data-pagelet-url]').attr('data-pagelet-url', '/g/<%= @gathering.slug %>/rotas/<%= rota.id %>?view=names')" href="#" class="pagelet-trigger">Show names instead of pictures</a>
+  <a onclick="$(this).closest('[data-pagelet-url]').attr('data-pagelet-url', <%= "/g/#{@gathering.slug}/rotas/#{rota.id}?view=names".to_json %>)" href="#" class="pagelet-trigger">Show names instead of pictures</a>
 <% end %>

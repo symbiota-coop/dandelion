@@ -19,7 +19,7 @@ linters:
   # Replaced by SafeErb (.erb_linters/safe_erb.rb), which leaves script types to AllowedScriptType
   ErbSafety:
     enabled: false
-  # Checks for unsafe interpolation into JavaScript and attributes; 134 offenses (some false positives) to work through
+  # Checks for unsafe interpolation into JavaScript and attributes; 113 offenses (some false positives) to work through
   SafeErb:
     enabled: false
   Rubocop:

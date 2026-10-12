@@ -49,7 +49,7 @@
         <% if !@membership.admin? && option.hide_members? %>
           <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
         <% else %>
-          <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/options/<%= option.id %>', function () {
+          <a href="javascript:;" onclick="$('#modal .modal-content').load(<%= "/g/#{@gathering.slug}/options/#{option.id}".to_json %>, function () {
                     $('#modal').modal('show')
                   });">
             <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
@@ -118,6 +118,6 @@
 </table>
 <% if params[:view] != 'names' %>
   <div class="d-none d-lg-block">
-    <a onclick="$(this).closest('[data-pagelet-url]').attr('data-pagelet-url', '/g/<%= @gathering.slug %>/options?view=names')" href="#" class="pagelet-trigger">Show names instead of pictures</a>
+    <a onclick="$(this).closest('[data-pagelet-url]').attr('data-pagelet-url', <%= "/g/#{@gathering.slug}/options?view=names".to_json %>)" href="#" class="pagelet-trigger">Show names instead of pictures</a>
   </div>
 <% end %>

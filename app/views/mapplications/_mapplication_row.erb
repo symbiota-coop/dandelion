@@ -2,7 +2,7 @@
   <%= partial :'accounts/account', locals: { account: (account = mapplication.account), show_email: (@membership.admin? || viewable?(account, :email)) } %>
 </td>
 <td>
-  <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/mapplications/<%= mapplication.id %>', function () {
+  <a href="javascript:;" onclick="$('#modal .modal-content').load(<%= "/g/#{@gathering.slug}/mapplications/#{mapplication.id}".to_json %>, function () {
         $('#modal').modal('show')
       });">
     <%= mapplication.created_at %>

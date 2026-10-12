@@ -71,8 +71,8 @@
             Auto top-up enabled<% if organisation.card_last4 %> using card ending in <%= organisation.card_last4 %><% end %>. <a data-method="post" href="/organisations/<%= organisation.id %>/clear_stripe_customer_id">Click to disable</a>
           <% else %>
             <a href="javascript:;" onclick="
-               $.post('/organisations/<%= organisation.id %>/stripe_setup', $(this).serializeObject(), function (data) {
-                  var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
+               $.post(<%= "/organisations/#{organisation.id}/stripe_setup".to_json %>, $(this).serializeObject(), function (data) {
+                  var stripe = Stripe(<%= ENV['STRIPE_PK'].to_json %>);
                   stripe.redirectToCheckout({sessionId: data['session_id']})
                 })
         ">Save time by enabling auto top-ups</a>
@@ -97,7 +97,7 @@
               $('#pay-form button[data-payment-method-clicked] i').show()
               $.post('/organisations/<%= organisation.id %>/pay', $(this).serializeObject(), function (data) {
                 if (data['session_id']) {
-                  var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
+                  var stripe = Stripe(<%= ENV['STRIPE_PK'].to_json %>);
                   stripe.redirectToCheckout({sessionId: data['session_id']})
                 }
               }).fail(function () {
