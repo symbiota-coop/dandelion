@@ -282,7 +282,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     sign_in(manager)
     visit "/events/#{event.id}/delete"
     assert page.has_content?("Please ask an admin of #{org.name} to delete the event")
-    refute page.has_link?('Delete event and attempt to refund all orders')
+    assert page.has_no_link?('Delete event and attempt to refund all orders')
     refute event.reload.deleted?
   end
 

@@ -92,7 +92,7 @@ class EventsTest < ActiveSupport::TestCase
 
     visit "/e/#{created_event.slug}/edit"
     assert page.has_content?('Event title'), 'Submitter should be able to access edit page'
-    refute page.has_css?('label[for="event_locked"]'), 'Submitter should not see locked checkbox'
+    assert page.has_no_css?('label[for="event_locked"]'), 'Submitter should not see locked checkbox'
     assert page.has_content?('submitted for review'), 'Submitter should see unlock message'
   end
 
@@ -116,7 +116,7 @@ class EventsTest < ActiveSupport::TestCase
 
     # Event admin (coordinator) cannot unlock - checkbox should be hidden
     visit "/e/#{@event.slug}/edit"
-    refute page.has_css?('label[for="event_locked"]'), 'Event admin should not see locked checkbox when event is locked (cannot unlock)'
+    assert page.has_no_css?('label[for="event_locked"]'), 'Event admin should not see locked checkbox when event is locked (cannot unlock)'
     assert page.has_content?('submitted for review'), 'Non-lock-admin should see unlock message'
 
     # Lock admin (org admin) can unlock

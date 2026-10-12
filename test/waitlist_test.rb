@@ -146,7 +146,7 @@ class WaitlistTest < ActiveSupport::TestCase
     visit "/e/#{@event.slug}"
 
     assert page.has_content?('Sales have ended for this event')
-    refute page.has_css?('button.join-ticket-type-waitlist'),
+    assert page.has_no_css?('button.join-ticket-type-waitlist'),
            'Sales-ended ticket types should not render per-ticket waitlist buttons'
   end
 

@@ -34,7 +34,7 @@ class PmailsTest < ActiveSupport::TestCase
     sign_in(@account)
     visit "/pmails/#{pmail.id}/preview?organisation_id=#{@organisation.id}"
     assert_includes page.response_headers.transform_keys(&:downcase)['content-security-policy'], "script-src 'none'"
-    refute page.has_title? 'pwned'
+    assert page.has_no_title?('pwned')
   end
 
   test 'sent pmails are viewable by token but not by id' do
@@ -45,7 +45,7 @@ class PmailsTest < ActiveSupport::TestCase
     visit "/pmails/#{pmail.token}"
     assert page.has_title? pmail.subject
     visit "/pmails/#{pmail.id}"
-    refute page.has_title? pmail.subject
+    assert page.has_no_title?(pmail.subject)
   end
 
   test 'legacy pmails without a token are still viewable by id' do

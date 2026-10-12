@@ -29,7 +29,8 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     fill_in 'event_ticket_types_attributes_0_quantity', with: ticket_type.quantity
     click_link 'Everything else'
     click_button 'Create event'
-    refute page.has_content? 'Add to calendar'
+    assert page.has_current_path?(%r{\A/e/[^/?]+\?created=1\z})
+    assert page.has_no_content?('Add to calendar')
   end
 
   test 'evergreen event appears in future scope' do
