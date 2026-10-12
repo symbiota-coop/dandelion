@@ -6,17 +6,19 @@
   <a href="/o/<%= organisation.slug %>/events"><%= organisation.name %></a>
 </div>
 <% } %>
-<% if add_and_remove %>
+<% if add || (remove && organisations.exists?) %>
   <div>
-    <a id="add-organisation" href="javascript:;" onclick="$(this).hide().next().show();
-        $('#remove-organisation').hide()"><i class="bi bi-plus-square-fill"></i></a>
-    <div style="display: none">
-      <% form_for new_object, new_url, class: 'add-block bg-white shadow-sm p-3 mt-2 mb-3 rounded' do |f| %>
-        <%= f.lookup_block :organisation_id, lookup_url: '/organisations/autocomplete.json', placeholder: 'Search organisations' %>
-        <%= f.submit_block button_text: "Add #{role}" %>
-      <% end %>
-    </div>
-    <% if organisations.exists? %>
+    <% if add %>
+      <a id="add-organisation" href="javascript:;" onclick="$(this).hide().next().show();
+          $('#remove-organisation').hide()"><i class="bi bi-plus-square-fill"></i></a>
+      <div style="display: none">
+        <% form_for new_object, new_url, class: 'add-block bg-white shadow-sm p-3 mt-2 mb-3 rounded' do |f| %>
+          <%= f.lookup_block :organisation_id, lookup_url: '/organisations/autocomplete.json', placeholder: 'Search organisations' %>
+          <%= f.submit_block button_text: "Add #{role}" %>
+        <% end %>
+      </div>
+    <% end %>
+    <% if remove && organisations.exists? %>
       <a id="remove-organisation" href="javascript:;" onclick="$(this).hide().next().show();
         $('#add-organisation').hide()"><i class="bi bi-dash-square-fill"></i></a>
       <div style="display: none">

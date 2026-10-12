@@ -232,9 +232,10 @@ Dandelion::App.controller do
   post '/events/:id/cohostships/new' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
-    # Cohost admins become event admins, so only accounts trusted by the host
-    # organisation may add cohosts (otherwise anyone could add their own organisation)
-    kick!(redirect_url: "/e/#{@event.slug}") unless event_revenue_settings_admin?
+    # Cohost admins become event admins and can see attendee emails, so only
+    # admins and event managers of the host organisation may add cohosts
+    # (otherwise an activity or local group admin could add their own organisation)
+    kick!(redirect_url: "/e/#{@event.slug}") unless organisation_admins_or_event_managers?(@event.organisation)
     if params[:cohostship] && params[:cohostship][:organisation_id]
       @organisation = Organisation.find(params[:cohostship][:organisation_id]) || not_found
       organisation_admins_or_event_managers_only! if @organisation.restrict_cohosting?

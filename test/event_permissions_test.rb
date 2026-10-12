@@ -129,6 +129,60 @@ class EventPermissionsTest < ActiveSupport::TestCase
     assert @event.cohostships.find_by(organisation: restricted)
   end
 
+  test 'activity admin cannot add their own org as cohost to see attendee emails' do
+    create_full_event_hierarchy(event_options: { show_emails: false }, skip_local_group: true)
+    activity_admin = FactoryBot.create(:account)
+    @activity.activityships.create!(account: activity_admin, admin: true, unsubscribed: false)
+    attacker_org = FactoryBot.create(:organisation, account: activity_admin)
+
+    sign_in_with_rack(activity_admin)
+    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: attacker_org.id }
+
+    assert last_response.redirect?
+    assert_includes last_response.location, "/e/#{@event.slug}"
+    refute @event.cohostships.find_by(organisation: attacker_org)
+    refute Event.email_viewer?(@event.reload, activity_admin)
+  end
+
+  test 'local group admin cannot add their own org as cohost' do
+    create_full_event_hierarchy(skip_activity: true)
+    local_group_admin = FactoryBot.create(:account)
+    @local_group.local_groupships.create!(account: local_group_admin, admin: true, unsubscribed: false)
+    attacker_org = FactoryBot.create(:organisation, account: local_group_admin)
+
+    sign_in_with_rack(local_group_admin)
+    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: attacker_org.id }
+
+    assert last_response.redirect?
+    refute @event.cohostships.find_by(organisation: attacker_org)
+  end
+
+  test 'host event_manager can add a cohost' do
+    create_event
+    manager = add_event_manager(@organisation)
+    cohost = FactoryBot.create(:organisation)
+
+    sign_in_with_rack(manager)
+    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: cohost.id }
+
+    assert last_response.redirect?
+    assert @event.cohostships.find_by(organisation: cohost)
+  end
+
+  test 'activity admin can remove a cohost' do
+    create_full_event_hierarchy(skip_local_group: true)
+    activity_admin = FactoryBot.create(:account)
+    @activity.activityships.create!(account: activity_admin, admin: true, unsubscribed: false)
+    cohost = FactoryBot.create(:organisation)
+    @event.cohostships.create!(organisation: cohost)
+
+    sign_in_with_rack(activity_admin)
+    post "/events/#{@event.id}/cohostships/destroy", organisation_id: cohost.id
+
+    assert last_response.redirect?
+    refute @event.cohostships.find_by(organisation: cohost)
+  end
+
   test 'event_manager is email viewer when show_emails is false' do
     org = FactoryBot.create(:organisation)
     manager = add_event_manager(org)
