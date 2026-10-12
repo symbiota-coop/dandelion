@@ -16,8 +16,11 @@ linters:
   # Flags all literal text, for translation, which we don't do
   HardCodedString:
     enabled: false
-  # Checks for unsafe interpolation into JavaScript and attributes; 147 offenses (some false positives) to work through
+  # Replaced by SafeErb (.erb_linters/safe_erb.rb), which leaves script types to AllowedScriptType
   ErbSafety:
+    enabled: false
+  # Checks for unsafe interpolation into JavaScript and attributes; 134 offenses (some false positives) to work through
+  SafeErb:
     enabled: false
   Rubocop:
     enabled: true
