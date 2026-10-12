@@ -12,7 +12,6 @@
   <% organisation = @event.organisation %>
 <% end %>
 
-
 <style>
   #pmail_body { height: 30rem; }
 </style>
@@ -33,7 +32,6 @@
 
   });
 </script>
-
 
 <% form_for @pmail, @pmail.new_record? ? '/pmails/new' : "/pmails/#{@pmail.id}/edit", id: 'pmail-form', multipart: true do |f| %>
   <% pmail_send_count = @pmail.send_count if @pmail.persisted? %>

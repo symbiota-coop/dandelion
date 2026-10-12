@@ -3,7 +3,6 @@
   current_account.organisationships.and(:admin => true).pluck(:organisation_id)
   ).and(:image_uid.ne => nil)).exists? %>
 
-
 <% organisations = organisations.sort_by { |organisation| created_at = organisation.events.live.publicly_visible.order('created_at desc').first.try(:created_at); created_at ? created_at.to_i : 0 }.reverse.first(12) %>
 
 <% slick_id = "slick-#{SecureRandom.uuid}" %>
