@@ -1,0 +1,74 @@
+---
+glob: "**/*.erb"
+EnableDefaultLinters: true
+linters:
+  # Forces an autocomplete attribute on every input; we add one only where it helps
+  RequireInputAutocomplete:
+    enabled: false
+  # Failing on existing templates; to be fixed and re-enabled one at a time
+  SpaceAroundErbTag:
+    enabled: false
+  FinalNewline:
+    enabled: false
+  SelfClosingTag:
+    enabled: false
+  TrailingWhitespace:
+    enabled: false
+  SpaceInHtmlTag:
+    enabled: false
+  ExtraNewline:
+    enabled: false
+  ClosingErbTagIndent:
+    enabled: false
+  CommentSyntax:
+    enabled: false
+  ParserErrors:
+    enabled: false
+  AllowedScriptType:
+    enabled: true
+    allowed_types:
+      - text/javascript
+      - module
+      - text/plain # held back until cookie consent (cookie_consent.js)
+      - application/json
+      - application/ld+json
+  HardCodedString:
+    enabled: true
+    exclude:
+      - "*.erb"
+  ErbSafety:
+    enabled: true
+    exclude:
+      - "*.erb"
+    better_html_config: .better-html.yml
+  Rubocop:
+    enabled: true
+    rubocop_config:
+      inherit_from:
+        - .rubocop.yml
+      Layout/InitialIndentation:
+        Enabled: false
+      Layout/TrailingEmptyLines:
+        Enabled: false
+      Layout/TrailingWhitespace:
+        Enabled: false
+      Naming/FileName:
+        Enabled: false
+      Style/Semicolon:
+        Enabled: true
+        AllowAsExpressionSeparator: true
+      Lint/UselessAssignment:
+        Enabled: false
+      # Failing on existing templates; to be fixed and re-enabled one at a time
+      Lint/SymbolConversion:
+        Enabled: false
+      Lint/AmbiguousOperatorPrecedence:
+        Enabled: false
+      Lint/UnusedBlockArgument:
+        Enabled: false
+      Lint/RedundantSafeNavigation:
+        Enabled: false
+      Lint/RedundantTypeConversion:
+        Enabled: false
+      Layout/EndAlignment:
+        Enabled: false

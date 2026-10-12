@@ -29,6 +29,9 @@ jobs:
     - name: Run RuboCop
       run: bundle exec rubocop --fail-level warning --display-only-fail-level-offenses
 
+    - name: Run erb_lint
+      run: bundle exec erb_lint --lint-all --fail-level W # W is warning, like RuboCop above; erb_lint 0.9 rejects the word "warning"
+
   generate-matrix:
     runs-on: ubuntu-latest
     outputs:
