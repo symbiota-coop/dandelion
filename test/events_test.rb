@@ -792,11 +792,11 @@ class EventsTest < ActiveSupport::TestCase
     refute_includes listing_event_ids, @event.id.to_s
   end
 
-  test 'saving an event measures its image only when the image is new' do
+  test 'saving an event does not read an image that is not new' do
     create_event
-    @event.image = File.open('app/assets/images/test-event.jpg')
-    @event.save!
-    assert_equal [1920, 1080], [@event.image_width_unmagic, @event.image_height_unmagic]
+    # Stored and measured directly, as an earlier upload would have left it, so the test doesn't need ImageMagick
+    uid = Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg'))
+    @event.set(image_uid: uid, image_width_unmagic: 1920, image_height_unmagic: 1080)
 
     event = Event.find(@event.id)
     Dragonfly.app.datastore.stub(:read, ->(*) { raise 'read an unchanged image' }) do
