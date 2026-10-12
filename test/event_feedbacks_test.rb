@@ -17,6 +17,16 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     follow_redirect! while last_response.redirect?
   end
 
+  test 'rating must be between 1 and 5' do
+    create_attended_event
+    [0, 6, -1_000_000, 1_000_000_000].each do |rating|
+      refute @event.event_feedbacks.build(account: @attendee, rating: rating).valid?, "rating #{rating} should be invalid"
+    end
+    [nil, 1, 5].each do |rating|
+      assert @event.event_feedbacks.build(account: @attendee, rating: rating).valid?, "rating #{rating.inspect} should be valid"
+    end
+  end
+
   # ═══════════════════════════════════════════════════════════════════════════
   # Public lists show deleted rows as Removed; admin lists hide them
   # ═══════════════════════════════════════════════════════════════════════════

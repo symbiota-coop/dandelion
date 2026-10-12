@@ -24,6 +24,7 @@ class EventFeedback
     %w[event_id account_id response public_answers has_public_answers answers]
   end
 
+  validates_inclusion_of :rating, in: 1..5, allow_nil: true
   validates_uniqueness_of :event, scope: :account, allow_nil: true, conditions: -> { where(deleted_at: nil) }, message: 'already has your feedback'
 
   before_validation do
