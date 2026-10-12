@@ -14,9 +14,9 @@ require 'rack/test'
 
 Capybara.app = Padrino.application
 Capybara.server_port = ENV['PORT']
-Capybara.save_path = 'capybara'
+# Each run saves its screenshots to its own folder, so runs at the same time don't delete each other's
+Capybara.save_path = ENV['CREATE_VIDEO'] ? 'capybara' : "capybara/#{Process.pid}"
 Capybara.default_max_wait_time = 10
-FileUtils.rm_rf("#{Capybara.save_path}/.") unless ENV['CI'] || ENV['CREATE_VIDEO']
 
 Capybara.register_driver :cuprite do |app|
   options = {}
@@ -35,21 +35,28 @@ Capybara.default_driver = :cuprite
 
 # Configure Geocoder for testing (avoid real API calls)
 Geocoder.configure(lookup: :test)
+Geocoder::Lookup::Test.set_default_stub([{ 'coordinates' => [59.3251, 18.0685] }]) # Gamla Stan coords (111 28, Sweden)
+
+test_run_running = lambda do |pid|
+  Process.kill(0, pid)
+  true
+rescue Errno::ESRCH
+  false
+rescue Errno::EPERM
+  true
+end
 
 # Drop this run's database (see config/boot.rb) when it ends, and any left by runs that didn't finish
 Mongoid.default_client.database_names.grep(/\Adandelion_test_(\d+)\z/) do |name|
-  pid = Regexp.last_match(1).to_i
-  running = begin
-    Process.kill(0, pid)
-  rescue Errno::ESRCH
-    false
-  rescue Errno::EPERM
-    true
-  end
-  Mongoid.default_client.use(name).database.drop unless running
+  Mongoid.default_client.use(name).database.drop unless test_run_running.call(Regexp.last_match(1).to_i)
 end
 Minitest.after_run { Mongoid.default_client.database.drop }
-Geocoder::Lookup::Test.set_default_stub([{ 'coordinates' => [59.3251, 18.0685] }]) # Gamla Stan coords (111 28, Sweden)
+
+# Remove the screenshots of runs that have finished, once they're an hour old
+Dir.glob('capybara/*/').each do |dir|
+  pid = File.basename(dir)
+  FileUtils.rm_rf(dir) if pid.match?(/\A\d+\z/) && !test_run_running.call(pid.to_i) && File.mtime(dir) < 1.hour.ago
+end
 
 module ActiveSupport
   class TestCase
