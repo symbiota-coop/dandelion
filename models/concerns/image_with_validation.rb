@@ -39,6 +39,17 @@ module ImageWithValidation
     end
   end
 
+  # Assigned in this request (an upload or image_url), or its uid set directly (a duplicated event's copied image)
+  def image_new?
+    image_changed? || image_uid_changed?
+  end
+
+  # Reading an image's width, height or format downloads the original from S3 and runs identify (about half a second
+  # for a 1920px JPEG), so validations do it only for a new image, or one not measured yet
+  def measure_image?
+    image && (image_new? || !image_width_unmagic || !image_height_unmagic)
+  end
+
   private
 
   def set_warm_image_derivatives
@@ -76,7 +87,7 @@ module ImageWithValidation
   end
 
   def validate_image_format
-    return unless image
+    return unless image && image_new?
 
     begin
       if image.image?

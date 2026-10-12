@@ -54,7 +54,7 @@ module OrganisationValidation
         end
       end
 
-      if image
+      if measure_image?
         begin
           self.image_width_unmagic = image.width
           self.image_height_unmagic = image.height

@@ -89,7 +89,7 @@ class Gathering
     self.member_limit = memberships.count if member_limit && (member_limit < memberships.count)
     self.fixed_threshold = nil if democratic_threshold
 
-    if image
+    if measure_image?
       begin
         self.image_width_unmagic = image.width
         self.image_height_unmagic = image.height

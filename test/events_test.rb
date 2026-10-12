@@ -791,4 +791,17 @@ class EventsTest < ActiveSupport::TestCase
     assert last_response.ok?
     refute_includes listing_event_ids, @event.id.to_s
   end
+
+  test 'saving an event measures its image only when the image is new' do
+    create_event
+    @event.image = File.open('app/assets/images/test-event.jpg')
+    @event.save!
+    assert_equal [1920, 1080], [@event.image_width_unmagic, @event.image_height_unmagic]
+
+    event = Event.find(@event.id)
+    Dragonfly.app.datastore.stub(:read, ->(*) { raise 'read an unchanged image' }) do
+      event.update_attributes!(name: 'Renamed')
+    end
+    assert_equal 1920, event.reload.image_width_unmagic
+  end
 end

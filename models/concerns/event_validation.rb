@@ -142,8 +142,10 @@ module EventValidation
 
       if image
         begin
-          self.image_width_unmagic = image.width
-          self.image_height_unmagic = image.height
+          if measure_image?
+            self.image_width_unmagic = image.width
+            self.image_height_unmagic = image.height
+          end
           errors.add(:image, 'must be at least 992px wide') if image_width_unmagic < 800 # legacy images are 800px
           errors.add(:image, 'must be more wide than high') if image_height_unmagic > image_width_unmagic
 
