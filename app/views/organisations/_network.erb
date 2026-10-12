@@ -20,7 +20,7 @@
         slug: organisation.slug,
         name: CGI.unescapeHTML(Sanitize.fragment(organisation.name)),
         weight: w,
-        width: [node_min_width + w.to_f / node_width_scale, node_max_width].min
+        width: [node_min_width + (w.to_f / node_width_scale), node_max_width].min
       }
     }
 
@@ -32,7 +32,7 @@
           source: edge.source_id.to_s,
           target: edge.sink_id.to_s,
           weight: w,
-          opacity: edge_min_opacity + w.to_f / edge_opacity_scale
+          opacity: edge_min_opacity + (w.to_f / edge_opacity_scale)
         }
       }
     end

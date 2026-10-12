@@ -58,8 +58,6 @@ linters:
       # Failing on existing templates; to be fixed and re-enabled one at a time
       Lint/SymbolConversion:
         Enabled: false
-      Lint/AmbiguousOperatorPrecedence:
-        Enabled: false
       Lint/UnusedBlockArgument:
         Enabled: false
       Lint/RedundantSafeNavigation:
