@@ -108,7 +108,8 @@ FactoryBot.define do
     sequence(:name) { |n| "Ticket Type #{n}" }
     price_or_range_submitted { true }
     price_or_range { 0 }
-    sequence(:quantity) { |n| n }
+    # Fixed, so a test can buy several tickets whichever tests ran before it
+    quantity { 100 }
     event
   end
 
