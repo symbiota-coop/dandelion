@@ -124,13 +124,8 @@ Dandelion::App.controller do
   end
 
   get '/stats/files' do
-    # Read repomix config to get ignore patterns
-    config_path = Padrino.root('repomix.config.json')
-    ignore_patterns = []
-    if File.exist?(config_path)
-      config = JSON.parse(File.read(config_path))
-      ignore_patterns = config.dig('ignore', 'customPatterns') || []
-    end
+    # Vendored code, which isn't ours to keep small
+    ignore_patterns = ['app/assets/javascripts/ext/**/*']
 
     @files = []
     root_path = Padrino.root.to_s
