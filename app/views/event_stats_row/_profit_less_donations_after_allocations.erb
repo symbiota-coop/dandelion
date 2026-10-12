@@ -1,8 +1,8 @@
 <td data-sort="<%= event_method_in_organisation_currency(event, :profit_less_donations_less_allocations, organisation) %>">
   <% if event.revenue_sharer %>
-    <%= "#{event.profit_share_to_organisation}/#{event.revenue_share_to_organisation}" %><br >
+    <%= "#{event.profit_share_to_organisation}/#{event.revenue_share_to_organisation}" %><br>
   <% else %>
-    <%= "#{event.profit_share_to_organisation}%" %><br >
+    <%= "#{event.profit_share_to_organisation}%" %><br>
   <% end %>
   <%= m event.profit_less_donations_less_allocations, event.currency %>
 </td>

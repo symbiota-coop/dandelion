@@ -1,7 +1,7 @@
 <table class="event-details my-3">
   <% unless @event.evergreen? %>
     <tr>
-      <td class="pe-2" <% if @event.start_time.to_date != @event.end_time.to_date %>style="vertical-align: top;"<% end %>>
+      <td class="pe-2" <% if @event.start_time.to_date != @event.end_time.to_date %> style="vertical-align: top;"<% end %>>
 
         <span class="event-detail calendar-date <% if @event.start_time.to_date != @event.end_time.to_date %>mt-1<% end %>" data-bs-toggle="tooltip" title="<% if @event.future? %>in <%= distance_of_time_in_words @event.start_time - Time.now %><% else %><%= distance_of_time_in_words @event.start_time - Time.now %> ago<% end %>">
           <span class="month"><span class="month-text"><%= @event.start_time.strftime('%b') %></span></span>
@@ -49,7 +49,7 @@
   <tr>
     <td>
 
-      <a data-bs-toggle="tooltip" title="<% if @event.location == 'Online' %>Online<% else %>Location<% end %>" <% if @event.location != 'Online' %>target="_blank" href="https://www.google.com/maps?q=<%= @event.location %>"<% end %> class="event-detail location">
+      <a data-bs-toggle="tooltip" title="<% if @event.location == 'Online' %>Online<% else %>Location<% end %>" <% if @event.location != 'Online' %> target="_blank" href="https://www.google.com/maps?q=<%= @event.location %>"<% end %> class="event-detail location">
 
         <% if @event.location == 'Online' %>
           <img src="<%= ENV['BASE_URI'] %>/images/icons/_camera-video.png">

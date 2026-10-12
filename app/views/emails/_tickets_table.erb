@@ -26,7 +26,7 @@
     <% end %>
     <tr>
       <td>
-        <a <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%= event.location %>"<% end %> target="_blank">
+        <a <% if event.location != 'Online' %> href="https://www.google.com/maps?q=<%= event.location %>"<% end %> target="_blank">
           <% if event.location == 'Online' %>
             <img src="<%= ENV['BASE_URI'] %>/images/icons/image/<%= event.theme_color_or_organisation_theme_color ? 'greyscale' : 'green' %>/image-camera-video.png">
           <% else %>
@@ -35,7 +35,7 @@
         </a>
       </td>
       <td>
-        <a class="text-body" target="_blank" <% if event.location != 'Online' %>href="https://www.google.com/maps?q=<%= event.location %>"<% end %>><%= event.location %></a>
+        <a class="text-body" target="_blank" <% if event.location != 'Online' %> href="https://www.google.com/maps?q=<%= event.location %>"<% end %>><%= event.location %></a>
         </td>
       </tr>
     </tbody>

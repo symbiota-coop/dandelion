@@ -4,15 +4,15 @@
     <span class="text-body-secondary fw-normal">
       Reminder about
     </span>
-    <br >
+    <br>
     <%= event.name %>
   </h2>
 
-  <hr >
+  <hr>
 
   <%= tickets_table %>
 
-  <hr >
+  <hr>
 
   <%= EmailHelper.rich_text(
         EmailFields.replace_magic_tags(

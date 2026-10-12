@@ -73,11 +73,11 @@
           <div class="mt-1">
             ordered for
             <% if ticket.name %>
-              <br >
+              <br>
               <strong><%= ticket.name %></strong>
             <% end %>
             <% if ticket.email && ticket_email_viewer?(ticket) %>
-              <br >
+              <br>
               <small><%= ticket.email %></small>
             <% end %>
           </div>

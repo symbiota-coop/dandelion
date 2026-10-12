@@ -1,7 +1,7 @@
  <% if params[:cohost] %>
-  <link rel="canonical" href="<%= ENV['BASE_URI'] %>/e/<%= @event.slug %>?cohost=<%= params[:cohost] %>" >
+  <link rel="canonical" href="<%= ENV['BASE_URI'] %>/e/<%= @event.slug %>?cohost=<%= params[:cohost] %>">
 <% else %>
-  <link rel="canonical" href="<%= ENV['BASE_URI'] %>/e/<%= @event.slug %>" >
+  <link rel="canonical" href="<%= ENV['BASE_URI'] %>/e/<%= @event.slug %>">
 <% end %>
 <% if @event.persisted? && @event.errors.empty? && !@event.evergreen? %>
   <script type="application/ld+json">

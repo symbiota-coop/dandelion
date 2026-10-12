@@ -19,7 +19,7 @@
           <%= role.name %>
         <% end %>
         <% if @gathering.enable_shift_worth %>
-          <br >
+          <br>
           <span data-bs-toggle="tooltip" title="<%= pluralize sprintf('%g', role.worth), 'point' %>" class="badge text-bg-yellow mb-1"><i class="bi bi-hand-index"></i> <%= sprintf('%g', role.worth) %></span>
         <% end %>
       </strong>
@@ -45,7 +45,7 @@
           <%= rslot.name %>
         <% end %>
         <% if @gathering.enable_shift_worth %>
-          <br >
+          <br>
           <span data-bs-toggle="tooltip" title="<%= pluralize sprintf('%g', rslot.worth), 'point' %>" class="badge text-bg-yellow mb-1"><i class="bi bi-hand-index"></i> <%= sprintf('%g', rslot.worth) %></span>
         <% end %>
       </strong>

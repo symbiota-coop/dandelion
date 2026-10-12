@@ -76,7 +76,7 @@
                   stripe.redirectToCheckout({sessionId: data['session_id']})
                 })
         ">Save time by enabling auto top-ups</a>
-            <br >
+            <br>
             When the suggested contribution exceeds <%= m Money.new(100 * 100, 'GBP'), currency %>
             or you fall below <%= (organisation.paid_up_fraction_or_default * 100).to_i %>% of the suggested amount,
             we'll top you up to 100%,

@@ -94,7 +94,7 @@
           <%= f.hidden_field :organisation_id, value: @event.organisation_id %>
         <% end %>
         <%= f.text_block :name %>
-        <div <% unless @event.evergreen? %>style="display: none;"<% end %>>
+        <div <% unless @event.evergreen? %> style="display: none;"<% end %>>
           <%= f.check_box_block :evergreen %>
         </div>
         <div id="time-fields" style="<%= 'display:none' if @event.evergreen? %>">
@@ -237,7 +237,7 @@
           <% if @event.persisted? %>
             <p class="field-note text-body-secondary">
               No need to repeat information you already entered on the <code>Description and confirmation</code> tab; it will be included below this greeting.
-              <br >
+              <br>
               <a target="_blank" href="/events/<%= @event.id %>/ticket_email">Preview order confirmation email &rarr;</a></p>
           <% end %>
         </div>

@@ -11,8 +11,6 @@ linters:
   RequireInputAutocomplete:
     enabled: false
   # Failing on existing templates; to be fixed and re-enabled one at a time
-  SpaceInHtmlTag:
-    enabled: false
   ExtraNewline:
     enabled: false
   ClosingErbTagIndent:

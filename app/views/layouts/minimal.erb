@@ -5,7 +5,7 @@
 <!doctype html>
 <html lang="en">
   <%= partial :'layouts/head' %>
-  <body <% if @organisation && @organisation.theme_background_color && !@skip_theme_background_color %>style="background-color: <%= @organisation.theme_background_color %>"<% end %>>
+  <body <% if @organisation && @organisation.theme_background_color && !@skip_theme_background_color %> style="background-color: <%= @organisation.theme_background_color %>"<% end %>>
   <% if @organisation && @organisation.unsanitized_ok? && @organisation.minimal_head && !@skip_minimal_head %>
     <%== @organisation.minimal_head %>
   <% end %>
