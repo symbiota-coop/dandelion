@@ -8,7 +8,7 @@
   <%= partial :'events/nav', locals: { event: @event } %>
 <% end %>
 <div class="my-2">
-  <a class="btn btn-primary" href="/discount_codes/new?<%=@scope%>"><i class="bi bi-plus-lg"></i> Create a discount code</a>
+  <a class="btn btn-primary" href="/discount_codes/new?<%= @scope %>"><i class="bi bi-plus-lg"></i> Create a discount code</a>
 </div>
 <table class="table">
   <thead>
@@ -23,7 +23,7 @@
   <% @discount_codes.each { |discount_code| %>
   <tr>
     <td>
-      <a href="/discount_codes/<%= discount_code.id %>/edit?<%=@scope%>">
+      <a href="/discount_codes/<%= discount_code.id %>/edit?<%= @scope %>">
         <%= discount_code.code %>
       </a>
       <br>

@@ -20,17 +20,17 @@
     </thead>
     <% @rpayments.each { |rpayment| %>
     <tr>
-      <td><%=rpayment.role.gsub('_',' ')%></td>
-      <td><%=m rpayment.amount, rpayment.currency %></td>
+      <td><%= rpayment.role.gsub('_',' ') %></td>
+      <td><%= m rpayment.amount, rpayment.currency %></td>
       <td>
         <% if rpayment.notes %>
           <%== Sanitize.fragment(rpayment.notes.gsub("\n",'<br />'), Sanitize::Config::DANDELION) %>
         <% end %>
       </td>
-      <td><%=rpayment.created_at%><% if rpayment.account%> by <a href="/u/<%=rpayment.account.username%>"><%=rpayment.account.name%></a><% end %></td>
+      <td><%= rpayment.created_at %><% if rpayment.account %> by <a href="/u/<%= rpayment.account.username %>"><%= rpayment.account.name %></a><% end %></td>
       <td>
-        <a href="/events/<%=@event.id%>/rpayments/<%=rpayment.id%>/edit" class="btn btn-primary"><i class="bi bi-pencil-fill"></i></a>
-        <a href="/events/<%=@event.id%>/rpayments/<%=rpayment.id%>/destroy" class="btn btn-danger"><i class="bi bi-x-lg"></i></a>
+        <a href="/events/<%= @event.id %>/rpayments/<%= rpayment.id %>/edit" class="btn btn-primary"><i class="bi bi-pencil-fill"></i></a>
+        <a href="/events/<%= @event.id %>/rpayments/<%= rpayment.id %>/destroy" class="btn btn-danger"><i class="bi bi-x-lg"></i></a>
       </td>
     </tr>
     <% } %>

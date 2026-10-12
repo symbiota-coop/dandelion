@@ -6,8 +6,6 @@ linters:
   RequireInputAutocomplete:
     enabled: false
   # Failing on existing templates; to be fixed and re-enabled one at a time
-  SpaceAroundErbTag:
-    enabled: false
   FinalNewline:
     enabled: false
   SelfClosingTag:

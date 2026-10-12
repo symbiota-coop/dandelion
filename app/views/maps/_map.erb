@@ -39,7 +39,7 @@
       polygonPaths: polygonPaths,
       fillScreen: <%= defined?(fill_screen) && fill_screen ? 'true' : 'false' %>,
       url: <%== (binding.local_variable_defined?(:url) ? url : nil).to_json %>,
-      boundingBox: <%== (defined?(bounding_box) ? bounding_box : nil).to_json  %>,
+      boundingBox: <%== (defined?(bounding_box) ? bounding_box : nil).to_json %>,
       pointsLimit: <%= MAP_POINTS_LIMIT %>,
       mapId: <%== (ENV['GOOGLE_MAPS_MAP_ID'] || 'DEMO_MAP_ID').to_json %>
     };

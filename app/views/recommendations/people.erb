@@ -35,7 +35,7 @@ recommended_people = @account.recommended_people || []
             gatherings = gathering_ids.any? ? Gathering.and(:id.in => gathering_ids) : []
           %>
           <% events.each { |event| %>
-          <li><i class="bi bi-calendar-event"></i> <a href="/e/<%= event.slug %>"><%= event.name %></a>, <%=concise_when_details(event) %></li>
+          <li><i class="bi bi-calendar-event"></i> <a href="/e/<%= event.slug %>"><%= event.name %></a>, <%= concise_when_details(event) %></li>
           <% } %>
           <% gatherings.each { |gathering| %>
           <li><i class="bi bi-moon-fill"></i> <a href="/g/<%= gathering.slug %>"><%= gathering.name %></a></li>

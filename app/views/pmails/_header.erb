@@ -8,7 +8,7 @@
       </div>
       <% if @pmail.analytics_available? && @pmail.mailgun_url %>
         <div class="col-auto">
-          <a class="btn btn-primary mb-1" target="_blank" href="<%=@pmail.mailgun_url%>">
+          <a class="btn btn-primary mb-1" target="_blank" href="<%= @pmail.mailgun_url %>">
             <i class="bi bi-bar-chart-line-fill"></i>
             View analytics on Mailgun
           </a>

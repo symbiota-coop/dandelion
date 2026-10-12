@@ -8,7 +8,7 @@
       <% if @search_pipeline == 'vector' %>
         AI search for recent and future events. <br class="d-sm-none" />
       <% end %>
-      <a href="/events?q=<%=@q%>&search=1">See precise search options &rarr;</a>
+      <a href="/events?q=<%= @q %>&search=1">See precise search options &rarr;</a>
     </p>
   <% end %>
   <input type="hidden" name="type" id="type" value="<%= @type %>">

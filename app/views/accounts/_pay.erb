@@ -4,7 +4,7 @@
 
   <% last_completed_contribution = account&.account_contributions&.and(payment_completed: true)&.order('created_at desc')&.first %>
   <% if (defined?(force) && force) || !last_completed_contribution || last_completed_contribution.created_at < 1.month.ago %>
-    <div class="<%=div_class if defined?(div_class)%>">
+    <div class="<%= div_class if defined?(div_class) %>">
 
       <div class="row justify-content-center">
         <div class="d-sm-none col-9">
@@ -52,8 +52,8 @@
               </style>
               <% [['Seed 🌱', 5, 'https://buy.stripe.com/fZedUhdmW1jC3VCaEG'], ['Butterfly 🦋', 10, 'https://buy.stripe.com/3cs8zXaaKd2k63K147'], ['Bee 🐝', 20, 'https://buy.stripe.com/fZe17vdmWgew4ZGcMQ']].each { |name,amount,url| %>
               <div class="btn-group oc-tier mb-1" role="group">
-                <a target="_blank" class="btn btn-outline-primary d-none d-sm-inline-block" href="<%=url%>"><%=name%></a>
-                <a target="_blank" class="btn btn-outline-primary" href="<%=url%>">£<%=amount%></a>
+                <a target="_blank" class="btn btn-outline-primary d-none d-sm-inline-block" href="<%= url %>"><%= name %></a>
+                <a target="_blank" class="btn btn-outline-primary" href="<%= url %>">£<%= amount %></a>
               </div>
               <% } %>
               <p class="mb-2 mt-1">or make a one-off donation:</p>

@@ -45,9 +45,9 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_inc
                           <% people.each { |k,v| account = people_accounts.find { |a| a.id.to_s == k.to_s }; next unless account;
                           next if account.private?
                           %>
-                          <a href="/u/<%=account.username%>"><%=account.name%></a>,
+                          <a href="/u/<%= account.username %>"><%= account.name %></a>,
                           <span data-bs-toggle="tooltip">
-                            <%=pluralize v.count, 'event'%> in common
+                            <%= pluralize v.count, 'event' %> in common
                           </span>
                           <span class="d-none">
                             <%

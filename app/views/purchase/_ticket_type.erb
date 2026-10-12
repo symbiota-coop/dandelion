@@ -29,7 +29,7 @@
       <i data-bs-toggle="tooltip" title="Available to you as you used a secret link" class="bi bi-lock"></i>
     <% end %>
     <% if ticket_type.minimum_monthly_donation %>
-      <i data-bs-toggle="tooltip" title="Available to those donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month" class="bi bi-lock"></i>
+      <i data-bs-toggle="tooltip" title="Available to those donating <%= m ticket_type.minimum_monthly_donation, @event.currency %>+/month" class="bi bi-lock"></i>
     <% end %>
 
     <% if ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>
@@ -101,7 +101,7 @@
         <% if @event.organisation.become_a_member_url %>
           <a href="<%= @event.organisation.become_a_member_url %>">Become a member</a>
         <% else %>
-          Available to those donating <%=m ticket_type.minimum_monthly_donation, @event.currency%>+/month
+          Available to those donating <%= m ticket_type.minimum_monthly_donation, @event.currency %>+/month
         <% end %>
       <% else %>
         <a href="/accounts/sign_in">Sign in</a>

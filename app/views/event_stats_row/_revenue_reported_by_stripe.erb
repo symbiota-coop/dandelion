@@ -10,11 +10,11 @@
   close_enough = (stripe_charges_money - event.revenue).abs.cents < 100
   bg_class = if event.end_time && event.end_time.to_date < Date.today - 1; (close_enough ? 'text-bg-primary' : 'text-bg-warning'); end
 %>
-<td data-sort="<%=event_method_in_organisation_currency(event, :stripe_revenue, organisation)%>" <% if bg_class %> class="<%= bg_class %>" <% end %>>
-  <%= stripe.split(' from ').first %> from <a <% if bg_class %> class="text-white fw-bold" <% end %> href="/events/<%=event.id%>/stripe_charges"><%= stripe.split(' from ').last %></a>
+<td data-sort="<%= event_method_in_organisation_currency(event, :stripe_revenue, organisation) %>" <% if bg_class %> class="<%= bg_class %>" <% end %>>
+  <%= stripe.split(' from ').first %> from <a <% if bg_class %> class="text-white fw-bold" <% end %> href="/events/<%= event.id %>/stripe_charges"><%= stripe.split(' from ').last %></a>
   <% if stripe_charges_transferred.exists? %>
     +
-    <%= stripe_transferred.split(' from ').first %> from <a <% if bg_class %> class="text-white fw-bold" <% end %> href="/events/<%=event.id%>/stripe_charges"><%= stripe_transferred.split(' from ').last %></a>
+    <%= stripe_transferred.split(' from ').first %> from <a <% if bg_class %> class="text-white fw-bold" <% end %> href="/events/<%= event.id %>/stripe_charges"><%= stripe_transferred.split(' from ').last %></a>
   <% end %>
   <% if event.stripe_revenue_adjustment && event.stripe_revenue_adjustment != 0 %>
     +

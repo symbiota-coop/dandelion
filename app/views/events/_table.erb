@@ -30,7 +30,7 @@
   <% @events.each { |event| %>
   <tr>
     <td>
-      <a href="/e/<%=event.slug%>"><%= event.name %></a>
+      <a href="/e/<%= event.slug %>"><%= event.name %></a>
       <% if event.locked? %>
         <span class="badge text-bg-secondary mb-1">Locked</span>
       <% end %>

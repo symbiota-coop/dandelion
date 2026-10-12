@@ -59,7 +59,7 @@
       <%= resourceship.created_at %>
     </td>
     <td>
-      <a data-confirm="Are you sure you want to remove this person?" class="btn btn-danger btn-sm" href="/<%=resourceship_name.pluralize%>/<%= resourceship.id %>/destroy"><i class="bi bi-x-lg"></i></a>
+      <a data-confirm="Are you sure you want to remove this person?" class="btn btn-danger btn-sm" href="/<%= resourceship_name.pluralize %>/<%= resourceship.id %>/destroy"><i class="bi bi-x-lg"></i></a>
     </td>
   </tr>
   <% } %>

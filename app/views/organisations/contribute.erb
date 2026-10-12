@@ -18,9 +18,9 @@
     </thead>
     <% events.each { |event| %>
     <tr>
-      <td><a href="/e/<%=event.slug%>"><%=event.name%></a>, <%=concise_when_details(event)%></td>
+      <td><a href="/e/<%= event.slug %>"><%= event.name %></a>, <%= concise_when_details(event) %></td>
       <td>
-        <%=m event.contribution_gbp, currency%>
+        <%= m event.contribution_gbp, currency %>
         <% if event.promotion_fee? %>
           <span class="badge text-bg-primary">Promotion fee</span>
         <% elsif event.cap && event.contribution_gbp == event.cap %>
@@ -50,8 +50,8 @@
     </thead>
     <% organisation_contributions.each { |organisation_contribution| %>
     <tr>
-      <td><%=organisation_contribution.created_at%></td>
-      <td><%=m organisation_contribution.amount, organisation_contribution.currency%></td>
+      <td><%= organisation_contribution.created_at %></td>
+      <td><%= m organisation_contribution.amount, organisation_contribution.currency %></td>
     </tr>
     <% } %>
   </table>

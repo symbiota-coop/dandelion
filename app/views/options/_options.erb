@@ -48,7 +48,7 @@
       <% if @membership.confirmed? %>
         <% if !@membership.admin? && option.hide_members? %>
           <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
-        <% else%>
+        <% else %>
           <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/options/<%= option.id %>', function () {
                     $('#modal').modal('show')
                   });">

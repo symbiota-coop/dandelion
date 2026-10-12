@@ -3,7 +3,7 @@
     <tr>
       <td class="pe-2" <% if @event.start_time.to_date != @event.end_time.to_date %>style="vertical-align: top;"<% end %>>
 
-        <span class="event-detail calendar-date <% if @event.start_time.to_date != @event.end_time.to_date %>mt-1<% end %>" data-bs-toggle="tooltip" title="<% if @event.future? %>in <%=distance_of_time_in_words @event.start_time - Time.now %><% else %><%=distance_of_time_in_words @event.start_time - Time.now %> ago<% end %>">
+        <span class="event-detail calendar-date <% if @event.start_time.to_date != @event.end_time.to_date %>mt-1<% end %>" data-bs-toggle="tooltip" title="<% if @event.future? %>in <%= distance_of_time_in_words @event.start_time - Time.now %><% else %><%= distance_of_time_in_words @event.start_time - Time.now %> ago<% end %>">
           <span class="month"><span class="month-text"><%= @event.start_time.strftime('%b') %></span></span>
           <span class="day"><%= @event.start_time.day %></span>
         </span>
@@ -52,9 +52,9 @@
       <a data-bs-toggle="tooltip" title="<% if @event.location == 'Online' %>Online<% else %>Location<% end %>" <% if @event.location != 'Online' %>target="_blank" href="https://www.google.com/maps?q=<%= @event.location %>"<% end %> class="event-detail location">
 
         <% if @event.location == 'Online' %>
-          <img src="<%=ENV['BASE_URI']%>/images/icons/_camera-video.png">
+          <img src="<%= ENV['BASE_URI'] %>/images/icons/_camera-video.png">
         <% else %>
-          <img src="<%=ENV['BASE_URI']%>/images/icons/_geo-alt.png">
+          <img src="<%= ENV['BASE_URI'] %>/images/icons/_geo-alt.png">
         <% end %>
 
       </a>
@@ -80,14 +80,14 @@
     <td>
 
       <a href="javascript:;" class="event-detail link copy-link-icon" data-bs-toggle="tooltip" title="Event URL (click to copy)">
-        <img src="<%=ENV['BASE_URI']%>/images/icons/_link.png">
+        <img src="<%= ENV['BASE_URI'] %>/images/icons/_link.png">
       </a>
 
     </td>
     <td>
 
-      <a href="javascript:;" class="copy-link text-body" data-bs-toggle="tooltip" title="Click to copy" data-url="<%=ENV['BASE_URI']%>/e/<%=@event.slug%>">
-        <span class="d-none d-md-inline"><%=ENV['BASE_URI'].match(%r{(https?://)})[1] rescue ''%></span><%=ENV['BASE_URI'].gsub(%r{https?://}, '')%>/e/<%=@event.slug%>
+      <a href="javascript:;" class="copy-link text-body" data-bs-toggle="tooltip" title="Click to copy" data-url="<%= ENV['BASE_URI'] %>/e/<%= @event.slug %>">
+        <span class="d-none d-md-inline"><%= ENV['BASE_URI'].match(%r{(https?://)})[1] rescue '' %></span><%= ENV['BASE_URI'].gsub(%r{https?://}, '') %>/e/<%= @event.slug %>
       </a>
       <script>
         $(function() {

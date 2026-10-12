@@ -37,7 +37,7 @@
           and contributed
           <%= m p, currency %>
           of a
-          <% if request.path.split('/').last == 'contribute' %>suggested <%= m r, currency %><% else %><a href="/o/<%=organisation.slug%>/contribute">suggested <%= m r, currency %></a><% end %><% if balance <= 0%>.<% else %>, leaving a balance of <%= m balance, currency %>.<% end %>
+          <% if request.path.split('/').last == 'contribute' %>suggested <%= m r, currency %><% else %><a href="/o/<%= organisation.slug %>/contribute">suggested <%= m r, currency %></a><% end %><% if balance <= 0 %>.<% else %>, leaving a balance of <%= m balance, currency %>.<% end %>
         </p>
 
         <% if w && w <= 100 %>
@@ -51,7 +51,7 @@
         <% form_tag '', class: 'form-inline mb-3', id: 'pay-form' do %>
           <div class="form-group mb-1 me-1">
             <div class="input-group">
-              <span class="input-group-text"><%=money_symbol(currency) %></span>
+              <span class="input-group-text"><%= money_symbol(currency) %></span>
               <%= hidden_field_tag :currency, value: currency %>
               <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: (balance if balance > Money.new(1 * 100, 'GBP')) %>
             </div>

@@ -17,8 +17,8 @@
 
 <ul class="icon-list mb-0" id="event-sessions">
   <% event_sessions.each_with_index { |event_session,i| %>
-  <li <% if i > 2%> style="display:none" <% end %>>
-    <i data-bs-toggle="tooltip" title="Session <%=i+1%>" class="bi bi-clock"></i>
+  <li <% if i > 2 %> style="display:none" <% end %>>
+    <i data-bs-toggle="tooltip" title="Session <%= i+1 %>" class="bi bi-clock"></i>
     <%= when_details(event_session, with_zone: false) %>
     <span class="add-to-calendar small" style="display: none">
       <%= partial :'events/add_to_calendar', locals: { event_session: event_session } %>

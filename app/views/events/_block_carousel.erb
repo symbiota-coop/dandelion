@@ -2,7 +2,7 @@
 <div class="m-1 position-relative">
   <% if image_source %>
     <a target="_parent" href="/e/<%= event.slug %><%= "?cohost=#{@organisation.slug}" if image_source.is_a?(Cohostship) %>"
-    <% if event.carousel_text %> data-bs-toggle="tooltip" title="<%=event.carousel_text%>" <% end %>
+    <% if event.carousel_text %> data-bs-toggle="tooltip" title="<%= event.carousel_text %>" <% end %>
     >
       <%= blurred_image_tag(image_source.image, width: image_source.image_width_unmagic, height: image_source.image_height_unmagic) %>
     </a>

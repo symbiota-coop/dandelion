@@ -14,7 +14,7 @@
         delete params.from;
         delete params.to;
         var queryString = $.param(params);
-        var baseUrl = '/o/<%=@organisation.slug%>/events.json?from=' + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0];
+        var baseUrl = '/o/<%= @organisation.slug %>/events.json?from=' + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0];
         var url = baseUrl + (queryString ? '&' + queryString : '');
         fetch(url)
           .then(response => response.json())

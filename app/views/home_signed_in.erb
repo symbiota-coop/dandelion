@@ -15,7 +15,7 @@
       </div>
     </div>
 
-    <div data-with-placeholder id="newsfeed" data-pagelet-url="<%= params[:tour] ? '/?tour=1' : '/'%>" data-pagelet-refresh="60" class="p-3 border rounded shadow-sm bg-white">
+    <div data-with-placeholder id="newsfeed" data-pagelet-url="<%= params[:tour] ? '/?tour=1' : '/' %>" data-pagelet-refresh="60" class="p-3 border rounded shadow-sm bg-white">
       <div class="placeholder-glow">
         <% 15.times do %>
           <span class="placeholder d-block w-75"></span>
@@ -42,7 +42,7 @@
                 <a href="/birthdays">All birthdays &rarr;</a>
               </div>
               <div class="col-auto">
-                <a data-bs-toggle="tooltip" title="iCal feed" class="text-primary fs-4" id="ical" target="_blank" href="/birthdays.ics?ics_key=<%=current_account.ensure_ics_key!%>">
+                <a data-bs-toggle="tooltip" title="iCal feed" class="text-primary fs-4" id="ical" target="_blank" href="/birthdays.ics?ics_key=<%= current_account.ensure_ics_key! %>">
                   <i class="bi bi-rss-fill"></i>
                 </a>
               </div>

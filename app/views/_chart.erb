@@ -1,6 +1,6 @@
 <% if defined?(data) || countable.exists? %>
   <div>
-    <canvas id="canvas-<%=r = SecureRandom.uuid%>"></canvas>
+    <canvas id="canvas-<%= r = SecureRandom.uuid %>"></canvas>
   </div>
   <script>
     $(function() {
@@ -60,10 +60,9 @@
           projected_value = (current_month_value.to_f / days_passed * days_in_month).round
           projection = [projected_value - current_month_value, 0].max
         end
-
       %>
 
-      new Chart(document.getElementById("canvas-<%=r%>").getContext("2d"), {
+      new Chart(document.getElementById("canvas-<%= r %>").getContext("2d"), {
       type: 'bar',
       data: {
         labels: <%== data.keys.to_json %>,
@@ -89,9 +88,9 @@
             formatter: function(value, context) {
               if (context.datasetIndex === 1 && value !== null) {
                 var actualValue = context.chart.data.datasets[0].data[context.dataIndex];
-                return <%==(defined?(unit) ? unit : '').to_json %> + (actualValue + value).toLocaleString() + <%==(defined?(unit_after) ? unit_after : '').to_json %>;
+                return <%== (defined?(unit) ? unit : '').to_json %> + (actualValue + value).toLocaleString() + <%== (defined?(unit_after) ? unit_after : '').to_json %>;
               }
-              return value ? <%==(defined?(unit) ? unit : '').to_json %> + value.toLocaleString() + <%==(defined?(unit_after) ? unit_after : '').to_json %> : null;
+              return value ? <%== (defined?(unit) ? unit : '').to_json %> + value.toLocaleString() + <%== (defined?(unit_after) ? unit_after : '').to_json %> : null;
             }
           }
         },

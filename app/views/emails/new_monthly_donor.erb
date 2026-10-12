@@ -1,6 +1,6 @@
 <div class="main">
   <p>
-    <%= organisationship.account.name %> (<a href="mailto:<%=organisationship.account.email%>"><%=organisationship.account.email%></a>)
+    <%= organisationship.account.name %> (<a href="mailto:<%= organisationship.account.email %>"><%= organisationship.account.email %></a>)
     is now donating
     <%= Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency).format(no_cents_if_whole: true) %> per month
     to <%= organisation.name %>
