@@ -18,14 +18,9 @@
   </div>
 
   <div data-with-placeholder data-pagelet-url="/daily?date=<%= @date.strftime('%Y-%m-%d') %>">
-    <% 
-      headers = File.read(Padrino.root('app', 'views', '_daily.erb'))
-                   .scan(/render_article\("([^"]+)"/).flatten
-    %>
-
-    <% headers.each do |header| %>
+    <% Daily::ARTICLES.each do |article| %>
       <div class="article">
-        <h2 class="article-title"><%= header %></h2>
+        <h2 class="article-title"><%= article[:title] %></h2>
         <div class="article-content placeholder-glow">
           <% 10.times do %>
             <span class="placeholder d-block mb-3" style="width: <%= rand(10..90) %>%"></span>

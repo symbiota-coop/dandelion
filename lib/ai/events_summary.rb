@@ -1,21 +1,8 @@
-Dandelion::App.helpers do
-  def render_article(title, prompt_prefix, events, use_feedback: false)
-    return if events.empty?
-    return if use_feedback && events.all? { |event| event.event_feedbacks.empty? }
+module EventsSummary
+  GENERAL_INSTRUCTIONS = 'Do not mention specific dates or times. Return well-formatted markdown. Do not use italics. Do not use headers. Link all event names using proper markdown syntax like [Event Name](URL).'.freeze
 
-    content = <<-HTML
-      <div class="article">
-        <h2 class="article-title">#{title}</h2>
-        <div class="article-content">
-          #{Sanitize.fragment(md(generate_events_summary(prompt_prefix, events, use_feedback: use_feedback)), Sanitize::Config::DANDELION)}
-        </div>
-      </div>
-    HTML
-
-    content.html_safe
-  end
-
-  def generate_events_summary(prompt_prefix, events, use_feedback: false, general_instructions: 'Do not mention specific dates or times. Return well-formatted markdown. Do not use italics. Do not use headers. Link all event names using proper markdown syntax like [Event Name](URL).')
+  # Markdown summarising the events (or their feedback), or nil if the model didn't answer
+  def self.generate(prompt_prefix, events, use_feedback: false, general_instructions: GENERAL_INSTRUCTIONS)
     output = ''
     seen_event_names = Set.new
 
@@ -34,7 +21,7 @@ Dandelion::App.helpers do
     prompt = %(#{prompt_prefix}\n\n#{general_instructions}\n\n#{output})
 
     result = OpenRouter.chat(prompt)
-    return '' if result.nil?
+    return if result.nil?
 
     # Remove first paragraph if starts with 'Here' or ends with a colon
     paragraphs = result.split("\n\n")

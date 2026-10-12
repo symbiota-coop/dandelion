@@ -1,35 +1,20 @@
-<%=
-events = Event.live.publicly_visible.browsable
-  .and(:description.ne => nil)
-  .and(:start_time.gte => @date, :start_time.lt => @date + 1)
-render_article("Today's events", "Create a two-paragraph summary of these events, happening today. IMPORTANT: Two paragraphs only.", events)
-%>
+<% @edition['articles'].each do |article| %>
+  <div class="article">
+    <h2 class="article-title"><%= article['title'] %></h2>
+    <div class="article-content">
+      <%== Sanitize.fragment(md(article['summary'].to_s), Sanitize::Config::DANDELION) %>
+    </div>
+  </div>
+<% end %>
 
-<%=
-events = Event.live.publicly_visible.browsable
-  .and(:end_time.gte => @date - 2, :end_time.lt => @date - 1)
-  .reject { |event| event.event_feedbacks.empty? || event.event_feedbacks.all? { |ef| !ef.answers || ef.answers.map { |q,a| a.blank? }.all? } }
-render_article("Feedback report", "Create a two-paragraph summary of the feedback on these events. IMPORTANT: Two paragraphs only.", events, use_feedback: true)
-%>
-
-<%=
-events = Event.live.publicly_visible.browsable
-  .and(:description.ne => nil)
-  .and(:created_at.gte => @date - 1, :created_at.lt => @date)
-render_article("Recently listed", "Create a two-paragraph summary of these newly-listed event(s). IMPORTANT: Two paragraphs only.", events)
-%>
-
-<%=
-events = Event.trending(@date, limit: 3)
-render_article("Trending events", "Create a two-paragraph summary of these trending, upcoming event(s). IMPORTANT: Two paragraphs only.", events)
-%>
-
+<%# Seeded by the date, so each date keeps its book and film %>
+<% random = Random.new(@date.jd) %>
 <div class="row">
   <div class="col-md-4 pe-md-5">
     <div class="article single-column">
       <h3>Book of the day</h3>
       <div>
-        <% book = library_books.sample %>
+        <% book = library_books.sample(random: random) %>
         <% if book %>
           <a href="/books/<%= book[:slug] %>">
             <img class="mw-100" src="/books/<%= book[:slug] %>.jpg">
@@ -42,7 +27,7 @@ render_article("Trending events", "Create a two-paragraph summary of these trend
     <div class="article single-column">
       <h3>Film of the day</h3>
       <div>
-        <% film = library_films.sample %>
+        <% film = library_films.sample(random: random) %>
         <% if film %>
           <a href="<%= film[:url] %>">
             <img class="mw-100" src="/films/<%= film[:slug] %>.jpg">
@@ -55,26 +40,18 @@ render_article("Trending events", "Create a two-paragraph summary of these trend
     <div class="article single-column">
       <h3>Facilitator of the day</h3>
       <div>
-        <%
-        if Padrino.env == :development
-          account = Account.first
-        else
-          account = Account.and(
-            :has_image => true,
-            :event_feedbacks_as_facilitator_count.gte => 20,
-            :id.in => EventFacilitation.and(:created_at.gt => 1.year.ago).pluck(:account_id).map(&:to_s).uniq
-          ).sample
-        end
-        %>
-        <a class="text-decoration-none" href="javascript:;" data-account-username="<%= account.username %>">
-          <img class="w-100 <%= 'private' if account.private? %>" src="<%= u account.image_thumb_or_gravatar_url %>">
-          <h4 class="mt-2">
-            <a class="text-body" href="/u/<%= account.username %>"><%= account.name %></a>
-          </h4>
-          <div class="facilitator-info">
-            <%= partial :'accounts/facilitator_info', locals: { account: account } %>
-          </div>
-        </a>
+        <% account = Account.find(@edition['facilitator_id']) %>
+        <% if account %>
+          <a class="text-decoration-none" href="javascript:;" data-account-username="<%= account.username %>">
+            <img class="w-100 <%= 'private' if account.private? %>" src="<%= u account.image_thumb_or_gravatar_url %>">
+            <h4 class="mt-2">
+              <a class="text-body" href="/u/<%= account.username %>"><%= account.name %></a>
+            </h4>
+            <div class="facilitator-info">
+              <%= partial :'accounts/facilitator_info', locals: { account: account } %>
+            </div>
+          </a>
+        <% end %>
       </div>
     </div>
   </div>

@@ -10,7 +10,8 @@ Dandelion::App.controller do
               Date.today
             end
     if request.xhr?
-      stash_partial(:daily, key: "/daily?date=#{@date.to_fs(:db_local)}")
+      @edition = Daily.edition(@date)
+      partial :daily
     else
       erb :daily
     end
