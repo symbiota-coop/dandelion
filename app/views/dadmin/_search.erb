@@ -87,7 +87,8 @@
       addCriterion(null, 'in', null)
     })
 
-    <%== Array(params[:qk]).each_with_index.map { |fieldname, i| [fieldname, params[:qb][i], params[:qv][i]] }.to_json %>.forEach(function (criterion) {
+    var criteria = <%== Array(params[:qk]).each_with_index.map { |fieldname, i| [fieldname, params[:qb][i], params[:qv][i]] }.to_json %>;
+    criteria.forEach(function (criterion) {
       addCriterion(criterion[0], criterion[1], criterion[2])
     })
 
