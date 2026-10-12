@@ -109,6 +109,8 @@ Dandelion::App.helpers do
       [rel.name, "#{rel.name.to_s.singularize}_ids"].map(&:to_s)
     end
     params.reject! { |k, _| foreign_keys.include?(k.to_s) && !allowed.include?(k.to_s) }
+    # No form sets a record's id or timestamps, and deleted_at= would soft-delete it without the delete route's checks
+    params.reject! { |k, _| %w[_id id created_at updated_at deleted_at].include?(k.to_s) }
     # Only the file itself and remove_<attachment> may come from a form. retained_<attachment>= deletes or adopts any
     # storage key it's given, <attachment>_uid= points at someone else's file, and <attachment>_url= fetches any URL
     if model.respond_to?(:dragonfly_attachment_classes)

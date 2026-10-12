@@ -565,6 +565,19 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal 0, other_event.event_sessions.count
   end
 
+  test 'event edit ignores deleted_at and timestamps from params' do
+    create_event(prices: [0])
+    created_at = @event.created_at
+
+    sign_in_with_rack(@account)
+    post "/e/#{@event.slug}/edit", event: { name: 'Renamed', deleted_at: '2020-01-01', created_at: '2020-01-01' }
+
+    event = Event.unscoped.find(@event.id)
+    assert_equal 'Renamed', event.name
+    assert_nil event.deleted_at
+    assert_equal created_at.to_i, event.created_at.to_i
+  end
+
   test 'rpayment edit rejects event_id from params' do
     create_event(prices: [0])
     other_event = FactoryBot.create(:event)
