@@ -2,12 +2,15 @@
 glob: "**/*.erb"
 EnableDefaultLinters: true
 linters:
+  # The iCal partials end where the feed ends, so a final newline would add a stray line after END:VCALENDAR
+  FinalNewline:
+    enabled: true
+    exclude:
+      - "**/_events_ical.erb"
   # Forces an autocomplete attribute on every input; we add one only where it helps
   RequireInputAutocomplete:
     enabled: false
   # Failing on existing templates; to be fixed and re-enabled one at a time
-  FinalNewline:
-    enabled: false
   SelfClosingTag:
     enabled: false
   TrailingWhitespace:
