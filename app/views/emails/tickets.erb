@@ -5,13 +5,13 @@
       <span class="text-body-secondary fw-normal">
         Your <%= event.evergreen? ? 'link' : (order.tickets.length == 1 ? 'ticket' : 'tickets') %> to
       </span>
-      <br />
+      <br >
       <%= event.name %>
     </h2>
-    <hr />
+    <hr >
 
     <%= tickets_table %>
-    <hr />
+    <hr >
 
   <% end %>
 

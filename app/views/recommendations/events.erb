@@ -60,13 +60,13 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_inc
                               gatherings = gathering_ids.any? ? Gathering.and(:id.in => gathering_ids) : []
                             %>
                             <% events.each { |event| %>
-                            <%= event.name %><br />
+                            <%= event.name %><br >
                             <% } %>
                             <% gatherings.each { |gathering| %>
-                            <%= gathering.name %><br />
+                            <%= gathering.name %><br >
                             <% } %>
                           </span>
-                          <br />
+                          <br >
                           <% } %>
                           <% if private_count > 0 %>
                             <% if public_count > 0 %>

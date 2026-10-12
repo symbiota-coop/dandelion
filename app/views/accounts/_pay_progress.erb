@@ -17,7 +17,7 @@
   <p class="mt-1 mb-0 text-center">
     <%= monthly_contributions.format(no_cents: true) %> raised of <%= m target, currency %> monthly target
     <% if admin? %>
-      <br class="d-lg-none" />
+      <br class="d-lg-none" >
       (projected <%= m contribution_data[:projected], currency %>)
     <% end %>
   </p>
