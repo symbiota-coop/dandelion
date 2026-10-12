@@ -4,6 +4,8 @@ Dandelion (canonical install https://dandelion.events) is a Ruby/Mongo app based
 
 The ORM is Mongoid, not ActiveRecord.
 
+Code map: controllers in `app/controllers`, views in `app/views`, CSS/JS in `app/assets`; models in `models`, with shared model code in `models/concerns`; view helpers in `app/helpers`; other library code in `lib` (form builder, payments, mail, auth); boot and config in `config`; rake tasks in `tasks`; tests in `test`. Background jobs use delayed_job (`handle_asynchronously` or `.delay`), run by the `worker` process in `Procfile`.
+
 ## Crucial restrictions
 
 - Never attempt to access ENV vars on Render.
@@ -15,8 +17,7 @@ Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Mongo
 
 - Cursor: `.cursor/environment.json` and `.cursor/Dockerfile`. After boot, `start` forks Mongo; a `web` terminal keeps `foreman start -e .env web` running (Puma on port 3000, logs in that session).
 - Claude Code on the web: a `SessionStart` hook in `.claude/settings.json` runs `.claude/remote-setup.sh`. Project MCP servers come from the committed `.mcp.json`, whose `${VAR}`s are filled from the cloud environment's variables (and from your shell locally). Other tools don't read it, so each has its own committed copy of the same servers, with secrets read from the environment rather than written in: `.cursor/mcp.json` (`${env:VAR}`), `.codex/config.toml` (`env_vars` and `bearer_token_env_var`; Codex only reads it in trusted projects) and `.opencode/opencode.json` (`{env:VAR}`). Only edit `.mcp.json`, then run `rake mcp:sync` to write the others. Variables in `.mcp.json` can't have defaults (`${VAR:-x}`), as the others can't express them. Cursor cloud agents don't read any repo MCP file; their MCP servers are set up in the Cursor dashboard
-- MongoDB MCP: `.mcp.json` runs `mongodb-atlas-mcp-remote`, a proxy to the Atlas Managed MCP Server (`https://mcp.mongodb.com`). `MDB_MCP_API_CLIENT_ID` and `MDB_MCP_API_CLIENT_SECRET` must come from an Atlas **MCP configuration**, not an ordinary Atlas service account: the latter gets a token but the server returns 403 (`CLIENT_HTTP_NOT_IMPLEMENTED`). The configuration has read-only roles (`GROUP_READ_ONLY` and `GROUP_DATA_ACCESS_READ_ONLY`). There is no Atlas UI for MCP configurations: a Project Owner creates them with the Admin API (`POST /api/atlas/v2/groups/{groupId}/mcpConfigs` with `mcpConfigName` and `roles`, then `POST .../mcpConfigs/{mcpConfigId}/secrets` with `secretExpiresAfterHours`, `Accept: application/vnd.atlas.2025-03-12+json`) or `atlas api remoteMcpConfigurations`. The secret is shown only once. The server lists write tools (`insert-many`, `update-many`, `delete-many`, `drop-*`, `atlas-create-*`); never call them
-
+- MongoDB MCP: `.mcp.json` runs `mongodb-atlas-mcp-remote`, a proxy to the Atlas Managed MCP Server (`https://mcp.mongodb.com`), with read-only access to production. The server lists write tools (`insert-many`, `update-many`, `delete-many`, `drop-*`, `atlas-create-*`); never call them
 - Browsing the app with Playwright (Claude Code on the web): Chromium ignores `HTTPS_PROXY`, so pass it or CDN assets (jQuery etc.) won't load and nothing works: `chromium.launch({ executablePath: process.env.BROWSER_PATH, args: ['--proxy-server=' + process.env.HTTPS_PROXY] })`. Don't use Playwright's `proxy` option: it sends localhost through the proxy too, which rejects it. The setup script trusts the proxy's CA in Chromium's NSS store (`~/.pki/nssdb`); never ignore certificate errors instead. Cuprite gets the proxy from `test/test_config.rb`
 - Run `foreman run bundle exec rake db:seed` to seed the database
 - Run `foreman start -e .env web` to start the web process if it is not already running. Both cloud agents start it on boot: Cursor in its `web` terminal, and Claude Code on the web in the background with logs in `log/web.log`. Puma takes about 20 seconds to boot, so if port 3000 isn't answering yet, check the log or wait rather than starting a second copy
@@ -34,10 +35,13 @@ Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Mongo
 - Never use Mongoid `.or` — it ORs against whatever is already in the selector (`Event.live.or(featured: true)` means live or featured). Use `self.and('$or' => [...])` so the OR is just another AND-ed filter (`Event.live.and('$or' => [...])` means live and (this or that))
 - Use `scope.and` rather than `scope.where`
 - Mongo indexes are created directly in the database, and are not defined in model files
-- `Event.hinted(index_name)` hints an index so MongoDB skips query planning, for queries it can't keep a cached plan for, such as an organisation's future and current events, whose `$or` the planner otherwise spends ~300 ms on for a large organisation (`events_including_cohosted.hinted(Event::HOSTS_INDEX)`). Hint at the call site, only where the query needs it: a hint forces the index even when a more selective one would serve (a filter on `_id` or `carousel_ids`). It only hints where the index exists, checked once per process, so dropping a hinted index needs a restart (or the queries fail) and renaming one needs a code change
-- Back every `validates_uniqueness_of` with a unique index. If the validation allows nil, give the index `partialFilterExpression: { field: { $type: '<BSON type>' } }` (e.g. `'string'`, `'objectId'`), never `$exists: true`: Mongoid can store explicit nulls (`tactivities.space_id` has dozens), and an `$exists` index treats them as duplicates of each other. If the validation doesn't allow nil and every document has the field, use a plain unique index with no filter: it serves the lookups too, so it needs no index beside it (documents missing the field count as nulls, so they would clash)
-- Random values that can't clash, like `SecureRandom` tokens (`token`, `ics_key`, `sign_in_token`, `DragonflyJob#uid`), still get a unique index, which catches bugs such as copying a record along with its token. But don't add `validates_uniqueness_of` or an `exists?` retry loop for them: each costs a query on every create. Short or derived values can clash, so they keep the validation (`evm_secret` is 4 digits, `DragonflyJob#signature` is a hash of the job)
-- The planner can't use a `$type`-filtered index for a plain `{ field: x }` query, since the query doesn't imply the filter, and `validates_uniqueness_of` itself runs one (unscoped, on create and whenever the field changes). So every `$type`-filtered unique index needs a plain non-unique index on the same fields beside it (e.g. `slug_1` beside `slug_1_unique` on events), unless another plain index already starts with them (e.g. `session_id_1__id_1` on orders). Never drop a plain index when adding a filtered unique one. Don't instead add a `$type` condition to the validation so its query uses the filtered index: it relies on how Mongoid combines two conditions on one field. Check with the slow query log or `$indexStats` (an index with 0 ops is serving nothing)
+- `Event.hinted(index_name)` makes MongoDB skip query planning, for queries it can't cache a plan for (e.g. an organisation's events `$or`, ~300 ms to plan: `events_including_cohosted.hinted(Event::HOSTS_INDEX)`). Hint only at call sites that need it, since it overrides more selective indexes. Index existence is checked once per process: dropping a hinted index needs a restart (or the queries fail), renaming one a code change
+- Unique indexes:
+  - Back every `validates_uniqueness_of` with a unique index
+  - If nil is allowed, filter it with `partialFilterExpression: { field: { $type: '<BSON type>' } }`, never `$exists: true` (Mongoid stores explicit nulls, which would clash). If nil isn't allowed, use a plain unique index with no filter, but only if every document has the field: documents missing it count as nulls and would clash
+  - Beside every `$type`-filtered index, keep a plain non-unique index on the same fields (e.g. `slug_1` beside `slug_1_unique`) unless another plain index starts with them: the planner can't use the filtered one for plain `{ field: x }` queries, including the validation's own. Never drop that plain index, and don't add a `$type` condition to the validation instead
+  - Random values that can't clash, like UUIDs and other `SecureRandom` tokens (`token`, `ics_key`, `sign_in_token`, `DragonflyJob#uid`), get a unique index but no `validates_uniqueness_of` or `exists?` loop, which would cost a query on every create. Short or derived values (`evm_secret`, `DragonflyJob#signature`) keep the validation
+  - Check index use with the slow query log or `$indexStats` (0 ops means unused)
 
 ## Tracing
 
@@ -56,20 +60,24 @@ Always ask permission before running tests. Your default posture should be to su
 
 `@` instance variables come from helpers (`create_organisation`, `create_event`, `create_gathering`, `create_full_event_hierarchy`, and file-local setup methods). Anything created inline in a test is a local. Use `create_event(as: :event1)` when a test needs more than one event.
 
-## Everything else
+## Conventions
 
-- You can find documentation at app/views/docs/md. Keep it up to date.
-- Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
-- CKEditor is our own build in `ckeditor/`, on CKEditor 37.1.0: 38 and later show a Powered by CKEditor badge under the GPL. Never edit `app/assets/javascripts/ext/ckeditor.js`: change `ckeditor/src/ckeditor.js` and run `rake ckeditor:build` (needs Node)
-- `lib/form_builder.rb` defines the `_block` helpers like `text_block`, `wysiwyg_block` etc. `lib/param_helpers.rb` runs `blanks_to_nils!` on `params` so we can just do `if params[:x]` (no need for `if params[:x].present?`).
-- Do not use `.presence`
 - Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` — no `before_action`, strong params, or `render`
+- Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
+- `lib/form_builder.rb` defines the `_block` helpers like `text_block`, `wysiwyg_block` etc.
+- `lib/param_helpers.rb` runs `blanks_to_nils!` on `params`, so blank values are already nil: just do `if params[:x]`, with no `.present?` or `.presence`. Do not use `.presence` elsewhere either
+- You can find documentation at app/views/docs/md. Keep it up to date.
+
+## Build/vendored code
+
+- CKEditor is our own build in `ckeditor/`, on CKEditor 37.1.0: 38 and later show a Powered by CKEditor badge under the GPL. Never edit `app/assets/javascripts/ext/ckeditor.js`: change `ckeditor/src/ckeditor.js` and run `rake ckeditor:build` (needs Node)
+- Never edit `bootstrap5.css` (compiled vendor CSS): change Bootstrap's variables in `bootstrap5.scss` and run `rake bootstrap:build` (needs Node)
 
 ## Design
 
 The design guide (`/design`, `app/views/design.erb`) shows the colours, type, spacing, components and their classes. Check it before styling anything, and keep it up to date when you change them. The rules it doesn't spell out:
 
-- Stylesheets are plain CSS. Never edit `bootstrap5.css` (compiled vendor CSS): override Bootstrap in `app.css`, or change its variables in `bootstrap5.scss` and run `rake bootstrap:build` (needs Node). Page-specific styles go in their own file loaded only by those pages (e.g. `docs.css`, `messages.css`)
+- Stylesheets are plain CSS. Override Bootstrap in `app.css` (see Build/vendored code for changing its variables). Page-specific styles go in their own file loaded only by those pages (e.g. `docs.css`, `messages.css`)
 - Bootstrap 5 with jQuery: use `data-bs-*` attributes, logical spacing/alignment (`ms-*`, `me-*`, `text-end`, `float-start`), `form-select` on selects and `mb-3` between fields
 - Filter forms above lists and tables use `.form-inline` and `.form-group` (kept in `app.css`) inside `.searchForm`; add `.submitOnChange` to submit when a field changes. Date fields take `.datepicker` or `.datetimepicker`, which `forms.js` wires up
 - Tooltips are `data-bs-toggle="tooltip"` and a `title`; `app.js` handles them for the whole page, so content loaded later needs no setup
