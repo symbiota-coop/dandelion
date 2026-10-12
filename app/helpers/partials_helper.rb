@@ -6,9 +6,11 @@ Dandelion::App.helpers do
     end
   end
 
-  def cp(slug, locals: {}, event: nil, key: slug, expires: 1.hour.from_now)
+  # Caches a partial, or with a block, whatever the block returns (e.g. cp(key: '/events.ics') { build_events_ical(...) })
+  def cp(slug = nil, locals: {}, event: nil, key: slug, expires: 1.hour.from_now)
+    render = -> { block_given? ? yield : partial(slug, locals: locals) }
     if Padrino.env == :development
-      partial(slug, locals: locals)
+      render.call
     else
       fragment = @fragments && @fragments.key?(key) ? @fragments[key] : Fragment.find_by(key: key)
       if fragment && fragment.expires > Time.now
@@ -16,7 +18,7 @@ Dandelion::App.helpers do
       else
         fragment.try(:destroy)
         begin
-          Fragment.create(event: event, key: key, value: partial(slug, locals: locals), expires: expires).value
+          Fragment.create(event: event, key: key, value: render.call, expires: expires).value
         rescue Mongo::Error::OperationFailure # protect against race condition
           Fragment.find_by(key: key).value
         end

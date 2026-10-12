@@ -41,7 +41,7 @@ Dandelion::App.controller do
       @events = @events.future
       @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
       @events = @events.limit(500)
-      cp(:'events/events_ical', locals: { events: @events }, key: "/events.ics?#{request.query_string}")
+      cp(key: "/events.ics?#{request.query_string}") { build_events_ical(@events, 'Dandelion') }
     end
   end
 
@@ -53,7 +53,7 @@ Dandelion::App.controller do
       erb :'events/my'
     when :ics
       events = current_account.upcoming_events.without_heavy_fields.limit(500)
-      cp(:'events/events_ical', locals: { events: events, calendar_name: 'My Dandelion events' }, key: "/events/my.ics?account=#{current_account.id}")
+      cp(key: "/events/my.ics?account=#{current_account.id}") { build_events_ical(events, 'My Dandelion events') }
     end
   end
 
