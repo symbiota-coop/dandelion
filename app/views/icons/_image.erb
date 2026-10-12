@@ -37,6 +37,6 @@
 
   <!-- Icon -->
   <g transform="translate(<%= icon_offset.round(2) %>, <%= icon_offset.round(2) %>) scale(<%= icon_scale.round(3) %>)" fill="#000000" opacity="0.5">
-    <%= icon_content.gsub(/<svg[^>]*>/, '').gsub(%r{</svg>}, '').html_safe %>
+    <%== icon_content.gsub(/<svg[^>]*>/, '').gsub(%r{</svg>}, '') %>
   </g>
 </svg>
