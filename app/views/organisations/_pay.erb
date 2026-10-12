@@ -73,7 +73,7 @@
             <a href="javascript:;" onclick="
                $.post('/organisations/<%= organisation.id %>/stripe_setup', $(this).serializeObject(), function (data) {
                   var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
-                  stripe.redirectToCheckout({sessionId: data['session_id']})                        
+                  stripe.redirectToCheckout({sessionId: data['session_id']})
                 })
         ">Save time by enabling auto top-ups</a>
             <br >

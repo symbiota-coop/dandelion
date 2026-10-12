@@ -8,6 +8,6 @@ data = d.map { |x|
   lead_org_events_in_month = Event.and(organisation_id: organisation_id).and(:created_at.gte => start_time, :created_at.lt => end_time).count
   other_events_in_month = Event.and(:organisation_id.ne => organisation_id).and(:created_at.gte => start_time, :created_at.lt => end_time).count
   ["#{Date::MONTHNAMES[x.month]} #{x.year}", (lead_org_events_in_month == 0 || other_events_in_month == 0) ? 0 : (100*(lead_org_events_in_month.to_f/other_events_in_month)).round]
-}.to_h 
+}.to_h
 %>
 <%= partial(:chart, locals: { unit_after: '%', data: data }) %>

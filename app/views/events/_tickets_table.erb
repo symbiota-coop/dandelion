@@ -7,7 +7,7 @@
    event_feedbacks_by_account = @event.event_feedbacks.and(:account_id.in => ticket_account_ids).index_by(&:account_id) %>
 <% if event_email_viewer? %>
   <pre>
-    <% 
+    <%
     email_list = tickets_on_page.filter_map do |ticket|
       name = ticket.name.present? ? ticket.name : (ticket.account&.name)
       email = ticket.email.present? ? ticket.email : (ticket.account&.email)

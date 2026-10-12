@@ -1,7 +1,7 @@
 <%
 drafts = current_account.drafts.and(model: 'Event')
 if @draft
-  drafts = drafts.and(:id.ne => @draft.id) 
+  drafts = drafts.and(:id.ne => @draft.id)
 end
 %>
 <% if drafts.exists? %>

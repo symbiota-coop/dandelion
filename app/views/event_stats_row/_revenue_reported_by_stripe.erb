@@ -1,4 +1,4 @@
-<% 
+<%
   stripe_charges = event.stripe_charges.and(:balance_float.gt => 0, :order_id.nin => Order.and(transferred: true).pluck(:id))
   stripe_charges_money = stripe_charges.sum(&:balance)
   stripe = "#{m stripe_charges_money, event.currency} from #{pluralize(stripe_charges.count, 'charge')}"

@@ -2,7 +2,7 @@
 
 <% if contribution_data %>
   <% monthly_contributions = contribution_data[:current]
-     
+
      base_target = Money.new(500*100, 'GBP')
      target = base_target
      while monthly_contributions >= (target * 0.8)
