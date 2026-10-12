@@ -61,7 +61,7 @@
         end
       %>
 
-      new Chart(document.getElementById("canvas-<%= r %>").getContext("2d"), {
+      new Chart(document.getElementById(<%== "canvas-#{r}".to_json %>).getContext("2d"), {
       type: 'bar',
       data: {
         labels: <%== data.keys.to_json %>,

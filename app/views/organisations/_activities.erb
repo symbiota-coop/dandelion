@@ -3,7 +3,7 @@
     <script>
       $(function () {
         $('#activities_form').submit(function () {
-          var url = '/o/<%= @organisation.slug %>/activities?' + $.param({q: $('input[name=q]', this).val()})
+          var url = <%== "/o/#{@organisation.slug}/activities?".to_json %> + $.param({q: $('input[name=q]', this).val()})
           $(this).closest('[data-pagelet-url]').attr('data-pagelet-url', url)
         })
       })

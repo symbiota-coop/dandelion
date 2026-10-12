@@ -17,8 +17,9 @@
 <% end %>
 
 <script>
-  var elements = <%== elements %>;
-  var tapHandler = function() { <%== tap_handler %> };
+  var elements = <%== elements.to_json %>;
+  var link = <%== link.to_json %>;
+  var tapHandler = function() { window.open(link.prefix + this.data(link.data) + link.suffix, '_blank') };
 
   function drawNetwork() {
     var cy = cytoscape({

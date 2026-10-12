@@ -16,7 +16,7 @@
     autosize($('#activity_application_questions')[0])
 
     <% if @activity.persisted? %>
-      initQuestionsPreview('#activity_application_questions', '/activities/<%= @activity.id %>/application_questions', {
+      initQuestionsPreview('#activity_application_questions', <%== "/activities/#{@activity.id}/application_questions".to_json %>, {
         extraParams: function () {
           return {
             hide_image: $('#activity_hide_image').is(':checked') ? '1' : '0',

@@ -54,7 +54,7 @@
       <% if params[:prices] && params[:prices][ticket_type.id.to_s] %>
         <script>
           $(function() {
-            var $input = $('[name="prices[<%= ticket_type.id %>]"]');
+            var $input = $(<%== %([name="prices[#{ticket_type.id}]"]).to_json %>);
             $input.attr('data-interacted', 'true');
             $input[0].oninput();
           });
@@ -80,7 +80,7 @@
           <% if params[:prices] && params[:prices][ticket_type.id.to_s] %>
             <script>
               $(function() {
-                $('[name="prices[<%= ticket_type.id %>]"]')[0].oninput();
+                $(<%== %([name="prices[#{ticket_type.id}]"]).to_json %>)[0].oninput();
               });
             </script>
           <% end %>

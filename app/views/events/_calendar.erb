@@ -3,9 +3,9 @@
   document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: '<%= params[:list] ? "listMonth" : "dayGridMonth" %>',
+      initialView: <%== (params[:list] ? 'listMonth' : 'dayGridMonth').to_json %>,
       <% if params[:date] %>
-      initialDate: '<%= params[:date] %>',
+      initialDate: <%== params[:date].to_s.to_json %>,
       <% end %>
       events: function(fetchInfo, successCallback, failureCallback) {
         // Fetch events from the server
@@ -14,7 +14,7 @@
         delete params.from;
         delete params.to;
         var queryString = $.param(params);
-        var baseUrl = '/o/<%= @organisation.slug %>/events.json?from=' + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0];
+        var baseUrl = <%== "/o/#{@organisation.slug}/events.json?from=".to_json %> + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0];
         var url = baseUrl + (queryString ? '&' + queryString : '');
         fetch(url)
           .then(response => response.json())

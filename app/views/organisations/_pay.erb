@@ -95,7 +95,7 @@
 
             $('#pay-form').submit(function () {
               $('#pay-form button[data-payment-method-clicked] i').show()
-              $.post('/organisations/<%= organisation.id %>/pay', $(this).serializeObject(), function (data) {
+              $.post(<%== "/organisations/#{organisation.id}/pay".to_json %>, $(this).serializeObject(), function (data) {
                 if (data['session_id']) {
                   var stripe = Stripe(<%== ENV['STRIPE_PK'].to_json %>);
                   stripe.redirectToCheckout({sessionId: data['session_id']})

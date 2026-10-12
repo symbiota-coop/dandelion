@@ -3,7 +3,7 @@
 <script>
   $(function () {
     var currencyPrefix = <%== money_symbol(@event_boost.currency).to_json %>;
-    var minHourlyAmount = <%= @min_hourly_boost.to_f %>;
+    var minHourlyAmount = <%== @min_hourly_boost.to_f.to_json %>;
 
     function formatBoostInputNumber (n) {
       if (typeof n !== 'number' || isNaN(n)) return '';
@@ -49,9 +49,9 @@
       $button.find('i').show();
       $form.css('opacity', 0.5);
 
-      $.post('/events/<%= @event.id %>/boosts', $form.serializeObject(), function (data) {
+      $.post(<%== "/events/#{@event.id}/boosts".to_json %>, $form.serializeObject(), function (data) {
         if (data.session_id) {
-          var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
+          var stripe = Stripe(<%== ENV['STRIPE_PK'].to_json %>);
           stripe.redirectToCheckout({sessionId: data.session_id});
         } else if (data.error) {
           alert(data.error);

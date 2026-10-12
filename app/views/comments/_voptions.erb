@@ -28,7 +28,7 @@
   <% if comment.voptions.exists? %>
     <script>
       $(function () {
-        $('#poll-for-<%= comment.id %>').hide().next().show()
+        $(<%== "#poll-for-#{comment.id}".to_json %>).hide().next().show()
       })
     </script>
   <% end %>

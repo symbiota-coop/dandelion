@@ -73,8 +73,8 @@
           <script>
             $(function() {
               $('#donation_amount').change(function() {
-                if ($(this).val() < <%= @event.minimum_donation %>)
-                  $(this).val('<%= @event.minimum_donation %>')
+                if ($(this).val() < <%== @event.minimum_donation.to_json %>)
+                  $(this).val(<%== @event.minimum_donation.to_s.to_json %>)
               })
             })
           </script>

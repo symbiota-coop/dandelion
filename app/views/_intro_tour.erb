@@ -5,7 +5,7 @@
 
       introJs.tour().setOptions({
         steps: [{
-          title: "Hi <%= current_account.firstname %>!",
+          title: <%== "Hi #{h(current_account.firstname)}!".to_json %>,
           intro: "Welcome to Dandelion!"
         }, {
           element: $('#newsfeed ul li')[0],

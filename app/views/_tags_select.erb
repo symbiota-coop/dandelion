@@ -9,7 +9,7 @@
 </div>
 <script>
   $(function () {
-    $("#<%= model_name %>_tag_names").select2({
+    $(<%== "##{model_name}_tag_names".to_json %>).select2({
       theme: 'bootstrap-5',
       tags: true,
       data: <%== tag_class.for_select.map { |t| { id: t, text: t } }.to_json %>,

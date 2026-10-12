@@ -13,7 +13,7 @@
   $(function () {
 
     $('#gathering_slug, #gathering_name').keyup(function () {
-      $('#slug-replace-stripe-webhook').text('<%= ENV['BASE_URI'] %>/g/' + $('#gathering_slug').val() + '/stripe_webhook');
+      $('#slug-replace-stripe-webhook').text(<%== "#{ENV['BASE_URI']}/g/".to_json %> + $('#gathering_slug').val() + '/stripe_webhook');
     }).keyup();
 
     $('#gathering-build-nav a[data-bs-toggle="tab"]').on('show.bs.tab', function (e) {

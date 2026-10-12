@@ -44,7 +44,7 @@
 
     $(".carousels").sortable({
       update: function (event, ui) {
-        $.post('/o/<%= @organisation.slug %>/carousels/order', {carousel_ids: $(event.target).sortable("toArray")})
+        $.post(<%== "/o/#{@organisation.slug}/carousels/order".to_json %>, {carousel_ids: $(event.target).sortable("toArray")})
       }
     });
 
