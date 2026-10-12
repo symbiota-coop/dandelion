@@ -19,9 +19,9 @@
 <script type="text/javascript">
   $(function () {
 
-  <% if params[:preview] %>
+    if (<%== (params[:preview] ? true : false).to_json %>) {
       window.open(<%== "/pmails/#{@pmail.id}/preview?#{@scope}".to_json %>, null, 'scrollbars=yes,width=800,height=600,left=150,top=150').focus();
-  <% end %>
+    }
 
     $('#pmail-form').submit(function() {
       if($('#pmail_to_option').val().length == 0) {

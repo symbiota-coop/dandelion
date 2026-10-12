@@ -13,10 +13,10 @@
         }, {
           element: $('#upcoming-events')[0],
           intro: "Here's where you'll see your upcoming events"
-        }, <% if current_account.upcoming_events.empty? %> {
+        }].concat(<%== current_account.upcoming_events.empty?.to_json %> ? [{
           element: $('.browse-events:visible')[0],
           intro: "Time to find your first event!"
-        } <% end %>]
+        }] : [])
       }).start();
 
     }

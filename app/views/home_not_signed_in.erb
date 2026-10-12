@@ -12,15 +12,15 @@
     <script src="https://cdn.jsdelivr.net/npm/typed.js@3.0.0/dist/typed.umd.js"></script>
     <script>
       $(function () {
-        <% if ENV['CREATE_VIDEO'] %>
+        if (<%== (ENV['CREATE_VIDEO'] ? true : false).to_json %>) {
           $('.typewriter').text('regenerative')
-        <% else %>
+        } else {
           var typed = new Typed('.typewriter', {
             strings: <%== ADJECTIVES.to_json %>,
             typeSpeed: 50,
             loop: true
           });
-        <% end %>
+        }
       })
     </script>
     <div class="col-12 col-lg-7">

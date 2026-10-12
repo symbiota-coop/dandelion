@@ -20,25 +20,24 @@
     s.parentNode.insertBefore(t, s)
   }(window, document, 'script',
           'https://connect.facebook.net/en_US/fbevents.js');
-  <% facebook_pixel_ids.each do |pixel_id| %>
-    fbq('init', <%== pixel_id.to_json %>);
-  <% end %>
+  <%== facebook_pixel_ids.to_json %>.forEach(function (pixelId) {
+    fbq('init', pixelId);
+  });
 
   fbq('track', 'PageView');
 
-  <% if @event && !track_purchase? %>
-    fbq('track', 'ViewContent', <%== facebook_pixel_view_content_params.to_json %>);
-  <% end %>
+  (function (viewContent) {
+    if (viewContent) fbq('track', 'ViewContent', viewContent);
+  })(<%== (facebook_pixel_view_content_params if @event && !track_purchase?).to_json %>);
 
-  <% if track_purchase? %>
-    (function () {
-      var orderId = <%== purchase_analytics[:order_id].to_json %>;
-      var storageKey = 'fbq_purchase_' + orderId;
-      try {
-        if (window.sessionStorage && sessionStorage.getItem(storageKey)) return;
-        if (window.sessionStorage) sessionStorage.setItem(storageKey, '1');
-      } catch (e) {}
-      fbq('track', 'Purchase', <%== facebook_pixel_purchase_params.to_json %>, {eventID: orderId});
-    })();
-  <% end %>
+  (function (purchase) {
+    if (!purchase) return;
+    var orderId = purchase.order_id;
+    var storageKey = 'fbq_purchase_' + orderId;
+    try {
+      if (window.sessionStorage && sessionStorage.getItem(storageKey)) return;
+      if (window.sessionStorage) sessionStorage.setItem(storageKey, '1');
+    } catch (e) {}
+    fbq('track', 'Purchase', purchase.params, {eventID: orderId});
+  })(<%== ({ order_id: purchase_analytics[:order_id], params: facebook_pixel_purchase_params } if track_purchase?).to_json %>);
 </script>

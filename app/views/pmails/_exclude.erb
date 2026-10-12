@@ -1,15 +1,9 @@
 <% if @organisation %>
   <script>
     $(function () {
-        <% if @pmail.event %>
-        $('#exclude-event-btn').click()
-        <% end %>
-        <% if @pmail.activity %>
-        $('#exclude-activity-btn').click()
-        <% end %>
-        <% if @pmail.local_group %>
-        $('#exclude-local-group-btn').click()
-        <% end %>
+        if (<%== (@pmail.event ? true : false).to_json %>) $('#exclude-event-btn').click()
+        if (<%== (@pmail.activity ? true : false).to_json %>) $('#exclude-activity-btn').click()
+        if (<%== (@pmail.local_group ? true : false).to_json %>) $('#exclude-local-group-btn').click()
     })
   </script>
   <div>
