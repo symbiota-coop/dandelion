@@ -234,7 +234,7 @@
           })
         </script>
         <% Gathering.enablable.each { |x| %>
-        <%= f.check_box_block "enable_#{x}".to_sym %>
+        <%= f.check_box_block :"enable_#{x}" %>
         <% } %>
         <%= f.check_box_block :hide_paid %>
         <%= f.check_box_block :demand_payment %>

@@ -56,7 +56,7 @@
       <!-- END #sidebar -->
       <!-- BEGIN #content -->
       <div id="content" class="content">
-        <%= content_blocks[:content.to_sym].present? ? yield_content(:content) : yield %>
+        <%= content_blocks[:content].present? ? yield_content(:content) : yield %>
       </div>
       <!-- END #content -->
     </div>
