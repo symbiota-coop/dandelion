@@ -2906,6 +2906,7 @@ table.event-details td {
    the date's month is a band of the theme's 50 in its 800, over a bold day */
 .event-detail {
   border: 1px solid var(--hairline);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- in em, so the corners scale with the tile, which is sized in em */
   border-radius: 0.3em;
   box-shadow: var(--bs-box-shadow-sm);
   overflow: hidden;
@@ -3090,6 +3091,7 @@ table.event-details td {
 
 .newsfeed-icon .bi-ticket-detailed-fill {
   position: relative;
+  /* stylelint-disable-next-line declaration-property-unit-disallowed-list -- a hairline nudge, to centre the glyph */
   top: -1px;
 }
 
