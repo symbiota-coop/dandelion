@@ -8,7 +8,7 @@ const shared = ['cssColor', 'destroyLinkFor', 'drawSpanTreeGuides', 'fixedHeader
 
 export default [
   {
-    ignores: ['.claude/**', 'app/assets/javascripts/ext/**', 'ckeditor/**', 'node_modules/**']
+    ignores: ['.claude/**', 'vendor/**', 'app/assets/javascripts/ext/**', 'ckeditor/**', 'node_modules/**']
   },
   js.configs.recommended,
   {

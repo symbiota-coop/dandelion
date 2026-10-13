@@ -1,5 +1,5 @@
 ---
-glob: "**/*.erb"
+glob: "app/views/**/*.erb"
 EnableDefaultLinters: true
 linters:
   # Forces an autocomplete attribute on every input; we add one only where it helps
