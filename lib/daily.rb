@@ -49,7 +49,23 @@ module Daily
 
   # The latest date with an edition, up to today
   def self.latest_date
-    stash = Stash.and(:key.gt => 'daily/', :key.lte => key(Date.today)).order(key: -1).only(:key).first
+    date_of(Stash.and(:key.gt => 'daily/', :key.lte => key(Date.today)).order(key: -1))
+  end
+
+  # The nearest dates either side of date with an edition, for the arrows. Forward goes to today if no later
+  # edition is out, so today stays reachable before late:errands has made it
+  def self.previous_date(date)
+    date_of(Stash.and(:key.gt => 'daily/', :key.lt => key(date)).order(key: -1))
+  end
+
+  def self.next_date(date)
+    return if date >= Date.today
+
+    date_of(Stash.and(:key.gt => key(date), :key.lte => key(Date.today)).order(key: 1)) || Date.today
+  end
+
+  def self.date_of(stashes)
+    stash = stashes.only(:key).first
     Date.parse(stash.key.delete_prefix('daily/')) if stash
   end
 

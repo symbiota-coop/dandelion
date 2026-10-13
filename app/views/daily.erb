@@ -2,12 +2,18 @@
 <div class="newspaper">
   <h1 class="newspaper-title">The Dandelion Daily</h1>
   <div class="date-navigation">
-    <a href="/daily?date=<%= (@date - 1).strftime('%Y-%m-%d') %>" class="nav-arrow">
-      <i class="bi bi-arrow-left"></i>
-    </a>
+    <% if (previous_date = Daily.previous_date(@date)) %>
+      <a href="/daily?date=<%= previous_date.strftime('%Y-%m-%d') %>" class="nav-arrow">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+    <% else %>
+      <span class="nav-arrow disabled">
+        <i class="bi bi-arrow-left"></i>
+      </span>
+    <% end %>
     <span><%= @date.strftime("%A, %B %-d, %Y") %></span>
-    <% if @date < Date.today %>
-      <a href="/daily?date=<%= (@date + 1).strftime('%Y-%m-%d') %>" class="nav-arrow">
+    <% if (next_date = Daily.next_date(@date)) %>
+      <a href="/daily?date=<%= next_date.strftime('%Y-%m-%d') %>" class="nav-arrow">
         <i class="bi bi-arrow-right"></i>
       </a>
     <% else %>

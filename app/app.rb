@@ -117,6 +117,9 @@ module Dandelion
     end
 
     not_found do
+      # A route that rendered its own 404 page (/daily's missing dates) keeps it
+      next if @own_not_found_page
+
       content_type 'text/html'
       erb :not_found, layout: :application
     end
