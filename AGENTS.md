@@ -33,7 +33,9 @@ When you add a rule to this file that code can check, add a check for it and lis
 - `declaration-property-value-disallowed-list` (Stylelint): Colours, radii and shadows come from tokens (`--theme-*`, `--color-*`, `--bs-gray-*`, `--hairline`, Bootstrap's radius and shadow variables and classes), never hex values, custom values or new translucent tints, so organisation themes follow. The check allows a hex value only where a custom property is defined
 - `declaration-property-unit-disallowed-list` (Stylelint): Spacing comes from the scale: Bootstrap's spacing utilities in markup, `--space-*` tokens in CSS, never px or off-scale rem. Other sizes are in rem (or em); px only for hairlines, shadows, the focus ring, breakpoints and Google Maps overrides. The check flags px in margins, padding, gaps, insets and font sizes
 
-## Linting
+## Committing
+
+Commit only the changes you made: other sessions may be editing the same checkout, so stage your files by name rather than with `git add -A` or `git commit -a`.
 
 Before committing, run CI's linters on the files you added or changed, and fix what they report:
 
