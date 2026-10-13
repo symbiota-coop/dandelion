@@ -8,14 +8,11 @@ Code map: controllers in `app/controllers`, views in `app/views`, CSS/JS in `app
 
 ## Custom checks
 
-CI fails on each rule below, and each names its check:
+CI fails on each rule below, and each names its check. When you add a rule to this file that code can check, add a check for it and list it here. Disable a check only where its rule genuinely doesn't apply.
 
-- RuboCop cops (`Dandelion/...`) in `.rubocop/dandelion/`, which also run on the Ruby in templates through erb_lint. Disable one on a line with `# rubocop:disable Dandelion/... -- reason`
-- An erb_lint linter, `DesignClasses`, in `.erb_linters/design_classes.rb`. Disable it on a line with `<%# erb_lint:disable DesignClasses: reason %>`
-- ESLint rules in `eslint.config.mjs`. Disable one with `// eslint-disable-next-line <rule> -- reason`
-- Stylelint rules in `stylelint.config.mjs`. Disable one with `/* stylelint-disable <rule> -- reason */` and `/* stylelint-enable <rule> */`
+### RuboCop
 
-When you add a rule to this file that code can check, add a check for it and list it here. Disable a check only where its rule genuinely doesn't apply.
+Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Ruby in templates through erb_lint. Disable one on a line with `# rubocop:disable Dandelion/... -- reason`.
 
 - `Dandelion/MongoidOr`: Never use Mongoid `.or` — it ORs against whatever is already in the selector (`Event.live.or(featured: true)` means live or featured). Use `self.and('$or' => [...])` so the OR is just another AND-ed filter (`Event.live.and('$or' => [...])` means live and (this or that))
 - `Dandelion/MongoidScope`: Query filters are class methods that return `self.and(...)` so they chain (`Event.live.future`). Do not use `scope :live, -> { ... }`
@@ -28,10 +25,26 @@ When you add a rule to this file that code can check, add a check for it and lis
 - `Dandelion/Presence`: Don't use `.presence`, on `params` or anywhere else
 - `Dandelion/ErrorReporting`: Report rescued errors with `ErrorReporting.capture_exception(e, context:, tags:)`, not `Sentry.capture_exception`
 - `Dandelion/CapybaraRefuteHas`: To check something isn't on the page, use `assert page.has_no_css?` (`has_no_content?`, `has_no_link?`, `has_no_title?`...), never `refute page.has_css?`: the `has_` form waits the full 10 s `default_max_wait_time` for it to appear before passing
-- `DesignClasses` (erb_lint) and `no-restricted-syntax` (ESLint): To show and hide elements from JS, start them hidden with `style="display: none"` and use jQuery `.show()` / `.hide()` / `.toggle()`, not `d-none` with `addClass` / `removeClass` (Bootstrap's `d-*` classes are `!important`). Keep `d-none d-md-block` and friends for purely responsive hiding
-- `DesignClasses` (erb_lint) and `no-restricted-syntax` (ESLint): Success is the theme colour, so use `-primary`, never `-success`. Badges are `badge text-bg-*`; there is no `.label` and no `badge-*` colour class
-- `declaration-property-value-disallowed-list` (Stylelint): Colours, radii and shadows come from tokens (`--theme-*`, `--color-*`, `--bs-gray-*`, `--hairline`, Bootstrap's radius and shadow variables and classes), never hex values, custom values or new translucent tints, so organisation themes follow. The check allows a hex value only where a custom property is defined
-- `declaration-property-unit-disallowed-list` (Stylelint): Spacing comes from the scale: Bootstrap's spacing utilities in markup, `--space-*` tokens in CSS, never px or off-scale rem. Other sizes are in rem (or em); px only for hairlines, shadows, the focus ring, breakpoints and Google Maps overrides. The check flags px in margins, padding, gaps, insets and font sizes
+
+### erb_lint
+
+Our linter, `DesignClasses`, is in `.erb_linters/design_classes.rb`. Disable it on a line with `<%# erb_lint:disable DesignClasses: reason %>`.
+
+- `DesignClasses`: To show and hide elements from JS, start them hidden with `style="display: none"` and use jQuery `.show()` / `.hide()` / `.toggle()`, not `d-none` with `addClass` / `removeClass` (Bootstrap's `d-*` classes are `!important`). Keep `d-none d-md-block` and friends for purely responsive hiding
+- `DesignClasses`: Success is the theme colour, so use `-primary`, never `-success`. Badges are `badge text-bg-*`; there is no `.label` and no `badge-*` colour class
+
+### ESLint
+
+Our rules are in `eslint.config.mjs`. Disable one with `// eslint-disable-next-line <rule> -- reason`.
+
+- `no-restricted-syntax`: The two `DesignClasses` rules above (showing and hiding; `-success`, `badge-*` and `.label`), in `app/assets/javascripts`
+
+### Stylelint
+
+Our rules are in `stylelint.config.mjs`. Disable one with `/* stylelint-disable <rule> -- reason */` and `/* stylelint-enable <rule> */`.
+
+- `declaration-property-value-disallowed-list`: Colours, radii and shadows come from tokens (`--theme-*`, `--color-*`, `--bs-gray-*`, `--hairline`, Bootstrap's radius and shadow variables and classes), never hex values, custom values or new translucent tints, so organisation themes follow. The check allows a hex value only where a custom property is defined
+- `declaration-property-unit-disallowed-list`: Spacing comes from the scale: Bootstrap's spacing utilities in markup, `--space-*` tokens in CSS, never px or off-scale rem. Other sizes are in rem (or em); px only for hairlines, shadows, the focus ring, breakpoints and Google Maps overrides. The check flags px in margins, padding, gaps, insets and font sizes
 
 ## Committing
 
