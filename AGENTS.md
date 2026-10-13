@@ -19,7 +19,7 @@ Dandelion is built with many coding agents (Claude Code, Codex, Cursor, opencode
 
 ## Custom checks
 
-CI fails on each rule below, and each names its check. When you add a rule to this file that code can check, add a check for it and list it here. Disable a check only where its rule genuinely doesn't apply.
+CI fails on each rule below, and each names its check. When you add a rule to this file that code can check, add a check for it, list it here, and add cases to `test/lint_test.rb`, which tests our checks (each cop's `@example`, good and bad, is tested as it stands). It doesn't boot the app, so it runs without foreman: `bundle exec ruby -I test test/lint_test.rb`, and CI's lint job runs it. Disable a check only where its rule genuinely doesn't apply.
 
 ### RuboCop
 

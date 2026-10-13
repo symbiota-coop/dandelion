@@ -48,6 +48,10 @@ jobs:
     - name: Run Stylelint
       run: script/lint --all --only stylelint
 
+    # Tests our own checks; here rather than in the test matrix, as it needs Node for the ESLint and Stylelint tests
+    - name: Test the linters
+      run: bundle exec ruby -I test test/lint_test.rb
+
   generate-matrix:
     runs-on: ubuntu-latest
     outputs:
@@ -59,8 +63,8 @@ jobs:
     - name: Generate test file matrix
       id: set-matrix
       run: |
-        # Find all *_test.rb files and extract the base names (without _test.rb suffix)
-        test_files=$(find test -name '*_test.rb' -type f | sed 's|test/||' | sed 's|_test.rb||' | sort | jq -R -s -c 'split("\n")[:-1]')
+        # Find all *_test.rb files and extract the base names (without _test.rb suffix). lint_test.rb runs in the lint job
+        test_files=$(find test -name '*_test.rb' -not -name 'lint_test.rb' -type f | sed 's|test/||' | sed 's|_test.rb||' | sort | jq -R -s -c 'split("\n")[:-1]')
         echo "test_files=$test_files" >> $GITHUB_OUTPUT
         echo "Found test files: $test_files"
 

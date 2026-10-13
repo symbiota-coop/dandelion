@@ -5,13 +5,13 @@ module RuboCop
       #
       # @example
       #   # bad
-      #   if params[:q].present?
-      #   if params[:q].blank?
-      #   if params.dig(:event, :name).present?
+      #   search(params[:q]) if params[:q].present?
+      #   redirect '/' if params[:q].blank?
+      #   rename(params[:event][:name]) if params.dig(:event, :name).present?
       #
       #   # good
-      #   if params[:q]
-      #   unless params[:q]
+      #   search(params[:q]) if params[:q]
+      #   redirect '/' unless params[:q]
       class ParamsBlank < Base
         MSG = 'Blank params are already nil, so check `params[...]` itself, not `.%<method>s`.'
         RESTRICT_ON_SEND = %i[present? blank?].freeze
