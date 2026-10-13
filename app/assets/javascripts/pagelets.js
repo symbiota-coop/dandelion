@@ -95,10 +95,17 @@ $(function () {
       return
     }
 
-    $.get(url, function (html) {
+    const currentStamp = pageletAttrRoot(pagelet, 'data-pagelet-stamp').attr('data-pagelet-stamp')
+
+    // With a stamp, the server can reply 304 (empty body) when nothing has changed
+    $.ajax({ url, headers: currentStamp ? { 'X-Pagelet-Stamp': currentStamp } : {} }).done(function (html, status, xhr) {
+      if (xhr.status === 304) {
+        if (callback) callback(false)
+        return
+      }
+
       const incoming = $('<div>').append($.parseHTML(html, document, false))
       const incomingStamp = pageletAttrRoot(incoming, 'data-pagelet-stamp').attr('data-pagelet-stamp')
-      const currentStamp = pageletAttrRoot(pagelet, 'data-pagelet-stamp').attr('data-pagelet-stamp')
 
       if (incomingStamp && incomingStamp === currentStamp) {
         if (callback) callback(false)
