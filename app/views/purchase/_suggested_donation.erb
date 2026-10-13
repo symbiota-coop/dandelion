@@ -80,7 +80,7 @@
           </script>
         <% end %>
         <% donation_value = params[:donation_amount] || @event.suggested_donation %>
-        <% donation_value = donation_value.to_f.to_i == donation_value.to_f ? donation_value.to_i : donation_value %>
+        <% donation_value = (donation_value.to_f % 1).zero? ? donation_value.to_i : donation_value %>
         <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: donation_value, min: (@event.minimum_donation || 0) %>
       </div>
       <% donation_text = @event.donation_text || @event.organisation.donation_text %>
