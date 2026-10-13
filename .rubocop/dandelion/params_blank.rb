@@ -7,6 +7,7 @@ module RuboCop
       #   # bad
       #   if params[:q].present?
       #   if params[:q].blank?
+      #   if params.dig(:event, :name).present?
       #
       #   # good
       #   if params[:q]
@@ -17,7 +18,7 @@ module RuboCop
 
         def on_send(node)
           receiver = node.receiver
-          receiver = receiver.receiver while receiver&.call_type? && receiver.method?(:[])
+          receiver = receiver.receiver while receiver&.call_type? && (receiver.method?(:[]) || receiver.method?(:dig))
           return unless receiver&.send_type? && receiver.receiver.nil? && receiver.method?(:params) && !receiver.arguments?
 
           add_offense(node.loc.selector, message: format(MSG, method: node.method_name))

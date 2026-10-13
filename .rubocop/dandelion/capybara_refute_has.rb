@@ -7,15 +7,17 @@ module RuboCop
       #   # bad
       #   refute page.has_css?('.alert')
       #   assert !page.has_content?('Saved')
+      #   assert_equal false, page.has_content?('Saved')
       #
       #   # good
       #   assert page.has_no_css?('.alert')
       #   assert page.has_no_content?('Saved')
       class CapybaraRefuteHas < Base
         MSG = "Use `assert %<receiver>shas_no_%<matcher>s`, which doesn't wait the full timeout first."
-        RESTRICT_ON_SEND = %i[refute assert_not assert].freeze
+        RESTRICT_ON_SEND = %i[refute assert_not assert assert_equal].freeze
         MATCHERS = %w[
-          button checked_field content css current_path field link select selector table text title unchecked_field xpath
+          ancestor button checked_field content css current_path element field link select selector sibling table text title
+          unchecked_field xpath
         ].freeze
 
         def on_send(node)
@@ -26,6 +28,10 @@ module RuboCop
             return unless check.send_type? && check.method?(:!)
 
             check = check.receiver
+          elsif node.method?(:assert_equal)
+            return unless check.false_type?
+
+            check = node.arguments[1]
           end
           return unless check&.call_type?
 
