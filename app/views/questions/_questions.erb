@@ -1,36 +1,27 @@
-<%
-q = questions.to_s.split("\n").map(&:strip).reject(&:blank?)
-questions_a = q.empty? ? [] : q
-is_preview = defined?(preview) && preview
-%>
+<% is_preview = defined?(preview) && preview %>
 
-<% questions_a.each_with_index { |q,i| %>
+<% Questions.parse(questions).each { |field| %>
+<% i = field[:index] %>
 <% unless is_preview %>
-  <%= hidden_field_tag "questions[#{i}]", value: q %>
+  <%= hidden_field_tag "questions[#{i}]", value: field[:question] %>
 <% end %>
 <div class="mb-3 links-blank">
-  <% if q =~ /^#\s*(.+)/ %>
-    <% match = Regexp.last_match(1) %>
-    <h4><%== Sanitize.fragment(Rinku.auto_link(match), Sanitize::Config::DANDELION) %></h4>
-  <% elsif q =~ /^-\s*(.+)/ %>
-    <% match = Regexp.last_match(1) %>
-    <p><%== Sanitize.fragment(Rinku.auto_link(match.chomp('*')), Sanitize::Config::DANDELION) %></p>
-  <% elsif m = q.match(Questions::SELECT_FIELD_REGEX) %>
+  <% case field[:type] %>
+  <% when 'heading' %>
+    <h4><%== Sanitize.fragment(Rinku.auto_link(field[:text]), Sanitize::Config::DANDELION) %></h4>
+  <% when 'info' %>
+    <p><%== Sanitize.fragment(Rinku.auto_link(field[:text]), Sanitize::Config::DANDELION) %></p>
+  <% when 'select' %>
     <%# Select field: Question text <option1, option2, option3> or Question text <option1, option2, option3>* %>
-    <% question_text = m[1] %>
-    <% options = m[2].split(',').map(&:strip) %>
     <div class="mb-3">
-      <label><%== Sanitize.fragment(Rinku.auto_link(question_text.chomp('*')), Sanitize::Config::DANDELION) %></label>
-      <%= select_tag "answers[#{i}]", options: [''] + options, selected: (params[:answers][i.to_s] if params[:answers]), required: q.ends_with?('*'), class: 'form-select', disabled: is_preview %>
+      <label><%== Sanitize.fragment(Rinku.auto_link(field[:text]), Sanitize::Config::DANDELION) %></label>
+      <%= select_tag "answers[#{i}]", options: [''] + field[:options], selected: (params[:answers][i.to_s] if params[:answers]), required: field[:required], class: 'form-select', disabled: is_preview %>
     </div>
-  <% elsif m = q.match(Questions::MULTIPLE_CHECKBOX_FIELD_REGEX) %>
+  <% when 'checkboxes' %>
     <%# Multiple checkboxes: Question text [option1, option2, option3] or Question text [option1, option2, option3]* %>
-    <% question_text = m[1] %>
-    <% options = m[2].split(',').map(&:strip) %>
-    <% is_required = q.ends_with?('*') %>
-    <div class="mb-3 checkbox-group-<%= i %>" data-required="<%= is_required %>">
-      <label><%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %></label>
-      <% options.each_with_index do |option, index| %>
+    <div class="mb-3 checkbox-group-<%= i %>" data-required="<%= field[:required] %>">
+      <label><%== Sanitize.fragment(Rinku.auto_link(field[:text]), Sanitize::Config::DANDELION) %></label>
+      <% field[:options].each_with_index do |option, index| %>
         <div class="form-check">
           <%= check_box_tag "answers[#{i}][#{index}]", value: option, id: "answers-#{i}-#{index}", class: "form-check-input checkbox-group-item-#{i}", checked: ((params[:answers] && params[:answers][i.to_s] && params[:answers][i.to_s][index.to_s] == 'true') if params[:answers]), disabled: is_preview %>
           <label class="form-check-label fw-bold" for="answers-<%= i %>-<%= index %>">
@@ -39,21 +30,21 @@ is_preview = defined?(preview) && preview
         </div>
       <% end %>
     </div>
-  <% elsif m = q.match(Questions::CHECKBOX_FIELD_REGEX) %>
+  <% when 'checkbox' %>
     <%# Checkbox: [Question text] %>
     <div class="form-check">
-      <%= check_box_tag "answers[#{i}]", id: "answers-#{i}", class: 'form-check-input', checked: ((params[:answers][i.to_s] == 'true') if params[:answers]), 'data-required': q.ends_with?('*'), disabled: is_preview %>
+      <%= check_box_tag "answers[#{i}]", id: "answers-#{i}", class: 'form-check-input', checked: ((params[:answers][i.to_s] == 'true') if params[:answers]), 'data-required': field[:required], disabled: is_preview %>
       <label class="form-check-label fw-bold" for="answers-<%= i %>">
-        <%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %>
+        <%== Sanitize.fragment(Rinku.auto_link(field[:text]), Sanitize::Config::DANDELION) %>
       </label>
     </div>
-  <% elsif m = q.match(Questions::DATE_FIELD_REGEX) %>
-    <label><%== Sanitize.fragment(Rinku.auto_link(m[1]), Sanitize::Config::DANDELION) %></label>
-    <%= date_field_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'form-control', value: (params[:answers][i.to_s] if params[:answers]), disabled: is_preview %>
+  <% when 'date' %>
+    <label><%== Sanitize.fragment(Rinku.auto_link(field[:text]), Sanitize::Config::DANDELION) %></label>
+    <%= date_field_tag "answers[#{i}]", required: field[:required], class: 'form-control', value: (params[:answers][i.to_s] if params[:answers]), disabled: is_preview %>
   <% else %>
-    <label><%== Sanitize.fragment(Rinku.auto_link(q.chomp('*')), Sanitize::Config::DANDELION) %></label>
+    <label><%== Sanitize.fragment(Rinku.auto_link(field[:text]), Sanitize::Config::DANDELION) %></label>
     <div>
-      <%= text_area_tag "answers[#{i}]", required: q.ends_with?('*'), class: 'autosize form-control', value: (params[:answers][i.to_s] if params[:answers]), disabled: is_preview %>
+      <%= text_area_tag "answers[#{i}]", required: field[:required], class: 'autosize form-control', value: (params[:answers][i.to_s] if params[:answers]), disabled: is_preview %>
     </div>
   <% end %>
 </div>
