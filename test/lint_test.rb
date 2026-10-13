@@ -174,6 +174,32 @@ class LintTest < Minitest::Test
     end
   end
 
+  # AGENTS.md, Dependencies: versions are exact, so a release can't arrive unchosen (and inside its 7-day cooldown)
+  EXACT = /\A\d+\.\d+\.\d+\z/
+
+  def test_dependency_versions_are_exact
+    # ckeditor/ installs from its yarn.lock, which pins every version
+    JSON.parse(File.read(File.join(ROOT, 'package.json'))).values_at('dependencies', 'devDependencies').compact.reduce({}, :merge).each do |name, version|
+      assert_match EXACT, version, "package.json: pin #{name} to an exact version"
+    end
+
+    cdn = Module.new.tap { |m| m.module_eval(File.read(File.join(ROOT, 'config/frontend_dependencies.rb'))) }::FRONTEND_DEPENDENCIES
+    packages = cdn.select { |base, _| base.start_with?('http') }.values.flat_map(&:keys)
+    packages += File.read(File.join(ROOT, 'app/views/layouts/_dependencies.erb')).scan(%r{/npm/([^/"']+)/})
+    packages += Dir[File.join(ROOT, 'tasks/*.rake')].flat_map { |f| File.read(f, encoding: 'UTF-8').scan(/'((?:@[\w.-]+\/)?[\w.-]+@[^']+)'/).flatten }
+    refute_empty packages
+    packages.flatten.each do |package|
+      assert_match EXACT, package.rpartition('@').last, "pin #{package} to an exact version"
+    end
+  end
+
+  # AGENTS.md, Build/vendored code: CKEditor 38 and later show a Powered by CKEditor badge under the GPL
+  def test_ckeditor_stays_on_37
+    JSON.parse(File.read(File.join(ROOT, 'ckeditor/package.json'))).values_at('dependencies', 'devDependencies').compact.reduce({}, :merge).each do |name, version|
+      assert_match(/\A[\^~]?37\./, version, "#{name} #{version}: keep CKEditor on 37") if name.start_with?('@ckeditor/', 'ckeditor5')
+    end
+  end
+
   def node_modules!
     skip 'needs node_modules (npm ci)' unless File.directory?(File.join(ROOT, 'node_modules'))
   end
