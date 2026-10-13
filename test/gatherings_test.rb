@@ -46,7 +46,7 @@ class GatheringsTest < ActiveSupport::TestCase
 
     visit "/g/#{@gathering.slug}/copy"
     assert page.has_content? 'You need to be an admin of another gathering to copy into it.'
-    assert_equal "/g/#{@gathering.slug}", page.current_path
+    assert page.has_current_path?("/g/#{@gathering.slug}", ignore_query: true)
   end
 
   test 'team edit rejects gathering_id from params' do

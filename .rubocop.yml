@@ -64,3 +64,6 @@ Dandelion/MongoidIndex:
 Dandelion/TestInstanceVariable:
   Include:
     - test/**/*_test.rb
+Dandelion/CapybaraCurrentPath:
+  Include:
+    - test/**/*_test.rb

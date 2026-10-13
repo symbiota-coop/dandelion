@@ -135,28 +135,28 @@ class SearchTest < ActiveSupport::TestCase
     create_event(name: 'Exact Match Event', prices: [0])
 
     visit '/search?q=event:"Exact Match Event"'
-    assert_equal "/e/#{@event.slug}", page.current_path
+    assert page.has_current_path?("/e/#{@event.slug}", ignore_query: true)
   end
 
   test 'search with account prefix redirects to account page when exact match' do
     account = FactoryBot.create(:account, name: 'Exact Match Account', has_signed_in: true)
 
     visit '/search?q=account:"Exact Match Account"'
-    assert_equal "/u/#{account.username}", page.current_path
+    assert page.has_current_path?("/u/#{account.username}", ignore_query: true)
   end
 
   test 'search with organisation prefix redirects to organisation page when exact match' do
     create_organisation(name: 'Exact Match Organisation')
 
     visit '/search?q=organisation:"Exact Match Organisation"'
-    assert_equal "/o/#{@organisation.slug}", page.current_path
+    assert page.has_current_path?("/o/#{@organisation.slug}", ignore_query: true)
   end
 
   test 'search with gathering prefix redirects to gathering page when exact match' do
     create_gathering(:public, name: 'Exact Match Gathering')
 
     visit '/search?q=gathering:"Exact Match Gathering"'
-    assert_equal "/g/#{@gathering.slug}", page.current_path
+    assert page.has_current_path?("/g/#{@gathering.slug}", ignore_query: true)
   end
 
   test 'search parses query with prefix without quotes' do
@@ -164,7 +164,7 @@ class SearchTest < ActiveSupport::TestCase
 
     visit '/search?q=event:Unquoted'
     # Should stay on search page (partial match doesn't redirect)
-    assert_equal '/search', page.current_path
+    assert page.has_current_path?('/search', ignore_query: true)
     assert page.has_selector?('.nav-tabs .nav-link.active', text: 'Events')
     assert page.has_content?('Unquoted Event Search')
   end

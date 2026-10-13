@@ -81,6 +81,10 @@ class LintTest < Minitest::Test
         "accept_confirm { click_button 'x' }\nassert page.has_no_css?('.y')" => 1, "click_button 'x'\nvisit '/'\nassert page.has_no_css?('.y')" => 0,
         "dismiss_prompt { click_on 'x' }\nassert page.has_no_css?('.y')" => 0, "fill_in 'x', with: 'y'\nassert page.has_no_css?('.y')" => 0
       },
+      'Dandelion/CapybaraCurrentPath' => {
+        'assert_equal "/x", page.current_path' => 1, 'x = current_url' => 1, %(assert page.has_current_path?("/x"), "Got \#{page.current_path}") => 0,
+        'session.current_path' => 0
+      },
       'Dandelion/TestInstanceVariable' => {
         "test 'x' do\n  @a ||= 1\nend" => 1, "it 'x' do\n  @a = 1\nend" => 0, "def setup_a\n  @a = 1\nend\ntest 'x' do\n  @a = 2\nend" => 0
       },

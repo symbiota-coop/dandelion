@@ -40,7 +40,7 @@ class WaitlistTest < ActiveSupport::TestCase
     click_button 'Submit'
 
     # Should redirect with success message
-    assert current_url.include?('added_to_waitlist=true'), 'Should redirect with waitlist confirmation'
+    assert page.has_current_path?(/added_to_waitlist=true/, url: true), 'Should redirect with waitlist confirmation'
 
     waitlist_account = Account.find_by(email: 'waitlist@example.com')
     assert waitlist_account.present?, 'Account should be created'

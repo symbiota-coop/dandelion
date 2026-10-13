@@ -258,7 +258,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     follower = add_member(org)
     sign_in(follower)
     visit "/events/new?organisation_id=#{org.id}"
-    assert_equal '/events', current_path
+    assert page.has_current_path?('/events', ignore_query: true)
     assert page.has_content? "don't have permission to create events for this organisation"
   end
 
@@ -270,7 +270,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     visit "/events/#{event.id}/delete"
     click_link 'Delete event and attempt to refund all orders'
     click_button 'Delete event'
-    assert_equal "/o/#{org.slug}/events", current_path
+    assert page.has_current_path?("/o/#{org.slug}/events", ignore_query: true)
     assert page.has_content?('The event was deleted')
     assert event.reload.deleted?
   end
@@ -294,7 +294,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     visit "/events/#{event.id}/delete"
     click_link 'Delete event and attempt to refund all orders'
     click_button 'Delete event'
-    assert_equal "/o/#{org.slug}/events", current_path
+    assert page.has_current_path?("/o/#{org.slug}/events", ignore_query: true)
     assert event.reload.deleted?
   end
 
