@@ -115,7 +115,6 @@ module EventValidation
       errors.add(:feedback_hours_after, 'cannot be negative') if feedback_hours_after&.negative?
       errors.add(:feedback_hours_after, "cannot be more than #{Event::MAX_FEEDBACK_HOURS_AFTER}") if feedback_hours_after && feedback_hours_after > Event::MAX_FEEDBACK_HOURS_AFTER
 
-      # rubocop:disable Style/CombinableLoops
       Event.profit_share_roles.each do |role|
         send("profit_share_to_#{role}=", 0) if send("profit_share_to_#{role}").nil?
       end
@@ -124,7 +123,6 @@ module EventValidation
         errors.add(:"profit_share_to_#{role}", 'must be between 0% and 100%') if send("profit_share_to_#{role}") < 0 || send("profit_share_to_#{role}") > 100
         errors.add(:"profit_share_to_#{role}", "along with other profit shares must not be greater than #{revenue_share_to_organisation}%") if Event.profit_share_roles.inject(0) { |sum, r| sum + send("profit_share_to_#{r}") } > revenue_share_to_organisation
       end
-      # rubocop:enable Style/CombinableLoops
 
       can_change_org_event_flags = Organisation.admin_or_event_manager?(organisation, last_saved_by)
       {

@@ -57,7 +57,7 @@ class Trace
     )
   end
 
-  COMMIT_TIMES = {} # rubocop:disable Style/MutableConstant
+  COMMIT_TIMES = {}
 
   # When a commit was made: from the local git history if the deploy has it, otherwise from GitHub.
   # Looked up once per process, as a commit's time never changes

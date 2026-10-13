@@ -43,7 +43,6 @@ class TicketTypeWaitship
 
     event = ticket_type.event
 
-    # rubocop:disable Style/GuardClause, Style/RedundantReturn
     unless event&.allow_ticket_type_waitlists?
       errors.add(:base, 'Ticket type waitlists are not enabled for this event.')
       return
@@ -63,6 +62,5 @@ class TicketTypeWaitship
       errors.add(:base, 'This ticket type is not sold out.')
       return
     end
-    # rubocop:enable Style/GuardClause, Style/RedundantReturn
   end
 end

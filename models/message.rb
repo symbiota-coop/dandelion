@@ -83,7 +83,6 @@ class Message
     scope = self.class.and(messenger_id: mid)
     recipient = messengee_id
 
-    # rubocop:disable Style/GuardClause, Style/RedundantReturn
     if unique_recipient_cap_exceeded?(scope, 10.minutes.ago, MESSENGER_RATE_10_MIN, recipient)
       errors.add(:base, rate_limit_message)
       return
@@ -98,7 +97,6 @@ class Message
       errors.add(:base, rate_limit_message)
       return
     end
-    # rubocop:enable Style/GuardClause, Style/RedundantReturn
   end
 
   def unique_recipient_cap_exceeded?(messenger_scope, since, limit, recipient_id)
