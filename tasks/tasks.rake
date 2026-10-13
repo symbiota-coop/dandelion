@@ -49,7 +49,7 @@ namespace :late do
     puts 'public home ticket stats (daily)'
     Ticket.refresh_home_page_stats!
     puts 'generate Dandelion Daily'
-    Daily.edition(Date.today)
+    Daily.publish(Date.today)
     puts 'create organisation edges'
     OrganisationEdge.delete_all
     OrganisationEdge.create_all(Organisation.and(:followers_count.gte => 50))
