@@ -1,4 +1,5 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
+require 'ostruct'
 
 class McpTest < ActiveSupport::TestCase
   include Rack::Test::Methods
@@ -284,5 +285,130 @@ class McpTest < ActiveSupport::TestCase
 
     assert rpc.dig('result', 'isError')
     assert_includes tool_text(rpc), 'Event not found'
+  end
+
+  def buyer_headers
+    @buyer ||= FactoryBot.create(:account)
+    { 'Authorization' => "Bearer #{@buyer.api_key}" }
+  end
+
+  def create_checkout(arguments)
+    rpc = mcp_tool_call('create_checkout_tool', arguments: { slug: @event.slug }.merge(arguments), headers: buyer_headers)
+    [rpc, (JSON.parse(tool_text(rpc)) unless rpc.dig('result', 'isError'))]
+  end
+
+  def with_stubbed_stripe_session(&)
+    session = OpenStruct.new(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test')
+    Stripe::Checkout::Session.stub(:create, session, &)
+  end
+
+  test 'create_checkout_tool requires authentication' do
+    create_event(prices: [0])
+    rpc = mcp_tool_call('create_checkout_tool', arguments: { slug: @event.slug, quantities: { @event.ticket_types.first.id.to_s => 1 } })
+
+    assert rpc.dig('result', 'isError')
+    assert_includes tool_text(rpc), 'Authentication required'
+  end
+
+  test 'create_checkout_tool books a free event for the authenticated account' do
+    create_event(prices: [0], questions: "Dietary requirements\nT-shirt size <S, M, L>*")
+    ticket_type = @event.ticket_types.first
+
+    _rpc, order = create_checkout(quantities: { ticket_type.id.to_s => 2 }, answers: { '1' => 'M' })
+
+    assert_equal 'complete', order['status']
+    assert_nil order['checkout_url']
+    assert_equal 2, order['tickets'].length
+    record = Order.find(order['order_id'])
+    assert_equal @buyer, record.account
+    assert_equal 'mcp', record.via
+    assert_equal [['Dietary requirements', nil], ['T-shirt size <S, M, L>*', 'M']], record.answers
+    assert_equal 2, @event.tickets.complete.and(account_id: @buyer.id).count
+  end
+
+  test 'create_checkout_tool returns a payment link for a paid event' do
+    create_event(prices: [10])
+    ticket_type = @event.ticket_types.first
+
+    order = nil
+    with_stubbed_stripe_session do
+      _rpc, order = create_checkout(quantities: { ticket_type.id.to_s => 1 })
+    end
+
+    assert_equal 'awaiting_payment', order['status']
+    assert_equal 'https://checkout.stripe.com/test', order['checkout_url']
+    assert_equal 10.0, order['total']
+    assert order['pay_by']
+
+    status_rpc = mcp_tool_call('get_order_status_tool', arguments: { order_id: order['order_id'] }, headers: buyer_headers)
+    assert_equal 'awaiting_payment', JSON.parse(tool_text(status_rpc))['status']
+
+    Order.find(order['order_id']).destroy
+    status_rpc = mcp_tool_call('get_order_status_tool', arguments: { order_id: order['order_id'] }, headers: buyer_headers)
+    assert_equal 'expired', JSON.parse(tool_text(status_rpc))['status']
+  end
+
+  test 'create_checkout_tool returns the first order when retried with the same idempotency key' do
+    create_event(prices: [10])
+    ticket_type = @event.ticket_types.first
+
+    first = second = nil
+    with_stubbed_stripe_session do
+      _rpc, first = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+      _rpc, second = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+    end
+
+    assert_equal first['order_id'], second['order_id']
+    assert_equal 1, @event.orders.count
+  end
+
+  test 'create_checkout_tool checks questions, terms, duplicates and the organisation setting' do
+    create_event(prices: [0], questions: 'T-shirt size <S, M, L>*', terms_and_conditions: 'Be kind', terms_and_conditions_check_box: true)
+    quantities = { @event.ticket_types.first.id.to_s => 1 }
+
+    rpc, = create_checkout(quantities: quantities, accept_terms: true)
+    assert_includes tool_text(rpc), 'Answer the required questions: T-shirt size'
+
+    rpc, = create_checkout(quantities: quantities, answers: { '1' => 'M' }, accept_terms: true)
+    assert_includes tool_text(rpc), 'Unknown question indexes: 1'
+
+    rpc, = create_checkout(quantities: quantities, answers: { '0' => 'M' })
+    assert_includes tool_text(rpc), 'accept the terms and conditions'
+
+    _rpc, order = create_checkout(quantities: quantities, answers: { '0' => 'M' }, accept_terms: true)
+    assert_equal 'complete', order['status']
+
+    rpc, = create_checkout(quantities: quantities, answers: { '0' => 'M' }, accept_terms: true)
+    assert_includes tool_text(rpc), 'has already been booked'
+
+    _rpc, order = create_checkout(quantities: quantities, answers: { '0' => 'M' }, accept_terms: true, confirm_duplicate: true)
+    assert_equal 'complete', order['status']
+
+    @organisation.update_attributes!(no_agent_bookings: true)
+    rpc, = create_checkout(quantities: quantities, answers: { '0' => 'M' }, accept_terms: true, confirm_duplicate: true)
+    assert_includes tool_text(rpc), 'does not take bookings from AI agents'
+    assert_equal 2, @event.orders.count
+  end
+
+  test 'create_checkout_tool does not sell hidden ticket types' do
+    create_event(prices: [0])
+    hidden = @event.ticket_types.create!(name: 'Secret', price: 0, quantity: 5, hidden: true)
+
+    rpc, = create_checkout(quantities: { hidden.id.to_s => 1 })
+
+    assert_includes tool_text(rpc), 'Ticket type not found'
+    assert_equal 0, @event.orders.count
+  end
+
+  test 'get_order_status_tool is only available to the buyer and event admins' do
+    create_event(prices: [0])
+    _rpc, order = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 })
+    stranger = FactoryBot.create(:account)
+
+    rpc = mcp_tool_call('get_order_status_tool', arguments: { order_id: order['order_id'] }, headers: { 'Authorization' => "Bearer #{stranger.api_key}" })
+    assert_includes tool_text(rpc), 'Order not found'
+
+    rpc = mcp_tool_call('get_order_status_tool', arguments: { order_id: order['order_id'] }, headers: { 'Authorization' => "Bearer #{@account.api_key}" })
+    assert_equal 'complete', JSON.parse(tool_text(rpc))['status']
   end
 end

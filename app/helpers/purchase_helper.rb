@@ -1,10 +1,10 @@
 Dandelion::App.helpers do
   def monthly_donor_for_event?(event = @event, account = current_account)
-    account && event.organisation.organisationships.find_by(:account => account, :monthly_donation_method.ne => nil)
+    event.monthly_donor?(account)
   end
 
   def activity_member_for_event?(event = @event, account = current_account)
-    event.activity && account && event.activity.activityships.find_by(account: account)
+    event.activity_member?(account)
   end
 
   def can_purchase_event_tickets?(event = @event, account = current_account)

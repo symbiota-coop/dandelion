@@ -8,7 +8,7 @@ class EventPaymentMethod
   attr_accessor :name, :label, :outline, :visible, :event_condition, :org_condition, :process, :partial,
                 :provider_name, :badge_text, :identity_fields,
                 :payment_id_field, :refund, :purchase_errors, :card, :complimentary, :platform_donations,
-                :dashboard_help, :contribution_reminder
+                :dashboard_help, :contribution_reminder, :redirect
 
   def initialize(name, options = {})
     @name = name
@@ -30,6 +30,9 @@ class EventPaymentMethod
     @card = options.fetch(:card, false)
     @complimentary = options.fetch(:complimentary, false)
     @platform_donations = options.fetch(:platform_donations, false)
+    # Whether paying means following a link to the provider (redirect_url or session_url),
+    # so that someone other than the payer, like an agent, can start the payment
+    @redirect = options.fetch(:redirect, false)
     @dashboard_help = options[:dashboard_help]
     @contribution_reminder = options[:contribution_reminder]
     @contribution_reminder_label = options[:contribution_reminder_label]
@@ -163,6 +166,7 @@ EventPaymentMethod.new('coinbase',
                        event_condition: ->(_event) { false })
 
 EventPaymentMethod.new('stripe',
+                       redirect: true,
                        label: 'Pay',
                        badge: false,
                        outline: false,
@@ -184,6 +188,7 @@ EventPaymentMethod.new('stripe',
                        })
 
 EventPaymentMethod.new('mollie',
+                       redirect: true,
                        label: 'Pay with Mollie',
                        provider_name: 'Mollie',
                        payment_id_field: :mollie_payment_id,
@@ -198,6 +203,7 @@ EventPaymentMethod.new('mollie',
                        })
 
 EventPaymentMethod.new('paypal',
+                       redirect: true,
                        label: 'Pay with PayPal',
                        provider_name: 'PayPal',
                        identity_fields: %i[paypal_order_id paypal_capture_id],
@@ -213,6 +219,7 @@ EventPaymentMethod.new('paypal',
                        })
 
 EventPaymentMethod.new('gocardless_instant',
+                       redirect: true,
                        label: 'Pay with GoCardless',
                        provider_name: 'GoCardless',
                        contribution_reminder_label: 'GoCardless Instant Bank Pay',
@@ -229,6 +236,7 @@ EventPaymentMethod.new('gocardless_instant',
                        })
 
 EventPaymentMethod.new('gocardless_instalment',
+                       redirect: true,
                        label: ->(event) { "Pay in #{event.gocardless_instalment_count} monthly instalments" },
                        provider_name: 'GoCardless',
                        contribution_reminder_label: 'GoCardless instalments',

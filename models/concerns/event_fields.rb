@@ -103,6 +103,10 @@ module EventFields
     end
   end
 
+  def terms_acceptance_required?
+    terms_and_conditions_check_box_for_purchase && (terms_and_conditions_for_purchase || terms_and_conditions_url_for_purchase).present?
+  end
+
   def terms_and_conditions_check_box_for_purchase
     if event_terms_and_conditions_override?
       terms_and_conditions_check_box

@@ -18,19 +18,21 @@ Zapier also calls `/z` to identify the signed-in account and `/z/organisation_ev
 
 ## MCP
 
-AI assistants can use Dandelion's MCP server to search and look up public records, and — with your API key — to read admin data for organisations and events you manage.
+AI assistants can use Dandelion's MCP server to search and look up public records, and — with your API key — to book events for you and to read admin data for organisations and events you manage.
 
 Public tools, which work without authentication:
 
 - Search events (recent and upcoming), organisations, gatherings and accounts
 - Look up events, organisations, gatherings and accounts, by slug/username or ID. An event comes with its currency and public ticket types: price (fixed, a range, or pay what you want), tickets available, whether it's sold out and when sales end
-- Get what booking an event involves (`get_event_checkout_requirements_tool`, by event `slug` or `id`): whether it can be booked and why not (sales closed, monthly donors only, members only), its ticket types, the buyer details and questions the checkout form asks for, opt-ins, terms and the payment methods on offer. Booking itself happens on the event page
+- Get what booking an event involves (`get_event_checkout_requirements_tool`, by event `slug` or `id`): whether it can be booked and why not (sales closed, monthly donors only, members only), its ticket types, the buyer details and questions the checkout form asks for, opt-ins, terms and the payment methods on offer, and whether each one works for agent bookings (`agent_checkout`)
 - Get trending events
 - Get upcoming events for an organisation
 
 Authenticated tools, which require your API key as a Bearer token:
 
 - Get the signed-in account
+- Book tickets to an event as the signed-in account (`create_checkout_tool`): pass ticket quantities by ticket type id, plus prices for range and pay-what-you-want tickets, answers to the event's questions by index, and `accept_terms` when the terms must be accepted. Free bookings are confirmed straight away. Paid ones return a `checkout_url` where you pay with the event's card, bank or PayPal provider; unpaid orders are released after an hour (`pay_by`). Pass an `idempotency_key` so that a retry returns the first order rather than booking twice. Orders are marked as coming via `mcp`. Organisations can turn agent bookings off with *Don't allow AI agents to book tickets*, under *Everything else* in their settings
+- Get the status of an order you made, or one to an event you admin (`get_order_status_tool`): `awaiting_payment`, `complete` or `expired`
 - Get all events hosted or cohosted by an organisation you admin
 - Get organisation followers from the last 24 hours
 - Get all completed orders for an event you admin

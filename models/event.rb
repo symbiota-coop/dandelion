@@ -233,6 +233,14 @@ class Event
     !secret?
   end
 
+  def monthly_donor?(account)
+    account && organisation.organisationships.find_by(:account => account, :monthly_donation_method.ne => nil)
+  end
+
+  def activity_member?(account)
+    activity && account && activity.activityships.find_by(account: account)
+  end
+
   def sold_out?
     return true if sales_closed_due_to_event_end?
 

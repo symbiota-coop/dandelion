@@ -25,6 +25,9 @@ module OrderFields
     field :transferred, type: Mongoid::Boolean
     field :restored, type: Mongoid::Boolean
     field :completing_at, type: Time
+    # Set on orders made through the MCP server: the agent's retry key, and where the buyer pays
+    field :idempotency_key, type: String
+    field :checkout_url, type: String
 
     field :donation_via_modal, type: Mongoid::Boolean
 
