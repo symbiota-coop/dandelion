@@ -26,6 +26,15 @@ jobs:
         ruby-version: 3.4.7
         bundler-cache: true
 
+    # RuboCop's results from earlier runs, so it only checks files that changed. A new Gemfile.lock, config or cop starts
+    # afresh, as their hashes are in the key
+    - name: Cache RuboCop's results
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/rubocop_cache
+        key: rubocop-${{ hashFiles('Gemfile.lock', '.rubocop.yml', '.rubocop/**') }}-${{ github.sha }}
+        restore-keys: rubocop-${{ hashFiles('Gemfile.lock', '.rubocop.yml', '.rubocop/**') }}-
+
     # script/lint sets each linter's command and flags, for the pre-commit hook too
     - name: Run RuboCop
       run: script/lint --all --only rubocop
