@@ -33,6 +33,8 @@ LINTERS = [
     configs: %r{\A(\.erb_lint\.yml|\.erb_linters/|\.rubocop\.yml|\.rubocop/|config/bootstrap4_leftovers\.json\z)},
     command: %w[bundle exec erb_lint --fail-level W], # W is warning, like RuboCop; erb_lint 0.9 rejects the word "warning"
     all: %w[--lint-all],
+    # erb_lint uses one core, so everything is linted as four runs, each on a share of the templates (.erb_lint.yml's glob)
+    shards: 'app/views/**/*.erb',
     stdin: ->(file) { ['--stdin', file] },
     env: ERB_ENV
   },
@@ -67,6 +69,8 @@ GENERATED = {
   }
 }.freeze
 
+WORKERS = 4 # linter runs at a time
+
 USAGE = "Usage: script/lint [--only #{LINTERS.map { |linter| linter[:name].downcase }.join('|')}] FILE... | --staged | --all".freeze
 
 if (at = ARGV.index('--only'))
@@ -100,7 +104,10 @@ jobs = LINTERS.flat_map do |linter|
   end
 
   env = linter[:env] || {}
-  if all
+  if all && linter[:shards]
+    templates = Dir[linter[:shards]]
+    templates.each_slice(templates.size.fdiv(WORKERS).ceil).map { |share| { name: linter[:name], command: linter[:command] + share, env: env } }
+  elsif all
     [{ name: linter[:name], command: linter[:command] + (linter[:all] || []), env: env }]
   elsif mode == '--staged'
     # One run per file, given the staged version on stdin, so unstaged edits (yours or another session's) don't count
@@ -118,7 +125,7 @@ runnable = jobs.reject { |job| job[:missing] }
 queue = Queue.new
 runnable.each_with_index { |job, index| queue << [job, index] }
 queue.close
-results = Array.new(4) do
+results = Array.new(WORKERS) do
   Thread.new do
     done = []
     while (item = queue.pop)
