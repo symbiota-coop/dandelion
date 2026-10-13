@@ -2,10 +2,7 @@
 // only these rules, so it checks the design tokens rather than formatting
 export default {
   ignoreFiles: [
-    'app/assets/stylesheets/bootstrap5.css', // compiled vendor CSS: change bootstrap5.scss instead
-    // Inlined into emails, which can't use custom properties, so they keep their own colours
-    'app/assets/stylesheets/email.css',
-    'app/assets/stylesheets/event_details.css'
+    'app/assets/stylesheets/bootstrap5.css' // compiled vendor CSS: change bootstrap5.scss instead
   ],
   rules: {
     // Colours come from tokens: a hex value only where a token is defined (--color-x: #...)
@@ -18,5 +15,18 @@ export default {
       { '/^(margin|padding|gap|row-gap|column-gap|inset)/': ['px'], 'font-size': ['px'] },
       { message: 'Use --space-* for spacing and rem or em for font sizes, not px' }
     ]
-  }
+  },
+  overrides: [
+    {
+      // Inlined into emails, which can't use custom properties, so they keep their own colours and sizes
+      files: ['app/assets/stylesheets/email.css', 'app/assets/stylesheets/event_details.css'],
+      rules: {
+        'declaration-property-value-disallowed-list': [
+          { '/.*/': ['/var\\(/'] },
+          { message: 'This file is inlined into emails, which can\'t use custom properties (var(--x))' }
+        ],
+        'declaration-property-unit-disallowed-list': null
+      }
+    }
+  ]
 }

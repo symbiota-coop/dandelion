@@ -45,6 +45,7 @@ Our rules are in `stylelint.config.mjs`. Disable one with `/* stylelint-disable 
 
 - `declaration-property-value-disallowed-list`: Colours, radii and shadows come from tokens (`--theme-*`, `--color-*`, `--bs-gray-*`, `--hairline`, Bootstrap's radius and shadow variables and classes), never hex values, custom values or new translucent tints, so organisation themes follow. The check allows a hex value only where a custom property is defined
 - `declaration-property-unit-disallowed-list`: Spacing comes from the scale: Bootstrap's spacing utilities in markup, `--space-*` tokens in CSS, never px or off-scale rem. Other sizes are in rem (or em); px only for hairlines, shadows, the focus ring, breakpoints and Google Maps overrides. The check flags px in margins, padding, gaps, insets and font sizes
+- `declaration-property-value-disallowed-list` (override for `event_details.css` and `email.css`): These two are inlined into emails, so they can't use CSS custom properties (`var(--x)`). The colour and spacing checks above don't apply to them
 
 ## Committing
 
@@ -139,7 +140,6 @@ The design guide (`/design`, `app/views/design.erb`) shows the colours, type, sp
 - Tooltips are `data-bs-toggle="tooltip"` and a `title`; `app.js` handles them for the whole page, so content loaded later needs no setup
 - Motion: shows where things come from and go, and is otherwise kept out of the way. State changes fade over `--transition-fast`; things that float (dropdown menus, the confirm popover, flash toasts) fade in over `--transition-enter`, moving at most `--space-2xs`; modals keep Bootstrap's slide; chevrons on things that open in place turn. Animate only colours, shadows, masks, opacity, `translate` and `rotate`; nothing bounces, scales or reveals on scroll (the guide lists a few older exceptions; don't add more), and only loading indicators (`.bi-spin`, `.placeholder-glow`) loop
 - Avatars: `partial :'accounts/square', locals: { account:, size: :xs }` (`:xs` to `:2xl`, default `:sm`, or `:fill`). For a bare `<img>` of an account, use `class="avatar avatar-sm"` rather than a width
-- `event_details.css` and `email.css` are inlined into emails, so they can't use CSS custom properties (`var(--x)`)
 
 ## Dependencies
 
