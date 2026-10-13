@@ -15,7 +15,7 @@
         </h3>
         <div class="card-body">
           <% if @event.past? %>
-            <% if event_feedback = @event.event_feedbacks.find_by(account: current_account) %>
+            <% if (event_feedback = @event.event_feedbacks.find_by(account: current_account)) %>
               <% if event_feedback.rating %>
                 <p>Your rating: <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %></p>
               <% end %>

@@ -1,4 +1,4 @@
-<% if ticket_type = ticket.ticket_type %>
+<% if (ticket_type = ticket.ticket_type) %>
   <span>
     <a href="javascript:;" onclick="$(this).parent().hide().next().show().find('select').focus()">
       <%= ticket_type.name %>

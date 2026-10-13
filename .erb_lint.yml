@@ -25,7 +25,10 @@ linters:
   # Rules from the Design section of AGENTS.md (.erb_linters/design_classes.rb)
   DesignClasses:
     enabled: true
+  # Replaced by RubocopTags (.erb_linters/rubocop_tags.rb), which also checks the conditions of if, unless and elsif tags
   Rubocop:
+    enabled: false
+  RubocopTags:
     enabled: true
     rubocop_config:
       # The Ruby in each tag is checked with .rubocop.yml's cops and settings, apart from the overrides below

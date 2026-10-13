@@ -12,7 +12,7 @@ CI fails on each rule below, and each names its check. When you add a rule to th
 
 ### RuboCop
 
-Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Ruby in templates through erb_lint. Disable one on a line with `# rubocop:disable Dandelion/... -- reason`.
+Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Ruby in templates through erb_lint (its `RubocopTags` linter, `.erb_linters/rubocop_tags.rb`, which also checks the conditions of `<% if %>`, `<% unless %>` and `<% elsif %>` tags). Disable one on a line with `# rubocop:disable Dandelion/... -- reason`.
 
 - `Dandelion/MongoidOr`: Never use Mongoid `.or` — it ORs against whatever is already in the selector (`Event.live.or(featured: true)` means live or featured). Use `self.and('$or' => [...])` so the OR is just another AND-ed filter (`Event.live.and('$or' => [...])` means live and (this or that))
 - `Dandelion/MongoidScope`: Query filters are class methods that return `self.and(...)` so they chain (`Event.live.future`). Do not use `scope :live, -> { ... }`

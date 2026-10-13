@@ -4,7 +4,7 @@
   </h3>
   <div class="card-body">
     <p class="lead">
-      <% if next_event = @event.organisation.events_including_cohosted.live.publicly_visible.future.and(:id.nin => [@event.id]).and(name: @event.name).reject(&:sold_out?).first %>
+      <% if (next_event = @event.organisation.events_including_cohosted.live.publicly_visible.future.and(:id.nin => [@event.id]).and(name: @event.name).reject(&:sold_out?).first) %>
         Missed out on tickets to <%= @event.name %>?
         <% if next_event.start_time %>
           It's happening again on <a href="/e/<%= next_event.slug %>"><%= next_event.start_time.to_date %></a>.

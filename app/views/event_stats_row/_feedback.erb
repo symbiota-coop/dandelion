@@ -4,7 +4,7 @@
     <% if event.attendees.count > 0 %>
       (<%= "#{(100 * (event.event_feedbacks.count.to_f / event.attendees.count)).round}%" %>)
     <% end %>
-    <% if average_rating = event.event_feedbacks.average_rating %>
+    <% if (average_rating = event.event_feedbacks.average_rating) %>
       <br>
       <span class="fs-5" title="Average rating <%= average_rating %>">
         <%= average_rating %>
