@@ -227,20 +227,32 @@ class LintTest < Minitest::Test
     skip 'needs ESLint and Stylelint installed (npm ci)' unless %w[eslint stylelint].all? { |tool| File.exist?(File.join(ROOT, 'node_modules/.bin', tool)) }
   end
 
-  # A linter's JSON report on some source, piped in. Stylelint writes it to stderr when it finds something
-  def node_lint(command, source)
-    stdout, stderr, = Open3.capture3(*command, stdin_data: source, chdir: ROOT)
-    JSON.parse(stdout.empty? ? stderr : stdout)
-  end
+  # Lints sources with ESLint's or Stylelint's own API, all in one Node process, as starting the linter for each case took
+  # most of this file's time. Takes [source, path] pairs and returns, for each, ESLint's messages or Stylelint's rules
+  NODE_LINT = <<~JS.freeze
+    import { readFileSync } from 'node:fs'
+    import { resolve } from 'node:path'
+    const { tool, cases } = JSON.parse(readFileSync(0, 'utf8'))
+    const results = []
+    if (tool === 'eslint') {
+      const eslint = new (await import('eslint')).ESLint()
+      for (const [code, file] of cases) results.push((await eslint.lintText(code, { filePath: resolve(file) }))[0].messages.map((m) => m.message))
+    } else {
+      const stylelint = (await import('stylelint')).default
+      for (const [code, file] of cases) results.push((await stylelint.lint({ code, codeFilename: resolve(file) })).results[0].warnings.map((w) => w.rule))
+    }
+    process.stdout.write(JSON.stringify(results))
+  JS
 
-  def eslint_rules(source)
-    result = node_lint(%w[npx eslint --format json --stdin --stdin-filename app/assets/javascripts/x.js], source)
-    result.first['messages'].map { |message| message['message'] }
+  def node_lint(tool, cases)
+    output, status = Open3.capture2('node', '--input-type=module', '-e', NODE_LINT, stdin_data: { tool: tool, cases: cases }.to_json, chdir: ROOT)
+    assert status.success?, "#{tool} didn't run"
+    JSON.parse(output)
   end
 
   def test_eslint_rules
     node_modules!
-    {
+    bad = {
       %(/* global el */\nel.classList.add('d-none')) => /d-none/,
       %($('#x').html(`<span class="badge text-bg-success">${1}</span>`)) => /-success/,
       %($('#x').html('<span class="badge badge-info">')) => /badge-\*/,
@@ -248,23 +260,19 @@ class LintTest < Minitest::Test
       %($('#x').addClass('mr-3')) => /ms-\*/,
       %($('#x').attr('data-toggle', 'tooltip')) => /data-bs-\*/,
       %($('#x').html('<select name="y">')) => /form-select/
-    }.each do |source, message|
-      messages = eslint_rules(source)
-      assert_equal 1, messages.size, "ESLint on #{source}: #{messages.inspect}"
-      assert_match message, messages.first
+    }
+    good = %($('#x').html('<label class="form-label ms-2 media" data-bs-toggle="x"><select class="form-select">').addClass('text-end').removeClass('with-label'))
+    *results, good_result = node_lint('eslint', [*bad.keys, good].map { |source| [source, 'app/assets/javascripts/x.js'] })
+    bad.each_with_index do |(source, message), index|
+      assert_equal 1, results[index].size, "ESLint on #{source}: #{results[index].inspect}"
+      assert_match message, results[index].first
     end
-    assert_empty eslint_rules(%($('#x').html('<label class="form-label ms-2 media" data-bs-toggle="x"><select class="form-select">').addClass('text-end').removeClass('with-label'))),
-                 'ESLint flags Bootstrap 5 and our own classes'
-  end
-
-  def stylelint_rules(source, path = 'app/assets/stylesheets/x.css')
-    result = node_lint(['npx', 'stylelint', '--formatter', 'json', '--stdin-filename', path], source)
-    result.first['warnings'].map { |warning| warning['rule'] }
+    assert_empty good_result, 'ESLint flags Bootstrap 5 and our own classes'
   end
 
   def test_stylelint_rules
     node_modules!
-    {
+    bad = {
       '.a { color: #fff; }' => 'declaration-property-value-disallowed-list',
       '.a { color: rgba(0, 0, 0, 0.5); }' => 'declaration-property-value-disallowed-list',
       '.a { color: white; }' => 'color-named',
@@ -276,16 +284,18 @@ class LintTest < Minitest::Test
       '.a { transition-property: color, transform; }' => 'declaration-property-value-disallowed-list',
       '.a { transition: opacity 0.3s ease; }' => 'declaration-property-value-disallowed-list',
       '.a { animation: pulse 1s infinite; }' => 'declaration-property-value-disallowed-list'
-    }.each { |source, rule| assert_equal [rule], stylelint_rules(source), source }
-
+    }
     good = <<~CSS
       .a { --c: #fff; color: rgba(var(--bs-black-rgb), 0.5); background: transparent; border: 1px solid var(--hairline); }
       .c { transition: opacity var(--transition-enter), translate var(--transition-enter), rotate var(--transition-fast), --fade-start var(--transition-fast); }
       .d { transition: none; animation: spin 2s linear; transform: translateY(50%); }
       .b { border-radius: 0 0 var(--bs-border-radius) 50%; box-shadow: inset 0 0 0 1px var(--x), var(--bs-box-shadow); margin: var(--space-xs) 0.375rem; }
     CSS
-    assert_empty stylelint_rules(good)
-    assert_equal ['declaration-property-value-disallowed-list'], stylelint_rules('.a { color: var(--x); }', 'app/assets/stylesheets/email.css')
+    cases = [*bad.keys, good].map { |source| [source, 'app/assets/stylesheets/x.css'] } << ['.a { color: var(--x); }', 'app/assets/stylesheets/email.css']
+    *results, good_result, email_result = node_lint('stylelint', cases)
+    bad.each_with_index { |(source, rule), index| assert_equal [rule], results[index], source }
+    assert_empty good_result
+    assert_equal ['declaration-property-value-disallowed-list'], email_result
   end
 
   def lint(*args)
@@ -309,15 +319,16 @@ class LintTest < Minitest::Test
   end
 
   def test_script_lint_fails_on_a_built_file_without_its_source
-    output, status = lint('app/assets/stylesheets/bootstrap5.css')
+    # --only eslint leaves these no files to lint, so only the check for built files runs
+    output, status = lint('--only', 'eslint', 'app/assets/stylesheets/bootstrap5.css')
     refute status.success?, output
     assert_match(/bootstrap5.css is built from bootstrap5.scss/, output)
-    output, status = lint('app/assets/javascripts/ext/ckeditor.js')
+    output, status = lint('--only', 'eslint', 'app/assets/javascripts/ext/ckeditor.js')
     refute status.success?, output
     assert_match(/ckeditor.js is built from ckeditor/, output)
 
     [%w[app/assets/stylesheets/bootstrap5.css app/assets/stylesheets/bootstrap5.scss], %w[app/assets/javascripts/ext/ckeditor.js ckeditor/yarn.lock]].each do |files|
-      output, status = lint(*files)
+      output, status = lint('--only', 'eslint', *files)
       assert status.success?, output
     end
   end
