@@ -8,11 +8,16 @@
       <h2>
         <a class="text-body" href="/u/<%= account.username %>"><%= account.name %></a>
       </h2>
+      <% if defined?(facilitator_info) && facilitator_info && account.event_tag_names %>
+        <div class="mb-1">
+          <%= partial :'accounts/event_tag_badges', locals: { account: account } %>
+        </div>
+      <% end %>
       <%= partial :'accounts/buttons', locals: { account: account } %>
     </div>
     <div class="search-result-details pt-2">
       <% if defined?(facilitator_info) && facilitator_info %>
-        <%= partial :'accounts/facilitator_info', locals: { account: account } %>
+        <%= partial :'accounts/facilitator_info', locals: { account: account, skip_tags: true } %>
       <% else %>
         <%= partial :'accounts/table', locals: { account: account, birthday: defined?(birthday) } %>
       <% end %>
