@@ -30,25 +30,19 @@ linters:
     enabled: false
   RubocopTags:
     enabled: true
+    # Only cops that can fail CI (warning or above), as CI runs erb_lint with --fail-level W like RuboCop: Lint, ours and
+    # the three warning-level Layout cops. Running only these, rather than every cop with most disabled, is most of its
+    # speed; convention cops wouldn't fail CI anyway, and erb_lint (unlike RuboCop) prints the offenses it ignores
+    only:
+      - Lint
+      - Dandelion
+      - Layout/BeginEndAlignment
+      - Layout/DefEndAlignment
+      - Layout/EndAlignment
     rubocop_config:
-      # The Ruby in each tag is checked with .rubocop.yml's cops and settings, apart from the overrides below
+      # The Ruby in each tag is checked with .rubocop.yml's settings for those cops, apart from the override below
       inherit_from:
         - .rubocop.yml
-      # Only cops that can fail CI (warning or above), as CI runs erb_lint with --fail-level W like RuboCop. Convention cops wouldn't
-      # fail it anyway, and erb_lint (unlike RuboCop) prints the offenses it ignores, so they would fill the output
-      Layout:
-        Enabled: false
-      Style:
-        Enabled: false
-      Naming:
-        Enabled: false
-      # The only warning-level cops in those departments
-      Layout/BeginEndAlignment:
-        Enabled: true
-      Layout/DefEndAlignment:
-        Enabled: true
-      Layout/EndAlignment:
-        Enabled: true
       # Each tag is checked on its own, so a variable set in one tag and used in a later one looks unused
       Lint/UselessAssignment:
         Enabled: false
