@@ -63,13 +63,13 @@ Our rules are in `stylelint.config.mjs`. Disable one with `/* stylelint-disable 
 
 Commit only the changes you made: other sessions may be editing the same checkout, so stage your files by name rather than with `git add -A` or `git commit -a`.
 
-`script/lint` runs CI's linters (`.github/workflows/ruby.yml`) with CI's flags, each on the files of its kind: RuboCop, erb_lint, ESLint and Stylelint. Run it on the files you added or changed as you go, and fix what it reports:
+`script/lint` runs our linters, RuboCop, erb_lint, ESLint and Stylelint, each on the files of its kind. CI's lint job (`.github/workflows/ruby.yml`) runs it too, so it is the one place their commands and flags are set: change a linter's flags or add a linter there, not in the workflow. Run it on the files you added or changed as you go, and fix what it reports:
 
 ```bash
 script/lint <files>
 ```
 
-If a linter's config is among them (`.rubocop.yml`, `.rubocop/`, `.erb_lint.yml`, `.erb_linters/`, `eslint.config.mjs`, `stylelint.config.mjs`, `package.json`), it runs that linter on everything, as CI does; `script/lint --all` runs them all. Run `npm ci` first if `node_modules` is missing.
+If a linter's config is among them (`.rubocop.yml`, `.rubocop/`, `.erb_lint.yml`, `.erb_linters/`, `eslint.config.mjs`, `stylelint.config.mjs`, `package.json`), it runs that linter on everything, as CI does; `script/lint --all` runs them all, and `--only <linter>` just one. Run `npm ci` first if `node_modules` is missing.
 
 The pre-commit hook (`.githooks/pre-commit`) runs `script/lint --staged`, which lints the staged version of each staged file, so another session's unstaged edits don't count. Git runs it once `core.hooksPath` is `.githooks`, which `script/agent-env/install.sh` sets; in a checkout of your own, run `git config core.hooksPath .githooks` once. If it fails, fix the offenses (or disable a check where its rule genuinely doesn't apply, as above) and commit again. Never skip it with `--no-verify`.
 

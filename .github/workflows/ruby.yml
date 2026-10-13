@@ -26,13 +26,12 @@ jobs:
         ruby-version: 3.4.7
         bundler-cache: true
 
+    # script/lint sets each linter's command and flags, for the pre-commit hook too
     - name: Run RuboCop
-      run: bundle exec rubocop --fail-level warning --display-only-fail-level-offenses
+      run: script/lint --all --only rubocop
 
     - name: Run erb_lint
-      run: bundle exec erb_lint --lint-all --fail-level W # W is warning, like RuboCop above; erb_lint 0.9 rejects the word "warning"
-      env:
-        RUBYOPT: -W0 # hides the parser gem warning that it only knows Ruby 3.4 as 3.4.0-dev
+      run: script/lint --all --only erb_lint
 
     - name: Install Node
       uses: actions/setup-node@v4
@@ -40,11 +39,14 @@ jobs:
         node-version: 22
         cache: npm
 
-    - name: Run ESLint and Stylelint
-      run: |
-        npm ci
-        npx eslint
-        npx stylelint "app/assets/stylesheets/**/*.css"
+    - name: Install linters
+      run: npm ci
+
+    - name: Run ESLint
+      run: script/lint --all --only eslint
+
+    - name: Run Stylelint
+      run: script/lint --all --only stylelint
 
   generate-matrix:
     runs-on: ubuntu-latest
