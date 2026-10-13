@@ -25,10 +25,10 @@
       <div class="daily-notice-icon">
         <i class="bi <%= out_soon ? 'bi-hourglass-split' : 'bi-newspaper' %>"></i>
       </div>
-      <h2 class="daily-notice-title"><%= out_soon ? 'Not out yet' : 'Not available' %></h2>
+      <h2 class="daily-notice-title"><%= out_soon ? 'Still at the printers' : 'Not available' %></h2>
       <p class="text-body-secondary">
         <% if out_soon %>
-          This edition of the Daily hasn't been printed yet. Check back soon!
+          This edition of the Daily isn't out yet. Check back soon!
         <% else %>
           There's no Daily for this day.
         <% end %>
