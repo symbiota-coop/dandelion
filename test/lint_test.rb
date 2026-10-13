@@ -7,6 +7,7 @@
 require 'json'
 require 'minitest/autorun'
 require 'open3'
+require 'rake'
 require 'tmpdir'
 require 'rubocop'
 require 'erb_lint/all'
@@ -158,6 +159,14 @@ class LintTest < Minitest::Test
     BOOTSTRAP_4['classes'].each do |entry|
       pattern = /\A(?:#{entry['pattern']})\z/
       assert_empty classes.grep(pattern), "#{entry['pattern']} matches classes we have"
+    end
+  end
+
+  # AGENTS.md: only edit .mcp.json, then run rake mcp:sync to write the copies other tools read
+  def test_mcp_copies_match_mcp_json
+    load File.join(ROOT, 'tasks/mcp.rake')
+    McpConfigFiles.files.each do |path, content|
+      assert_equal content, File.read(File.join(ROOT, path), encoding: 'UTF-8'), "#{path} differs from .mcp.json: edit .mcp.json and run rake mcp:sync"
     end
   end
 

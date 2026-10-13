@@ -63,6 +63,12 @@ Our rules are in `stylelint.config.mjs`. Disable one with `/* stylelint-disable 
 - `declaration-property-value-disallowed-list`: Motion: transitions animate only colours, shadows, masks, opacity, `translate` and `rotate` (not `all`, `transform`, `scale` or sizes), over `--transition-fast` or `--transition-enter` rather than a duration of their own, and only loading indicators loop (`infinite`). The design guide's older exceptions are disabled where they are; don't add more
 - `declaration-property-value-disallowed-list` (override for `event_details.css` and `email.css`): These two are inlined into emails, so they can't use CSS custom properties (`var(--x)`). The colour, radius, shadow and spacing checks above don't apply to them
 
+### Other checks
+
+Rules no linter covers, checked by `test/lint_test.rb` (which CI's lint job runs). Each names its test.
+
+- `test_mcp_copies_match_mcp_json`: `.cursor/mcp.json`, `.opencode/opencode.json` and `.codex/config.toml` are copies of `.mcp.json`: only edit `.mcp.json`, then run `rake mcp:sync` (Cloud agents)
+
 ## Committing
 
 Commit only the changes you made: other sessions may be editing the same checkout, so stage your files by name rather than with `git add -A` or `git commit -a`.
