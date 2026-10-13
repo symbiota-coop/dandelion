@@ -1,5 +1,5 @@
 # The Dandelion Daily (/daily): each date's AI-written articles and facilitator of the day, worked out once and kept
-# in a Stash. late:errands makes today's; other dates are made the first time someone opens them
+# in a Stash. Only late:errands makes them, with Daily.publish(Date.today); /daily just shows what's been kept
 module Daily
   ARTICLES = [
     {
@@ -37,23 +37,29 @@ module Daily
     }
   ].freeze
 
-  # { 'articles' => [{ 'title' =>, 'summary' => markdown }], 'facilitator_id' => }
+  def self.key(date)
+    "daily/#{date.to_fs(:db_local)}"
+  end
+
+  # { 'articles' => [{ 'title' =>, 'summary' => markdown }], 'facilitator_id' => }, or nil if it hasn't been made
   def self.edition(date)
-    key = "daily/#{date.to_fs(:db_local)}"
-    if (stash = Stash.find_by(key: key))
-      return JSON.parse(stash.value)
-    end
+    stash = Stash.find_by(key: key(date))
+    JSON.parse(stash.value) if stash
+  end
+
+  # Makes and keeps the date's edition, unless it already has one
+  def self.publish(date)
+    return if Stash.and(key: key(date)).exists?
 
     edition = generate(date)
-    # Don't keep an edition missing a summary the model failed to write, so the next visit tries again
-    return edition if edition['articles'].any? { |article| article['summary'].nil? }
+    # Don't keep an edition missing a summary the model failed to write
+    return if edition['articles'].any? { |article| article['summary'].nil? }
 
     begin
-      Stash.create(key: key, value: edition.to_json)
+      Stash.create(key: key(date), value: edition.to_json)
     rescue Mongo::Error::OperationFailure # another process stashed it first
-      return JSON.parse(Stash.find_by(key: key).value)
+      nil
     end
-    edition
   end
 
   def self.generate(date)

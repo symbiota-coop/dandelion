@@ -17,16 +17,11 @@
     <% end %>
   </div>
 
-  <div data-with-placeholder data-pagelet-url="/daily?date=<%= @date.strftime('%Y-%m-%d') %>">
-    <% Daily::ARTICLES.each do |article| %>
-      <div class="article">
-        <h2 class="article-title"><%= article[:title] %></h2>
-        <div class="article-content placeholder-glow">
-          <% 10.times do %>
-            <span class="placeholder d-block mb-3" style="width: <%= rand(10..90) %>%"></span>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-  </div>
+  <% if @edition %>
+    <%= partial :daily %>
+  <% elsif @date >= Date.today %>
+    <p class="text-body-secondary">This edition isn't out yet, check back soon</p>
+  <% else %>
+    <p class="text-body-secondary">This edition isn't available</p>
+  <% end %>
 </div>

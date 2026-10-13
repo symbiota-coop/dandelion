@@ -9,11 +9,7 @@ Dandelion::App.controller do
             else
               Date.today
             end
-    if request.xhr?
-      @edition = Daily.edition(@date)
-      partial :daily
-    else
-      erb :daily
-    end
+    @edition = Daily.edition(@date)
+    erb :daily
   end
 end
