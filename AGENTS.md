@@ -6,9 +6,16 @@ The ORM is Mongoid, not ActiveRecord.
 
 Code map: controllers in `app/controllers`, views in `app/views`, CSS/JS in `app/assets`; models in `models`, with shared model code in `models/concerns`; view helpers in `app/helpers`; other library code in `lib` (form builder, payments, mail, auth); boot and config in `config`; rake tasks in `tasks`; tests in `test`. Background jobs use delayed_job (`handle_asynchronously` or `.delay`), run by the `worker` process in `Procfile`.
 
-## Custom cops
+## Custom checks
 
-Our own RuboCop cops in `.rubocop/dandelion/` check these rules. They're warnings, so they fail CI in Ruby files and, through erb_lint, in templates. When you add a rule to this file that code can check, add a cop for it here too. Where a rule genuinely doesn't apply, disable the cop on that line with a `# rubocop:disable Dandelion/...` comment.
+CI fails on each rule below, and each names its check:
+
+- RuboCop cops (`Dandelion/...`) in `.rubocop/dandelion/`, which also run on the Ruby in templates through erb_lint. Disable one on a line with `# rubocop:disable Dandelion/... -- reason`
+- An erb_lint linter, `DesignClasses`, in `.erb_linters/design_classes.rb`. Disable it on a line with `<%# erb_lint:disable DesignClasses: reason %>`
+- ESLint rules in `eslint.config.mjs`. Disable one with `// eslint-disable-next-line <rule> -- reason`
+- Stylelint rules in `stylelint.config.mjs`. Disable one with `/* stylelint-disable <rule> -- reason */` and `/* stylelint-enable <rule> */`
+
+When you add a rule to this file that code can check, add a check for it and list it here. Disable a check only where its rule genuinely doesn't apply.
 
 - `Dandelion/MongoidOr`: Never use Mongoid `.or` — it ORs against whatever is already in the selector (`Event.live.or(featured: true)` means live or featured). Use `self.and('$or' => [...])` so the OR is just another AND-ed filter (`Event.live.and('$or' => [...])` means live and (this or that))
 - `Dandelion/MongoidScope`: Query filters are class methods that return `self.and(...)` so they chain (`Event.live.future`). Do not use `scope :live, -> { ... }`
@@ -21,6 +28,10 @@ Our own RuboCop cops in `.rubocop/dandelion/` check these rules. They're warning
 - `Dandelion/Presence`: Don't use `.presence`, on `params` or anywhere else
 - `Dandelion/ErrorReporting`: Report rescued errors with `ErrorReporting.capture_exception(e, context:, tags:)`, not `Sentry.capture_exception`
 - `Dandelion/CapybaraRefuteHas`: To check something isn't on the page, use `assert page.has_no_css?` (`has_no_content?`, `has_no_link?`, `has_no_title?`...), never `refute page.has_css?`: the `has_` form waits the full 10 s `default_max_wait_time` for it to appear before passing
+- `DesignClasses` (erb_lint) and `no-restricted-syntax` (ESLint): To show and hide elements from JS, start them hidden with `style="display: none"` and use jQuery `.show()` / `.hide()` / `.toggle()`, not `d-none` with `addClass` / `removeClass` (Bootstrap's `d-*` classes are `!important`). Keep `d-none d-md-block` and friends for purely responsive hiding
+- `DesignClasses` (erb_lint) and `no-restricted-syntax` (ESLint): Success is the theme colour, so use `-primary`, never `-success`. Badges are `badge text-bg-*`; there is no `.label` and no `badge-*` colour class
+- `declaration-property-value-disallowed-list` (Stylelint): Colours, radii and shadows come from tokens (`--theme-*`, `--color-*`, `--bs-gray-*`, `--hairline`, Bootstrap's radius and shadow variables and classes), never hex values, custom values or new translucent tints, so organisation themes follow. The check allows a hex value only where a custom property is defined
+- `declaration-property-unit-disallowed-list` (Stylelint): Spacing comes from the scale: Bootstrap's spacing utilities in markup, `--space-*` tokens in CSS, never px or off-scale rem. Other sizes are in rem (or em); px only for hairlines, shadows, the focus ring, breakpoints and Google Maps overrides. The check flags px in margins, padding, gaps, insets and font sizes
 
 ## Crucial restrictions
 
@@ -70,7 +81,7 @@ Always ask permission before running tests. Your default posture should be to su
 
 `@` instance variables come from helpers (`create_organisation`, `create_event`, `create_gathering`, `create_full_event_hierarchy`, and file-local setup methods). Anything created inline in a test is a local. Use `create_event(as: :event1)` when a test needs more than one event.
 
-Straight after a click or submit, assert something on the new page before checking something isn't there (see `Dandelion/CapybaraRefuteHas`), or that check can pass on the old page.
+Straight after a click or submit, assert something on the new page before checking something isn't there (see `Dandelion/CapybaraRefuteHas` in Custom checks), or that check can pass on the old page.
 
 ## Conventions
 
@@ -92,17 +103,13 @@ Straight after a click or submit, assert something on the new page before checki
 
 ## Design
 
-The design guide (`/design`, `app/views/design.erb`) shows the colours, type, spacing, components and their classes. Check it before styling anything, and keep it up to date when you change them. The rules it doesn't spell out:
+The design guide (`/design`, `app/views/design.erb`) shows the colours, type, spacing, components and their classes. Check it before styling anything, and keep it up to date when you change them. The rules it doesn't spell out are below, apart from those with a check (showing and hiding, success and badge classes, colours, spacing), which are in Custom checks:
 
 - Stylesheets are plain CSS. Override Bootstrap in `app.css` (see Build/vendored code for changing its variables). Page-specific styles go in their own file loaded only by those pages (e.g. `docs.css`, `messages.css`)
 - Bootstrap 5 with jQuery: use `data-bs-*` attributes, logical spacing/alignment (`ms-*`, `me-*`, `text-end`, `float-start`), `form-select` on selects and `mb-3` between fields
 - Filter forms above lists and tables use `.form-inline` and `.form-group` (kept in `app.css`) inside `.searchForm`; add `.submitOnChange` to submit when a field changes. Date fields take `.datepicker` or `.datetimepicker`, which `forms.js` wires up
 - Tooltips are `data-bs-toggle="tooltip"` and a `title`; `app.js` handles them for the whole page, so content loaded later needs no setup
-- To show and hide elements from JS, start them hidden with `style="display: none"` and use jQuery `.show()` / `.hide()` / `.toggle()`, not `d-none` with `addClass` / `removeClass` (Bootstrap's `d-*` classes are `!important`). Keep `d-none d-md-block` and friends for purely responsive hiding
-- Success is the theme colour, so use `-primary`, never `-success`. Badges are `badge text-bg-*`; there is no `.label` and no `badge-*` colour class
-- Colours, radii and shadows come from tokens (`--theme-*`, `--color-*`, `--bs-gray-*`, `--hairline`, Bootstrap's radius and shadow variables and classes), never hex values, custom values or new translucent tints, so organisation themes follow
 - Motion: shows where things come from and go, and is otherwise kept out of the way. State changes fade over `--transition-fast`; things that float (dropdown menus, the confirm popover, flash toasts) fade in over `--transition-enter`, moving at most `--space-2xs`; modals keep Bootstrap's slide; chevrons on things that open in place turn. Animate only colours, shadows, masks, opacity, `translate` and `rotate`; nothing bounces, scales or reveals on scroll (the guide lists a few older exceptions; don't add more), and only loading indicators (`.bi-spin`, `.placeholder-glow`) loop
-- Spacing comes from the scale: Bootstrap's spacing utilities in markup, `--space-*` tokens in CSS, never px or off-scale rem. Other sizes are in rem (or em); px only for hairlines, shadows, the focus ring, breakpoints and Google Maps overrides
 - Avatars: `partial :'accounts/square', locals: { account:, size: :xs }` (`:xs` to `:2xl`, default `:sm`, or `:fill`). For a bare `<img>` of an account, use `class="avatar avatar-sm"` rather than a width
 - `event_details.css` and `email.css` are inlined into emails, so they can't use CSS custom properties (`var(--x)`)
 
@@ -112,7 +119,7 @@ Cooldown: never use a gem or JS package version released less than 7 days ago. T
 
 - Gems: the Gemfile's source has `cooldown: 7`, so Bundler enforces it
 - `rake bootstrap:build` runs `npm install` with `--before` set to 7 days ago
-- The root `package.json` is only ESLint, which CI runs as `npx eslint` over `app/assets/javascripts` (`eslint.config.mjs`). It installs from `package-lock.json` (`npm ci`): pin exact versions, and when adding or bumping one run `npm install --before=<the date a week ago>` so its own dependencies are a week old too
+- The root `package.json` is only linters: ESLint, which CI runs as `npx eslint` over `app/assets/javascripts` (`eslint.config.mjs`), and Stylelint, which it runs over `app/assets/stylesheets` (`stylelint.config.mjs`; `npm run lint` runs both). It installs from `package-lock.json` (`npm ci`): pin exact versions, and when adding or bumping one run `npm install --before=<the date a week ago>` so its own dependencies are a week old too
 - `ckeditor/` installs from its `yarn.lock`. Yarn 1 has no cooldown, so when refreshing the lockfile (`yarn upgrade`), check the new versions' release dates (`npm view <package> time`) and pin back any that are under a week old
 - When adding or bumping a CDN package in `config/frontend_dependencies.rb`, or a version in a rake task, pick a version at least 7 days old
 

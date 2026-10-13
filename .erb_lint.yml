@@ -22,6 +22,9 @@ linters:
   # Checks for unsafe interpolation into JavaScript and attributes
   SafeErb:
     enabled: true
+  # Rules from the Design section of AGENTS.md (.erb_linters/design_classes.rb)
+  DesignClasses:
+    enabled: true
   Rubocop:
     enabled: true
     rubocop_config:

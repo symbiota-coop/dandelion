@@ -40,10 +40,11 @@ jobs:
         node-version: 22
         cache: npm
 
-    - name: Run ESLint
+    - name: Run ESLint and Stylelint
       run: |
         npm ci
         npx eslint
+        npx stylelint "app/assets/stylesheets/**/*.css"
 
   generate-matrix:
     runs-on: ubuntu-latest

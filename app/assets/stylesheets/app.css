@@ -2311,19 +2311,20 @@ a.ui-button:active,
    Base: html, body and typography
    ========================================================================== */
 
+/* The rem base: 17px, 19px and 21px at the browser's default 16px, scaling with the reader's own setting */
 html {
-  font-size: 17px;
+  font-size: 106.25%;
 }
 
 @media (min-width: 1680px) {
   html {
-    font-size: 19px;
+    font-size: 118.75%;
   }
 }
 
 @media (min-width: 1920px) {
   html {
-    font-size: 21px;
+    font-size: 131.25%;
   }
 }
 
@@ -2553,7 +2554,7 @@ ul.map-event li {
   font-size: var(--font-size-base) !important
 }
 
-/* Google Maps draws in pixels, so these overrides, the markers and the clusters stay in px to line up with it */
+/* stylelint-disable declaration-property-unit-disallowed-list -- Google Maps draws in pixels, so these overrides, the markers and the clusters stay in px to line up with it */
 #map-canvas button[title=Close] {
   height: 36px !important;
   margin-top: -8px !important;
@@ -2624,6 +2625,7 @@ ul.map-event li {
   --map-cluster-color: var(--color-red-500);
   font-size: 14px;
 }
+/* stylelint-enable declaration-property-unit-disallowed-list */
 
 /* A marker or cluster whose details are loading */
 .map-loading {
@@ -2792,12 +2794,12 @@ ul.map-event li {
 
 /* Add margin between events to prevent squashing */
 .fc-event {
-  margin-bottom: 2px !important;
+  margin-bottom: var(--space-2xs) !important;
 }
 
 /* Add some padding to event content */
 .fc-event-main {
-  padding: 1px 2px !important;
+  padding: 0 var(--space-2xs) !important;
 }
 
 /* Shorten month names and hide Today button on small screens */
