@@ -3,7 +3,7 @@
 #
 #   bundle exec ruby -I test test/lint_test.rb
 #
-# The ESLint and Stylelint tests need node_modules (npm ci), and skip without it; CI's lint job runs them.
+# The ESLint and Stylelint tests need them installed (npm ci), and skip without them; CI's lint job runs them.
 require 'json'
 require 'minitest/autorun'
 require 'open3'
@@ -224,7 +224,7 @@ class LintTest < Minitest::Test
   end
 
   def node_modules!
-    skip 'needs node_modules (npm ci)' unless File.directory?(File.join(ROOT, 'node_modules'))
+    skip 'needs ESLint and Stylelint installed (npm ci)' unless %w[eslint stylelint].all? { |tool| File.exist?(File.join(ROOT, 'node_modules/.bin', tool)) }
   end
 
   # A linter's JSON report on some source, piped in. Stylelint writes it to stderr when it finds something

@@ -42,7 +42,7 @@ LINTERS = [
     name: 'ESLint',
     files: %r{\Aapp/assets/javascripts/(?!ext/).+\.js\z},
     configs: %r{\A(eslint\.config\.mjs|package(-lock)?\.json|config/bootstrap4_leftovers\.json)\z},
-    command: %w[npx eslint --no-warn-ignored],
+    command: %w[npx --no-install eslint --no-warn-ignored],
     stdin: ->(file) { ['--stdin', '--stdin-filename', file] },
     node: true
   },
@@ -50,7 +50,7 @@ LINTERS = [
     name: 'Stylelint',
     files: %r{\Aapp/assets/stylesheets/.+\.css\z},
     configs: /\A(stylelint\.config\.mjs|package(-lock)?\.json)\z/,
-    command: %w[npx stylelint --allow-empty-input],
+    command: %w[npx --no-install stylelint --allow-empty-input],
     all: ['app/assets/stylesheets/**/*.css'],
     stdin: ->(file) { ['--stdin-filename', file] },
     node: true
@@ -98,8 +98,9 @@ jobs = LINTERS.flat_map do |linter|
   mine = files.select { |f| f.match?(linter[:files]) }
   next [] unless all || mine.any?
 
-  if linter[:node] && !File.directory?('node_modules')
-    $stderr.puts "#{linter[:name]}: node_modules is missing, so run npm ci first"
+  # Only the versions package-lock.json installs: npx would otherwise fetch a missing linter, of any age
+  if linter[:node] && !File.exist?("node_modules/.bin/#{linter[:name].downcase}")
+    $stderr.puts "#{linter[:name]} isn't installed, so run npm ci first"
     next [{ name: linter[:name], missing: true }]
   end
 
