@@ -32,7 +32,7 @@ Dandelion::App.controller do
       403
     elsif params[:checked_in] && ticket.checked_in
       409
-    elsif !params[:checked_in] && !ticket.checked_in
+    elsif !params[:checked_in] && !ticket.checked_in # rubocop:disable Lint/DuplicateBranch
       409
     else
       if params[:checked_in]

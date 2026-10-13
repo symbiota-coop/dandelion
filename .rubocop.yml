@@ -31,4 +31,4 @@ Style/NumericPredicate:
 Lint/ShadowingOuterLocalVariable:
   Enabled: false
 Lint/DuplicateBranch:
-  Enabled: false
+  IgnoreDuplicateElseBranch: true
