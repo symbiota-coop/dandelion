@@ -170,6 +170,25 @@ class LintTest < Minitest::Test
     end
   end
 
+  # AGENTS.md, Custom checks: disable a check only where its rule doesn't apply, and say why in the comment
+  DISABLES = {
+    /rubocop:(?:disable|todo)\s/ => /rubocop:(?:disable|todo) [\w\/, ]+ -- \S/,
+    /eslint-disable(?:-next-line|-line)?\s/ => /eslint-disable(?:-next-line|-line)? [\w\/@, -]+ -- \S/,
+    /stylelint-disable(?:-next-line|-line)?\s/ => /stylelint-disable(?:-next-line|-line)? [\w\/, -]+ -- \S/,
+    /erb_?lint:disable\s/ => /erb_?lint:disable \w+: \S/
+  }.freeze
+
+  def test_every_disable_says_why
+    output, = Open3.capture2('git', 'ls-files', '-z', chdir: ROOT)
+    paths = output.split("\0").grep(/\.(rb|rake|erb|js|mjs|css)\z/).grep_v(%r{\A(app/assets/javascripts/ext/|app/assets/stylesheets/bootstrap5\.css|ckeditor/|test/lint_test\.rb)})
+    missing = paths.flat_map do |path|
+      File.foreach(File.join(ROOT, path), encoding: 'UTF-8').with_index(1).filter_map do |line, number|
+        DISABLES.any? { |disable, with_reason| line.match?(disable) && !line.match?(with_reason) } && "#{path}:#{number}: #{line.strip}"
+      end
+    end
+    assert_empty missing, "Say why after the rule (-- reason, or Linter: reason for erb_lint)"
+  end
+
   # AGENTS.md: only edit .mcp.json, then run rake mcp:sync to write the copies other tools read
   def test_mcp_copies_match_mcp_json
     load File.join(ROOT, 'tasks/mcp.rake')

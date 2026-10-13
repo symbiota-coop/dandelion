@@ -19,7 +19,7 @@ Dandelion is built with many coding agents (Claude Code, Codex, Cursor, opencode
 
 ## Custom checks
 
-CI fails on each rule below, and each names its check. When you add a rule to this file that code can check, add a check for it, list it here, and add cases to `test/lint_test.rb`, which tests our checks (each cop's `@example`, good and bad, is tested as it stands). It doesn't boot the app, so it runs without foreman: `bundle exec ruby -I test test/lint_test.rb`, and CI's lint job runs it. Disable a check only where its rule genuinely doesn't apply.
+CI fails on each rule below, and each names its check. When you add a rule to this file that code can check, add a check for it, list it here, and add cases to `test/lint_test.rb`, which tests our checks (each cop's `@example`, good and bad, is tested as it stands). It doesn't boot the app, so it runs without foreman: `bundle exec ruby -I test test/lint_test.rb`, and CI's lint job runs it. Disable a check only where its rule genuinely doesn't apply, and say why in the comment.
 
 ### RuboCop
 
@@ -71,6 +71,7 @@ Our rules are in `stylelint.config.mjs`. Disable one with `/* stylelint-disable 
 Rules no linter covers, checked by `test/lint_test.rb` (which CI's lint job runs) or `script/lint` (which the pre-commit hook runs). Each names its check.
 
 - `test_mcp_copies_match_mcp_json`: `.cursor/mcp.json`, `.opencode/opencode.json` and `.codex/config.toml` are copies of `.mcp.json`: only edit `.mcp.json`, then run `rake mcp:sync` (Cloud agents)
+- `test_every_disable_says_why`: every disable comment gives its reason, after `--` (or after `Linter:` for erb_lint), as each linter's section shows
 - `test_dependency_versions_are_exact`: the root `package.json`, the CDN packages (`config/frontend_dependencies.rb`, `layouts/_dependencies.erb`) and the packages rake tasks install name exact versions, so none arrives unchosen (Dependencies)
 - `test_ckeditor_stays_on_37`: CKEditor stays on 37 (Build/vendored code)
 - `script/lint`: `bootstrap5.css` and `ext/ckeditor.js` are built (Build/vendored code), so a commit that changes one without its source (`bootstrap5.scss`, `ckeditor/`, or their rake task) fails
