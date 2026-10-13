@@ -9,6 +9,7 @@ require 'minitest/autorun'
 require 'open3'
 require 'rake'
 require 'tmpdir'
+require 'yaml'
 require 'rubocop'
 require 'erb_lint/all'
 
@@ -191,6 +192,13 @@ class LintTest < Minitest::Test
       end
     end
     assert_empty missing, "Say why after the rule (-- reason, or Linter: reason for erb_lint)"
+  end
+
+  # CI lists its test jobs (one per test file) rather than finding them, so each test file needs to be there
+  def test_ci_runs_every_test_file
+    listed = YAML.load_file(File.join(ROOT, '.github/workflows/ruby.yml'))['jobs']['test']['strategy']['matrix']['test_file']
+    files = Dir[File.join(ROOT, 'test/*_test.rb')].map { |f| File.basename(f, '_test.rb') } - ['lint']
+    assert_equal files.sort, listed.sort, 'List each test file in .github/workflows/ruby.yml, once'
   end
 
   # AGENTS.md: only edit .mcp.json, then run rake mcp:sync to write the copies other tools read

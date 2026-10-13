@@ -72,6 +72,7 @@ Our rules are in `stylelint.config.mjs`. Disable one with `/* stylelint-disable 
 Rules no linter covers, checked by `test/lint_test.rb` (which CI's lint job runs) or `script/lint` (which the pre-commit hook runs). Each names its check.
 
 - `test_mcp_copies_match_mcp_json`: `.cursor/mcp.json`, `.opencode/opencode.json` and `.codex/config.toml` are copies of `.mcp.json`: only edit `.mcp.json`, then run `rake mcp:sync` (Cloud agents)
+- `test_ci_runs_every_test_file`: CI's test jobs, one per test file, are listed in `.github/workflows/ruby.yml`: add a new test file there (Tests)
 - `test_every_disable_says_why`: every disable comment gives its reason, after `--` (or after `Linter:` for erb_lint), as each linter's section shows
 - `test_dependency_versions_are_exact`: the root `package.json`, the CDN packages (`config/frontend_dependencies.rb`, `layouts/_dependencies.erb`) and the packages rake tasks install name exact versions, so none arrives unchosen (Dependencies)
 - `test_ckeditor_stays_on_37`: CKEditor stays on 37 (Build/vendored code)
@@ -134,6 +135,8 @@ You can use the following command structure to test a single file: `foreman run 
 To run only certain tests in a file, add `-n /pattern/` (matches the method name, with spaces as underscores) e.g. `foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb -n /youtube_titles/`
 
 Each test run gets its own database (`dandelion_test_<pid>`, dropped when the run ends) and a free port, set in `config/boot.rb`, so runs can go at the same time, in one checkout or several. To run several files at once, start each in its own process, e.g. `printf '%s\n' accounts events | xargs -P 2 -I{} sh -c 'foreman run -e .env.test bundle exec ruby -I test test/{}_test.rb > tmp/{}.log 2>&1'`; each browser run starts its own Chrome, so keep to 3 or 4 at once. Test files take minutes, so if your tool can run commands in the background, start test runs there and keep working until they finish. Each run saves its screenshots to `capybara/<pid>/`, kept for an hour after the run ends.
+
+CI runs each test file as its own job, listed in `.github/workflows/ruby.yml`: add a new test file there.
 
 Always ask permission before running tests. Your default posture should be to suggest only added/modified tests and any other clearly relevant tests, unless the change is substantial, in which case it may be appropriate to run whole files. Never attempt to run the full test suite.
 
