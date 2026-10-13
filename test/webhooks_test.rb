@@ -270,6 +270,17 @@ class WebhooksTest < ActiveSupport::TestCase
     assert restored.tickets.first.payment_completed?
   end
 
+  test 'instant bank pay return page says how long confirmation usually takes' do
+    create_instant_event
+    order = create_incomplete_order(@event, gocardless_payment_request_id: "PRQ#{SecureRandom.hex(4)}")
+
+    get "/e/#{@event.slug}?payment_request_id=#{order.gocardless_payment_request_id}&success=true"
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'Confirming your payment'
+    assert_includes last_response.body, 'You can close this page'
+  end
+
   # ═══════════════════════════════════════════════════════════════════════════
   # GoCardless instalments
   # ═══════════════════════════════════════════════════════════════════════════

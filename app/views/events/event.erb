@@ -38,6 +38,9 @@
         <h3 class="card-header text-bg-primary">Confirming your payment</h3>
         <div class="card-body readable">
           <p class="mb-0">We're confirming your payment<%= " with #{@pending_order.payment_provider}" if @pending_order.payment_provider %>... <i class="bi bi-spin bi-slash-lg"></i></p>
+          <% if @pending_order.gocardless_payment_request_id %>
+            <p class="mb-0 mt-3">This usually takes a minute or two, but can sometimes take longer. You can close this page: we'll email your ticket as soon as your payment is confirmed.</p>
+          <% end %>
         </div>
       </div>
       <script>
