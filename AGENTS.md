@@ -6,6 +6,17 @@ The ORM is Mongoid, not ActiveRecord.
 
 Code map: controllers in `app/controllers`, views in `app/views`, CSS/JS in `app/assets`; models in `models`, with shared model code in `models/concerns`; view helpers in `app/helpers`; other library code in `lib` (form builder, payments, mail, auth); boot and config in `config`; rake tasks in `tasks`; tests in `test`. Background jobs use delayed_job (`handle_asynchronously` or `.delay`), run by the `worker` process in `Procfile`.
 
+## Many agents
+
+Dandelion is built with many coding agents (Claude Code, Codex, Cursor, opencode and others), on our own machines and in the cloud, and often several at once in the same checkout. It's set up so that any of them can work on it equally well, with nothing that only works for one:
+
+- Instructions: this file is the instructions for every agent. Write what an agent needs to know here, for any agent, rather than in a tool's own file (`CLAUDE.md`, `.cursor/rules`, `.github/copilot-instructions.md`...), which other agents wouldn't read and which would drift from this one. Claude Code reads this file itself when there's no `CLAUDE.md`
+- Rules: a rule that code can check gets a check (Custom checks), not just a line here, so it holds whichever agent wrote the code. The checks run where every agent passes: the pre-commit hook (Committing), as every agent commits with git, and CI. Don't rely on one tool's hooks or settings to enforce a rule
+- Setup: `script/agent-env/` installs and starts everything for any environment, and each tool's own config only calls it (Cloud agents)
+- MCP servers: defined once in `.mcp.json` and copied into each tool's format by `rake mcp:sync` (Cloud agents)
+- Shared checkouts: other sessions may be editing the same files, so commit only your own changes (Committing)
+- Automation: the AI workflows in `.github/workflows` (PR review, daily bug reviews) run Claude, Codex and Cursor on the same prompts (`.github/prompts`, `.github/actions`), with their models in `.github/models.env`
+
 ## Custom checks
 
 CI fails on each rule below, and each names its check. When you add a rule to this file that code can check, add a check for it and list it here. Disable a check only where its rule genuinely doesn't apply.
