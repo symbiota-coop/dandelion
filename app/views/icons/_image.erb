@@ -22,21 +22,21 @@
 <svg width="<%= svg_size %>" height="<%= svg_size %>" viewBox="0 0 <%= svg_size %> <%= svg_size %>" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="<%= border_width %>" stdDeviation="<%= border_width %>" flood-color="#000000" flood-opacity="0.06"/>
+      <feDropShadow dx="0" dy="<%= border_width %>" stdDeviation="<%= border_width %>" flood-color="#000000" flood-opacity="0.06" />
     </filter>
   </defs>
 
   <!-- Tile, with its shadow -->
   <rect x="<%= inset %>" y="<%= inset %>" width="<%= tile_size %>" height="<%= tile_size %>" rx="<%= corner_radius %>" ry="<%= corner_radius %>"
-        fill="#ffffff" filter="url(#shadow)"/>
+        fill="#ffffff" filter="url(#shadow)" />
 
   <!-- Hairline border (black at 10%), inside the tile's edge -->
   <rect x="<%= (inset + (border_width / 2)).round(2) %>" y="<%= (inset + (border_width / 2)).round(2) %>" width="<%= (tile_size - border_width).round(2) %>" height="<%= (tile_size - border_width).round(2) %>"
         rx="<%= (corner_radius - (border_width / 2)).round(2) %>" ry="<%= (corner_radius - (border_width / 2)).round(2) %>"
-        fill="none" stroke="#000000" stroke-opacity="0.1" stroke-width="<%= border_width %>"/>
+        fill="none" stroke="#000000" stroke-opacity="0.1" stroke-width="<%= border_width %>" />
 
   <!-- Icon -->
   <g transform="translate(<%= icon_offset.round(2) %>, <%= icon_offset.round(2) %>) scale(<%= icon_scale.round(3) %>)" fill="#000000" opacity="0.5">
-    <%= icon_content.gsub(/<svg[^>]*>/, '').gsub(%r{</svg>}, '').html_safe %>
+    <%== icon_content.gsub(/<svg[^>]*>/, '').gsub(%r{</svg>}, '') %>
   </g>
 </svg>

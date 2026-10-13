@@ -305,7 +305,7 @@ module EventAtproto
 
       # Get all local events that should have AT Protocol records FOR THIS DID
       # (records may be published under different handles/DIDs)
-      local_events = Event.and(:atproto_uri.ne => nil).select { |e| e.atproto_record_did == client.did }
+      local_events = Event.and(:atproto_uri.ne => nil).select { |event| event.atproto_record_did == client.did }
       local_by_uri = local_events.index_by(&:atproto_uri)
 
       # Check each remote record

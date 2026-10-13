@@ -293,7 +293,7 @@ $(function () {
     const $startSmall = $('#event_start_time').siblings('small')
     $('<a href="javascript:;" class="mt-1">Mark as evergreen/on-demand, with no dates or location</a>')
       .insertAfter($startSmall)
-      .on('click', function (e) {
+      .on('click', function () {
         $(this).hide()
         $evergreen.prop('checked', true).trigger('change')
       })

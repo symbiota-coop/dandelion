@@ -42,7 +42,7 @@ end
       <% end %>
     <% end %>
 
-    <div id="ticket-types" <% if @concise_ticket_form %>style="display: none"<% end %>>
+    <div id="ticket-types" <% if @concise_ticket_form %> style="display: none"<% end %>>
       <% form_tag '' do %>
         <%= hidden_field_tag :cohost, value: params[:cohost] %>
         <%= hidden_field_tag :affiliate_type, value: params[:affiliate_type] %>

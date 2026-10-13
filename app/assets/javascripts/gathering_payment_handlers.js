@@ -1,6 +1,5 @@
 /* global Stripe, runEvmPaymentFlow */
 
-// eslint-disable-next-line no-unused-vars
 function gatheringPaymentHandlers (config) {
   return {
     stripe: function (data) {

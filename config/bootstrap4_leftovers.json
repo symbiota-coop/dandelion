@@ -1,0 +1,25 @@
+{
+  "description": "Bootstrap 4 classes and attributes that Bootstrap 5 renamed or dropped, with what to use instead. DesignClasses (.erb_linters/design_classes.rb) checks templates for them and ESLint (eslint.config.mjs) our scripts. Each pattern is a regex for a whole class name. .media, .form-group and .form-inline are left out: Bootstrap 5 dropped them, but app.css and email.css define our own",
+  "classes": [
+    { "pattern": "[mp][lr]-(?:(?:sm|md|lg|xl|xxl)-)?(?:n?[0-5]|auto)", "use": "ms-*, me-*, ps-* and pe-* (ml-2 is ms-2)" },
+    { "pattern": "(?:text|float)-(?:(?:sm|md|lg|xl|xxl)-)?(?:left|right)", "use": "text-start, text-end, float-start and float-end" },
+    { "pattern": "(?:border|rounded)-(?:left|right)(?:-0)?", "use": "border-start, border-end, rounded-start and rounded-end" },
+    { "pattern": "rounded-(?:sm|lg)", "use": "rounded-1 (sm) or rounded-3 (lg)" },
+    { "pattern": "dropdown-menu-(?:(?:sm|md|lg|xl|xxl)-)?(?:left|right)", "use": "dropdown-menu-start and dropdown-menu-end" },
+    { "pattern": "sr-only(?:-focusable)?", "use": "visually-hidden and visually-hidden-focusable" },
+    { "pattern": "badge-pill", "use": "rounded-pill" },
+    { "pattern": "no-gutters|form-row", "use": "row with g-0 or another g-* gutter" },
+    { "pattern": "custom-(?:select|control|checkbox|radio|switch|range|file)(?:-[a-z]+)*", "use": "form-select, form-check, form-switch, form-range or form-control" },
+    { "pattern": "btn-block", "use": "w-100, or d-grid on the parent" },
+    { "pattern": "close", "use": "btn-close, which draws its own ×" },
+    { "pattern": "embed-responsive(?:-[a-z0-9]+)?", "use": "ratio and ratio-16x9 (or another ratio-*)" },
+    { "pattern": "font-weight-[a-z]+|font-italic|text-monospace", "use": "fw-*, fst-italic and font-monospace" },
+    { "pattern": "thead-(?:dark|light)", "use": "table-dark or table-light" },
+    { "pattern": "form-control-(?:file|range)", "use": "form-control or form-range" },
+    { "pattern": "input-group-(?:append|prepend)", "use": "nothing: put the button or text straight inside .input-group" },
+    { "pattern": "media-body|card-deck|card-columns|jumbotron(?:-fluid)?|pre-scrollable|text-hide", "use": "the grid and utilities, as Bootstrap 5 dropped it" }
+  ],
+  "attributes": [
+    { "pattern": "data-(?:toggle|dismiss|ride|slide|slide-to|spy)", "use": "data-bs-* (data-bs-toggle, data-bs-dismiss...)" }
+  ]
+}

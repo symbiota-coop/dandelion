@@ -9,8 +9,7 @@
     next unless event.has_image?
     next if event.locked? && !event_admin?(event)
     next if !params[:show_events_with_same_name] && previous_event && previous_event.name == event.name && !previous_event.sold_out?
-    event_count += 1
-    %>
+    event_count += 1 %>
     <div class="col-12 col-sm-6 col-lg-4 event-block" style="margin-bottom: var(--space-sm);<%= ' display: none;' if params[:show_more] && event_count > 6 %>">
       <%= cp(:'events/block_carousel', locals: { event: event }, event: event, key: event_block_carousel_cache_key(event)) %>
     </div>

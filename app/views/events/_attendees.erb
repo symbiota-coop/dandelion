@@ -1,4 +1,4 @@
-<% 
+<%
 image_accounts = @event.public_attendees.and(has_image: true).and(hidden: false)
 image_accounts_count = image_accounts.count
 no_image_accounts = @event.attendees.and(:id.nin => image_accounts.pluck(:id))
@@ -8,24 +8,24 @@ others_count = no_image_accounts.count + (@event.tickets.complete.and(:email.ne 
   <div class="image-wall">
     <% image_accounts.each { |account| %>
     <%= partial :'accounts/square', locals: { account: account } %>
-    <% };  %>
+    <% }; %>
     <% if others_count > 0 %>
       <% if image_accounts_count == 0 %>
         <% if others_count < 10 %>
           &lt; 10 people
         <% else %>
-          <%=others_count %>+ people
+          <%= others_count %>+ people
         <% end %>
       <% elsif image_accounts_count > 0 %>
         <% if others_count < 10 %>
           + others
         <% else %>
-          + <%=others_count %> people
+          + <%= others_count %> people
         <% end %>
       <% end %>
     <% end %>
   </div>
-  <% if (current_account && ticket = @event.tickets.complete.find_by(account: current_account)) %>
+  <% if current_account && (ticket = @event.tickets.complete.find_by(account: current_account)) %>
     <% if @event.tickets.complete.and(account: current_account).all? { |ticket| ticket.show_attendance? } %>
       <a class="pagelet-trigger mb-1" data-method="post" href="/events/<%= @event.id %>/hide_attendance">Hide attendance</a>
     <% else %>

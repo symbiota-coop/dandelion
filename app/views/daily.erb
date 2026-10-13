@@ -2,12 +2,18 @@
 <div class="newspaper">
   <h1 class="newspaper-title">The Dandelion Daily</h1>
   <div class="date-navigation">
-    <a href="/daily?date=<%= (@date - 1).strftime('%Y-%m-%d') %>" class="nav-arrow">
-      <i class="bi bi-arrow-left"></i>
-    </a>
+    <% if (previous_date = Daily.previous_date(@date)) %>
+      <a href="/daily?date=<%= previous_date.strftime('%Y-%m-%d') %>" class="nav-arrow">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+    <% else %>
+      <span class="nav-arrow disabled">
+        <i class="bi bi-arrow-left"></i>
+      </span>
+    <% end %>
     <span><%= @date.strftime("%A, %B %-d, %Y") %></span>
-    <% if @date < Date.today %>
-      <a href="/daily?date=<%= (@date + 1).strftime('%Y-%m-%d') %>" class="nav-arrow">
+    <% if (next_date = Daily.next_date(@date)) %>
+      <a href="/daily?date=<%= next_date.strftime('%Y-%m-%d') %>" class="nav-arrow">
         <i class="bi bi-arrow-right"></i>
       </a>
     <% else %>
@@ -17,16 +23,25 @@
     <% end %>
   </div>
 
-  <div data-with-placeholder data-pagelet-url="/daily?date=<%= @date.strftime('%Y-%m-%d') %>">
-    <% Daily::ARTICLES.each do |article| %>
-      <div class="article">
-        <h2 class="article-title"><%= article[:title] %></h2>
-        <div class="article-content placeholder-glow">
-          <% 10.times do %>
-            <span class="placeholder d-block mb-3" style="width: <%= rand(10..90) %>%"></span>
-          <% end %>
-        </div>
+  <% if @edition %>
+    <%= partial :daily %>
+  <% else %>
+    <% out_soon = @date >= Date.today %>
+    <div class="empty-notice">
+      <div class="empty-notice-icon">
+        <i class="bi <%= out_soon ? 'bi-printer' : 'bi-newspaper' %>"></i>
       </div>
-    <% end %>
-  </div>
+      <h2 class="empty-notice-title"><%= out_soon ? 'Still at the printers' : 'Not available' %></h2>
+      <p class="text-body-secondary">
+        <% if out_soon %>
+          This edition of the Daily isn't out yet. Check back soon!
+        <% else %>
+          There's no Daily for this day.
+        <% end %>
+      </p>
+      <% if Daily.latest_date %>
+        <a class="btn btn-outline-primary" href="/daily">Read the latest Daily</a>
+      <% end %>
+    </div>
+  <% end %>
 </div>

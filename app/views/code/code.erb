@@ -1,6 +1,6 @@
 <p class="lead">Dandelion is a <a href="https://fair.io/">fair source</a> project. <a target="_blank" href="https://github.com/symbiota-coop/dandelion">View the code on Github</a> · <a href="/design">See the design guide</a></p>
 
-<% 
+<%
 client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
 
 repo = "symbiota-coop/dandelion"
@@ -13,7 +13,7 @@ github_commits = client.commits(repo, per_page: per_page, page: page)
 
 # If we got a full page, assume there might be more (so total = page * per_page + 1)
 # This allows the "Next" button to show up without fetching the actual total
-total_entries = github_commits.length == per_page ? (page * per_page + 1) : (page - 1) * per_page + github_commits.length
+total_entries = github_commits.length == per_page ? ((page * per_page) + 1) : ((page - 1) * per_page) + github_commits.length
 
 # Wrap in WillPaginate::Collection (GitHub already did the pagination)
 commits = WillPaginate::Collection.create(page, per_page, total_entries) do |pager|

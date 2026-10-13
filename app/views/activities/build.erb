@@ -15,8 +15,8 @@
     $('#activity_application_questions').attr('rows', '3')
     autosize($('#activity_application_questions')[0])
 
-    <% if @activity.persisted? %>
-      initQuestionsPreview('#activity_application_questions', '/activities/<%= @activity.id %>/application_questions', {
+    if (<%== @activity.persisted?.to_json %>) {
+      initQuestionsPreview('#activity_application_questions', <%== "/activities/#{@activity.id}/application_questions".to_json %>, {
         extraParams: function () {
           return {
             hide_image: $('#activity_hide_image').is(':checked') ? '1' : '0',
@@ -27,7 +27,7 @@
         },
         refreshOn: '#activity_hide_image, #activity_hide_location, #activity_hide_date_of_birth, #activity_hide_gender'
       })
-    <% end %>
+    }
   })
 </script>
 <% form_for @activity, @activity.new_record ? '/activities/new' : "/activities/#{@activity.id}/edit" do |f| %>

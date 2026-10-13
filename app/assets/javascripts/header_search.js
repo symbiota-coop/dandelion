@@ -1,5 +1,5 @@
 // Shared by the header search and the messages search
-function renderSearchAutocompleteItem (ul, item) { // eslint-disable-line no-unused-vars
+function renderSearchAutocompleteItem (ul, item) {
   const icon = $('<i aria-hidden="true">').addClass('bi').css('margin-right', '0.35em')
   if (typeof item.icon === 'string' && /^bi-[a-z0-9-]+$/.test(item.icon)) {
     icon.addClass(item.icon)

@@ -15,12 +15,12 @@
         </h3>
         <div class="card-body">
           <% if @event.past? %>
-            <% if event_feedback = @event.event_feedbacks.find_by(account: current_account) %>
+            <% if (event_feedback = @event.event_feedbacks.find_by(account: current_account)) %>
               <% if event_feedback.rating %>
                 <p>Your rating: <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %></p>
               <% end %>
             <% else %>
-              <p><a href="/events/<%=@event.id%>/give_feedback">Give feedback</a></p>
+              <p><a href="/events/<%= @event.id %>/give_feedback">Give feedback</a></p>
             <% end %>
           <% end %>
           <%= partial :'events/orders', locals: { event: @event, orders: orders, tickets: tickets } %>
@@ -72,7 +72,7 @@
     <% end %>
   </div>
   <div id="get-tickets-sidebar" class="d-none d-md-none sticky-under-header">
-    <a <% if @event.purchase_url %>target="_blank" href="<%= @event.purchase_url %>"<% else %>href="javascript:;" onclick="$(window).scrollTop($('#purchase').offset()['top'] - $('#header').height() - 17)"<% end %> class="btn btn-primary w-100">
+    <a <% if @event.purchase_url %> target="_blank" href="<%= @event.purchase_url %>"<% else %> href="javascript:;" onclick="$(window).scrollTop($('#purchase').offset()['top'] - $('#header').height() - 17)"<% end %> class="btn btn-primary w-100">
       <% if @event.purchase_url %>
         <%= @event.rsvp_button_text || "Book via #{HttpUrl.host(@event.purchase_url)}" %>
       <% else %>

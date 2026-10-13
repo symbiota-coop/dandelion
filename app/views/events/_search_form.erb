@@ -4,7 +4,6 @@
   })
 </script>
 
-
 <% unless params[:search] %>
   <div class="mb-3 popular-locations filter-buttons">
     <% popular_locations = Location.order('events_count desc').to_a %>

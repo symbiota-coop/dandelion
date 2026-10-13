@@ -80,8 +80,8 @@ module AccountNotifications
     batch_message.subject "[Account] #{account.name} created a subscription of #{subscription.plan.amount / 100} #{subscription.plan.currency.upcase} per month"
     batch_message.body_text "Account: #{ENV['BASE_URI']}/u/#{account.username}"
 
-    Account.and(admin: true).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
+    Account.and(admin: true).each do |recipient|
+      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.sign_in_token_for_email, 'id' => recipient.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -96,8 +96,8 @@ module AccountNotifications
     batch_message.subject "[Account] #{account.name} deleted a subscription of #{subscription.plan.amount / 100} #{subscription.plan.currency.upcase} per month"
     batch_message.body_text "Account: #{ENV['BASE_URI']}/u/#{account.username}"
 
-    Account.and(admin: true).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
+    Account.and(admin: true).each do |recipient|
+      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.sign_in_token_for_email, 'id' => recipient.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production

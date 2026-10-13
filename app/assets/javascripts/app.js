@@ -8,7 +8,7 @@ if (window.DataTable) {
 $(function () {
   // One tooltip handler for the whole page, so content loaded later needs no setup.
   // Sidebar links have their own, which only show when the sidebar is minified (see _nav.erb)
-  new bootstrap.Tooltip(document.body, { // eslint-disable-line no-new
+  new bootstrap.Tooltip(document.body, {
     selector: '[data-bs-toggle="tooltip"]:not(#sidebar *)',
     html: true,
     // The title, or failing that the span after the element. Bootstrap moves title to data-bs-original-title

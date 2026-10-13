@@ -15,6 +15,6 @@
   'opencollective.png' => ['https://opencollective.com/', 'order-3 order-md-5']
 }.each do |k, (v, order)| %>
   <div class="col-4 col-md mb-3 mb-md-0 <%= order %>">
-    <a href="<%= v %>"><img class="<%= k.split('.').first %> w-100" src="/images/payment_methods/<%= k %>" /></a>
+    <a href="<%= v %>"><img class="<%= k.split('.').first %> w-100" src="/images/payment_methods/<%= k %>"></a>
   </div>
 <% end %>

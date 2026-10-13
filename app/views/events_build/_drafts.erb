@@ -1,7 +1,7 @@
 <%
 drafts = current_account.drafts.and(model: 'Event')
 if @draft
-  drafts = drafts.and(:id.ne => @draft.id) 
+  drafts = drafts.and(:id.ne => @draft.id)
 end
 %>
 <% if drafts.exists? %>
@@ -18,15 +18,15 @@ end
         params = Rack::Utils.parse_query(uri.query || '')
         params['draft_id'] = draft.id
         uri.query = Rack::Utils.build_query(params)
-      %>
+            %>
             <i class="bi bi-pencil-square"></i>
-            <a href="<%=uri%>">
-              <%=draft.name%>
+            <a href="<%= uri %>">
+              <%= draft.name %>
             </a>
             <span class="text-body-secondary">
               saved <%= time_ago_in_words draft.created_at %> ago
             </span>
-            <a href="javascript:;" onclick="var a = this; $.post('/drafts/<%=draft.id%>/destroy', function() { hideTooltips(); $(a).parent().remove(); if ($('#drafts').find('li').length == 0) { $('#drafts').remove() } })"><i class="bi bi-x-lg" data-bs-toggle="tooltip" title="Delete draft"></i></a>
+            <a href="javascript:;" onclick="var a = this; $.post(<%= "/drafts/#{draft.id}/destroy".to_json %>, function() { hideTooltips(); $(a).parent().remove(); if ($('#drafts').find('li').length == 0) { $('#drafts').remove() } })"><i class="bi bi-x-lg" data-bs-toggle="tooltip" title="Delete draft"></i></a>
           </li>
         <% end %>
       </ul>

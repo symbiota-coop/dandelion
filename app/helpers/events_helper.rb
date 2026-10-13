@@ -4,7 +4,7 @@ Dandelion::App.helpers do
     if Padrino.env == :production && !organisation.stripe_client_id && organisation.stripe_sk && !organisation.stripe_connect_json
       @organisation = organisation
       halt erb(:'events/stripe_connect')
-    elsif organisation.contribution_reminder && params[:contribution_skipped].blank?
+    elsif organisation.contribution_reminder && !params[:contribution_skipped]
       redirect "/o/#{organisation.slug}/contribute?return_to=#{CGI.escape("/events/#{@event.id}/duplicate")}"
     end
   end

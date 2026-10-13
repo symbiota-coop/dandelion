@@ -38,6 +38,9 @@
         <h3 class="card-header text-bg-primary">Confirming your payment</h3>
         <div class="card-body readable">
           <p class="mb-0">We're confirming your payment<%= " with #{@pending_order.payment_provider}" if @pending_order.payment_provider %>... <i class="bi bi-spin bi-slash-lg"></i></p>
+          <% if @pending_order.gocardless_payment_request_id %>
+            <p class="mb-0 mt-3">This usually takes a minute or two, but can sometimes take longer. You can close this page: we'll email your ticket as soon as your payment is confirmed.</p>
+          <% end %>
         </div>
       </div>
       <script>
@@ -50,7 +53,7 @@
         })
       </script>
     <% elsif @event_image %>
-      <a href="/e/<%=@event.slug%><% if params[:cohost] %>?cohost=<%=params[:cohost]%><% end %>"><%= blurred_image_tag(@event_image, width: @event_image_width, height: @event_image_height, full_size: '1920x1920', md_size: '992x992', css_class: 'w-100 mb-3', id: 'event-image') %></a>
+      <a href="/e/<%= @event.slug %><% if params[:cohost] %>?cohost=<%= params[:cohost] %><% end %>"><%= blurred_image_tag(@event_image, width: @event_image_width, height: @event_image_height, full_size: '1920x1920', md_size: '992x992', css_class: 'w-100 mb-3', id: 'event-image') %></a>
     <% end %>
   </div>
 </div>
@@ -61,7 +64,7 @@
   <% get_tickets_fixed_bottom_style = 'class="fixed-bottom bg-white p-3 w-100 d-md-none" style="z-index: 1019; box-shadow: 0px -2px 4px 0px rgba(var(--bs-black-rgb), 0.3);"' %>
   <% if @event.purchase_url %>
     <div id="get-tickets-fixed-bottom" <%== get_tickets_fixed_bottom_style %>>
-      <a target="_blank" href="<%=@event.purchase_url%>" class="btn btn-primary w-100"><%= @event.rsvp_button_text || "Book via #{HttpUrl.host(@event.purchase_url)}" %></a>
+      <a target="_blank" href="<%= @event.purchase_url %>" class="btn btn-primary w-100"><%= @event.rsvp_button_text || "Book via #{HttpUrl.host(@event.purchase_url)}" %></a>
     </div>
     <style>
       @media (max-width: 767.98px) { #content { padding-bottom: 5.5rem } }
@@ -93,10 +96,10 @@
           future_events_scope.and(:id.in => matching_event_ids, :start_time.ne => @event.start_time)
         else
           future_events_scope.and(:name => @event.name, :location => @event.location, :start_time.ne => @event.start_time)
-        end
+                        end
         events = ([@event] + future_events).uniq
         n = events.count
-     end %>
+      end %>
 
       <div class="row g-0">
         <div class="col">
@@ -108,7 +111,7 @@
           </h1>
         </div>
         <div class="col-auto">
-          <div class="d-inline ms-3 me-2 fs-4" data-pagelet-url="/events/<%=@event.id%>/star">
+          <div class="d-inline ms-3 me-2 fs-4" data-pagelet-url="/events/<%= @event.id %>/star">
             <%= partial :'events/star', locals: {event: @event} %>
           </div>
         </div>

@@ -26,8 +26,27 @@ jobs:
         ruby-version: 3.4.7
         bundler-cache: true
 
+    # script/lint sets each linter's command and flags, for the pre-commit hook too
     - name: Run RuboCop
-      run: bundle exec rubocop --fail-level warning --display-only-fail-level-offenses
+      run: script/lint --all --only rubocop
+
+    - name: Run erb_lint
+      run: script/lint --all --only erb_lint
+
+    - name: Install Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+
+    - name: Install linters
+      run: npm ci
+
+    - name: Run ESLint
+      run: script/lint --all --only eslint
+
+    - name: Run Stylelint
+      run: script/lint --all --only stylelint
 
   generate-matrix:
     runs-on: ubuntu-latest

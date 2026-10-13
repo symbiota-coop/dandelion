@@ -2,7 +2,7 @@
 
 <% if contribution_data %>
   <% monthly_contributions = contribution_data[:current]
-     
+
      base_target = Money.new(500*100, 'GBP')
      target = base_target
      while monthly_contributions >= (target * 0.8)
@@ -17,7 +17,7 @@
   <p class="mt-1 mb-0 text-center">
     <%= monthly_contributions.format(no_cents: true) %> raised of <%= m target, currency %> monthly target
     <% if admin? %>
-      <br class="d-lg-none" />
+      <br class="d-lg-none">
       (projected <%= m contribution_data[:projected], currency %>)
     <% end %>
   </p>

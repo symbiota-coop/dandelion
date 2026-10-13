@@ -1,17 +1,17 @@
-<% if ticket_type = ticket.ticket_type %>
+<% if (ticket_type = ticket.ticket_type) %>
   <span>
     <a href="javascript:;" onclick="$(this).parent().hide().next().show().find('select').focus()">
       <%= ticket_type.name %>
     </a>
     <% if ticket_type.ticket_group %>
-      <span class="badge text-primary border border-primary"><%=ticket_type.ticket_group.name%></span>
+      <span class="badge text-primary border border-primary"><%= ticket_type.ticket_group.name %></span>
     <% end %>
   </span>
   <% form_tag "/tickets/#{ticket.id}/ticket_type", style: 'display:none' do %>
     <%= select_tag :ticket_type_id, class: 'form-select', value: ticket.ticket_type_id, options: ticket.event.ticket_types.map { |t| [t.name, t.id] }, onchange: '$(this.form).submit()', onblur: '$(this.form).submit()' %>
   <% end %>
 <% elsif ticket.original_ticket_type_name %>
-  <span data-bs-toggle="tooltip" title="Ticket type has been deleted" >
+  <span data-bs-toggle="tooltip" title="Ticket type has been deleted">
     <%= ticket.original_ticket_type_name %> <i class="bi bi-trash"></i>
   </span>
 <% end %>

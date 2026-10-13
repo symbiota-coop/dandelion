@@ -37,7 +37,7 @@
           and contributed
           <%= m p, currency %>
           of a
-          <% if request.path.split('/').last == 'contribute' %>suggested <%= m r, currency %><% else %><a href="/o/<%=organisation.slug%>/contribute">suggested <%= m r, currency %></a><% end %><% if balance <= 0%>.<% else %>, leaving a balance of <%= m balance, currency %>.<% end %>
+          <% if request.path.split('/').last == 'contribute' %>suggested <%= m r, currency %><% else %><a href="/o/<%= organisation.slug %>/contribute">suggested <%= m r, currency %></a><% end %><% if balance <= 0 %>.<% else %>, leaving a balance of <%= m balance, currency %>.<% end %>
         </p>
 
         <% if w && w <= 100 %>
@@ -51,7 +51,7 @@
         <% form_tag '', class: 'form-inline mb-3', id: 'pay-form' do %>
           <div class="form-group mb-1 me-1">
             <div class="input-group">
-              <span class="input-group-text"><%=money_symbol(currency) %></span>
+              <span class="input-group-text"><%= money_symbol(currency) %></span>
               <%= hidden_field_tag :currency, value: currency %>
               <%= text_field_tag :amount, style: 'width: 5em;', required: 'required', class: 'form-control', id: 'amount', value: (balance if balance > Money.new(1 * 100, 'GBP')) %>
             </div>
@@ -71,12 +71,12 @@
             Auto top-up enabled<% if organisation.card_last4 %> using card ending in <%= organisation.card_last4 %><% end %>. <a data-method="post" href="/organisations/<%= organisation.id %>/clear_stripe_customer_id">Click to disable</a>
           <% else %>
             <a href="javascript:;" onclick="
-               $.post('/organisations/<%= organisation.id %>/stripe_setup', $(this).serializeObject(), function (data) {
-                  var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
-                  stripe.redirectToCheckout({sessionId: data['session_id']})                        
+               $.post(<%= "/organisations/#{organisation.id}/stripe_setup".to_json %>, $(this).serializeObject(), function (data) {
+                  var stripe = Stripe(<%= ENV['STRIPE_PK'].to_json %>);
+                  stripe.redirectToCheckout({sessionId: data['session_id']})
                 })
         ">Save time by enabling auto top-ups</a>
-            <br />
+            <br>
             When the suggested contribution exceeds <%= m Money.new(100 * 100, 'GBP'), currency %>
             or you fall below <%= (organisation.paid_up_fraction_or_default * 100).to_i %>% of the suggested amount,
             we'll top you up to 100%,
@@ -95,9 +95,9 @@
 
             $('#pay-form').submit(function () {
               $('#pay-form button[data-payment-method-clicked] i').show()
-              $.post('/organisations/<%= organisation.id %>/pay', $(this).serializeObject(), function (data) {
+              $.post(<%== "/organisations/#{organisation.id}/pay".to_json %>, $(this).serializeObject(), function (data) {
                 if (data['session_id']) {
-                  var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
+                  var stripe = Stripe(<%== ENV['STRIPE_PK'].to_json %>);
                   stripe.redirectToCheckout({sessionId: data['session_id']})
                 }
               }).fail(function () {

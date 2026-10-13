@@ -1,7 +1,7 @@
 <div class="main">
   <p>Hi %recipient.firstname%,</p>
   <p>
-    Your ticket to <a href="<%= ENV['BASE_URI'] %>/e/<%=event.slug%>"><%= event.name %></a> was resold.
+    Your ticket to <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>"><%= event.name %></a> was resold.
     <% if defined?(requires_manual_refund) && requires_manual_refund %>
       The organiser has been notified and will process your refund.
       <% if defined?(gocardless_instalment) && gocardless_instalment %>

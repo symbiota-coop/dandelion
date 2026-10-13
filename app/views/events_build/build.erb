@@ -94,7 +94,7 @@
           <%= f.hidden_field :organisation_id, value: @event.organisation_id %>
         <% end %>
         <%= f.text_block :name %>
-        <div <% unless @event.evergreen? %>style="display: none;"<% end %>>
+        <div <% unless @event.evergreen? %> style="display: none;"<% end %>>
           <%= f.check_box_block :evergreen %>
         </div>
         <div id="time-fields" style="<%= 'display:none' if @event.evergreen? %>">
@@ -117,7 +117,7 @@
               Organisation
             </label>
             <div>
-              <input type="text" value="<%=@event.organisation.name%>" class="form-control " disabled="disabled">
+              <input type="text" value="<%= @event.organisation.name %>" class="form-control " disabled="disabled">
             </div>
           </div>
         <% end %>
@@ -142,7 +142,7 @@
         <%= f.wysiwyg_block :description %>
         <%= f.wysiwyg_block :extra_info_for_ticket_email %>
         <% if @event.persisted? %>
-          <p class="field-note"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
+          <p class="field-note"><a target="_blank" href="/events/<%= @event.id %>/ticket_email">Preview order confirmation email &rarr;</a></p>
         <% end %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab-tickets">
@@ -164,7 +164,7 @@
                 <li>One question per line</li>
                 <li>Text fields only, like: question?</li>
                 <li>Leave blank to disable feedback</li>
-                <li>View answers on the <a target="_blank" href="/events/<%=@event.id%>/feedback">Feedback</a> page</li>
+                <li>View answers on the <a target="_blank" href="/events/<%= @event.id %>/feedback">Feedback</a> page</li>
               </ul>
             </div>
           </div>
@@ -186,13 +186,13 @@
         <% if @event.donations_to_dandelion? %>
           <div class="alert alert-warning">
             <p class="mb-0">
-              The settings below won't take effect until you've met the <a target="_blank" href="/o/<%=@event.organisation.slug%>/contribute">suggested contribution</a>.
+              The settings below won't take effect until you've met the <a target="_blank" href="/o/<%= @event.organisation.slug %>/contribute">suggested contribution</a>.
             </p>
           </div>
         <% elsif @event.organisation.stripe_connect? %>
           <div class="alert alert-primary">
             <p class="mb-0">
-              For as long as your organisation meets the <strong><a target="_blank" href="/o/<%=@event.organisation.slug%>/contribute">suggested contribution</a></strong> of 1% of ticket sales, we'll apply the settings below and pass on donations to your organisation. <strong><a target="_blank" href="/docs/events#about-the-suggested-donation">Read more</a></strong>
+              For as long as your organisation meets the <strong><a target="_blank" href="/o/<%= @event.organisation.slug %>/contribute">suggested contribution</a></strong> of 1% of ticket sales, we'll apply the settings below and pass on donations to your organisation. <strong><a target="_blank" href="/docs/events#about-the-suggested-donation">Read more</a></strong>
             </p>
           </div>
         <% end %>
@@ -205,7 +205,7 @@
       </div>
       <div role="tabpanel" class="tab-pane" id="tab-appearance">
         <%= f.color_block :theme_color %>
-        <%= partial :'quick_theme_colors', locals: { input_name: 'event[theme_color]' } %>
+        <%= partial :quick_theme_colors, locals: { input_name: 'event[theme_color]' } %>
         <% if Padrino.env == :development || @event.organisation.change_select_tickets_title %>
           <%= f.text_block :select_tickets_title %>
         <% end %>
@@ -227,7 +227,7 @@
       <div role="tabpanel" class="tab-pane" id="tab-emails">
         <div class="alert alert-primary">
           <p class="mb-0">
-            Leaving a field blank will mean the email uses the value from the <a target="_blank" href="/o/<%=@event.organisation.slug%>/edit#tab-emails">organisation's email settings</a> instead.
+            Leaving a field blank will mean the email uses the value from the <a target="_blank" href="/o/<%= @event.organisation.slug %>/edit#tab-emails">organisation's email settings</a> instead.
           </p>
         </div>
         <p>Magic tags: <%== EmailFields::MAGIC_TAGS.map { |t| "<code>[#{t}]</code>" }.join(', ') %></p>
@@ -237,15 +237,15 @@
           <% if @event.persisted? %>
             <p class="field-note text-body-secondary">
               No need to repeat information you already entered on the <code>Description and confirmation</code> tab; it will be included below this greeting.
-              <br />
-              <a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
+              <br>
+              <a target="_blank" href="/events/<%= @event.id %>/ticket_email">Preview order confirmation email &rarr;</a></p>
           <% end %>
         </div>
         <div class="mt-5">
           <%= f.text_block :reminder_email_title %>
           <%= f.wysiwyg_block :reminder_email_body %>
           <% if @event.persisted? %>
-            <p class="field-note"><a target="_blank" href="/events/<%=@event.id%>/reminder_email">Preview reminder email &rarr;</a></p>
+            <p class="field-note"><a target="_blank" href="/events/<%= @event.id %>/reminder_email">Preview reminder email &rarr;</a></p>
           <% end %>
           <div class="evergreen-hide" style="<%= 'display:none' if @event.evergreen? %>">
             <% if @event.sent_reminders_at %>
@@ -262,7 +262,7 @@
           <%= f.text_block :feedback_email_title %>
           <%= f.wysiwyg_block :feedback_email_body %>
           <% if @event.persisted? %>
-            <p class="field-note"><a target="_blank" href="/events/<%=@event.id%>/feedback_request_email">Preview feedback request email &rarr;</a></p>
+            <p class="field-note"><a target="_blank" href="/events/<%= @event.id %>/feedback_request_email">Preview feedback request email &rarr;</a></p>
           <% end %>
           <div class="evergreen-hide" style="<%= 'display:none' if @event.evergreen? %>">
             <% if @event.sent_feedback_requests_at %>
@@ -280,7 +280,7 @@
             <%= f.text_block :recording_email_title %>
             <%= f.wysiwyg_block :recording_email_greeting %>
             <% if @event.persisted? %>
-              <p class="field-note"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
+              <p class="field-note"><a target="_blank" href="/events/<%= @event.id %>/ticket_email">Preview order confirmation email &rarr;</a></p>
             <% end %>
           </div>
         <% end %>
@@ -302,7 +302,7 @@
         <%= f.url_block :purchase_url %>
         <%= f.text_block :match_phrase %>
         <% if current_account.memberships.and(admin: true).exists? %>
-          <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,b| a } %>
+          <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,_b| a } %>
         <% end %>
         <%= f.url_block :terms_and_conditions_url %>
         <%= f.text_area_block :terms_and_conditions %>
@@ -339,7 +339,7 @@
         <div role="tabpanel" class="tab-pane" id="tab-recording">
           <%= f.wysiwyg_block :extra_info_for_recording_email %>
           <% if @event.persisted? %>
-            <p class="field-note"><a target="_blank" href="/events/<%=@event.id%>/ticket_email">Preview order confirmation email &rarr;</a></p>
+            <p class="field-note"><a target="_blank" href="/events/<%= @event.id %>/ticket_email">Preview order confirmation email &rarr;</a></p>
           <% end %>
         </div>
       <% end %>
@@ -361,7 +361,6 @@
 
           <%= f.number_block :stripe_revenue_adjustment, disabled: revenue_fields_disabled %>
           <%= f.text_area_block :notes %>
-
 
           <% if @event.new_record? %>
             <%= f.submit_block %>

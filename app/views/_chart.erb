@@ -1,7 +1,54 @@
 <% if defined?(data) || countable.exists? %>
   <div>
-    <canvas id="canvas-<%=r = SecureRandom.uuid%>"></canvas>
+    <canvas id="canvas-<%= r = SecureRandom.uuid %>"></canvas>
   </div>
+  <%
+    if !defined?(data)
+      if !defined?(months_ago); months_ago = 12; end
+
+      # Start from months_ago instead of scanning entire collection
+      earliest = months_ago.months.ago.to_date
+      months = [Date.new(earliest.year, earliest.month, 1)]
+      months << (months.last + 1.month) while months.last < Date.new(Date.today.year, Date.today.month, 1)
+
+      # Build criteria with date range, then use MongoDB aggregation
+      range_start = months.first
+      range_end = (months.last + 1.month)
+      criteria = countable.and(:created_at.gte => range_start, :created_at.lt => range_end)
+
+      # Use aggregation to group by month in a single query
+      results = criteria.collection.aggregate([
+        { '$match' => criteria.selector },
+        { '$group' => {
+            '_id' => {
+              'year' => { '$year' => '$created_at' },
+              'month' => { '$month' => '$created_at' }
+            },
+            'count' => { '$sum' => 1 }
+          }
+        }
+      ]).to_a
+
+      # Build lookup hash with default of 0 for missing months
+      counts_lookup = Hash.new(0)
+      results.each do |doc|
+        month_key = Date.new(doc['_id']['year'], doc['_id']['month'], 1)
+        counts_lookup[month_key] = doc['count']
+      end
+
+      data = months.map do |month|
+        ["#{Date::MONTHNAMES[month.month]} #{month.year}", counts_lookup[month]]
+      end.to_h
+    end
+
+    if defined?(make_projection)
+      current_month_value = data.values.last
+      days_in_month = Date.new(Date.today.year, Date.today.month, -1).day
+      days_passed = Date.today.day
+      projected_value = (current_month_value.to_f / days_passed * days_in_month).round
+      projection = [projected_value - current_month_value, 0].max
+    end
+  %>
   <script>
     $(function() {
 
@@ -13,57 +60,7 @@
         }
       })
 
-
-      <%
-        if !defined?(data)
-          if !defined?(months_ago); months_ago = 12; end
-
-          # Start from months_ago instead of scanning entire collection
-          earliest = months_ago.months.ago.to_date
-          months = [Date.new(earliest.year, earliest.month, 1)]
-          months << (months.last + 1.month) while months.last < Date.new(Date.today.year, Date.today.month, 1)
-
-          # Build criteria with date range, then use MongoDB aggregation
-          range_start = months.first
-          range_end = (months.last + 1.month)
-          criteria = countable.and(:created_at.gte => range_start, :created_at.lt => range_end)
-
-          # Use aggregation to group by month in a single query
-          results = criteria.collection.aggregate([
-            { '$match' => criteria.selector },
-            { '$group' => {
-                '_id' => {
-                  'year' => { '$year' => '$created_at' },
-                  'month' => { '$month' => '$created_at' }
-                },
-                'count' => { '$sum' => 1 }
-              }
-            }
-          ]).to_a
-
-          # Build lookup hash with default of 0 for missing months
-          counts_lookup = Hash.new(0)
-          results.each do |doc|
-            month_key = Date.new(doc['_id']['year'], doc['_id']['month'], 1)
-            counts_lookup[month_key] = doc['count']
-          end
-
-          data = months.map do |month|
-            ["#{Date::MONTHNAMES[month.month]} #{month.year}", counts_lookup[month]]
-          end.to_h
-        end
-
-        if defined?(make_projection)
-          current_month_value = data.values.last
-          days_in_month = Date.new(Date.today.year, Date.today.month, -1).day
-          days_passed = Date.today.day
-          projected_value = (current_month_value.to_f / days_passed * days_in_month).round
-          projection = [projected_value - current_month_value, 0].max
-        end
-
-      %>
-
-      new Chart(document.getElementById("canvas-<%=r%>").getContext("2d"), {
+      new Chart(document.getElementById(<%== "canvas-#{r}".to_json %>).getContext("2d"), {
       type: 'bar',
       data: {
         labels: <%== data.keys.to_json %>,
@@ -89,9 +86,9 @@
             formatter: function(value, context) {
               if (context.datasetIndex === 1 && value !== null) {
                 var actualValue = context.chart.data.datasets[0].data[context.dataIndex];
-                return <%==(defined?(unit) ? unit : '').to_json %> + (actualValue + value).toLocaleString() + <%==(defined?(unit_after) ? unit_after : '').to_json %>;
+                return <%== (defined?(unit) ? unit : '').to_json %> + (actualValue + value).toLocaleString() + <%== (defined?(unit_after) ? unit_after : '').to_json %>;
               }
-              return value ? <%==(defined?(unit) ? unit : '').to_json %> + value.toLocaleString() + <%==(defined?(unit_after) ? unit_after : '').to_json %> : null;
+              return value ? <%== (defined?(unit) ? unit : '').to_json %> + value.toLocaleString() + <%== (defined?(unit_after) ? unit_after : '').to_json %> : null;
             }
           }
         },

@@ -17,7 +17,7 @@
   <%= partial :'events/toggle_search_well' %>
 <% end %>
 
-<div class="search border rounded p-3 pb-lg-0 mb-3 <%='mt-3' if params[:minimal] || @carousel_buttons %>" style="<%= 'display: none;' if (params[:display].in?(['map', 'calendar'])) || (@carousel_buttons && !params[:search]) %>">
+<div class="search border rounded p-3 pb-lg-0 mb-3 <%= 'mt-3' if params[:minimal] || @carousel_buttons %>" style="<%= 'display: none;' if (params[:display].in?(['map', 'calendar'])) || (@carousel_buttons && !params[:search]) %>">
 
   <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
     <%= hidden_field_tag :display, value: params[:display] %>
@@ -52,7 +52,7 @@
         <% if @organisation.event_types %>
           <div class="form-group col-12 col-sm-auto">
             <label>Event type</label>
-            <%= select_tag :event_type, options: [[(@organisation.event_types_placeholder if params[:minimal]), '', {disabled: true, selected: params[:event_type].blank?}]] + @organisation.event_types.split(',').map { |type| [type, type.parameterize] }, selected: params[:event_type], class: 'form-select select-placeholder' %>
+            <%= select_tag :event_type, options: [[(@organisation.event_types_placeholder if params[:minimal]), '', {disabled: true, selected: !params[:event_type]}]] + @organisation.event_types.split(',').map { |type| [type, type.parameterize] }, selected: params[:event_type], class: 'form-select select-placeholder' %>
           </div>
         <% end %>
         <div class="form-group col-12 col-sm-auto">
@@ -61,7 +61,7 @@
       <% else %>
         <%= partial :'organisations/search_event_tags' %>
         <%
-          # partial :'organisations/search_local_groups' 
+          # partial :'organisations/search_local_groups'
         %>
         <%
          # partial :'organisations/search_activities'
@@ -86,7 +86,7 @@
     <%= hidden_field_tag :search, value: 1 %>
   <% end %>
 
-  <% unless params[:no_listings] || params[:no_view_options]  %>
+  <% unless params[:no_listings] || params[:no_view_options] %>
     <%= partial :'events/view_options', locals: { grid_view: true, calendar_view: true } %>
   <% end %>
 

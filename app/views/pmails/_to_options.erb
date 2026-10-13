@@ -1,5 +1,4 @@
 <%
-
 to_options = []
 selected_to_option = @pmail.to_selected if @pmail.persisted?
 
@@ -68,7 +67,7 @@ elsif @organisation
                           end.sum([])
                         else
                           []
-                        end)
+                         end)
   to_options += local_group_options
 
 elsif @activity
@@ -76,7 +75,6 @@ elsif @activity
 elsif @local_group
   to_options << [@local_group.name, "local_group:#{@local_group.id}"]
 end
-
 %>
 
 <script>

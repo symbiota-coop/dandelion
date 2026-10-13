@@ -15,20 +15,20 @@
   # Pre-fetch all orders and tickets in date range
   orders = Order.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :value.ne => nil, :currency.in => FIAT_CURRENCIES)
   tickets = Ticket.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :price.gt => 0)
-  
+
   # Get organisations with events that have orders
   event_ids_with_orders = orders.pluck(:event_id).uniq
   organisation_ids = Event.and(:id.in => event_ids_with_orders).pluck(:organisation_id).uniq
   organisations = Organisation.and(:id.in => organisation_ids)
-  
+
   # Pre-group tickets and orders by event_id for faster lookup
   tickets_by_event = tickets.group_by(&:event_id)
   orders_by_event = orders.group_by(&:event_id)
-  
+
   # Pre-fetch all events and group by organisation_id
   events_in_range = Event.and(:id.in => (tickets.pluck(:event_id) + orders.pluck(:event_id)).uniq)
   events_by_org = events_in_range.group_by(&:organisation_id)
-  
+
   # Calculate total value for summary
   total_value = orders.inject(Money.new(0,'GBP')) { |sum, o| sum + Money.new(o.value*100, o.currency) }
 %>
@@ -63,39 +63,38 @@
       # Get this organisation's events in the date range
       org_events = events_by_org[organisation.id] || []
       org_event_ids = org_events.map(&:id)
-      
+
       # Get tickets and orders for this organisation's events
       org_tickets = org_event_ids.flat_map { |eid| tickets_by_event[eid] || [] }
       org_orders = org_event_ids.flat_map { |eid| orders_by_event[eid] || [] }
-      
+
       # Calculate order sum
       orders_sum = org_orders.inject(Money.new(0, 'GBP')) do |sum, o|
         sum + Money.new(o.value * 100, o.currency)
       end
-      orders_sum = orders_sum.exchange_to('GBP') if orders_sum > 0
-    %>
+      orders_sum = orders_sum.exchange_to('GBP') if orders_sum > 0 %>
     <tr>
       <td>
-        <a href="/o/<%=organisation.slug%>"><%=organisation.name%></a>
+        <a href="/o/<%= organisation.slug %>"><%= organisation.name %></a>
       </td>
       <td>
-        <%=org_events.count %>
+        <%= org_events.count %>
       </td>
       <td>
-        <%=org_tickets.count%>
+        <%= org_tickets.count %>
       </td>
       <td>
         <%= orders_sum.format(no_cents: true) %>
       </td>
-      <td data-sort="<%=organisation.created_at.to_fs(:db_local)%>"><%=organisation.created_at%></td>
+      <td data-sort="<%= organisation.created_at.to_fs(:db_local) %>"><%= organisation.created_at %></td>
 
       <% r = organisation.contribution_requested_gbp_cache %>
       <% p = organisation.contribution_paid_gbp_cache %>
       <% if r && p %>
         <% w = organisation.fraction_paid*100 if organisation.fraction_paid %>
         <% balance = r - p %>
-        <td data-sort="<%=organisation.fraction_paid%>">
-          <%=m p, 'GBP'%>/<%=m r, 'GBP'%>
+        <td data-sort="<%= organisation.fraction_paid %>">
+          <%= m p, 'GBP' %>/<%= m r, 'GBP' %>
 
           <% if w %>
             <div class="progress my-3" style="height: 1.875rem">
@@ -105,8 +104,8 @@
             </div>
           <% end %>
         </td>
-        <td data-sort="<%=balance%>">
-          <%=m balance, 'GBP'%>
+        <td data-sort="<%= balance %>">
+          <%= m balance, 'GBP' %>
         </td>
       <% else %>
         <td data-sort="0"></td>

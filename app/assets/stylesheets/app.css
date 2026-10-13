@@ -841,6 +841,35 @@ p.action a {
    Badges
    ========================================================================== */
 
+/* A page's whole content when it has none (the Daily's dates with no edition): centred, an icon in a 5rem
+   circle like the principles' (--hairline border, --bs-box-shadow-sm), a title, a line of text and an optional button.
+   An empty list or table inside a page takes the plain grey phrase instead */
+.empty-notice {
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: var(--space-2xl) 0;
+  text-align: center;
+}
+
+.empty-notice-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 5rem;
+  margin-bottom: var(--space-base);
+  border: 1px solid var(--hairline);
+  border-radius: 50%;
+  background: var(--bs-body-bg);
+  box-shadow: var(--bs-box-shadow-sm);
+  font-size: var(--font-size-3xl);
+}
+
+.empty-notice-title {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-xs);
+}
+
 /* Bootstrap's badge, coloured with its text-bg-* classes, for counts, statuses, tags and amounts alike.
    Sized in em and shaped as a pill (bootstrap5.scss), so a badge scales with the text around it */
 
@@ -1554,6 +1583,11 @@ input.flatpickr-mobile {
   width: 100%;
   min-width: 100%;
   box-sizing: border-box;
+}
+
+/* Hide Chrome's dd/mm/yyyy, --:-- mask while a native date input is empty (forms.js adds the class) */
+input.flatpickr-mobile-empty:not(:focus)::-webkit-datetime-edit {
+  color: transparent;
 }
 
 /* In an input group, share the row with the addon rather than taking its full width */
@@ -2311,19 +2345,20 @@ a.ui-button:active,
    Base: html, body and typography
    ========================================================================== */
 
+/* The rem base: 17px, 19px and 21px at the browser's default 16px, scaling with the reader's own setting */
 html {
-  font-size: 17px;
+  font-size: 106.25%;
 }
 
 @media (min-width: 1680px) {
   html {
-    font-size: 19px;
+    font-size: 118.75%;
   }
 }
 
 @media (min-width: 1920px) {
   html {
-    font-size: 21px;
+    font-size: 131.25%;
   }
 }
 
@@ -2553,7 +2588,7 @@ ul.map-event li {
   font-size: var(--font-size-base) !important
 }
 
-/* Google Maps draws in pixels, so these overrides, the markers and the clusters stay in px to line up with it */
+/* stylelint-disable declaration-property-unit-disallowed-list -- Google Maps draws in pixels, so these overrides, the markers and the clusters stay in px to line up with it */
 #map-canvas button[title=Close] {
   height: 36px !important;
   margin-top: -8px !important;
@@ -2624,6 +2659,7 @@ ul.map-event li {
   --map-cluster-color: var(--color-red-500);
   font-size: 14px;
 }
+/* stylelint-enable declaration-property-unit-disallowed-list */
 
 /* A marker or cluster whose details are loading */
 .map-loading {
@@ -2792,12 +2828,12 @@ ul.map-event li {
 
 /* Add margin between events to prevent squashing */
 .fc-event {
-  margin-bottom: 2px !important;
+  margin-bottom: var(--space-2xs) !important;
 }
 
 /* Add some padding to event content */
 .fc-event-main {
-  padding: 1px 2px !important;
+  padding: 0 var(--space-2xs) !important;
 }
 
 /* Shorten month names and hide Today button on small screens */
@@ -2899,6 +2935,7 @@ table.event-details td {
    the date's month is a band of the theme's 50 in its 800, over a bold day */
 .event-detail {
   border: 1px solid var(--hairline);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- in em, so the corners scale with the tile, which is sized in em */
   border-radius: 0.3em;
   box-shadow: var(--bs-box-shadow-sm);
   overflow: hidden;
@@ -3083,6 +3120,7 @@ table.event-details td {
 
 .newsfeed-icon .bi-ticket-detailed-fill {
   position: relative;
+  /* stylelint-disable-next-line declaration-property-unit-disallowed-list -- a hairline nudge, to centre the glyph */
   top: -1px;
 }
 

@@ -87,7 +87,7 @@
       yAxisID: 'y'
     });
 
-    new Chart(document.getElementById("canvas-<%= r %>").getContext("2d"), {
+    new Chart(document.getElementById(<%== "canvas-#{r}".to_json %>).getContext("2d"), {
       data: {
         labels: labels,
         datasets: datasets

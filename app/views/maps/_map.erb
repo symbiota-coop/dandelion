@@ -1,46 +1,34 @@
+<% map_points = if defined?(points)
+                  points.each_with_index.map do |point, n|
+                    { model_name: point.class.to_s, id: encrypt_map_id(point.class.to_s, point.id.to_s), lat: point.lat, lng: point.lng, n: n }
+                  end
+                else
+                  []
+                end
+   # Each polygon is a list of rings, each a list of {lat, lng}; coordinates are stored [lng, lat]
+   polygon_paths = if defined?(polygonables)
+                     polygonables.flat_map do |polygonable|
+                       polygonable.polygons.select { |polygon| polygon.coordinates.is_a?(Array) && polygon.coordinates[0].is_a?(Array) }.map do |polygon|
+                         polygon.coordinates.select { |ring| ring.is_a?(Array) }.map { |ring| ring.map { |coordinate| { lat: coordinate[1], lng: coordinate[0] } } }
+                       end
+                     end
+                   else
+                     []
+                   end %>
 <script>
   $(function () {
 
-    var points = [];
-    <% if defined?(points) %>
-      <% points.each_with_index { |point, n| %>
-        points.push({
-          model_name: '<%= point.class.to_s %>',
-          id: '<%= encrypt_map_id(point.class.to_s, point.id.to_s) %>',
-          lat: <%= point.lat %>,
-          lng: <%= point.lng %>,
-          n: <%= n %>
-        });
-      <% } %>
-    <% end %>
-
-    var polygonPaths = [];
-    <% if defined?(polygonables) %>
-      <% polygonables.each { |polygonable| %>
-        <% polygonable.polygons.each { |polygon| %>
-          <% next unless polygon.coordinates.is_a?(Array) && polygon.coordinates[0].is_a?(Array) %>
-          polygonPaths.push([
-            <% polygon.coordinates.each { |ring| %>
-              <% next unless ring.is_a?(Array) %>
-              [
-                <% ring.each { |coordinate| %>
-                  {lat: <%= coordinate[1] %>, lng: <%= coordinate[0] %>},
-                <% } %>
-              ],
-            <% } %>
-          ]);
-        <% } %>
-      <% } %>
-    <% end %>
+    var points = <%== map_points.to_json %>;
+    var polygonPaths = <%== polygon_paths.to_json %>;
 
     // Map configuration
     var config = {
       points: points,
       polygonPaths: polygonPaths,
-      fillScreen: <%= defined?(fill_screen) && fill_screen ? 'true' : 'false' %>,
+      fillScreen: <%== (defined?(fill_screen) && fill_screen ? true : false).to_json %>,
       url: <%== (binding.local_variable_defined?(:url) ? url : nil).to_json %>,
-      boundingBox: <%== (defined?(bounding_box) ? bounding_box : nil).to_json  %>,
-      pointsLimit: <%= MAP_POINTS_LIMIT %>,
+      boundingBox: <%== (defined?(bounding_box) ? bounding_box : nil).to_json %>,
+      pointsLimit: <%== MAP_POINTS_LIMIT.to_json %>,
       mapId: <%== (ENV['GOOGLE_MAPS_MAP_ID'] || 'DEMO_MAP_ID').to_json %>
     };
 

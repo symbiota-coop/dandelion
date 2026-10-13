@@ -6,7 +6,7 @@
   .feedback-columns-item img { padding: 0.1rem }
 </style>
 <div class="feedback-columns mt-5">
-  <% 
+  <%
   # Use aggregation to join with accounts and events at database level
   # Step 1: Find eligible accounts (this should be fast with proper indexes)
   eligible_account_ids = Account.and(
@@ -14,13 +14,13 @@
     :has_signed_in => true,
     :hidden => false,
   ).pluck(:id)
-  
+
   # Step 2: Find the most recent 5-star feedback from each eligible account
   # Using a simpler aggregation that only works with filtered account IDs
   pipeline = [
-    { '$match' => { 
+    { '$match' => {
       'anonymous' => false,
-      'has_public_answers' => true, 
+      'has_public_answers' => true,
       'rating' => 5,
       'account_id' => { '$in' => eligible_account_ids }
     } },
@@ -30,13 +30,14 @@
     { '$sort' => { 'created_at' => -1 } },
     { '$limit' => 10 }
   ]
-  
+
   EventFeedback.collection.aggregate(pipeline).each { |doc|
   event_feedback = EventFeedback.new(doc.select { |k, _v| EventFeedback.fields.keys.include?(k.to_s) })
   account = event_feedback.account
   next if account.name.include?('_')
   quote = event_feedback.public_answers.map { |q,a| a if a.present? }.compact.join('<br /><br />').gsub("\n", '<br />')
-  next if quote.length > 500 %>
+  next if quote.length > 500
+  %>
   <div class="feedback-columns-item">
 
     <div class="row g-0">

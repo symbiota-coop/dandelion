@@ -20,7 +20,7 @@ module PublicToken
 
       if (record = find_by(token: id_or_token))
         record
-      elsif id_or_token.match?(/\A[0-9a-fA-F]{24}\z/) && (record = find(id_or_token)) && record.token.blank?
+      elsif id_or_token.match?(/\A[0-9a-fA-F]{24}\z/) && (record = find(id_or_token)) && record.token.blank? # rubocop:disable Lint/DuplicateBranch
         record
       end
     end

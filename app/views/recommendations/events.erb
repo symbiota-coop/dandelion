@@ -16,8 +16,7 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_inc
         next if event.sold_out?
         next if event.created_at < 1.year.ago
         next if event.event_facilitations.find_by(account: current_account);
-        r = r + 1;
-        %>
+        r = r + 1; %>
       <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
         <div class="mb-4">
 
@@ -43,30 +42,29 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_inc
                         <% public_count = people_accounts.count - private_count %>
                         <li><i data-bs-toggle="tooltip" title="People" class="bi bi-person-fill"></i>
                           <% people.each { |k,v| account = people_accounts.find { |a| a.id.to_s == k.to_s }; next unless account;
-                          next if account.private?
-                          %>
-                          <a href="/u/<%=account.username%>"><%=account.name%></a>,
+                          next if account.private? %>
+                          <a href="/u/<%= account.username %>"><%= account.name %></a>,
                           <span data-bs-toggle="tooltip">
-                            <%=pluralize v.count, 'event'%> in common
+                            <%= pluralize v.count, 'event' %> in common
                           </span>
                           <span class="d-none">
                             <%
                               # Collect IDs by type
                               event_ids = v.select { |connection| connection['type'] == 'Event' }.map { |connection| connection['id'] }
                               gathering_ids = v.select { |connection| connection['type'] == 'Gathering' }.map { |connection| connection['id'] }
-                              
+
                               # Bulk query events and gatherings
                               events = event_ids.any? ? Event.and(:id.in => event_ids).order('start_time desc') : []
                               gatherings = gathering_ids.any? ? Gathering.and(:id.in => gathering_ids) : []
                             %>
                             <% events.each { |event| %>
-                            <%= event.name %><br />
+                            <%= event.name %><br>
                             <% } %>
                             <% gatherings.each { |gathering| %>
-                            <%= gathering.name %><br />
+                            <%= gathering.name %><br>
                             <% } %>
                           </span>
-                          <br />
+                          <br>
                           <% } %>
                           <% if private_count > 0 %>
                             <% if public_count > 0 %>

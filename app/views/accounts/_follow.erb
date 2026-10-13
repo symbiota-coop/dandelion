@@ -26,7 +26,7 @@
           <%== text %>
         </button>
         <div class="dropdown-menu">
-          <% action_options.invert.reject { |text, value| value == current_state }.each { |text,value| %>
+          <% action_options.invert.reject { |_text, value| value == current_state }.each { |text,value| %>
           <a class="pagelet-trigger dropdown-item" data-method="post" href="/follow/<%= account.id %>?f=<%= value %>"><%== text %></a>
           <% } %>
         </div>

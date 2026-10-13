@@ -12,7 +12,6 @@
   <% organisation = @event.organisation %>
 <% end %>
 
-
 <style>
   #pmail_body { height: 30rem; }
 </style>
@@ -20,9 +19,9 @@
 <script type="text/javascript">
   $(function () {
 
-  <% if params[:preview] %>
-      window.open('/pmails/<%= @pmail.id %>/preview?<%= @scope %>', null, 'scrollbars=yes,width=800,height=600,left=150,top=150').focus();
-  <% end %>
+    if (<%== (params[:preview] ? true : false).to_json %>) {
+      window.open(<%== "/pmails/#{@pmail.id}/preview?#{@scope}".to_json %>, null, 'scrollbars=yes,width=800,height=600,left=150,top=150').focus();
+    }
 
     $('#pmail-form').submit(function() {
       if($('#pmail_to_option').val().length == 0) {
@@ -33,7 +32,6 @@
 
   });
 </script>
-
 
 <% form_for @pmail, @pmail.new_record? ? '/pmails/new' : "/pmails/#{@pmail.id}/edit", id: 'pmail-form', multipart: true do |f| %>
   <% pmail_send_count = @pmail.send_count if @pmail.persisted? %>

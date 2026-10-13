@@ -23,6 +23,7 @@ Dandelion::App.controller do
     end
     MessageReceipt.mark_read!(messenger: @account, messengee: current_account)
     if request.xhr?
+      halt 304 if request.env['HTTP_X_PAGELET_STAMP'] == Message.thread_stamp(current_account, @account)
       partial :'messages/thread'
     else
       erb :'messages/messages'

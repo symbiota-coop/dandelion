@@ -25,7 +25,7 @@ class EventFeedback
   end
 
   validates_inclusion_of :rating, in: 1..5, allow_nil: true
-  validates_uniqueness_of :event, scope: :account, allow_nil: true, conditions: -> { where(deleted_at: nil) }, message: 'already has your feedback'
+  validates_uniqueness_of :event, scope: :account, allow_nil: true, conditions: -> { self.and(deleted_at: nil) }, message: 'already has your feedback'
 
   before_validation do
     self.has_public_answers = public_answers.present?

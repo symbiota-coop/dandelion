@@ -2,10 +2,10 @@
   <% @event.ticket_groups.each { |ticket_group| %>
   <tr <% if params[:ticket_group_id] == ticket_group.id.to_s %> <% elsif params[:ticket_type_id] || params[:ticket_group_id] %> class="opacity-50"<% end %>>
     <td style="width: 1px" class="pe-3 text-nowrap">
-      <span class="badge text-primary border border-primary"><%=ticket_group.name%></span>
+      <span class="badge text-primary border border-primary"><%= ticket_group.name %></span>
     </td>
     <td>
-      <a href="/events/<%=@event.id%>/tickets<%= params[:ticket_group_id] == ticket_group.id.to_s ? '' : "?ticket_group_id=#{ticket_group.id}" %>">
+      <a href="/events/<%= @event.id %>/tickets<%= params[:ticket_group_id] == ticket_group.id.to_s ? '' : "?ticket_group_id=#{ticket_group.id}" %>">
         <%= ticket_group.slots_taken %>/<%= ticket_group.capacity %>
         <% if ticket_group.capacity > 0 %>
           <% w = ((ticket_group.slots_taken / ticket_group.capacity.to_f) * 100).round %>
@@ -23,20 +23,20 @@
       <% if ticket_type.hidden %>
         <a href="/events/<%= @event.id %><%= params[:ticket_type_id] == ticket_type.id.to_s ? '' : "?ticket_type_id=#{ticket_type.public_id}" %>"><%= ticket_type.name %></a>
         <% if ticket_type.ticket_group %>
-          <span class="badge text-primary border border-primary"><%=ticket_type.ticket_group.name%></span>
+          <span class="badge text-primary border border-primary"><%= ticket_type.ticket_group.name %></span>
         <% end %>
         <i data-bs-toggle="tooltip" title="Secret ticket type" class="bi bi-lock ms-1"></i>
       <% else %>
         <%= ticket_type.name %>
         <% if ticket_type.ticket_group %>
-          <span class="badge text-primary border border-primary"><%=ticket_type.ticket_group.name%></span>
+          <span class="badge text-primary border border-primary"><%= ticket_type.ticket_group.name %></span>
         <% end %>
       <% end %>
     </td>
     <td>
       <% cap = ticket_type.effective_quantity %>
       <% w = cap.to_i > 0 ? ((ticket_type.tickets.count / cap.to_f) * 100).round : 0 %>
-      <a href="/events/<%=@event.id%>/tickets<%= params[:ticket_type_id] == ticket_type.id.to_s ? '' : "?ticket_type_id=#{ticket_type.id}" %>">
+      <a href="/events/<%= @event.id %>/tickets<%= params[:ticket_type_id] == ticket_type.id.to_s ? '' : "?ticket_type_id=#{ticket_type.id}" %>">
         <%= ticket_type.tickets.count %>/<%= cap %>
         <div class="progress">
           <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"></div>

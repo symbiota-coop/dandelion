@@ -22,13 +22,13 @@
 </td>
 <td>
   <% mapplication = membership.mapplication; if @membership.admin? && mapplication && mapplication.answers %>
-  <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/mapplications/<%= mapplication.id %>', function () {
+  <a href="javascript:;" onclick="$('#modal .modal-content').load(<%= "/g/#{@gathering.slug}/mapplications/#{mapplication.id}".to_json %>, function () {
           $('#modal').modal('show')
         });">
     <%= membership.created_at %>
   </a>
 <% elsif membership.answers %>
-  <a href="javascript:;" onclick="$('#modal .modal-content').load('/g/<%= @gathering.slug %>/memberships/<%= membership.id %>', function () {
+  <a href="javascript:;" onclick="$('#modal .modal-content').load(<%= "/g/#{@gathering.slug}/memberships/#{membership.id}".to_json %>, function () {
           $('#modal').modal('show')
         });">
     <%= membership.created_at %>
@@ -47,7 +47,7 @@
   <td>
     <% @gathering.events.each { |event| %>
     <% event.tickets.complete.and(account: account).each { |ticket| %>
-    <a href="/events/<%=event.id%>/tickets" class="badge text-bg-primary mb-1 text-decoration-none"><i class="bi bi-ticket-detailed-fill"></i> <%= (ticket.ticket_type.name + ', ') if ticket.ticket_type%><%= event.name %></a>
+    <a href="/events/<%= event.id %>/tickets" class="badge text-bg-primary mb-1 text-decoration-none"><i class="bi bi-ticket-detailed-fill"></i> <%= (ticket.ticket_type.name + ', ') if ticket.ticket_type %><%= event.name %></a>
     <% } %>
     <% } %>
   </td>

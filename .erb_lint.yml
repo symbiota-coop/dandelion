@@ -1,0 +1,54 @@
+---
+glob: "app/views/**/*.erb"
+EnableDefaultLinters: true
+linters:
+  # Forces an autocomplete attribute on every input; we add one only where it helps
+  RequireInputAutocomplete:
+    enabled: false
+  AllowedScriptType:
+    enabled: true
+    allowed_types:
+      - text/javascript
+      - module
+      - text/plain # held back until cookie consent (cookie_consent.js)
+      - application/json
+      - application/ld+json
+  # Flags all literal text, for translation, which we don't do
+  HardCodedString:
+    enabled: false
+  # Replaced by SafeErb (.erb_linters/safe_erb.rb), which leaves script types to AllowedScriptType
+  ErbSafety:
+    enabled: false
+  # Checks for unsafe interpolation into JavaScript and attributes
+  SafeErb:
+    enabled: true
+  # Rules from the Design section of AGENTS.md (.erb_linters/design_classes.rb)
+  DesignClasses:
+    enabled: true
+  # Replaced by RubocopTags (.erb_linters/rubocop_tags.rb), which also checks the conditions of if, unless and elsif tags
+  Rubocop:
+    enabled: false
+  RubocopTags:
+    enabled: true
+    rubocop_config:
+      # The Ruby in each tag is checked with .rubocop.yml's cops and settings, apart from the overrides below
+      inherit_from:
+        - .rubocop.yml
+      # Only cops that can fail CI (warning or above), as CI runs erb_lint with --fail-level W like RuboCop. Convention cops wouldn't
+      # fail it anyway, and erb_lint (unlike RuboCop) prints the offenses it ignores, so they would fill the output
+      Layout:
+        Enabled: false
+      Style:
+        Enabled: false
+      Naming:
+        Enabled: false
+      # The only warning-level cops in those departments
+      Layout/BeginEndAlignment:
+        Enabled: true
+      Layout/DefEndAlignment:
+        Enabled: true
+      Layout/EndAlignment:
+        Enabled: true
+      # Each tag is checked on its own, so a variable set in one tag and used in a later one looks unused
+      Lint/UselessAssignment:
+        Enabled: false

@@ -4,21 +4,21 @@
     <span class="text-body-secondary fw-normal">
       Reminder about
     </span>
-    <br />
+    <br>
     <%= event.name %>
   </h2>
 
-  <hr />
+  <hr>
 
   <%= tickets_table %>
 
-  <hr />
+  <hr>
 
   <p>Hi %recipient.firstname%,</p>
   <p>Just a reminder that your starred event <a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>"><%= event.name %></a> takes place a week from now.</p>
   <p>
     Best wishes,
-    <br />
+    <br>
     Dandelion
   </p>
 </div>

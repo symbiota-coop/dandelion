@@ -3,10 +3,8 @@
   document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: '<%= params[:list] ? "listMonth" : "dayGridMonth" %>',
-      <% if params[:date] %>
-      initialDate: '<%= params[:date] %>',
-      <% end %>
+      initialView: <%== (params[:list] ? 'listMonth' : 'dayGridMonth').to_json %>,
+      initialDate: <%== params[:date].to_json %> || undefined,
       events: function(fetchInfo, successCallback, failureCallback) {
         // Fetch events from the server
         var currentQuery = window.location.search;
@@ -14,7 +12,7 @@
         delete params.from;
         delete params.to;
         var queryString = $.param(params);
-        var baseUrl = '/o/<%=@organisation.slug%>/events.json?from=' + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0];
+        var baseUrl = <%== "/o/#{@organisation.slug}/events.json?from=".to_json %> + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0];
         var url = baseUrl + (queryString ? '&' + queryString : '');
         fetch(url)
           .then(response => response.json())
@@ -46,18 +44,17 @@
             failureCallback(error);
           });
       },
-      <% if params[:minimal] %>
-        eventClick: function(info) {
-          // Check for modifier keys (cmd on Mac, ctrl on Windows/Linux)
-          if (info.jsEvent.metaKey || info.jsEvent.ctrlKey) {
-            // Allow default behavior for cmd/ctrl+click to open in new tab
-            return;
-          }
-          // For regular clicks, open in same window
-          window.open(info.event.url, '_parent');
-          info.jsEvent.preventDefault();
-        },
-      <% end %>
+      // In the minimal (embedded) view, open events in the parent window
+      eventClick: <%== (params[:minimal] ? true : false).to_json %> ? function(info) {
+        // Check for modifier keys (cmd on Mac, ctrl on Windows/Linux)
+        if (info.jsEvent.metaKey || info.jsEvent.ctrlKey) {
+          // Allow default behavior for cmd/ctrl+click to open in new tab
+          return;
+        }
+        // For regular clicks, open in same window
+        window.open(info.event.url, '_parent');
+        info.jsEvent.preventDefault();
+      } : undefined,
       eventDidMount: function(info) {
         // Initialize Bootstrap tooltip for each event
         var locationIcon = '';

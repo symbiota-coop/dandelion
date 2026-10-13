@@ -1,6 +1,8 @@
 # The Dandelion Daily (/daily): each date's AI-written articles and facilitator of the day, worked out once and kept
-# in a Stash. late:errands makes today's; other dates are made the first time someone opens them
+# in a Stash. Only late:errands makes them, with Daily.publish(Date.today); /daily just shows what's been kept
 module Daily
+  class GenerationFailed < StandardError; end
+
   ARTICLES = [
     {
       title: "Today's events",
@@ -37,23 +39,56 @@ module Daily
     }
   ].freeze
 
-  # { 'articles' => [{ 'title' =>, 'summary' => markdown }], 'facilitator_id' => }
+  def self.key(date)
+    "daily/#{date.to_fs(:db_local)}"
+  end
+
+  # { 'articles' => [{ 'title' =>, 'summary' => markdown }], 'facilitator_id' => }, or nil if it hasn't been made
   def self.edition(date)
-    key = "daily/#{date.to_fs(:db_local)}"
-    if (stash = Stash.find_by(key: key))
-      return JSON.parse(stash.value)
-    end
+    stash = Stash.find_by(key: key(date))
+    JSON.parse(stash.value) if stash
+  end
+
+  # The latest date with an edition, up to today
+  def self.latest_date
+    date_of(Stash.and(:key.gt => 'daily/', :key.lte => key(Date.today)).order(key: -1))
+  end
+
+  # The nearest dates either side of date with an edition, for the arrows. Forward goes to today if no later
+  # edition is out, so today stays reachable before late:errands has made it
+  def self.previous_date(date)
+    date_of(Stash.and(:key.gt => 'daily/', :key.lt => key(date)).order(key: -1))
+  end
+
+  def self.next_date(date)
+    return if date >= Date.today
+
+    date_of(Stash.and(:key.gt => key(date), :key.lte => key(Date.today)).order(key: 1)) || Date.today
+  end
+
+  def self.date_of(stashes)
+    stash = stashes.only(:key).first
+    Date.parse(stash.key.delete_prefix('daily/')) if stash
+  end
+
+  # Makes and keeps the date's edition, unless it already has one
+  def self.publish(date)
+    return if Stash.and(key: key(date)).exists?
 
     edition = generate(date)
-    # Don't keep an edition missing a summary the model failed to write, so the next visit tries again
-    return edition if edition['articles'].any? { |article| article['summary'].nil? }
+    # Don't keep an edition missing a summary the model failed to write. Errors raised in late:errands reach Sentry
+    # anyway, but OpenRouter.chat returns nil when the model doesn't answer, so say so
+    if (failed = edition['articles'].select { |article| article['summary'].nil? }).any?
+      titles = failed.map { |article| article['title'] }.join(', ')
+      ErrorReporting.capture_exception(GenerationFailed.new("No Daily for #{date}: no summary for #{titles}"))
+      return
+    end
 
     begin
-      Stash.create(key: key, value: edition.to_json)
+      Stash.create(key: key(date), value: edition.to_json)
     rescue Mongo::Error::OperationFailure # another process stashed it first
-      return JSON.parse(Stash.find_by(key: key).value)
+      nil
     end
-    edition
   end
 
   def self.generate(date)

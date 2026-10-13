@@ -31,7 +31,7 @@
       $(this).closest('form').submit()
     })
 
-    if ($(window).width() > 992 || <%= request.xhr? ? 'true' : 'false' %>)
+    if ($(window).width() > 992 || <%== (request.xhr? ? true : false).to_json %>)
       $('#message-body').focus()
   })
 </script>

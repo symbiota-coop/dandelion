@@ -203,6 +203,8 @@ class Notification
     end.html_safe
   end
 
+  # One branch per notification type, so types that share a link or icon repeat it
+  # rubocop:disable Lint/DuplicateBranch
   def link
     case type.to_sym
     when :created_gathering
@@ -332,6 +334,7 @@ class Notification
       'bi-star'
     end
   end
+  # rubocop:enable Lint/DuplicateBranch
 
   private
 

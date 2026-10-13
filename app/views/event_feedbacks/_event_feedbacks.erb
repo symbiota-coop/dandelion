@@ -92,12 +92,12 @@
       <% if !account || event_feedback.anonymous? %>
         Anonymous
       <% elsif account.publicly_visible? %>
-        <a <% if params[:minimal] %>target="_blank"<% end %> href="/u/<%= account.username %>"><%= account.name %></a>
+        <a <% if params[:minimal] %> target="_blank"<% end %> href="/u/<%= account.username %>"><%= account.name %></a>
       <% else %>
         <%= account.abbrname %>
       <% end %>
       <% if event_feedback.event %>
-        <span class="text-body-secondary">on</span> <a <% if params[:minimal] %>target="_blank"<% end %> href="/e/<%= event_feedback.event.slug %>"><%= event_feedback.event.name %></a>
+        <span class="text-body-secondary">on</span> <a <% if params[:minimal] %> target="_blank"<% end %> href="/e/<%= event_feedback.event.slug %>"><%= event_feedback.event.name %></a>
       <% end %>
     </div>
     <% if answers.any? && event_feedback.response && event_feedback.respondable? %>

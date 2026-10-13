@@ -42,7 +42,7 @@
         <div class="message-thread-breadcrumbs d-block d-lg-none">
           <ul id="message-breadcrumbs" class="breadcrumb">
             <li class="breadcrumb-item"><a href="javascript:;" onclick="$('#thread-panel').hide();
-                $('#preview-panel').removeClass('d-none')">Messages</a></li>
+                $('#preview-panel').removeClass('d-none')">Messages</a></li><%# erb_lint:disable DesignClasses: the panel's d-none is responsive (d-none d-lg-block), so .show() can't replace it %>
             <li class="breadcrumb-item active"><%= @account.name %></li>
           </ul>
         </div>

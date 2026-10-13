@@ -215,6 +215,7 @@ class Ticket
     Order.and(:value.ne => nil, :currency.in => FIAT_CURRENCIES).each do |o|
       m += Money.new(o.value * 100, o.currency)
     rescue StandardError
+      # Leave out orders that can't be converted to GBP (e.g. no exchange rate for their currency)
     end
     rated = EventFeedback.rated
     stats = {

@@ -1,7 +1,7 @@
 // Suggests places as someone types a location. The field stays an ordinary input, so free text still works:
 // jQuery UI shows the menu and the Places API (New) fills it. Google requires its attribution under suggestions
 // shown without a map, which app.css adds to the menu
-function placeAutocomplete (input, options = {}) { // eslint-disable-line no-unused-vars
+function placeAutocomplete (input, options = {}) {
   const $input = $(input)
   if (!$input.length) return
 

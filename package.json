@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "description": "Linting for app/assets/javascripts (ESLint) and app/assets/stylesheets (Stylelint). The app itself loads its JavaScript from a CDN (config/frontend_dependencies.rb)",
+  "scripts": {
+    "lint": "eslint && stylelint \"app/assets/stylesheets/**/*.css\""
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.12.0",
+    "globals": "17.13.0",
+    "stylelint": "17.16.0"
+  }
+}

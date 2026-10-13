@@ -27,6 +27,13 @@ class Message
     ])
   end
 
+  # Changes whenever the thread between viewer and other would render differently: a new or deleted message, or other reading it
+  def self.thread_stamp(viewer, other)
+    messages = between(viewer, other)
+    message_receipt = MessageReceipt.find_by(messenger: viewer, messengee: other)
+    [messages.order('created_at desc').first&.id, messages.count, message_receipt&.received_at&.to_i].join('-')
+  end
+
   def self.read?(messenger, messengee)
     messages = Message.and(messenger: messenger, messengee: messengee).order('created_at desc')
     message = messages.first

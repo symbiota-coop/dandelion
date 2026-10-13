@@ -8,7 +8,7 @@
         <p>A sign in code was sent to <%= @show_email ? @account.email : 'your email address' %>. Please check your email app and paste the code below ✨</p>
 
         <p>
-          (If you don't receive a code within 2 minutes, please email <a href="mailto:<%=ENV['CONTACT_EMAIL']%>"><%=ENV['CONTACT_EMAIL']%></a>.)
+          (If you don't receive a code within 2 minutes, please email <a href="mailto:<%= ENV['CONTACT_EMAIL'] %>"><%= ENV['CONTACT_EMAIL'] %></a>.)
         </p>
 
         <% form_tag '/accounts/sign_in_code', class: 'my-3' do %>

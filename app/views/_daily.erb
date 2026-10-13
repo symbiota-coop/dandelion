@@ -40,7 +40,7 @@
     <div class="article single-column">
       <h3>Facilitator of the day</h3>
       <div>
-        <% account = Account.find(@edition['facilitator_id']) %>
+        <% account = Account.find(@edition['facilitator_id']) if @edition['facilitator_id'] %>
         <% if account %>
           <a class="text-decoration-none" href="javascript:;" data-account-username="<%= account.username %>">
             <img class="w-100 <%= 'private' if account.private? %>" src="<%= u account.image_thumb_or_gravatar_url %>">

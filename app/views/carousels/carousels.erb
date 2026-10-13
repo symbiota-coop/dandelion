@@ -1,7 +1,7 @@
 <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
 
 <div class="my-2">
-  <a class="btn btn-primary" href="/o/<%=@organisation.slug%>/carousels/new?<%=@scope%>"><i class="bi bi-plus-lg"></i> Create a carousel</a>
+  <a class="btn btn-primary" href="/o/<%= @organisation.slug %>/carousels/new?<%= @scope %>"><i class="bi bi-plus-lg"></i> Create a carousel</a>
 </div>
 <table class="table">
   <thead>
@@ -14,17 +14,17 @@
   </thead>
   <tbody class="carousels">
     <% @carousels.each { |carousel| %>
-    <tr id="<%=carousel.id%>" style="opacity: <%= carousel.hidden ? 0.5 : 1 %>">
+    <tr id="<%= carousel.id %>" style="opacity: <%= carousel.hidden ? 0.5 : 1 %>">
       <td>
-        <a href="/o/<%=@organisation.slug%>/carousels/<%= carousel.id %>/edit">
-          <%= carousel.name%>
+        <a href="/o/<%= @organisation.slug %>/carousels/<%= carousel.id %>/edit">
+          <%= carousel.name %>
         </a>
       </td>
       <td>
         <%= pluralize carousel.weeks, 'week' %>
       </td>
       <td>
-        <%= partial :'carousels/tag_labels', locals: {carousel: carousel}%>
+        <%= partial :'carousels/tag_labels', locals: {carousel: carousel} %>
       </td>
       <td>
         <% if carousel.button %>
@@ -44,7 +44,7 @@
 
     $(".carousels").sortable({
       update: function (event, ui) {
-        $.post('/o/<%=@organisation.slug%>/carousels/order', {carousel_ids: $(event.target).sortable("toArray")})
+        $.post(<%== "/o/#{@organisation.slug}/carousels/order".to_json %>, {carousel_ids: $(event.target).sortable("toArray")})
       }
     });
 

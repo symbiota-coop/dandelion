@@ -98,8 +98,10 @@ module Dandelion
       route_path = '/' if route_path.empty?
       name = "#{request.request_method} #{route_path}"
 
-      ext = File.extname(request.path)
-      name = "#{name}#{ext}" if !ext.empty? && !name.end_with?(ext)
+      # The format the route parsed (/events/:id.ics), not the path's extension, which can be part of a param
+      # (/u/nika.shoot is GET /u/:username)
+      ext = ".#{params[:format]}" if params[:format]
+      name = "#{name}#{ext}" if ext && !name.end_with?(ext)
 
       scope = Sentry.get_current_scope
       scope&.set_transaction_name(name, source: :route)
@@ -115,6 +117,9 @@ module Dandelion
     end
 
     not_found do
+      # A route that rendered its own 404 page (/daily's missing dates) keeps it
+      next if @own_not_found_page
+
       content_type 'text/html'
       erb :not_found, layout: :application
     end

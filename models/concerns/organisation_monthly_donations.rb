@@ -177,8 +177,8 @@ module OrganisationMonthlyDonations
     batch_message.subject "Monthly donation ended for #{organisation.name}: #{account.name}"
     batch_message.body_html EmailHelper.html(:finished_monthly_donor, organisationship: organisationship, organisation: organisation)
 
-    admins_receiving_feedback.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
+    admins_receiving_feedback.each do |recipient|
+      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.sign_in_token_for_email, 'id' => recipient.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production

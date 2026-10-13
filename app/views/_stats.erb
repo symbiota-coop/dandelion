@@ -47,7 +47,7 @@ if youngest && oldest %>
             data: {
               labels: <%== data.keys.map { |p| "People in their #{p}s" }.to_json %>,
               datasets: [{
-              data: <%= data.values %>,
+              data: <%== data.values.to_json %>,
               backgroundColor: <%== chart_colors(data.values.length).to_json %>.map(cssColor)
               }],
             },

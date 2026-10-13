@@ -45,6 +45,8 @@ $(function () {
       }
     })
 
+    $('input.flatpickr-mobile').once('mobile-empty').each(markEmptyDateInput)
+
     $('textarea[id=comment_body], textarea.autosize').once('autosize').each(function () {
       autosize(this)
     })
@@ -72,6 +74,12 @@ $(function () {
 
     $('.colorpicker').attr('data-coloris', true)
   })
+
+  // On phones Flatpickr shows a native date input; mark it while empty so app.css can hide Chrome's dd/mm/yyyy mask
+  function markEmptyDateInput () {
+    $(this).toggleClass('flatpickr-mobile-empty', !this.value)
+  }
+  $(document).on('input change', 'input.flatpickr-mobile', markEmptyDateInput)
 
   $(document).on('change', 'select', function () {
     styleSelectElement(this)

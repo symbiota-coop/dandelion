@@ -8,7 +8,6 @@ function redirectToCheckout (config, url) {
   window.location = url
 }
 
-// eslint-disable-next-line no-unused-vars
 function eventPaymentHandlers (config) {
   return {
     rsvp: function (data) {

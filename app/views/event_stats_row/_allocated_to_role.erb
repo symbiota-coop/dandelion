@@ -1,20 +1,20 @@
 <% if role == 'organiser' && event.revenue_sharer %>
   <td></td>
 <% else %>
-  <td data-sort="<%=event_method_in_organisation_currency(event, :"profit_to_#{role}", organisation)%>"<% if [event.send("profit_share_to_#{role}"), event.send("profit_to_#{role}"), event.send("paid_to_#{role}")].any? { |v| v && v != 0 } %> data-nonzero<% end %>>
+  <td data-sort="<%= event_method_in_organisation_currency(event, :"profit_to_#{role}", organisation) %>"<% if [event.send("profit_share_to_#{role}"), event.send("profit_to_#{role}"), event.send("paid_to_#{role}")].any? { |v| v && v != 0 } %> data-nonzero<% end %>>
     <% if event.revenue_sharer %>
-      <%= "#{event.send("profit_share_to_#{role}")}/#{event.revenue_share_to_organisation}" %><br />
+      <%= "#{event.send("profit_share_to_#{role}")}/#{event.revenue_share_to_organisation}" %><br>
     <% else %>
-      <%= "#{event.send("profit_share_to_#{role}")}%" %><br />
+      <%= "#{event.send("profit_share_to_#{role}")}%" %><br>
     <% end %>
     <%= m event.send("profit_to_#{role}"), event.currency %>
-    <br />
-    <br />
+    <br>
+    <br>
     <div>
       <%= m event.send("paid_to_#{role}"), event.currency %> paid
     </div>
     <% remaining = event.send("remaining_to_#{role}") %>
-    <a <% if remaining > 0 %> href="/events/<%=event.id%>/rpayments?create=1&role=<%=role%>&amount=<%=remaining.abs%>&currency=<%=event.currency%>" <% else %> href="/events/<%=event.id%>/rpayments" <% end %> class="<% if remaining > 0 %>badge text-bg-warning<% elsif remaining < 0 %>badge text-bg-danger<% end %>">
+    <a <% if remaining > 0 %> href="/events/<%= event.id %>/rpayments?create=1&role=<%= role %>&amount=<%= remaining.abs %>&currency=<%= event.currency %>" <% else %> href="/events/<%= event.id %>/rpayments" <% end %> class="<% if remaining > 0 %>badge text-bg-warning<% elsif remaining < 0 %>badge text-bg-danger<% end %>">
       <%= m remaining.abs, event.currency %> <%= remaining < 0 ? 'overpaid' : 'remaining' %>
     </a>
   </td>

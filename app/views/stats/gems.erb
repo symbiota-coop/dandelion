@@ -15,13 +15,13 @@
     </thead>
     <tbody>
       <% @gems.each do |gem| %>
-        <tr >
+        <tr>
           <td>
             <a href="https://rubygems.org/gems/<%= gem[:name] %>" target="_blank"><%= gem[:name] %></a>
           </td>
           <td><code><%= gem[:version] %></code></td>
           <%= partial 'stats/version_bump_cells', locals: { cells: gem[:version_bump_cells] } %>
-          <td data-order="<%= gem[:updated_at]&.to_i || 0 %>">
+          <td data-order="<%= gem[:updated_at].to_i %>">
             <% if gem[:updated_at] %>
               <span title="<%= gem[:updated_at].strftime('%Y-%m-%d %H:%M:%S UTC') %>">
                 <%= gem[:updated_at].strftime('%Y-%m-%d') %>

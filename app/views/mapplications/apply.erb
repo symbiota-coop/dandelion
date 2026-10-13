@@ -18,7 +18,7 @@
   <% end %>
   <div class="<%= @gathering.hide_members_on_application_form ? 'col-lg-12' : 'col-lg-8' %> order-lg-0">
     <% if params[:accepted] %>
-      <h2>You've been accepted to <%=@gathering.name%></h2>
+      <h2>You've been accepted to <%= @gathering.name %></h2>
       <p>Check your email app for a sign in link.</p>
     <% elsif params[:applied] or (current_account and @gathering.mapplications.find_by(:status.ne => 'accepted', :account => current_account)) %>
       <h2>Thanks for applying</h2>

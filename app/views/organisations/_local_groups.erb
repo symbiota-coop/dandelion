@@ -3,7 +3,7 @@
     <script>
       $(function () {
         $('#local_groups_form').submit(function () {
-          var url = '/o/<%= @organisation.slug %>/local_groups?' + $.param({q: $('input[name=q]', this).val()})
+          var url = <%== "/o/#{@organisation.slug}/local_groups?".to_json %> + $.param({q: $('input[name=q]', this).val()})
           $(this).closest('[data-pagelet-url]').attr('data-pagelet-url', url)
         })
       })

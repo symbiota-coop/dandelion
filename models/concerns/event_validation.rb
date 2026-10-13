@@ -11,8 +11,8 @@ module EventValidation
     validates_presence_of :name, :currency
     validates_presence_of :start_time, :end_time, :location, unless: :evergreen?
     validates_uniqueness_of :slug, allow_nil: true
-    validates_uniqueness_of :name, scope: [:start_time, :organisation_id], conditions: -> { where(deleted_at: nil) }, message: 'is invalid: an event with this title and start time already exists for this organisation', unless: -> { duplicate || evergreen? }
-    validates_uniqueness_of :name, scope: [:organisation_id], conditions: -> { where(deleted_at: nil, evergreen: true) }, message: 'is invalid: an on-demand course with this title already exists for this organisation', if: -> { evergreen? && !duplicate }
+    validates_uniqueness_of :name, scope: [:start_time, :organisation_id], conditions: -> { self.and(deleted_at: nil) }, message: 'is invalid: an event with this title and start time already exists for this organisation', unless: -> { duplicate || evergreen? }
+    validates_uniqueness_of :name, scope: [:organisation_id], conditions: -> { self.and(deleted_at: nil, evergreen: true) }, message: 'is invalid: an on-demand course with this title already exists for this organisation', if: -> { evergreen? && !duplicate }
     validates_format_of :slug, with: /\A[a-z0-9-]+\z/, if: :slug
     validates_http_url :purchase_url, :facebook_event_url, :redirect_url, :terms_and_conditions_url
     validates_numericality_of :fixed_contribution_gbp, :cap_gbp, greater_than_or_equal_to: 0, allow_nil: true

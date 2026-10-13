@@ -1,5 +1,6 @@
 <%= partial :block, locals: {
-      title: "#{activity.name}#{activity.locked? ? ' <i class="bi bi-lock"></i>' : ''}".html_safe,
+      title: activity.name,
+      icon: ('<i class="bi bi-lock"></i>' if activity.locked?),
       image: activity.image,
       view_url: "/o/#{activity.organisation.slug}/a/#{activity.slug}",
       edit_url: "/activities/#{activity.id}/edit",

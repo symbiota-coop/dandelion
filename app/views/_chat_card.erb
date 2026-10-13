@@ -47,20 +47,20 @@
   <div class="card-body" id="chat-card-body">
     <div id="chat-container">
       <div class="d-none d-lg-block p-2 text-bg-primary rounded-top">
-        <a id="chat-hide" style="<%= 'display:none' if !show_chat %>"        
+        <a id="chat-hide" style="<%= 'display:none' if !show_chat %>"
             class="text-white" href="javascript:;"
             onclick="$('#chat').hide();$(this).hide().next().show();$('#chat-spacer').removeClass('d-lg-block');">
           <span class="float-end"><i class="bi bi-chevron-double-down"></i></span>
           <span class="text-white fw-bold"><%= title %></span>
         </a>
         <a id="chat-show" style="<%= 'display:none' if show_chat %>"
-             class="text-white" href="javascript:;"         
+             class="text-white" href="javascript:;"
              onclick="$('#chat').show();$(this).hide().prev().show();$('#chat-spacer').addClass('d-lg-block');">
           <span class="float-end"><i class="bi bi-chevron-double-up"></i></span>
           <span class="text-white fw-bold"><%= title %></span>
         </a>
       </div>
-      <div id="chat" <% if !show_chat %>style="display:none"<% end %>>
+      <div id="chat" <% if !show_chat %> style="display:none"<% end %>>
         <%= content %>
       </div>
     </div>

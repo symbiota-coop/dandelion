@@ -225,8 +225,13 @@ Dandelion::App.controller do
     @organisation = Organisation.find_by(slug: params[:slug]) || not_found
     organisation_admins_only!
     halt 400 unless params[:csv].is_a?(Tempfile)
-    @organisation.import_from_csv(ImportFromCsv.read(params[:csv]), :organisationships)
-    flash[:notice] = 'The followers will be added shortly. Refresh the page to check progress.'
+    csv = ImportFromCsv.read(params[:csv])
+    if (error = ImportFromCsv.error(csv))
+      flash[:error] = error
+    else
+      @organisation.import_from_csv(csv, :organisationships)
+      flash[:notice] = 'The followers will be added shortly. Refresh the page to check progress.'
+    end
     redirect "/o/#{@organisation.slug}/followers"
   end
 

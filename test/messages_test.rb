@@ -163,6 +163,43 @@ class MessagesTest < ActiveSupport::TestCase
     assert Message.read?(@account, @account1)
   end
 
+  test 'thread polls get an empty 304 until a message or read receipt changes the stamp' do
+    create_messaging_pair
+    sign_in_with_rack(@account)
+    create_message(messenger: @account, messengee: @account1, body: 'First')
+
+    poll = lambda do |stamp = nil|
+      env = { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }
+      env['HTTP_X_PAGELET_STAMP'] = stamp if stamp
+      get "/messages/#{@account1.id}", {}, env
+    end
+
+    poll.call
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'First'
+    stamp = Message.thread_stamp(@account, @account1)
+    assert_includes last_response.body, %(data-pagelet-stamp="#{stamp}")
+
+    poll.call(stamp)
+    assert_equal 304, last_response.status
+    assert_empty last_response.body
+
+    create_message(messenger: @account1, messengee: @account, body: 'Reply')
+    poll.call(stamp)
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'Reply'
+    stamp = Message.thread_stamp(@account, @account1)
+
+    poll.call(stamp)
+    assert_equal 304, last_response.status
+
+    create_message(messenger: @account, messengee: @account1, body: 'Second')
+    stamp = Message.thread_stamp(@account, @account1)
+    MessageReceipt.mark_read!(messenger: @account, messengee: @account1)
+    poll.call(stamp)
+    assert_equal 200, last_response.status
+  end
+
   test 'cannot message yourself and empty bodies are rejected' do
     create_messaging_pair
     sign_in_with_rack(@account)

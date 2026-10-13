@@ -8,7 +8,6 @@
  * @param {string} options.pollUrl - GET JSON with { payment_completed: boolean }
  * @param {function} options.onComplete - called when payment is confirmed
  */
-// eslint-disable-next-line no-unused-vars
 function runEvmPaymentFlow (config, data, options) {
   const expiryMs = parseInt(data.order_expiry || data.payment_expiry, 10)
 
