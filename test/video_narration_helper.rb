@@ -42,7 +42,7 @@ module VideoNarrationHelper
     x, y, width, height = evaluate_script(
       '[window.scrollX, window.scrollY, window.innerWidth, window.innerHeight]'
     )
-    save_screenshot(filename, area: { x: x, y: y, width: width, height: height }) # rubocop:disable Lint/Debugger
+    save_screenshot(filename, area: { x: x, y: y, width: width, height: height })
     "#{Capybara.save_path}/#{filename}"
   end
 
