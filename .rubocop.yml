@@ -1,3 +1,6 @@
+# CI runs RuboCop with --fail-level warning, so only warning-level cops (mostly Lint) fail it; convention cops (Layout, Style, Naming) are reported but don't.
+# .erb_lint.yml inherits this file for the Ruby in templates, but runs only the warning-level cops there, so convention cops set here don't reach templates.
+
 AllCops:
   NewCops: enable 
 Layout/EndAlignment:
