@@ -39,6 +39,29 @@ class TicketTypesTest < ActiveSupport::TestCase
     get "/e/#{@event.slug}?ticket_type_id=#{ticket_type.id}"
     assert_includes last_response.body, 'Secret squirrel'
   end
+
+  test 'nested ticket type and ticket group attributes cannot take over another event\'s tickets or ticket types' do
+    create_event(prices: [0])
+    ticket_type = @event.ticket_types.first
+    ticket_group = @event.ticket_groups.create!(name: 'Group', capacity: 10)
+    other_event = FactoryBot.create(:event, prices: [0])
+    other_ticket_type = other_event.ticket_types.first
+    other_ticket = other_event.tickets.create!(account: FactoryBot.create(:account), ticket_type: other_ticket_type, payment_completed: true)
+
+    sign_in_with_rack(@account)
+    post "/e/#{@event.slug}/edit", event: {
+      ticket_types_attributes: { '0' => { id: ticket_type.id, name: 'Renamed', ticket_group_id: ticket_group.id, ticket_ids: [other_ticket.id] } },
+      ticket_groups_attributes: { '0' => { id: ticket_group.id, name: 'Group', ticket_type_ids: [other_ticket_type.id] } }
+    }
+
+    assert last_response.redirect?
+    ticket_type.reload
+    assert_equal 'Renamed', ticket_type.name
+    assert_equal ticket_group.id, ticket_type.ticket_group_id
+    assert_equal other_ticket_type.id, other_ticket.reload.ticket_type_id
+    assert_nil other_ticket_type.reload.ticket_group_id
+  end
+
   test 'parses fixed price from price_or_range' do
     event = FactoryBot.build(:event)
     ticket_type = TicketType.new(event: event, price_or_range: '25', price_or_range_submitted: true, name: 'Standard', quantity: 10)

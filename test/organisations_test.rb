@@ -274,13 +274,15 @@ class OrganisationsTest < ActiveSupport::TestCase
     params = {
       'name' => 'Org', 'image' => upload, 'remove_image' => '1',
       'retained_image' => Dragonfly::Serializer.json_b64_encode('uid' => uid),
-      'image_uid' => uid, 'image_url' => 'https://example.com/x.png', 'image_name' => 'x.png'
+      'image_uid' => uid, 'image_name' => 'x.png'
     }
 
     assigned = Dandelion::App.new!.mass_assigning(params, Organisation)
 
     assert_equal %w[image name remove_image], assigned.keys.sort
     assert_equal 'victim', Dragonfly.app.fetch(uid).data
+    error = assert_raises(RuntimeError) { Dandelion::App.new!.mass_assigning(params.merge('image_url' => 'https://example.com/x.png'), Organisation) }
+    assert_match(/are protected/, error.message)
   end
 
   test 'organisation tier edit rejects organisation_id from params' do

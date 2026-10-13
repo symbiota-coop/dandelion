@@ -43,6 +43,10 @@ class Event
     %w[raw_description direct_charges trending last_saved_by last_saved_by_id duplicate image_url carousel_ids atproto_uri fixed_contribution_gbp cap_gbp]
   end
 
+  def self.virtual_attributes
+    super + %w[update_activity_events]
+  end
+
   def self.assignable_foreign_keys
     %w[coordinator_id organiser_id activity_id local_group_id gathering_id revenue_sharer_id]
   end

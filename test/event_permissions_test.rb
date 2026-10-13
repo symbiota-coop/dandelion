@@ -592,6 +592,19 @@ class EventPermissionsTest < ActiveSupport::TestCase
     assert_includes Event.protected_attributes, 'atproto_uri'
   end
 
+  test 'mass_assigning keeps only form attributes, not setters Mongoid and Dragonfly generate' do
+    params = {
+      'name' => 'Event', 'tag_names' => 'a,b', 'update_tag_names' => 'true', 'update_activity_events' => '1',
+      'activity_id' => 'x', 'image' => 'file', 'remove_image' => '1',
+      'organisation_id' => 'x', 'ticket_type_ids' => ['x'], 'tickets' => ['x'], 'deleted_at' => 'x', 'created_at' => 'x',
+      'image_uid' => 'x', 'retained_image' => 'x', 'image_width_unmagic' => 'x', 'prevent_order_refunds' => '1'
+    }
+
+    assigned = Dandelion::App.new!.mass_assigning(params, Event)
+
+    assert_equal %w[activity_id image name remove_image tag_names update_activity_events update_tag_names], assigned.keys.sort
+  end
+
   test 'atproto client is only returned for calendar event records' do
     create_event
     @organisation.set(atproto_handle: 'org.bsky.social', atproto_app_password: 'password', atproto_did: 'did:plc:org')

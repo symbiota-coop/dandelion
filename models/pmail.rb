@@ -34,6 +34,10 @@ class Pmail
     %w[organisation_id account_id sent_at requested_send_at message_ids gift editor token] + recipient_fields
   end
 
+  def self.virtual_attributes
+    %w[file to_option]
+  end
+
   def self.recipient_fields
     %w[recipient_kind mailable_type mailable_id ticket_group_id ticket_type_id]
   end
