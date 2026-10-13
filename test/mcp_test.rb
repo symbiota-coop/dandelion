@@ -232,4 +232,57 @@ class McpTest < ActiveSupport::TestCase
     assert_equal '', tickets.first['email']
     assert_equal attendee.name, tickets.first['name']
   end
+
+  test 'get_event_tool includes public ticket types' do
+    create_event(prices: [10, '5-20', ''])
+    @event.ticket_types.create!(name: 'Secret', price: 1, quantity: 5, hidden: true)
+
+    rpc = mcp_tool_call('get_event_tool', arguments: { slug: @event.slug })
+    payload = JSON.parse(tool_text(rpc))
+
+    refute rpc.dig('result', 'isError')
+    assert_equal 'GBP', payload['currency']
+    ticket_types = payload['ticket_types'].index_by { |ticket_type| ticket_type['pricing'] }
+    assert_equal %w[fixed pay_what_you_want range], ticket_types.keys.sort
+    assert_equal 10.0, ticket_types['fixed']['price']
+    assert_equal 100, ticket_types['fixed']['available']
+    assert_equal [5.0, 20.0], ticket_types['range'].values_at('price_min', 'price_max')
+    assert(payload['ticket_types'].none? { |ticket_type| ticket_type['name'] == 'Secret' })
+  end
+
+  test 'get_event_checkout_requirements_tool describes the checkout form' do
+    create_event(prices: [0], ask_hear_about: true, opt_in_organisation: true,
+                 questions: "# About you\nDietary requirements\nT-shirt size <S, M, L>*\n[I agree to the code of conduct]*")
+    @organisation.update_attributes!(collect_phone: true)
+
+    rpc = mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })
+    payload = JSON.parse(tool_text(rpc))
+
+    refute rpc.dig('result', 'isError')
+    assert payload['purchasable']
+    assert_empty payload['restrictions']
+    assert_equal @event.ticket_types.first.id.to_s, payload['ticket_types'].first['id']
+    assert_equal %w[name email phone hear_about], payload['buyer_fields'].pluck('name')
+    assert_equal %w[heading text select checkbox], payload['questions'].pluck('type')
+    assert_equal [0, 1, 2, 3], payload['questions'].pluck('index')
+    assert_equal %w[S M L], payload['questions'][2]['options']
+    assert payload['questions'][3]['required']
+    refute payload['questions'][1]['required']
+    assert_equal ['opt_in_organisation'], payload['opt_ins'].pluck('name')
+    assert_includes payload['payment_methods'].pluck('name'), 'rsvp'
+  end
+
+  test 'get_event_checkout_requirements_tool reports restrictions and hides secret events' do
+    create_event(prices: [10], monthly_donors_only: true)
+    restricted = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))
+
+    refute restricted['purchasable']
+    assert_equal ['monthly_donors_only'], restricted['restrictions']
+
+    create_event(prices: [10], secret: true, as: :secret_event)
+    rpc = mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @secret_event.slug })
+
+    assert rpc.dig('result', 'isError')
+    assert_includes tool_text(rpc), 'Event not found'
+  end
 end

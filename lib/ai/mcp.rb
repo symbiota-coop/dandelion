@@ -4,7 +4,7 @@ module Dandelion
       'Event' => {
         finder_field: :slug,
         search_fields: ->(e) { { id: e.id.to_s, name: e.name, slug: e.slug, url: "#{ENV['BASE_URI']}/e/#{e.slug}", start_time: e.start_time, end_time: e.end_time, location: e.location } },
-        get_fields: lambda(&:public_data),
+        get_fields: ->(e) { e.public_data.merge(currency: e.currency, ticket_types: e.public_ticket_types) },
         search_description: 'Search recent and upcoming Dandelion events.'
       },
       'Account' => {
@@ -63,6 +63,15 @@ module Dandelion
       Date.parse(date)
     rescue Date::Error
       nil
+    end
+
+    def self.perform_get_event_checkout_requirements(slug: nil, id: nil)
+      return tool_error('Provide event slug or id') if slug.blank? && id.blank?
+
+      event = Event.search_scope.find_by_slug_or_id(slug: slug, id: id)
+      return tool_error('Event not found') unless event
+
+      tool_json(event.checkout_requirements)
     end
 
     def self.perform_get_trending_events(limit: nil)
@@ -261,6 +270,20 @@ module Dandelion
 
           define_singleton_method(:call) do |slug: nil, id: nil, from: nil, to: nil, limit: nil, _server_context: {}|
             Dandelion::MCP.perform_get_upcoming_organisation_events(slug: slug, id: id, from: from, to: to, limit: limit)
+          end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'get_event_checkout_requirements_tool'
+          title 'Get Event Checkout Requirements'
+          description 'Get what booking a Dandelion event involves, by slug or ID: whether it can be booked, its ticket types with prices and availability, the buyer details and questions the checkout form asks for, opt-ins, terms and the payment methods on offer. Booking itself happens on the event page.'
+          input_schema(properties: {
+                         slug: { type: 'string', description: 'Event slug' },
+                         id: { type: 'string', description: 'Event ID' }
+                       })
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |slug: nil, id: nil, _server_context: {}|
+            Dandelion::MCP.perform_get_event_checkout_requirements(slug: slug, id: id)
           end
         end,
         Class.new(::MCP::Tool) do

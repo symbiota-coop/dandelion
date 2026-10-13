@@ -47,4 +47,70 @@ module EventSerialization
       description: description
     }
   end
+
+  # Ticket types anyone can buy (hidden ones need their secret link), as listed on the event page
+  def public_ticket_types
+    ticket_types.and(hidden: false).order('order asc, price desc').map do |ticket_type|
+      {
+        id: ticket_type.id.to_s,
+        name: ticket_type.name,
+        description: ticket_type.public_description,
+        pricing: if ticket_type.range
+                   'range'
+                 elsif ticket_type.price
+                   'fixed'
+                 else
+                   'pay_what_you_want'
+                 end,
+        price: ticket_type.price,
+        price_min: ticket_type.range_min,
+        price_max: ticket_type.range_max,
+        currency: currency,
+        available: [ticket_type.number_of_tickets_available_in_single_purchase, 0].max,
+        sold_out: ticket_type.sold_out?,
+        sales_end: ticket_type.sales_end,
+        ticket_group: ticket_type.ticket_group&.name,
+        minimum_monthly_donation: ticket_type.minimum_monthly_donation
+      }
+    end
+  end
+
+  # What the checkout form on the event page asks for, so an agent can prepare a booking
+  def checkout_requirements
+    restrictions = []
+    restrictions << 'sales_closed' if sales_closed_due_to_event_end?
+    restrictions << 'monthly_donors_only' if monthly_donors_only
+    restrictions << 'members_only' if activity && activity.privacy != 'open'
+
+    buyer_fields = [
+      { name: 'name', required: true },
+      { name: 'email', required: true }
+    ]
+    buyer_fields << { name: 'phone', required: false, format: 'international, starting with +' } if organisation&.collect_phone?
+    buyer_fields += [{ name: 'postcode', required: false }, { name: 'country', required: false }] if organisation&.collect_location
+    buyer_fields << { name: 'hear_about', required: false } if ask_hear_about
+
+    opt_ins = []
+    opt_ins << { name: 'opt_in_organisation', label: "Get email updates from #{organisation_and_cohosts.map(&:name).to_sentence}" } if opt_in_organisation
+    opt_ins << { name: 'opt_in_facilitator', label: "Get email updates from #{event_facilitators.map(&:firstname).to_sentence}" } if opt_in_facilitator && event_facilitators.exists?
+
+    {
+      event: { id: id.to_s, slug: slug, name: name, url: "#{ENV['BASE_URI']}/e/#{slug}", start_time: start_time, end_time: end_time, time_zone: time_zone },
+      purchasable: restrictions.empty? && !sold_out?,
+      restrictions: restrictions,
+      currency: currency,
+      ticket_types: public_ticket_types,
+      buyer_fields: buyer_fields,
+      questions: Questions.parse(questions),
+      opt_ins: opt_ins,
+      terms: {
+        text: terms_and_conditions_for_purchase,
+        url: terms_and_conditions_url_for_purchase,
+        must_accept: terms_and_conditions_check_box_for_purchase && (terms_and_conditions_for_purchase || terms_and_conditions_url_for_purchase).present?,
+        platform_terms_url: "#{ENV['BASE_URI']}/terms",
+        organiser: responsible_name
+      },
+      payment_methods: EventPaymentMethod.all.select { |pm| pm.process && pm.available?(self) }.map { |pm| { name: pm.name, label: pm.button_label(self) } }
+    }
+  end
 end

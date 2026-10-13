@@ -23,7 +23,8 @@ AI assistants can use Dandelion's MCP server to search and look up public record
 Public tools, which work without authentication:
 
 - Search events (recent and upcoming), organisations, gatherings and accounts
-- Look up events, organisations, gatherings and accounts, by slug/username or ID
+- Look up events, organisations, gatherings and accounts, by slug/username or ID. An event comes with its currency and public ticket types: price (fixed, a range, or pay what you want), tickets available, whether it's sold out and when sales end
+- Get what booking an event involves (`get_event_checkout_requirements_tool`, by event `slug` or `id`): whether it can be booked and why not (sales closed, monthly donors only, members only), its ticket types, the buyer details and questions the checkout form asks for, opt-ins, terms and the payment methods on offer. Booking itself happens on the event page
 - Get trending events
 - Get upcoming events for an organisation
 
