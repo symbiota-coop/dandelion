@@ -36,6 +36,7 @@ Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Rub
 - `Dandelion/Presence`: Don't use `.presence`, on `params` or anywhere else
 - `Dandelion/ErrorReporting`: Report rescued errors with `ErrorReporting.capture_exception(e, context:, tags:)`, not `Sentry.capture_exception`
 - `Dandelion/RailsController`: Controllers are `Dandelion::App.controller` blocks (Padrino), not Rails controllers: `before do`, not `before_action`; `erb`, `partial` or `cp`, not `render`; `redirect`, not `redirect_to`; `provides:` and `content_type`, not `respond_to`; and no strong parameters: pass `params[:x]` through `mass_assigning(params[:x], Model)`. It checks `app/controllers`
+- `Dandelion/CapybaraHasNoAfterClick`: Straight after a click, assert something on the new page before checking something isn't there (`has_no_*`, `assert_no_*`), or that check can pass on the old page. A click whose confirm is dismissed (`dismiss_confirm`) doesn't leave the page. It checks `test`
 - `Dandelion/CapybaraRefuteHas`: To check something isn't on the page, use `assert page.has_no_css?` (`has_no_content?`, `has_no_link?`, `has_no_title?`...), never `refute page.has_css?`: the `has_` form waits the full 10 s `default_max_wait_time` for it to appear before passing
 
 ### erb_lint
@@ -123,7 +124,7 @@ Always ask permission before running tests. Your default posture should be to su
 
 `@` instance variables come from helpers (`create_organisation`, `create_event`, `create_gathering`, `create_full_event_hierarchy`, and file-local setup methods). Anything created inline in a test is a local. Use `create_event(as: :event1)` when a test needs more than one event.
 
-Straight after a click or submit, assert something on the new page before checking something isn't there (see `Dandelion/CapybaraRefuteHas` in Custom checks), or that check can pass on the old page.
+Straight after a click or submit, assert something on the new page before checking something isn't there, or that check can pass on the old page (`Dandelion/CapybaraHasNoAfterClick`; and check with `assert page.has_no_*`, as `Dandelion/CapybaraRefuteHas` says).
 
 ## Conventions
 

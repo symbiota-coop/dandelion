@@ -34,23 +34,31 @@ class LintTest < Minitest::Test
   def cop_examples(cop)
     path = File.join(ROOT, '.rubocop/dandelion', "#{cop.cop_name.delete_prefix('Dandelion/').gsub(/(?<!^)([A-Z])/, '_\1').downcase}.rb")
     comment = File.read(path)[/# @example\n((?:\s*#.*\n)+?)\s*class /, 1]
-    lines = comment.lines.map { |line| line.sub(/\A\s*#\s?/, '').delete_prefix('  ') }
+    lines = comment.lines.map { |line| line.sub(/\A\s*# ?/, '').delete_prefix('  ') }
     sections = lines.slice_before { |line| line.match?(/\A# (bad|good)$/) }.to_h { |section| [section.first[/bad|good/], section.drop(1).join] }
     [sections.fetch('bad'), sections.fetch('good')]
   end
 
-  # Each top-level statement in some Ruby
-  def statements(code)
-    ast = RuboCop::ProcessedSource.new(code, RUBOCOP_CONFIG.target_ruby_version).ast
-    ast.begin_type? ? ast.children : [ast]
+  # The cases in a cop's bad example: each top-level statement, or, where blank lines split it into paragraphs (for a cop
+  # about a sequence of statements), each paragraph. Each as its [first line, last line]
+  def bad_cases(code)
+    if code.strip.include?("\n\n")
+      code.lines.each_with_index.chunk_while { |(line, _), _| line.strip != '' }.filter_map do |chunk|
+        lines = chunk.reject { |line, _| line.strip.empty? }.map { |_, index| index + 1 }
+        [lines.first, lines.last] if lines.any?
+      end
+    else
+      ast = RuboCop::ProcessedSource.new(code, RUBOCOP_CONFIG.target_ruby_version).ast
+      (ast.begin_type? ? ast.children : [ast]).map { |statement| [statement.first_line, statement.last_line] }
+    end
   end
 
   def test_each_cop_flags_each_bad_example_and_no_good_one
     DANDELION_COPS.each do |cop|
       bad, good = cop_examples(cop)
       flagged = cop_offenses(cop, bad).map(&:line).uniq
-      statements(bad).each do |statement|
-        assert flagged.any? { |line| statement.source_range.line_span.include?(line) }, "#{cop.cop_name} misses its bad example: #{statement.source}"
+      bad_cases(bad).each do |first, last|
+        assert flagged.any? { |line| (first..last).cover?(line) }, "#{cop.cop_name} misses its bad example: #{bad.lines[(first - 1)..(last - 1)].join.strip}"
       end
       assert_empty cop_offenses(cop, good).map(&:message), "#{cop.cop_name} flags its good example"
     end
@@ -67,6 +75,11 @@ class LintTest < Minitest::Test
       'Dandelion/MongoidOr' => { 'x.or(a: 1)' => 1, 'a or b' => 0 },
       'Dandelion/ErrorReporting' => { 'Sentry.capture_message("x")' => 1, '::Sentry.capture_exception(e)' => 1, 'ErrorReporting.capture_exception(e)' => 0 },
       'Dandelion/ValidateBlock' => { 'validate :name_is_short' => 0, 'validate { errors.add(:name, "x") }' => 1 },
+      'Dandelion/CapybaraHasNoAfterClick' => {
+        "click_link 'x'\nassert has_no_link?('x')" => 1, "find('.x').click\nassert_no_selector('.y')" => 1,
+        "accept_confirm { click_button 'x' }\nassert page.has_no_css?('.y')" => 1, "click_button 'x'\nvisit '/'\nassert page.has_no_css?('.y')" => 0,
+        "dismiss_prompt { click_on 'x' }\nassert page.has_no_css?('.y')" => 0, "fill_in 'x', with: 'y'\nassert page.has_no_css?('.y')" => 0
+      },
       'Dandelion/RailsController' => {
         'params[:event].permit(:name)' => 1, 'skip_before_action :x' => 1, 'pdf.render' => 0, 'EmailHelper.render(:x)' => 0,
         'require "x"' => 0, 'x.respond_to?(:y)' => 0, 'event.permit(:x)' => 0
