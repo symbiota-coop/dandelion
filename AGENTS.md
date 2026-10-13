@@ -65,9 +65,10 @@ Our rules are in `stylelint.config.mjs`. Disable one with `/* stylelint-disable 
 
 ### Other checks
 
-Rules no linter covers, checked by `test/lint_test.rb` (which CI's lint job runs). Each names its test.
+Rules no linter covers, checked by `test/lint_test.rb` (which CI's lint job runs) or `script/lint` (which the pre-commit hook runs). Each names its check.
 
 - `test_mcp_copies_match_mcp_json`: `.cursor/mcp.json`, `.opencode/opencode.json` and `.codex/config.toml` are copies of `.mcp.json`: only edit `.mcp.json`, then run `rake mcp:sync` (Cloud agents)
+- `script/lint`: `bootstrap5.css` and `ext/ckeditor.js` are built (Build/vendored code), so a commit that changes one without its source (`bootstrap5.scss`, `ckeditor/`, or their rake task) fails
 
 ## Committing
 

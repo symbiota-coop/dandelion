@@ -254,6 +254,20 @@ class LintTest < Minitest::Test
     assert_match(/Passed: RuboCop, erb_lint, ESLint, Stylelint/, output)
   end
 
+  def test_script_lint_fails_on_a_built_file_without_its_source
+    output, status = lint('app/assets/stylesheets/bootstrap5.css')
+    refute status.success?, output
+    assert_match(/bootstrap5.css is built from bootstrap5.scss/, output)
+    output, status = lint('app/assets/javascripts/ext/ckeditor.js')
+    refute status.success?, output
+    assert_match(/ckeditor.js is built from ckeditor/, output)
+
+    [%w[app/assets/stylesheets/bootstrap5.css app/assets/stylesheets/bootstrap5.scss], %w[app/assets/javascripts/ext/ckeditor.js ckeditor/yarn.lock]].each do |files|
+      output, status = lint(*files)
+      assert status.success?, output
+    end
+  end
+
   def test_script_lint_fails_on_an_offense
     Dir.mktmpdir do |dir|
       bad = File.join(dir, 'bad.rb')

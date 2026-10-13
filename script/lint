@@ -7,7 +7,8 @@
 #   script/lint --all       everything, as CI does
 #
 # Add --only <linter> (rubocop, erb_lint, eslint or stylelint) to run just one, as CI's separate steps do.
-# A changed linter config (or one of our own cops or linters) runs that linter on everything, as CI would.
+# A changed linter config (or one of our own cops or linters) runs that linter on everything, as CI would. A built file
+# (bootstrap5.css, ckeditor.js) given without its source fails, as it was edited by hand.
 # Exits non-zero if any linter fails.
 require 'open3'
 
@@ -54,6 +55,18 @@ LINTERS = [
   }
 ].freeze
 
+# Built files, which change only with their source (AGENTS.md, Build/vendored code), so one changed alone was edited by hand
+GENERATED = {
+  'app/assets/stylesheets/bootstrap5.css' => {
+    sources: %r{\A(app/assets/stylesheets/bootstrap5\.scss|tasks/bootstrap\.rake)\z},
+    message: 'is built from bootstrap5.scss: change that and run rake bootstrap:build'
+  },
+  'app/assets/javascripts/ext/ckeditor.js' => {
+    sources: %r{\A(ckeditor/|tasks/ckeditor\.rake\z)},
+    message: 'is built from ckeditor/: change ckeditor/src/ckeditor.js and run rake ckeditor:build'
+  }
+}.freeze
+
 USAGE = "Usage: script/lint [--only #{LINTERS.map { |linter| linter[:name].downcase }.join('|')}] FILE... | --staged | --all".freeze
 
 if (at = ARGV.index('--only'))
@@ -71,6 +84,9 @@ files =
   end
 
 # Each job is a command, its env and what to pipe to it
+hand_edited = GENERATED.select { |file, built| files.include?(file) && files.none? { |f| f.match?(built[:sources]) } }
+hand_edited.each { |file, built| $stderr.puts "#{file} #{built[:message]}, rather than editing it" }
+
 jobs = LINTERS.flat_map do |linter|
   next [] if only && linter[:name].downcase != only.downcase
 
@@ -97,6 +113,7 @@ jobs = LINTERS.flat_map do |linter|
 end
 
 failed = jobs.select { |job| job[:missing] }.map { |job| job[:name] }
+failed << 'Generated files' if hand_edited.any?
 runnable = jobs.reject { |job| job[:missing] }
 queue = Queue.new
 runnable.each_with_index { |job, index| queue << [job, index] }
