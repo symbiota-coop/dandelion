@@ -1556,6 +1556,11 @@ input.flatpickr-mobile {
   box-sizing: border-box;
 }
 
+/* Hide Chrome's dd/mm/yyyy, --:-- mask while a native date input is empty (forms.js adds the class) */
+input.flatpickr-mobile-empty:not(:focus)::-webkit-datetime-edit {
+  color: transparent;
+}
+
 /* In an input group, share the row with the addon rather than taking its full width */
 .input-group > input[type="date"].form-control,
 .input-group > input[type="datetime-local"].form-control,
