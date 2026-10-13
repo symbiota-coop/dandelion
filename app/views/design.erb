@@ -1489,6 +1489,15 @@
     <% design_subsection 'Empty states' do %>
       <div class="border rounded p-4"><p class="mb-0 text-body-secondary">No upcoming events</p></div>
       <div class="spec">A short "No …" phrase in --bs-secondary-color, left-aligned and without a full stop, where the list or table would be: grey, since it is the absence of content rather than content</div>
+      <div class="border rounded mt-4">
+        <div class="empty-notice">
+          <div class="empty-notice-icon"><i class="bi bi-printer"></i></div>
+          <h2 class="empty-notice-title">Still at the printers</h2>
+          <p class="text-body-secondary">This edition of the Daily isn't out yet. Check back soon!</p>
+          <a class="btn btn-outline-primary" href="#components">Read the latest Daily</a>
+        </div>
+      </div>
+      <div class="spec">.empty-notice, for a page whose whole content is missing (daily.erb's dates with no edition), not a list inside one: centred, up to 28rem wide, --space-2xl above and below · .empty-notice-icon, a 5rem circle with a --hairline border and --bs-box-shadow-sm like the principles, holding a --font-size-3xl icon · .empty-notice-title at --font-size-2xl · a line of text in --bs-secondary-color, in sentences, so with full stops · an optional btn-outline-primary to somewhere with content</div>
     <% end %>
 
     <% design_subsection 'Principles', 'No platform fees, the co-op and open data, on the signed-out home and /donate (_badges.erb). Each is a 7rem white circle with a --hairline border and --bs-box-shadow-sm, like the date and icon tiles, holding its black line drawing (gift-cycle.png, the gift and arrows from gift.png without the hand; coop.png; opendata.png), then its line of text. Laid out by its own width with container queries: three centred columns from 36rem, otherwise a list with the circle beside the text. <code>columns: true</code> keeps the three columns at any width, the circles shrinking to fit and the text at --font-size-xs, as in the donation modal.' do %>

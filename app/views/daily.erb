@@ -27,11 +27,11 @@
     <%= partial :daily %>
   <% else %>
     <% out_soon = @date >= Date.today %>
-    <div class="daily-notice">
-      <div class="daily-notice-icon">
+    <div class="empty-notice">
+      <div class="empty-notice-icon">
         <i class="bi <%= out_soon ? 'bi-printer' : 'bi-newspaper' %>"></i>
       </div>
-      <h2 class="daily-notice-title"><%= out_soon ? 'Still at the printers' : 'Not available' %></h2>
+      <h2 class="empty-notice-title"><%= out_soon ? 'Still at the printers' : 'Not available' %></h2>
       <p class="text-body-secondary">
         <% if out_soon %>
           This edition of the Daily isn't out yet. Check back soon!

@@ -79,30 +79,3 @@
 .average-rating {
   font-size: var(--font-size-lg);
 }
-
-/* Shown in place of the articles when a date has no edition, or it isn't out yet */
-.daily-notice {
-  max-width: 28rem;
-  margin: 0 auto;
-  padding: var(--space-2xl) 0;
-  text-align: center;
-}
-
-.daily-notice-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 5rem;
-  height: 5rem;
-  margin-bottom: var(--space-base);
-  border: 1px solid var(--hairline);
-  border-radius: 50%;
-  background: var(--bs-body-bg);
-  box-shadow: var(--bs-box-shadow-sm);
-  font-size: var(--font-size-3xl);
-}
-
-.daily-notice-title {
-  font-size: var(--font-size-2xl);
-  margin-bottom: var(--space-xs);
-}

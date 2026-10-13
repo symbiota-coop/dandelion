@@ -841,6 +841,35 @@ p.action a {
    Badges
    ========================================================================== */
 
+/* A page's whole content when it has none (the Daily's dates with no edition): centred, an icon in a 5rem
+   circle like the principles' (--hairline border, --bs-box-shadow-sm), a title, a line of text and an optional button.
+   An empty list or table inside a page takes the plain grey phrase instead */
+.empty-notice {
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: var(--space-2xl) 0;
+  text-align: center;
+}
+
+.empty-notice-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 5rem;
+  margin-bottom: var(--space-base);
+  border: 1px solid var(--hairline);
+  border-radius: 50%;
+  background: var(--bs-body-bg);
+  box-shadow: var(--bs-box-shadow-sm);
+  font-size: var(--font-size-3xl);
+}
+
+.empty-notice-title {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-xs);
+}
+
 /* Bootstrap's badge, coloured with its text-bg-* classes, for counts, statuses, tags and amounts alike.
    Sized in em and shaped as a pill (bootstrap5.scss), so a badge scales with the text around it */
 
