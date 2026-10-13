@@ -1,6 +1,8 @@
 # The Dandelion Daily (/daily): each date's AI-written articles and facilitator of the day, worked out once and kept
 # in a Stash. Only late:errands makes them, with Daily.publish(Date.today); /daily just shows what's been kept
 module Daily
+  class GenerationFailed < StandardError; end
+
   ARTICLES = [
     {
       title: "Today's events",
@@ -74,8 +76,13 @@ module Daily
     return if Stash.and(key: key(date)).exists?
 
     edition = generate(date)
-    # Don't keep an edition missing a summary the model failed to write
-    return if edition['articles'].any? { |article| article['summary'].nil? }
+    # Don't keep an edition missing a summary the model failed to write. Errors raised in late:errands reach Sentry
+    # anyway, but OpenRouter.chat returns nil when the model doesn't answer, so say so
+    if (failed = edition['articles'].select { |article| article['summary'].nil? }).any?
+      titles = failed.map { |article| article['title'] }.join(', ')
+      ErrorReporting.capture_exception(GenerationFailed.new("No Daily for #{date}: no summary for #{titles}"))
+      return
+    end
 
     begin
       Stash.create(key: key(date), value: edition.to_json)
