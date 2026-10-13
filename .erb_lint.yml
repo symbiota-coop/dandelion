@@ -27,16 +27,18 @@ linters:
     rubocop_config:
       inherit_from:
         - .rubocop.yml
-      Layout/InitialIndentation:
+      # Only cops that can fail CI (warning or above): erb_lint prints the offenses --fail-level ignores, so convention cops would fill the output
+      Layout:
         Enabled: false
-      Layout/TrailingEmptyLines:
+      Style:
         Enabled: false
-      Layout/TrailingWhitespace:
+      Naming:
         Enabled: false
-      Naming/FileName:
-        Enabled: false
-      Style/Semicolon:
+      Layout/BeginEndAlignment:
         Enabled: true
-        AllowAsExpressionSeparator: true
+      Layout/DefEndAlignment:
+        Enabled: true
+      Layout/EndAlignment:
+        Enabled: true
       Lint/UselessAssignment:
         Enabled: false
