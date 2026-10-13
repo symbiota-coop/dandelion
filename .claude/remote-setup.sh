@@ -6,7 +6,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-if ! command -v mongod >/dev/null || [ -z "$(bash script/agent-env/browser-path.sh)" ]; then
+if ! command -v mongod >/dev/null || [ -z "$(bash script/agent-env/browser-path.sh)" ] || ! command -v node >/dev/null; then
   bash script/agent-env/system-deps.sh
 fi
 BROWSER_PATH="$(bash script/agent-env/browser-path.sh)"

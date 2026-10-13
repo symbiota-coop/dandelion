@@ -32,10 +32,8 @@ else
   done
 fi
 
-# ESLint and Stylelint (package.json)
-if command -v npm >/dev/null; then
-  npm ci --no-audit --no-fund
-fi
+# ESLint and Stylelint. Node comes from system-deps.sh; a missing npm should fail this, not skip the linters.
+npm ci --no-audit --no-fund
 
 # The pre-commit hook, which lints staged files with script/lint
 git config core.hooksPath .githooks
