@@ -37,7 +37,7 @@ Our linter, `DesignClasses`, is in `.erb_linters/design_classes.rb`. Disable it 
 
 Our rules are in `eslint.config.mjs`. Disable one with `// eslint-disable-next-line <rule> -- reason`.
 
-- `no-restricted-syntax`: The two `DesignClasses` rules above (showing and hiding; `-success`, `badge-*` and `.label`), in `app/assets/javascripts`
+- `no-restricted-syntax`: The two `DesignClasses` rules above (showing and hiding; `-success`, `badge-*` and `.label`), in the strings and template literals of `app/assets/javascripts`
 
 ### Stylelint
 

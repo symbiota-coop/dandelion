@@ -5,6 +5,12 @@ import globals from 'globals'
 // (config/frontend_dependencies.rb and layouts/_dependencies.erb), and some files define functions others call
 const libraries = ['autosize', 'bootstrap', 'ClassicEditor', 'Coloris', 'DataTable', 'google', 'iframely', 'markerClusterer', 'Tribute']
 const shared = ['cssColor', 'destroyLinkFor', 'drawSpanTreeGuides', 'fixedHeaderHeight', 'hideTooltips', 'onContentLoaded', 'placeAutocomplete', 'scrollspy']
+// Selects string literals and the static parts of template literals whose text matches a regex (esquery's /.../ syntax),
+// anywhere or as arguments of the calls a parent selector matches
+const strings = (regex, parent) => {
+  const [literal, template] = [`Literal[value=${regex}]`, `TemplateLiteral > TemplateElement[value.cooked=${regex}]`]
+  return parent ? `${parent} > ${literal}, ${parent} > ${template}` : `${literal}, ${template}`
+}
 
 export default [
   {
@@ -31,16 +37,27 @@ export default [
       // Rules from the Design section of AGENTS.md (templates get the same checks from .erb_linters/design_classes.rb)
       'no-restricted-syntax': ['error',
         {
-          selector: "CallExpression[callee.property.name=/^(addClass|removeClass|toggleClass)$/] > Literal[value=/(^|\\s)d-none(\\s|$)/], CallExpression[callee.object.property.name='classList'] > Literal[value='d-none']",
+          selector: [
+            strings('/(^|\\s)d-none(\\s|$)/', 'CallExpression[callee.property.name=/^(addClass|removeClass|toggleClass)$/]'),
+            strings('/^d-none$/', "CallExpression[callee.object.property.name='classList']")
+          ].join(', '),
           message: 'To show and hide elements, start them hidden with style="display: none" and use .show() / .hide() / .toggle(), not d-none (Bootstrap\'s d-* classes are !important).'
         },
         {
-          selector: 'Literal[value=/(^|[^\\w-])[a-z][a-z-]*-success([^\\w-]|$)/]',
+          selector: strings('/(^|[^\\w-])[a-z][a-z-]*-success([^\\w-]|$)/'),
           message: 'Success is the theme colour, so use -primary, not -success.'
         },
         {
-          selector: 'Literal[value=/(^|[^\\w-])badge-(primary|secondary|success|danger|warning|info|light|dark)([^\\w-]|$)/]',
+          selector: strings('/(^|[^\\w-])badge-(primary|secondary|success|danger|warning|info|light|dark)([^\\w-]|$)/'),
           message: 'Badges are badge text-bg-*; there is no badge-* colour class.'
+        },
+        {
+          // In a class attribute, or added as a class
+          selector: [
+            strings('/class=["\'][^"\']*(?<![\\w-])label(?![\\w-])/'),
+            strings('/(^|\\s)label(\\s|$)/', 'CallExpression[callee.property.name=/^(addClass|toggleClass)$/]')
+          ].join(', '),
+          message: 'There is no .label class; use badge text-bg-*.'
         }
       ]
     }
