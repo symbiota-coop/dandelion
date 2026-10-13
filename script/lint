@@ -55,8 +55,8 @@ LINTERS = [
 
 USAGE = "Usage: script/lint [--only #{LINTERS.map { |linter| linter[:name].downcase }.join('|')}] FILE... | --staged | --all".freeze
 
-if (i = ARGV.index('--only'))
-  only = ARGV.slice!(i, 2).last
+if (at = ARGV.index('--only'))
+  only = ARGV.slice!(at, 2).last
   abort USAGE unless LINTERS.any? { |linter| linter[:name].downcase == only&.downcase }
 end
 mode = ARGV.first&.start_with?('--') ? ARGV.shift : nil
@@ -98,14 +98,15 @@ end
 failed = jobs.select { |job| job[:missing] }.map { |job| job[:name] }
 runnable = jobs.reject { |job| job[:missing] }
 queue = Queue.new
-runnable.each_with_index { |job, i| queue << [job, i] }
+runnable.each_with_index { |job, index| queue << [job, index] }
 queue.close
 results = Array.new(4) do
   Thread.new do
     done = []
-    while (job, i = queue.pop)
+    while (item = queue.pop)
+      job, index = item
       output, status = Open3.capture2e(job[:env], *job[:command], stdin_data: job[:stdin] || '')
-      done << [i, job, output, status]
+      done << [index, job, output, status]
     end
     done
   end
