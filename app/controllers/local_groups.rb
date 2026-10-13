@@ -218,8 +218,13 @@ Dandelion::App.controller do
     @local_group = LocalGroup.find(params[:id]) || not_found
     local_group_admins_only!
     halt 400 unless params[:csv].is_a?(Tempfile)
-    @local_group.import_from_csv(ImportFromCsv.read(params[:csv]), :local_groupships)
-    flash[:notice] = 'The followers will be added shortly. Refresh the page to check progress.'
+    csv = ImportFromCsv.read(params[:csv])
+    if (error = ImportFromCsv.error(csv))
+      flash[:error] = error
+    else
+      @local_group.import_from_csv(csv, :local_groupships)
+      flash[:notice] = 'The followers will be added shortly. Refresh the page to check progress.'
+    end
     redirect "/local_groups/#{@local_group.id}/followers"
   end
 

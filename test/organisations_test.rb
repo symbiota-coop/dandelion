@@ -450,4 +450,18 @@ class OrganisationsTest < ActiveSupport::TestCase
     get "/o/#{@organisation.slug}/carousels/featured"
     assert_equal 2, last_response.body.scan('cached card').length
   end
+
+  test 'importing followers from a CSV' do
+    create_organisation
+    utf16 = "\uFEFFName\tEmail\nAlice\t Alice@example.com \n\t\n".encode(Encoding::UTF_16LE).b
+    csv = ImportFromCsv.sanitize(utf16)
+    assert_nil ImportFromCsv.error(csv)
+    @organisation.import_from_csv_without_delay(csv, :organisationships)
+    alice = Account.find_by(email: 'alice@example.com')
+    assert_equal 'Alice', alice.name
+    assert @organisation.organisationships.find_by(account: alice)
+
+    assert_equal 'The CSV needs a column headed email', ImportFromCsv.error("Name,Email Address\nBob,bob@example.com\n")
+    assert_equal "The CSV couldn't be read (there's a problem on line 2)", ImportFromCsv.error("Name,Email\nBob,\"bob\"@example.com\n")
+  end
 end
