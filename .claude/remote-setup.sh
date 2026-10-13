@@ -1,51 +1,18 @@
 #!/usr/bin/env bash
-# Sets up Claude Code on the web sessions, sharing script/agent-env with .cursor/.
+# Sets up Claude Code on the web sessions with script/agent-env, as .cursor/ does.
 # No-op outside the cloud environment.
 set -euo pipefail
 [ "${CLAUDE_CODE_REMOTE:-}" = "true" ] || exit 0
 
 cd "$(dirname "$0")/.."
 
-RUBY_VERSION="$(sed -nE "s/^ruby '([^']+)'.*/\1/p" Gemfile)"
-
-# Prefer the Playwright Chromium preinstalled in the image; Ubuntu's apt chromium is a snap stub
-find_browser() {
-  if [ -x /opt/pw-browsers/chromium ]; then
-    echo /opt/pw-browsers/chromium
-  else
-    command -v chromium || true
-  fi
-}
-
-if ! command -v mongod >/dev/null || [ -z "$(find_browser)" ]; then
+if ! command -v mongod >/dev/null || [ -z "$(bash script/agent-env/browser-path.sh)" ]; then
   bash script/agent-env/system-deps.sh
 fi
-BROWSER_PATH="$(find_browser)"
+BROWSER_PATH="$(bash script/agent-env/browser-path.sh)"
 
-# Prebuilt Ruby from ruby/ruby-builder (as used by ruby/setup-ruby), installed at the prefix it was built for
-RUBY_PREFIX=""
-if [ "$(ruby -e 'print RUBY_VERSION' 2>/dev/null || true)" != "$RUBY_VERSION" ]; then
-  . /etc/os-release
-  case "$(uname -m)" in
-    x86_64) ruby_arch=x64 ;;
-    aarch64|arm64) ruby_arch=arm64 ;;
-    *) echo "Unsupported architecture: $(uname -m)" >&2; exit 1 ;;
-  esac
-  case "${ID}-${VERSION_ID}" in
-    ubuntu-22.04|ubuntu-24.04) ;;
-    *) echo "No prebuilt Ruby for ${ID} ${VERSION_ID}" >&2; exit 1 ;;
-  esac
-  RUBY_PREFIX="/opt/hostedtoolcache/Ruby/${RUBY_VERSION}/${ruby_arch}"
-  if [ ! -x "$RUBY_PREFIX/bin/ruby" ]; then
-    SUDO=""
-    [ "$(id -u)" -ne 0 ] && SUDO="sudo"
-    $SUDO mkdir -p "$(dirname "$RUBY_PREFIX")"
-    curl -fsSL "https://github.com/ruby/ruby-builder/releases/download/ruby-${RUBY_VERSION}/ruby-${RUBY_VERSION}-ubuntu-${VERSION_ID}-${ruby_arch}.tar.gz" \
-      | $SUDO tar -xz -C "$(dirname "$RUBY_PREFIX")"
-    $SUDO chown -R "$(id -u):$(id -g)" "$RUBY_PREFIX"
-  fi
-  export PATH="$RUBY_PREFIX/bin:$PATH"
-fi
+RUBY_PREFIX="$(bash script/agent-env/ruby.sh)"
+[ -z "$RUBY_PREFIX" ] || export PATH="$RUBY_PREFIX/bin:$PATH"
 
 # Chromium ignores the system CA store, so trust the agent proxy's CA in its NSS store, or every CDN request fails
 PROXY_CA=/root/.ccr/agent-proxy-ca.crt
@@ -69,9 +36,4 @@ fi
 
 bash script/agent-env/install.sh
 bash script/agent-env/start-services.sh
-
-# Keep Puma running like Cursor's web terminal, detached so the hook can finish
-if ! (exec 3<>/dev/tcp/127.0.0.1/3000) 2>/dev/null && ! pgrep -f 'foreman: main' >/dev/null; then
-  mkdir -p log
-  setsid nohup foreman start -e .env web >> log/web.log 2>&1 < /dev/null &
-fi
+bash script/agent-env/start-web.sh

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# System packages and MongoDB for cloud agent environments (Cursor, Claude Code).
+# System packages, Chromium and MongoDB for cloud agent environments (Cursor, Claude Code).
 # Run as root or with passwordless sudo.
 set -euo pipefail
 
@@ -15,7 +15,6 @@ $SUDO apt-get install -y --no-install-recommends \
   automake \
   build-essential \
   ca-certificates \
-  chromium \
   curl \
   fonts-liberation \
   git \
@@ -31,10 +30,17 @@ $SUDO apt-get install -y --no-install-recommends \
   sudo \
   tzdata \
   zlib1g-dev
+
+# Ubuntu's chromium package is a snap stub that doesn't run, so there use a Playwright Chromium the image provides
+. /etc/os-release
+if [ "$ID" = "debian" ]; then
+  $SUDO apt-get install -y --no-install-recommends chromium
+elif [ ! -x /opt/pw-browsers/chromium ]; then
+  echo "No Chromium: expected a Playwright Chromium at /opt/pw-browsers/chromium" >&2
+fi
 $SUDO rm -rf /var/lib/apt/lists/*
 
 if ! command -v mongod >/dev/null; then
-  . /etc/os-release
   case "$(uname -m)" in
     x86_64) arch=x86_64 ;;
     aarch64|arm64) arch=aarch64 ;;
