@@ -18,11 +18,12 @@ module PublicToken
     def find_by_id_or_token(id_or_token)
       return unless id_or_token.is_a?(String) && id_or_token.present?
 
-      if (record = find_by(token: id_or_token))
-        record
-      elsif id_or_token.match?(/\A[0-9a-fA-F]{24}\z/) && (record = find(id_or_token)) && record.token.blank? # rubocop:disable Lint/DuplicateBranch
-        record
-      end
+      record = find_by(token: id_or_token)
+      return record if record
+      return unless id_or_token.match?(/\A[0-9a-fA-F]{24}\z/)
+
+      record = find(id_or_token)
+      record if record&.token.blank?
     end
   end
 

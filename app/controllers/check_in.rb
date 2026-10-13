@@ -30,9 +30,7 @@ Dandelion::App.controller do
     ticket = @event.tickets.complete.find_by_id_or_token(params[:ticket_id])
     if !ticket
       403
-    elsif params[:checked_in] && ticket.checked_in
-      409
-    elsif !params[:checked_in] && !ticket.checked_in # rubocop:disable Lint/DuplicateBranch
+    elsif !ticket.checked_in == params[:checked_in].nil? # already checked in, or already not
       409
     else
       if params[:checked_in]
