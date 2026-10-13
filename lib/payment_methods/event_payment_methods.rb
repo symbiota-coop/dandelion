@@ -119,8 +119,8 @@ class EventPaymentMethod
     label.respond_to?(:call) ? label.call(event) : label
   end
 
-  def process_payment(order:, event:, account: nil, details_form: nil, ticket_form: nil)
-    process.call(order: order, event: event, account: account, details_form: details_form, ticket_form: ticket_form)
+  def process_payment(order:, event:, account: nil, cohost: nil, utm: {})
+    process.call(order: order, event: event, account: account, cohost: cohost, utm: utm)
   end
 
   def order_currency_for(event)

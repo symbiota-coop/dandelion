@@ -50,8 +50,4 @@ Dandelion::App.helpers do
     HTML
   end
 
-  def ignore_dandelion_donation?(details_form)
-    @event.donations_to_dandelion? && !EventPaymentMethod.object(details_form[:payment_method].to_s)&.platform_donations
-  end
-
 end
