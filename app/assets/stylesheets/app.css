@@ -3118,10 +3118,9 @@ table.event-details td {
   height: 2.25em;
 }
 
+/* The ticket glyph sits low in its icon, so it's lifted by 1/16 of its size (1px at the base size) */
 .newsfeed-icon .bi-ticket-detailed-fill {
-  position: relative;
-  /* stylelint-disable-next-line declaration-property-unit-disallowed-list -- a hairline nudge, to centre the glyph */
-  top: -1px;
+  translate: 0 -0.0625em;
 }
 
 /* ==========================================================================
