@@ -7,7 +7,7 @@ module ErrorReporting
     Sentry.with_scope do |scope|
       scope.set_context('additional', context) if context.present?
       scope.set_tags(tags) if tags.present?
-      Sentry.capture_exception(exception)
+      Sentry.capture_exception(exception) # rubocop:disable Dandelion/ErrorReporting
     end
   end
 end

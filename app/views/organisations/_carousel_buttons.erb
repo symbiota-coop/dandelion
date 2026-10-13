@@ -81,7 +81,7 @@
       <% end %>
       <% local_group_options = local_groups.order('name asc').map { |local_group| ["#{local_group.name}#{@organisation.near_select_suffix}", "#{local_group.name}#{@organisation.near_select_suffix}"] } %>
       <%= select_tag :near, options: ([
-          ['Location', '', {disabled: true, selected: params[:near].blank?}],
+          ['Location', '', {disabled: true, selected: !params[:near]}],
           ['Anywhere',''],
           ['Online', 'online'],
           ([params[:near], params[:near]] if params[:near] && params[:near] != 'online' &&!local_group_options.map(&:last).include?(params[:near]))

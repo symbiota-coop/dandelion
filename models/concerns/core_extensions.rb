@@ -198,7 +198,7 @@ module CoreExtensions
       opts[:optional]  = true
       opts[:validate]  = false
 
-      belongs_to(name, **opts)
+      belongs_to(name, **opts) # rubocop:disable Dandelion/BelongsTo
 
       return if original_opts[:optional] == true
 

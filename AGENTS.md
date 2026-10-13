@@ -6,6 +6,22 @@ The ORM is Mongoid, not ActiveRecord.
 
 Code map: controllers in `app/controllers`, views in `app/views`, CSS/JS in `app/assets`; models in `models`, with shared model code in `models/concerns`; view helpers in `app/helpers`; other library code in `lib` (form builder, payments, mail, auth); boot and config in `config`; rake tasks in `tasks`; tests in `test`. Background jobs use delayed_job (`handle_asynchronously` or `.delay`), run by the `worker` process in `Procfile`.
 
+## Custom cops
+
+Our own RuboCop cops in `.rubocop/dandelion/` check these rules. They're warnings, so they fail CI in Ruby files and, through erb_lint, in templates. When you add a rule to this file that code can check, add a cop for it here too. Where a rule genuinely doesn't apply, disable the cop on that line with a `# rubocop:disable Dandelion/...` comment.
+
+- `Dandelion/MongoidOr`: Never use Mongoid `.or` — it ORs against whatever is already in the selector (`Event.live.or(featured: true)` means live or featured). Use `self.and('$or' => [...])` so the OR is just another AND-ed filter (`Event.live.and('$or' => [...])` means live and (this or that))
+- `Dandelion/MongoidScope`: Query filters are class methods that return `self.and(...)` so they chain (`Event.live.future`). Do not use `scope :live, -> { ... }`
+- `Dandelion/MongoidWhere`: Use `scope.and` rather than `scope.where` (a JavaScript `$where` string, `where('this.paid < this.requested_contribution')`, is the exception, as `.and` can't take one)
+- `Dandelion/BelongsTo`: Use `belongs_to_without_parent_validation`, not Mongoid `belongs_to` (its parent check fails when the parent is only in memory)
+- `Dandelion/HasManyThrough`: Use `has_many_through` for join collections, not `has_many :x, through:` (Mongoid has no `through`)
+- `Dandelion/ValidatesPresence`: Use `validates_presence_of`, not `validates :name, presence: true`
+- `Dandelion/ValidateBlock`: Put field cleanup and `errors.add` in `before_validation`, not `validate do`
+- `Dandelion/ParamsBlank`: `lib/param_helpers.rb` runs `blanks_to_nils!` on `params`, so blank values are already nil: just do `if params[:x]` (or `unless`), with no `.present?` or `.blank?`
+- `Dandelion/Presence`: Don't use `.presence`, on `params` or anywhere else
+- `Dandelion/ErrorReporting`: Report rescued errors with `ErrorReporting.capture_exception(e, context:, tags:)`, not `Sentry.capture_exception`
+- `Dandelion/CapybaraRefuteHas`: To check something isn't on the page, use `assert page.has_no_css?` (`has_no_content?`, `has_no_link?`, `has_no_title?`...), never `refute page.has_css?`: the `has_` form waits the full 10 s `default_max_wait_time` for it to appear before passing
+
 ## Crucial restrictions
 
 - Never attempt to access ENV vars on Render.
@@ -27,13 +43,6 @@ Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Mongo
 
 - We set `Mongoid.raise_not_found_error = false` in `boot.rb` so `Model.find(id)` returns `nil` for invalid ids
 - Nil booleans are converted to false using `after_initialize :convert_nil_booleans_to_false` and `before_validation :convert_nil_booleans_to_false`
-- Use `validates_presence_of`, not `validates :name, presence: true`
-- Put field cleanup and `errors.add` in `before_validation`, not `validate do`
-- Use `belongs_to_without_parent_validation`, not Mongoid `belongs_to` (its parent check fails when the parent is only in memory)
-- Use `has_many_through` for join collections, not `has_many :x, through:` (Mongoid has no `through`)
-- Query filters are class methods that return `self.and(...)` so they chain (`Event.live.future`). Do not use `scope :live, -> { ... }`
-- Never use Mongoid `.or` — it ORs against whatever is already in the selector (`Event.live.or(featured: true)` means live or featured). Use `self.and('$or' => [...])` so the OR is just another AND-ed filter (`Event.live.and('$or' => [...])` means live and (this or that))
-- Use `scope.and` rather than `scope.where`
 - Mongo indexes are created directly in the database, and are not defined in model files
 - `Event.hinted(index_name)` makes MongoDB skip query planning, for queries it can't cache a plan for (e.g. an organisation's events `$or`, ~300 ms to plan: `events_including_cohosted.hinted(Event::HOSTS_INDEX)`). Hint only at call sites that need it, since it overrides more selective indexes. Index existence is checked once per process: dropping a hinted index needs a restart (or the queries fail), renaming one a code change
 - Unique indexes:
@@ -48,7 +57,6 @@ Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Mongo
 - Every request is traced, but `before_send_transaction` (`config/sentry_config.rb`) saves it to the `traces` collection (`Trace`) and returns nil: Sentry gets only errors and logs, never transactions or profiles. For performance data, query `traces` (e.g. with the MongoDB MCP), not Sentry: `name` (route), `duration_ms`, `http_status`, `release`, `started_at`
 - Requests matching no route and `GET /health` aren't saved. Mongo queries become spans via `SentryMongoCommandSubscriber`
 - Spans are zstd-compressed in `spans_zstd`, so Mongo queries can't read them; use `Trace#spans` in Ruby. Atlas Search pipelines and timings are also stored uncompressed in `search_spans`
-- Report rescued errors with `ErrorReporting.capture_exception(e, context:, tags:)`
 
 ## Tests
 
@@ -62,14 +70,13 @@ Always ask permission before running tests. Your default posture should be to su
 
 `@` instance variables come from helpers (`create_organisation`, `create_event`, `create_gathering`, `create_full_event_hierarchy`, and file-local setup methods). Anything created inline in a test is a local. Use `create_event(as: :event1)` when a test needs more than one event.
 
-To check something isn't on the page, use `assert page.has_no_css?` (`has_no_content?`, `has_no_link?`, `has_no_title?`...), never `refute page.has_css?`: the `has_` form waits the full 10 s `default_max_wait_time` for it to appear before passing. Straight after a click or submit, first assert something on the new page, or the check can pass on the old one.
+Straight after a click or submit, assert something on the new page before checking something isn't there (see `Dandelion/CapybaraRefuteHas`), or that check can pass on the old page.
 
 ## Conventions
 
 - Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` — no `before_action`, strong params, or `render`
 - Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
 - `lib/form_builder.rb` defines the `_block` helpers like `text_block`, `wysiwyg_block` etc.
-- `lib/param_helpers.rb` runs `blanks_to_nils!` on `params`, so blank values are already nil: just do `if params[:x]`, with no `.present?` or `.presence`. Do not use `.presence` elsewhere either
 - You can find documentation at app/views/docs/md. Keep it up to date.
 
 ## Security reviews

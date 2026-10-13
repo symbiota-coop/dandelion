@@ -87,7 +87,7 @@ Dandelion::App.controller do
     if Padrino.env == :production && !@event.organisation.stripe_client_id && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
       @organisation = @event.organisation
       erb :'events/stripe_connect'
-    elsif @event.organisation.contribution_reminder && params[:contribution_skipped].blank?
+    elsif @event.organisation.contribution_reminder && !params[:contribution_skipped]
       redirect "/o/#{@event.organisation.slug}/contribute?return_to=#{CGI.escape(request.fullpath)}"
     else
       @event.location = 'Online'

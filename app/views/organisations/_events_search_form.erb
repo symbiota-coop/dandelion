@@ -52,7 +52,7 @@
         <% if @organisation.event_types %>
           <div class="form-group col-12 col-sm-auto">
             <label>Event type</label>
-            <%= select_tag :event_type, options: [[(@organisation.event_types_placeholder if params[:minimal]), '', {disabled: true, selected: params[:event_type].blank?}]] + @organisation.event_types.split(',').map { |type| [type, type.parameterize] }, selected: params[:event_type], class: 'form-select select-placeholder' %>
+            <%= select_tag :event_type, options: [[(@organisation.event_types_placeholder if params[:minimal]), '', {disabled: true, selected: !params[:event_type]}]] + @organisation.event_types.split(',').map { |type| [type, type.parameterize] }, selected: params[:event_type], class: 'form-select select-placeholder' %>
           </div>
         <% end %>
         <div class="form-group col-12 col-sm-auto">
