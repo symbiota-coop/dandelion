@@ -47,6 +47,12 @@ module Daily
     JSON.parse(stash.value) if stash
   end
 
+  # The latest date with an edition, up to today
+  def self.latest_date
+    stash = Stash.and(:key.gt => 'daily/', :key.lte => key(Date.today)).order(key: -1).only(:key).first
+    Date.parse(stash.key.delete_prefix('daily/')) if stash
+  end
+
   # Makes and keeps the date's edition, unless it already has one
   def self.publish(date)
     return if Stash.and(key: key(date)).exists?

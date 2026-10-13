@@ -7,7 +7,7 @@ Dandelion::App.controller do
                 Date.today
               end
             else
-              Date.today
+              Daily.latest_date || Date.today
             end
     @edition = Daily.edition(@date)
     erb :daily

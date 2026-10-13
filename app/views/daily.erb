@@ -33,8 +33,8 @@
           There's no Daily for this day.
         <% end %>
       </p>
-      <% if @date != Date.today %>
-        <a class="btn btn-outline-primary" href="/daily">Read today's Daily</a>
+      <% if Daily.latest_date %>
+        <a class="btn btn-outline-primary" href="/daily">Read the latest Daily</a>
       <% end %>
     </div>
   <% end %>
