@@ -1,0 +1,116 @@
+#!/usr/bin/env ruby
+# Runs CI's linters (.github/workflows/ruby.yml) with CI's flags, each on the files of its kind:
+#
+#   script/lint FILE...     the files as they are on disk
+#   script/lint --staged    the staged version of each staged file (the pre-commit hook in .githooks)
+#   script/lint --all       everything, as CI does
+#
+# A changed linter config (or one of our own cops or linters) runs that linter on everything, as CI would.
+# Exits non-zero if any linter fails.
+require 'open3'
+
+$stdout.sync = true # so the summary on stderr comes after the output
+Dir.chdir(File.expand_path('..', __dir__))
+
+ERB_ENV = { 'RUBYOPT' => '-W0' }.freeze # hides the parser gem warning that it only knows Ruby 3.4 as 3.4.0-dev
+
+LINTERS = [
+  {
+    name: 'RuboCop',
+    files: %r{\.(rb|rake|ru|gemspec)\z|\A(Gemfile|Rakefile)\z|\Ascript/lint\z},
+    configs: %r{\A(\.rubocop\.yml|\.rubocop/)},
+    command: %w[bundle exec rubocop --fail-level warning --display-only-fail-level-offenses --force-exclusion],
+    stdin: ->(file) { ['--stdin', file] }
+  },
+  {
+    name: 'erb_lint',
+    files: %r{\Aapp/views/.+\.erb\z},
+    # Templates are checked with .rubocop.yml and our cops too
+    configs: %r{\A(\.erb_lint\.yml|\.erb_linters/|\.rubocop\.yml|\.rubocop/)},
+    command: %w[bundle exec erb_lint --fail-level W],
+    all: %w[--lint-all],
+    stdin: ->(file) { ['--stdin', file] },
+    env: ERB_ENV
+  },
+  {
+    name: 'ESLint',
+    files: %r{\Aapp/assets/javascripts/(?!ext/).+\.js\z},
+    configs: /\A(eslint\.config\.mjs|package(-lock)?\.json)\z/,
+    command: %w[npx eslint --no-warn-ignored],
+    stdin: ->(file) { ['--stdin', '--stdin-filename', file] },
+    node: true
+  },
+  {
+    name: 'Stylelint',
+    files: %r{\Aapp/assets/stylesheets/.+\.css\z},
+    configs: /\A(stylelint\.config\.mjs|package(-lock)?\.json)\z/,
+    command: %w[npx stylelint --allow-empty-input],
+    all: ['app/assets/stylesheets/**/*.css'],
+    stdin: ->(file) { ['--stdin-filename', file] },
+    node: true
+  }
+].freeze
+
+mode = ARGV.first&.start_with?('--') ? ARGV.shift : nil
+abort 'Usage: script/lint FILE... | --staged | --all' unless (mode.nil? && ARGV.any?) || (%w[--staged --all].include?(mode) && ARGV.empty?)
+
+files =
+  case mode
+  when '--staged' then `git diff --cached --name-only --diff-filter=ACMR -z`.split("\0")
+  when '--all' then []
+  else ARGV.map { |f| f.delete_prefix('./') }
+  end
+
+# Each job is a command, its env and what to pipe to it
+jobs = LINTERS.flat_map do |linter|
+  all = mode == '--all' || files.any? { |f| f.match?(linter[:configs]) }
+  mine = files.select { |f| f.match?(linter[:files]) }
+  next [] unless all || mine.any?
+
+  if linter[:node] && !File.directory?('node_modules')
+    warn "#{linter[:name]}: node_modules is missing, so run npm ci first"
+    next [{ name: linter[:name], missing: true }]
+  end
+
+  env = linter[:env] || {}
+  if all
+    [{ name: linter[:name], command: linter[:command] + (linter[:all] || []), env: env }]
+  elsif mode == '--staged'
+    # One run per file, given the staged version on stdin, so unstaged edits (yours or another session's) don't count
+    mine.map do |f|
+      { name: linter[:name], command: linter[:command] + linter[:stdin].call(f), env: env, stdin: Open3.capture2('git', 'show', ":#{f}").first }
+    end
+  else
+    [{ name: linter[:name], command: linter[:command] + mine, env: env }]
+  end
+end
+
+failed = jobs.select { |job| job[:missing] }.map { |job| job[:name] }
+runnable = jobs.reject { |job| job[:missing] }
+queue = Queue.new
+runnable.each_with_index { |job, i| queue << [job, i] }
+queue.close
+results = Array.new(4) do
+  Thread.new do
+    done = []
+    while (job, i = queue.pop)
+      output, status = Open3.capture2e(job[:env], *job[:command], stdin_data: job[:stdin] || '')
+      done << [i, job, output, status]
+    end
+    done
+  end
+end.flat_map(&:value).sort_by(&:first)
+
+results.each do |_, job, output, status|
+  next if status.success?
+
+  failed << job[:name]
+  puts output
+end
+
+if failed.any?
+  warn "\nFailed: #{failed.uniq.join(', ')}"
+  exit 1
+elsif jobs.any?
+  puts "Passed: #{jobs.map { |job| job[:name] }.uniq.join(', ')}"
+end

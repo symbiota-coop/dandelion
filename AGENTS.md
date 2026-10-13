@@ -52,16 +52,15 @@ Our rules are in `stylelint.config.mjs`. Disable one with `/* stylelint-disable 
 
 Commit only the changes you made: other sessions may be editing the same checkout, so stage your files by name rather than with `git add -A` or `git commit -a`.
 
-Before committing, run CI's linters on the files you added or changed, and fix what they report:
+`script/lint` runs CI's linters (`.github/workflows/ruby.yml`) with CI's flags, each on the files of its kind: RuboCop, erb_lint, ESLint and Stylelint. Run it on the files you added or changed as you go, and fix what it reports:
 
 ```bash
-bundle exec rubocop --fail-level warning --display-only-fail-level-offenses --force-exclusion <.rb files>
-RUBYOPT=-W0 bundle exec erb_lint --fail-level W <.erb files in app/views>
-npx eslint <.js files in app/assets/javascripts>
-npx stylelint <.css files in app/assets/stylesheets>
+script/lint <files>
 ```
 
-Skip a linter when no files of its kind changed, and run `npm ci` first if `node_modules` is missing. If you change a linter's config (`.rubocop.yml`, `.rubocop/`, `.erb_lint.yml`, `.erb_linters/`, `eslint.config.mjs`, `stylelint.config.mjs`), run that linter on everything, as CI does (`.github/workflows/ruby.yml`): `erb_lint --lint-all`, `stylelint "app/assets/stylesheets/**/*.css"`, and rubocop and eslint with no files.
+If a linter's config is among them (`.rubocop.yml`, `.rubocop/`, `.erb_lint.yml`, `.erb_linters/`, `eslint.config.mjs`, `stylelint.config.mjs`, `package.json`), it runs that linter on everything, as CI does; `script/lint --all` runs them all. Run `npm ci` first if `node_modules` is missing.
+
+The pre-commit hook (`.githooks/pre-commit`) runs `script/lint --staged`, which lints the staged version of each staged file, so another session's unstaged edits don't count. Git runs it once `core.hooksPath` is `.githooks`, which `script/agent-env/install.sh` sets; in a checkout of your own, run `git config core.hooksPath .githooks` once. If it fails, fix the offenses (or disable a check where its rule genuinely doesn't apply, as above) and commit again. Never skip it with `--no-verify`.
 
 ## Crucial restrictions
 
@@ -70,7 +69,7 @@ Skip a linter when no files of its kind changed, and run `npm ci` first if `node
 
 ## Cloud agents (Cursor, Claude Code)
 
-Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, MongoDB), `install.sh` (bundle install, `.env` files) and `start-services.sh` (starts MongoDB).
+Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, MongoDB), `install.sh` (bundle install, npm ci, `.env` files, the pre-commit hook) and `start-services.sh` (starts MongoDB).
 
 - Cursor: `.cursor/environment.json` and `.cursor/Dockerfile`. After boot, `start` forks Mongo; a `web` terminal keeps `foreman start -e .env web` running (Puma on port 3000, logs in that session).
 - Claude Code on the web: a `SessionStart` hook in `.claude/settings.json` runs `.claude/remote-setup.sh`. Project MCP servers come from the committed `.mcp.json`, whose `${VAR}`s are filled from the cloud environment's variables (and from your shell locally). Other tools don't read it, so each has its own committed copy of the same servers, with secrets read from the environment rather than written in: `.cursor/mcp.json` (`${env:VAR}`), `.codex/config.toml` (`env_vars` and `bearer_token_env_var`; Codex only reads it in trusted projects) and `.opencode/opencode.json` (`{env:VAR}`). Only edit `.mcp.json`, then run `rake mcp:sync` to write the others. Variables in `.mcp.json` can't have defaults (`${VAR:-x}`), as the others can't express them. Cursor cloud agents don't read any repo MCP file; their MCP servers are set up in the Cursor dashboard

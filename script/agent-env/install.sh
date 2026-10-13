@@ -32,10 +32,13 @@ else
   done
 fi
 
-# ESLint, for linting app/assets/javascripts (package.json)
+# ESLint and Stylelint (package.json)
 if command -v npm >/dev/null; then
   npm ci --no-audit --no-fund
 fi
+
+# The pre-commit hook, which lints staged files with script/lint
+git config core.hooksPath .githooks
 
 if [ ! -f .env ]; then
   cp .env.example .env
