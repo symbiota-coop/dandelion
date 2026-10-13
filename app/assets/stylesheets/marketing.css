@@ -93,6 +93,7 @@
   border-radius: var(--bs-border-radius-xl);
   padding: var(--space-lg);
   height: 100%;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- an older exception (design guide, Motion): the marketing pages' cards lift */
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 

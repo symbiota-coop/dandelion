@@ -326,6 +326,7 @@
 .docs-ask .docs-ask-status-word {
   display: inline-block;
   opacity: 1;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- the status words cross-fade slowly as they cycle while an answer loads */
   transition: opacity 1s ease;
 }
 

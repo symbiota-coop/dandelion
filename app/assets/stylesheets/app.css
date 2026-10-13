@@ -419,6 +419,7 @@
   height: 2px;
   border-radius: var(--bs-border-radius-pill);
   background-color: var(--bs-white);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- an older exception (design guide, Motion): the menu button's bars turn into a cross */
   transition: all var(--transition-fast);
 }
 
@@ -1080,6 +1081,7 @@ p.action a {
 
 .quick-color-btn {
   cursor: pointer;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- an older exception (design guide, Motion): the quick theme colours grow 10% on hover */
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   outline: none;
 }
@@ -1969,6 +1971,7 @@ ul.pagination {
 
 .bi-spin {
   display: inline-block;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- a loading indicator */
   animation: spin 2s linear infinite;
 }
 

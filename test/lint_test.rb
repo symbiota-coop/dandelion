@@ -208,11 +208,17 @@ class LintTest < Minitest::Test
       '.a { border-radius: 7px; }' => 'declaration-property-value-disallowed-list',
       '.a { box-shadow: 0 2px 9px var(--x); }' => 'declaration-property-value-disallowed-list',
       '.a { margin-left: 4px; }' => 'declaration-property-unit-disallowed-list',
-      '.a { top: 12px; }' => 'declaration-property-unit-disallowed-list'
+      '.a { top: 12px; }' => 'declaration-property-unit-disallowed-list',
+      '.a { transition: all var(--transition-fast); }' => 'declaration-property-value-disallowed-list',
+      '.a { transition-property: color, transform; }' => 'declaration-property-value-disallowed-list',
+      '.a { transition: opacity 0.3s ease; }' => 'declaration-property-value-disallowed-list',
+      '.a { animation: pulse 1s infinite; }' => 'declaration-property-value-disallowed-list'
     }.each { |source, rule| assert_equal [rule], stylelint_rules(source), source }
 
     good = <<~CSS
       .a { --c: #fff; color: rgba(var(--bs-black-rgb), 0.5); background: transparent; border: 1px solid var(--hairline); }
+      .c { transition: opacity var(--transition-enter), translate var(--transition-enter), rotate var(--transition-fast), --fade-start var(--transition-fast); }
+      .d { transition: none; animation: spin 2s linear; transform: translateY(50%); }
       .b { border-radius: 0 0 var(--bs-border-radius) 50%; box-shadow: inset 0 0 0 1px var(--x), var(--bs-box-shadow); margin: var(--space-xs) 0.375rem; }
     CSS
     assert_empty stylelint_rules(good)
