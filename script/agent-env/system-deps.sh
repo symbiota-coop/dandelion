@@ -1,18 +1,16 @@
 #!/usr/bin/env bash
-# System packages, Chromium, MongoDB and Node for cloud agent environments (Cursor, Claude Code).
+# System packages, Chromium and MongoDB for cloud agent environments (Cursor, Claude Code).
 # Run as root or with passwordless sudo.
 set -euo pipefail
 
 MONGODB_VERSION=8.2.6
-# Node 22, the major CI installs (.github/workflows/ruby.yml), so install.sh can npm ci the linters
-NODE_VERSION=22.23.3
 
 SUDO=""
 [ "$(id -u)" -ne 0 ] && SUDO="sudo"
 
 export DEBIAN_FRONTEND=noninteractive
 $SUDO apt-get update -qq
-# tmux: Cursor launches .cursor/environment.json terminals as tmux sessions, and without it the web process never starts
+# xz-utils: node.sh's Node tarball is .tar.xz
 $SUDO apt-get install -y --no-install-recommends \
   autoconf \
   automake \
@@ -31,7 +29,6 @@ $SUDO apt-get install -y --no-install-recommends \
   libzstd-dev \
   pkg-config \
   sudo \
-  tmux \
   tzdata \
   xz-utils \
   zlib1g-dev
@@ -61,15 +58,4 @@ if ! command -v mongod >/dev/null; then
   tar -xzf /tmp/mongodb.tgz -C /tmp/mongodb --strip-components=1
   $SUDO cp /tmp/mongodb/bin/mongod /tmp/mongodb/bin/mongos /usr/local/bin/
   rm -rf /tmp/mongodb /tmp/mongodb.tgz
-fi
-
-if ! command -v node >/dev/null || [ "$(node -p 'process.versions.node.split(".")[0]')" != "22" ]; then
-  case "$(uname -m)" in
-    x86_64) node_arch=x64 ;;
-    aarch64|arm64) node_arch=arm64 ;;
-    *) echo "Unsupported architecture: $(uname -m)" >&2; exit 1 ;;
-  esac
-  curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${node_arch}.tar.xz" -o /tmp/node.tar.xz
-  $SUDO tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1
-  rm -f /tmp/node.tar.xz
 fi

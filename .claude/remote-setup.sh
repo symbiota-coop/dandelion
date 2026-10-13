@@ -6,13 +6,16 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-if ! command -v mongod >/dev/null || [ -z "$(bash script/agent-env/browser-path.sh)" ] || ! command -v node >/dev/null; then
+if ! command -v mongod >/dev/null || [ -z "$(bash script/agent-env/browser-path.sh)" ]; then
   bash script/agent-env/system-deps.sh
 fi
 BROWSER_PATH="$(bash script/agent-env/browser-path.sh)"
 
 RUBY_PREFIX="$(bash script/agent-env/ruby.sh)"
 [ -z "$RUBY_PREFIX" ] || export PATH="$RUBY_PREFIX/bin:$PATH"
+
+NODE_PREFIX="$(bash script/agent-env/node.sh)"
+[ -z "$NODE_PREFIX" ] || export PATH="$NODE_PREFIX/bin:$PATH"
 
 # Chromium ignores the system CA store, so trust the agent proxy's CA in its NSS store, or every CDN request fails
 PROXY_CA=/root/.ccr/agent-proxy-ca.crt
@@ -30,6 +33,9 @@ if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
     echo "export BROWSER_PATH=$BROWSER_PATH"
     if [ -n "$RUBY_PREFIX" ]; then
       echo "export PATH=\"$RUBY_PREFIX/bin:\$PATH\""
+    fi
+    if [ -n "$NODE_PREFIX" ]; then
+      echo "export PATH=\"$NODE_PREFIX/bin:\$PATH\""
     fi
   } >> "$CLAUDE_ENV_FILE"
 fi

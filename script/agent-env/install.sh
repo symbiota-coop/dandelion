@@ -32,8 +32,19 @@ else
   done
 fi
 
-# ESLint and Stylelint. Node comes from system-deps.sh; a missing npm should fail this, not skip the linters.
-npm ci --no-audit --no-fund
+# ESLint and Stylelint (Node from node.sh). Linters only, so a failure warns rather than stopping the services that start after this
+if ! command -v npm >/dev/null; then
+  echo "WARNING: no npm, so ESLint and Stylelint aren't installed: run script/agent-env/node.sh, then npm ci" >&2
+else
+  for attempt in 1 2 3; do
+    if npm ci --no-audit --no-fund; then
+      break
+    fi
+    if [ "$attempt" -eq 3 ]; then
+      echo "WARNING: npm ci failed, so ESLint and Stylelint aren't installed: run npm ci" >&2
+    fi
+  done
+fi
 
 # The pre-commit hook, which lints staged files with script/lint
 git config core.hooksPath .githooks
