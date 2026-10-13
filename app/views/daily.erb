@@ -23,7 +23,7 @@
     <% out_soon = @date >= Date.today %>
     <div class="daily-notice">
       <div class="daily-notice-icon">
-        <i class="bi <%= out_soon ? 'bi-hourglass-split' : 'bi-newspaper' %>"></i>
+        <i class="bi <%= out_soon ? 'bi-printer' : 'bi-newspaper' %>"></i>
       </div>
       <h2 class="daily-notice-title"><%= out_soon ? 'Still at the printers' : 'Not available' %></h2>
       <p class="text-body-secondary">
