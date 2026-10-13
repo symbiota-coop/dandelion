@@ -47,3 +47,6 @@ Dandelion/RailsController:
 Dandelion/CapybaraHasNoAfterClick:
   Include:
     - test/**/*.rb
+Dandelion/MongoidIndex:
+  Include:
+    - models/**/*.rb

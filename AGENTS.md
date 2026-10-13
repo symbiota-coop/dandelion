@@ -26,6 +26,7 @@ CI fails on each rule below, and each names its check. When you add a rule to th
 Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Ruby in templates through erb_lint (its `RubocopTags` linter, `.erb_linters/rubocop_tags.rb`, which also checks the conditions of `<% if %>`, `<% unless %>` and `<% elsif %>` tags). Disable one on a line with `# rubocop:disable Dandelion/... -- reason`.
 
 - `Dandelion/MongoidOr`: Never use Mongoid `.or` — it ORs against whatever is already in the selector (`Event.live.or(featured: true)` means live or featured). Use `self.and('$or' => [...])` so the OR is just another AND-ed filter (`Event.live.and('$or' => [...])` means live and (this or that))
+- `Dandelion/MongoidIndex`: Mongo indexes are created directly in the database, not declared in models with Mongoid's `index`. It checks `models`
 - `Dandelion/MongoidScope`: Query filters are class methods that return `self.and(...)` so they chain (`Event.live.future`). Do not use `scope :live, -> { ... }`
 - `Dandelion/MongoidWhere`: Use `scope.and` rather than `scope.where` (a JavaScript `$where` string, `where('this.paid < this.requested_contribution')`, is the exception, as `.and` can't take one)
 - `Dandelion/BelongsTo`: Use `belongs_to_without_parent_validation`, not Mongoid `belongs_to` (its parent check fails when the parent is only in memory)
@@ -108,7 +109,7 @@ Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Chrom
 
 - We set `Mongoid.raise_not_found_error = false` in `boot.rb` so `Model.find(id)` returns `nil` for invalid ids
 - Nil booleans are converted to false using `after_initialize :convert_nil_booleans_to_false` and `before_validation :convert_nil_booleans_to_false`
-- Mongo indexes are created directly in the database, and are not defined in model files
+- Mongo indexes are created directly in the database, and are not defined in model files (`Dandelion/MongoidIndex`)
 - `Event.hinted(index_name)` makes MongoDB skip query planning, for queries it can't cache a plan for (e.g. an organisation's events `$or`, ~300 ms to plan: `events_including_cohosted.hinted(Event::HOSTS_INDEX)`). Hint only at call sites that need it, since it overrides more selective indexes. Index existence is checked once per process: dropping a hinted index needs a restart (or the queries fail), renaming one a code change
 - Unique indexes:
   - Back every `validates_uniqueness_of` with a unique index
