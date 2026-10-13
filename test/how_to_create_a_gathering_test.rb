@@ -6,10 +6,10 @@ class HowToCreateAGatheringTest < ActiveSupport::TestCase
   include VideoNarrationHelper
 
   test 'how to create a gathering' do
-    @account1 = FactoryBot.create(:account, name: 'Maria Sabina', email: 'maria@symbiota.coop')
-    @account2 = FactoryBot.create(:account, name: 'David Bohm', email: 'david@symbiota.coop')
-    @gathering = FactoryBot.build_stubbed(:gathering, name: 'Garden Gathering', slug: 'garden-gathering')
-    sign_in(@account1)
+    account1 = FactoryBot.create(:account, name: 'Maria Sabina', email: 'maria@symbiota.coop')
+    account2 = FactoryBot.create(:account, name: 'David Bohm', email: 'david@symbiota.coop')
+    gathering = FactoryBot.build_stubbed(:gathering, name: 'Garden Gathering', slug: 'garden-gathering')
+    sign_in(account1)
     click_link 'Gatherings'
     click_link 'All gatherings'
     narrate %(
@@ -19,7 +19,7 @@ class HowToCreateAGatheringTest < ActiveSupport::TestCase
     )
     within('#content') { click_link 'Create a gathering' }
     narrate %(Enter the name of the gathering.), lambda {
-      fill_in 'Name', with: @gathering.name
+      fill_in 'Name', with: gathering.name
     }
     click_link 'Joining'
     narrate %(
@@ -39,8 +39,8 @@ class HowToCreateAGatheringTest < ActiveSupport::TestCase
     }
     click_link 'Payments'
     narrate %(Under the Payments tab, we'll enter our Stripe API keys so we can accept payments.), lambda {
-      fill_in 'Stripe public key', with: @gathering.stripe_pk
-      fill_in 'Stripe secret key', with: @gathering.stripe_sk
+      fill_in 'Stripe public key', with: gathering.stripe_pk
+      fill_in 'Stripe secret key', with: gathering.stripe_sk
     }
     click_link 'Features'
     narrate %(OK, that'll do for now. We go to the final tab and click 'Create gathering'.), lambda {
@@ -51,11 +51,11 @@ class HowToCreateAGatheringTest < ActiveSupport::TestCase
     narrate %(Under 'Members', we can see the current list of members.)
     click_link 'Applications'
     narrate %(Under 'Applications', we can see outstanding applications and the application link. Let's preview the application form.), lambda {
-      visit "/g/#{@gathering.slug}/apply"
+      visit "/g/#{gathering.slug}/apply"
     }
-    @gathering = Gathering.first
-    @gathering.mapplications.create account: @account2, status: 'pending', answers: @gathering.application_questions_a.each_with_index.map { |q, i| [q, "answer #{i}"] }
-    visit "/g/#{@gathering.slug}/applications"
+    gathering = Gathering.first
+    gathering.mapplications.create account: account2, status: 'pending', answers: gathering.application_questions_a.each_with_index.map { |q, i| [q, "answer #{i}"] }
+    visit "/g/#{gathering.slug}/applications"
     narrate %(This is what we see once someone has applied. We can click Propose to act as a proposer for this application.), lambda {
       click_link 'Propose'
       click_button 'Submit'

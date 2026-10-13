@@ -50,3 +50,6 @@ Dandelion/CapybaraHasNoAfterClick:
 Dandelion/MongoidIndex:
   Include:
     - models/**/*.rb
+Dandelion/TestInstanceVariable:
+  Include:
+    - test/**/*_test.rb
