@@ -28,7 +28,7 @@ LINTERS = [
     name: 'erb_lint',
     files: %r{\Aapp/views/.+\.erb\z},
     # Templates are checked with .rubocop.yml and our cops too
-    configs: %r{\A(\.erb_lint\.yml|\.erb_linters/|\.rubocop\.yml|\.rubocop/)},
+    configs: %r{\A(\.erb_lint\.yml|\.erb_linters/|\.rubocop\.yml|\.rubocop/|config/bootstrap4_leftovers\.json\z)},
     command: %w[bundle exec erb_lint --fail-level W], # W is warning, like RuboCop; erb_lint 0.9 rejects the word "warning"
     all: %w[--lint-all],
     stdin: ->(file) { ['--stdin', file] },
@@ -37,7 +37,7 @@ LINTERS = [
   {
     name: 'ESLint',
     files: %r{\Aapp/assets/javascripts/(?!ext/).+\.js\z},
-    configs: /\A(eslint\.config\.mjs|package(-lock)?\.json)\z/,
+    configs: %r{\A(eslint\.config\.mjs|package(-lock)?\.json|config/bootstrap4_leftovers\.json)\z},
     command: %w[npx eslint --no-warn-ignored],
     stdin: ->(file) { ['--stdin', '--stdin-filename', file] },
     node: true
