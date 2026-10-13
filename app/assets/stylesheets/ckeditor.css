@@ -105,7 +105,7 @@ blockquote {
   background: var(--bs-white) !important;
   animation-name: opacity;
   animation-duration: 2s;
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- CKEditor's upload bar, a loading indicator */
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- CKEditor's upload bar, a loading indicator, which may loop */
   animation-iteration-count: infinite;
 }
 

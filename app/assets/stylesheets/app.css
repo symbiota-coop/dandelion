@@ -419,8 +419,7 @@
   height: 2px;
   border-radius: var(--bs-border-radius-pill);
   background-color: var(--bs-white);
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- an older exception (design guide, Motion): the menu button's bars turn into a cross */
-  transition: all var(--transition-fast);
+  transition: rotate var(--transition-fast), translate var(--transition-fast);
 }
 
 .header .navbar-toggler .icon-bar + .icon-bar {
@@ -429,15 +428,13 @@
 
 .header .navbar-toggler.active .icon-bar {
   width: 1.25rem;
-  position: relative;
-  top: 0.1875rem;
-  transform: rotate(45deg);
+  translate: 0 0.1875rem;
+  rotate: 45deg;
 }
 
 .header .navbar-toggler.active .icon-bar + .icon-bar {
-  top: auto;
-  bottom: 0.1875rem;
-  transform: rotate(-45deg);
+  translate: 0 -0.1875rem;
+  rotate: -45deg;
 }
 
 @media (max-width: 767.98px) {
@@ -1971,7 +1968,7 @@ ul.pagination {
 
 .bi-spin {
   display: inline-block;
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- a loading indicator */
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- a loading indicator, which may loop */
   animation: spin 2s linear infinite;
 }
 

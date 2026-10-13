@@ -326,7 +326,7 @@
 .docs-ask .docs-ask-status-word {
   display: inline-block;
   opacity: 1;
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- the status words cross-fade slowly as they cycle while an answer loads */
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- the status words cycle while an answer loads, a loading indicator, so they keep their own timing (docs_ask.js's FADE_MS) */
   transition: opacity 1s ease;
 }
 
