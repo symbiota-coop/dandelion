@@ -46,8 +46,8 @@ module OrderNotifications
     batch_message.subject "New order for #{event.name}"
     batch_message.body_html EmailHelper.html(:order, account: account, order: order, event: event)
 
-    event.event_facilitators.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
+    event.event_facilitators.each do |recipient|
+      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.sign_in_token_for_email, 'id' => recipient.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -220,8 +220,8 @@ module OrderNotifications
     batch_message.subject "#{provider || 'Payment'} error on #{event.name}"
     batch_message.body_html EmailHelper.html(:purchase_failed, account: account, event: event, error: error, provider: provider, help: help)
 
-    (event.organisation.admins_receiving_feedback + Account.and(admin: true)).uniq.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
+    (event.organisation.admins_receiving_feedback + Account.and(admin: true)).uniq.each do |recipient|
+      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.sign_in_token_for_email, 'id' => recipient.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -239,8 +239,8 @@ module OrderNotifications
     provider = order.refund_provider
     batch_message.body_html EmailHelper.html(:refund_failed_order, account: account, event: event, error: error, provider: provider)
 
-    (event.contacts + Account.and(admin: true)).uniq.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
+    (event.contacts + Account.and(admin: true)).uniq.each do |recipient|
+      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.sign_in_token_for_email, 'id' => recipient.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
