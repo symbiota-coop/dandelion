@@ -35,6 +35,7 @@ Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Rub
 - `Dandelion/ParamsBlank`: `lib/param_helpers.rb` runs `blanks_to_nils!` on `params`, so blank values are already nil: just do `if params[:x]` (or `unless`), with no `.present?` or `.blank?`
 - `Dandelion/Presence`: Don't use `.presence`, on `params` or anywhere else
 - `Dandelion/ErrorReporting`: Report rescued errors with `ErrorReporting.capture_exception(e, context:, tags:)`, not `Sentry.capture_exception`
+- `Dandelion/RailsController`: Controllers are `Dandelion::App.controller` blocks (Padrino), not Rails controllers: `before do`, not `before_action`; `erb`, `partial` or `cp`, not `render`; `redirect`, not `redirect_to`; `provides:` and `content_type`, not `respond_to`; and no strong parameters: pass `params[:x]` through `mass_assigning(params[:x], Model)`. It checks `app/controllers`
 - `Dandelion/CapybaraRefuteHas`: To check something isn't on the page, use `assert page.has_no_css?` (`has_no_content?`, `has_no_link?`, `has_no_title?`...), never `refute page.has_css?`: the `has_` form waits the full 10 s `default_max_wait_time` for it to appear before passing
 
 ### erb_lint
@@ -126,7 +127,7 @@ Straight after a click or submit, assert something on the new page before checki
 
 ## Conventions
 
-- Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` — no `before_action`, strong params, or `render`
+- Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` (`Dandelion/RailsController` checks for Rails habits)
 - Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
 - `lib/form_builder.rb` defines the `_block` helpers like `text_block`, `wysiwyg_block` etc.
 - You can find documentation at app/views/docs/md. Keep it up to date.

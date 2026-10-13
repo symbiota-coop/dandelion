@@ -17,9 +17,14 @@ class LintTest < Minitest::Test
   DANDELION_COPS = RuboCop::Cop::Registry.global.select { |cop| cop.department == :Dandelion }
   BOOTSTRAP_4 = JSON.parse(File.read(File.join(ROOT, 'config/bootstrap4_leftovers.json'), encoding: 'UTF-8'))
 
-  # The offenses one cop finds in some Ruby
-  def cop_offenses(cop, code)
-    source = RuboCop::ProcessedSource.new(code, RUBOCOP_CONFIG.target_ruby_version, File.join(ROOT, 'app/x.rb'))
+  # A file a cop checks: one in its Include, if it has one (Dandelion/RailsController only checks controllers)
+  def cop_path(cop)
+    (RUBOCOP_CONFIG.for_cop(cop)['Include']&.first || 'app/**/*.rb').sub('**/*', 'x')
+  end
+
+  # The offenses one cop finds in some Ruby, in a file it checks
+  def cop_offenses(cop, code, path = cop_path(cop))
+    source = RuboCop::ProcessedSource.new(code, RUBOCOP_CONFIG.target_ruby_version, File.join(ROOT, path))
     source.config = RUBOCOP_CONFIG
     source.registry = RuboCop::Cop::Registry.global
     RuboCop::Cop::Team.mobilize([cop], RUBOCOP_CONFIG, raise_error: true).investigate(source).offenses
@@ -61,11 +66,20 @@ class LintTest < Minitest::Test
       'Dandelion/MongoidWhere' => { "where('this.a < this.b')" => 0, 'where(a: 1)' => 1, 'x&.where(a: 1)' => 1 },
       'Dandelion/MongoidOr' => { 'x.or(a: 1)' => 1, 'a or b' => 0 },
       'Dandelion/ErrorReporting' => { 'Sentry.capture_message("x")' => 1, '::Sentry.capture_exception(e)' => 1, 'ErrorReporting.capture_exception(e)' => 0 },
-      'Dandelion/ValidateBlock' => { 'validate :name_is_short' => 0, 'validate { errors.add(:name, "x") }' => 1 }
+      'Dandelion/ValidateBlock' => { 'validate :name_is_short' => 0, 'validate { errors.add(:name, "x") }' => 1 },
+      'Dandelion/RailsController' => {
+        'params[:event].permit(:name)' => 1, 'skip_before_action :x' => 1, 'pdf.render' => 0, 'EmailHelper.render(:x)' => 0,
+        'require "x"' => 0, 'x.respond_to?(:y)' => 0, 'event.permit(:x)' => 0
+      }
     }.each do |name, cases|
       cop = RuboCop::Cop::Registry.global.find_by_cop_name(name)
       cases.each { |code, count| assert_equal count, cop_offenses(cop, code).size, "#{name} on #{code}" }
     end
+  end
+
+  def test_rails_controller_only_checks_controllers
+    cop = RuboCop::Cop::Registry.global.find_by_cop_name('Dandelion/RailsController')
+    assert_empty cop_offenses(cop, 'render :show', 'app/helpers/x.rb')
   end
 
   def test_agents_md_lists_each_cop

@@ -41,3 +41,6 @@ Lint/DuplicateBranch:
 # Warning, so they fail CI, in templates too
 Dandelion:
   Severity: warning
+Dandelion/RailsController:
+  Include:
+    - app/controllers/**/*.rb
