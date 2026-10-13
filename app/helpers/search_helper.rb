@@ -1,4 +1,3 @@
-# rubocop:disable Naming/MethodParameterName
 Dandelion::App.helpers do
   def search_type_config
     {
@@ -107,4 +106,3 @@ Dandelion::App.helpers do
     [nil, q]
   end
 end
-# rubocop:enable Naming/MethodParameterName

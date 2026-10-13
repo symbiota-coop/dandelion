@@ -254,7 +254,7 @@ module CoreExtensions
     # def followers
     #   Account.and(:id.in => follower_ids)
     # end
-    def has_many_through(name, through:, class_name: nil, foreign_key: nil, conditions: nil) # rubocop:disable Naming/PredicatePrefix
+    def has_many_through(name, through:, class_name: nil, foreign_key: nil, conditions: nil)
       class_name_string = class_name || name.to_s.singularize.camelize
 
       fk = (foreign_key || "#{class_name_string.underscore}_id").to_s
