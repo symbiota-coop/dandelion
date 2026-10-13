@@ -19,9 +19,23 @@
 
   <% if @edition %>
     <%= partial :daily %>
-  <% elsif @date >= Date.today %>
-    <p class="text-body-secondary">This edition isn't out yet, check back soon</p>
   <% else %>
-    <p class="text-body-secondary">This edition isn't available</p>
+    <% out_soon = @date >= Date.today %>
+    <div class="daily-notice">
+      <div class="daily-notice-icon">
+        <i class="bi <%= out_soon ? 'bi-hourglass-split' : 'bi-newspaper' %>"></i>
+      </div>
+      <h2 class="daily-notice-title"><%= out_soon ? 'Not out yet' : 'Not available' %></h2>
+      <p class="text-body-secondary">
+        <% if out_soon %>
+          This edition of the Daily hasn't been printed yet. Check back soon!
+        <% else %>
+          There's no Daily for this day.
+        <% end %>
+      </p>
+      <% if @date != Date.today %>
+        <a class="btn btn-outline-primary" href="/daily">Read today's Daily</a>
+      <% end %>
+    </div>
   <% end %>
 </div>
