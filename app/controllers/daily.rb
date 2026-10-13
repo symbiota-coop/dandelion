@@ -1,14 +1,11 @@
 Dandelion::App.controller do
   get '/daily' do
-    @date = if params[:date]
-              begin
-                Date.parse(params[:date])
-              rescue Date::Error
-                Date.today
-              end
-            else
-              Daily.latest_date || Date.today
-            end
+    # A date that won't parse (Date::Error, or ArgumentError when it's too long; TypeError for date[]=) gets the latest
+    @date = begin
+      Date.parse(params[:date]) if params[:date]
+    rescue ArgumentError, TypeError
+      nil
+    end || Daily.latest_date || Date.today
     @edition = Daily.edition(@date)
     unless @edition
       # Past dates with no edition don't exist, so crawlers drop them; future ones will, so just keep them out of search
