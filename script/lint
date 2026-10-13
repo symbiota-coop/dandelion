@@ -12,6 +12,7 @@
 require 'open3'
 
 $stdout.sync = true # so the summary on stderr comes after the output
+# Messages go to $stderr.puts rather than warn, which prints nothing under RUBYOPT=-W0
 Dir.chdir(File.expand_path('..', __dir__))
 
 ERB_ENV = { 'RUBYOPT' => '-W0' }.freeze # hides the parser gem warning that it only knows Ruby 3.4 as 3.4.0-dev
@@ -78,7 +79,7 @@ jobs = LINTERS.flat_map do |linter|
   next [] unless all || mine.any?
 
   if linter[:node] && !File.directory?('node_modules')
-    warn "#{linter[:name]}: node_modules is missing, so run npm ci first"
+    $stderr.puts "#{linter[:name]}: node_modules is missing, so run npm ci first"
     next [{ name: linter[:name], missing: true }]
   end
 
@@ -120,7 +121,7 @@ results.each do |_, job, output, status|
 end
 
 if failed.any?
-  warn "\nFailed: #{failed.uniq.join(', ')}"
+  $stderr.puts "\nFailed: #{failed.uniq.join(', ')}"
   exit 1
 elsif jobs.any?
   puts "Passed: #{jobs.map { |job| job[:name] }.uniq.join(', ')}"
