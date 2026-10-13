@@ -78,6 +78,10 @@ export default [
           ].join(', '),
           message: 'There is no .label class; use badge text-bg-*.'
         },
+        {
+          selector: strings('/<select(?![^>]*(?<![\\w-])form-select(?![\\w-]))[^>]*>/'),
+          message: 'Selects take form-select.'
+        },
         ...bootstrap4
       ]
     }

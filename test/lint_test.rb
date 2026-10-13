@@ -121,7 +121,9 @@ class LintTest < Minitest::Test
       '<button class="close">' => /btn-close/,
       %(<script>$('#x').removeClass('text-left')</script>) => /text-start/,
       '<a data-toggle="tooltip">' => /data-bs-\*/,
-      %(<%= link_to 'x', '#', data: { toggle: 'dropdown' } %>) => /data-bs-\*/
+      %(<%= link_to 'x', '#', data: { toggle: 'dropdown' } %>) => /data-bs-\*/,
+      '<select name="x" class="me-1">' => /form-select/,
+      "<%= select_tag :x,\n  class: 'me-1', options: [] %>" => /form-select/
     }.each do |template, message|
       offenses = erb_offenses(template).select { |linter, _| linter == 'DesignClasses' }
       assert_equal 1, offenses.size, "DesignClasses on #{template}: #{offenses.inspect}"
@@ -132,7 +134,9 @@ class LintTest < Minitest::Test
       '<div class="ms-2 me-auto text-end float-start rounded-1 btn-close closed html-label media form-group form-inline">',
       '<div data-bs-toggle="tooltip" data-parent="x" data-target="y">',
       %(<div class="<%= 'ml-2' %>">), # Ruby inside the attribute isn't a class
-      '<p>Close it, then align it left</p>'
+      '<p>Close it, then align it left</p>',
+      %(<select class="form-select form-select-sm" data-x="a>b">), %(<%= select_tag :x, options: [1, 2],\n  class: 'form-select d-inline-block' %>),
+      '<p>A select_tag needs one too</p>'
     ].each { |template| assert_empty erb_offenses(template), template }
   end
 
@@ -193,13 +197,14 @@ class LintTest < Minitest::Test
       %($('#x').html('<span class="badge badge-info">')) => /badge-\*/,
       %($('#x').html('<span class="label">')) => /\.label/,
       %($('#x').addClass('mr-3')) => /ms-\*/,
-      %($('#x').attr('data-toggle', 'tooltip')) => /data-bs-\*/
+      %($('#x').attr('data-toggle', 'tooltip')) => /data-bs-\*/,
+      %($('#x').html('<select name="y">')) => /form-select/
     }.each do |source, message|
       messages = eslint_rules(source)
       assert_equal 1, messages.size, "ESLint on #{source}: #{messages.inspect}"
       assert_match message, messages.first
     end
-    assert_empty eslint_rules(%($('#x').html('<label class="form-label ms-2 media" data-bs-toggle="x">').addClass('text-end').removeClass('with-label'))),
+    assert_empty eslint_rules(%($('#x').html('<label class="form-label ms-2 media" data-bs-toggle="x"><select class="form-select">').addClass('text-end').removeClass('with-label'))),
                  'ESLint flags Bootstrap 5 and our own classes'
   end
 

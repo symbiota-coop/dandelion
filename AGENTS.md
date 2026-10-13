@@ -46,12 +46,13 @@ Our linter, `DesignClasses`, is in `.erb_linters/design_classes.rb`. Disable it 
 - `DesignClasses`: To show and hide elements from JS, start them hidden with `style="display: none"` and use jQuery `.show()` / `.hide()` / `.toggle()`, not `d-none` with `addClass` / `removeClass` (Bootstrap's `d-*` classes are `!important`). Keep `d-none d-md-block` and friends for purely responsive hiding
 - `DesignClasses`: Success is the theme colour, so use `-primary`, never `-success`. Badges are `badge text-bg-*`; there is no `.label` and no `badge-*` colour class
 - `DesignClasses`: Bootstrap 5, not 4: `data-bs-*` attributes and logical spacing and alignment (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-end`, `float-start`). `config/bootstrap4_leftovers.json` lists the Bootstrap 4 classes and attributes it flags, with what replaces each; add one there if you find another
+- `DesignClasses`: Selects take `form-select` (`<select>` tags and `select_tag`; the form builder's `select_block` adds it), even ones Select2 replaces, so they look right until it loads
 
 ### ESLint
 
 Our rules are in `eslint.config.mjs`. Disable one with `// eslint-disable-next-line <rule> -- reason`.
 
-- `no-restricted-syntax`: The three `DesignClasses` rules above (showing and hiding; `-success`, `badge-*` and `.label`; Bootstrap 4 leftovers), in the strings and template literals of `app/assets/javascripts`
+- `no-restricted-syntax`: The `DesignClasses` rules above (showing and hiding; `-success`, `badge-*` and `.label`; Bootstrap 4 leftovers; `form-select`), in the strings and template literals of `app/assets/javascripts`
 
 ### Stylelint
 
@@ -157,7 +158,7 @@ Straight after a click or submit, assert something on the new page before checki
 The design guide (`/design`, `app/views/design.erb`) shows the colours, type, spacing, components and their classes. Check it before styling anything, and keep it up to date when you change them. The rules it doesn't spell out are below, apart from those with a check (showing and hiding, success and badge classes, colours, spacing), which are in Custom checks:
 
 - Stylesheets are plain CSS. Override Bootstrap in `app.css` (see Build/vendored code for changing its variables). Page-specific styles go in their own file loaded only by those pages (e.g. `docs.css`, `messages.css`)
-- Bootstrap 5 with jQuery: `form-select` on selects and `mb-3` between fields (its `data-bs-*` attributes and logical spacing are a check, under erb_lint)
+- Bootstrap 5 with jQuery: `mb-3` between fields (its `data-bs-*` attributes, logical spacing and `form-select` are checks, under erb_lint)
 - Filter forms above lists and tables use `.form-inline` and `.form-group` (kept in `app.css`) inside `.searchForm`; add `.submitOnChange` to submit when a field changes. Date fields take `.datepicker` or `.datetimepicker`, which `forms.js` wires up
 - Tooltips are `data-bs-toggle="tooltip"` and a `title`; `app.js` handles them for the whole page, so content loaded later needs no setup
 - Motion: shows where things come from and go, and is otherwise kept out of the way. State changes fade over `--transition-fast`; things that float (dropdown menus, the confirm popover, flash toasts) fade in over `--transition-enter`, moving at most `--space-2xs`; modals keep Bootstrap's slide; chevrons on things that open in place turn. Nothing bounces or reveals on scroll; what transitions may animate, their durations and looping are a check, under Stylelint

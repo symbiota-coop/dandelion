@@ -22,6 +22,9 @@ module ERBLint
 
       # class="..." attributes and class: '...' options in Ruby
       CLASS_LISTS = /\bclass(?:=|:\s*)(['"])(.*?)\1/m
+      # <select> tags and select_tag calls, which take form-select
+      SELECTS = /<select\b(?:[^>"']|"[^"]*"|'[^']*')*>|\bselect_tag\b.*?%>/m
+      FORM_SELECT = /(?<![\w-])form-select(?![\w-])/
       # Classes added from inline scripts
       CLASS_CALLS = /\b(?:(?:add|remove|toggle)Class|classList\.(?:add|remove|toggle))\(\s*(['"])(.*?)\1/
 
@@ -50,6 +53,13 @@ module ERBLint
           match = Regexp.last_match
           classes = match[2].gsub(/<%.*?%>/m) { |erb| ' ' * erb.length } # Ruby inside the attribute isn't a class
           check_classes(processed_source, classes, match.begin(2), label: true)
+        end
+
+        source.scan(SELECTS) do
+          match = Regexp.last_match
+          next if match[0].match?(FORM_SELECT)
+
+          add(processed_source, match.begin(0)...(match.begin(0) + match[0][/\A\S+/].length), 'Selects take `form-select`.')
         end
 
         source.scan(CLASS_CALLS) do
