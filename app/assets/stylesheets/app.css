@@ -3460,8 +3460,13 @@ td .tactivity-accept {
 }
 
 /* Accounts with no image (Account#avatar_class): their generated avatar is a stencil, so the theme shows through
-   its letters, and paler through the translucent white around them, close to --theme-100 */
+   its letters, and paler through the translucent white around them, close to --theme-100. The theme goes behind it
+   only once it has loaded (avatar-loaded, app.js), so it starts white rather than a block of the 500 */
 .avatar-initials {
+  transition: background-color var(--transition-fast);
+}
+
+.avatar-initials.avatar-loaded {
   background-color: var(--theme-500);
 }
 

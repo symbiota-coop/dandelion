@@ -5,6 +5,16 @@ if (window.DataTable) {
   })
 }
 
+// Generated avatars (.avatar-initials, app.css) take the theme behind them once their stencil has loaded, so they start
+// white rather than as a block of colour: those already loaded when this runs, and any that load later, including in
+// content loaded later (load doesn't bubble, so this listens in the capture phase)
+document.querySelectorAll('img.avatar-initials').forEach(function (img) {
+  if (img.complete && img.naturalWidth) img.classList.add('avatar-loaded')
+})
+document.addEventListener('load', function (e) {
+  if (e.target.matches && e.target.matches('img.avatar-initials')) e.target.classList.add('avatar-loaded')
+}, true)
+
 $(function () {
   // One tooltip handler for the whole page, so content loaded later needs no setup.
   // Sidebar links have their own, which only show when the sidebar is minified (see _nav.erb)
