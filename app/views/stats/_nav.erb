@@ -34,6 +34,11 @@
   </li>
 <% end %>
 <% {
+  'Performance' => [
+    ['Transactions', 'transactions', 'speedometer2'],
+    ['Traces', 'traces', 'bar-chart-steps'],
+    ['Spans', 'sentry_spans', 'activity']
+  ],
   'Growth' => [
     ['Orders', 'orders', 'cart-fill'],
     ['Organisations', 'organisations', 'flag-fill'],
@@ -46,11 +51,6 @@
     ['Feedback', 'feedback', 'chat-left-quote'],
     ['Comments', 'comments', 'chat-left-text'],
     ['Messages', 'messages', 'chat-left']
-  ],
-  'Performance' => [
-    ['Transactions', 'transactions', 'speedometer2'],
-    ['Traces', 'traces', 'bar-chart-steps'],
-    ['Spans', 'sentry_spans', 'activity']
   ],
   'Operations' => [
     ['Delivery', 'delivery', 'envelope-check'],
