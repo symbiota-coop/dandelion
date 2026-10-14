@@ -1,7 +1,9 @@
-<% if current_account.upcoming_events.exists? %>
+<%# Loaded once, as working out the account's events takes several queries; capped, as each row runs more %>
+<% upcoming_events = current_account.upcoming_events.includes(:organisation, :activity, :local_group).limit(10).to_a %>
+<% if upcoming_events.any? %>
 
   <table class="table table-borderless">
-    <% current_account.upcoming_events.each { |event| %>
+    <% upcoming_events.each { |event| %>
     <tr>
       <td class="pe-2" style="width: 1px">
 

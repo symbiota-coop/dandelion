@@ -1,3 +1,5 @@
+<%# Rendered once and shown in two places, the card below on small screens and the sidebar's on large ones %>
+<% my_upcoming = partial :'events/my_upcoming' %>
 <div class="row">
   <div class="col-lg-8">
     <%= cp(:'organisations/carousel', key: "/organisations/carousel/#{current_account.id}") %>
@@ -11,7 +13,7 @@
     <div class="card mb-3 d-lg-none">
       <h3 class="card-header chill">Your upcoming events</h3>
       <div class="card-body">
-        <%= partial :'events/my_upcoming' %>
+        <%= my_upcoming %>
       </div>
     </div>
 
@@ -26,7 +28,7 @@
   </div>
   <div class="col-lg-4">
     <div class="sticky-under-header">
-      <%= partial :'events/awesome' %>
+      <%= partial :'events/awesome', locals: { my_upcoming: my_upcoming } %>
       <% if current_account.following.and(:hidden => false, :date_of_birth.ne => nil).exists? %>
         <div class="card mt-3">
           <h3 class="card-header chill">Upcoming birthdays</h3>
