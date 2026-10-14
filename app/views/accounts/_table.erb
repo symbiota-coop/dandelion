@@ -6,7 +6,7 @@
       <td>
         <div class="row justify-content-between g-0">
           <div class="col">
-            <a target="_blank" href="mailto:<%= account.email %>"><%= account.email %></a>
+            <a class="text-break" target="_blank" href="mailto:<%= account.email %>"><%= account.email %></a>
           </div>
           <% if current_account && current_account.id == account.id %>
             <div class="col-12 col-sm-auto">
@@ -40,7 +40,7 @@
       <td>
         <div class="row justify-content-between g-0">
           <div class="col">
-            <a target="_blank" href="<%= account.website %>"><%= account.website %></a>
+            <a class="text-break" target="_blank" href="<%= account.website %>"><%= account.website %></a>
           </div>
           <% if current_account && current_account.id == account.id %>
             <div class="col-12 col-sm-auto">

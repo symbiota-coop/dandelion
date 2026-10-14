@@ -2,7 +2,7 @@
   <div class="col-12 col-lg-auto text-center">
     <img class="profile-photo <%= account.avatar_class %>" title="<%= account.name %>" src="<%= u account.image_thumb_or_gravatar_url %>">
   </div>
-  <div class="col-12 col-sm">
+  <div class="col-12 col-sm profile-details">
     <% if defined?(modal) %>
     <% else %>
       <div class="mb-2 text-center text-lg-start">
@@ -14,7 +14,7 @@
       </div>
     <% end %>
     <% if (info_tags = partial(:'accounts/info_tags', locals: { account: account })).strip.length > 0 %>
-      <div class="mb-2 text-center text-lg-start">
+      <div class="mb-2 d-flex flex-wrap gap-1 justify-content-center justify-content-lg-start">
         <%= info_tags %>
       </div>
     <% end %>

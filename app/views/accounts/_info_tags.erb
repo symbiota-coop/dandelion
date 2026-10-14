@@ -1,13 +1,13 @@
 <% if (e = Event.past.and(:id.in => account.tickets.complete.pluck(:event_id)).count) > 0 %>
   <% if current_account == account %>
-    <a href="/events/my?tab=past" class="mt-1 mt-lg-0 badge text-bg-primary">Attended <%= pluralize(e,'event') %></a>
+    <a href="/events/my?tab=past" class="badge text-bg-primary">Attended <%= pluralize(e,'event') %></a>
   <% else %>
-    <span class="mt-1 mt-lg-0 badge text-bg-primary">Attended <%= pluralize(e,'event') %></span>
+    <span class="badge text-bg-primary">Attended <%= pluralize(e,'event') %></span>
   <% end %>
 <% end %>
 <% if (e = Event.past.and(:id.in => account.event_facilitations.pluck(:event_id)).count) > 0 %>
-  <span class="mt-1 mt-lg-0 badge text-bg-primary">Facilitated <%= pluralize(e,'event') %></span>
+  <span class="badge text-bg-primary">Facilitated <%= pluralize(e,'event') %></span>
 <% end %>
 <% if current_account && Follow.and(follower: account, followee: current_account).exists? %>
-  <span class="mt-1 mt-lg-0 badge text-bg-primary">Follows you</span>
+  <span class="badge text-bg-primary">Follows you</span>
 <% end %>

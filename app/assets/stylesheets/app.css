@@ -3420,6 +3420,11 @@ td .tactivity-accept {
   border: 0.1875rem solid var(--bs-white);
 }
 
+/* The column beside it (accounts/_top.erb): free to shrink, so a long email or website breaks (text-break) rather than pushing the column under the photo */
+.profile-details {
+  min-width: 0;
+}
+
 /* Avatars (accounts/_square.erb, size: :xs to :2xl, :sm by default): square, in rem so they scale with the text */
 .avatar {
   aspect-ratio: 1 / 1;
