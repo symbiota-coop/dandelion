@@ -81,10 +81,17 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'generated avatars are PNGs, for initials of one or two Latin letters' do
-    ['/avatar/v2.png', '/avatar/v2/SR.png', '/avatar/v2/%C3%89Z.png'].each do |path|
-      get path
+    # ImageMagick, which draws them, isn't on CI's runner, so this checks the routes, not the drawing
+    { '/avatar/v2.png' => nil, '/avatar/v2/SR.png' => 'SR', '/avatar/v2/%C3%89Z.png' => 'ÉZ' }.each do |path, initials|
+      drawn = :not_drawn
+      draw = lambda do |i = nil|
+        drawn = i
+        'png'
+      end
+      GeneratedAvatar.stub(:png, draw) { get path }
       assert last_response.ok?, "expected #{path} to be served, got #{last_response.status}"
       assert_equal 'image/png', last_response.media_type
+      assert_equal initials.to_s, drawn.to_s
     end
 
     ['/avatar/v2/ABC.png', '/avatar/v2/12.png'].each do |path|
