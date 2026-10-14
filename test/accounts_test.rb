@@ -61,6 +61,35 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal 1, account.reload.sign_ins.count
   end
 
+  test 'generated avatars take the initials of the first and last names' do
+    assert_equal 'SR', GeneratedAvatar.initials('Stephen Reid')
+    assert_equal 'JG', GeneratedAvatar.initials('Dr. Jane Mary Goodall')
+    assert_equal 'M', GeneratedAvatar.initials('madonna')
+    assert_equal 'ÉZ', GeneratedAvatar.initials('Émile Zola')
+    assert_nil GeneratedAvatar.initials('Ольга Петрова')
+    assert_nil GeneratedAvatar.initials(nil)
+  end
+
+  test 'accounts with no image fall back to their generated avatar' do
+    account = FactoryBot.create(:account, name: 'Émile Zola')
+
+    assert_equal '/avatar/%C3%89Z.png', account.generated_avatar_path
+    assert_includes account.image_thumb_or_gravatar_url, CGI.escape("#{ENV['BASE_URI']}/avatar/%C3%89Z.png")
+  end
+
+  test 'generated avatars are PNGs, for initials of one or two Latin letters' do
+    ['/avatar.png', '/avatar/SR.png', '/avatar/%C3%89Z.png'].each do |path|
+      get path
+      assert last_response.ok?, "expected #{path} to be served, got #{last_response.status}"
+      assert_equal 'image/png', last_response.media_type
+    end
+
+    ['/avatar/ABC.png', '/avatar/12.png'].each do |path|
+      get path
+      assert last_response.not_found?, "expected #{path} to 404, got #{last_response.status}"
+    end
+  end
+
   test 'sign in token does not replace an existing session' do
     victim = FactoryBot.create(:account)
     attacker = FactoryBot.create(:account)

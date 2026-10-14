@@ -262,7 +262,12 @@ class Account
   end
 
   def gravatar_url
-    Padrino.env == :development ? '/images/silhouette.png' : "https://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email.downcase)}?s=400&d=#{Addressable::URI.escape("#{ENV['BASE_URI']}/images/silhouette.png")}"
+    Padrino.env == :development ? generated_avatar_path : "https://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email.downcase)}?s=400&d=#{CGI.escape("#{ENV['BASE_URI']}#{generated_avatar_path}")}"
+  end
+
+  def generated_avatar_path
+    initials = GeneratedAvatar.initials(name)
+    initials ? "/avatar/#{CGI.escape(initials)}.png" : '/avatar.png'
   end
 
   def unread_notifications?(notifications = network_notifications)
