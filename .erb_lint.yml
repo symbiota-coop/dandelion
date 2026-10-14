@@ -30,11 +30,12 @@ linters:
     enabled: false
   RubocopTags:
     enabled: true
-    # Only cops that can fail CI (warning or above), as CI runs erb_lint with --fail-level W like RuboCop: Lint, ours and
-    # the three warning-level Layout cops. Running only these, rather than every cop with most disabled, is most of its
+    # Only cops that can fail CI (warning or above), as CI runs erb_lint with --fail-level W like RuboCop: Lint, Security,
+    # ours and the three warning-level Layout cops. Running only these, rather than every cop with most disabled, is most of its
     # speed; convention cops wouldn't fail CI anyway, and erb_lint (unlike RuboCop) prints the offenses it ignores
     only:
       - Lint
+      - Security
       - Dandelion
       - Layout/BeginEndAlignment
       - Layout/DefEndAlignment

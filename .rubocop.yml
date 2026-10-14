@@ -1,5 +1,5 @@
-# Only cops that can fail CI (warning or above, as CI runs RuboCop with --fail-level warning): Lint, ours and the three
-# warning-level Layout cops. Convention cops (Style, Layout, Naming) are off, so plain `rubocop` reports what CI does.
+# Only cops that can fail CI (warning or above, as CI runs RuboCop with --fail-level warning): Lint, Security, ours and
+# the three warning-level Layout cops. Convention cops (Style, Layout, Naming) are off, so plain `rubocop` reports what CI does.
 # .erb_lint.yml inherits this file for the Ruby in templates.
 
 # Our own cops (.rubocop/dandelion), which check rules from AGENTS.md
@@ -24,6 +24,10 @@ Layout/DefEndAlignment:
 Layout/EndAlignment:
   Enabled: true
   AutoCorrect: true
+
+# Eval, YAML.load, Marshal.load, Kernel#open... are convention-level by default; warning, so they fail CI
+Security:
+  Severity: warning
 
 Lint/DuplicateBranch:
   IgnoreDuplicateElseBranch: true
