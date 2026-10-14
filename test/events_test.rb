@@ -333,7 +333,8 @@ class EventsTest < ActiveSupport::TestCase
       ticket_groups_attributes: { '0' => { id: own_group.id.to_s, name: own_group.name, capacity: own_group.capacity.to_s, event_id: other_event.id.to_s } }
     }
 
-    refute last_response.redirect?
+    # mass_assigning drops event_id, so the event saves with both left where they were
+    assert last_response.redirect?
     assert_equal @event.id, ticket_type.reload.event_id
     assert_equal @event.id, own_group.reload.event_id
   end
