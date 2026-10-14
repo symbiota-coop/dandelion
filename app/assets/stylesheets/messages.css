@@ -98,6 +98,13 @@
   right: -0.4375rem;
 }
 
+/* Below lg an open thread takes the page, hiding the list until its Messages link goes back to it */
+@media (max-width: 991.98px) {
+  .messages-thread-open > #preview-panel {
+    display: none;
+  }
+}
+
 .message-thread-layout {
   position: sticky;
   top: var(--fixed-header-height, var(--header-offset));

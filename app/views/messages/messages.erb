@@ -8,8 +8,8 @@
     thread.classList.remove('thread-scroll-prepin')
   }
 </script>
-<div class="row">
-  <div id="preview-panel" class="col-lg-3 <% if @account %>d-none d-lg-block <% end %>">
+<div class="row<%= ' messages-thread-open' if @account %>">
+  <div id="preview-panel" class="col-lg-3">
 
     <script>
       $(function() {
@@ -41,8 +41,7 @@
       <% if @account %>
         <div class="message-thread-breadcrumbs d-block d-lg-none">
           <ul id="message-breadcrumbs" class="breadcrumb">
-            <li class="breadcrumb-item"><a href="javascript:;" onclick="$('#thread-panel').hide();
-                $('#preview-panel').removeClass('d-none') /* eslint-disable-line no-restricted-syntax -- the panel's d-none is responsive (d-none d-lg-block), so .show() can't replace it */">Messages</a></li>
+            <li class="breadcrumb-item"><a href="javascript:;" onclick="$('#thread-panel').hide(); $(this).closest('.messages-thread-open').removeClass('messages-thread-open')">Messages</a></li>
             <li class="breadcrumb-item active"><%= @account.name %></li>
           </ul>
         </div>
