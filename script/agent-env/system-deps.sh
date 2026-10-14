@@ -10,6 +10,7 @@ SUDO=""
 
 export DEBIAN_FRONTEND=noninteractive
 $SUDO apt-get update -qq
+# xz-utils: node.sh's Node tarball is .tar.xz
 $SUDO apt-get install -y --no-install-recommends \
   autoconf \
   automake \
@@ -29,6 +30,7 @@ $SUDO apt-get install -y --no-install-recommends \
   pkg-config \
   sudo \
   tzdata \
+  xz-utils \
   zlib1g-dev
 
 # Ubuntu's chromium package is a snap stub that doesn't run, so there use a Playwright Chromium the image provides
