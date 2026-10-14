@@ -195,6 +195,22 @@ class EventPermissionsTest < ActiveSupport::TestCase
     assert_includes last_response.body, 'id="add-organisation"'
   end
 
+  test 'events stats page makes event managers revenue admins of hosted and cohosted events' do
+    create_event
+    manager = add_event_manager(@organisation)
+    other_organisation = FactoryBot.create(:organisation)
+    cohosted_event = FactoryBot.create(:event, organisation: other_organisation)
+    cohosted_event.cohostships.create!(organisation: @organisation)
+
+    sign_in_with_rack(manager)
+    get "/o/#{@organisation.slug}/events/stats"
+
+    assert last_response.ok?
+    [@event, cohosted_event].each do |event|
+      assert_match %r{/events/#{event.id}/stats_row\?[^"]*event_revenue_admin=1"}, last_response.body
+    end
+  end
+
   test 'host event_manager can add a cohost' do
     create_event
     manager = add_event_manager(@organisation)

@@ -142,9 +142,25 @@ Dandelion::App.helpers do
     kick!(redirect_url: "/e/#{@event.slug}") unless can_delete_event?
   end
 
+  # Admins and event managers of an event's organisation are revenue admins of it, so that's checked first, once per
+  # organisation: otherwise each of an organisation's events costs several queries (its activity, local group and
+  # organisation, and the event manager check), which made /o/:slug/events/stats take seconds for event managers
+  def event_organisation_admin_or_event_manager?(event, account = current_account)
+    return false unless event&.organisation_id && account
+
+    cache = @event_organisation_admin_or_event_manager_cache ||= {}
+    key = [event.organisation_id.to_s, account.id.to_s]
+    cache.fetch(key) do
+      # organisation_admins_or_event_managers? falls back to @organisation when given nil
+      cache[key] = (organisation = event.organisation) && organisation_admins_or_event_managers?(organisation, account) ? true : false
+    end
+  end
+
   def event_revenue_admin?(event = nil, account = current_account)
     event ||= @event
     cached_permission(:@event_revenue_admin_cache, event, account) do
+      next true if event_organisation_admin_or_event_manager?(event, account)
+
       Event.revenue_admin?(
         event,
         account,
