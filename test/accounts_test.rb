@@ -61,6 +61,45 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal 1, account.reload.sign_ins.count
   end
 
+  test 'generated avatars take the initials of the first and last names' do
+    assert_equal 'SR', GeneratedAvatar.initials('Stephen Reid')
+    assert_equal 'JG', GeneratedAvatar.initials('Dr. Jane Mary Goodall')
+    assert_equal 'M', GeneratedAvatar.initials('madonna')
+    assert_equal 'ÉZ', GeneratedAvatar.initials('Émile Zola')
+    assert_nil GeneratedAvatar.initials('Ольга Петрова')
+    assert_nil GeneratedAvatar.initials(nil)
+  end
+
+  test 'accounts with no image fall back to their generated avatar' do
+    account = FactoryBot.create(:account, name: 'Émile Zola')
+
+    assert_equal '/avatar/v2/ÉZ.png', account.generated_avatar_path
+
+    # Views escape the URL again with u, so Gravatar's fallback must come through that and one decode intact
+    src = URI::Parser.new.escape(account.image_thumb_or_gravatar_url)
+    assert_equal "#{ENV['BASE_URI']}/avatar/v2/%C3%89Z.png", URI.decode_www_form(URI(src).query).to_h['d']
+  end
+
+  test 'generated avatars are PNGs, for initials of one or two Latin letters' do
+    # ImageMagick, which draws them, isn't on CI's runner, so this checks the routes, not the drawing
+    { '/avatar/v2.png' => nil, '/avatar/v2/SR.png' => 'SR', '/avatar/v2/%C3%89Z.png' => 'ÉZ' }.each do |path, initials|
+      drawn = :not_drawn
+      draw = lambda do |i = nil|
+        drawn = i
+        'png'
+      end
+      GeneratedAvatar.stub(:png, draw) { get path }
+      assert last_response.ok?, "expected #{path} to be served, got #{last_response.status}"
+      assert_equal 'image/png', last_response.media_type
+      assert_equal initials.to_s, drawn.to_s
+    end
+
+    ['/avatar/v2/ABC.png', '/avatar/v2/12.png'].each do |path|
+      get path
+      assert last_response.not_found?, "expected #{path} to 404, got #{last_response.status}"
+    end
+  end
+
   test 'sign in token does not replace an existing session' do
     victim = FactoryBot.create(:account)
     attacker = FactoryBot.create(:account)

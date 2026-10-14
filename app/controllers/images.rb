@@ -15,6 +15,20 @@ Dandelion::App.controller do
     end
   end
 
+  # Gravatar's fallback for accounts with no image (see Account#gravatar_url): the initials are in the path rather
+  # than looked up, so it needs no query, and a new name is a new URL, which Gravatar hasn't cached. Gravatar and
+  # browsers keep these for a year, so when the image changes, bump the version here and in Account#generated_avatar_path
+  get '/avatar/v2', provides: :png do
+    cache_control :public, max_age: 1.year.to_i
+    GeneratedAvatar.png
+  end
+
+  get '/avatar/v2/:initials', provides: :png do
+    halt 404 unless params[:initials].match?(GeneratedAvatar::INITIALS)
+    cache_control :public, max_age: 1.year.to_i
+    GeneratedAvatar.png(params[:initials])
+  end
+
   get '/youtube_thumb/:id' do
     halt 400 unless params[:id] =~ /\A[A-Za-z0-9_-]{11}\z/
 

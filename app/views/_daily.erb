@@ -43,7 +43,7 @@
         <% account = Account.find(@edition['facilitator_id']) if @edition['facilitator_id'] %>
         <% if account %>
           <a class="text-decoration-none" href="javascript:;" data-account-username="<%= account.username %>">
-            <img class="w-100 <%= 'private' if account.private? %>" src="<%= u account.image_thumb_or_gravatar_url %>">
+            <img class="w-100 <%= account.avatar_class %> <%= 'private' if account.private? %>" src="<%= u account.image_thumb_or_gravatar_url %>">
             <h4 class="mt-2">
               <a class="text-body" href="/u/<%= account.username %>"><%= account.name %></a>
             </h4>
