@@ -124,46 +124,13 @@ Dandelion::App.controller do
   end
 
   get '/stats/files' do
-    # Vendored code, which isn't ours to keep small
-    ignore_patterns = ['app/assets/javascripts/ext/**/*']
-
-    @files = []
     root_path = Padrino.root.to_s
+    # Dir.glob skips hidden files and directories (like .git). app/assets/javascripts/ext is vendored code, which isn't ours to keep small
+    @files = Dir.glob('**/*.{rb,erb,js}', base: root_path).filter_map do |path|
+      file_path = File.join(root_path, path)
+      next if path.start_with?('app/assets/javascripts/ext/') || !File.file?(file_path)
 
-    # Traverse all files
-    Find.find(root_path) do |file_path|
-      # Skip hidden directories entirely (like .git)
-      Find.prune if File.directory?(file_path) && File.basename(file_path).start_with?('.')
-      next unless File.file?(file_path)
-
-      # Get relative path from root
-      relative_path = file_path.sub("#{root_path}/", '')
-      # Handle root-level files
-      relative_path = File.basename(file_path) if relative_path == file_path
-
-      # Check if file matches any ignore pattern
-      # FNM_PATHNAME: wildcards don't match /
-      # FNM_EXTGLOB: enables ** (globstar) to match directories recursively
-      fnmatch_flags = File::FNM_PATHNAME | File::FNM_EXTGLOB
-      ignored = ignore_patterns.any? do |pattern|
-        # Convert glob pattern to match relative paths
-        # Handle both relative and absolute path matching
-        File.fnmatch?(pattern, relative_path, fnmatch_flags) ||
-          File.fnmatch?(pattern, file_path, fnmatch_flags) ||
-          File.fnmatch?("#{root_path}/#{pattern}", file_path, fnmatch_flags)
-      end
-
-      next if ignored
-
-      # Only show .rb, .erb, and .js files
-      next unless ['.rb', '.erb', '.js'].include?(File.extname(file_path))
-
-      file_size = File.size(file_path)
-      @files << {
-        path: relative_path,
-        size: file_size,
-        modified: File.mtime(file_path)
-      }
+      { path: path, size: File.size(file_path), modified: File.mtime(file_path) }
     end
 
     # Sort by size (largest first)

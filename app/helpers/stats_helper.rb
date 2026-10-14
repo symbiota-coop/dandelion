@@ -63,21 +63,15 @@ Dandelion::App.helpers do
 
   def sentry_span_source_files
     root_path = Padrino.root.to_s
-    ignored_dirs = %w[.git .bundle .claude log tmp vendor node_modules public]
+    # Dir.glob skips hidden directories (like .git)
+    ignored_dirs = %w[log tmp vendor node_modules public]
 
-    files = []
-    Find.find(root_path) do |file_path|
-      if File.directory?(file_path)
-        Find.prune if ignored_dirs.include?(File.basename(file_path))
-        next
-      end
+    Dir.glob('**/*.{rb,erb,rake}', base: root_path).filter_map do |path|
+      next if path.split('/').intersect?(ignored_dirs)
 
-      next unless File.file?(file_path)
-      next unless %w[.rb .erb .rake].include?(File.extname(file_path))
-
-      files << file_path
+      file_path = File.join(root_path, path)
+      file_path if File.file?(file_path)
     end
-    files
   end
 
   def sentry_spans_in_file(file_path)

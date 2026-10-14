@@ -2,15 +2,14 @@
 # Hash to store occurrences
 bi_counts = Hash.new(0)
 
-['app', 'models', 'lib'].each do |dir|
-  Find.find(dir) do |path|
-    if File.file?(path) && !path.split('/').last.starts_with?('.') && !path.include?('fonts') && !path.include?('images')
-      File.readlines(path).each do |line|
-        # Find all matches of 'bi-*' and count them
-        line.scan(/\bbi-[-\w]+/).each do |match|
-          bi_counts[match] += 1
-        end
-      end
+# Dir.glob skips hidden files
+Dir.glob('{app,models,lib}/**/*').each do |path|
+  next if !File.file?(path) || path.include?('fonts') || path.include?('images')
+
+  File.readlines(path).each do |line|
+    # Find all matches of 'bi-*' and count them
+    line.scan(/\bbi-[-\w]+/).each do |match|
+      bi_counts[match] += 1
     end
   end
 end
