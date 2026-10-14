@@ -13,9 +13,9 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   def assert_edit_redirect_with_param(param_name, param_value)
-    assert page.current_path.include?('/accounts/edit'),
+    assert page.has_current_path?(%r{/accounts/edit}, ignore_query: true),
            "Expected redirect to /accounts/edit, got #{page.current_path}"
-    assert page.current_url.include?("#{param_name}=#{param_value}"),
+    assert page.has_current_path?(/#{Regexp.escape("#{param_name}=#{param_value}")}/, url: true),
            "Expected URL to include #{param_name}=#{param_value}"
   end
 
@@ -253,7 +253,7 @@ class AccountsTest < ActiveSupport::TestCase
     visit "/invite/#{referrer.id}"
     fill_signup_form(account)
 
-    assert page.current_path.include?('/o/new')
+    assert page.has_current_path?(%r{/o/new}, ignore_query: true)
 
     fill_in 'Organisation name', with: organisation.name
     fill_in 'URL', with: organisation.slug
@@ -272,9 +272,9 @@ class AccountsTest < ActiveSupport::TestCase
     account.generate_sign_in_token!
     visit "/e/#{@event2.slug}?sign_in_token=#{account.sign_in_token}"
 
-    assert page.current_path.include?("/e/#{@event2.slug}"),
+    assert page.has_current_path?(%r{/e/#{@event2.slug}}, ignore_query: true),
            "Expected to stay on #{@event2.slug}, got #{page.current_path}"
-    refute page.current_path.include?(@event1.slug)
+    assert page.has_no_current_path?(/#{@event1.slug}/, ignore_query: true)
   end
 
   test 'sign in token on homepage still honours return_to from an event page' do
@@ -285,7 +285,7 @@ class AccountsTest < ActiveSupport::TestCase
     account.generate_sign_in_token!
     visit "/?sign_in_token=#{account.sign_in_token}"
 
-    assert page.current_path.include?("/e/#{@event.slug}"),
+    assert page.has_current_path?(%r{/e/#{@event.slug}}, ignore_query: true),
            "Expected to return to #{@event.slug}, got #{page.current_path}"
   end
 
@@ -295,15 +295,15 @@ class AccountsTest < ActiveSupport::TestCase
 
     visit "/invite/#{referrer.id}"
     fill_signup_form(account)
-    assert page.current_path.include?('/o/new')
+    assert page.has_current_path?(%r{/o/new}, ignore_query: true)
 
     visit '/accounts/sign_out'
     account2 = FactoryBot.build_stubbed(:account)
     visit '/accounts/new'
     fill_signup_form(account2)
 
-    assert page.current_path.include?('/accounts/edit')
-    refute page.current_path.include?('/o/new')
+    assert page.has_current_path?(%r{/accounts/edit}, ignore_query: true)
+    assert page.has_no_current_path?(%r{/o/new}, ignore_query: true)
   end
 
   test 'signing up with organisation_id' do
@@ -371,7 +371,7 @@ class AccountsTest < ActiveSupport::TestCase
     fill_signup_form(FactoryBot.build_stubbed(:account, email: existing_account.email))
 
     assert page.has_content?("There's already an account registered under that email address")
-    assert_equal '/accounts/sign_in', page.current_path
+    assert page.has_current_path?('/accounts/sign_in', ignore_query: true)
   end
 
   test 'existing account created by a concurrent signup' do
@@ -387,7 +387,7 @@ class AccountsTest < ActiveSupport::TestCase
       fill_signup_form(FactoryBot.build_stubbed(:account, email: existing_account.email))
 
       assert page.has_content?("There's already an account registered under that email address")
-      assert_equal '/accounts/sign_in', page.current_path
+      assert page.has_current_path?('/accounts/sign_in', ignore_query: true)
     end
   end
 

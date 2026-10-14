@@ -7,11 +7,13 @@
 #   script/lint --all       everything, as CI does
 #
 # Add --only <linter> (rubocop, erb_lint, eslint or stylelint) to run just one, as CI's separate steps do.
-# A changed linter config (or one of our own cops or linters) runs that linter on everything, as CI would.
+# A changed linter config (or one of our own cops or linters) runs that linter on everything, as CI would. A built file
+# (bootstrap5.css, ckeditor.js) given without its source fails, as it was edited by hand.
 # Exits non-zero if any linter fails.
 require 'open3'
 
 $stdout.sync = true # so the summary on stderr comes after the output
+# Messages go to $stderr.puts rather than warn, which prints nothing under RUBYOPT=-W0
 Dir.chdir(File.expand_path('..', __dir__))
 
 ERB_ENV = { 'RUBYOPT' => '-W0' }.freeze # hides the parser gem warning that it only knows Ruby 3.4 as 3.4.0-dev
@@ -31,6 +33,8 @@ LINTERS = [
     configs: %r{\A(\.erb_lint\.yml|\.erb_linters/|\.rubocop\.yml|\.rubocop/|config/bootstrap4_leftovers\.json\z)},
     command: %w[bundle exec erb_lint --fail-level W], # W is warning, like RuboCop; erb_lint 0.9 rejects the word "warning"
     all: %w[--lint-all],
+    # erb_lint uses one core, so everything is linted as four runs, each on a share of the templates (.erb_lint.yml's glob)
+    shards: 'app/views/**/*.erb',
     stdin: ->(file) { ['--stdin', file] },
     env: ERB_ENV
   },
@@ -38,7 +42,7 @@ LINTERS = [
     name: 'ESLint',
     files: %r{\Aapp/assets/javascripts/(?!ext/).+\.js\z},
     configs: %r{\A(eslint\.config\.mjs|package(-lock)?\.json|config/bootstrap4_leftovers\.json)\z},
-    command: %w[npx eslint --no-warn-ignored],
+    command: %w[npx --no-install eslint --no-warn-ignored],
     stdin: ->(file) { ['--stdin', '--stdin-filename', file] },
     node: true
   },
@@ -46,12 +50,26 @@ LINTERS = [
     name: 'Stylelint',
     files: %r{\Aapp/assets/stylesheets/.+\.css\z},
     configs: /\A(stylelint\.config\.mjs|package(-lock)?\.json)\z/,
-    command: %w[npx stylelint --allow-empty-input],
+    command: %w[npx --no-install stylelint --allow-empty-input],
     all: ['app/assets/stylesheets/**/*.css'],
     stdin: ->(file) { ['--stdin-filename', file] },
     node: true
   }
 ].freeze
+
+# Built files, which change only with their source (AGENTS.md, Build/vendored code), so one changed alone was edited by hand
+GENERATED = {
+  'app/assets/stylesheets/bootstrap5.css' => {
+    sources: %r{\A(app/assets/stylesheets/bootstrap5\.scss|tasks/bootstrap\.rake)\z},
+    message: 'is built from bootstrap5.scss: change that and run rake bootstrap:build'
+  },
+  'app/assets/javascripts/ext/ckeditor.js' => {
+    sources: %r{\A(ckeditor/|tasks/ckeditor\.rake\z)},
+    message: 'is built from ckeditor/: change ckeditor/src/ckeditor.js and run rake ckeditor:build'
+  }
+}.freeze
+
+WORKERS = 4 # linter runs at a time
 
 USAGE = "Usage: script/lint [--only #{LINTERS.map { |linter| linter[:name].downcase }.join('|')}] FILE... | --staged | --all".freeze
 
@@ -70,6 +88,9 @@ files =
   end
 
 # Each job is a command, its env and what to pipe to it
+hand_edited = GENERATED.select { |file, built| files.include?(file) && files.none? { |f| f.match?(built[:sources]) } }
+hand_edited.each { |file, built| $stderr.puts "#{file} #{built[:message]}, rather than editing it" }
+
 jobs = LINTERS.flat_map do |linter|
   next [] if only && linter[:name].downcase != only.downcase
 
@@ -77,13 +98,17 @@ jobs = LINTERS.flat_map do |linter|
   mine = files.select { |f| f.match?(linter[:files]) }
   next [] unless all || mine.any?
 
-  if linter[:node] && !File.directory?('node_modules')
-    warn "#{linter[:name]}: node_modules is missing, so run npm ci first"
+  # Only the versions package-lock.json installs: npx would otherwise fetch a missing linter, of any age
+  if linter[:node] && !File.exist?("node_modules/.bin/#{linter[:name].downcase}")
+    $stderr.puts "#{linter[:name]} isn't installed, so run npm ci first"
     next [{ name: linter[:name], missing: true }]
   end
 
   env = linter[:env] || {}
-  if all
+  if all && linter[:shards]
+    templates = Dir[linter[:shards]]
+    templates.each_slice(templates.size.fdiv(WORKERS).ceil).map { |share| { name: linter[:name], command: linter[:command] + share, env: env } }
+  elsif all
     [{ name: linter[:name], command: linter[:command] + (linter[:all] || []), env: env }]
   elsif mode == '--staged'
     # One run per file, given the staged version on stdin, so unstaged edits (yours or another session's) don't count
@@ -96,11 +121,12 @@ jobs = LINTERS.flat_map do |linter|
 end
 
 failed = jobs.select { |job| job[:missing] }.map { |job| job[:name] }
+failed << 'Generated files' if hand_edited.any?
 runnable = jobs.reject { |job| job[:missing] }
 queue = Queue.new
 runnable.each_with_index { |job, index| queue << [job, index] }
 queue.close
-results = Array.new(4) do
+results = Array.new(WORKERS) do
   Thread.new do
     done = []
     while (item = queue.pop)
@@ -120,7 +146,7 @@ results.each do |_, job, output, status|
 end
 
 if failed.any?
-  warn "\nFailed: #{failed.uniq.join(', ')}"
+  $stderr.puts "\nFailed: #{failed.uniq.join(', ')}"
   exit 1
 elsif jobs.any?
   puts "Passed: #{jobs.map { |job| job[:name] }.uniq.join(', ')}"

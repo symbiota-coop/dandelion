@@ -37,7 +37,33 @@ Style/NumericPredicate:
 
 Lint/DuplicateBranch:
   IgnoreDuplicateElseBranch: true
+# Our tests save screenshots on purpose (each test's last page, in capybara/<pid>/, and the how-to videos' frames), so
+# save_screenshot isn't a debugging leftover; the rest of Capybara's list (save_and_open_page...) still is
+Lint/Debugger:
+  DebuggerMethods:
+    Capybara:
+      - page.save_and_open_page
+      - page.save_and_open_screenshot
+      - page.save_page
+      - save_and_open_page
+      - save_and_open_screenshot
+      - save_page
 
 # Warning, so they fail CI, in templates too
 Dandelion:
   Severity: warning
+Dandelion/RailsController:
+  Include:
+    - app/controllers/**/*.rb
+Dandelion/CapybaraHasNoAfterClick:
+  Include:
+    - test/**/*.rb
+Dandelion/MongoidIndex:
+  Include:
+    - models/**/*.rb
+Dandelion/TestInstanceVariable:
+  Include:
+    - test/**/*_test.rb
+Dandelion/CapybaraCurrentPath:
+  Include:
+    - test/**/*_test.rb

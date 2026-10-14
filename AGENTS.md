@@ -15,17 +15,18 @@ Dandelion is built with many coding agents (Claude Code, Codex, Cursor, opencode
 - Setup: `script/agent-env/` installs and starts everything for any environment, and each tool's own config only calls it (Cloud agents)
 - MCP servers: defined once in `.mcp.json` and copied into each tool's format by `rake mcp:sync` (Cloud agents)
 - Shared checkouts: other sessions may be editing the same files, so commit only your own changes (Committing)
-- Automation: the AI workflows in `.github/workflows` (PR review, daily bug reviews) run Claude, Codex and Cursor on the same prompts (`.github/prompts`, `.github/actions`), with their models in `.github/models.env`
+- Automation: the daily bug reviews in `.github/workflows` run Claude, Codex and Cursor on the same prompt (`.github/prompts`, `.github/actions`), with their models in `.github/models.env`
 
 ## Custom checks
 
-CI fails on each rule below, and each names its check. When you add a rule to this file that code can check, add a check for it and list it here. Disable a check only where its rule genuinely doesn't apply.
+CI fails on each rule below, and each names its check. When you add a rule to this file that code can check, add a check for it, list it here, and add cases to `test/lint_test.rb`, which tests our checks (each cop's `@example`, good and bad, is tested as it stands). It doesn't boot the app, so it runs without foreman: `bundle exec ruby -I test test/lint_test.rb`, and CI's lint job runs it. Disable a check only where its rule genuinely doesn't apply, and say why in the comment.
 
 ### RuboCop
 
 Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Ruby in templates through erb_lint (its `RubocopTags` linter, `.erb_linters/rubocop_tags.rb`, which also checks the conditions of `<% if %>`, `<% unless %>` and `<% elsif %>` tags). Disable one on a line with `# rubocop:disable Dandelion/... -- reason`.
 
 - `Dandelion/MongoidOr`: Never use Mongoid `.or` — it ORs against whatever is already in the selector (`Event.live.or(featured: true)` means live or featured). Use `self.and('$or' => [...])` so the OR is just another AND-ed filter (`Event.live.and('$or' => [...])` means live and (this or that))
+- `Dandelion/MongoidIndex`: Mongo indexes are created directly in the database, not declared in models with Mongoid's `index`. It checks `models`
 - `Dandelion/MongoidScope`: Query filters are class methods that return `self.and(...)` so they chain (`Event.live.future`). Do not use `scope :live, -> { ... }`
 - `Dandelion/MongoidWhere`: Use `scope.and` rather than `scope.where` (a JavaScript `$where` string, `where('this.paid < this.requested_contribution')`, is the exception, as `.and` can't take one)
 - `Dandelion/BelongsTo`: Use `belongs_to_without_parent_validation`, not Mongoid `belongs_to` (its parent check fails when the parent is only in memory)
@@ -35,6 +36,10 @@ Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Rub
 - `Dandelion/ParamsBlank`: `lib/param_helpers.rb` runs `blanks_to_nils!` on `params`, so blank values are already nil: just do `if params[:x]` (or `unless`), with no `.present?` or `.blank?`
 - `Dandelion/Presence`: Don't use `.presence`, on `params` or anywhere else
 - `Dandelion/ErrorReporting`: Report rescued errors with `ErrorReporting.capture_exception(e, context:, tags:)`, not `Sentry.capture_exception`
+- `Dandelion/RailsController`: Controllers are `Dandelion::App.controller` blocks (Padrino), not Rails controllers: `before do`, not `before_action`; `erb`, `partial` or `cp`, not `render`; `redirect`, not `redirect_to`; `provides:` and `content_type`, not `respond_to`; and no strong parameters: pass `params[:x]` through `mass_assigning(params[:x], Model)`. It checks `app/controllers`
+- `Dandelion/CapybaraHasNoAfterClick`: Straight after a click, assert something on the new page before checking something isn't there (`has_no_*`, `assert_no_*`), or that check can pass on the old page. A click whose confirm is dismissed (`dismiss_confirm`) doesn't leave the page. It checks `test`
+- `Dandelion/TestInstanceVariable`: In a test, `@` variables come from helpers (`create_organisation`, `create_event`, `create_gathering`, `create_full_event_hierarchy`, and file-local setup methods); anything created inline in a test is a local. A test may refresh a variable one of its file's helpers sets. It checks `test`
+- `Dandelion/CapybaraCurrentPath`: Check the page's path with `assert page.has_current_path?(...)` (with `ignore_query: true` to compare the path alone, or `url: true` for the whole URL), which waits for the page: `current_path` and `current_url` don't, so straight after a click they can still be the old page's. It checks `test`
 - `Dandelion/CapybaraRefuteHas`: To check something isn't on the page, use `assert page.has_no_css?` (`has_no_content?`, `has_no_link?`, `has_no_title?`...), never `refute page.has_css?`: the `has_` form waits the full 10 s `default_max_wait_time` for it to appear before passing
 
 ### erb_lint
@@ -44,12 +49,13 @@ Our linter, `DesignClasses`, is in `.erb_linters/design_classes.rb`. Disable it 
 - `DesignClasses`: To show and hide elements from JS, start them hidden with `style="display: none"` and use jQuery `.show()` / `.hide()` / `.toggle()`, not `d-none` with `addClass` / `removeClass` (Bootstrap's `d-*` classes are `!important`). Keep `d-none d-md-block` and friends for purely responsive hiding
 - `DesignClasses`: Success is the theme colour, so use `-primary`, never `-success`. Badges are `badge text-bg-*`; there is no `.label` and no `badge-*` colour class
 - `DesignClasses`: Bootstrap 5, not 4: `data-bs-*` attributes and logical spacing and alignment (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-end`, `float-start`). `config/bootstrap4_leftovers.json` lists the Bootstrap 4 classes and attributes it flags, with what replaces each; add one there if you find another
+- `DesignClasses`: Selects take `form-select` (`<select>` tags and `select_tag`; the form builder's `select_block` adds it), even ones Select2 replaces, so they look right until it loads
 
 ### ESLint
 
 Our rules are in `eslint.config.mjs`. Disable one with `// eslint-disable-next-line <rule> -- reason`.
 
-- `no-restricted-syntax`: The three `DesignClasses` rules above (showing and hiding; `-success`, `badge-*` and `.label`; Bootstrap 4 leftovers), in the strings and template literals of `app/assets/javascripts`
+- `no-restricted-syntax`: The `DesignClasses` rules above (showing and hiding; `-success`, `badge-*` and `.label`; Bootstrap 4 leftovers; `form-select`), in the strings and template literals of `app/assets/javascripts`
 
 ### Stylelint
 
@@ -58,7 +64,19 @@ Our rules are in `stylelint.config.mjs`. Disable one with `/* stylelint-disable 
 - `declaration-property-value-disallowed-list` and `color-named`: Colours come from tokens (`--theme-*`, `--color-*`, `--bs-gray-*`, `--hairline`...), so organisation themes follow: never hex values, `rgb()`/`hsl()` of numbers or named colours, which the check allows only where a custom property is defined. Translucent black and white are `rgba(var(--bs-black-rgb), a)` and `rgba(var(--bs-white-rgb), a)`; don't add other translucent tints beyond those the design guide lists (not checked)
 - `declaration-property-value-disallowed-list`: Radii come from Bootstrap's variables (`--bs-border-radius`, `-sm`, `-lg`, `-xl`, `-pill`), or are 0, 50% or inherit. A shadow with blur is an elevation, so it's one of Bootstrap's (`--bs-box-shadow-sm`, `--bs-box-shadow`, `--bs-box-shadow-lg` or the `shadow-*` classes); unblurred rings (the focus ring, hairline rings, image overlays) are fine. The check flags lengths in radii and blurred shadows
 - `declaration-property-unit-disallowed-list`: Spacing comes from the scale: Bootstrap's spacing utilities in markup, `--space-*` tokens in CSS, never px. Off the scale only to size a control to match another or to line up with a fixed layout dimension (the design guide's Spacing lists them). Other sizes are in rem (or em); px only for hairlines, shadows, the focus ring, breakpoints and Google Maps overrides. The check flags px in margins, padding, gaps, insets (`inset*`, `top`, `right`, `bottom`, `left`) and font sizes
+- `declaration-property-value-disallowed-list`: Motion: transitions animate only colours, shadows, masks, opacity, `translate` and `rotate` (not `all`, `transform`, `scale` or sizes), over `--transition-fast` or `--transition-enter` rather than a duration of their own, and only loading indicators loop (`infinite`). Loading indicators, which may loop on their own timing, disable it where they are, as do the guide's two older exceptions (the quick theme colours and feedback stars grow on hover); don't add more
 - `declaration-property-value-disallowed-list` (override for `event_details.css` and `email.css`): These two are inlined into emails, so they can't use CSS custom properties (`var(--x)`). The colour, radius, shadow and spacing checks above don't apply to them
+
+### Other checks
+
+Rules no linter covers, checked by `test/lint_test.rb` (which CI's lint job runs) or `script/lint` (which the pre-commit hook runs). Each names its check.
+
+- `test_mcp_copies_match_mcp_json`: `.cursor/mcp.json`, `.opencode/opencode.json` and `.codex/config.toml` are copies of `.mcp.json`: only edit `.mcp.json`, then run `rake mcp:sync` (Cloud agents)
+- `test_ci_runs_every_test_file`: CI's test jobs, one per test file, are listed in `.github/workflows/ruby.yml`: add a new test file there (Tests)
+- `test_every_disable_says_why`: every disable comment gives its reason, after `--` (or after `Linter:` for erb_lint), as each linter's section shows
+- `test_dependency_versions_are_exact`: the root `package.json`, the CDN packages (`config/frontend_dependencies.rb`, `layouts/_dependencies.erb`) and the packages rake tasks install name exact versions, so none arrives unchosen (Dependencies)
+- `test_ckeditor_stays_on_37`: CKEditor stays on 37 (Build/vendored code)
+- `script/lint`: `bootstrap5.css` and `ext/ckeditor.js` are built (Build/vendored code), so a commit that changes one without its source (`bootstrap5.scss`, `ckeditor/`, or their rake task) fails
 
 ## Committing
 
@@ -81,21 +99,21 @@ The pre-commit hook (`.githooks/pre-commit`) runs `script/lint --staged`, which 
 
 ## Cloud agents (Cursor, Claude Code)
 
-Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, MongoDB), `install.sh` (bundle install, npm ci, `.env` files, the pre-commit hook) and `start-services.sh` (starts MongoDB).
+Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Chromium, MongoDB), `ruby.sh` (the Gemfile's Ruby, for images without it), `node.sh` (the Node in `.nvmrc`, which CI's setup-node also reads, for images without its major; installed at a prefix of its own rather than over the image's Node), `browser-path.sh` (prints the Chromium for `BROWSER_PATH`), `install.sh` (bundle install, npm ci for the linters, which only warns if it fails, `.env` files, the pre-commit hook), `start-services.sh` (starts MongoDB) and `start-web.sh` (starts Puma in the background, logging to `log/web.log`, for environments with no terminal to keep it in). A tool's own setup only calls these, plus anything that applies to that tool alone (Claude Code's proxy CA and `CLAUDE_ENV_FILE`).
 
-- Cursor: `.cursor/environment.json` and `.cursor/Dockerfile`. After boot, `start` forks Mongo; a `web` terminal keeps `foreman start -e .env web` running (Puma on port 3000, logs in that session).
+- Cursor: `.cursor/environment.json` and `.cursor/Dockerfile`. After boot, `start` forks Mongo; a `web` terminal keeps `foreman start -e .env web` running (Puma on port 3000, logs in that session). That terminal is a tmux session, so the Dockerfile installs tmux.
 - Claude Code on the web: a `SessionStart` hook in `.claude/settings.json` runs `.claude/remote-setup.sh`. Project MCP servers come from the committed `.mcp.json`, whose `${VAR}`s are filled from the cloud environment's variables (and from your shell locally). Other tools don't read it, so each has its own committed copy of the same servers, with secrets read from the environment rather than written in: `.cursor/mcp.json` (`${env:VAR}`), `.codex/config.toml` (`env_vars` and `bearer_token_env_var`; Codex only reads it in trusted projects) and `.opencode/opencode.json` (`{env:VAR}`). Only edit `.mcp.json`, then run `rake mcp:sync` to write the others. Variables in `.mcp.json` can't have defaults (`${VAR:-x}`), as the others can't express them. Cursor cloud agents don't read any repo MCP file; their MCP servers are set up in the Cursor dashboard
 - MongoDB MCP: `.mcp.json` runs `mongodb-atlas-mcp-remote`, a proxy to the Atlas Managed MCP Server (`https://mcp.mongodb.com`), with read-only access to production. The server lists write tools (`insert-many`, `update-many`, `delete-many`, `drop-*`, `atlas-create-*`); never call them
 - Browsing the app with Playwright (Claude Code on the web): Chromium ignores `HTTPS_PROXY`, so pass it or CDN assets (jQuery etc.) won't load and nothing works: `chromium.launch({ executablePath: process.env.BROWSER_PATH, args: ['--proxy-server=' + process.env.HTTPS_PROXY] })`. Don't use Playwright's `proxy` option: it sends localhost through the proxy too, which rejects it. The setup script trusts the proxy's CA in Chromium's NSS store (`~/.pki/nssdb`); never ignore certificate errors instead. Cuprite gets the proxy from `test/test_config.rb`
 - Run `foreman run bundle exec rake db:seed` to seed the database
-- Run `foreman start -e .env web` to start the web process if it is not already running. Both cloud agents start it on boot: Cursor in its `web` terminal, and Claude Code on the web in the background with logs in `log/web.log`. Puma takes about 20 seconds to boot, so if port 3000 isn't answering yet, check the log or wait rather than starting a second copy
+- Run `foreman start -e .env web` to start the web process if it is not already running. Both cloud agents start it on boot: Cursor in its `web` terminal, and Claude Code on the web in the background (`script/agent-env/start-web.sh`) with logs in `log/web.log`. Puma takes about 20 seconds to boot, so if port 3000 isn't answering yet, check the log or wait rather than starting a second copy
 - Login with `SEED_ACCOUNT_EMAIL` and `SEED_ACCOUNT_PASSWORD` in `.env`
 
 ## Mongo
 
 - We set `Mongoid.raise_not_found_error = false` in `boot.rb` so `Model.find(id)` returns `nil` for invalid ids
 - Nil booleans are converted to false using `after_initialize :convert_nil_booleans_to_false` and `before_validation :convert_nil_booleans_to_false`
-- Mongo indexes are created directly in the database, and are not defined in model files
+- Mongo indexes are created directly in the database, and are not defined in model files (`Dandelion/MongoidIndex`)
 - `Event.hinted(index_name)` makes MongoDB skip query planning, for queries it can't cache a plan for (e.g. an organisation's events `$or`, ~300 ms to plan: `events_including_cohosted.hinted(Event::HOSTS_INDEX)`). Hint only at call sites that need it, since it overrides more selective indexes. Index existence is checked once per process: dropping a hinted index needs a restart (or the queries fail), renaming one a code change
 - Unique indexes:
   - Back every `validates_uniqueness_of` with a unique index
@@ -118,15 +136,17 @@ To run only certain tests in a file, add `-n /pattern/` (matches the method name
 
 Each test run gets its own database (`dandelion_test_<pid>`, dropped when the run ends) and a free port, set in `config/boot.rb`, so runs can go at the same time, in one checkout or several. To run several files at once, start each in its own process, e.g. `printf '%s\n' accounts events | xargs -P 2 -I{} sh -c 'foreman run -e .env.test bundle exec ruby -I test test/{}_test.rb > tmp/{}.log 2>&1'`; each browser run starts its own Chrome, so keep to 3 or 4 at once. Test files take minutes, so if your tool can run commands in the background, start test runs there and keep working until they finish. Each run saves its screenshots to `capybara/<pid>/`, kept for an hour after the run ends.
 
+CI runs each test file as its own job, listed in `.github/workflows/ruby.yml`: add a new test file there.
+
 Always ask permission before running tests. Your default posture should be to suggest only added/modified tests and any other clearly relevant tests, unless the change is substantial, in which case it may be appropriate to run whole files. Never attempt to run the full test suite.
 
-`@` instance variables come from helpers (`create_organisation`, `create_event`, `create_gathering`, `create_full_event_hierarchy`, and file-local setup methods). Anything created inline in a test is a local. Use `create_event(as: :event1)` when a test needs more than one event.
+`@` instance variables come from helpers, and anything created inline in a test is a local (`Dandelion/TestInstanceVariable`). Use `create_event(as: :event1)` when a test needs more than one event.
 
-Straight after a click or submit, assert something on the new page before checking something isn't there (see `Dandelion/CapybaraRefuteHas` in Custom checks), or that check can pass on the old page.
+Straight after a click or submit, assert something on the new page before checking something isn't there, or that check can pass on the old page (`Dandelion/CapybaraHasNoAfterClick`; and check with `assert page.has_no_*`, as `Dandelion/CapybaraRefuteHas` says).
 
 ## Conventions
 
-- Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` — no `before_action`, strong params, or `render`
+- Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` (`Dandelion/RailsController` checks for Rails habits)
 - Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
 - `lib/form_builder.rb` defines the `_block` helpers like `text_block`, `wysiwyg_block` etc.
 - You can find documentation at app/views/docs/md. Keep it up to date.
@@ -148,10 +168,10 @@ Straight after a click or submit, assert something on the new page before checki
 The design guide (`/design`, `app/views/design.erb`) shows the colours, type, spacing, components and their classes. Check it before styling anything, and keep it up to date when you change them. The rules it doesn't spell out are below, apart from those with a check (showing and hiding, success and badge classes, colours, spacing), which are in Custom checks:
 
 - Stylesheets are plain CSS. Override Bootstrap in `app.css` (see Build/vendored code for changing its variables). Page-specific styles go in their own file loaded only by those pages (e.g. `docs.css`, `messages.css`)
-- Bootstrap 5 with jQuery: `form-select` on selects and `mb-3` between fields (its `data-bs-*` attributes and logical spacing are a check, under erb_lint)
+- Bootstrap 5 with jQuery: `mb-3` between fields (its `data-bs-*` attributes, logical spacing and `form-select` are checks, under erb_lint)
 - Filter forms above lists and tables use `.form-inline` and `.form-group` (kept in `app.css`) inside `.searchForm`; add `.submitOnChange` to submit when a field changes. Date fields take `.datepicker` or `.datetimepicker`, which `forms.js` wires up
 - Tooltips are `data-bs-toggle="tooltip"` and a `title`; `app.js` handles them for the whole page, so content loaded later needs no setup
-- Motion: shows where things come from and go, and is otherwise kept out of the way. State changes fade over `--transition-fast`; things that float (dropdown menus, the confirm popover, flash toasts) fade in over `--transition-enter`, moving at most `--space-2xs`; modals keep Bootstrap's slide; chevrons on things that open in place turn. Animate only colours, shadows, masks, opacity, `translate` and `rotate`; nothing bounces, scales or reveals on scroll (the guide lists a few older exceptions; don't add more), and only loading indicators (`.bi-spin`, `.placeholder-glow`) loop
+- Motion: shows where things come from and go, and is otherwise kept out of the way. State changes fade over `--transition-fast`; things that float (dropdown menus, the confirm popover, flash toasts) fade in over `--transition-enter`, moving at most `--space-2xs`; modals keep Bootstrap's slide; chevrons on things that open in place turn. Nothing bounces or reveals on scroll; what transitions may animate, their durations and looping are a check, under Stylelint
 - Avatars: `partial :'accounts/square', locals: { account:, size: :xs }` (`:xs` to `:2xl`, default `:sm`, or `:fill`). For a bare `<img>` of an account, use `class="avatar avatar-sm"` rather than a width
 
 ## Dependencies

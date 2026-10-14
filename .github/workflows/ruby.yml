@@ -26,6 +26,15 @@ jobs:
         ruby-version: 3.4.7
         bundler-cache: true
 
+    # RuboCop's results from earlier runs, so it only checks files that changed. A new Gemfile.lock, config or cop starts
+    # afresh, as their hashes are in the key
+    - name: Cache RuboCop's results
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/rubocop_cache
+        key: rubocop-${{ hashFiles('Gemfile.lock', '.rubocop.yml', '.rubocop/**') }}-${{ github.sha }}
+        restore-keys: rubocop-${{ hashFiles('Gemfile.lock', '.rubocop.yml', '.rubocop/**') }}-
+
     # script/lint sets each linter's command and flags, for the pre-commit hook too
     - name: Run RuboCop
       run: script/lint --all --only rubocop
@@ -36,7 +45,7 @@ jobs:
     - name: Install Node
       uses: actions/setup-node@v4
       with:
-        node-version: 22
+        node-version-file: .nvmrc
         cache: npm
 
     - name: Install linters
@@ -48,24 +57,11 @@ jobs:
     - name: Run Stylelint
       run: script/lint --all --only stylelint
 
-  generate-matrix:
-    runs-on: ubuntu-latest
-    outputs:
-      test_files: ${{ steps.set-matrix.outputs.test_files }}
-    steps:
-    - name: Git checkout
-      uses: actions/checkout@v4
-
-    - name: Generate test file matrix
-      id: set-matrix
-      run: |
-        # Find all *_test.rb files and extract the base names (without _test.rb suffix)
-        test_files=$(find test -name '*_test.rb' -type f | sed 's|test/||' | sed 's|_test.rb||' | sort | jq -R -s -c 'split("\n")[:-1]')
-        echo "test_files=$test_files" >> $GITHUB_OUTPUT
-        echo "Found test files: $test_files"
+    # Tests our own checks; here rather than in the test matrix, as it needs Node for the ESLint and Stylelint tests
+    - name: Test the linters
+      run: bundle exec ruby -I test test/lint_test.rb
 
   test:
-    needs: generate-matrix
     runs-on: ubuntu-latest
     services:
       mongodb:
@@ -74,8 +70,38 @@ jobs:
           - 27017:27017
     strategy:
       fail-fast: false
+      # One job per test file (test/*_test.rb, but lint_test.rb, which the lint job runs), listed here rather than found by a
+      # job of its own, which the tests had to wait for; test/lint_test.rb checks the list matches test/
       matrix:
-        test_file: ${{ fromJson(needs.generate-matrix.outputs.test_files) }}
+        test_file:
+          - accounts
+          - activities
+          - analytics_providers
+          - calendar
+          - dadmin
+          - design
+          - event_bookings
+          - event_boosts
+          - event_drafts
+          - event_feedbacks
+          - event_opencollective
+          - event_permissions
+          - events
+          - evergreen_events
+          - gatherings
+          - how_to_create_a_gathering
+          - how_to_create_an_event
+          - local_groups
+          - mcp
+          - messages
+          - orders
+          - organisations
+          - pmails
+          - search
+          - ticket_types
+          - tour
+          - waitlist
+          - webhooks
     steps:
     - name: Git checkout
       uses: actions/checkout@v4

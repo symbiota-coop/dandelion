@@ -7,6 +7,7 @@
   cursor: pointer;
   font-size: 2.75rem;
   color: var(--bs-gray-300);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- an older exception (design guide, Motion): the feedback stars grow 10% on hover, like the quick theme colours */
   transition: color var(--transition-fast), transform var(--transition-fast);
   margin: 0 0.1rem;
 }
@@ -16,7 +17,7 @@
 }
 
 .feedback-stars .bi-star-fill:hover {
-  transform: scale(1.08);
+  transform: scale(1.1);
 }
 
 .feedback-rating-panel {

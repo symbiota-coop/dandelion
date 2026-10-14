@@ -203,25 +203,21 @@ class Notification
     end.html_safe
   end
 
-  # One branch per notification type, so types that share a link or icon repeat it
-  # rubocop:disable Lint/DuplicateBranch
   def link
     case type.to_sym
     when :created_gathering
       ['View gathering', "#{ENV['BASE_URI']}/g/#{circle.slug}"]
-    when :applied
+    when :applied, :mapplication_removed
       ['View applications', "#{ENV['BASE_URI']}/g/#{circle.slug}/applications"]
-    when :joined_gathering
+    when :joined_gathering, :made_admin, :unadmined, :left_gathering
       ['View members', "#{ENV['BASE_URI']}/g/#{circle.slug}/members"]
     when :joined_team
       ['View team', "#{ENV['BASE_URI']}/g/#{circle.slug}/teams/#{notifiable.team_id}"]
-    when :created_spend
+    when :created_spend, :created_payment
       ['View budget', "#{ENV['BASE_URI']}/g/#{circle.slug}/budget"]
-    when :created_profile
+    when :created_profile, :updated_profile
       ['View profile', "#{ENV['BASE_URI']}/u/#{notifiable.username}"]
-    when :updated_profile
-      ['View profile', "#{ENV['BASE_URI']}/u/#{notifiable.username}"]
-    when :created_tactivity
+    when :created_tactivity, :scheduled_tactivity, :unscheduled_tactivity
       ['View activity', "#{ENV['BASE_URI']}/g/#{circle.slug}/tactivities/#{notifiable.id}"]
     when :signed_up_to_a_shift
       ['View rotas', "#{ENV['BASE_URI']}/g/#{circle.slug}/rotas"]
@@ -233,37 +229,17 @@ class Notification
       ['View options', "#{ENV['BASE_URI']}/g/#{circle.slug}/options"]
     when :created_rota
       ['View rotas', "#{ENV['BASE_URI']}/g/#{circle.slug}/rotas/#{notifiable.id}"]
-    when :scheduled_tactivity
-      ['View activity', "#{ENV['BASE_URI']}/g/#{circle.slug}/tactivities/#{notifiable.id}"]
-    when :unscheduled_tactivity
-      ['View activity', "#{ENV['BASE_URI']}/g/#{circle.slug}/tactivities/#{notifiable.id}"]
-    when :made_admin
-      ['View members', "#{ENV['BASE_URI']}/g/#{circle.slug}/members"]
-    when :unadmined
-      ['View members', "#{ENV['BASE_URI']}/g/#{circle.slug}/members"]
     when :created_timetable
       ['View timetable', "#{ENV['BASE_URI']}/g/#{circle.slug}/timetables/#{notifiable.id}"]
-    when :commented
+    when :commented, :reacted_to_a_comment
       ['View post', notifiable.post.url]
-    when :reacted_to_a_comment
-      ['View post', notifiable.post.url]
-    when :left_gathering
-      ['View members', "#{ENV['BASE_URI']}/g/#{circle.slug}/members"]
-    when :created_payment
-      ['View budget', "#{ENV['BASE_URI']}/g/#{circle.slug}/budget"]
     when :created_inventory_item
       ['View inventory', "#{ENV['BASE_URI']}/g/#{circle.slug}/inventory"]
-    when :mapplication_removed
-      ['View applications', "#{ENV['BASE_URI']}/g/#{circle.slug}/applications"]
-    when :created_event
-      ['View event', "#{ENV['BASE_URI']}/e/#{notifiable.slug}"]
-    when :updated_event
+    when :created_event, :updated_event
       ['View event', "#{ENV['BASE_URI']}/e/#{notifiable.slug}"]
     when :created_organisation
       ['View organisation', "#{ENV['BASE_URI']}/o/#{notifiable.slug}"]
-    when :created_order
-      ['View event', "#{ENV['BASE_URI']}/events/#{notifiable.event_id}"]
-    when :left_feedback
+    when :created_order, :left_feedback
       ['View event', "#{ENV['BASE_URI']}/events/#{notifiable.event_id}"]
     when :starred_event
       ['View event', "#{ENV['BASE_URI']}/events/#{notifiable.id}"]
@@ -272,33 +248,27 @@ class Notification
 
   def icon
     case type.to_sym
-    when :created_gathering
+    when :created_gathering, :joined_team, :created_team
       'bi-people-fill'
-    when :applied
+    when :applied, :mapplication_removed
       'bi-file-text'
     when :joined_gathering
       'bi-person-fill-add'
-    when :joined_team
-      'bi-people-fill'
-    when :created_spend
+    when :created_spend, :created_payment
       'bi-cash-coin'
-    when :created_profile
-      'bi-person-fill'
-    when :updated_profile
+    when :created_profile, :updated_profile
       'bi-person-fill'
     when :created_tactivity
       'bi-easel'
     when :signed_up_to_a_shift
       'bi-hand-index'
-    when :interested_in_tactivity
+    when :interested_in_tactivity, :reacted_to_a_comment
       'bi-hand-thumbs-up'
-    when :created_team
-      'bi-people-fill'
     when :created_option
       'bi-check-lg'
-    when :created_rota
+    when :created_rota, :created_timetable
       'bi-table'
-    when :scheduled_tactivity
+    when :scheduled_tactivity, :created_event
       'bi-calendar-plus'
     when :unscheduled_tactivity
       'bi-calendar-minus'
@@ -306,22 +276,12 @@ class Notification
       'bi-key-fill'
     when :unadmined
       'bi-key'
-    when :created_timetable
-      'bi-table'
     when :commented
       'bi-chat-left-text'
-    when :reacted_to_a_comment
-      'bi-hand-thumbs-up'
     when :left_gathering
       'bi-box-arrow-right'
-    when :created_payment
-      'bi-cash-coin'
     when :created_inventory_item
       'bi-wrench'
-    when :mapplication_removed
-      'bi-file-text'
-    when :created_event
-      'bi-calendar-plus'
     when :updated_event
       'bi-calendar-event'
     when :created_organisation
@@ -334,7 +294,6 @@ class Notification
       'bi-star'
     end
   end
-  # rubocop:enable Lint/DuplicateBranch
 
   private
 

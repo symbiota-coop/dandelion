@@ -419,7 +419,7 @@
   height: 2px;
   border-radius: var(--bs-border-radius-pill);
   background-color: var(--bs-white);
-  transition: all var(--transition-fast);
+  transition: rotate var(--transition-fast), translate var(--transition-fast);
 }
 
 .header .navbar-toggler .icon-bar + .icon-bar {
@@ -428,15 +428,13 @@
 
 .header .navbar-toggler.active .icon-bar {
   width: 1.25rem;
-  position: relative;
-  top: 0.1875rem;
-  transform: rotate(45deg);
+  translate: 0 0.1875rem;
+  rotate: 45deg;
 }
 
 .header .navbar-toggler.active .icon-bar + .icon-bar {
-  top: auto;
-  bottom: 0.1875rem;
-  transform: rotate(-45deg);
+  translate: 0 -0.1875rem;
+  rotate: -45deg;
 }
 
 @media (max-width: 767.98px) {
@@ -1080,6 +1078,7 @@ p.action a {
 
 .quick-color-btn {
   cursor: pointer;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- an older exception (design guide, Motion): the quick theme colours grow 10% on hover */
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   outline: none;
 }
@@ -1969,6 +1968,7 @@ ul.pagination {
 
 .bi-spin {
   display: inline-block;
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- a loading indicator, which may loop */
   animation: spin 2s linear infinite;
 }
 
@@ -3118,10 +3118,9 @@ table.event-details td {
   height: 2.25em;
 }
 
+/* The ticket glyph sits low in its icon, so it's lifted by 1/16 of its size (1px at the base size) */
 .newsfeed-icon .bi-ticket-detailed-fill {
-  position: relative;
-  /* stylelint-disable-next-line declaration-property-unit-disallowed-list -- a hairline nudge, to centre the glyph */
-  top: -1px;
+  translate: 0 -0.0625em;
 }
 
 /* ==========================================================================

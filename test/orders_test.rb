@@ -302,6 +302,9 @@ class OrdersTest < ActiveSupport::TestCase
     assert_equal 200, last_response.status
     assert @ticket.reload.checked_in
 
+    post "/events/#{@event.id}/check_in/#{@ticket.token}", checked_in: true, secret: secret
+    assert_equal 409, last_response.status # already checked in
+
     post "/events/#{@event.id}/check_in/#{@ticket.id}", secret: secret
     assert_equal 403, last_response.status
     assert @ticket.reload.checked_in
@@ -310,6 +313,9 @@ class OrdersTest < ActiveSupport::TestCase
     post "/events/#{@event.id}/check_in/#{@ticket.id}", secret: secret
     assert_equal 200, last_response.status
     refute @ticket.reload.checked_in
+
+    post "/events/#{@event.id}/check_in/#{@ticket.id}", secret: secret
+    assert_equal 409, last_response.status # already not checked in
   end
 
   test 'ticketholder routes return 404 for an unknown ticket' do
