@@ -63,6 +63,8 @@ module EventFields
     field :feedback_hours_after, type: Integer
     field :terms_and_conditions_url, type: String
     field :terms_and_conditions, type: String
+    field :locked_error, type: String
+    field :locked_error_provider, type: String
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer

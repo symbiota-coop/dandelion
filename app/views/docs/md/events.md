@@ -196,6 +196,8 @@ You can see all events under an organisation (including events marked secret or 
 
 Locked events are hidden from the public. Anyone who can view the event page (event admins) can still purchase tickets, so you can test checkout before unlocking.
 
+If your payment provider returns an error that means no one can buy tickets (an unverified account, say), Dandelion locks the event and emails the organisation's admins. The error also shows on the event page until you fix it with your provider and unlock the event.
+
 ## Reminders
 
 Dandelion can send event attendees a reminder email before the event starts. Set **Hours before the event to send the reminder email** in the event's Emails tab (default: 24). Leave blank to skip the reminder. You can also customise the reminder subject and body in your organisation or event settings.

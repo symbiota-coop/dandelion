@@ -129,6 +129,23 @@ class EventsTest < ActiveSupport::TestCase
     refute @event.reload.locked?, 'Event should be unlocked after lock admin unchecks the box'
   end
 
+  test 'event locked after a purchase error shows the error until unlocked' do
+    create_event(prices: [0])
+    @event.set(locked: true, locked_error: 'Creditor account not fully verified', locked_error_provider: 'GoCardless')
+
+    sign_in(@account)
+    visit "/e/#{@event.slug}/edit"
+    assert page.has_content?('It was locked after an error from GoCardless')
+    assert page.has_content?('Creditor account not fully verified')
+    find('label[for="event_locked"]').click
+    click_button 'Update event'
+    assert page.has_content?('The event was saved')
+    @event.reload
+    refute @event.locked?
+    assert_nil @event.locked_error
+    assert_nil @event.locked_error_provider
+  end
+
   test 'ticket email strips event-handler attributes from editor HTML' do
     create_event(
       prices: [0],

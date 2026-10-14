@@ -27,6 +27,11 @@ module EventValidation
         self.no_tickets_pdf = true
       end
 
+      unless locked?
+        self.locked_error = nil
+        self.locked_error_provider = nil
+      end
+
       self.name = name.strip if name
       self.suggested_donation = suggested_donation.round(2) if suggested_donation
       self.minimum_donation = nil unless suggested_donation
