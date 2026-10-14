@@ -298,13 +298,13 @@
       return
     }
 
-    fetch(MCP_URL, {
+    $.ajax({
+      url: MCP_URL,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json, text/event-stream'
-      },
-      body: JSON.stringify({
+      contentType: 'application/json',
+      headers: { Accept: 'application/json, text/event-stream' },
+      dataType: 'text',
+      data: JSON.stringify({
         jsonrpc: '2.0',
         id: 1,
         method: 'tools/call',
@@ -316,9 +316,6 @@
           }
         }
       })
-    }).then(function (res) {
-      if (!res.ok) throw new Error('bad status')
-      return res.text()
     }).then(function (body) {
       if (failed) return
       var text = mcpText(parseSse(body))

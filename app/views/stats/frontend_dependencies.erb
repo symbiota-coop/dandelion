@@ -85,12 +85,14 @@
       }
 
       var sizePromises = fileUrls.map(function(url) {
-        return fetch(url, { method: 'HEAD', cache: 'force-cache' })
-          .then(function(response) {
-            var contentLength = response.headers.get('content-length');
-            return contentLength ? parseInt(contentLength, 10) : 0;
-          })
-          .catch(function() { return 0; });
+        return new Promise(function(resolve) {
+          $.ajax({ url: url, method: 'HEAD' })
+            .done(function(data, status, xhr) {
+              var contentLength = xhr.getResponseHeader('content-length');
+              resolve(contentLength ? parseInt(contentLength, 10) : 0);
+            })
+            .fail(function() { resolve(0); });
+        });
       });
 
       Promise.all(sizePromises).then(function(sizes) {

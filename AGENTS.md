@@ -44,18 +44,20 @@ Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Rub
 
 ### erb_lint
 
-Our linter, `DesignClasses`, is in `.erb_linters/design_classes.rb`. Disable it on a line with `<%# erb_lint:disable DesignClasses: reason %>`.
+Our linters, `DesignClasses` and `JqueryRequests`, are in `.erb_linters/`. Disable one on a line with `<%# erb_lint:disable DesignClasses: reason %>`.
 
 - `DesignClasses`: To show and hide elements from JS, start them hidden with `style="display: none"` and use jQuery `.show()` / `.hide()` / `.toggle()`, not `d-none` with `addClass` / `removeClass` (Bootstrap's `d-*` classes are `!important`). Keep `d-none d-md-block` and friends for purely responsive hiding
 - `DesignClasses`: Success is the theme colour, so use `-primary`, never `-success`. Badges are `badge text-bg-*`; there is no `.label` and no `badge-*` colour class
 - `DesignClasses`: Bootstrap 5, not 4: `data-bs-*` attributes and logical spacing and alignment (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-end`, `float-start`). `config/bootstrap4_leftovers.json` lists the Bootstrap 4 classes and attributes it flags, with what replaces each; add one there if you find another
 - `DesignClasses`: Selects take `form-select` (`<select>` tags and `select_tag`; the form builder's `select_block` adds it), even ones Select2 replaces, so they look right until it loads
+- `JqueryRequests`: The ESLint `no-restricted-globals` rule below (jQuery, not `fetch`), in templates' inline scripts and event attributes
 
 ### ESLint
 
 Our rules are in `eslint.config.mjs`. Disable one with `// eslint-disable-next-line <rule> -- reason`.
 
 - `no-restricted-syntax`: The `DesignClasses` rules above (showing and hiding; `-success`, `badge-*` and `.label`; Bootstrap 4 leftovers; `form-select`), in the strings and template literals of `app/assets/javascripts`
+- `no-restricted-globals`: Requests use jQuery (`$.get`, `$.getJSON`, `$.post`, `$.ajax`), not `fetch`. Where an API needs a real Promise (`ClipboardItem`), wrap the request: `Promise.resolve($.get(url))`. Templates get the same check from `JqueryRequests`, under erb_lint
 
 ### Stylelint
 

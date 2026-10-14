@@ -14,8 +14,7 @@
         var queryString = $.param(params);
         var baseUrl = <%== "/o/#{@organisation.slug}/events.json?from=".to_json %> + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0];
         var url = baseUrl + (queryString ? '&' + queryString : '');
-        fetch(url)
-          .then(response => response.json())
+        $.getJSON(url)
           .then(data => {
             var events = data.map(function(event) {
               // For multi-day events, only show the start day

@@ -25,6 +25,9 @@ linters:
   # Rules from the Design section of AGENTS.md (.erb_linters/design_classes.rb)
   DesignClasses:
     enabled: true
+  # Requests use jQuery, not fetch (.erb_linters/jquery_requests.rb)
+  JqueryRequests:
+    enabled: true
   # Replaced by RubocopTags (.erb_linters/rubocop_tags.rb), which also checks the conditions of if, unless and elsif tags
   Rubocop:
     enabled: false

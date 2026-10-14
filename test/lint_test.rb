@@ -149,6 +149,16 @@ class LintTest < Minitest::Test
     ].each { |template| assert_empty erb_offenses(template), template }
   end
 
+  def test_jquery_requests
+    [%(<script>fetch('/x').then(function (r) { return r.text() })</script>), %(<a onclick="fetch(this.href)">)].each do |template|
+      offenses = erb_offenses(template).select { |linter, _| linter == 'JqueryRequests' }
+      assert_equal 1, offenses.size, "JqueryRequests on #{template}: #{offenses.inspect}"
+    end
+    [%(<script>$.get('/x')</script>), %(<%= ENV.fetch('X', nil) %>), '<script>x.fetch(1)</script>'].each do |template|
+      assert_empty erb_offenses(template), template
+    end
+  end
+
   def test_rubocop_tags_checks_conditions
     {
       '<% if params[:q].present? %>x<% end %>' => ['Dandelion/ParamsBlank'],
@@ -271,7 +281,8 @@ class LintTest < Minitest::Test
       %($('#x').html('<span class="label">')) => /\.label/,
       %($('#x').addClass('mr-3')) => /ms-\*/,
       %($('#x').attr('data-toggle', 'tooltip')) => /data-bs-\*/,
-      %($('#x').html('<select name="y">')) => /form-select/
+      %($('#x').html('<select name="y">')) => /form-select/,
+      %(fetch('/x').then(function (response) { return response.text() })) => /jQuery/
     }
     good = %($('#x').html('<label class="form-label ms-2 media" data-bs-toggle="x"><select class="form-select">').addClass('text-end').removeClass('with-label'))
     *results, good_result = node_lint('eslint', [*bad.keys, good].map { |source| [source, 'app/assets/javascripts/x.js'] })

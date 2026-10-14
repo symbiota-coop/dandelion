@@ -3,10 +3,7 @@
   <%# The link is fetched on click: building the image's url can store a copy of it (dragonfly_config.rb), which takes a second or so %>
   <% if event.image_source(organisation) %>
     <a data-bs-toggle="tooltip" title="Copy linked image" class="btn btn-sm btn-primary" href="javascript:;" data-linked-image-url="/events/<%= event.id %>/linked_image?organisation_id=<%= organisation.id %>" onclick="
-        var html = fetch(this.dataset.linkedImageUrl).then(function (response) {
-          if (!response.ok) throw new Error(response.status);
-          return response.text();
-        }).then(function (text) {
+        var html = Promise.resolve($.get(this.dataset.linkedImageUrl)).then(function (text) {
           return new Blob([text], { type: 'text/html' });
         });
         navigator.clipboard.write([new ClipboardItem({ 'text/html': html })]).then(function () {
