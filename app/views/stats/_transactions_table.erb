@@ -12,8 +12,8 @@
         <% %w[p50 p99 p100].each do |percentile| %>
           <th class="text-end <%= 'd-none d-md-table-cell' unless percentile == @percentile %>"><%= percentile %></th>
         <% end %>
-        <th class="text-end">Total</th>
         <th class="text-end">Count</th>
+        <th class="text-end">Total</th>
       </tr>
     </thead>
     <tbody>
@@ -36,8 +36,8 @@
               <% end %>
             </td>
           <% end %>
-          <td class="text-end text-nowrap" data-order="<%= summary[:total_ms] %>"><%= format_duration(summary[:total_ms]) %></td>
           <td class="text-end"><%= summary[:count] %></td>
+          <td class="text-end text-nowrap" data-order="<%= summary[:total_ms] %>"><%= format_duration(summary[:total_ms]) %></td>
         </tr>
       <% end %>
     </tbody>
