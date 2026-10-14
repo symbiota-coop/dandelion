@@ -3454,6 +3454,12 @@ td .tactivity-accept {
   width: 100%;
 }
 
+/* Accounts with no image (Account#avatar_class): their generated avatar is a stencil, so the theme shows through
+   its letters, and paler through the translucent white around them, close to --theme-100 */
+.avatar-initials {
+  background-color: var(--theme-500);
+}
+
 img.private {
   opacity: 0.5
 }

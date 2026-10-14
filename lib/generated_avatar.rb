@@ -1,8 +1,8 @@
-# Avatars for accounts with no image: their initials in Plus Jakarta Sans, in --color-lavender-500 on --color-lavender-100
+# Avatars for accounts with no image: their initials in Plus Jakarta Sans, as a stencil that takes the page's theme
+# colour from the <img>'s background (.avatar-initials, Account#avatar_class): the letters are cut out, so the theme
+# shows through them, and the rest is white at WASH, so it shows through paler, close to --theme-100
 module GeneratedAvatar
-  # As hex, since ImageMagick can't read the oklch() they're defined with in app.css
-  BACKGROUND = '#ede1ff'.freeze # --color-lavender-100
-  TEXT = '#a376e9'.freeze # --color-lavender-500
+  WASH = 0.8
 
   FONT = Padrino.root('app/assets/fonts/PlusJakartaSans/ttf/PlusJakartaSans-SemiBold.ttf')
   SIZE = 400
@@ -21,14 +21,22 @@ module GeneratedAvatar
     Tempfile.create(['avatar', '.png']) do |file|
       MiniMagick.convert do |c|
         c.size "#{SIZE}x#{SIZE}"
-        c << "xc:#{BACKGROUND}"
-        if initials
-          c.font FONT
-          c.fill TEXT
-          c.pointsize(initials.length > 1 ? 150 : 180)
-          c.gravity 'center'
-          c.annotate '+0+0', initials
+        c << 'xc:white'
+        # The alpha: the letters in black (clear) on grey at WASH
+        c.stack do |mask|
+          mask.size "#{SIZE}x#{SIZE}"
+          mask << "xc:gray(#{(WASH * 100).round}%)"
+          if initials
+            mask.font FONT
+            mask.fill 'black'
+            mask.pointsize(initials.length > 1 ? 150 : 180)
+            mask.gravity 'center'
+            mask.annotate '+0+0', initials
+          end
         end
+        c.alpha 'off'
+        c.compose 'CopyOpacity'
+        c.composite
         c << file.path
       end
       File.binread(file.path)

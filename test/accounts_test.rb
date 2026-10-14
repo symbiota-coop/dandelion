@@ -73,21 +73,21 @@ class AccountsTest < ActiveSupport::TestCase
   test 'accounts with no image fall back to their generated avatar' do
     account = FactoryBot.create(:account, name: 'Émile Zola')
 
-    assert_equal '/avatar/ÉZ.png', account.generated_avatar_path
+    assert_equal '/avatar/v2/ÉZ.png', account.generated_avatar_path
 
     # Views escape the URL again with u, so Gravatar's fallback must come through that and one decode intact
     src = URI::Parser.new.escape(account.image_thumb_or_gravatar_url)
-    assert_equal "#{ENV['BASE_URI']}/avatar/%C3%89Z.png", URI.decode_www_form(URI(src).query).to_h['d']
+    assert_equal "#{ENV['BASE_URI']}/avatar/v2/%C3%89Z.png", URI.decode_www_form(URI(src).query).to_h['d']
   end
 
   test 'generated avatars are PNGs, for initials of one or two Latin letters' do
-    ['/avatar.png', '/avatar/SR.png', '/avatar/%C3%89Z.png'].each do |path|
+    ['/avatar/v2.png', '/avatar/v2/SR.png', '/avatar/v2/%C3%89Z.png'].each do |path|
       get path
       assert last_response.ok?, "expected #{path} to be served, got #{last_response.status}"
       assert_equal 'image/png', last_response.media_type
     end
 
-    ['/avatar/ABC.png', '/avatar/12.png'].each do |path|
+    ['/avatar/v2/ABC.png', '/avatar/v2/12.png'].each do |path|
       get path
       assert last_response.not_found?, "expected #{path} to 404, got #{last_response.status}"
     end
