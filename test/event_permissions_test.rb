@@ -561,6 +561,19 @@ class EventPermissionsTest < ActiveSupport::TestCase
     assert_equal 'new zoom', other.extra_info_for_ticket_email
   end
 
+  test 'event admins cannot list their event under another organisation through the cohost caches' do
+    create_event(prices: [0])
+    other_organisation = FactoryBot.create(:organisation, account: FactoryBot.create(:account))
+    sign_in_with_rack(@account)
+
+    [{ cohosts_ids_cache: [other_organisation.id.to_s] }, { hosts_ids_cache: [other_organisation.id.to_s] }].each do |event_params|
+      error = assert_raises(RuntimeError) { post "/e/#{@event.slug}/edit", event: event_params }
+      assert_match(/are protected/, error.message)
+    end
+    assert_empty other_organisation.events_including_cohosted.to_a
+    assert_empty other_organisation.cohosted_events.to_a
+  end
+
   test 'event admins cannot set the contribution to Dandelion' do
     create_event(prices: [0])
     sign_in_with_rack(@account)

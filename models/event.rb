@@ -40,7 +40,13 @@ class Event
   end
 
   def self.protected_attributes
-    %w[raw_description direct_charges trending carousel_ids atproto_uri fixed_contribution_gbp cap_gbp]
+    %w[
+      raw_description direct_charges trending carousel_ids atproto_uri fixed_contribution_gbp cap_gbp
+      cohosts_ids_cache hosts_ids_cache
+      sent_feedback_requests_at sent_reminders_at sent_star_reminders_at
+      voyage_embedding ai_tagged sold_out_cache sold_out_due_to_sales_end_cache browsable
+      calendar_import_feed_url calendar_import_uid calendar_import_source_url calendar_import_last_synced_at
+    ]
   end
 
   def self.virtual_attributes
