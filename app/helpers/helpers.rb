@@ -98,40 +98,24 @@ Dandelion::App.helpers do
       model.secret_fields.each { |f| params.delete(f) if params.key?(f) && params[f].nil? && !clear_secrets.include?(f) }
       clear_secrets.each { |f| params[f] = nil if model.secret_fields.include?(f) }
     end
-    allowed = model.assignable_foreign_keys.map(&:to_s)
-    allowed += model.permitted_attributes.map(&:to_s) if model.respond_to?(:permitted_attributes)
-    allowed += model.protected_attributes.map(&:to_s) if model.respond_to?(:protected_attributes) # let these through so they raise below
-    foreign_keys = model.relations.values.grep(Mongoid::Association::Referenced::BelongsTo).flat_map do |rel|
-      [rel.name, rel.foreign_key, (rel.inverse_type if rel.polymorphic?)].compact.map(&:to_s)
-    end
-    # has_many/has_one/embeds relations get name= and <name>_ids= setters that re-parent the given children
-    foreign_keys += model.relations.values.reject { |rel| rel.is_a?(Mongoid::Association::Referenced::BelongsTo) }.flat_map do |rel|
-      [rel.name, "#{rel.name.to_s.singularize}_ids"].map(&:to_s)
-    end
-    params.reject! { |k, _| foreign_keys.include?(k.to_s) && !allowed.include?(k.to_s) }
-    # No form sets a record's id or timestamps, and deleted_at= would soft-delete it without the delete route's checks
-    params.reject! { |k, _| %w[_id id created_at updated_at deleted_at].include?(k.to_s) }
-    # Only the file itself and remove_<attachment> may come from a form. retained_<attachment>= deletes or adopts any
-    # storage key it's given, <attachment>_uid= points at someone else's file, and <attachment>_url= fetches any URL
-    if model.respond_to?(:dragonfly_attachment_classes)
-      dragonfly_keys = model.dragonfly_attachment_classes.flat_map do |klass|
-        a = klass.attribute.to_s
-        ["retained_#{a}", "#{a}_url", "#{a}_uid", "#{a}_name"] + klass.magic_attributes.map { |m| "#{a}_#{m}" }
-      end
-      params.reject! { |k, _| dragonfly_keys.include?(k.to_s) }
-    end
-    if model.respond_to?(:permitted_attributes)
-      permitted = model.permitted_attributes.map(&:to_s)
-      unpermitted = params.keys.reject { |k| permitted.include?(k.to_s) }
-      raise "Attributes #{unpermitted} are not permitted" unless unpermitted.empty?
-      params.select { |k, _| permitted.include?(k.to_s) }
-    elsif model.respond_to?(:protected_attributes)
+    if model.respond_to?(:protected_attributes)
       intersection = model.protected_attributes & params.keys.map(&:to_s)
       raise "Attributes #{intersection} are protected" unless intersection.empty?
-      params
-    else
-      params
     end
+    params = params.to_h.transform_keys(&:to_s).slice(*model.form_attributes)
+    # Each nested record is filtered with its own model, keeping the id and _destroy that find and remove it
+    model.nested_attributes.each_key do |name|
+      next unless params[name]
+
+      child_model = model.relations[name.delete_suffix('_attributes')].klass
+      filter_child = lambda do |attrs|
+        attrs = attrs.to_h.transform_keys(&:to_s)
+        mass_assigning(attrs.except('id', '_destroy'), child_model).merge(attrs.slice('id', '_destroy'))
+      end
+      # Forms send a hash of index => attributes; JSON can send an array
+      params[name] = params[name].is_a?(Array) ? params[name].map(&filter_child) : params[name].to_h.transform_values(&filter_child)
+    end
+    params
   end
 
   # Works from total_entries, which will_paginate counts once, rather than loading the page:

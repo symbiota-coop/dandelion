@@ -40,7 +40,11 @@ class Event
   end
 
   def self.protected_attributes
-    %w[raw_description direct_charges trending last_saved_by last_saved_by_id duplicate image_url carousel_ids atproto_uri fixed_contribution_gbp cap_gbp]
+    %w[raw_description direct_charges trending carousel_ids atproto_uri fixed_contribution_gbp cap_gbp]
+  end
+
+  def self.virtual_attributes
+    super + %w[update_activity_events]
   end
 
   def self.assignable_foreign_keys

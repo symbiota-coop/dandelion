@@ -21,7 +21,7 @@ class Tactivity
   field :has_image, type: Boolean
 
   def self.protected_attributes
-    %w[has_image image_uid image_url]
+    %w[has_image]
   end
 
   def self.assignable_foreign_keys

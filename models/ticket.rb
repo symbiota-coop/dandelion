@@ -40,6 +40,8 @@ class Ticket
     %w[payment_completed token]
   end
 
+  validates_same_parent :ticket_type, via: :event
+
   before_validation do
     if email
       self.email = email.downcase.strip

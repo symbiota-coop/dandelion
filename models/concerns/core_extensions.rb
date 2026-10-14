@@ -38,6 +38,35 @@ module CoreExtensions
       []
     end
 
+    # Setters other than fields that forms use, e.g. TicketType's price_or_range
+    def virtual_attributes
+      []
+    end
+
+    # The keys mass_assigning lets through: permitted_attributes if the model lists them, otherwise its own fields,
+    # less ids, timestamps, foreign keys and the fields that store an attachment (<attachment>_uid etc.), plus
+    # assignable_foreign_keys, attachments and remove_<attachment>, nested attributes and virtual_attributes. Every
+    # other setter Mongoid or Dragonfly generates, like has_many <name>_ids= (which re-parents the given records),
+    # deleted_at= or retained_<attachment>=, is never assignable. Fields are let through by default: a field forms
+    # mustn't set goes in protected_attributes, which mass_assigning raises on
+    def form_attributes
+      @form_attributes ||= if respond_to?(:permitted_attributes)
+                             permitted_attributes.map(&:to_s)
+                           else
+                             foreign_keys = relations.values.grep(Mongoid::Association::Referenced::BelongsTo).flat_map do |rel|
+                               [rel.foreign_key, (rel.inverse_type if rel.polymorphic?)].compact.map(&:to_s)
+                             end
+                             attachments = respond_to?(:dragonfly_attachment_classes) ? dragonfly_attachment_classes.map { |klass| klass.attribute.to_s } : []
+                             own_fields = fields.keys - %w[_id _type created_at updated_at deleted_at] - foreign_keys
+                             own_fields = own_fields.reject { |f| attachments.any? { |a| f.start_with?("#{a}_") } }
+                             own_fields +
+                               assignable_foreign_keys.map(&:to_s) +
+                               attachments.flat_map { |a| [a, "remove_#{a}"] } +
+                               nested_attributes.keys +
+                               virtual_attributes.map(&:to_s)
+                           end
+    end
+
     def validates_same_parent(child, via:)
       before_validation do
         errors.add(child, "must belong to the same #{via}") if send(child) && send(via) && send(child).send("#{via}_id") != send("#{via}_id")

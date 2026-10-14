@@ -366,13 +366,9 @@ class EventPermissionsTest < ActiveSupport::TestCase
       { show_emails: '1', featured: '1', duplicate: '1' },
       { show_emails: '1', featured: '1', last_saved_by_id: @account.id, duplicate: '1' }
     ].each do |event_params|
-      if event_params.keys.intersect?(%i[last_saved_by_id duplicate])
-        error = assert_raises(RuntimeError) { post "/e/#{@event.slug}/edit", event: event_params }
-        assert_match(/are protected/, error.message)
-      else
-        post "/e/#{@event.slug}/edit", event: event_params
-        refute last_response.redirect?
-      end
+      # mass_assigning drops last_saved_by_id and duplicate, so they can't get round the check
+      post "/e/#{@event.slug}/edit", event: event_params
+      refute last_response.redirect?
       @event.reload
       refute @event.show_emails, "show_emails changed for #{event_params.keys}"
       refute @event.featured, "featured changed for #{event_params.keys}"
@@ -403,13 +399,9 @@ class EventPermissionsTest < ActiveSupport::TestCase
       hijack.merge(duplicate: '1'),
       hijack.merge(last_saved_by_id: @account.id, duplicate: '1')
     ].each do |event_params|
-      if event_params.keys.intersect?(%i[last_saved_by_id duplicate])
-        error = assert_raises(RuntimeError) { post "/e/#{@event.slug}/edit", event: event_params }
-        assert_match(/are protected/, error.message)
-      else
-        post "/e/#{@event.slug}/edit", event: event_params
-        refute last_response.redirect?
-      end
+      # mass_assigning drops last_saved_by_id and duplicate, so they can't get round the check
+      post "/e/#{@event.slug}/edit", event: event_params
+      refute last_response.redirect?
       @event.reload
       assert_nil @event.revenue_sharer_id, "revenue_sharer set for #{event_params.keys}"
       assert_equal 0, @event.revenue_share_to_revenue_sharer
@@ -590,6 +582,26 @@ class EventPermissionsTest < ActiveSupport::TestCase
 
   test 'atproto_uri is protected from mass assignment' do
     assert_includes Event.protected_attributes, 'atproto_uri'
+  end
+
+  test 'protected_attributes list only keys that form_attributes would let through' do
+    Mongoid.models.select { |model| model.respond_to?(:protected_attributes) }.each do |model|
+      already_dropped = model.protected_attributes.map(&:to_s) - model.form_attributes
+      assert_empty already_dropped, "#{model.name}.protected_attributes lists keys mass_assigning already drops"
+    end
+  end
+
+  test 'mass_assigning keeps only form attributes, not setters Mongoid and Dragonfly generate' do
+    params = {
+      'name' => 'Event', 'tag_names' => 'a,b', 'update_tag_names' => 'true', 'update_activity_events' => '1',
+      'activity_id' => 'x', 'image' => 'file', 'remove_image' => '1',
+      'organisation_id' => 'x', 'ticket_type_ids' => ['x'], 'tickets' => ['x'], 'deleted_at' => 'x', 'created_at' => 'x',
+      'image_uid' => 'x', 'retained_image' => 'x', 'image_width_unmagic' => 'x', 'prevent_order_refunds' => '1'
+    }
+
+    assigned = Dandelion::App.new!.mass_assigning(params, Event)
+
+    assert_equal %w[activity_id image name remove_image tag_names update_activity_events update_tag_names], assigned.keys.sort
   end
 
   test 'atproto client is only returned for calendar event records' do

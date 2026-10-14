@@ -21,7 +21,7 @@ class EventFeedback
   field :has_public_answers, type: Boolean
 
   def self.protected_attributes
-    %w[event_id account_id response public_answers has_public_answers answers]
+    %w[response public_answers has_public_answers answers]
   end
 
   validates_inclusion_of :rating, in: 1..5, allow_nil: true

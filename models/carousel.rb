@@ -14,10 +14,6 @@ class Carousel
   field :hidden, type: Boolean
   field :button, type: Boolean
 
-  def self.protected_attributes
-    %w[organisation_id]
-  end
-
   validates_presence_of :name
 
   def self.new_hints

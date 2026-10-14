@@ -2,6 +2,11 @@ module Taggable
   extend ActiveSupport::Concern
 
   class_methods do
+    # The tags select sends tag_names, and update_tag_names to say it was on the form
+    def virtual_attributes
+      super + %w[tag_names update_tag_names]
+    end
+
     def taggable(tagships:, tag:)
       field :tag_names_cache, type: Array
 

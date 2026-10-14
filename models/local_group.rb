@@ -19,10 +19,6 @@ class LocalGroup
   field :type, type: String
   field :slug, type: String
 
-  def self.protected_attributes
-    %w[account_id]
-  end
-
   def self.search_fields
     %w[name]
   end

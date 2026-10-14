@@ -38,6 +38,14 @@ class TicketType
     %w[token]
   end
 
+  def self.assignable_foreign_keys
+    %w[ticket_group_id]
+  end
+
+  def self.virtual_attributes
+    %w[price_or_range price_or_range_submitted]
+  end
+
   attr_writer :price_or_range
   attr_accessor :price_or_range_submitted
 
