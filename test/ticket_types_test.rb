@@ -62,6 +62,23 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert_nil other_ticket_type.reload.ticket_group_id
   end
 
+  test 'a ticket cannot take a ticket type from another event' do
+    create_event(prices: [0])
+    other_event = FactoryBot.create(:event, prices: [0])
+    other_ticket_type = other_event.ticket_types.first
+
+    ticket = @event.tickets.build(account: FactoryBot.create(:account), ticket_type: other_ticket_type, complimentary: true)
+    refute ticket.valid?
+    assert_includes ticket.errors[:ticket_type], 'must belong to the same event'
+
+    sign_in_with_rack(@account)
+    post "/events/#{@event.id}/create_ticket", ticket: { name: 'Guest', email: 'guest@example.com', ticket_type_id: other_ticket_type.id.to_s, price: '0' }
+
+    assert last_response.redirect?
+    assert_equal 0, other_ticket_type.tickets.count
+    assert_equal 0, @event.tickets.count
+  end
+
   test 'parses fixed price from price_or_range' do
     event = FactoryBot.build(:event)
     ticket_type = TicketType.new(event: event, price_or_range: '25', price_or_range_submitted: true, name: 'Standard', quantity: 10)

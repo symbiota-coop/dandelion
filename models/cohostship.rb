@@ -24,7 +24,7 @@ class Cohostship
   field :featured, type: Boolean
 
   def self.protected_attributes
-    %w[organisation_id event_id has_image image_uid image_url image_width_unmagic image_height_unmagic]
+    %w[has_image]
   end
 
   before_validation do

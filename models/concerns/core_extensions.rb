@@ -43,11 +43,12 @@ module CoreExtensions
       []
     end
 
-    # The only attributes mass_assigning lets a form set: permitted_attributes if the model lists them, otherwise
-    # its own fields, less ids, timestamps, foreign keys and the fields that store an attachment (<attachment>_uid
-    # etc.), plus assignable_foreign_keys, attachments and remove_<attachment>, nested attributes and
-    # virtual_attributes. Every other setter Mongoid or Dragonfly generates, like has_many <name>_ids= (which
-    # re-parents the given records), deleted_at= or retained_<attachment>=, is never assignable
+    # The keys mass_assigning lets through: permitted_attributes if the model lists them, otherwise its own fields,
+    # less ids, timestamps, foreign keys and the fields that store an attachment (<attachment>_uid etc.), plus
+    # assignable_foreign_keys, attachments and remove_<attachment>, nested attributes and virtual_attributes. Every
+    # other setter Mongoid or Dragonfly generates, like has_many <name>_ids= (which re-parents the given records),
+    # deleted_at= or retained_<attachment>=, is never assignable. Fields are let through by default: a field forms
+    # mustn't set goes in protected_attributes, which mass_assigning raises on
     def form_attributes
       @form_attributes ||= if respond_to?(:permitted_attributes)
                              permitted_attributes.map(&:to_s)

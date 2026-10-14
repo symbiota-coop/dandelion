@@ -31,7 +31,7 @@ class Pmail
   field :gift, type: Boolean
 
   def self.protected_attributes
-    %w[organisation_id account_id sent_at requested_send_at message_ids gift editor token] + recipient_fields
+    %w[sent_at requested_send_at message_ids gift token recipient_kind]
   end
 
   def self.virtual_attributes
