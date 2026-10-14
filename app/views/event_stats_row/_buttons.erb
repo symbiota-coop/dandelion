@@ -1,30 +1,19 @@
 <td nowrap>
   <a data-bs-toggle="tooltip" title="Edit event" class="btn btn-sm btn-primary" href="/e/<%= event.slug %>/edit"><i class="bi bi-pencil-fill"></i></a>
-  <% image_source = event.image_source(organisation) %>
-  <% if image_source %>
-    <a data-bs-toggle="tooltip" title="Copy linked image" class="btn btn-sm btn-primary" href="javascript:;" onclick="
-        var div = $(this).next().show();
-        var node = $(div).find('a')[0];
-
-        // Create a range and select the node's content
-        var range = document.createRange();
-        range.selectNode(node);
-
-        // Add the selected content to the clipboard
-        var selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-        document.execCommand('copy');
-
-        // Deselect the content
-        selection.removeAllRanges();
-
-        $(div).hide();
-        // Alert the user that the node has been copied
-        alert('Linked image copied');
+  <%# The link is fetched on click: building the image's url can store a copy of it (dragonfly_config.rb), which takes a second or so %>
+  <% if event.image_source(organisation) %>
+    <a data-bs-toggle="tooltip" title="Copy linked image" class="btn btn-sm btn-primary" href="javascript:;" data-linked-image-url="/events/<%= event.id %>/linked_image?organisation_id=<%= organisation.id %>" onclick="
+        var html = fetch(this.dataset.linkedImageUrl).then(function (response) {
+          if (!response.ok) throw new Error(response.status);
+          return response.text();
+        }).then(function (text) {
+          return new Blob([text], { type: 'text/html' });
+        });
+        navigator.clipboard.write([new ClipboardItem({ 'text/html': html })]).then(function () {
+          alert('Linked image copied');
+        }, function () {
+          alert('The linked image could not be copied');
+        });
     "><i class="bi bi-image"></i></a>
-    <div style="display: none">
-      <a target="_parent" href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>"><img src="<%= u image_source.image.url %>"></a>
-    </div>
   <% end %>
 </td>

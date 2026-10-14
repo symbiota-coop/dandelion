@@ -56,6 +56,14 @@ Dandelion::App.controller do
     cp(:'events/event_stats_row', locals: { event: @event, organisation: @organisation, event_revenue_admin: event_revenue_admin? }, event: @event, key: "/events/#{@event.id}/stats_row?timezone=#{@event.start_time&.strftime('%Z')}&organisation_id=#{@organisation.id}&event_revenue_admin=#{event_revenue_admin? ? 1 : 0}")
   end
 
+  get '/events/:id/linked_image' do
+    @event = Event.unscoped.find(params[:id]) || not_found
+    @organisation = Organisation.find(params[:organisation_id]) || not_found
+    event_admins_or_revenue_admins_only!
+    image_source = @event.image_source(@organisation) || not_found
+    partial :'event_stats_row/linked_image', locals: { event: @event, image_source: image_source }
+  end
+
   get '/events/:id/duplicate' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!
