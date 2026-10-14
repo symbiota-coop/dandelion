@@ -262,12 +262,14 @@ class Account
   end
 
   def gravatar_url
-    Padrino.env == :development ? generated_avatar_path : "https://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email.downcase)}?s=400&d=#{CGI.escape("#{ENV['BASE_URI']}#{generated_avatar_path}")}"
+    # Addressable leaves the fallback's : and / alone, as views escape this URL again with u (so % would become %25)
+    Padrino.env == :development ? generated_avatar_path : "https://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email.downcase)}?s=400&d=#{Addressable::URI.escape("#{ENV['BASE_URI']}#{generated_avatar_path}")}"
   end
 
+  # Unescaped (an accented initial stays as it is), as gravatar_url and the views escape it
   def generated_avatar_path
     initials = GeneratedAvatar.initials(name)
-    initials ? "/avatar/#{CGI.escape(initials)}.png" : '/avatar.png'
+    initials ? "/avatar/#{initials}.png" : '/avatar.png'
   end
 
   def unread_notifications?(notifications = network_notifications)
