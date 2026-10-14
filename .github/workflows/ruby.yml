@@ -59,7 +59,7 @@ jobs:
 
     # Tests our own checks; here rather than in the test matrix, as it needs Node for the ESLint and Stylelint tests
     - name: Test the linters
-      run: bundle exec ruby -I test test/lint_test.rb
+      run: script/lint --all --only lint_test
 
   test:
     runs-on: ubuntu-latest

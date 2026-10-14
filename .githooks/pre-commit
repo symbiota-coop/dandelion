@@ -1,4 +1,4 @@
 #!/bin/sh
-# Lints the staged version of each staged file with CI's linters (script/lint --staged), so a commit that would fail CI's
-# lint job stops here. Git runs it once core.hooksPath points at .githooks, which script/agent-env/install.sh sets
+# Lints the staged version of each staged file with CI's linters (script/lint --staged), and runs test/lint_test.rb when
+# a file it checks is staged, so a commit that would fail CI's lint job stops here. Git runs it once core.hooksPath points at .githooks, which script/agent-env/install.sh sets
 exec script/lint --staged

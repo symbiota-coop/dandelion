@@ -6,9 +6,10 @@
 #   script/lint --staged    the staged version of each staged file (the pre-commit hook in .githooks)
 #   script/lint --all       everything, as CI does
 #
-# Add --only <linter> (rubocop, erb_lint, eslint or stylelint) to run just one, as CI's separate steps do.
-# A changed linter config (or one of our own cops or linters) runs that linter on everything, as CI would. A built file
-# (bootstrap5.css, ckeditor.js) given without its source fails, as it was edited by hand.
+# Add --only <linter> (rubocop, erb_lint, eslint, stylelint or lint_test) to run just one, as CI's separate steps do.
+# A changed linter config (or one of our own cops or linters) runs that linter on everything, as CI would, and
+# test/lint_test.rb when a file it checks changes. A built file (bootstrap5.css, ckeditor.js) given without its source
+# fails, as it was edited by hand.
 # Exits non-zero if any linter fails.
 require 'open3'
 
@@ -54,6 +55,25 @@ LINTERS = [
     all: ['app/assets/stylesheets/**/*.css'],
     stdin: ->(file) { ['--stdin-filename', file] },
     node: true
+  },
+  {
+    # Tests our checks and the rules under AGENTS.md's Other checks, so runs when what they read changes: our linters and
+    # their configs, the files the Other checks compare, and a new test file (which needs listing in ruby.yml). It reads
+    # files from disk, even with --staged
+    name: 'lint_test',
+    files: %r{
+      \A(
+        \.rubocop\.yml | \.rubocop/.+ | \.erb_lint\.yml | \.erb_linters/.+ | eslint\.config\.mjs | stylelint\.config\.mjs |
+        package(-lock)?\.json | config/bootstrap4_leftovers\.json | script/lint | test/lint_test\.rb | AGENTS\.md |
+        \.github/workflows/ruby\.yml | \.mcp\.json | \.cursor/mcp\.json | \.opencode/opencode\.json | \.codex/config\.toml |
+        tasks/.+\.rake | config/frontend_dependencies\.rb | app/views/layouts/_dependencies\.erb | ckeditor/package\.json
+      )\z
+    }x,
+    added: %r{\Atest/.+_test\.rb\z},
+    command: %w[bundle exec ruby -I test test/lint_test.rb],
+    whole: true, # runs on its own files, never the ones given
+    # LINT_TEST: its tests run script/lint, which mustn't run it again
+    env: ERB_ENV.merge('LINT_TEST' => '1')
   }
 ].freeze
 
@@ -86,6 +106,8 @@ files =
   when '--all' then []
   else ARGV.map { |f| f.delete_prefix('./') }
   end
+# New files, for checks that only care about those
+added = mode == '--staged' ? `git diff --cached --name-only --diff-filter=A -z`.split("\0") : []
 
 # Each job is a command, its env and what to pipe to it
 hand_edited = GENERATED.select { |file, built| files.include?(file) && files.none? { |f| f.match?(built[:sources]) } }
@@ -93,9 +115,10 @@ hand_edited.each { |file, built| $stderr.puts "#{file} #{built[:message]}, rathe
 
 jobs = LINTERS.flat_map do |linter|
   next [] if only && linter[:name].downcase != only.downcase
+  next [] if linter[:whole] && ENV['LINT_TEST']
 
-  all = mode == '--all' || files.any? { |f| f.match?(linter[:configs]) }
-  mine = files.select { |f| f.match?(linter[:files]) }
+  all = mode == '--all' || (linter[:configs] && files.any? { |f| f.match?(linter[:configs]) })
+  mine = files.select { |f| f.match?(linter[:files]) } + added.select { |f| linter[:added]&.match?(f) }
   next [] unless all || mine.any?
 
   # Only the versions package-lock.json installs: npx would otherwise fetch a missing linter, of any age
@@ -105,7 +128,9 @@ jobs = LINTERS.flat_map do |linter|
   end
 
   env = linter[:env] || {}
-  if all && linter[:shards]
+  if linter[:whole]
+    [{ name: linter[:name], command: linter[:command], env: env }]
+  elsif all && linter[:shards]
     templates = Dir[linter[:shards]]
     templates.each_slice(templates.size.fdiv(WORKERS).ceil).map { |share| { name: linter[:name], command: linter[:command] + share, env: env } }
   elsif all

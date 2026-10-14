@@ -19,7 +19,7 @@ Dandelion is built with many coding agents (Claude Code, Codex, Cursor, opencode
 
 ## Custom checks
 
-CI fails on each rule below, and each names its check. When you add a rule to this file that code can check, add a check for it, list it here, and add cases to `test/lint_test.rb`, which tests our checks (each cop's `@example`, good and bad, is tested as it stands). It doesn't boot the app, so it runs without foreman: `bundle exec ruby -I test test/lint_test.rb`, and CI's lint job runs it. Disable a check only where its rule genuinely doesn't apply, and say why in the comment.
+CI fails on each rule below, and each names its check. When you add a rule to this file that code can check, add a check for it, list it here, and add cases to `test/lint_test.rb`, which tests our checks (each cop's `@example`, good and bad, is tested as it stands). It doesn't boot the app, so it runs without foreman: `bundle exec ruby -I test test/lint_test.rb`. CI's lint job runs it, and the pre-commit hook does when you commit a file it checks (a linter or its config, a file an Other check compares, or a new test file). Disable a check only where its rule genuinely doesn't apply, and say why in the comment.
 
 ### RuboCop
 
@@ -69,7 +69,7 @@ Our rules are in `stylelint.config.mjs`. Disable one with `/* stylelint-disable 
 
 ### Other checks
 
-Rules no linter covers, checked by `test/lint_test.rb` (which CI's lint job runs) or `script/lint` (which the pre-commit hook runs). Each names its check.
+Rules no linter covers, checked by `test/lint_test.rb` or `script/lint` (both run by CI's lint job and the pre-commit hook). Each names its check.
 
 - `test_mcp_copies_match_mcp_json`: `.cursor/mcp.json`, `.opencode/opencode.json` and `.codex/config.toml` are copies of `.mcp.json`: only edit `.mcp.json`, then run `rake mcp:sync` (Cloud agents)
 - `test_ci_runs_every_test_file`: CI's test jobs, one per test file, are listed in `.github/workflows/ruby.yml`: add a new test file there (Tests)
@@ -90,7 +90,7 @@ script/lint <files>
 
 If a linter's config is among them (`.rubocop.yml`, `.rubocop/`, `.erb_lint.yml`, `.erb_linters/`, `eslint.config.mjs`, `stylelint.config.mjs`, `package.json`), it runs that linter on everything, as CI does; `script/lint --all` runs them all, and `--only <linter>` just one. Run `npm ci` first if `node_modules` is missing.
 
-The pre-commit hook (`.githooks/pre-commit`) runs `script/lint --staged`, which lints the staged version of each staged file, so another session's unstaged edits don't count. Git runs it once `core.hooksPath` is `.githooks`, which `script/agent-env/install.sh` sets; in a checkout of your own, run `git config core.hooksPath .githooks` once. If it fails, fix the offenses (or disable a check where its rule genuinely doesn't apply, as above) and commit again. Never skip it with `--no-verify`.
+The pre-commit hook (`.githooks/pre-commit`) runs `script/lint --staged`, which lints the staged version of each staged file, so another session's unstaged edits don't count (`test/lint_test.rb`, which it runs when you commit a file it checks, reads from disk). Git runs it once `core.hooksPath` is `.githooks`, which `script/agent-env/install.sh` sets; in a checkout of your own, run `git config core.hooksPath .githooks` once. If it fails, fix the offenses (or disable a check where its rule genuinely doesn't apply, as above) and commit again. Never skip it with `--no-verify`.
 
 ## Crucial restrictions
 
