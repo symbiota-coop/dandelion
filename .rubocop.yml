@@ -1,39 +1,29 @@
-# CI runs RuboCop with --fail-level warning, so only warning-level cops (mostly Lint) fail it; convention cops (Layout, Style, Naming) are reported but don't.
-# .erb_lint.yml inherits this file for the Ruby in templates, but runs only the warning-level cops there, so convention cops set here don't reach templates.
+# Only cops that can fail CI (warning or above, as CI runs RuboCop with --fail-level warning): Lint, ours and the three
+# warning-level Layout cops. Convention cops (Style, Layout, Naming) are off, so plain `rubocop` reports what CI does.
+# .erb_lint.yml inherits this file for the Ruby in templates.
 
 # Our own cops (.rubocop/dandelion), which check rules from AGENTS.md
 require:
   - ./.rubocop/dandelion.rb
 
 AllCops:
-  NewCops: enable 
-Layout/EndAlignment:
-  AutoCorrect: true
-Style/SymbolArray:
-  MinSize: 3
-Style/HashSyntax:
-  EnforcedShorthandSyntax: never 
+  NewCops: enable
 
+Style:
+  Enabled: false
+Layout:
+  Enabled: false
+Naming:
+  Enabled: false
 Metrics:
   Enabled: false
-
-Layout/LineLength:
-  Enabled: false  
-
-Style/FrozenStringLiteralComment:
-  Enabled: false
-Style/SafeNavigation:
-  Enabled: false
-Style/FetchEnvVar:
-  Enabled: false
-Style/HashLikeCase:
-  Enabled: false  
-Style/Documentation:
-  Enabled: false
-Style/OpenStructUse:
-  Enabled: false  
-Style/NumericPredicate:
-  Enabled: false
+Layout/BeginEndAlignment:
+  Enabled: true
+Layout/DefEndAlignment:
+  Enabled: true
+Layout/EndAlignment:
+  Enabled: true
+  AutoCorrect: true
 
 Lint/DuplicateBranch:
   IgnoreDuplicateElseBranch: true
