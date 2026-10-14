@@ -359,7 +359,7 @@
           <div class="row g-3 flex-grow-1">
             <% [['col-8', 'col-lg-8 · newsfeed'], ['col-4', 'col-lg-4 · sticky']].each do |col, label| %>
               <div class="<%= col %>">
-                <div class="h-100 border rounded shadow-sm d-flex align-items-center justify-content-center text-center spec" style="background: repeating-linear-gradient(135deg, var(--bs-gray-100) 0 .625rem, #fff .625rem 1.25rem)"><%= label %></div>
+                <div class="h-100 border rounded shadow-sm d-flex align-items-center justify-content-center text-center spec" style="background: repeating-linear-gradient(135deg, var(--bs-gray-100) 0 .625rem, var(--bs-white) .625rem 1.25rem)"><%= label %></div>
               </div>
             <% end %>
           </div>
@@ -1447,6 +1447,7 @@
     <div class="row g-5">
       <% design_subsection 'Map info window', col: 'col-lg-5' do %>
         <div class="bg-body-tertiary rounded p-4">
+          <%# stylelint-disable-next-line declaration-property-unit-disallowed-list, declaration-property-value-disallowed-list -- Google's own InfoWindow, which this shows, sized in px with its own radius and shadow %>
           <div class="gm-style position-relative bg-white mx-auto" style="max-width: 20rem; padding: 12px; border-radius: 8px; box-shadow: 0 2px 7px 1px rgba(var(--bs-black-rgb), .3)">
             <button type="button" class="btn-close position-absolute top-0 end-0 m-2" aria-label="Close"></button>
             <div class="infowindow">
@@ -1459,6 +1460,7 @@
 
       <% design_subsection 'Email previews', col: 'col-lg-7' do %>
         <div class="email-preview-iframe-container border rounded" style="height: 20rem">
+          <%# stylelint-disable-next-line declaration-property-value-disallowed-list -- an email, which can't use custom properties (as in the emails' own templates) %>
           <iframe title="Email preview" srcdoc="<%= '<body style="margin: 0; padding: 2rem; font-family: sans-serif; background: #f6f6f6"><div style="max-width: 32rem; margin: 0 auto; background: #fff; padding: 1.5rem; border-radius: 8px"><h2 style="margin-top: 0">Your tickets to Full moon gathering</h2><p>Thanks for booking, Maya. Your tickets are attached.</p></div></body>' %>"></iframe>
         </div>
         <div class="spec">.email-preview-iframe-container, on the ticket, reminder and feedback request email pages (events/ticket_email.erb and friends): the email rendered by its own route into a borderless iframe that fills the container, 80vh tall (20rem here)</div>

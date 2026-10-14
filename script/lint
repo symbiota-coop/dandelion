@@ -50,10 +50,11 @@ LINTERS = [
   },
   {
     name: 'Stylelint',
-    files: %r{\Aapp/assets/stylesheets/.+\.css\z},
+    # Templates for their <style>s and style attributes (stylelint.config.mjs)
+    files: %r{\A(app/assets/stylesheets/.+\.css|app/views/.+\.erb)\z},
     configs: /\A(stylelint\.config\.mjs|package(-lock)?\.json)\z/,
     command: %w[npx --no-install stylelint --allow-empty-input],
-    all: ['app/assets/stylesheets/**/*.css'],
+    all: ['app/assets/stylesheets/**/*.css', 'app/views/**/*.erb'],
     stdin: ->(file) { ['--stdin-filename', file] },
     node: true
   },

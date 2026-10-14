@@ -264,7 +264,7 @@ class LintTest < Minitest::Test
       for (const [code, file] of cases) results.push((await eslint.lintText(code, { filePath: resolve(file) }))[0].messages.map((m) => `${m.line}:${m.column} ${m.message}`))
     } else {
       const stylelint = (await import('stylelint')).default
-      for (const [code, file] of cases) results.push((await stylelint.lint({ code, codeFilename: resolve(file) })).results[0].warnings.map((w) => w.rule))
+      for (const [code, file] of cases) results.push((await stylelint.lint({ code, codeFilename: resolve(file) })).results[0].warnings.map((w) => file.endsWith('.erb') ? `${w.line}:${w.column} ${w.rule}` : w.rule))
     }
     process.stdout.write(JSON.stringify(results))
   JS
@@ -349,6 +349,24 @@ class LintTest < Minitest::Test
     bad.each_with_index { |(source, rule), index| assert_equal [rule], results[index], source }
     assert_empty good_result
     assert_equal ['declaration-property-value-disallowed-list'], email_result
+  end
+
+  # stylelint.config.mjs checks a template's <style>s and style attributes, where they are in the template
+  def test_stylelint_lints_templates
+    node_modules!
+    template = <<~ERB
+      <style>
+        .a { color: #fff; margin: <%= x %>; }
+        <%= 'b { c: d }' %>
+      </style>
+      <div style="<%= 'display: none' if y %>; border-radius: 4px; color: var(--theme-500)" class="z">
+      <%# stylelint-disable-next-line declaration-property-unit-disallowed-list -- a reason %>
+      <p style="padding: 3px"><p style = 'margin: <%= z %>px'>
+    ERB
+    email = %(<div style="color: #333; padding: 12px">\n<p style="color: var(--x)">)
+    messages, email_messages = node_lint('stylelint', [[template, 'app/views/x.erb'], [email, 'app/views/emails/x.erb']])
+    assert_equal ['2:15 declaration-property-value-disallowed-list', '5:57 declaration-property-value-disallowed-list'], messages
+    assert_equal ['2:18 declaration-property-value-disallowed-list'], email_messages
   end
 
   def lint(*args)

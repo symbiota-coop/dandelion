@@ -63,13 +63,15 @@ ESLint checks `app/assets/javascripts` and the JavaScript in templates: their in
 
 ### Stylelint
 
-Our rules are in `stylelint.config.mjs`. Disable one with `/* stylelint-disable <rule> -- reason */` and `/* stylelint-enable <rule> */`.
+Our rules are in `stylelint.config.mjs`. Disable one with `/* stylelint-disable <rule> -- reason */` and `/* stylelint-enable <rule> */` (or `/* stylelint-disable-line <rule> -- reason */`; in a template, `<%# stylelint-disable-next-line <rule> -- reason %>` also works, and prints nothing, which suits CSS in a style attribute or Ruby string).
+
+Stylelint checks `app/assets/stylesheets` and the CSS in templates: their `<style>`s and `style="..."` attributes (including those in Ruby strings, but not `style:` options), each template as one stylesheet, where ERB output in a value is `__erb`.
 
 - `declaration-property-value-disallowed-list` and `color-named`: Colours come from tokens (`--theme-*`, `--color-*`, `--bs-gray-*`, `--hairline`...), so organisation themes follow: never hex values, `rgb()`/`hsl()` of numbers or named colours, which the check allows only where a custom property is defined. Translucent black and white are `rgba(var(--bs-black-rgb), a)` and `rgba(var(--bs-white-rgb), a)`; don't add other translucent tints beyond those the design guide lists (not checked)
 - `declaration-property-value-disallowed-list`: Radii come from Bootstrap's variables (`--bs-border-radius`, `-sm`, `-lg`, `-xl`, `-pill`), or are 0, 50% or inherit. A shadow with blur is an elevation, so it's one of Bootstrap's (`--bs-box-shadow-sm`, `--bs-box-shadow`, `--bs-box-shadow-lg` or the `shadow-*` classes); unblurred rings (the focus ring, hairline rings, image overlays) are fine. The check flags lengths in radii and blurred shadows
 - `declaration-property-unit-disallowed-list`: Spacing comes from the scale: Bootstrap's spacing utilities in markup, `--space-*` tokens in CSS, never px. Off the scale only to size a control to match another or to line up with a fixed layout dimension (the design guide's Spacing lists them). Other sizes are in rem (or em); px only for hairlines, shadows, the focus ring, breakpoints and Google Maps overrides. The check flags px in margins, padding, gaps, insets (`inset*`, `top`, `right`, `bottom`, `left`) and font sizes
 - `declaration-property-value-disallowed-list`: Motion: transitions animate only colours, shadows, masks, opacity, `translate` and `rotate` (not `all`, `transform`, `scale` or sizes), over `--transition-fast` or `--transition-enter` rather than a duration of their own, and only loading indicators loop (`infinite`). Loading indicators, which may loop on their own timing, disable it where they are, as do the guide's two older exceptions (the quick theme colours and feedback stars grow on hover); don't add more
-- `declaration-property-value-disallowed-list` (override for `event_details.css` and `email.css`): These two are inlined into emails, so they can't use CSS custom properties (`var(--x)`). The colour, radius, shadow and spacing checks above don't apply to them
+- `declaration-property-value-disallowed-list` (override for `event_details.css`, `email.css` and the email templates, `emails/` and `layouts/email.erb` and `pmail.erb`): Emails, and the stylesheets inlined into them, can't use CSS custom properties (`var(--x)`). The colour, radius, shadow and spacing checks above don't apply to them
 
 ### Other checks
 
@@ -187,7 +189,7 @@ Cooldown: never use a gem or JS package version released less than 7 days ago. T
 
 - Gems: the Gemfile's source has `cooldown: 7`, so Bundler enforces it
 - `rake bootstrap:build` runs `npm install` with `--before` set to 7 days ago
-- The root `package.json` is only linters: ESLint, which CI runs as `npx eslint` over `app/assets/javascripts` and the templates in `app/views` (`eslint.config.mjs`), and Stylelint, which it runs over `app/assets/stylesheets` (`stylelint.config.mjs`; `npm run lint` runs both). It installs from `package-lock.json` (`npm ci`): pin exact versions, and when adding or bumping one run `npm install --before=<the date a week ago>` so its own dependencies are a week old too
+- The root `package.json` is only linters: ESLint, which CI runs as `npx eslint` over `app/assets/javascripts` and the templates in `app/views` (`eslint.config.mjs`), and Stylelint, which it runs over `app/assets/stylesheets` and the templates (`stylelint.config.mjs`, which parses templates with PostCSS, also listed; `npm run lint` runs both). It installs from `package-lock.json` (`npm ci`): pin exact versions, and when adding or bumping one run `npm install --before=<the date a week ago>` so its own dependencies are a week old too
 - `ckeditor/` installs from its `yarn.lock`. Yarn 1 has no cooldown, so when refreshing the lockfile (`yarn upgrade`), check the new versions' release dates (`npm view <package> time`) and pin back any that are under a week old
 - When adding or bumping a CDN package in `config/frontend_dependencies.rb`, or a version in a rake task, pick a version at least 7 days old
 

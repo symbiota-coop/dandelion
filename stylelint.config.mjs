@@ -1,5 +1,35 @@
-// Rules from the Design section of AGENTS.md, for our stylesheets in app/assets/stylesheets. No shared config:
-// only these rules, so it checks the design tokens rather than formatting
+import postcss from 'postcss'
+
+// Rules from the Design section of AGENTS.md, for our stylesheets in app/assets/stylesheets and the CSS in templates. No
+// shared config: only these rules, so it checks the design tokens rather than formatting
+
+// Templates' CSS, parsed as one stylesheet per template: everything else is blanked, so lines and columns stay put.
+// <style> blocks keep their place; style="..." attributes become a{...} over their = and quotes. ERB output in a value
+// becomes __erb, and other ERB tags (or output standing for a whole declaration or part of a selector) spaces. An ERB
+// comment that disables a rule (<%# stylelint-disable-next-line rule -- reason %>) becomes a CSS comment, for CSS in Ruby
+const STYLE = /<style\b((?:<%[\s\S]*?%>|[^>])*)>([\s\S]*?)<\/style>/gi
+const STYLE_ATTRIBUTE = /(\sstyle\s*=\s*)(["'])((?:<%[\s\S]*?%>|(?!\2)[\s\S])*)\2/gi
+const blank = (text) => text.replace(/[^\n]/g, ' ')
+const inValue = (css) => css.slice(Math.max(css.lastIndexOf(';'), css.lastIndexOf('{'), css.lastIndexOf('}')) + 1).includes(':')
+const erbToCss = (text) => text.replace(/<%(==?|#|-)?[\s\S]*?%>/g, (tag, kind, offset, css) =>
+  (kind === '=' || kind === '==') && inValue(css.slice(0, offset)) ? `__erb${blank(tag.slice(5))}` : blank(tag))
+function templateCss (template) {
+  const out = blank(template).split('')
+  const put = (at, text) => out.splice(at, text.length, ...text)
+  const styles = []
+  for (const match of template.matchAll(STYLE)) {
+    styles.push([match.index, match.index + match[0].length])
+    put(match.index + match[0].length - '</style>'.length - match[2].length, erbToCss(match[2]))
+  }
+  for (const match of template.matchAll(STYLE_ATTRIBUTE)) {
+    if (styles.some(([start, end]) => match.index >= start && match.index < end)) continue
+    put(match.index + match[1].length - 1, `a{${erbToCss(match[3])}}`)
+  }
+  for (const match of template.matchAll(/<%#(\s*stylelint-[\s\S]*?)%>/g)) put(match.index, `/* ${match[1].slice(1)}*/`)
+  return out.join('')
+}
+const templateSyntax = { parse: (template, options) => postcss.parse(templateCss(template), options), stringify: postcss.stringify }
+
 export default {
   ignoreFiles: [
     'app/assets/stylesheets/bootstrap5.css' // compiled vendor CSS: change bootstrap5.scss instead
@@ -45,8 +75,12 @@ export default {
   },
   overrides: [
     {
-      // Inlined into emails, which can't use custom properties, so they keep their own colours and sizes
-      files: ['app/assets/stylesheets/email.css', 'app/assets/stylesheets/event_details.css'],
+      files: ['app/views/**/*.erb'],
+      customSyntax: templateSyntax
+    },
+    {
+      // Inlined into emails, or emails themselves, which can't use custom properties, so they keep their own colours and sizes
+      files: ['app/assets/stylesheets/email.css', 'app/assets/stylesheets/event_details.css', 'app/views/emails/**/*.erb', 'app/views/layouts/{email,pmail}.erb'],
       rules: {
         'declaration-property-value-disallowed-list': [
           { '/.*/': ['/var\\(/'] },
