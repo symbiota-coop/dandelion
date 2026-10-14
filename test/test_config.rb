@@ -32,6 +32,9 @@ end
 Capybara.javascript_driver = :cuprite
 Capybara.default_driver = :cuprite
 
+# Tests don't look email domains up in DNS: it's slow, and a domain that stops resolving fails tests that aren't about it
+EmailAddress::Config.configure(host_validation: :syntax)
+
 # Configure Geocoder for testing (avoid real API calls)
 Geocoder.configure(lookup: :test)
 Geocoder::Lookup::Test.set_default_stub([{ 'coordinates' => [59.3251, 18.0685] }]) # Gamla Stan coords (111 28, Sweden)
