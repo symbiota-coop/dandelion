@@ -52,9 +52,9 @@
         if (!code)
           return
         checkingIn = true
-        $.post(<%== "/events/#{@event.id}/check_in/".to_json %> + code, {checked_in: true}, function(accountName, textStatus, jqXHR) {
+        $.post(<%== "/events/#{@event.id}/check_in/".to_json %> + code, {checked_in: true}, function(accountName) {
           alert('Checked in ' + accountName + ' ' + code + ' ✅')
-        }).fail(function(data, textStatus, jqXHR) {
+        }).fail(function(data) {
           switch (data.status) {
           case 403:
             alert('Ticket ID not found ⚠️')

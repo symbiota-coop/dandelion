@@ -4,7 +4,8 @@ require 'json'
 
 module ERBLint
   module Linters
-    # Rules from the Design section of AGENTS.md that a template's classes and inline scripts can break
+    # Rules from the Design section of AGENTS.md that a template's classes, and the JavaScript in its Ruby (onclick: '...'),
+    # can break. ESLint checks the template's own scripts and event attributes (eslint.config.mjs)
     class DesignClasses < Linter
       include LinterRegistry
 
@@ -14,18 +15,21 @@ module ERBLint
         # Success is the theme colour
         /(?<![\w-])[a-z][a-z-]*-success(?![\w-])/ => 'Success is the theme colour, so use `-primary`, not `-success`.',
         # Bootstrap 5 dropped the badge colour classes
-        /(?<![\w-])badge-(?:#{BOOTSTRAP_COLOURS})(?![\w-])/o => 'Badges are `badge text-bg-*`; there is no `badge-*` colour class.',
-        # Bootstrap's d-* classes are !important, so .show() can't undo them
-        /\b(?:(?:add|remove|toggle)Class|classList\.(?:add|remove|toggle))\(\s*(['"])d-none\1/ =>
-          'To show and hide elements from JS, start them hidden with `style="display: none"` and use `.show()` / `.hide()` / `.toggle()`, not `d-none`.'
+        /(?<![\w-])badge-(?:#{BOOTSTRAP_COLOURS})(?![\w-])/o => 'Badges are `badge text-bg-*`; there is no `badge-*` colour class.'
       }.freeze
+
+      # Bootstrap's d-* classes are !important, so .show() can't undo them
+      D_NONE_CALLS = /\b(?:(?:add|remove|toggle)Class|classList\.(?:add|remove|toggle))\(\s*(['"])d-none\1/
+      D_NONE = 'To show and hide elements from JS, start them hidden with `style="display: none"` and use `.show()` / `.hide()` / `.toggle()`, not `d-none`.'
+      # ERB tags, whose Ruby can hold JavaScript
+      ERB_TAGS = /<%(?!#).*?%>/m
 
       # class="..." attributes and class: '...' options in Ruby
       CLASS_LISTS = /\bclass(?:=|:\s*)(['"])(.*?)\1/m
       # <select> tags and select_tag calls, which take form-select
       SELECTS = /<select\b(?:[^>"']|"[^"]*"|'[^']*')*>|\bselect_tag\b.*?%>/m
       FORM_SELECT = /(?<![\w-])form-select(?![\w-])/
-      # Classes added from inline scripts
+      # Classes added from JavaScript
       CLASS_CALLS = /\b(?:(?:add|remove|toggle)Class|classList\.(?:add|remove|toggle))\(\s*(['"])(.*?)\1/
 
       # Bootstrap 4 classes and attributes that Bootstrap 5 renamed or dropped, shared with ESLint
@@ -62,9 +66,13 @@ module ERBLint
           add(processed_source, match.begin(0)...(match.begin(0) + match[0][/\A\S+/].length), 'Selects take `form-select`.')
         end
 
-        source.scan(CLASS_CALLS) do
-          match = Regexp.last_match
-          check_classes(processed_source, match[2], match.begin(2))
+        source.scan(ERB_TAGS) do
+          tag = Regexp.last_match
+          tag[0].scan(D_NONE_CALLS) { add(processed_source, (tag.begin(0) + Regexp.last_match.begin(0))...(tag.begin(0) + Regexp.last_match.end(0)), D_NONE) }
+          tag[0].scan(CLASS_CALLS) do
+            match = Regexp.last_match
+            check_classes(processed_source, match[2], tag.begin(0) + match.begin(2))
+          end
         end
       end
 

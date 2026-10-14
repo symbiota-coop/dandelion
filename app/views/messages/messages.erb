@@ -42,7 +42,7 @@
         <div class="message-thread-breadcrumbs d-block d-lg-none">
           <ul id="message-breadcrumbs" class="breadcrumb">
             <li class="breadcrumb-item"><a href="javascript:;" onclick="$('#thread-panel').hide();
-                $('#preview-panel').removeClass('d-none')">Messages</a></li><%# erb_lint:disable DesignClasses: the panel's d-none is responsive (d-none d-lg-block), so .show() can't replace it %>
+                $('#preview-panel').removeClass('d-none') /* eslint-disable-line no-restricted-syntax -- the panel's d-none is responsive (d-none d-lg-block), so .show() can't replace it */">Messages</a></li>
             <li class="breadcrumb-item active"><%= @account.name %></li>
           </ul>
         </div>

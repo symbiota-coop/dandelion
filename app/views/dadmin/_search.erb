@@ -68,7 +68,7 @@
           option.attr("value", fieldname).text(fieldname)
           option.appendTo(select)
         } else { // collection
-          $.each(options, function (f2, o2) {
+          $.each(options, function (f2) {
             var option = $("<option></option>")
             option.attr("value", fieldname + '.' + f2).text(fieldname + '.' + f2)
             option.appendTo(select)

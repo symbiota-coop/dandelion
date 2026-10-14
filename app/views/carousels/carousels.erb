@@ -43,7 +43,7 @@
   $(function () {
 
     $(".carousels").sortable({
-      update: function (event, ui) {
+      update: function (event) {
         $.post(<%== "/o/#{@organisation.slug}/carousels/order".to_json %>, {carousel_ids: $(event.target).sortable("toArray")})
       }
     });

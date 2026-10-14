@@ -41,7 +41,8 @@ LINTERS = [
   },
   {
     name: 'ESLint',
-    files: %r{\Aapp/assets/javascripts/(?!ext/).+\.js\z},
+    # Templates for their inline scripts and event attributes (eslint.config.mjs)
+    files: %r{\A(app/assets/javascripts/(?!ext/).+\.js|app/views/.+\.erb)\z},
     configs: %r{\A(eslint\.config\.mjs|package(-lock)?\.json|config/bootstrap4_leftovers\.json)\z},
     command: %w[npx --no-install eslint --no-warn-ignored],
     stdin: ->(file) { ['--stdin', '--stdin-filename', file] },

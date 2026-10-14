@@ -33,7 +33,7 @@
     $(function () {
 
       $(".roles").sortable({
-        update: function (event, ui) {
+        update: function (event) {
           $.post('/roles/order', {rota_id: $(event.target).attr('data-rota-id'), role_ids: $(event.target).sortable("toArray")}, function () {
             $(event.target).next().show()
           })
@@ -41,7 +41,7 @@
       });
 
       $(".rslots").sortable({
-        update: function (event, ui) {
+        update: function (event) {
           $.post('/rslots/order', {rota_id: $(event.target).attr('data-rota-id'), rslot_ids: $(event.target).sortable("toArray")}, function () {
             $(event.target).next().show()
           })

@@ -15,7 +15,7 @@
         if (<%== (ENV['CREATE_VIDEO'] ? true : false).to_json %>) {
           $('.typewriter').text('regenerative')
         } else {
-          var typed = new Typed('.typewriter', {
+          new Typed('.typewriter', {
             strings: <%== ADJECTIVES.to_json %>,
             typeSpeed: 50,
             loop: true

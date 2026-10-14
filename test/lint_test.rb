@@ -124,11 +124,11 @@ class LintTest < Minitest::Test
       '<div class="badge text-bg-success">' => /-success/,
       '<span class="badge badge-danger">' => /badge-\*/,
       '<span class="label">' => /\.label/,
-      %(<a onclick="$('#x').addClass('d-none')">) => /d-none/,
+      %(<%= link_to 'x', '#', onclick: "$('#x').addClass('d-none')" %>) => /d-none/,
       '<div class="ml-2">' => /ms-\*/,
       %(<%= link_to 'x', '#', class: 'float-right' %>) => /float-start/,
       '<button class="close">' => /btn-close/,
-      %(<script>$('#x').removeClass('text-left')</script>) => /text-start/,
+      %(<%= button_tag 'x', onclick: "$(this).removeClass('text-left')" %>) => /text-start/,
       '<a data-toggle="tooltip">' => /data-bs-\*/,
       %(<%= link_to 'x', '#', data: { toggle: 'dropdown' } %>) => /data-bs-\*/,
       '<select name="x" class="me-1">' => /form-select/,
@@ -145,16 +145,19 @@ class LintTest < Minitest::Test
       %(<div class="<%= 'ml-2' %>">), # Ruby inside the attribute isn't a class
       '<p>Close it, then align it left</p>',
       %(<select class="form-select form-select-sm" data-x="a>b">), %(<%= select_tag :x, options: [1, 2],\n  class: 'form-select d-inline-block' %>),
-      '<p>A select_tag needs one too</p>'
+      '<p>A select_tag needs one too</p>',
+      # ESLint checks the template's own scripts and event attributes
+      %(<script>$('#x').addClass('d-none')</script><a onclick="$(this).removeClass('text-left')">)
     ].each { |template| assert_empty erb_offenses(template), template }
   end
 
   def test_jquery_requests
-    [%(<script>fetch('/x').then(function (r) { return r.text() })</script>), %(<a onclick="fetch(this.href)">)].each do |template|
+    [%(<%= link_to 'x', '#', onclick: "fetch(this.href)" %>), %(<%= button_tag 'x',\n  onclick: 'fetch("/x")' %>)].each do |template|
       offenses = erb_offenses(template).select { |linter, _| linter == 'JqueryRequests' }
       assert_equal 1, offenses.size, "JqueryRequests on #{template}: #{offenses.inspect}"
     end
-    [%(<script>$.get('/x')</script>), %(<%= ENV.fetch('X', nil) %>), '<script>x.fetch(1)</script>'].each do |template|
+    # ESLint checks the template's own scripts and event attributes
+    [%(<script>fetch('/x')</script><a onclick="fetch(this.href)">), %(<%= ENV.fetch('X', nil) %>), %(<%= link_to 'x', '#', onclick: 'x.fetch(1)' %>)].each do |template|
       assert_empty erb_offenses(template), template
     end
   end
@@ -258,7 +261,7 @@ class LintTest < Minitest::Test
     const results = []
     if (tool === 'eslint') {
       const eslint = new (await import('eslint')).ESLint()
-      for (const [code, file] of cases) results.push((await eslint.lintText(code, { filePath: resolve(file) }))[0].messages.map((m) => m.message))
+      for (const [code, file] of cases) results.push((await eslint.lintText(code, { filePath: resolve(file) }))[0].messages.map((m) => `${m.line}:${m.column} ${m.message}`))
     } else {
       const stylelint = (await import('stylelint')).default
       for (const [code, file] of cases) results.push((await stylelint.lint({ code, codeFilename: resolve(file) })).results[0].warnings.map((w) => w.rule))
@@ -291,6 +294,33 @@ class LintTest < Minitest::Test
       assert_match message, results[index].first
     end
     assert_empty good_result, 'ESLint flags Bootstrap 5 and our own classes'
+  end
+
+  # eslint.config.mjs lints a template's inline scripts and event attributes, where they are in the template
+  def test_eslint_lints_templates
+    node_modules!
+    template = <<~ERB
+      <a href="#" onclick="$(this).addClass('d-none'); return false">x</a>
+      <% if x %>
+        <script>
+          var url = <%== '/x'.to_json %> + '<%= y %>'
+          fetch(url)
+        </script>
+      <% end %>
+      <script type="application/json">{"a": <%== 1 %>}</script>
+      <script src="<%= z %>"></script>
+      <button onclick="go(<%= w.to_json %>)" onmouseover="return true">y</button>
+      <script type = "application/json">{"b": 2}</script>
+      <a onClick = "x(&quot;y&quot;) &amp;&amp; $(this).hide()">z</a><script>fetch('/z')</script>
+    ERB
+    messages, = node_lint('eslint', [[template, 'app/views/x.erb']])
+    assert_equal 5, messages.size, messages.inspect
+    assert_match(/\A1:39 .*d-none/, messages[0])
+    assert_match(/\A5:5 .*jQuery/, messages[1])
+    assert_match(/\A10:18 .*'go' is not defined/, messages[2])
+    # Spaced, mixed-case event attributes, with HTML entities, which move no columns
+    assert_match(/\A12:15 .*'x' is not defined/, messages[3])
+    assert_match(/\A12:72 .*jQuery/, messages[4])
   end
 
   def test_stylelint_rules

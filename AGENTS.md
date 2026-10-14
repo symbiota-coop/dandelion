@@ -44,20 +44,22 @@ Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Rub
 
 ### erb_lint
 
-Our linters, `DesignClasses` and `JqueryRequests`, are in `.erb_linters/`. Disable one on a line with `<%# erb_lint:disable DesignClasses: reason %>`.
+Our linters, `DesignClasses` and `JqueryRequests`, are in `.erb_linters/`. Disable one on a line with `<%# erb_lint:disable DesignClasses: reason %>`. Their checks on JavaScript calls (`addClass('d-none')`, `fetch`) cover only the JavaScript in a template's Ruby (`onclick: '...'` options), as ESLint checks the template's own scripts and event attributes. Their checks on class names and attributes run on the whole template, so an HTML string in a script can get the same message from both
 
 - `DesignClasses`: To show and hide elements from JS, start them hidden with `style="display: none"` and use jQuery `.show()` / `.hide()` / `.toggle()`, not `d-none` with `addClass` / `removeClass` (Bootstrap's `d-*` classes are `!important`). Keep `d-none d-md-block` and friends for purely responsive hiding
 - `DesignClasses`: Success is the theme colour, so use `-primary`, never `-success`. Badges are `badge text-bg-*`; there is no `.label` and no `badge-*` colour class
 - `DesignClasses`: Bootstrap 5, not 4: `data-bs-*` attributes and logical spacing and alignment (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-end`, `float-start`). `config/bootstrap4_leftovers.json` lists the Bootstrap 4 classes and attributes it flags, with what replaces each; add one there if you find another
 - `DesignClasses`: Selects take `form-select` (`<select>` tags and `select_tag`; the form builder's `select_block` adds it), even ones Select2 replaces, so they look right until it loads
-- `JqueryRequests`: The ESLint `no-restricted-globals` rule below (jQuery, not `fetch`), in templates' inline scripts and event attributes
+- `JqueryRequests`: The ESLint `no-restricted-globals` rule below (jQuery, not `fetch`)
 
 ### ESLint
 
-Our rules are in `eslint.config.mjs`. Disable one with `// eslint-disable-next-line <rule> -- reason`.
+Our rules are in `eslint.config.mjs`. Disable one with `// eslint-disable-next-line <rule> -- reason` (or `/* eslint-disable-line <rule> -- reason */` in an event attribute).
 
-- `no-restricted-syntax`: The `DesignClasses` rules above (showing and hiding; `-success`, `badge-*` and `.label`; Bootstrap 4 leftovers; `form-select`), in the strings and template literals of `app/assets/javascripts`
-- `no-restricted-globals`: Requests use jQuery (`$.get`, `$.getJSON`, `$.post`, `$.ajax`), not `fetch`. Where an API needs a real Promise (`ClipboardItem`), wrap the request: `Promise.resolve($.get(url))`. Templates get the same check from `JqueryRequests`, under erb_lint
+ESLint checks `app/assets/javascripts` and the JavaScript in templates: their inline `<script>`s (not `src` ones or other types, like JSON) and event attributes (`onclick="..."`), each template as one script, where ERB output is the global `__erb`. Scripts share the page's globals, so a library or a function another file or template defines needs adding to `libraries` or `shared` in `eslint.config.mjs`.
+
+- `no-restricted-syntax`: The `DesignClasses` rules above (showing and hiding; `-success`, `badge-*` and `.label`; Bootstrap 4 leftovers; `form-select`), in the strings and template literals of scripts
+- `no-restricted-globals`: Requests use jQuery (`$.get`, `$.getJSON`, `$.post`, `$.ajax`), not `fetch`. Where an API needs a real Promise (`ClipboardItem`), wrap the request: `Promise.resolve($.get(url))`
 
 ### Stylelint
 
@@ -185,7 +187,7 @@ Cooldown: never use a gem or JS package version released less than 7 days ago. T
 
 - Gems: the Gemfile's source has `cooldown: 7`, so Bundler enforces it
 - `rake bootstrap:build` runs `npm install` with `--before` set to 7 days ago
-- The root `package.json` is only linters: ESLint, which CI runs as `npx eslint` over `app/assets/javascripts` (`eslint.config.mjs`), and Stylelint, which it runs over `app/assets/stylesheets` (`stylelint.config.mjs`; `npm run lint` runs both). It installs from `package-lock.json` (`npm ci`): pin exact versions, and when adding or bumping one run `npm install --before=<the date a week ago>` so its own dependencies are a week old too
+- The root `package.json` is only linters: ESLint, which CI runs as `npx eslint` over `app/assets/javascripts` and the templates in `app/views` (`eslint.config.mjs`), and Stylelint, which it runs over `app/assets/stylesheets` (`stylelint.config.mjs`; `npm run lint` runs both). It installs from `package-lock.json` (`npm ci`): pin exact versions, and when adding or bumping one run `npm install --before=<the date a week ago>` so its own dependencies are a week old too
 - `ckeditor/` installs from its `yarn.lock`. Yarn 1 has no cooldown, so when refreshing the lockfile (`yarn upgrade`), check the new versions' release dates (`npm view <package> time`) and pin back any that are under a week old
 - When adding or bumping a CDN package in `config/frontend_dependencies.rb`, or a version in a rake task, pick a version at least 7 days old
 

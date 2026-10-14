@@ -27,7 +27,7 @@
       <script>
         $(function () {
           $(".spaces").sortable({
-            update: function (event, ui) {
+            update: function (event) {
               $.post('/spaces/order', {timetable_id: $(event.target).attr('data-timetable-id'), space_ids: $(event.target).sortable("toArray")}, function () {
                 $(event.target).next().show()
               })
@@ -35,7 +35,7 @@
           });
 
           $(".tslots").sortable({
-            update: function (event, ui) {
+            update: function (event) {
               $.post('/tslots/order', {timetable_id: $(event.target).attr('data-timetable-id'), tslot_ids: $(event.target).sortable("toArray")}, function () {
                 $(event.target).next().show()
               })
