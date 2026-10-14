@@ -54,25 +54,47 @@ jobs:
           opencode_err="$(mktemp)"
 
           # --auto approves every permission request (bash, writing /tmp/issue-body.md outside the checkout...), which
-          # `opencode run` would otherwise reject, as there's no one to ask
+          # `opencode run` would otherwise reject, as there's no one to ask. --print-logs puts opencode's own warnings
+          # and errors on stderr, as a model call that fails can otherwise end the run with no event to say why.
+          # The JSON events are kept for the summary, and shown in the log as a trace of what it's doing
           set +e
           opencode run --auto --model "$OPENCODE_MODEL" \
             --format json \
+            --print-logs --log-level WARN \
             "$PROMPT_TEXT" \
-            2> >(tee "$opencode_err" >&2) | tee "$opencode_log"
+            2> >(tee "$opencode_err" >&2) | tee "$opencode_log" | jq --unbuffered -r -R '
+              fromjson?
+              | if .type == "text" then "\n" + .part.text + "\n"
+                elif .type == "tool_use" then
+                  "→ \(.part.tool): " + (.part.state.input | .command // .filePath // .pattern // tostring | tostring | .[0:300])
+                  + (if .part.state.status == "error" then " (failed: \(.part.state.error // "" | tostring | .[0:300]))" else "" end)
+                elif .type == "error" then "Error: " + (.error.data.message // .error | tostring)
+                else empty end
+            '
           opencode_status=${PIPESTATUS[0]}
           set -e
+
+          # The final result is the text of the last step that wrote any (each step_start begins a step)
+          final_result=$(jq -r -R -s '
+            reduce (split("\n")[] | fromjson? | select(.type == "step_start" or .type == "text")) as $e
+              ([""]; if $e.type == "step_start" then . + [""] else .[-1] += $e.part.text end)
+            | map(select(test("\\S"))) | last // ""
+          ' "$opencode_log")
+
+          # opencode can exit 0 part-way through, when a step starts and never finishes. That review didn't happen, so
+          # fail it, and the next run's review window still starts from the last run that finished
+          finished=$(jq -r -R -s '
+            [split("\n")[] | fromjson? | select(.type == "step_start" or .type == "step_finish")] | last
+            | .type == "step_finish" and .part.reason == "stop"
+          ' "$opencode_log")
+          if [ "$opencode_status" -eq 0 ] && [ "$finished" != "true" ]; then
+            echo "::error::opencode stopped part-way through the review, without finishing its last step."
+            opencode_status=1
+          fi
 
           {
             echo "## opencode Report"
             echo
-
-            # The final result is the text of the last step that wrote any (each step_start begins a step)
-            final_result=$(jq -r -R -s '
-              reduce (split("\n")[] | fromjson? | select(.type == "step_start" or .type == "text")) as $e
-                ([""]; if $e.type == "step_start" then . + [""] else .[-1] += $e.part.text end)
-              | map(select(test("\\S"))) | last // ""
-            ' "$opencode_log")
 
             if [ -n "$final_result" ]; then
               echo "### Final Result"
@@ -86,7 +108,11 @@ jobs:
               echo
               echo "### Exit Status"
               echo
-              echo "\`opencode\` exited with status \`$opencode_status\`."
+              if [ "$finished" = "true" ]; then
+                echo "\`opencode\` exited with status \`$opencode_status\`."
+              else
+                echo "\`opencode\` stopped part-way through the review, without finishing its last step."
+              fi
 
               if [ -s "$opencode_err" ]; then
                 echo
