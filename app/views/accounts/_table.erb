@@ -1,5 +1,7 @@
 <table class="table table-hr">
   <% viewer_in_network = current_account && account.network.find(current_account.id) %>
+  <%# In a modal there's no room beside the value, so the privacy toggle goes under it, as on mobile %>
+  <% privacy_col_class = defined?(modal) && modal ? 'col-12' : 'col-12 col-sm-auto' %>
   <% if (defined?(include_email) && include_email) || viewable?(account, :email, viewer_in_network: viewer_in_network) %>
     <tr>
       <td>Email</td>
@@ -9,7 +11,7 @@
             <a class="text-break" target="_blank" href="mailto:<%= account.email %>"><%= account.email %></a>
           </div>
           <% if current_account && current_account.id == account.id %>
-            <div class="col-12 col-sm-auto">
+            <div class="<%= privacy_col_class %>">
               <div data-pagelet-url="/accounts/privacyable/email"></div>
             </div>
           <% end %>
@@ -26,7 +28,7 @@
             <a target="_blank" href="tel:<%= account.phone %>"><%= account.phone %></a>
           </div>
           <% if current_account && current_account.id == account.id %>
-            <div class="col-12 col-sm-auto">
+            <div class="<%= privacy_col_class %>">
               <div data-pagelet-url="/accounts/privacyable/phone"></div>
             </div>
           <% end %>
@@ -43,7 +45,7 @@
             <a class="text-break" target="_blank" href="<%= account.website %>"><%= account.website %></a>
           </div>
           <% if current_account && current_account.id == account.id %>
-            <div class="col-12 col-sm-auto">
+            <div class="<%= privacy_col_class %>">
               <div data-pagelet-url="/accounts/privacyable/website"></div>
             </div>
           <% end %>
@@ -60,7 +62,7 @@
             <%= account.age %>
           </div>
           <% if current_account && current_account.id == account.id %>
-            <div class="col-12 col-sm-auto">
+            <div class="<%= privacy_col_class %>">
               <div data-pagelet-url="/accounts/privacyable/date_of_birth"></div>
             </div>
           <% end %>
@@ -90,7 +92,7 @@
             <%= account.gender %>
           </div>
           <% if current_account && current_account.id == account.id %>
-            <div class="col-12 col-sm-auto">
+            <div class="<%= privacy_col_class %>">
               <div data-pagelet-url="/accounts/privacyable/gender"></div>
             </div>
           <% end %>
@@ -107,7 +109,7 @@
             <%= account.location %>
           </div>
           <% if current_account && current_account.id == account.id %>
-            <div class="col-12 col-sm-auto">
+            <div class="<%= privacy_col_class %>">
               <div data-pagelet-url="/accounts/privacyable/location"></div>
             </div>
           <% end %>
@@ -124,7 +126,7 @@
             <%= time_ago_in_words account.last_active %> ago
           </div>
           <% if current_account && current_account.id == account.id %>
-            <div class="col-12 col-sm-auto">
+            <div class="<%= privacy_col_class %>">
               <div data-pagelet-url="/accounts/privacyable/last_active"></div>
             </div>
           <% end %>
