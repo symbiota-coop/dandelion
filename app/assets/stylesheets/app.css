@@ -1043,6 +1043,15 @@ p.action a {
   --bs-btn-focus-shadow-rgb: var(--theme-500-rgb);
 }
 
+/* Joined buttons for a choice of views or lists (_view_as.erb, _scope_toggle.erb): the chosen one a theme tint with theme text rather than solid, so it doesn't compete with a Search button beside it */
+.segmented .btn-outline-primary {
+  --bs-btn-bg: var(--bs-white);
+  --bs-btn-hover-bg: var(--theme-50);
+  --bs-btn-hover-color: var(--theme-500);
+  --bs-btn-active-bg: var(--theme-100);
+  --bs-btn-active-color: var(--theme-500);
+}
+
 /* Bootstrap components that use the primary colour */
 .nav-pills {
   --bs-nav-pills-link-active-bg: var(--theme-500);
@@ -1123,15 +1132,6 @@ p.action a {
 
 #donation-percent-buttons .btn {
   padding: 0.375rem var(--space-xs)
-}
-
-/* The events and facilitators view switchers (_view_options.erb): white buttons that keep their text colour on hover */
-#view-options .btn {
-  background-color: var(--bs-white);
-}
-
-#view-options .btn:hover {
-  color: inherit;
 }
 
 /* ==========================================================================

@@ -2,61 +2,14 @@
   <%== '<div class="container-fluid my-3">' %>
 <% end %>
 
-<script>
-  $(function() {
-    // The labels show beside the icons on large screens, so only smaller ones need tooltips
-    function handleViewOptionsTooltips() {
-      var large = $(window).width() >= 992;
-      $('#view-options').find('[title], [data-bs-original-title]').each(function() {
-        if (large) {
-          var tooltip = bootstrap.Tooltip.getInstance(this);
-          if (tooltip) tooltip.dispose();
-          $(this).removeAttr('data-bs-toggle');
-        } else {
-          $(this).attr('data-bs-toggle', 'tooltip');
-        }
-      });
-    }
-
-    handleViewOptionsTooltips();
-    $(window).on('resize', handleViewOptionsTooltips);
-  });
-</script>
 <%
   view_options = [
     { key: 'list', label: 'List', icon: 'bi-list-task', active: !params[:display].in?(%w[map calendar]) },
     { key: 'map', label: 'Map', icon: 'bi-geo-alt-fill', active: params[:display] == 'map' }
   ]
 %>
-<div class="row" id="view-options">
-
-  <div class="col-12 col-lg-auto">
-
-    <ul class="ps-0 mb-3 d-flex flex-wrap row-gap-2 align-items-center">
-      <li class="list-inline-item">
-        <label class="mb-0 text-nowrap">View as</label>
-      </li>
-      <% view_options.each do |opt| %>
-        <li class="list-inline-item">
-          <a data-bs-toggle="tooltip" title="<%= opt[:label] %> view" class="btn text-nowrap <%= 'btn-outline-primary' if opt[:active] %>" href="<%= view_url(opt[:key], path: (path if defined?(path))) %>">
-            <i class="bi <%= opt[:icon] %>"></i> <span class="d-none d-lg-inline"><%= opt[:label] %></span>
-          </a>
-        </li>
-      <% end %>
-    </ul>
-  </div>
-
-  <% if params[:display] != 'map' %>
-    <div class="col-12 col-lg-auto">
-      <% form_tag (path if defined?(path)).to_s, method: 'get', class: 'form-inline submitOnChange' do %>
-        <% view_base_params.reject { |k, _| %w[search order slug].include?(k) }.each do |k, v| %>
-          <%= hidden_field_tag k, value: v %>
-        <% end %>
-        <%= hidden_field_tag :search, value: 1 %>
-      <% end %>
-    </div>
-  <% end %>
-
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+  <%= partial :view_as, locals: { view_options: view_options, path: (path if defined?(path)) } %>
 </div>
 
 <% if params[:minimal] %>

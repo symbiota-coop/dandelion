@@ -1,0 +1,14 @@
+<%# Switches a list between everything and the current account's own (organisations they follow or admin, gatherings they're in), at the start of its search row. scopes are [label, param, count]; one with a count of 0 is hidden unless it's showing, and the toggle with it when none is left %>
+<% params_to_drop = scopes.map { |_, param, _| param.to_s } + [page_param.to_s] %>
+<% base = view_base_params.reject { |k, _| params_to_drop.include?(k) } %>
+<% shown = scopes.select { |_, param, count| params[:"#{param}"] || count > 0 } %>
+<% if shown.any? %>
+  <div class="form-group">
+    <div class="btn-group segmented" role="group">
+      <a class="btn btn-outline-primary text-nowrap <%= 'active' if scopes.none? { |_, param, _| params[:"#{param}"] } %>" href="<%= path %>?<%= base.merge('search' => 1).to_query %>">All</a>
+      <% shown.each do |label, param, count| %>
+        <a class="btn btn-outline-primary text-nowrap <%= 'active' if params[:"#{param}"] %>" href="<%= path %>?<%= base.merge('search' => 1, param.to_s => 1).to_query %>"><%= label %> · <%= count %></a>
+      <% end %>
+    </div>
+  </div>
+<% end %>

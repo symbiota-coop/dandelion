@@ -8,13 +8,13 @@
 <% form_tag '/gatherings', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
   <%= hidden_field_tag :display, value: params[:display] %>
   <%= hidden_field_tag :order, value: params[:order] %>
-  <div class="form-group">
-    <label>Search</label>
-    <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
-  </div>
+  <%= hidden_field_tag :my_gatherings, value: params[:my_gatherings] %>
   <% if current_account %>
-    <%= checkbox 'My gatherings' %>
+    <%= partial :scope_toggle, locals: { path: '/gatherings', page_param: :gatherings_page, scopes: [['My gatherings', :my_gatherings, current_account.memberships.count]] } %>
   <% end %>
+  <div class="form-group">
+    <%= text_field_tag :q, class: 'form-control', value: params[:q], placeholder: 'Search gatherings', 'aria-label': 'Search gatherings' %>
+  </div>
   <%= submit_tag 'Search', class: 'btn btn-primary' %>
   <%= hidden_field_tag :search, value: 1 %>
 <% end %>
@@ -25,26 +25,10 @@
     { key: 'map', label: 'Map', icon: 'bi-geo-alt-fill', active: params[:display] == 'map' }
   ]
 %>
-<div class="row justify-content-between mb-3 mb-lg-0">
-
-  <div class="col-12 col-sm">
-
-    <ul class="ps-0 mb-3 d-flex flex-wrap row-gap-2 align-items-center">
-      <li class="list-inline-item col-12 col-sm-auto">
-        <label class="mb-0 text-nowrap">View as</label>
-      </li>
-      <% view_options.each do |opt| %>
-        <li class="list-inline-item">
-          <a class="btn text-nowrap <%= 'btn-outline-primary' if opt[:active] %>" href="<%= view_url(opt[:key], path: (path if defined?(path))) %>">
-            <i class="bi <%= opt[:icon] %>"></i> <%= opt[:label] %>
-          </a>
-        </li>
-      <% end %>
-    </ul>
-  </div>
-
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+  <%= partial :view_as, locals: { view_options: view_options, path: (path if defined?(path)) } %>
   <% if params[:display] != 'map' %>
-    <div class="col-12 col-lg-auto">
+    <div>
       <% form_tag (path if defined?(path)).to_s, method: 'get', class: 'form-inline submitOnChange' do %>
         <% view_base_params.reject { |k, _| %w[search order slug].include?(k) }.each do |k, v| %>
           <%= hidden_field_tag k, value: v %>
@@ -55,11 +39,12 @@
       <% end %>
     </div>
   <% end %>
-
 </div>
 
 <% if params[:display] == 'map' %>
   <%= partial :'maps/map', locals: { url: "/gatherings", fill_screen: true } %>
+<% elsif params[:my_gatherings] && @gatherings.empty? && !params[:q] %>
+  <p class="text-body-secondary">You're not in any gatherings yet. <a href="/gatherings">Browse all gatherings</a></p>
 <% else %>
   <%= partial :'gatherings/blocks', locals: { gatherings: @gatherings } %>
   <%= will_paginate @gatherings, param_name: 'gatherings_page', page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

@@ -3,6 +3,7 @@ Dandelion::App.controller do
     @organisations = Organisation.all
     @organisations = params[:order] == 'created_at' ? @organisations.order('created_at desc') : @organisations.order('followers_count desc')
     @organisations = @organisations.and(:id.in => current_account.organisations_following.pluck(:id)) if current_account && params[:following]
+    @organisations = @organisations.and(:id.in => current_account.organisationships.and(admin: true).pluck(:organisation_id)) if current_account && params[:admin]
     @organisations = @organisations.and(:id.in => Organisation.search(params[:q], @organisations).pluck(:id)) if params[:q]
 
     case content_type

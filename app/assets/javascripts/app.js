@@ -27,6 +27,11 @@ $(function () {
     }
   })
 
+  // View as buttons show their labels from 992px, so only smaller screens need their tooltips (_view_as.erb)
+  $(document).on('show.bs.tooltip', '.segmented [data-bs-toggle="tooltip"]', function (e) {
+    if (window.matchMedia('(min-width: 992px)').matches) e.preventDefault()
+  })
+
   // The fixed header's height and #content's padding as custom properties, for layouts that fill the rest of
   // the screen (messages.css), updated on resize
   function syncFixedHeaderHeight () {

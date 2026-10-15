@@ -695,6 +695,31 @@
       <div class="spec">Fields stack below 576px, with the button below them · the checkbox helper (<code>checkbox 'Deleted'</code>) is a .form-group holding a .form-check-inline · in grid rows instead (events/_search_form.erb), each .form-group takes a col, with the checkboxes beside the button on a second row, inside a .search panel: --bs-tertiary-bg, --bs-box-shadow-sm · .select-placeholder greys a select until forms.js loads, which then greys any select while its chosen option is a disabled placeholder · popular locations: .filter-buttons (see Filter buttons)</div>
     <% end %>
 
+    <% design_subsection 'Scope toggle and View as', 'View as (_view_as.erb), on the left with Sort by on the right, above events, facilitators, organisations and gatherings, switches how a list shows: list, grid, map, calendar, network, blocks. Its buttons say what they are, so it has no visible label, only aria-label="View as". Below 992px it\'s icons only, with tooltips. The scope toggle, at the start of the search row above a list that a signed-in account can switch to their own: organisations they follow or admin, gatherings they\'re in (_scope_toggle.erb). Switching shows a different list rather than narrowing this one, so it\'s a group of links, All then each of theirs, not a checkbox. Joined btn-outline-primary buttons in a .segmented, the chosen one .active: --theme-100 with theme text rather than solid, so it doesn\'t compete with the Search button, the other with the count of their own. Each of theirs is hidden when they have none, unless it\'s showing, and the toggle with it when none is left; that list, when empty, says so and links back to all.' do %>
+      <div class="border rounded p-4">
+        <form class="searchForm form-inline" onsubmit="return false">
+          <div class="form-group">
+            <div class="btn-group segmented" role="group">
+              <a class="btn btn-outline-primary text-nowrap active" href="#components">All</a>
+              <a class="btn btn-outline-primary text-nowrap" href="#components">Following · 12</a>
+              <a class="btn btn-outline-primary text-nowrap" href="#components">Admin · 2</a>
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" id="dg-scope-q" autocomplete="off" placeholder="Search organisations" aria-label="Search organisations">
+          </div>
+          <input type="submit" class="btn btn-primary" value="Search">
+        </form>
+        <div class="d-flex mt-3">
+          <div class="btn-group segmented" role="group" aria-label="View as">
+            <a class="btn btn-outline-primary text-nowrap active" href="#components"><i class="bi bi-grid-fill"></i> Blocks</a>
+            <a class="btn btn-outline-primary text-nowrap" href="#components"><i class="bi bi-share"></i> Network</a>
+            <a class="btn btn-outline-primary text-nowrap" href="#components"><i class="bi bi-geo-alt-fill"></i> Map</a>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
     <div class="row g-5">
       <% design_subsection 'Short URL input', col: 'col-lg-6' do %>
         <div class="border rounded p-4">
