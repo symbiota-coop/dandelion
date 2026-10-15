@@ -92,6 +92,22 @@ class EventPaymentMethod
     nil
   end
 
+  # An error's message for the purchase_failed email and the event's locked_error. A GoCardless error's message alone
+  # is just "Validation failed", so it gets the fields it rejected and its request id
+  def self.purchase_error_message(error)
+    return error.message unless error.is_a?(GoCardlessPro::Error)
+
+    message = error.message
+    if error.errors.any?
+      message += ': ' + error.errors.map { |err|
+        detail = "#{err['field'] || err['reason']} #{err['message']}"
+        err['request_pointer'] ? "#{detail} (#{err['request_pointer']})" : detail
+      }.join('; ')
+    end
+    message += "\nRequest ID: #{error.request_id}" if error.request_id
+    message
+  end
+
   # The advice purchase_error_for gives with a provider's errors that lock an event, for the locked alert, which has only the provider's name
   def self.dashboard_help_for(provider_name)
     all.find { |pm| pm.provider_name == provider_name }&.dashboard_help

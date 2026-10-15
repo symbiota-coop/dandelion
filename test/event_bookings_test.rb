@@ -49,6 +49,43 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 2, hidden.tickets.count
   end
 
+  test 'a GoCardless purchase error names the rejected field in the email and the locked error' do
+    create_event(prices: [0.5])
+    @organisation.set(gocardless_instant_bank_pay: true, gocardless_access_token: 'test')
+    buyer = FactoryBot.create(:account)
+    purchase = lambda do |error|
+      emails = []
+      html = EmailHelper.method(:html)
+      EventPaymentMethod::GoCardlessInstantBankPay.stub :call, proc { raise error } do
+        EmailHelper.stub :html, proc { |*args, **kwargs| html.call(*args, **kwargs).tap { |h| emails << h if args.first == :purchase_failed } } do
+          header 'Accept', 'application/json'
+          post "/events/#{@event.id}/purchase",
+               ticketForm: { quantities: { @event.ticket_types.first.id.to_s => '1' } },
+               detailsForm: { payment_method: 'gocardless_instant', account: { name: buyer.name, email: buyer.email } }
+        end
+      end
+      assert_equal 400, last_response.status
+      emails
+    end
+
+    emails = purchase.call(GoCardlessPro::ValidationError.new(
+                             'message' => 'Validation failed', 'request_id' => 'RQ123',
+                             'errors' => [{ 'field' => 'amount', 'message' => 'must be greater than or equal to 100', 'request_pointer' => '/billing_requests/payment_request/amount' }]
+                           ))
+    assert_equal 1, emails.length
+    assert_includes emails.first, 'Validation failed: amount must be greater than or equal to 100 (/billing_requests/payment_request/amount)'
+    assert_includes emails.first, 'Request ID: RQ123'
+    refute @event.reload.locked?
+
+    emails = purchase.call(GoCardlessPro::InvalidApiUsageError.new(
+                             'message' => 'Creditor <b>not</b> verified', 'request_id' => 'RQ456',
+                             'errors' => [{ 'reason' => 'creditor_not_verified', 'message' => 'Creditor account not fully verified' }]
+                           ))
+    assert_includes emails.first, 'Creditor &lt;b&gt;not&lt;/b&gt; verified: creditor_not_verified Creditor account not fully verified'
+    assert @event.reload.locked?
+    assert_equal "Creditor <b>not</b> verified: creditor_not_verified Creditor account not fully verified\nRequest ID: RQ456", @event.locked_error
+  end
+
   test 'booking onto a paid event' do
     create_event(prices: [(ticket_price = 10)], suggested_donation: 0)
     sign_in(@account)

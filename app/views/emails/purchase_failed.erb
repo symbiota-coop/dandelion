@@ -1,4 +1,4 @@
 <div class="main">
   <p>Hi %recipient.firstname%,</p>
-  <%== EmailHelper.render(:_purchase_error, account: account, event: event, provider: provider, message: error.message, help: help) %>
+  <%== EmailHelper.render(:_purchase_error, account: account, event: event, provider: provider, message: EventPaymentMethod.purchase_error_message(error), help: help) %>
 </div>

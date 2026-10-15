@@ -8,7 +8,7 @@
   <% end %>
 </p>
 <blockquote>
-  <%== Rinku.auto_link(h(message)) %>
+  <%== message.split("\n").map { |line| Rinku.auto_link(h(line)) }.join('<br>') %>
 </blockquote>
 <% unless help == false %>
   <% if event.locked? %>

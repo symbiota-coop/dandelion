@@ -122,7 +122,7 @@ Dandelion::App.controller do
     info = EventPaymentMethod.purchase_error_for(e)
     if info && @order
       if info[:action] == :lock
-        @order.event.set(locked: true, locked_error: e.message, locked_error_provider: info[:provider])
+        @order.event.set(locked: true, locked_error: EventPaymentMethod.purchase_error_message(e), locked_error_provider: info[:provider])
         @order.event.delete_atproto
       end
       @order.notify_of_failed_purchase(e, provider: info[:provider], help: info[:help])
