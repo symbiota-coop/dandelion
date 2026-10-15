@@ -31,8 +31,9 @@ Sentry.init do |config|
     config.release = commit
   end
 
-  config.send_default_pii = true
-  config.enable_logs = true
+  # Collect everything (user, cookies, headers, bodies, query strings), less the SDK's denylist of sensitive keys:
+  # what send_default_pii = true gave before it was deprecated. Logs are on by default
+  config.data_collection = Sentry::DataCollection.new
   # Outgoing HTTP requests (Stripe, Google...) become http.client spans, so the time spent waiting on them shows in
   # traces. Their query strings are filtered in Trace.compact_spans
   config.enabled_patches = %i[logger http]
