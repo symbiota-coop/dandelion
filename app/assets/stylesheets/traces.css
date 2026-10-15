@@ -192,6 +192,12 @@ tr.collapsed .span-tree-count .bi {
   }
 }
 
+/* Each Total's bar: thin, on a neutral track so the green alone reads as the time */
+.transactions-table .progress {
+  height: 0.25rem;
+  background-color: var(--bs-tertiary-bg);
+}
+
 .transactions-table td:first-child {
   overflow-wrap: anywhere;
 }

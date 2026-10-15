@@ -19,15 +19,18 @@
 <% else %>
   <% sections = { 'GET' => [], 'POST' => [], 'XHR' => [], 'Jobs' => [], 'Other HTTP' => [] } %>
   <% @summaries.each { |summary| sections[transaction_section(summary)] << summary } %>
+  <%# One scale for every section, so their bars compare: the summaries come most total time first %>
+  <% max_total_ms = @summaries.first[:total_ms].to_f %>
   <% sections.each do |title, summaries| %>
     <% next if summaries.empty? %>
-    <%= partial :'stats/transactions_table', locals: { title: title, summaries: summaries, link: true } %>
+    <%= partial :'stats/transactions_table', locals: { title: title, summaries: summaries, link: true, max_total_ms: max_total_ms } %>
   <% end %>
 <% end %>
 
-<%# Every search, whatever the filter: searches are a part of a request, and rarely slow enough to pass it %>
+<%# Every search, whatever the filter: searches are a part of a request, and rarely slow enough to pass it.
+    Their time is already in the transactions', so their bars have a scale of their own %>
 <% if @search_summaries.any? %>
-  <%= partial :'stats/transactions_table', locals: { title: 'Search', summaries: @search_summaries, link: false } %>
+  <%= partial :'stats/transactions_table', locals: { title: 'Search', summaries: @search_summaries, link: false, max_total_ms: @search_summaries.first[:total_ms].to_f } %>
 <% end %>
 
 <script>

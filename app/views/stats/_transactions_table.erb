@@ -1,4 +1,5 @@
-<%# A table of durations: a section of transactions (linking to their traces), or of searches by pipeline %>
+<%# A table of durations: a section of transactions (linking to their traces), or of searches by pipeline.
+    Each Total has a bar, a fraction of max_total_ms, the most total time of any row on the page sharing its scale %>
 <div class="table-responsive mt-4">
   <table class="transactions-table table table-hover">
     <thead>
@@ -17,8 +18,6 @@
       </tr>
     </thead>
     <tbody>
-      <%# The summaries come most total time first, so each Total's bar is a fraction of the first row's %>
-      <% max_total_ms = summaries.first[:total_ms].to_f %>
       <% summaries.first(10).each do |summary| %>
         <tr>
           <td>
@@ -41,7 +40,7 @@
           <td class="text-end"><%= summary[:count] %></td>
           <td class="text-end text-nowrap" data-order="<%= summary[:total_ms] %>">
             <%= format_duration(summary[:total_ms]) %>
-            <div class="progress mt-1" role="presentation" style="height: 0.25rem">
+            <div class="progress mt-1" role="presentation">
               <div class="progress-bar" style="width: <%= max_total_ms.positive? ? (100.0 * summary[:total_ms] / max_total_ms).round(2) : 0 %>%"></div>
             </div>
           </td>
