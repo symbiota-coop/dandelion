@@ -1,6 +1,6 @@
 FRONTEND_DEPENDENCIES = {
   'https://cdn.jsdelivr.net/npm/' => {
-    'jquery-ui@1.13.2' => 'dist/jquery-ui.min.js dist/themes/base/jquery-ui.min.css',
+    'jquery-ui@1.14.2' => 'dist/jquery-ui.min.js dist/themes/base/jquery-ui.min.css',
     '@github/relative-time-element@5.3.1' => 'dist/bundle.js',
     'flatpickr@4.6.13' => 'dist/flatpickr.min.js dist/flatpickr.min.css',
     'datatables.net@3.1.2' => 'js/dataTables.min.js',
@@ -16,7 +16,7 @@ FRONTEND_DEPENDENCIES = {
     'bootstrap-icons@1.13.1' => 'font/bootstrap-icons.min.css',
     'chartjs-plugin-datalabels@2.2.0' => 'dist/chartjs-plugin-datalabels.min.js',
     'autosize@6.0.1' => 'dist/autosize.min.js',
-    'countup.js@2.1.0' => 'dist/countUp.umd.js',
+    'countup.js@2.10.1' => 'dist/countUp.umd.js',
     'linkifyjs@4.3.3' => 'dist/linkify.min.js',
     'linkify-jquery@4.3.3' => 'dist/linkify-jquery.min.js',
     '@googlemaps/markerclusterer@2.6.2' => 'dist/index.min.js',
