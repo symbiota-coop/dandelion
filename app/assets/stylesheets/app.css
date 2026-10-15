@@ -896,6 +896,17 @@ p.action a {
   background: var(--variant-200) !important;
 }
 
+/* Badges side by side are taller than their line, so when they wrap the rows would touch: each gets mb-1's space below it.
+   Flex and grid rows space theirs with gap instead */
+.badge:has(+ .badge),
+.badge + .badge {
+  margin-bottom: var(--space-2xs);
+}
+
+:is(.d-flex, .d-inline-flex, .d-grid) > .badge {
+  margin-bottom: 0;
+}
+
 /* Beside an h1, h2 or h3 an em-sized badge would be nearly heading-sized, so it stays at body size, centred on the heading's line */
 :is(h1, h2, h3, .h1, .h2, .h3) .badge {
   font-size: var(--font-size-md);

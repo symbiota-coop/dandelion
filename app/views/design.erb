@@ -274,7 +274,7 @@
     <% design_subsection 'Spacing', "One scale for padding, margins and gaps, as <code>--space-*</code> in app.css. Bootstrap's spacing utilities are the same scale without sm and xl, so in markup use the utility and in CSS the token. In app.css, values off the scale mostly size a control to match another (.375rem, btn-sm's padding, the nav crumbs' .625rem), line up with a fixed layout dimension (the header, the sidebar, search results' image column) or are px hairlines. The page-specific stylesheets are on the scale too, except for the same kinds of value: the docs select's room for its caret and the search icon's inset, and marketing sections' 3.5rem and 5rem, which are layout rather than spacing." do %>
       <div class="border-bottom">
         <% [
-             ['--space-2xs', '1', 'Label to field, dropdown and autocomplete items, sidebar sub-menu, badges in a row (mb-1, gap-1)'],
+             ['--space-2xs', '1', 'Label to field, dropdown and autocomplete items, sidebar sub-menu, badges in a row (set in app.css, or gap-1)'],
              ['--space-xs', '2', 'Nav links, dropdown headers, search tabs, filter form fields, cookie banner buttons'],
              ['--space-sm', nil, 'Grid gutter, table cells, card headers, alerts down, notification items, mobile sidebar links'],
              ['--space-base', '3', 'Between fields (mb-3), mobile --content-padding, dropdown and list items across, alerts across'],
@@ -400,9 +400,9 @@
 
     <% design_subsection 'Badges', "Bootstrap's <code>.badge</code> with a <code>text-bg-*</code> colour, for counts, statuses, tags and amounts. Sized in em, so a badge scales with the text around it: small in a nav, bigger beside an h4, and at body size (1rem) beside an h1, h2 or h3, where it would otherwise be nearly heading-sized. Pick the colour by what it means." do %>
       <div class="border rounded p-4 d-flex flex-column gap-3">
-        <h4 class="m-0">Full moon gathering <span class="badge mb-1 text-bg-yellow">Featured</span> <span class="badge mb-1 text-bg-warning">Locked</span></h4>
-        <div>Followers <span class="badge mb-1 text-bg-primary">128</span> · Tagged <a class="badge mb-1 text-bg-primary" href="#components">breathwork</a> in <span class="badge mb-1 text-primary border border-primary">Weekend pass</span> · Paid <span class="badge mb-1 text-bg-secondary">SPRING: £5</span></div>
-        <div class="spec">.badge · .9375em (1rem in h1–h3) · .4em .85em · pill · mb-1 where badges can wrap onto a second line, so the rows don't touch · weight 600 · primary, secondary, warning, danger and yellow are soft: their variant's 100 behind its 800, so they show on grey as well as white (danger: the 200, as red's 100 reads pink; secondary: --bs-gray-200 and 800); dark, stripe and payment badges are filled · in a selected menu item, sheet item or pill, a primary or secondary badge turns to its 800 with white text, so it sits in the selection · .badge-overlay, for labels over images (the carousel), is filled with its variant's 500 at 70%, white text, square</div>
+        <h4 class="m-0">Full moon gathering <span class="badge text-bg-yellow">Featured</span> <span class="badge text-bg-warning">Locked</span></h4>
+        <div>Followers <span class="badge text-bg-primary">128</span> · Tagged <a class="badge text-bg-primary" href="#components">breathwork</a> in <span class="badge text-primary border border-primary">Weekend pass</span> · Paid <span class="badge text-bg-secondary">SPRING: £5</span></div>
+        <div class="spec">.badge · .9375em (1rem in h1–h3) · .4em .85em · pill · badges side by side get .25rem (mb-1) below them from app.css, so the rows don't touch when they wrap (flex rows use gap-1 instead) · weight 600 · primary, secondary, warning, danger and yellow are soft: their variant's 100 behind its 800, so they show on grey as well as white (danger: the 200, as red's 100 reads pink; secondary: --bs-gray-200 and 800); dark, stripe and payment badges are filled · in a selected menu item, sheet item or pill, a primary or secondary badge turns to its 800 with white text, so it sits in the selection · .badge-overlay, for labels over images (the carousel), is filled with its variant's 500 at 70%, white text, square</div>
       </div>
       <div class="table-responsive">
         <table class="table table-sm mb-0">
