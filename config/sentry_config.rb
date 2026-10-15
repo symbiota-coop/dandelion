@@ -33,7 +33,11 @@ Sentry.init do |config|
 
   config.send_default_pii = true
   config.enable_logs = true
-  config.enabled_patches = [:logger]
+  # Outgoing HTTP requests (Stripe, Google...) become http.client spans, so the time spent waiting on them shows in
+  # traces. Their query strings are filtered in Trace.compact_spans
+  config.enabled_patches = %i[logger http]
+  # Without adding our sentry-trace and baggage headers to those requests: nothing they call reports to us
+  config.trace_propagation_targets = []
   config.traces_sample_rate = 1.0
   # Keep every transaction, whatever its status. Sentry drops redirects and some 4xx by default, which would lose
   # nearly every form POST (they redirect when they succeed)

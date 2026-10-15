@@ -98,11 +98,15 @@ class Trace
     return unless request&.url
     return request.url if request.query_string.blank?
 
-    query = request.query_string.split('&').map do |pair|
+    "#{request.url}?#{filter_query(request.query_string)}"
+  end
+
+  # A query string with the values of SECRET_QUERY_PARAMs replaced by [Filtered]
+  def self.filter_query(query_string)
+    query_string.split('&').map do |pair|
       name, value = pair.split('=', 2)
       value && CGI.unescape(name).match?(SECRET_QUERY_PARAM) ? "#{name}=[Filtered]" : pair
-    end
-    "#{request.url}?#{query.join('&')}"
+    end.join('&')
   end
 
   def self.pack_spans(spans)
@@ -130,6 +134,8 @@ class Trace
     positions = spans.each_with_index.to_h { |span, i| [span['span_id'], i] }
     spans.map do |span|
       data = span['data']&.except(*REDUNDANT_SPAN_DATA)
+      # The query string of an outgoing request (http.client span), which can carry an API key (Google's key=)
+      data['http.query'] = filter_query(data['http.query']) if data&.dig('http.query').is_a?(String)
       ms = span_ms.call(span).round(3)
       self_ms = [span_ms.call(span) - children_ms[span['span_id']], 0].max.round(3)
       {

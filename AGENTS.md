@@ -131,7 +131,7 @@ Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Chrom
 ## Tracing
 
 - Every request is traced, but `before_send_transaction` (`config/sentry_config.rb`) saves it to the `traces` collection (`Trace`) and returns nil: Sentry gets only errors and logs, never transactions or profiles. For performance data, query `traces` (e.g. with the MongoDB MCP), not Sentry: `name` (route), `duration_ms`, `http_status`, `release`, `started_at`
-- Requests matching no route and `GET /health` aren't saved. Mongo queries become spans via `SentryMongoCommandSubscriber`
+- Requests matching no route and `GET /health` aren't saved. Mongo queries become spans via `SentryMongoCommandSubscriber`, and outgoing HTTP requests (Stripe, Google...) `http.client` spans via Sentry's `:http` patch, with secret query values filtered and no trace headers sent
 - Spans are zstd-compressed in `spans_zstd`, so Mongo queries can't read them; use `Trace#spans` in Ruby. Atlas Search pipelines and timings are also stored uncompressed in `search_spans`
 
 ## Tests
