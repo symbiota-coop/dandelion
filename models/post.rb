@@ -12,6 +12,11 @@ class Post
   has_many :comments, dependent: :destroy
   has_many :comment_reactions, dependent: :destroy
 
+  # An event's discussion post (Event#discussion_post) is made with its first comment
+  before_validation do
+    self.subject ||= 'Discussion' if commentable_type == 'Event'
+  end
+
   after_create do
     commentable.discussers.each { |account| subscriptions.create account: account }
   end

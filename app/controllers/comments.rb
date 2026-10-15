@@ -43,6 +43,7 @@ Dandelion::App.controller do
     @comment.post = @commentable.posts.find(post_id) || not_found if post_id
     @comment.account = current_account
     @comment.force = true if @comment.allow_force?(current_account) && force_param.present?
+    @comment.post ||= @commentable.discussion_post!(current_account) if @comment.chat?
     unless @comment.post
       @post = @commentable.posts.create!(account: current_account, subject: subject)
       @comment.post = @post

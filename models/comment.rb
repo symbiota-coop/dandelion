@@ -96,7 +96,7 @@ class Comment
     name = ERB::Util.html_escape(account.name)
     if commentable.is_a?(Mapplication)
       "<strong>#{name}</strong> commented on <strong>#{ERB::Util.html_escape(commentable.account.name)}</strong>'s application"
-    elsif post.comments.count == 1
+    elsif !chat? && post.comments.count == 1
       "<strong>#{name}</strong> started a thread"
     elsif first_real_comment?
       "<strong>#{name}</strong> commented"
@@ -105,7 +105,14 @@ class Comment
     end.html_safe
   end
 
+  # An event's discussion is one chat rather than threads, so none of its comments starts one
+  def chat?
+    commentable_type == 'Event'
+  end
+
   def first_in_post?
+    return false if chat?
+
     !post || post.new_record? || ((comment = post.comments.order('created_at asc').first) && comment.id == id)
   end
 
@@ -113,9 +120,9 @@ class Comment
     post.comments.order('created_at asc').first
   end
 
+  # The first comment with a body: a thread can open with only a subject
   def first_real_comment?
-    comments = post.comments.order('created_at asc')
-    comments[0].body.nil? && comments[1].id == id
+    post.comments.and(:body.ne => nil).order('created_at asc').first&.id == id
   end
 
   after_create do

@@ -239,11 +239,6 @@ Dandelion::App.controller do
     when :html
       @hide_right_nav = true
 
-      if @event.posts.empty?
-        post = @event.posts.create(subject: "Chat for #{@event.name}", account: @event.account)
-        post.comments.create(account: @event.account) if post.persisted?
-      end
-
       if params[:ticket_form_only]
         partial :'purchase/purchase', layout: :minimal
       else
@@ -340,12 +335,6 @@ Dandelion::App.controller do
     @event = Event.find(params[:id]) || not_found
     @event.tickets.complete.and(account: current_account).update_all(show_attendance: true)
     200
-  end
-
-  get '/events/:id/subscribe_discussion' do
-    sign_in_required!
-    @event = Event.find(params[:id]) || not_found
-    partial :'events/subscribe_discussion'
   end
 
   post '/events/:id/set_subscribe_discussion' do

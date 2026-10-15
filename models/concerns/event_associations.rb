@@ -121,6 +121,22 @@ module EventAssociations
     Account.and(:id.in => tickets.unscoped.pluck(:account_id))
   end
 
+  # The event's discussion is one chat in one post, made with its first comment
+  def discussion_post
+    posts.first
+  end
+
+  # The post is the event creator's rather than the first commenter's, as deleting an account destroys its posts.
+  # The unique index posts.commentable_id_1_event_unique keeps it to one post: when two first comments
+  # come at once, the second's insert fails and it takes the first's post
+  def discussion_post!(commenter)
+    discussion_post || posts.create!(account: account || commenter)
+  rescue Mongo::Error::OperationFailure => e
+    raise unless e.code == 11_000
+
+    discussion_post
+  end
+
   def discussers
     Account.and(:id.in =>
         [account.try(:id), revenue_sharer.try(:id), coordinator.try(:id)].compact +

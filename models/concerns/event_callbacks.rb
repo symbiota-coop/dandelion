@@ -17,10 +17,6 @@ module EventCallbacks
 
       refresh_sold_out_cache_and_notify_waitlist if previous_changes.keys.intersect?(%w[capacity no_sales_after_end_time end_time])
 
-      if previous_changes['name'] && (post = posts.find_by(subject: "Chat for #{previous_changes['name'][0]}"))
-        post.set(subject: "Chat for #{name}")
-      end
-
       if previous_changes['activity_id'] && activity && activity.privacy == 'open' && previous_changes['activity_id'][0]
         previous_activity = Activity.find(previous_changes['activity_id'][0])
         attendees.each do |account|
