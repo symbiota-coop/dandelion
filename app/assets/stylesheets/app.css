@@ -2050,6 +2050,11 @@ table.dataTable.table-sm > thead > tr > th[class*="dt-order"] .dt-column-order {
   font-size: var(--body-font-size);
 }
 
+/* Columns of question answers (orders, feedback), which DataTables would otherwise squeeze to a few words a line */
+.table th.answers-col {
+  min-width: 20rem;
+}
+
 /* Bootstrap's .small comes before the rule above, so restate it for small tables */
 .table.small {
   font-size: 0.875em;
