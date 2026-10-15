@@ -135,7 +135,7 @@ class EventsTest < ActiveSupport::TestCase
 
     sign_in(@account)
     visit "/e/#{@event.slug}/edit"
-    assert page.has_content?('It was locked after an error from GoCardless')
+    assert page.has_content?('We received an error from GoCardless when someone tried to buy tickets')
     assert page.has_content?('Creditor account not fully verified')
     find('label[for="event_locked"]').click
     click_button 'Update event'

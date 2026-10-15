@@ -1,0 +1,27 @@
+<%# A payment provider's error on a purchase, quoted, with what to do about it: for the purchase_failed email and the locked alert on the event page (events/_locked.erb), where account is nil, and which needn't say it's on Dandelion %>
+<p>
+  We received an error<%= " from #{provider}" if provider %> when
+  <% if account %>
+    <%= account.name %> (<a href="mailto:<%= account.email %>"><%= account.email %></a>) attempted to purchase ticket(s) for the event <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>"><%= event.name %></a>:
+  <% else %>
+    someone tried to buy tickets:
+  <% end %>
+</p>
+<blockquote>
+  <%== Rinku.auto_link(h(message)) %>
+</blockquote>
+<% unless help == false %>
+  <% if event.locked? %>
+    <p>
+      We've locked the event<%= ' on Dandelion' if account %> to prevent further errors, so it's visible to event admins only.
+    </p>
+  <% end %>
+  <p>
+    <% if provider %>
+      Please log into your <%= provider %> account and resolve any warnings or notifications you see there.<% if help.is_a?(String) %> <%= help %><% end %>
+    <% end %>
+    <% if event.locked? %>
+      Once you've done that, you can <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>/edit">edit the event</a> to uncheck the Locked checkbox and save to allow purchases again.
+    <% end %>
+  </p>
+<% end %>

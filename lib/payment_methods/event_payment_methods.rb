@@ -92,6 +92,11 @@ class EventPaymentMethod
     nil
   end
 
+  # The advice purchase_error_for gives with a provider's errors that lock an event, for the locked alert, which has only the provider's name
+  def self.dashboard_help_for(provider_name)
+    all.find { |pm| pm.provider_name == provider_name }&.dashboard_help
+  end
+
   def available?(event)
     return false if org_condition && !org_condition.call(event.organisation)
 

@@ -808,6 +808,18 @@ p.action a {
   --bs-alert-link-color: var(--variant-800);
 }
 
+/* Blockquotes in alerts (a quoted error, say) take the alert's text colour for their bar, as the theme's 200 barely shows on the alert's tint
+   (!important as ckeditor.css sets it with !important), and its text size rather than blockquotes' larger one */
+.alert blockquote {
+  border-left-color: var(--bs-alert-color) !important;
+  font-size: inherit;
+}
+
+/* An alert's last paragraph or quote doesn't add space at its foot, so shared markup (emails/_purchase_error.erb) needs no mb-0 */
+.alert > :last-child {
+  margin-bottom: 0;
+}
+
 /* Toasts are tinted and bordered like alerts: their variant's 100, with its 800 for text and a border in its 200 */
 .toast-primary,
 .toast-warning,

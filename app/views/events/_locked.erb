@@ -7,41 +7,33 @@
 <% end %>
 <% if @event.locked? || (@event.organisation && !@event.organisation.payment_method? && @event.paid_tickets?) %>
   <div class="alert alert-warning">
-    <% locked_error = @event.locked_error if @event.locked? && event_lock_admin? %>
-    <% if locked_error %>
-      <p class="mb-2">
-        <i class="bi bi-exclamation-triangle-fill"></i>
-        This event is currently locked and visible to event admins only.
-      </p>
-      <p class="mb-2">
-        It was locked after an error<%= " from #{@event.locked_error_provider}" if @event.locked_error_provider %> when someone tried to buy tickets:
-        <em><%= locked_error %></em>
-      </p>
-    <% end %>
-    <p class="mb-0">
-      <% if locked_error %>
-        <% if @event.locked_error_provider %>
-          Log into your <%= @event.locked_error_provider %> account and resolve any warnings or notifications you see there.
-        <% end %>
-      <% else %>
+    <% if @event.locked? && event_lock_admin? && @event.locked_error %>
+      <%== EmailHelper.render(:_purchase_error, account: nil, event: @event, provider: @event.locked_error_provider, message: @event.locked_error, help: EventPaymentMethod.dashboard_help_for(@event.locked_error_provider)) %>
+      <% if @event.organisation && !@event.organisation.payment_method? && @event.paid_tickets? %>
+        <p>
+          You must <a href="/o/<%= @event.organisation.slug %>/edit">add details for Stripe or another payment processor in the Payments tab of your organisation</a> to take payments.
+        </p>
+      <% end %>
+    <% else %>
+      <p class="mb-0">
         <i class="bi bi-exclamation-triangle-fill"></i>
         <% if @event.locked? && event_lock_admin? %>
           This event is currently locked and visible to event admins only.
         <% end %>
-      <% end %>
-      <% if @event.organisation && !@event.organisation.payment_method? && @event.paid_tickets? %>
-        You must <a href="/o/<%= @event.organisation.slug %>/edit">add details for Stripe or another payment processor in the Payments tab of your organisation</a> to take payments.
-      <% elsif @event.locked? %>
-        <% if event_lock_admin? %>
-          <% if request.path.include?('/edit') %>
-            Uncheck the Locked checkbox and save to unlock it.
+        <% if @event.organisation && !@event.organisation.payment_method? && @event.paid_tickets? %>
+          You must <a href="/o/<%= @event.organisation.slug %>/edit">add details for Stripe or another payment processor in the Payments tab of your organisation</a> to take payments.
+        <% elsif @event.locked? %>
+          <% if event_lock_admin? %>
+            <% if request.path.include?('/edit') %>
+              Uncheck the Locked checkbox and save to unlock it.
+            <% else %>
+              <a href="/events/<%= @event.id %>/edit">Edit the event</a>, uncheck the Locked checkbox and save to unlock it.
+            <% end %>
           <% else %>
-            <a href="/events/<%= @event.id %>/edit">Edit the event</a>, uncheck the Locked checkbox and save to unlock it.
+            The event has been submitted for review. It's currently locked and visible to event admins only.
           <% end %>
-        <% else %>
-          The event has been submitted for review. It's currently locked and visible to event admins only.
         <% end %>
-      <% end %>
-    </p>
+      </p>
+    <% end %>
   </div>
 <% end %>
