@@ -25,6 +25,8 @@
           <td>
             <% if link %>
               <a href="/stats/traces?<%= transaction_query(summary[:name], summary[:xhr]) %>"><code><%= wrap_at_separators(summary[:name]) %></code></a>
+              <%# Outside the XHR section, say which rows are, as Search has GET /search both ways %>
+              <% if summary[:xhr] && title != 'XHR' %><span class="badge text-bg-dark ms-1">XHR</span><% end %>
             <% else %>
               <%= summary[:name] %>
             <% end %>

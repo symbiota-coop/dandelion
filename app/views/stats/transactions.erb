@@ -17,7 +17,8 @@
 <% if @summaries.empty? %>
   <p class="text-body-secondary">No transactions with a <%= @percentile %> over <%= @min_s.to_s.delete_suffix('.0') %> seconds</p>
 <% else %>
-  <% sections = { 'GET' => [], 'POST' => [], 'XHR' => [], 'Jobs' => [], 'Other HTTP' => [] } %>
+  <%# Search (the search page) comes last, above the searches it makes %>
+  <% sections = { 'GET' => [], 'POST' => [], 'XHR' => [], 'Jobs' => [], 'Other HTTP' => [], 'Search' => [] } %>
   <% @summaries.each { |summary| sections[transaction_section(summary)] << summary } %>
   <% sections.each do |title, summaries| %>
     <% next if summaries.empty? %>
@@ -27,7 +28,7 @@
 
 <%# Every search, whatever the filter: searches are a part of a request, and rarely slow enough to pass it %>
 <% if @search_summaries.any? %>
-  <%= partial :'stats/transactions_table', locals: { title: 'Search', summaries: @search_summaries, link: false } %>
+  <%= partial :'stats/transactions_table', locals: { title: 'Search pipeline', summaries: @search_summaries, link: false } %>
 <% end %>
 
 <script>

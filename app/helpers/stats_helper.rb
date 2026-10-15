@@ -35,11 +35,13 @@ Dandelion::App.helpers do
     ERB::Util.html_escape(text).gsub(%r{[/.]}, '\\0<wbr>').html_safe
   end
 
-  # Which section of /stats/transactions a transaction goes in: XHR, GET or POST, Jobs for background jobs (named by
-  # their class and method, not an HTTP method and path), or Other HTTP (HEAD, PUT, DELETE and the like)
+  # Which section of /stats/transactions a transaction goes in: Search for the search page and its XHR requests
+  # (above the searches they make), XHR, GET or POST, Jobs for background jobs (named by their class and method, not an
+  # HTTP method and path), or Other HTTP (HEAD, PUT, DELETE and the like)
   def transaction_section(summary)
     method = summary[:name][/\A[A-Z]+(?= |\z)/]
-    if summary[:xhr] then 'XHR'
+    if summary[:name] == 'GET /search' then 'Search'
+    elsif summary[:xhr] then 'XHR'
     elsif %w[GET POST].include?(method) then method
     elsif method then 'Other HTTP'
     else 'Jobs'
