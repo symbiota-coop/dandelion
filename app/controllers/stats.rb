@@ -72,11 +72,6 @@ Dandelion::App.controller do
     erb :'stats/comments'
   end
 
-  get '/stats/accounts' do
-    @accounts = Account.includes(organisationships: :organisation, memberships: :gathering, mapplications: :gathering).publicly_visible.order('created_at desc').paginate(page: params[:page], per_page: 20)
-    erb :'stats/accounts'
-  end
-
   get '/stats/messages' do
     @messages = Message.includes(:messenger, :messengee).order('created_at desc').paginate(page: params[:page], per_page: 20)
     erb :'stats/messages'
