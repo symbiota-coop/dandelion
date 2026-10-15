@@ -1,6 +1,6 @@
 <%# A table of durations: a section of transactions (linking to their traces), or of searches by pipeline.
-    Each Total is a percentage of max_total_ms, the most total time of any row on the page sharing its scale, with a
-    bar to match (and the time itself in a tooltip) %>
+    Each Total is a percentage of the section's most (its first row, as the summaries come most total time first),
+    with a bar to match (and the time itself in a tooltip) %>
 <div class="table-responsive mt-4">
   <table class="transactions-table table table-hover">
     <thead>
@@ -19,6 +19,7 @@
       </tr>
     </thead>
     <tbody>
+      <% max_total_ms = summaries.first[:total_ms].to_f %>
       <% summaries.first(10).each do |summary| %>
         <tr>
           <td>
