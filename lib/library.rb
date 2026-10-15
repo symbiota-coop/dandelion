@@ -1,5 +1,10 @@
 # The books and films on /books, /films and the Daily, from the CSVs in stephenreid321/stephenreid, fetched once per
-# process (boot.rb fetches them as the app boots)
+# process (boot.rb fetches them as the app boots).
+#
+# A failed fetch (a 5xx, a refused connection or a timeout) is tried up to 3 times at boot, and if it still fails the
+# list is cached empty until the process restarts. We don't retry on later requests: if GitHub was down, each request
+# to /books, /films or the Daily would wait on it again (up to 15 s a try, two CSVs for books). Losing those pages until
+# the next deploy is the smaller cost.
 module Library
   def self.books
     LIBRARY_CACHE[:books] ||= begin
@@ -19,7 +24,14 @@ module Library
   end
 
   def self.csv(name)
-    CSV.parse(Faraday.get("https://raw.githubusercontent.com/stephenreid321/stephenreid/master/data/#{name}.csv").body, headers: true).map do |row|
+    response = Faraday.new do |conn|
+      conn.options.timeout = 10
+      conn.options.open_timeout = 5
+      conn.request :retry, max: 2, interval: 1, backoff_factor: 2,
+                           exceptions: [Faraday::ServerError, Faraday::ConnectionFailed, Faraday::TimeoutError]
+      conn.response :raise_error
+    end.get("https://raw.githubusercontent.com/stephenreid321/stephenreid/master/data/#{name}.csv")
+    CSV.parse(response.body, headers: true).map do |row|
       row.to_h
          .transform_keys { |k| k.to_s.downcase.gsub(/\s+/, '_').to_sym }
          .transform_values { |v| v.nil? || v.empty? ? nil : v }
