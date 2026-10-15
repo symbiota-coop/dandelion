@@ -254,7 +254,7 @@
       </div>
     <% end %>
 
-    <% design_subsection 'Elevation', "Bootstrap's three shadows, set in <code>bootstrap5.scss</code> and used through its variables or the <code>shadow-sm</code>, <code>shadow</code> and <code>shadow-lg</code> classes. Soft, in px like hairlines: sm is a tight contact shadow (1px) alone, and the base and lg add a wide, faint one under it. Floating menus and panels (dropdowns, autocomplete, the cookie banner) also have a --hairline border, so the shadow can stay light; toasts have a border in their variant's 200, and the chat panel has the shadow alone." do %>
+    <% design_subsection 'Elevation', "Bootstrap's three shadows, set in <code>bootstrap5.scss</code> and used through its variables or the <code>shadow-sm</code>, <code>shadow</code> and <code>shadow-lg</code> classes. Soft, in px like hairlines: sm is a tight contact shadow (1px) alone, and the base and lg add a wide, faint one under it. Floating menus and panels (dropdowns, autocomplete, the cookie banner) also have a --hairline border, so the shadow can stay light; toasts have a border in their variant's 200, and the chat panel (_chat_card.erb: an event's discussion, an organisation's files) has the shadow alone, under a text-bg-primary bar that opens and closes it; below 992px it's a card with a .chill header instead." do %>
       <div class="bg-body-tertiary rounded p-4">
         <div class="row g-4">
           <% [
@@ -321,7 +321,8 @@
              ['Tab and crumb scrollers', 'edge fades, chevron colour'],
              ['Dropdown menus, confirm popover, flash toasts', 'fade in, settle'],
              ['Modals', 'Bootstrap fade and slide'],
-             ['Sidebar groups, subscription cards', 'slide, chevron turns']
+             ['Sidebar groups, subscription cards', 'slide, chevron turns'],
+             ['Chat panel', 'chevron turns']
            ].each do |title, value| %>
           <div class="col">
             <div class="d-flex justify-content-between gap-3 py-2 border-bottom"><span><%= title %></span><code class="text-body-secondary"><%= value %></code></div>

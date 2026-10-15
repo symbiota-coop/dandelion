@@ -1,3 +1,4 @@
+<% subtitle = 'Only attendees and facilitators can see this' %>
 <% if Padrino.env != :test && @event.posts.count == 1 && @event.posts.first.subject == "Chat for #{@event.name}" %>
 
   <% content = capture do %>
@@ -6,16 +7,24 @@
     </div>
   <% end %>
 
-  <%= partial :chat_card, locals: { title: "Private discussion for attendees and facilitators", show_chat: @event.posts.first.comments.count > 1, content: content } %>
+  <%= partial :chat_card, locals: { title: 'Discussion', subtitle: subtitle, show_chat: @event.posts.first.comments.count > 1, content: content } %>
 
 <% else %>
-  <h2 class="mt-5">Private discussion for attendees and facilitators</h2>
-  <% if (ticket = @event.tickets.complete.find_by(account: current_account)) %>
-    <div data-pagelet-url="/events/<%= @event.id %>/subscribe_discussion">
-      <%= partial :'events/subscribe_discussion' %>
+  <div class="card mt-3" id="discussion">
+    <h3 class="card-header chill">Discussion</h3>
+    <div class="card-body">
+      <div class="small text-body-secondary mb-3">
+        <%= subtitle %>
+        <% if @event.tickets.complete.and(account: current_account).exists? %>
+          &middot;
+          <span data-pagelet-url="/events/<%= @event.id %>/subscribe_discussion">
+            <%= partial :'events/subscribe_discussion' %>
+          </span>
+        <% end %>
+      </div>
+      <div data-pagelet-url="/commentable?commentable_type=Event&commentable_id=<%= @event.id %>">
+        <%= partial :'comments/commentable', locals: { commentable: @event } %>
+      </div>
     </div>
-  <% end %>
-  <div class="mt-3" data-pagelet-url="/commentable?commentable_type=Event&commentable_id=<%= @event.id %>">
-    <%= partial :'comments/commentable', locals: { commentable: @event } %>
   </div>
 <% end %>
