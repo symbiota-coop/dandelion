@@ -252,6 +252,33 @@ class EventsTest < ActiveSupport::TestCase
     assert_includes last_response.body, '&lt;img src=x onerror=alert(1)&gt;'
   end
 
+  test 'email notifications for a discussion nobody has written in yet make its post' do
+    create_event(prices: [0])
+    attendee = FactoryBot.create(:account)
+    @event.tickets.create!(account: attendee, ticket_type: @event.ticket_types.first, payment_completed: true)
+
+    get "/e/#{@event.slug}", sign_in_token: attendee.sign_in_token
+    assert_nil @event.discussion_post
+
+    post "/events/#{@event.id}/subscribe_discussion"
+    assert last_response.ok?
+    assert @event.discussion_post.subscriptions.and(account: attendee).exists?
+
+    get "/events/#{@event.id}/unsubscribe_discussion"
+    assert last_response.redirect?
+    assert_not @event.discussion_post.subscriptions.and(account: attendee).exists?
+  end
+
+  test 'only people who can see the discussion can subscribe to it' do
+    create_event(prices: [0])
+    outsider = FactoryBot.create(:account)
+
+    get "/e/#{@event.slug}", sign_in_token: outsider.sign_in_token
+    post "/events/#{@event.id}/subscribe_discussion"
+    assert_not last_response.ok?
+    assert_nil @event.discussion_post
+  end
+
   test 'json-ld cannot close the script tag' do
     create_event(prices: [0], description: '<p>Welcome</p>')
     # location/website are not name-sanitised; description text is HTML-decoded

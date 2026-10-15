@@ -140,8 +140,7 @@ module EventAssociations
   def discussers
     Account.and(:id.in =>
         [account.try(:id), revenue_sharer.try(:id), coordinator.try(:id)].compact +
-        event_facilitator_ids +
-        tickets.complete.and(subscribed_discussion: true).pluck(:account_id))
+        event_facilitator_ids)
   end
 
   def subscribed_members

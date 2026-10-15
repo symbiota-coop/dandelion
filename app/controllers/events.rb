@@ -337,18 +337,23 @@ Dandelion::App.controller do
     200
   end
 
-  post '/events/:id/set_subscribe_discussion' do
+  # Email notifications for the discussion, before anyone has written in it: makes its post to subscribe to
+  post '/events/:id/subscribe_discussion' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
-    @event.tickets.complete.and(account: current_account).update_all(subscribed_discussion: true)
-    request.xhr? ? 200 : redirect("/e/#{@event.slug}")
+    @commentable = @event
+    commentable_viewers_only!
+    @event.discussion_post!(current_account).subscriptions.find_or_create_by(account: current_account)
+    200
   end
 
+  # Discussion emails sent before 2026-10-15 link here to unsubscribe
   get '/events/:id/unsubscribe_discussion' do
     sign_in_required!
     @event = Event.find(params[:id]) || not_found
-    @event.tickets.complete.and(account: current_account).update_all(subscribed_discussion: false)
-    request.xhr? ? 200 : redirect("/e/#{@event.slug}")
+    @event.discussion_post&.subscriptions&.and(account: current_account)&.destroy_all
+    flash[:notice] = "You unsubscribed from the discussion of #{@event.name}"
+    redirect "/e/#{@event.slug}"
   end
 
   get '/events/:id/star' do

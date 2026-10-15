@@ -10,15 +10,14 @@
   </div>
 </div>
 <div class="small" style="padding-left: 1em; padding-bottom: 1em">
-  <% if (post = commentable.discussion_post) %>
-    <% if (subscription = post.subscriptions.find_by(account: current_account)) %>
-      <a class="pagelet-trigger" href="/subscriptions/<%= subscription.id %>/unsubscribe">Email notifications on</a>
-    <% else %>
-      <a class="text-body-secondary pagelet-trigger" data-method="post" href="/subscriptions/create?post_id=<%= post.id %>">Email notifications off</a>
-    <% end %>
+  <% post = commentable.discussion_post %>
+  <% if post && (subscription = post.subscriptions.find_by(account: current_account)) %>
+    <a class="pagelet-trigger" href="/subscriptions/<%= subscription.id %>/unsubscribe">Email notifications on</a>
+  <% else %>
+    <a class="text-body-secondary pagelet-trigger" data-method="post" href="/events/<%= commentable.id %>/subscribe_discussion">Email notifications off</a>
+  <% end %>
+  <% if post %>
     <span class="text-body-secondary">&middot; <%= pluralize(post.subscriptions.count, 'person') %> subscribed</span>
-  <% elsif commentable.tickets.complete.and(account: current_account).exists? %>
-    <%= partial :'events/subscribe_discussion', locals: { event: commentable } %>
   <% end %>
 </div>
 <script>

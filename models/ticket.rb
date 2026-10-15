@@ -26,7 +26,6 @@ class Ticket
   field :percentage_discount_monthly_donor, type: Integer
   field :organisation_revenue_share, type: Float
   field :show_attendance, type: Boolean
-  field :subscribed_discussion, type: Boolean
   field :checked_in, type: Boolean
   field :checked_in_at, type: Time
   field :name, type: String

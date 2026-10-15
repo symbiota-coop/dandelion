@@ -43,13 +43,6 @@
   <a href="<%= ENV['BASE_URI'] %>/posts/<%= comment.post_id %>/unsubscribe?sign_in_token=%recipient.token%">
     Unsubscribe from this post
   </a>
-  <% if comment.commentable.is_a?(Event) %>
-    <% event = comment.commentable %>
-    &middot;
-    <a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>/unsubscribe_discussion?sign_in_token=%recipient.token%">
-      Unsubscribe from this event
-    </a>
-  <% end %>
   <% if comment.commentable.is_a?(Team) %>
     <% gathering = comment.commentable.gathering %>
     &middot;
