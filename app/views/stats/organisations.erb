@@ -11,32 +11,11 @@
   <%= submit_tag 'Search', class: 'btn btn-primary' %>
 <% end %>
 
-<%
-  # Pre-fetch all orders and tickets in date range
-  orders = Order.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :value.ne => nil, :currency.in => FIAT_CURRENCIES)
-  tickets = Ticket.and(:created_at.gte => @from, :created_at.lt => @to + 1.day, :price.gt => 0)
-
-  # Get organisations with events that have orders
-  event_ids_with_orders = orders.pluck(:event_id).uniq
-  organisation_ids = Event.and(:id.in => event_ids_with_orders).pluck(:organisation_id).uniq
-  organisations = Organisation.and(:id.in => organisation_ids)
-
-  # Pre-group tickets and orders by event_id for faster lookup
-  tickets_by_event = tickets.group_by(&:event_id)
-  orders_by_event = orders.group_by(&:event_id)
-
-  # Pre-fetch all events and group by organisation_id
-  events_in_range = Event.and(:id.in => (tickets.pluck(:event_id) + orders.pluck(:event_id)).uniq)
-  events_by_org = events_in_range.group_by(&:organisation_id)
-
-  # Calculate total value for summary
-  total_value = orders.inject(Money.new(0,'GBP')) { |sum, o| sum + Money.new(o.value*100, o.currency) }
-%>
 <p class="lead mt-3">
-  <%= pluralize(organisations.count, 'organisation') %> sold
-  <%= pluralize(tickets.count, 'ticket') %>
+  <%= pluralize(@organisations.count, 'organisation') %> sold
+  <%= pluralize(@tickets_count, 'ticket') %>
   worth
-  <%= total_value.exchange_to('GBP').format(no_cents: true) %>
+  <%= @total_value.format(no_cents: true) %>
 </p>
 
 <div class="mt-3">
@@ -55,65 +34,45 @@
         <th data-col-name="tickets">Tickets</th>
         <th data-col-name="value">Value</th>
         <th data-col-name="created_at">Created at</th>
-        <th data-col-name="contribution">Contribution</th>
-        <th data-col-name="remaining">Remaining</th>
+        <th data-col-name="contribution">Suggested contribution</th>
       </tr>
     </thead>
-    <% organisations.each { |organisation|
-      # Get this organisation's events in the date range
-      org_events = events_by_org[organisation.id] || []
-      org_event_ids = org_events.map(&:id)
-
-      # Get tickets and orders for this organisation's events
-      org_tickets = org_event_ids.flat_map { |eid| tickets_by_event[eid] || [] }
-      org_orders = org_event_ids.flat_map { |eid| orders_by_event[eid] || [] }
-
-      # Calculate order sum
-      orders_sum = org_orders.inject(Money.new(0, 'GBP')) do |sum, o|
-        sum + Money.new(o.value * 100, o.currency)
-      end
-      orders_sum = orders_sum.exchange_to('GBP') if orders_sum > 0 %>
+    <% @organisations.each do |organisation| %>
+      <% row = @rows[organisation.id] %>
     <tr>
       <td>
         <a href="/o/<%= organisation.slug %>"><%= organisation.name %></a>
       </td>
       <td>
-        <%= org_events.count %>
+        <%= row[:events] %>
       </td>
       <td>
-        <%= org_tickets.count %>
+        <%= row[:tickets] %>
       </td>
-      <td>
-        <%= orders_sum.format(no_cents: true) %>
+      <% value = row[:value].exchange_to('GBP') %>
+      <td data-sort="<%= value.to_f %>">
+        <%= value.format(no_cents: true) %>
       </td>
       <td data-sort="<%= organisation.created_at.to_fs(:db_local) %>"><%= organisation.created_at %></td>
 
       <% r = organisation.contribution_requested_gbp_cache %>
-      <% p = organisation.contribution_paid_gbp_cache %>
-      <% if r && p %>
+      <td data-sort="<%= r || 0 %>">
+        <% p = organisation.contribution_paid_gbp_cache %>
+        <% if r && p %><%= m p.round, 'GBP' %>/<%= m r.round, 'GBP' %><% end %>
+        <% if organisation.stripe_customer_id %>
+          <span class="badge text-bg-primary">Auto top-up</span>
+        <% end %>
         <% w = organisation.fraction_paid*100 if organisation.fraction_paid %>
-        <% balance = r - p %>
-        <td data-sort="<%= organisation.fraction_paid %>">
-          <%= m p, 'GBP' %>/<%= m r, 'GBP' %>
-
-          <% if w %>
-            <div class="progress my-3" style="height: 1.875rem">
-              <div class="progress-bar" role="progressbar" style="width: <%= "#{w > 100 ? 100 : w}%" %>;">
-                <% if w > 0 %><%= w.to_f.round %>%<% end %>
-              </div>
+        <% if w %>
+          <div class="progress my-3" style="height: 1.875rem">
+            <div class="progress-bar" role="progressbar" style="width: <%= "#{w > 100 ? 100 : w}%" %>;">
+              <% if w > 0 %><%= w.to_f.round %>%<% end %>
             </div>
-          <% end %>
-        </td>
-        <td data-sort="<%= balance %>">
-          <%= m balance, 'GBP' %>
-        </td>
-      <% else %>
-        <td data-sort="0"></td>
-        <td data-sort="0"></td>
-      <% end %>
-
+          </div>
+        <% end %>
+      </td>
     </tr>
-    <% } %>
+    <% end %>
   </table>
 
 </div>

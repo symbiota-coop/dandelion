@@ -30,10 +30,40 @@ Dandelion::App.controller do
   end
 
   get '/stats/organisations' do
-    @from = params[:from] ? parse_date(params[:from]) : Date.new(3.months.ago.year, 3.months.ago.month, 1)
-    @to = params[:to] ? parse_date(params[:to]) : Date.new(Date.today.year, Date.today.month, 1) - 1.day
-    @min_tickets = params[:min_tickets] ? params[:min_tickets].to_i : 10
-    @min_order_value = params[:min_order_value] || 1000
+    @from = params[:from] ? parse_date(params[:from]) : 3.months.ago.to_date
+    @to = params[:to] ? parse_date(params[:to]) : Date.today
+    created_at = { '$gte' => @from.to_time(:utc), '$lt' => (@to + 1.day).to_time(:utc) }
+
+    # Sums and counts by event in the database, rather than loading every order and ticket
+    order_sums = Order.collection.aggregate([
+                                              { '$match' => { created_at: created_at, value: { '$ne' => nil }, currency: { '$in' => FIAT_CURRENCIES } } },
+                                              { '$group' => { _id: { event_id: '$event_id', currency: '$currency' }, value: { '$sum' => '$value' } } }
+                                            ]).to_a
+    ticket_counts = Ticket.collection.aggregate([
+                                                  { '$match' => { created_at: created_at, price: { '$gt' => 0 } } },
+                                                  { '$group' => { _id: '$event_id', count: { '$sum' => 1 } } }
+                                                ]).to_a.to_h { |r| [r['_id'], r['count']] }
+
+    event_ids = (order_sums.map { |r| r['_id']['event_id'] } + ticket_counts.keys).uniq
+    organisation_id_by_event = Event.and(:id.in => event_ids).pluck(:id, :organisation_id).to_h
+
+    @rows = Hash.new { |h, k| h[k] = { events: 0, tickets: 0, value: Money.new(0, 'GBP') } }
+    organisation_id_by_event.each do |event_id, organisation_id|
+      @rows[organisation_id][:events] += 1
+      @rows[organisation_id][:tickets] += ticket_counts[event_id] || 0
+    end
+    order_sums.each do |r|
+      organisation_id = organisation_id_by_event[r['_id']['event_id']]
+      next unless organisation_id
+
+      @rows[organisation_id][:value] += Money.new(r['value'] * 100, r['_id']['currency'])
+      @rows[organisation_id][:sold] = true
+    end
+    @rows.select! { |_, row| row[:sold] }
+
+    @tickets_count = ticket_counts.values.sum
+    @total_value = order_sums.sum(Money.new(0, 'GBP')) { |r| Money.new(r['value'] * 100, r['_id']['currency']) }.exchange_to('GBP')
+    @organisations = Organisation.and(:id.in => @rows.keys).only(:id, :name, :slug, :created_at, :stripe_customer_id, :contribution_requested_gbp_cache, :contribution_paid_gbp_cache)
     erb :'stats/organisations'
   end
 
