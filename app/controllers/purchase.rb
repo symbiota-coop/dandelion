@@ -14,7 +14,7 @@ Dandelion::App.controller do
     account_hash[:phone] = account_data[:phone] if @event.organisation.collect_phone?
 
     @account = Account.find_by(email: account_data[:email].downcase.strip)
-    @account ||= Account.new(account_hash.merge(skip_confirmation_email: true, default_currency: visitor_currency))
+    @account ||= Account.new(account_hash.merge(skip_confirmation_email: true, default_currency: visitor_currency, skip_geocoding: true))
 
     if @account.persisted?
       # Only the account owner may merge checkout fields into an existing profile.
@@ -58,6 +58,9 @@ Dandelion::App.controller do
       via: account_data[:via],
       http_referrer: account_data[:http_referrer]
     )
+    # Not needed for the purchase, so looked up in the background, once the order has joined the account to its
+    # organisations (whose local groups need the coordinates)
+    @account.delay.geocode_location! if @account.skip_geocoding && @account.location
 
     purchased = Hash.new(0)
     available = {}

@@ -58,19 +58,31 @@ module AccountValidation
 
     after_validation do
       if location_changed?
-        if location
-          geocode || (self.coordinates = nil)
-          if coordinates
-            self.time_zone = begin
-              Timezone.lookup(*coordinates.reverse)
-            rescue Timezone::Error::InvalidZone, Timezone::Error::InvalidConfig, Timezone::Error::Google
-              nil
-            end
-          end
-        else
+        if !location
           self.coordinates = nil
+        elsif !skip_geocoding
+          look_up_coordinates_and_time_zone
         end
       end
     end
+  end
+
+  def look_up_coordinates_and_time_zone
+    geocode || (self.coordinates = nil)
+    return unless coordinates
+
+    self.time_zone = begin
+      Timezone.lookup(*coordinates.reverse)
+    rescue Timezone::Error::InvalidZone, Timezone::Error::InvalidConfig, Timezone::Error::Google
+      nil
+    end
+  end
+
+  # For accounts saved with skip_geocoding (checkout), run in the background. Also joins the local groups of
+  # organisations the account has joined, which found no coordinates to match when it joined them
+  def geocode_location!
+    look_up_coordinates_and_time_zone
+    set(coordinates: coordinates, time_zone: time_zone)
+    organisationships.and(unsubscribed: false).each(&:associate_with_relevant_local_groups!)
   end
 end

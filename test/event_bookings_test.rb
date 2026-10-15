@@ -290,18 +290,23 @@ class EventBookingsTest < ActiveSupport::TestCase
     click_button 'RSVP'
     assert page.has_content? 'Thanks for booking'
 
-    # Verify account was created with location and coordinates
+    # Verify account was created with location, but geocoded in the background rather than during checkout
     new_account = Account.find_by(email: 'gamlastan@example.com')
     assert new_account.present?, 'Account should be created'
     assert new_account.location.include?('111 28'), "Location should include postcode, got: #{new_account.location}"
-    assert new_account.coordinates.present?, 'Account should have coordinates from geocoding'
+    assert_nil new_account.coordinates, 'Checkout should leave geocoding to a background job'
 
     # Check organisationship was created
     organisationship = @organisation.organisationships.find_by(account: new_account)
     assert organisationship, 'User should be subscribed to organisation'
+    assert_nil local_group.local_groupships.find_by(account: new_account)
+
+    assert Delayed::Job.and(handler: /geocode_location!/).exists?, 'Checkout should queue geocoding'
+    new_account.geocode_location!
+    assert new_account.reload.coordinates.present?, 'Account should have coordinates from geocoding'
 
     # Verify user is auto-subscribed to local_group based on their geocoded location
-    # (organisationship.after_create creates local_groupship when account coordinates are within polygon)
+    # (geocode_location! creates the local_groupship the organisationship couldn't, as the account had no coordinates)
     local_groupship = local_group.local_groupships.find_by(account: new_account)
     assert local_groupship, 'User with coordinates in Gamla Stan should be subscribed to local_group'
   end

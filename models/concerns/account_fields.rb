@@ -2,7 +2,7 @@ module AccountFields
   extend ActiveSupport::Concern
 
   included do
-    attr_accessor :password, :postcode, :country, :skip_confirmation_email
+    attr_accessor :password, :postcode, :country, :skip_confirmation_email, :skip_geocoding
 
     field :name, type: String
     field :name_transliterated, type: String
