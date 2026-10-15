@@ -360,16 +360,17 @@ class Pmail
 
     result = batch_message.finalize if Padrino.env == :production
 
-    send_signal_messages(accounts) if is_event_pmail
+    # In a job of its own, so a slow Signal API doesn't hold up the request (Send test) or the mail
+    send_signal_messages(accounts.and(:phone.ne => nil).pluck(:id)) if is_event_pmail && signal_configured?
 
     result
   end
 
-  def send_signal_messages(accounts)
+  def send_signal_messages(account_ids)
     return unless signal_configured?
     return unless mailable.is_a?(Event)
 
-    accounts.each do |account|
+    Account.and(:id.in => account_ids).each do |account|
       next unless account.phone.present?
 
       pmail_url = "#{ENV['BASE_URI']}/pmails/#{public_id}"
@@ -378,6 +379,7 @@ class Pmail
       send_signal_message(account.phone, message)
     end
   end
+  handle_asynchronously :send_signal_messages
 
   def duplicate!(account)
     duplicate_to_option = to_option || to_selected
