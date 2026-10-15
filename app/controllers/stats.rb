@@ -34,13 +34,13 @@ Dandelion::App.controller do
     @to = params[:to] ? parse_date(params[:to]) : Date.today
     created_at = { '$gte' => @from.to_time(:utc), '$lt' => (@to + 1.day).to_time(:utc) }
 
-    # Sums and counts by event in the database, rather than loading every order and ticket
+    # Sums and counts by event in the database, rather than loading every order and ticket (raw aggregations skip the paranoia scope, so exclude deleted orders and tickets here)
     order_sums = Order.collection.aggregate([
-                                              { '$match' => { created_at: created_at, value: { '$ne' => nil }, currency: { '$in' => FIAT_CURRENCIES } } },
+                                              { '$match' => { created_at: created_at, deleted_at: nil, value: { '$ne' => nil }, currency: { '$in' => FIAT_CURRENCIES } } },
                                               { '$group' => { _id: { event_id: '$event_id', currency: '$currency' }, value: { '$sum' => '$value' } } }
                                             ]).to_a
     ticket_counts = Ticket.collection.aggregate([
-                                                  { '$match' => { created_at: created_at, price: { '$gt' => 0 } } },
+                                                  { '$match' => { created_at: created_at, deleted_at: nil, price: { '$gt' => 0 } } },
                                                   { '$group' => { _id: '$event_id', count: { '$sum' => 1 } } }
                                                 ]).to_a.to_h { |r| [r['_id'], r['count']] }
 
