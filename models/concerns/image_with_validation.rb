@@ -4,7 +4,9 @@ module ImageWithValidation
   MAX_IMAGE_BYTES = 20 * 1024 * 1024
 
   included do
-    # Before dragonfly_accessor's own before_save, which then finds the image stored
+    # Both before dragonfly_accessor's own before_save: storing the image marks it unchanged, so whether to warm its
+    # derivatives is decided first, and dragonfly_accessor's then finds it stored
+    before_save :set_warm_image_derivatives
     before_save :store_image
 
     dragonfly_accessor :image do
@@ -25,7 +27,6 @@ module ImageWithValidation
       end
     end
 
-    before_save :set_warm_image_derivatives
     after_save :warm_image_derivatives, if: :warm_image_derivatives_after_save?
     handle_asynchronously :warm_image_derivatives
 
