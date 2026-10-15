@@ -58,7 +58,7 @@
       <% r = organisation.contribution_requested_gbp_cache %>
       <td data-sort="<%= r || 0 %>">
         <% p = organisation.contribution_paid_gbp_cache %>
-        <% if r && p %><%= m p.round, 'GBP' %>/<%= m r.round, 'GBP' %><% end %>
+        <% if r && p %><% if p.round > 0 %><%= m p.round, 'GBP' %>/<% end %><%= m r.round, 'GBP' %><% end %>
         <% if organisation.stripe_customer_id %>
           <span class="badge text-bg-primary">Auto top-up</span>
         <% end %>
