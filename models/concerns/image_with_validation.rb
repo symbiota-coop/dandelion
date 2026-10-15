@@ -4,18 +4,23 @@ module ImageWithValidation
   MAX_IMAGE_BYTES = 20 * 1024 * 1024
 
   included do
+    # Before dragonfly_accessor's own before_save, which then finds the image stored
+    before_save :store_image
+
     dragonfly_accessor :image do
       after_assign do |attachment|
-        if attachment.size.to_i > MAX_IMAGE_BYTES
-          @image_too_large = true
-          attachment.assign(nil)
-        elsif attachment.image?
-          if attachment.format != 'jpeg'
-            attachment.convert('-format jpeg')
-            attachment.name = "#{SecureRandom.uuid}.jpeg"
-          end
+        image_span('assign') do
+          if attachment.size.to_i > MAX_IMAGE_BYTES
+            @image_too_large = true
+            attachment.assign(nil)
+          elsif attachment.image?
+            if attachment.format != 'jpeg'
+              attachment.convert('-format jpeg')
+              attachment.name = "#{SecureRandom.uuid}.jpeg"
+            end
 
-          attachment.process!(:thumb, '1920x1920>')
+            attachment.process!(:thumb, '1920x1920>')
+          end
         end
       end
     end
@@ -50,7 +55,20 @@ module ImageWithValidation
     image && (image_new? || !image_width_unmagic || !image_height_unmagic)
   end
 
+  # ImageMagick (identify and convert) and S3 run outside Mongo and Net::HTTP, so they don't make spans of their own:
+  # these show where an image upload's time goes in a trace
+  def image_span(action, &)
+    Sentry.with_child_span(op: "image.#{action}", description: "#{self.class.name} image", &)
+  end
+
   private
+
+  # Storing applies the processing assigning queued up (converting and resizing), then writes to S3
+  def store_image
+    return unless image_changed?
+
+    image_span('store') { dragonfly_attachments[:image].save! }
+  end
 
   def set_warm_image_derivatives
     @warm_image_derivatives_after_save = image.present? && image_changed?
@@ -89,7 +107,7 @@ module ImageWithValidation
   def validate_image_format
     return unless image && image_new?
 
-    begin
+    image_span('validate') do
       if image.image?
         image.name = "#{SecureRandom.uuid}.#{image.format}"
       else
