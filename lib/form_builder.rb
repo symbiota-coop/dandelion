@@ -49,8 +49,10 @@ module Padrino
                                            label_class: label_class, div_class: div_class, required: r)
         end
 
+        # A field for setting a new password: new-password stops browsers filling in the saved one, which would change
+        # nothing but re-hash it at full BCrypt cost (about 350 ms) on every save
         def password_block(fieldname, placeholder: nil, required: false, disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
-          content = password_field(fieldname,
+          content = password_field(fieldname, autocomplete: 'new-password',
                                    class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
                                                             'is-invalid'
                                                           end}", required: (r = required || model_required(fieldname)), disabled: disabled, placeholder: placeholder)
