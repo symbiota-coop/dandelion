@@ -49,9 +49,9 @@ module AccountValidation
       errors.add(:name, 'must not contain https://') if name && name.include?('https://')
       # errors.add(:name, 'must not contain digits') if self.name and self.name =~ /\d/
 
-      if !password && !crypted_password
-        self.password = Account.generate_password # if there's no password, just set one
-      end
+      # If there's no password, just set one. Nobody is given it, so it's hashed at BCrypt's minimum cost
+      # (see Account#encrypt_password)
+      self.password = @unused_password = Account.generate_password if !password && !crypted_password
 
       errors.add(:date_of_birth, 'is invalid') if age && age <= 0
     end

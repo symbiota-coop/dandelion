@@ -114,6 +114,20 @@ class AccountsTest < ActiveSupport::TestCase
     Haikunator.stub(:haikunate, 'cool-moon') { assert_equal 'cool_moon', Account.generate_username }
   end
 
+  test 'a generated password nobody is given is hashed at minimum cost, and one someone sets at full cost' do
+    BCrypt::Engine.stub(:cost, 5) do
+      unused = Account.create!(name: 'Unused Password', email: "unused@#{ENV['DOMAIN']}")
+      assert_equal BCrypt::Engine::MIN_COST, BCrypt::Password.new(unused.crypted_password).cost
+
+      unused.update_attributes!(password: 'a password someone chose')
+      assert_equal 5, BCrypt::Password.new(unused.crypted_password).cost
+      assert unused.password_matches?('a password someone chose')
+
+      given = FactoryBot.create(:account, password: Account.generate_password)
+      assert_equal 5, BCrypt::Password.new(given.crypted_password).cost
+    end
+  end
+
   test 'sign in token does not replace an existing session' do
     victim = FactoryBot.create(:account)
     attacker = FactoryBot.create(:account)

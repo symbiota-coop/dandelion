@@ -397,7 +397,7 @@ class Account
 
   def self.generate_password(length = 16)
     chars = ('a'..'z').to_a + ('0'..'9').to_a
-    Array.new(length) { chars[rand(chars.size)] }.join
+    Array.new(length) { chars[SecureRandom.random_number(chars.size)] }.join
   end
 
   # A random adjective_noun, numbered (_1, _2...) when taken. There are only 64 × 64 of them, so most are taken
@@ -512,8 +512,13 @@ class Account
 
   private
 
+  # A slow hash protects passwords people choose, which can be guessed. A generated password nobody is given
+  # (see AccountValidation) is 16 random characters, which can't be guessed at any cost, so it's hashed at the
+  # minimum, saving a few hundred ms on every account created at checkout. Any password someone sets or is given,
+  # generated or not, is hashed at full cost
   def encrypt_password
-    self.crypted_password = ::BCrypt::Password.create(password)
+    cost = password == @unused_password ? ::BCrypt::Engine::MIN_COST : ::BCrypt::Engine.cost
+    self.crypted_password = ::BCrypt::Password.create(password, cost: cost)
   end
 
   def password_required
