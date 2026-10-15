@@ -1,13 +1,10 @@
 <%= cp :'locations/header', key: "/locations/#{@location.name}/header", locals: { location: @location, events: @events } %>
 
-<% fragment = Fragment.find_by(key: "/locations/#{@location.name}") %>
-<div data-bs-toggle="tooltip" title="AI-generated summary ✨" <% unless fragment %> data-with-placeholder<% end %> class="readable" data-pagelet-url="/locations/<%= @location.name %>">
-  <% if fragment %>
-    <%== fragment.value %>
-  <% else %>
-    <%= partial :placeholder, locals: { count: 1 } %>
-  <% end %>
-</div>
+<% if @location.summary %>
+  <div data-bs-toggle="tooltip" title="AI-generated summary ✨" class="readable">
+    <%== Sanitize.fragment(md(@location.summary), Sanitize::Config::DANDELION) %>
+  </div>
+<% end %>
 
 <% if @location.signal_group_link %>
   <a href="<%= @location.signal_group_link %>" target="_blank" class="btn btn-signal mb-3"><i class="bi bi-signal"></i> Join the Signal group</a>
@@ -15,6 +12,6 @@
 
 <%= partial :'events/search_form', locals: { path: '/events' } %>
 
-<div data-with-placeholder data-pagelet-url="/events?online=<%= 1 if @location.name == 'Online' %>&near=<%= CGI.escape(@location.query) if @location.query %>">
+<div data-with-placeholder data-pagelet-url="/events?online=<%= 1 if @location.online? %>&near=<%= CGI.escape(@location.query) if @location.query %>">
   <%= partial :'events/blocks_placeholder' %>
 </div>

@@ -84,6 +84,8 @@ namespace :late do
       stripe_charge.set(balance_float: stripe_charge.balance_from_transactions)
       stripe_charge.set(fees_float: stripe_charge.fees_from_transactions)
     end
+    puts 'location summaries'
+    Location.all.each(&:generate_summary)
     puts 'event recommendations'
     Event.recommend
     puts 'mailgun delivery stats alert'
