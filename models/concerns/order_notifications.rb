@@ -4,6 +4,7 @@ module OrderNotifications
   included do
     handle_asynchronously :send_notification
     handle_asynchronously :send_tickets
+    handle_asynchronously :send_signal_order_link
 
     before_destroy :queue_rsvp_cancelled_notification
   end
@@ -150,13 +151,8 @@ module OrderNotifications
       File.delete(fn)
     end
 
-    # Send Signal message if account has phone number
-    Sentry.with_child_span(op: 'http.client', description: 'POST Signal /v2/send') do |span|
-      span&.set_data('http.request.method', 'POST')
-      span&.set_data('url', "#{ENV['SIGNAL_API_URL']}/v2/send") if ENV['SIGNAL_API_URL'].present?
-      span&.set_data('signal.configured', signal_configured?)
-      send_signal_order_link
-    end if account&.phone.present?
+    # Send Signal message if account has phone number, as its own job: Signal can take seconds to send
+    send_signal_order_link if account&.phone.present?
   end
 
   def queue_rsvp_cancelled_notification
