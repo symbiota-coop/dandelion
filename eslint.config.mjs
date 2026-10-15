@@ -7,7 +7,7 @@ import bootstrap4Leftovers from './config/bootstrap4_leftovers.json' with { type
 // templates define functions others call
 const libraries = [
   'autosize', 'bootstrap', 'Chart', 'ChartDataLabels', 'ClassicEditor', 'Coloris', 'countUp', 'cytoscape', 'DataTable', 'flatpickr',
-  'FullCalendar', 'google', 'grecaptcha', 'iframely', 'introJs', 'jsQR', 'markerClusterer', 'Stripe', 'Tribute', 'Typed'
+  'FullCalendar', 'google', 'grecaptcha', 'iframely', 'introJs', 'jsQR', 'markerClusterer', 'Stripe', 'Typed'
 ]
 const shared = [
   'cssColor', 'DandelionMap', 'destroyLinkFor', 'drawSpanTreeGuides', 'fixedHeaderHeight', 'hideTooltips', 'initQuestionsPreview', 'onContentLoaded',

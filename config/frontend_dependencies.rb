@@ -7,7 +7,6 @@ FRONTEND_DEPENDENCIES = {
     'datatables.net-bs5@3.1.2' => 'js/dataTables.bootstrap5.min.js css/dataTables.bootstrap5.min.css',
     'datatables.net-responsive@4.1.1' => 'js/dataTables.responsive.min.js',
     'datatables.net-responsive-bs5@4.1.1' => 'js/responsive.bootstrap5.min.js css/responsive.bootstrap5.min.css',
-    'tributejs@3.5.3' => 'dist/tribute.min.js dist/tribute.min.css',
     'select2@4.1.0' => 'dist/js/select2.full.min.js dist/css/select2.min.css',
     'select2-bootstrap-5-theme@1.3.0' => 'dist/select2-bootstrap-5-theme.min.css',
     'iframe-resizer@4.2.10' => 'js/iframeResizer.contentWindow.min.js',

@@ -217,7 +217,7 @@ module Dandelion
         @accounts = current_account.network
         @accounts = @accounts.and(:id.in => Account.search(@q, @accounts).pluck(:id))
         @accounts.map do |account|
-          { key: account.name, value: account.username }
+          { key: account.name, value: account.username, image: account.image_thumb_or_gravatar_url, avatar_class: account.avatar_class }
         end.to_json
       end
     end

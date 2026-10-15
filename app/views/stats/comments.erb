@@ -22,7 +22,7 @@
         <a href="/u/<%= comment.account.username %>"><%= comment.account.name %></a>
       </td>
       <td>
-        <div class="comment-body compact-urls linkify nl2br tagify"><%= comment.body %></div>
+        <div class="comment-body compact-urls linkify nl2br"><%= comment.body_html %></div>
       </td>
       <td>
         <%= comment.created_at %>

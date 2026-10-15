@@ -35,19 +35,49 @@ class Comment
 
   after_create do
     post.subscriptions.create account: account
-    if body
-      body.scan(/\[@[\w\s'-.]+\]\(@(\w+)\)/) do |match|
-        post.subscriptions.create account: Account.find_by(username: match[0])
-      end
+    mentioned_accounts.each_value do |mentioned|
+      post.subscriptions.create account: mentioned
     end
+  end
+
+  # @username, not straight after a letter, dot or @, so email addresses don't count
+  MENTION_REGEX = /(?<![\w.@])@([a-z0-9_.]+)/i
+
+  # Accounts mentioned in the body, by username
+  def mentioned_accounts
+    @mentioned_accounts ||= mention_tokens.filter_map { |token| mentioned_account(token) }.uniq.index_by(&:username)
+  end
+
+  # The body as HTML, with mentions of accounts shown as their names, linked to their profiles
+  def body_html(base_uri: '')
+    return unless body
+
+    ERB::Util.html_escape(body).to_str.gsub(MENTION_REGEX) do
+      token = Regexp.last_match(1)
+      next "@#{token}" unless (mentioned = mentioned_account(token))
+
+      "<a href=\"#{base_uri}/u/#{mentioned.username}\">#{ERB::Util.html_escape(mentioned.name)}</a>#{token[mentioned.username.length..]}"
+    end.html_safe
+  end
+
+  def mention_tokens
+    body ? body.scan(MENTION_REGEX).flatten.map(&:downcase) : []
+  end
+
+  # Usernames can end in a dot, so '@jo.' is jo. if there's a jo., and otherwise jo at the end of a sentence
+  def mentioned_account(token)
+    @mention_candidates ||= begin
+      usernames = mention_tokens.flat_map { |t| [t, t.sub(/\.+\z/, '')] }.uniq
+      usernames.any? ? Account.and(:username.in => usernames).index_by(&:username) : {}
+    end
+    token = token.downcase
+    @mention_candidates[token] || @mention_candidates[token.sub(/\.+\z/, '')]
   end
 
   def body_with_additions
     return unless body
 
-    b = EmailHelper.h(body)
-    b = b.gsub("\n", '<br />')
-    b.gsub(/\[@((?:[\w\s'-.]|&#39;)+)\]\(@(\w+)\)/, "<a href=\"#{ENV['BASE_URI']}/u/\\2\">\\1</a>").html_safe
+    EmailHelper.untrusted(body_html(base_uri: ENV['BASE_URI'])).gsub("\n", '<br />').html_safe
   end
 
   has_many :notifications, as: :notifiable, dependent: :destroy

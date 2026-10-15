@@ -1562,6 +1562,65 @@ textarea[id=comment_body] {
   overflow: hidden;
 }
 
+/* The @ mention menu under comment boxes (comments.js), floating like a dropdown menu: a hairline border, the base shadow
+   and radius lg, with an avatar, name and @username on each row */
+.mention-menu {
+  position: absolute;
+  z-index: 9999;
+  width: 18.75rem;
+  max-width: calc(100vw - 2 * var(--space-base));
+  margin: var(--space-2xs) 0 0;
+  padding: var(--space-2xs);
+  list-style: none;
+  background: var(--bs-body-bg);
+  border: 1px solid var(--hairline);
+  border-radius: var(--bs-border-radius-lg);
+  box-shadow: var(--bs-box-shadow);
+  transition: opacity var(--transition-enter), translate var(--transition-enter);
+}
+
+@starting-style {
+  .mention-menu {
+    opacity: 0;
+    translate: 0 calc(-1 * var(--space-2xs));
+  }
+}
+
+.mention-menu li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: var(--bs-border-radius);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.mention-menu li.active {
+  background: var(--bs-tertiary-bg);
+}
+
+.mention-menu li.mention-empty {
+  color: var(--bs-secondary-color);
+  cursor: default;
+}
+
+.mention-menu .mention-name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mention-menu .mention-username {
+  min-width: 0;
+  color: var(--bs-secondary-color);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 textarea[id=verdict_reason] {
   height: 6em;
 }

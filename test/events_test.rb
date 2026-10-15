@@ -279,6 +279,37 @@ class EventsTest < ActiveSupport::TestCase
     assert_nil @event.discussion_post
   end
 
+  test 'comment mentions link to profiles and subscribe the people mentioned' do
+    create_event(prices: [0])
+    mentioned = FactoryBot.create(:account, name: 'Ada Lovelace', username: 'ada.lovelace')
+    discussion = @event.discussion_post!(@account)
+    comment = discussion.comments.create!(account: @account, commentable: @event,
+                                          body: "Thanks @Ada.Lovelace. Write to me@example.com, or ask @nobody_here <b>now</b>")
+
+    assert discussion.subscriptions.and(account: mentioned).exists?
+    assert_equal 2, discussion.subscriptions.count
+    html = comment.body_html
+    assert_includes html, '<a href="/u/ada.lovelace">Ada Lovelace</a>. Write'
+    assert_includes html, 'me@example.com'
+    assert_includes html, '@nobody_here &lt;b&gt;now&lt;/b&gt;'
+    assert_includes comment.body_with_additions, %(<a href="#{ENV['BASE_URI']}/u/ada.lovelace">)
+
+    get "/e/#{@event.slug}", sign_in_token: @account.sign_in_token
+    assert_includes last_response.body, '<a href="/u/ada.lovelace">Ada Lovelace</a>'
+  end
+
+  test 'a comment mention ending in a dot subscribes only the account it links to' do
+    create_event(prices: [0])
+    jo = FactoryBot.create(:account, username: 'jo')
+    jo_dot = FactoryBot.create(:account, username: 'jo.')
+    discussion = @event.discussion_post!(@account)
+    comment = discussion.comments.create!(account: @account, commentable: @event, body: 'Over to @jo. today')
+
+    assert discussion.subscriptions.and(account: jo_dot).exists?
+    assert_not discussion.subscriptions.and(account: jo).exists?
+    assert_includes comment.body_html, '<a href="/u/jo.">'
+  end
+
   test 'json-ld cannot close the script tag' do
     create_event(prices: [0], description: '<p>Welcome</p>')
     # location/website are not name-sanitised; description text is HTML-decoded
