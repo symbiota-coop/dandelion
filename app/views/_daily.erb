@@ -14,7 +14,7 @@
     <div class="article single-column">
       <h3>Book of the day</h3>
       <div>
-        <% book = library_books.sample(random: random) %>
+        <% book = Library.books.sample(random: random) %>
         <% if book %>
           <a href="/books/<%= book[:slug] %>">
             <img class="mw-100" src="/books/<%= book[:slug] %>.jpg">
@@ -27,7 +27,7 @@
     <div class="article single-column">
       <h3>Film of the day</h3>
       <div>
-        <% film = library_films.sample(random: random) %>
+        <% film = Library.films.sample(random: random) %>
         <% if film %>
           <a href="<%= film[:url] %>">
             <img class="mw-100" src="/films/<%= film[:slug] %>.jpg">

@@ -57,6 +57,9 @@ require_relative 'sentry_config'
 require_relative 'dragonfly_config'
 require_relative 'frontend_dependencies'
 
+# Fetch the library's books and films as the app boots, so no request waits on GitHub for them
+Library.books && Library.films unless Padrino.env == :test
+
 OmniAuth.config.allowed_request_methods = [:get]
 OmniAuth.config.logger = Logger.new(IO::NULL)
 
