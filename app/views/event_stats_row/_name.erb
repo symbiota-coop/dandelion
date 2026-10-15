@@ -5,7 +5,7 @@
     <a href="<%= "/e/#{event.slug}#{if organisation && organisation != event.organisation; "?cohost=#{organisation.slug}"; end }" %>"><%= event.name %></a>
   <% end %>
   <% if event.locked? %>
-    <span class="badge text-bg-secondary">Locked</span>
+    <span class="badge text-bg-warning">Locked</span>
   <% end %>
   <% if event.secret? %>
     <span class="badge text-bg-secondary">Secret</span>
