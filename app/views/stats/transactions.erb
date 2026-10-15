@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="<%= cachebust('/stylesheets/traces.css') %>">
 
 <h2>Transactions</h2>
-<p class="text-body-secondary">Durations of the saved traces, by transaction (other than the /stats pages), most total time first.</p>
+<p class="text-body-secondary">Durations of the saved traces, by transaction (other than the /stats pages), most total time first, with each one's share of all the time traced.</p>
 
 <%# A flex row rather than .form-inline, which stacks its fields on phones: this one is short enough to fit %>
 <% form_tag '', method: 'get', class: 'submitOnChange d-flex flex-wrap align-items-center gap-2 mb-3' do %>
@@ -23,14 +23,14 @@
   <% max_total_ms = @summaries.first[:total_ms].to_f %>
   <% sections.each do |title, summaries| %>
     <% next if summaries.empty? %>
-    <%= partial :'stats/transactions_table', locals: { title: title, summaries: summaries, link: true, max_total_ms: max_total_ms } %>
+    <%= partial :'stats/transactions_table', locals: { title: title, summaries: summaries, link: true, max_total_ms: max_total_ms, all_total_ms: @all_total_ms } %>
   <% end %>
 <% end %>
 
 <%# Every search, whatever the filter: searches are a part of a request, and rarely slow enough to pass it.
-    Their time is already in the transactions', so their bars have a scale of their own %>
+    Their time is already in the transactions', so their shares and bars are of the time searching %>
 <% if @search_summaries.any? %>
-  <%= partial :'stats/transactions_table', locals: { title: 'Search', summaries: @search_summaries, link: false, max_total_ms: @search_summaries.first[:total_ms].to_f } %>
+  <%= partial :'stats/transactions_table', locals: { title: 'Search', summaries: @search_summaries, link: false, max_total_ms: @search_summaries.first[:total_ms].to_f, all_total_ms: @search_summaries.sum { |summary| summary[:total_ms] } } %>
 <% end %>
 
 <script>

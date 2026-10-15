@@ -171,6 +171,11 @@ tr.collapsed .span-tree-count .bi {
   width: 6rem;
 }
 
+/* Wider, so its bar has room to show the differences */
+.transactions-table th:last-child {
+  width: 12rem;
+}
+
 @media (max-width: 767.98px) {
   .transactions-table {
     table-layout: auto;
@@ -178,6 +183,10 @@ tr.collapsed .span-tree-count .bi {
 
   .transactions-table th:not(:first-child) {
     width: 4.5rem;
+  }
+
+  .transactions-table th:last-child {
+    width: 6rem;
   }
 
   /* Span trees step in less at each level */

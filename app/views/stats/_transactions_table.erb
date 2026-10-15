@@ -1,5 +1,6 @@
 <%# A table of durations: a section of transactions (linking to their traces), or of searches by pipeline.
-    Each Total has a bar, a fraction of max_total_ms, the most total time of any row on the page sharing its scale %>
+    Each Total is a share of all_total_ms, the time of every row it's one of (with the time itself in a tooltip),
+    and has a bar, a fraction of max_total_ms, the most total time of any row on the page sharing its scale %>
 <div class="table-responsive mt-4">
   <table class="transactions-table table table-hover">
     <thead>
@@ -38,8 +39,9 @@
             </td>
           <% end %>
           <td class="text-end"><%= summary[:count] %></td>
+          <% share = all_total_ms.positive? ? 100.0 * summary[:total_ms] / all_total_ms : 0 %>
           <td class="text-end text-nowrap" data-order="<%= summary[:total_ms] %>">
-            <%= format_duration(summary[:total_ms]) %>
+            <span data-bs-toggle="tooltip" title="<%= format_duration(summary[:total_ms]) %>"><% if share < 0.05 %>&lt;0.1<% elsif share < 10 %><%= share.round(1) %><% else %><%= share.round %><% end %>%</span>
             <div class="progress mt-1" role="presentation">
               <div class="progress-bar" style="width: <%= max_total_ms.positive? ? (100.0 * summary[:total_ms] / max_total_ms).round(2) : 0 %>%"></div>
             </div>

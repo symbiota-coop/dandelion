@@ -151,7 +151,10 @@ Dandelion::App.controller do
     @percentile = %w[p50 p99 p100].include?(params[:percentile]) ? params[:percentile] : 'p99'
     @min_s = params[:min_s] ? params[:min_s].to_f : 2
     # Leaving out the stats pages themselves
-    @summaries = Trace.summary.select { |summary| summary[:"#{@percentile}_ms"] > @min_s * 1000 && summary[:name] !~ %r{\A[A-Z]+ /stats(/|\z)} }
+    summaries = Trace.summary.reject { |summary| summary[:name] =~ %r{\A[A-Z]+ /stats(/|\z)} }
+    @summaries = summaries.select { |summary| summary[:"#{@percentile}_ms"] > @min_s * 1000 }
+    # Totals show as shares of all the time traced, whatever the filter (and of all the time searching, for searches)
+    @all_total_ms = summaries.sum { |summary| summary[:total_ms] }
     @search_summaries = Trace.search_summary
     erb :'stats/transactions'
   end
