@@ -73,7 +73,7 @@ class LintTest < Minitest::Test
         'refute has_css?(".x")' => 1, 'assert_equal false, page.has_sibling?("x")' => 1, 'assert_equal true, page.has_css?(".x")' => 0,
         'assert page.has_css?(".x")' => 0, 'refute page.has_no_css?(".x")' => 0, 'refute foo.valid?' => 0
       },
-      'Dandelion/MongoidWhere' => { "where('this.a < this.b')" => 0, 'where(a: 1)' => 1, 'x&.where(a: 1)' => 1 },
+      'Dandelion/MongoidWhere' => { "where('this.a < this.b')" => 1, 'where(a: 1)' => 1, 'x&.where(a: 1)' => 1 },
       'Dandelion/MongoidOr' => { 'x.or(a: 1)' => 1, 'a or b' => 0 },
       'Dandelion/ErrorReporting' => { 'Sentry.capture_message("x")' => 1, '::Sentry.capture_exception(e)' => 1, 'ErrorReporting.capture_exception(e)' => 0 },
       'Dandelion/ValidateBlock' => { 'validate :name_is_short' => 0, 'validate { errors.add(:name, "x") }' => 1 },

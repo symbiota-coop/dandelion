@@ -28,7 +28,7 @@ Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Rub
 - `Dandelion/MongoidOr`: Never use Mongoid `.or` — it ORs against whatever is already in the selector (`Event.live.or(featured: true)` means live or featured). Use `self.and('$or' => [...])` so the OR is just another AND-ed filter (`Event.live.and('$or' => [...])` means live and (this or that))
 - `Dandelion/MongoidIndex`: Mongo indexes are created directly in the database, not declared in models with Mongoid's `index`. It checks `models`
 - `Dandelion/MongoidScope`: Query filters are class methods that return `self.and(...)` so they chain (`Event.live.future`). Do not use `scope :live, -> { ... }`
-- `Dandelion/MongoidWhere`: Use `scope.and` rather than `scope.where` (a JavaScript `$where` string, `where('this.paid < this.requested_contribution')`, is the exception, as `.and` can't take one)
+- `Dandelion/MongoidWhere`: Use `scope.and` rather than `scope.where`. Mongoid rejects JavaScript `$where` strings (`where('this.paid < this.requested_contribution')`), so compare two fields with `$expr`: `memberships.and('$expr' => { '$lt' => ['$paid', '$requested_contribution'] })`
 - `Dandelion/BelongsTo`: Use `belongs_to_without_parent_validation`, not Mongoid `belongs_to` (its parent check fails when the parent is only in memory)
 - `Dandelion/HasManyThrough`: Use `has_many_through` for join collections, not `has_many :x, through:` (Mongoid has no `through`)
 - `Dandelion/ValidatesPresence`: Use `validates_presence_of`, not `validates :name, presence: true`
