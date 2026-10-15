@@ -101,9 +101,20 @@ class Trace
     "#{request.url}?#{filter_query(request.query_string)}"
   end
 
-  # A query string with the values of SECRET_QUERY_PARAMs replaced by [Filtered]
-  def self.filter_query(query_string)
-    query_string.split('&').map do |pair|
+  # A query string with the values of SECRET_QUERY_PARAMs replaced by [Filtered]. Sentry 7 gives the request's query as
+  # the parsed params (with its own sensitive keys already [Filtered]), and spans' http.query as a string
+  def self.filter_query(query)
+    if query.is_a?(Hash)
+      return query.map do |name, value|
+        if value == Sentry::DataCollection::KeyValueCollection::FILTERED_VALUE || name.to_s.match?(SECRET_QUERY_PARAM)
+          "#{CGI.escape(name.to_s)}=[Filtered]"
+        else
+          Rack::Utils.build_nested_query(name => value)
+        end
+      end.join('&')
+    end
+
+    query.split('&').map do |pair|
       name, value = pair.split('=', 2)
       value && CGI.unescape(name).match?(SECRET_QUERY_PARAM) ? "#{name}=[Filtered]" : pair
     end.join('&')
