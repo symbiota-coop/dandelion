@@ -100,6 +100,20 @@ class AccountsTest < ActiveSupport::TestCase
     end
   end
 
+  test 'generated usernames take the lowest free number when the name is taken' do
+    FactoryBot.create(:account, username: 'cool_sun')
+    FactoryBot.create(:account, username: 'cool_sun_1')
+    FactoryBot.create(:account, username: 'cool_sun_3')
+    FactoryBot.create(:account, username: 'cool_sunrise')
+    Haikunator.stub(:haikunate, 'cool-sun') do
+      assert_equal 'cool_sun_2', Account.generate_username
+      account = FactoryBot.create(:account)
+      assert_equal 'cool_sun_2', account.username
+      assert_equal 'cool_sun_4', Account.generate_username
+    end
+    Haikunator.stub(:haikunate, 'cool-moon') { assert_equal 'cool_moon', Account.generate_username }
+  end
+
   test 'sign in token does not replace an existing session' do
     victim = FactoryBot.create(:account)
     attacker = FactoryBot.create(:account)

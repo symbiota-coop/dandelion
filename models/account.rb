@@ -400,6 +400,19 @@ class Account
     Array.new(length) { chars[rand(chars.size)] }.join
   end
 
+  # A random adjective_noun, numbered (_1, _2...) when taken. There are only 64 × 64 of them, so most are taken
+  # several times over: one anchored prefix query (which uses the username index) gets every taken variant,
+  # rather than a query per number tried
+  def self.generate_username
+    base = Haikunator.haikunate(0).underscore
+    taken = Account.and(username: /\A#{Regexp.escape(base)}(_\d+)?\z/).pluck(:username).to_set
+    return base unless taken.include?(base)
+
+    n = 1
+    n += 1 while taken.include?("#{base}_#{n}")
+    "#{base}_#{n}"
+  end
+
   def self.check_organisation_cache_sync(fix: false)
     out_of_sync = []
 

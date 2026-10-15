@@ -12,16 +12,7 @@ module AccountValidation
     validates_http_url :website
 
     before_validation do
-      unless username
-        u = Haikunator.haikunate(0).underscore
-        if Account.find_by(username: u)
-          n = 1
-          n += 1 while Account.find_by(username: "#{u}_#{n}")
-          self.username = "#{u}_#{n}"
-        else
-          self.username = u
-        end
-      end
+      self.username = Account.generate_username unless username
 
       self.api_key = SecureRandom.uuid unless api_key.present?
       self.ics_key = SecureRandom.uuid unless ics_key.present?
