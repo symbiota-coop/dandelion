@@ -13,7 +13,7 @@
         </h1>
       </div>
     <% end %>
-    <% if (info_tags = partial(:'accounts/info_tags', locals: { account: account })).strip.length > 0 %>
+    <% if !defined?(modal) && (info_tags = partial(:'accounts/info_tags', locals: { account: account })).strip.length > 0 %>
       <div class="mb-2 d-flex flex-wrap gap-1 justify-content-center justify-content-lg-start">
         <%= info_tags %>
       </div>
