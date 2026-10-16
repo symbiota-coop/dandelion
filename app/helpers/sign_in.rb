@@ -2,8 +2,7 @@ Dandelion::App.helpers do
   # A link in an email, which works until it expires, for anyone the email reaches
   def sign_in_via_link_token
     token = link_token_param.to_s
-    # Accounts the rename from sign_in_token hasn't reached yet have it under the old name: drop this once it has run
-    account = Account.find_by(link_token: token) || Account.and(sign_in_token: token).first
+    account = Account.find_by(link_token: token)
 
     if account && !Account.link_token_expired?(token)
       sign_in_from_email(account)

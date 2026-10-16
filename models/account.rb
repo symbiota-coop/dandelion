@@ -119,8 +119,6 @@ class Account
 
   def generate_link_token!
     set(link_token: Account.generate_link_token)
-    # The old token from before the rename, which would otherwise still sign in: drop this once the rename has run
-    unset(:sign_in_token) if attributes.key?('sign_in_token')
   end
 
   def link_token_for_email

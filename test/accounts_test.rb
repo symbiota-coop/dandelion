@@ -679,24 +679,6 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal account.id.to_s, last_request.session[:account_id]
   end
 
-  test 'an account the rename has not reached yet still signs in with its link' do
-    account = FactoryBot.create(:account)
-    token = Account.generate_link_token
-    Account.collection.update_one({ _id: account.id }, { '$set' => { sign_in_token: token }, '$unset' => { link_token: 1 } })
-    clear_cookies
-    get '/', link_token: token
-    assert_equal account.id.to_s, last_request.session[:account_id]
-  end
-
-  test 'signing in with a link from before the rename ends the old token' do
-    account = FactoryBot.create(:account)
-    token = Account.generate_link_token
-    Account.collection.update_one({ _id: account.id }, { '$set' => { sign_in_token: token } })
-    clear_cookies
-    get '/', link_token: token
-    assert_nil Account.collection.find(_id: account.id).first['sign_in_token']
-  end
-
   test 'a session from an email link cannot change the email or password without a code' do
     account = FactoryBot.create(:account)
     crypted_password = account.crypted_password
