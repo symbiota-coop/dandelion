@@ -852,6 +852,25 @@ class AccountsTest < ActiveSupport::TestCase
     assert_nil other_browser.last_request.session[:account_id]
   end
 
+  test 'signing out of other browsers keeps this one and needs a code' do
+    account = FactoryBot.create(:account)
+    other_browser = Rack::Test::Session.new(app)
+    account.generate_link_token!
+    other_browser.get '/', link_token: account.link_token
+    other_browser.post '/accounts/sign_out_other_browsers'
+    assert_equal '/accounts/sign_in_code', URI(other_browser.last_response.location).path
+
+    sign_in_with_rack(account)
+    post '/accounts/sign_out_other_browsers'
+    follow_redirect!
+    assert_includes last_response.body, 'Your other browsers were signed out.'
+    get '/accounts/edit'
+    assert last_response.ok?
+    other_browser.get '/accounts/edit'
+    assert other_browser.last_response.redirect?
+    assert_nil other_browser.last_request.session[:account_id]
+  end
+
   test 'a session from before session tokens is kept until the account revokes its sessions' do
     account = FactoryBot.create(:account)
     clear_cookies

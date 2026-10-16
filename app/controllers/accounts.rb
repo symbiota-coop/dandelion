@@ -208,6 +208,16 @@ Dandelion::App.controller do
     erb :'accounts/password'
   end
 
+  # Asks for a code, as the password tab it's on does, so a session from a forwarded link can't sign out the account's owner
+  post '/accounts/sign_out_other_browsers' do
+    sign_in_required!
+    verification_required!(return_to: '/accounts/password', notice: "Your other browsers weren't signed out: enter the code below, then sign them out again.")
+    current_account.revoke_sessions!
+    start_session!(current_account)
+    flash[:notice] = 'Your other browsers were signed out.'
+    redirect '/accounts/password'
+  end
+
   # The API key signs in (sign_in_via_api_key) until the account revokes its sessions, so it's shown only to a session
   # that entered a sign in code, not one from a link in a forwarded email
   get '/accounts/api_key' do
