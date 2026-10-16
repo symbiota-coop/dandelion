@@ -208,6 +208,15 @@ Dandelion::App.controller do
     erb :'accounts/password'
   end
 
+  # The API key signs in (sign_in_via_api_key) until the account revokes its sessions, so it's shown only to a session
+  # that entered a sign in code, not one from a link in a forwarded email
+  get '/accounts/api_key' do
+    sign_in_required!
+    verification_required!(return_to: '/accounts/api_key', notice: 'To see your API key, enter the code below.')
+    @account = current_account
+    erb :'accounts/api_key'
+  end
+
   get '/accounts/delete' do
     sign_in_required!
     @account = current_account

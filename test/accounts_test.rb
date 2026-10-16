@@ -799,6 +799,25 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal 'A New Name', account.reload.name
   end
 
+  test 'the API key tab shows the key only after a sign in code' do
+    account = FactoryBot.create(:account)
+    account.set(email_confirmed: true)
+    account.generate_link_token!
+    clear_cookies
+    get '/accounts/edit', link_token: account.link_token
+    assert last_response.ok?
+    refute_includes last_response.body, account.api_key
+
+    get '/accounts/api_key'
+    assert_equal '/accounts/sign_in_code', URI(last_response.location).path
+    get '/', sign_in_code: account.issue_sign_in_code!
+    assert_equal '/accounts/api_key', URI(last_response.location).path
+    follow_redirect!
+    assert_includes last_response.body, account.api_key
+    get '/accounts/edit'
+    refute_includes last_response.body, account.api_key
+  end
+
   test 'changing the password signs out other sessions and ends the links already sent' do
     account = FactoryBot.create(:account)
     account.generate_link_token!
