@@ -34,7 +34,7 @@
                    "Lightness follows the hue, as each colour reads as itself only in a band: yellow only when light, red only when fairly dark. Hues stay clear of their neighbours: red short of both orange-red and pink, orange an amber at 72, set apart from yellow at 90 by lightness as well (their tints, which share a lightness, aren't, so warning badges take the 200), and lavender the default green turned to 300. Yellow's 500 is the lightest, so its 200 to 500 sit close together, set apart more by saturation than lightness."
                  ] do %>
     <div class="row g-2">
-      <% [['--color-red-500', 'Red', 'hue 25 · lightness .63'], ['--color-orange-500', 'Orange', 'hue 72 · lightness .79'], ['--color-yellow-500', 'Yellow', 'hue 90 · lightness .86'], ['--color-green-500', 'Green', 'the default theme · lightness .661'], ['--color-lavender-500', 'Lavender', 'hue 300 · lightness .661']].each do |var, title, note| %>
+      <% [['--color-red-500', 'Red', 'hue 25 · lightness .63'], ['--color-orange-500', 'Orange', 'hue 72 · lightness .79'], ['--color-yellow-500', 'Yellow', 'hue 90 · lightness .86'], ['--color-green-500', 'Green', 'hue 153 · lightness .661 · the default theme'], ['--color-lavender-500', 'Lavender', 'hue 300 · lightness .661']].each do |var, title, note| %>
         <%= partial :'design/swatch', locals: { vars: [var], title: title, note: note, col: 'col-4 col-md' } %>
       <% end %>
     </div>
