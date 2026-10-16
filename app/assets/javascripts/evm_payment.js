@@ -28,7 +28,7 @@ function runEvmPaymentFlow (config, data, options) {
 
   web3.eth.net.getId().then(thisNetworkId => {
     if (thisNetworkId != config.networkId) {
-      $('#pay-with-evm').find('.card-body p.web3wallet').html("<mark>Please switch your web3 wallet's network to " + config.networkName + '</mark>')
+      $('#pay-with-evm').find('.card-body p.web3wallet').empty().append($('<mark>').text("Please switch your web3 wallet's network to " + config.networkName))
       ethereum.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: '0x' + config.networkId.toString(16) }]

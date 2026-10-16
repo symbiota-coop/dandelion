@@ -89,7 +89,7 @@
     }
     var html = '<p class="doc-search-count">' + results.length + (results.length === 1 ? ' result' : ' results') + ' for &ldquo;' + escapeHtml(query) + '&rdquo;</p><ul class="doc-search-list">'
     results.forEach(function(result) {
-      html += '<li><a href="' + result.href + '" class="doc-search-result">'
+      html += '<li><a href="' + escapeHtml(result.href) + '" class="doc-search-result">'
       html += '<span class="doc-search-page">' + escapeHtml(result.pageName) + '</span>'
       html += '<span class="doc-search-heading">' + highlight(result.heading, terms) + '</span>'
       if (result.snippet) html += '<span class="doc-search-snippet">' + highlight(result.snippet, terms) + '</span>'

@@ -90,8 +90,9 @@
             $(function () {
 
               $('#pay-form button[data-payment-method]').click(function () {
+                const method = $(this).attr('data-payment-method')
                 $('input[type=hidden][name=payment_method]').attr('disabled', true)
-                $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').removeAttr('disabled')
+                  .filter(function () { return this.value === method }).removeAttr('disabled')
                 $(this).attr('data-payment-method-clicked', true)
               })
 

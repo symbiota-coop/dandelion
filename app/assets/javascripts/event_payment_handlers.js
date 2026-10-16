@@ -24,7 +24,7 @@ function eventPaymentHandlers (config) {
     },
 
     opencollective: function (data) {
-      window.location = 'https://opencollective.com/' + config.organisationOcSlug + '/events/' + config.ocSlug + '/donate?interval=oneTime&amount=' + data.value + '&tags=' + data.oc_secret + '&redirect=' + encodeURIComponent(config.eventUrl + '?success=true&order_id=' + data.order_id)
+      window.location = 'https://opencollective.com/' + encodeURIComponent(config.organisationOcSlug) + '/events/' + encodeURIComponent(config.ocSlug) + '/donate?interval=oneTime&amount=' + data.value + '&tags=' + data.oc_secret + '&redirect=' + encodeURIComponent(config.eventUrl + '?success=true&order_id=' + data.order_id)
     },
 
     evm: function (data) {

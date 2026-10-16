@@ -10,7 +10,7 @@ function gatheringPaymentHandlers (config) {
     evm: function (data) {
       runEvmPaymentFlow(config, data, {
         pollUrl: '/g/' + config.gatheringSlug + '/payments/' + data.payment_id,
-        onComplete: function () { window.location = '/g/' + config.gatheringSlug + '/options' }
+        onComplete: function () { window.location = '/g/' + encodeURIComponent(config.gatheringSlug) + '/options' }
       })
     }
   }

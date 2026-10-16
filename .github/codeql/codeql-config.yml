@@ -1,5 +1,4 @@
-query-filters:
-  - exclude:
-      id: js/xss-through-dom
-  - exclude:
-      id: rb/reflected-xss
+# Linter configs: their template-parsing regexes only run on our own files, so ReDoS findings there are noise
+paths-ignore:
+  - eslint.config.mjs
+  - stylelint.config.mjs

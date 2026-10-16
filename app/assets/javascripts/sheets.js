@@ -31,7 +31,7 @@ $(function () {
 
   // The event stats row as a list of its columns, since the table is far wider than a phone
   $(document).on('click', '[data-stats-sheet]', function () {
-    const $table = $($(this).attr('data-stats-sheet'))
+    const $table = $(document).find($(this).attr('data-stats-sheet'))
     const $cells = $table.find('tbody tr').first().children()
     const $list = $('<div class="list-group list-group-flush"></div>')
     $table.find('thead tr').first().children().each(function (i) {

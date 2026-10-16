@@ -201,9 +201,9 @@ $(function () {
     const $paid = $('#details form button[data-payment-method]').not($rsvp)
     const $firstPaidButton = $('#details form button[data-payment-method]').eq(1)
     const cardMethods = config.cardMethods || []
-    const $card = $(cardMethods.map(function (name) {
-      return '#details form button[data-payment-method=' + name + ']'
-    }).join(', '))
+    const $card = $('#details form button[data-payment-method]').filter(function () {
+      return cardMethods.includes($(this).attr('data-payment-method'))
+    })
 
     if (p == 0) {
       $rsvp.show()
@@ -219,8 +219,9 @@ $(function () {
       $card.find('span').text('Pay ' + config.currencySymbol + (+b).toFixed(2) + ' via card')
     }
 
+    const method = $('#details form button[data-payment-method]:visible').first().attr('data-payment-method')
     $('input[type=hidden][name=payment_method]').prop('disabled', true)
-    $('input[type=hidden][name=payment_method][value=' + $('#details form button[data-payment-method]:visible').first().attr('data-payment-method') + ']').prop('disabled', false)
+      .filter(function () { return this.value === method }).prop('disabled', false)
   }
   $('select[name^=quantities], #donation_amount').change(function () {
     setTotal()
@@ -330,8 +331,9 @@ $(function () {
   })
 
   $('#details form button[data-payment-method]').click(function () {
+    const method = $(this).attr('data-payment-method')
     $('input[type=hidden][name=payment_method]').prop('disabled', true)
-    $('input[type=hidden][name=payment_method][value=' + $(this).attr('data-payment-method') + ']').prop('disabled', false)
+      .filter(function () { return this.value === method }).prop('disabled', false)
     $(this).attr('data-payment-method-clicked', true)
   })
 
