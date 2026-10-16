@@ -37,7 +37,6 @@
   <%== pay_config.to_json %>
 </script>
 <% if @gathering.evm_address && @gathering.chain %>
-  <%= cdn_tag 'https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js' %>
   <script src="<%= cachebust('/javascripts/evm_payment.js') %>"></script>
 <% end %>
 <script src="<%= cachebust('/javascripts/gathering_payment_handlers.js') %>"></script>

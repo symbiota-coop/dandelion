@@ -9,7 +9,7 @@ class EventPaymentMethod
       {
         evm_secret: order.evm_secret,
         value: order.evm_value,
-        wei: (order.evm_value * 1e18.to_d).to_i,
+        wei: (order.evm_value * 1e18.to_d).to_i.to_s, # a string, as JavaScript numbers lose precision past 2^53
         order_id: order.public_id,
         order_expiry: (order.created_at + 1.hour).to_datetime.strftime('%Q')
       }.to_json

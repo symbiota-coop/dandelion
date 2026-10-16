@@ -41,6 +41,5 @@ FRONTEND_INTEGRITY = {
   'https://cdn.jsdelivr.net/npm/slick-carousel@2.0.0/slick/slick-theme.css' => 'sha384-sarvIWMdXatSaCji8NoZV9/K9SjIJLD49ozI9LEHcYGruDEAHkz3SCDraA+2uo0n',
   'https://cdn.jsdelivr.net/npm/slick-carousel@2.0.0/slick/slick.css' => 'sha384-Keftlm78u7xfBHejsLrhEiv7eZVnyYvQKvr6zUulFtgxW8JtrwrAo8hn/O3Yp+gB',
   'https://cdn.jsdelivr.net/npm/slick-carousel@2.0.0/slick/slick.min.js' => 'sha384-5MfYQxWDQgt6TThAM9tk3dZqJNosm/eVLxtQLosoyTz8eFus3yIUO7luxPHqSqpU',
-  'https://cdn.jsdelivr.net/npm/typed.js@3.0.0/dist/typed.umd.js' => 'sha384-swMjK7d9Y7Vvk7zPwkxWg3wYlRv+PrA3G4V/FyBzjhwNfGKlWHTWJUmnmU8FgBMp',
-  'https://cdn.jsdelivr.net/npm/web3@1.10.4/dist/web3.min.js' => 'sha384-ulu2XS1P+kSni6pddyZyDGmNiztg1R9ziuOn0U+RtEoVB46ekZ9MLOzruBMtXjQQ'
+  'https://cdn.jsdelivr.net/npm/typed.js@3.0.0/dist/typed.umd.js' => 'sha384-swMjK7d9Y7Vvk7zPwkxWg3wYlRv+PrA3G4V/FyBzjhwNfGKlWHTWJUmnmU8FgBMp'
 }.freeze
