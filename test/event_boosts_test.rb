@@ -4,33 +4,6 @@ require 'ostruct'
 class EventBoostsTest < ActiveSupport::TestCase
   include Capybara::DSL
 
-  test 'event admin can view boosts page and pending boost shows checkout ids' do
-    create_event(prices: [0])
-
-    sign_in(@account)
-    visit "/events/#{@event.id}/boosts"
-
-    assert page.has_content?('Boost this event')
-
-    start_time = (Time.zone.now.beginning_of_hour + 2.hours).strftime('%Y-%m-%d %H:%M')
-    execute_script %(document.getElementById('event_boost_start_time').value = #{start_time.to_json})
-    fill_in 'event_boost_hours', with: 2
-    fill_in 'event_boost_hourly_amount', with: 12
-
-    stripe_session = OpenStruct.new(id: 'cs_test_boost', payment_intent: 'pi_test_boost')
-    Stripe::Checkout::Session.stub :create, stripe_session do
-      page.execute_script(<<~JS)
-        window.Stripe = function() { return { redirectToCheckout: function() { return Promise.resolve(); } }; };
-      JS
-      click_button 'Buy boost'
-    end
-
-    event_boost = @event.event_boosts.order('created_at desc').first
-    assert_equal 'cs_test_boost', event_boost.session_id
-    assert_equal 'pi_test_boost', event_boost.payment_intent
-    refute event_boost.payment_completed?
-  end
-
   test 'boost payment can be marked complete' do
     create_event(prices: [0])
 
@@ -51,6 +24,8 @@ class EventBoostsTest < ActiveSupport::TestCase
     end
 
     event_boost = @event.event_boosts.order('created_at desc').first
+    assert_equal 'cs_complete_me', event_boost.session_id
+    assert_equal 'pi_test', event_boost.payment_intent
     refute event_boost.payment_completed?
     event_boost.set(payment_completed: true)
 

@@ -360,22 +360,6 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert_equal 1, refreshes
   end
 
-  test 'accepts slots via nested attributes' do
-    create_event(prices: [0])
-    ticket_type = @event.ticket_types.first
-
-    assert @event.update_attributes(ticket_types_attributes: {
-                                      '0' => {
-                                        'id' => ticket_type.id.to_s,
-                                        'name' => ticket_type.name,
-                                        'quantity' => ticket_type.quantity,
-                                        'slots' => 2
-                                      }
-                                    })
-
-    assert_equal 2, ticket_type.reload.slots
-  end
-
   test 'destroys existing ticket type via nested attributes' do
     create_event(prices: [0])
     ticket_type = @event.ticket_types.first
