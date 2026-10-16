@@ -1,4 +1,4 @@
-FROM ruby:3.4.7-bookworm
+FROM ruby:4.0.7-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive \
     BUNDLE_PATH=/usr/local/bundle \
