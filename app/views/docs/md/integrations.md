@@ -1,4 +1,4 @@
-Dandelion can connect to other apps via [Zapier](https://zapier.com/apps/dandelion/) and to AI assistants via the [Model Context Protocol](https://modelcontextprotocol.io/docs/2026-07-28/getting-started/intro) (MCP). Both use the same API key, from the [API key tab](/accounts/api_key) of your account settings, which shows it once you've entered a sign in code we email you.
+Dandelion can connect to other apps via [Zapier](https://zapier.com/apps/dandelion/) and to AI assistants via the [Model Context Protocol](https://modelcontextprotocol.io/docs/2026-07-28/getting-started/intro) (MCP). Both use the same API key, from the [API keys tab](/accounts/api_key) of your account settings, which shows it once you've entered a sign in code we email you.
 
 All access is read-only. Email addresses are included only when you are allowed to view them.
 

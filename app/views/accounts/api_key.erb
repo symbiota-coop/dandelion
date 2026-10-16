@@ -1,12 +1,16 @@
 <%= partial :'accounts/nav' %>
 <div class="container">
-  <p>Your API key connects Dandelion to <a href="/docs/integrations">Zapier and AI assistants</a>. Anyone with it can act as you, so keep it secret.</p>
-  <div class="mb-3">
-    <label class="form-label" for="api_key">API key</label>
-    <input type="text" id="api_key" class="form-control" value="<%= @account.api_key %>" readonly onclick="this.select()">
-  </div>
-  <p>If someone else might have it, replace it. Anything using the old one stops working until you give it the new one.</p>
+  <h2 class="h5"><label for="api_key">API key</label></h2>
+  <p>Your API key connects Dandelion to <a href="/docs/integrations">Zapier and AI assistants</a>. Anyone with it can act as you, so keep it secret. If someone else might have it, replace it: anything using the old one stops working until you give it the new one.</p>
+  <input type="text" id="api_key" class="form-control mb-3" value="<%= @account.api_key %>" readonly onclick="this.select()">
   <% form_tag '/accounts/api_key' do %>
     <button type="submit" class="btn btn-outline-primary" data-confirm="Replace your API key? Anything using the old one stops working." data-confirm-label="Replace API key">Replace API key</button>
+  <% end %>
+
+  <h2 class="h5 mt-5"><label for="ics_key">Calendar key</label></h2>
+  <p>Your calendar key is in the links to your calendar feeds, like <a href="/events/my">your events</a> and <a href="/birthdays">birthdays</a>, so calendar apps can show them. Anyone with it can see those feeds. If someone else might have it, replace it: calendars subscribed to your feeds need subscribing to again.</p>
+  <input type="text" id="ics_key" class="form-control mb-3" value="<%= @account.ensure_ics_key! %>" readonly onclick="this.select()">
+  <% form_tag '/accounts/ics_key' do %>
+    <button type="submit" class="btn btn-outline-primary" data-confirm="Replace your calendar key? Calendars subscribed to your feeds need subscribing to again." data-confirm-label="Replace calendar key">Replace calendar key</button>
   <% end %>
 </div>

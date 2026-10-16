@@ -89,7 +89,7 @@ Dandelion::App.helpers do
     removed_providers = account.confirm_email!(same_browser: same_browser)
     return if same_browser
 
-    notice = 'Your email address was confirmed. It was confirmed in a different browser from the one that set this account up, so we signed out other browsers and replaced its password and API key'
+    notice = 'Your email address was confirmed. It was confirmed in a different browser from the one that set this account up, so we signed out other browsers and replaced its password, API key and calendar key'
     if removed_providers.any?
       them = removed_providers.one? ? 'it' : 'them'
       notice += ". #{removed_providers.to_sentence} had been connected to this account before its email address was confirmed, so we disconnected #{them}. If that was you, connect #{them} again from your account settings"

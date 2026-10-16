@@ -218,11 +218,12 @@ Dandelion::App.controller do
     redirect '/accounts/password'
   end
 
-  # The API key signs in (sign_in_via_api_key) until the account revokes its sessions, so it's shown only to a session
-  # that entered a sign in code, not one from a link in a forwarded email
+  # The API key signs in to the API and MCP (sign_in_via_api_key), and the calendar key to the account's calendar feeds
+  # (sign_in_via_ics_key), until they're replaced, so they're shown only to a session that entered a sign in code, not one
+  # from a link in a forwarded email
   get '/accounts/api_key' do
     sign_in_required!
-    verification_required!(return_to: '/accounts/api_key', notice: 'To see your API key, enter the code below.')
+    verification_required!(return_to: '/accounts/api_key', notice: 'To see your API and calendar keys, enter the code below.')
     @account = current_account
     erb :'accounts/api_key'
   end
@@ -232,6 +233,14 @@ Dandelion::App.controller do
     verification_required!(return_to: '/accounts/api_key', notice: "Your API key wasn't replaced: enter the code below, then replace it again.")
     current_account.replace_api_key!
     flash[:notice] = 'Your API key was replaced. Anything using the old one, like Zapier or an AI assistant, needs the new one.'
+    redirect '/accounts/api_key'
+  end
+
+  post '/accounts/ics_key' do
+    sign_in_required!
+    verification_required!(return_to: '/accounts/api_key', notice: "Your calendar key wasn't replaced: enter the code below, then replace it again.")
+    current_account.replace_ics_key!
+    flash[:notice] = 'Your calendar key was replaced. Calendars subscribed to your feeds need subscribing to again.'
     redirect '/accounts/api_key'
   end
 

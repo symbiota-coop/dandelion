@@ -816,17 +816,32 @@ class AccountsTest < ActiveSupport::TestCase
     refute_includes last_response.body, account.api_key
   end
 
-  test 'the API key tab replaces the key' do
+  test 'the API key tab replaces the API key and the calendar key separately' do
     account = FactoryBot.create(:account)
     api_key = account.api_key
+    ics_key = account.ensure_ics_key!
     sign_in_with_rack(account)
+    get '/accounts/api_key'
+    assert_includes last_response.body, ics_key
 
     post '/accounts/api_key'
     follow_redirect!
     assert_includes last_response.body, 'Your API key was replaced'
-    refute_equal api_key, account.reload.api_key
+    account.reload
+    refute_equal api_key, account.api_key
     assert_nil Account.find_by(api_key: api_key)
+    assert_equal ics_key, account.ics_key
     assert_includes last_response.body, account.api_key
+
+    api_key = account.api_key
+    post '/accounts/ics_key'
+    follow_redirect!
+    assert_includes last_response.body, 'Your calendar key was replaced'
+    account.reload
+    refute_equal ics_key, account.ics_key
+    assert_nil Account.find_by(ics_key: ics_key)
+    assert_equal api_key, account.api_key
+    assert_includes last_response.body, account.ics_key
   end
 
   test 'changing the password signs out other sessions and ends the links already sent' do
@@ -956,7 +971,7 @@ class AccountsTest < ActiveSupport::TestCase
     assert_empty account.provider_links
     refute_equal crypted_password, account.crypted_password
     refute_equal api_key, account.api_key
-    assert_nil account.ics_key
+    refute_equal ics_key, account.ics_key
     assert_nil Account.find_by(ics_key: ics_key)
 
     get '/accounts/edit'

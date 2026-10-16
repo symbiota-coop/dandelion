@@ -182,8 +182,8 @@ class Account
   end
 
   # Signs out every browser, and ends the links and code already sent, which would otherwise sign one back in. It leaves the
-  # API key and calendar feed key, which integrations and calendar apps hold: only a session that entered a code sees the
-  # API key (/accounts/api_key), and its owner can replace it there
+  # API key and calendar feed key, which integrations and calendar apps hold: only a session that entered a code sees
+  # them (/accounts/api_key), and its owner can replace them there
   def revoke_sessions!
     set(session_token: SecureRandom.uuid, legacy_sessions_revoked: true)
     generate_link_token!
@@ -194,9 +194,13 @@ class Account
     set(api_key: SecureRandom.uuid)
   end
 
+  def replace_ics_key!
+    set(ics_key: SecureRandom.uuid)
+  end
+
   # Someone has shown they get this address's email. Whoever set the account up may not have been them, so unless they
-  # did it in this browser, other sessions end, the password, API key and calendar feed key are replaced (a new ics_key is
-  # made when next needed) and providers connected before now are removed. Returns the removed providers
+  # did it in this browser, other sessions end, the password, API key and calendar feed key are replaced and providers
+  # connected before now are removed. Returns the removed providers
   def confirm_email!(same_browser:)
     set(email_confirmed: true)
     # Links from before before_email_confirmed have no value for it, and could have been connected by anyone
@@ -207,7 +211,7 @@ class Account
     else
       revoke_sessions!
       replace_api_key!
-      unset(:ics_key)
+      replace_ics_key!
       set(crypted_password: ::BCrypt::Password.create(Account.generate_password, cost: ::BCrypt::Engine::MIN_COST)) # nobody is given it
       unconfirmed_links.pluck(:provider).tap { unconfirmed_links.destroy_all }
     end
