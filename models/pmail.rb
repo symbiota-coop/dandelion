@@ -248,8 +248,9 @@ class Pmail
     end
   end
 
+  # The pmail's scheduled send_pmail job, not its other jobs (send_signal_messages)
   def delayed_jobs
-    Delayed::Job.and(handler: %r{object: !ruby/Mongoid:Pmail}).and(handler: /#{Regexp.escape(Base64.encode64(id.to_bson.to_s))}/)
+    Delayed::Job.and(handler: %r{object: !ruby/Mongoid:Pmail}).and(handler: /^method_name: :send_pmail$/).and(handler: /#{Regexp.escape(Base64.encode64(id.to_bson.to_s))}/)
   end
 
   def delayed_job
@@ -361,7 +362,10 @@ class Pmail
     result = batch_message.finalize if Padrino.env == :production
 
     # In a job of its own, so a slow Signal API doesn't hold up the request (Send test) or the mail
-    send_signal_messages(accounts.and(:phone.ne => nil).pluck(:id)) if is_event_pmail && signal_configured?
+    if is_event_pmail && signal_configured?
+      account_ids = accounts.and(:phone.ne => nil).pluck(:id)
+      send_signal_messages(account_ids) if account_ids.any?
+    end
 
     result
   end
