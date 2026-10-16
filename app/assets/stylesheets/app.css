@@ -2697,6 +2697,16 @@ ul.map-event li {
   font-size: var(--font-size-base) !important
 }
 
+/* Google sets InfoWindow text at weight 300 (in a stylesheet it adds after ours), so our content takes the body's weight back */
+.infowindow {
+  font-weight: var(--bs-body-font-weight);
+}
+
+/* The title line is smaller in an InfoWindow (fs-4), so body-size badges would be nearly heading-sized: they match the tags below */
+.infowindow .event-title-line .badge {
+  font-size: var(--font-size-xs);
+}
+
 /* stylelint-disable declaration-property-unit-disallowed-list -- Google Maps draws in pixels, so these overrides, the markers and the clusters stay in px to line up with it */
 #map-canvas button[title=Close] {
   height: 36px !important;
