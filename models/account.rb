@@ -155,6 +155,22 @@ class Account
            .update_all('$unset' => { sign_in_code_digest: true, sign_in_code_expires_at: true }).modified_count == 1
   end
 
+  # Each session carries the token it was started with (start_session!), so changing it signs out every browser
+  def session_token!
+    return session_token if session_token
+
+    # Only if still unset, so two requests at once can't each set one and leave the other's session holding a stale token
+    Account.and(id: id, session_token: nil).update_all(session_token: SecureRandom.uuid)
+    attributes['session_token'] = Account.and(id: id).pluck(:session_token).first # already saved, so not a pending change
+  end
+
+  # Signs out every browser, and ends the links and code already sent, which would otherwise sign one back in
+  def revoke_sessions!
+    set(session_token: SecureRandom.uuid, legacy_sessions_revoked: true)
+    generate_link_token!
+    unset(:sign_in_code_digest, :sign_in_code_expires_at)
+  end
+
   def link_token_expired?
     Account.link_token_expired?(link_token)
   end

@@ -27,10 +27,10 @@ Dandelion::App.helpers do
   end
 
   def sign_in_from_email(account, sign_in_code: nil)
-    # Block switching only when the session id still belongs to a different
-    # live account. Look up from the DB so a memoized or deleted current_account
-    # cannot hide a stale cookie.
-    return if session[:account_id].present? && session[:account_id] != account.id.to_s && Account.find(session[:account_id])
+    # Block switching only when the session still belongs to a different live account. Look it up afresh
+    # (not the memoized current_account) so a deleted account or a revoked session can't block it
+    session_owner = session_account
+    return if session_owner && session_owner != account
 
     kick! notice: "That sign in code isn't valid any longer. Please request a new one." if sign_in_code && !account.redeem_sign_in_code!(sign_in_code)
 
@@ -55,8 +55,30 @@ Dandelion::App.helpers do
   def start_session!(account, verified: false)
     session.delete(:verified_at) unless verified || session[:account_id] == account.id.to_s
     session[:account_id] = account.id.to_s
+    session[:session_token] = account.session_token!
     session[:verified_at] = Time.now.to_i if verified
     @current_account = account
+  end
+
+  # The session's account, while the session carries the account's session_token (revoke_sessions! changes it).
+  # Sessions from before session tokens are given one, unless the account has since revoked its sessions
+  def session_account
+    return unless session[:account_id]
+
+    account = Account.find(session[:account_id])
+    if account && session[:session_token]
+      return account if account.session_token && ActiveSupport::SecurityUtils.secure_compare(session[:session_token].to_s, account.session_token)
+    elsif account && !account.legacy_sessions_revoked?
+      token = account.session_token!
+      # A revocation since the account was read sets a new token and legacy_sessions_revoked together: don't adopt that token
+      unless Account.and(id: account.id, legacy_sessions_revoked: true).exists?
+        session[:session_token] = token
+        return account
+      end
+    end
+
+    %i[account_id session_token verified_at].each { |k| session.delete(k) }
+    nil
   end
 
   # Within the last hour, this session signed in with a sign in code sent to the account's email

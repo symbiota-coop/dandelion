@@ -21,6 +21,7 @@ module AccountFields
     field :link_token, type: String # the token in the links of every email; was sign_in_token
     field :sign_in_code_digest, type: String
     field :sign_in_code_expires_at, type: Time
+    field :session_token, type: String
     field :api_key, type: String
     field :ics_key, type: String
     field :last_active, type: Time
@@ -47,7 +48,7 @@ module AccountFields
     field :sent_first_event_email, type: Time
     field :event_feedbacks_as_facilitator_count, type: Integer
     field :event_tag_names, type: Array
-    %w[email_confirmed updated_profile admin unsubscribed unsubscribed_messages unsubscribed_feedback unsubscribed_reminders block_reply_by_email hidden seen_intro_tour can_reset_passwords has_signed_in].each do |b|
+    %w[email_confirmed updated_profile admin unsubscribed unsubscribed_messages unsubscribed_feedback unsubscribed_reminders block_reply_by_email hidden seen_intro_tour can_reset_passwords has_signed_in legacy_sessions_revoked].each do |b|
       field b.to_sym, type: Mongoid::Boolean
     end
 

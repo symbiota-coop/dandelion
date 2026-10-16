@@ -195,6 +195,10 @@ Dandelion::App.controller do
       @account.password = password
     end
     if account_params.is_a?(Hash) && @account.update_attributes(mass_assigning(account_params, Account))
+      if changing_credentials
+        @account.revoke_sessions!
+        start_session!(@account)
+      end
       flash[:notice] = '<strong>Awesome!</strong> Your account was updated successfully.'
       @account.notifications_as_notifiable.and(type: 'updated_profile').destroy_all
       @account.notifications_as_notifiable.create! circle: @account, type: 'updated_profile'
@@ -276,6 +280,7 @@ Dandelion::App.controller do
     @account.password = Account.generate_password
     @account.failed_sign_in_attempts = nil
     @account.save!
+    @account.revoke_sessions!
     { password: @account.password }.to_json
   end
 

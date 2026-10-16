@@ -721,6 +721,62 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal 'A New Name', account.reload.name
   end
 
+  test 'changing the password signs out other sessions and ends the links already sent' do
+    account = FactoryBot.create(:account)
+    account.generate_link_token!
+    link = account.link_token
+    other_browser = Rack::Test::Session.new(app)
+    other_browser.get '/', link_token: link
+    other_browser.get '/accounts/edit'
+    assert other_browser.last_response.ok?
+    link = account.reload.link_token # signing in made a new one
+
+    sign_in_with_rack(account)
+    post '/accounts/edit', account: { name: account.name, password: 'a-new-password' }
+    assert account.reload.password_matches?('a-new-password')
+    get '/accounts/edit'
+    assert last_response.ok?
+
+    other_browser.get '/accounts/edit'
+    assert other_browser.last_response.redirect?
+    assert_nil other_browser.last_request.session[:account_id]
+    other_browser.get '/', link_token: link
+    assert_nil other_browser.last_request.session[:account_id]
+  end
+
+  test 'a session from before session tokens is kept until the account revokes its sessions' do
+    account = FactoryBot.create(:account)
+    clear_cookies
+    env 'rack.session', { 'account_id' => account.id.to_s }
+    get '/accounts/edit'
+    assert last_response.ok?
+    assert_equal account.reload.session_token, last_request.session[:session_token]
+
+    account.revoke_sessions!
+    clear_cookies
+    env 'rack.session', { 'account_id' => account.id.to_s }
+    get '/accounts/edit'
+    assert last_response.redirect?
+    assert_nil last_request.session[:account_id]
+  end
+
+  test 'a session from before session tokens is not given the token of a revocation at the same moment' do
+    account = FactoryBot.create(:account)
+    clear_cookies
+    env 'rack.session', { 'account_id' => account.id.to_s }
+    original = Account.instance_method(:session_token!)
+    # The revocation lands after the request has read the account, before it gives the session a token
+    Account.define_method(:session_token!) do
+      Account.find(id).revoke_sessions!
+      original.bind_call(self)
+    end
+    get '/accounts/edit'
+    assert last_response.redirect?
+    assert_nil last_request.session[:account_id]
+  ensure
+    Account.define_method(:session_token!, original)
+  end
+
   test 'the notification settings form cannot change the email' do
     account = FactoryBot.create(:account)
     account.generate_link_token!
