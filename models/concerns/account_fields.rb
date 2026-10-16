@@ -20,6 +20,7 @@ module AccountFields
     field :sign_ins_count, type: Integer
     field :link_token, type: String # the token in the links of every email; was sign_in_token
     field :sign_in_code_digest, type: String
+    field :sign_in_code_nonce, type: String
     field :sign_in_code_expires_at, type: Time
     field :session_token, type: String
     field :api_key, type: String

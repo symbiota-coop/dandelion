@@ -685,6 +685,42 @@ class AccountsTest < ActiveSupport::TestCase
     assert_includes last_response.body, "That sign in code isn't valid any longer"
   end
 
+  test 'asking for a sign in code again resends the code already sent' do
+    account = FactoryBot.create(:account)
+    code = account.issue_sign_in_code!
+
+    clear_cookies
+    post '/accounts/sign_in_code', email: account.email
+    assert_equal code, account.reload.issue_sign_in_code!
+    get '/', sign_in_code: code
+    assert_equal account.id.to_s, last_request.session[:account_id]
+  end
+
+  test 'asking for a sign in code gives a new one once the last has little time left or was used' do
+    account = FactoryBot.create(:account)
+    code = account.issue_sign_in_code!
+    account.set(sign_in_code_expires_at: 10.minutes.from_now)
+    new_code = account.issue_sign_in_code!
+    refute_equal code, new_code
+    assert_nil Account.with_sign_in_code(code)
+
+    assert account.redeem_sign_in_code!(new_code)
+    refute_equal new_code, account.reload.issue_sign_in_code!
+  end
+
+  test 'revoking sessions ends the API key and calendar feed key' do
+    account = FactoryBot.create(:account)
+    api_key = account.api_key
+    ics_key = account.ensure_ics_key!
+
+    account.revoke_sessions!
+    account.reload
+    refute_equal api_key, account.api_key
+    assert_nil Account.find_by(api_key: api_key)
+    assert_nil account.ics_key
+    refute_equal ics_key, account.ensure_ics_key!
+  end
+
   test 'links with the old sign_in_token param still sign in' do
     account = FactoryBot.create(:account)
     account.generate_link_token!
@@ -705,6 +741,25 @@ class AccountsTest < ActiveSupport::TestCase
     account.reload
     refute_equal 'taken-over@example.com', account.email
     assert_equal crypted_password, account.crypted_password
+  end
+
+  test 'changing the email sends a confirmation email whose link still works' do
+    account = FactoryBot.create(:account)
+    sign_in_with_rack(account)
+    sent_tokens = []
+    original = Account.instance_method(:send_confirmation_email)
+    Account.define_method(:send_confirmation_email) { sent_tokens << link_token_for_email }
+
+    post '/accounts/edit', account: { name: account.name, email: 'new-address@example.com' }
+    assert_equal 'new-address@example.com', account.reload.email
+    refute account.email_confirmed?
+    assert_equal [account.link_token], sent_tokens
+
+    get "/confirm_email/#{sent_tokens.first}"
+    assert last_response.ok?
+    assert_includes last_response.body, 'Confirm my email address'
+  ensure
+    Account.define_method(:send_confirmation_email, original)
   end
 
   test 'a session from an email link can still edit the rest of the profile' do

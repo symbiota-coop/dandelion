@@ -215,7 +215,8 @@ Dandelion::App.controller do
       password = account_params.delete('password')
       # A browser can fill in the saved password, which changes nothing
       password = nil if password && @account.crypted_password && @account.password_matches?(password)
-      changing_credentials = password || (account_params['email'] && account_params['email'].downcase.strip != @account.email)
+      changing_email = account_params['email'] && account_params['email'].downcase.strip != @account.email
+      changing_credentials = password || changing_email
       verification_required!(return_to: '/accounts/edit', notice: "Your changes weren't saved: to change your email or password, enter the code below, then make the change again.") if changing_credentials
       @account.password = password
     end
@@ -224,7 +225,11 @@ Dandelion::App.controller do
         @account.revoke_sessions!
         start_session!(@account)
       end
-      flash[:notice] = '<strong>Awesome!</strong> Your account was updated successfully.'
+      # After revoke_sessions!, which ends the link token the email carries
+      @account.send_confirmation_email if changing_email
+      notice = '<strong>Awesome!</strong> Your account was updated successfully.'
+      notice += ' Please click the link in the email we sent to confirm your new email address.' if changing_email
+      flash[:notice] = notice
       @account.notifications_as_notifiable.and(type: 'updated_profile').destroy_all
       @account.notifications_as_notifiable.create! circle: @account, type: 'updated_profile'
       redirect(if params[:slug]

@@ -131,10 +131,29 @@ class Account
   # A sign in code is emailed only when someone asks for one, unlike link_token, which is in the links of every email,
   # so signing in with one shows they get this address's email now (recently_verified?). It lasts an hour and works once,
   # and only its digest is stored. Indexes: sign_in_code_digest_1_unique and sign_in_code_digest_1
+  SIGN_IN_CODE_LIFETIME = 1.hour
+  # Anyone can ask for an account's code, so asking again resends the code already sent rather than ending it, until it has
+  # this long left. The code is made from sign_in_code_nonce and TokenVerifier's secret, so the database alone can't give it
+  SIGN_IN_CODE_REUSABLE_FOR = 15.minutes
+
   def issue_sign_in_code!
-    code = SecureRandom.alphanumeric(20)
-    set(sign_in_code_digest: Account.sign_in_code_digest(code), sign_in_code_expires_at: 1.hour.from_now)
+    if sign_in_code_nonce && sign_in_code_expires_at && sign_in_code_expires_at > SIGN_IN_CODE_REUSABLE_FOR.from_now
+      code = Account.sign_in_code_from_nonce(sign_in_code_nonce)
+      # Unless the secret has changed since
+      return code if code && Account.sign_in_code_digest(code) == sign_in_code_digest
+    end
+
+    nonce = SecureRandom.hex(16)
+    code = Account.sign_in_code_from_nonce(nonce) || SecureRandom.alphanumeric(20)
+    set(sign_in_code_digest: Account.sign_in_code_digest(code), sign_in_code_nonce: nonce, sign_in_code_expires_at: SIGN_IN_CODE_LIFETIME.from_now)
     code
+  end
+
+  # 20 base 36 characters, or nil without the secret, when each code is random and asking again ends the last one
+  def self.sign_in_code_from_nonce(nonce)
+    return unless (secret = TokenVerifier.secret)
+
+    OpenSSL::HMAC.hexdigest('SHA256', secret, "sign_in_code:#{nonce}").to_i(16).to_s(36)[0, 20]
   end
 
   def self.sign_in_code_digest(code)
@@ -150,7 +169,7 @@ class Account
   # False if another request used the code first
   def redeem_sign_in_code!(code)
     Account.and(id: id, sign_in_code_digest: Account.sign_in_code_digest(code))
-           .update_all('$unset' => { sign_in_code_digest: true, sign_in_code_expires_at: true }).modified_count == 1
+           .update_all('$unset' => { sign_in_code_digest: true, sign_in_code_nonce: true, sign_in_code_expires_at: true }).modified_count == 1
   end
 
   # Each session carries the token it was started with (start_session!), so changing it signs out every browser
@@ -162,11 +181,12 @@ class Account
     attributes['session_token'] = Account.and(id: id).pluck(:session_token).first # already saved, so not a pending change
   end
 
-  # Signs out every browser, and ends the links and code already sent, which would otherwise sign one back in
+  # Signs out every browser, and ends the links and code already sent, which would otherwise sign one back in, and the
+  # API key and calendar feed key, which sign in too (sign_in_via_api_key, the ics feeds). A new ics_key is made when next needed
   def revoke_sessions!
-    set(session_token: SecureRandom.uuid, legacy_sessions_revoked: true)
+    set(session_token: SecureRandom.uuid, legacy_sessions_revoked: true, api_key: SecureRandom.uuid)
     generate_link_token!
-    unset(:sign_in_code_digest, :sign_in_code_expires_at)
+    unset(:sign_in_code_digest, :sign_in_code_nonce, :sign_in_code_expires_at, :ics_key)
   end
 
   # Someone has shown they get this address's email. Whoever set the account up may not have been them, so unless they
