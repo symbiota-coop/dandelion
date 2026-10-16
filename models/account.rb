@@ -228,7 +228,6 @@ class Account
                 end
     return true if timestamp.zero?
 
-    # Check if token is older than 24 hours
     (Time.now.to_i - timestamp) > 24.hours.to_i
   end
 
@@ -270,7 +269,6 @@ class Account
   end
 
   def merge(victim)
-    # Don't allow merging with self
     return if id == victim.id
 
     preferred_organisationship_ids = organisationships.pluck(:id)
@@ -281,14 +279,12 @@ class Account
 
       # Handle associations with different naming patterns
       if association.options[:inverse_of]
-        # For associations with explicit inverse_of
         foreign_key = "#{association.options[:inverse_of]}_id"
       elsif association.options[:as]
         # For polymorphic associations
         type_key = "#{association.options[:as]}_type"
         id_key = "#{association.options[:as]}_id"
 
-        # Update the polymorphic association
         klass = association.klass
         if klass.respond_to?(:unscoped)
           klass.unscoped.and(type_key => victim.class.name, id_key => victim.id)
@@ -297,7 +293,6 @@ class Account
         next
       end
 
-      # Get the target collection and update foreign keys
       target_collection = victim.send(association.name)
       target_collection.update_all(foreign_key => id) if target_collection.respond_to?(:update_all)
     end
@@ -544,7 +539,6 @@ class Account
 
     relevant_account_ids = (expected_caches.keys + account_ids_with_caches).uniq
 
-    # Process in batches of 1000
     relevant_account_ids.each_slice(1000) do |batch_ids|
       Account.in(id: batch_ids).each do |account|
         expected = expected_caches[account.id] || {}

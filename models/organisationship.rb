@@ -40,7 +40,6 @@ class Organisationship
     }
   end
 
-  # Geocoder
   geocoded_by :monthly_donation_postcode
 
   def lat
@@ -111,14 +110,12 @@ class Organisationship
 
   after_create do
     account.set(organisation_ids_cache: ((account.organisation_ids_cache || []) + [organisation.id]).uniq)
-    # Update account's subscribed/unsubscribed organisation caches
     if unsubscribed
       account.set(unsubscribed_organisation_ids_cache: ((account.unsubscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
     else
       account.set(subscribed_organisation_ids_cache: ((account.subscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
       associate_with_relevant_local_groups!
     end
-    # Refresh organisations IDs in notification cache
     account.account_notification_cache&.refresh_organisations_ids!
     send_welcome unless skip_welcome
   end
@@ -133,7 +130,6 @@ class Organisationship
     else
       account.set(organisation_ids_public_cache: ((account.organisation_ids_public_cache || []) + [organisation.id]).uniq)
     end
-    # Update account's subscribed/unsubscribed organisation caches when unsubscribed status changes
     if saved_change_to_unsubscribed?
       if unsubscribed
         account.set(subscribed_organisation_ids_cache: (account.subscribed_organisation_ids_cache || []) - [organisation.id])

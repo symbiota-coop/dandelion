@@ -3,7 +3,6 @@
  * Ask boxes shared with other pages (.ask-box, .docs-deepwiki) stay in app.css.
  */
 
-/* Docs */
 .docs-main {
   max-width: 42rem;
   font-size: var(--font-size-md);

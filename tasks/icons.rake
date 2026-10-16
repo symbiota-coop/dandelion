@@ -1,19 +1,16 @@
 namespace :icons do
   task generate: :environment do
-    # Create calendar directories if they don't exist
     calendar_dir = Padrino.root('app', 'assets', 'images', 'icons', 'calendar')
     svg_dir = File.join(calendar_dir, 'svg')
     png_dir = File.join(calendar_dir, 'png')
     FileUtils.mkdir_p(svg_dir)
     FileUtils.mkdir_p(png_dir)
 
-    # Create image icon directories if they don't exist
     image_dir = Padrino.root('app', 'assets', 'images', 'icons', 'image')
     FileUtils.mkdir_p(image_dir)
 
     puts 'Generating calendar icons for all days of the year...'
 
-    # Read the calendar template
     calendar_template_path = Padrino.root('app', 'views', 'icons', '_calendar.erb')
     calendar_template_content = File.read(calendar_template_path)
 
@@ -33,24 +30,20 @@ namespace :icons do
       }
     }
 
-    # Get month abbreviations and days dynamically from Ruby
     months = (1..12).map { |m| Date::ABBR_MONTHNAMES[m].upcase }
     days_in_month = (1..12).map { |m| Date.new(2024, m, -1).day } # Get last day of each month
 
     total_calendar_svg_generated = 0
     total_calendar_png_converted = 0
 
-    # Generate icons for each color scheme
     color_schemes.each do |scheme_name, colors|
       puts "\nGenerating #{scheme_name} calendar icons..."
 
-      # Create scheme-specific directories
       scheme_svg_dir = File.join(svg_dir, scheme_name.to_s)
       scheme_png_dir = File.join(png_dir, scheme_name.to_s)
       FileUtils.mkdir_p(scheme_svg_dir)
       FileUtils.mkdir_p(scheme_png_dir)
 
-      # Set color variables for this scheme
       month_bg_color = colors[:month_bg_color]
       month_text_color = colors[:month_text_color]
       day_text_color = colors[:day_text_color]
@@ -62,22 +55,18 @@ namespace :icons do
         days_in_month[month_index].times do |day_num|
           day = (day_num + 1).to_s
 
-          # Generate filenames
           svg_filename = "#{month.downcase}_#{day.rjust(2, '0')}.svg"
           png_filename = "#{month.downcase}_#{day.rjust(2, '0')}.png"
           svg_filepath = File.join(scheme_svg_dir, svg_filename)
           png_filepath = File.join(scheme_png_dir, png_filename)
 
-          # Generate SVG if it doesn't exist
           if File.exist?(svg_filepath)
             puts "Skipping #{scheme_name}/#{svg_filename} (already exists)"
           else
             begin
-              # Generate SVG content using ERB template
               erb = ERB.new(calendar_template_content)
               svg_content = erb.result(binding)
 
-              # Save the SVG content
               File.write(svg_filepath, svg_content)
               puts "Generated #{scheme_name}/#{svg_filename}"
               calendar_svg_generated += 1
@@ -87,15 +76,10 @@ namespace :icons do
             end
           end
 
-          # Convert to PNG if PNG doesn't exist
           if File.exist?(png_filepath)
             puts "Skipping #{scheme_name}/#{png_filename} (already exists)"
           else
             begin
-              # Convert SVG to PNG using rsvg-convert
-              # --width 160 --height 160: Set output dimensions
-              # --format png: Specify PNG output format
-              # --background-color white: Set white background
               system("rsvg-convert --width 160 --height 160 --format png --background-color white '#{svg_filepath}' > '#{png_filepath}'")
 
               if File.exist?(png_filepath)
@@ -122,11 +106,9 @@ namespace :icons do
 
     puts 'Generating image icons...'
 
-    # Read the image template
     image_template_path = Padrino.root('app', 'views', 'icons', '_image.erb')
     image_template_content = File.read(image_template_path)
 
-    # Icon types to generate
     icons = %w[geo-alt camera-video]
 
     image_svg_generated = 0
@@ -138,23 +120,19 @@ namespace :icons do
       FileUtils.mkdir_p(scheme_image_dir)
 
       icons.each do |icon_name|
-        # Generate filenames
         svg_filename = "image-#{icon_name}.svg"
         png_filename = "image-#{icon_name}.png"
         svg_filepath = File.join(scheme_image_dir, svg_filename)
         png_filepath = File.join(scheme_image_dir, png_filename)
 
-        # Generate SVG if it doesn't exist
         if File.exist?(svg_filepath)
           puts "Skipping #{scheme_name}/#{svg_filename} (already exists)"
         else
           begin
-            # Generate SVG content using ERB template
             erb = ERB.new(image_template_content)
             image = icon_name # Set the image variable for the template
             svg_content = erb.result(binding)
 
-            # Save the SVG content
             File.write(svg_filepath, svg_content)
             puts "Generated #{scheme_name}/#{svg_filename}"
             image_svg_generated += 1
@@ -164,15 +142,10 @@ namespace :icons do
           end
         end
 
-        # Convert to PNG if PNG doesn't exist
         if File.exist?(png_filepath)
           puts "Skipping #{scheme_name}/#{png_filename} (already exists)"
         else
           begin
-            # Convert SVG to PNG using rsvg-convert
-            # --width 160 --height 160: Set output dimensions
-            # --format png: Specify PNG output format
-            # --background-color white: Set white background
             system("rsvg-convert --width 160 --height 160 --format png --background-color white '#{svg_filepath}' > '#{png_filepath}'")
 
             if File.exist?(png_filepath)

@@ -89,7 +89,6 @@ $.currencySymbol = function (currency) {
     const symbol = parts.find(part => part.type === 'currency');
     const symbolValue = symbol ? symbol.value : currency;
 
-    // If symbol is compound (>1 char) and ends with $, return original currency code
     return (symbolValue.length > 1 && symbolValue.endsWith('$')) ? currency : symbolValue;
   } catch {
     return currency;
@@ -137,7 +136,6 @@ $.fn.serializeObject = function () {
   const o = {};
   const a = this.serializeArray();
 
-  // Helper to set nested value
   function setNestedValue (obj, path, value) {
     const keys = path.replace(/\]/g, '').split('[')
     let current = obj
@@ -160,7 +158,6 @@ $.fn.serializeObject = function () {
     }
   }
 
-  // Handle regular form fields
   $.each(a, function () {
     setNestedValue(o, this.name, this.value || '')
   });

@@ -21,7 +21,6 @@
     var points = <%== map_points.to_json %>;
     var polygonPaths = <%== polygon_paths.to_json %>;
 
-    // Map configuration
     var config = {
       points: points,
       polygonPaths: polygonPaths,
@@ -32,7 +31,6 @@
       mapId: <%== (ENV['GOOGLE_MAPS_MAP_ID'] || 'DEMO_MAP_ID').to_json %>
     };
 
-    // Initialize the map
     DandelionMap.initializeMap(config);
   });
 </script>

@@ -260,11 +260,10 @@ class Pmail
   end
 
   def send_pmail
-    return if sent_at # if already sent
+    return if sent_at
 
     set(requested_send_at: Time.now) unless requested_send_at
 
-    # send_batch_message
     return unless (message_ids = send_batch_message)
 
     set(sent_at: Time.now)

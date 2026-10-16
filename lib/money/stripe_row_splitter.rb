@@ -2,14 +2,12 @@ class StripeRowSplitter
   def self.split(csv_string)
     csv = CSV.parse(csv_string, headers: true)
 
-    # Process each row
     processed_rows = csv.flat_map do |row|
       description = row['Description']
       next if description.blank?
 
       base_desc, ticket_info = description.rpartition(':').values_at(0, 2).map(&:strip)
 
-      # Parse ticket information
       ticket_parts = []
       current_part = ''
       ticket_info.each_char do |char|
@@ -23,12 +21,10 @@ class StripeRowSplitter
       end
       ticket_parts << current_part.strip if current_part.strip.length > 0
 
-      # Initialize variables
       donation_amount = 0
       discount_percentage = 0
       fixed_discount = 0
 
-      # Process each part (ticket, donation, discount)
       # Does not yet handle multiple % discounts (OK if no monthly donors) or credit
       ticket_types = []
       ticket_parts.each do |part|
@@ -46,12 +42,10 @@ class StripeRowSplitter
 
       results = []
 
-      # Create separate row for each ticket type
       ticket_types.each do |ticket_type|
         price, quantity = ticket_type.match(/£([\d.,]+)x(\d+)/)[1, 2].map { |n| n.gsub(',', '').to_f }
         ticket_row = row.to_h
 
-        # Build discount text combining both types if present
         discount_texts = []
         if discount_percentage > 0
           formatted_percentage = discount_percentage.to_i == discount_percentage ? discount_percentage.to_i : discount_percentage

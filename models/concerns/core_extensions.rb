@@ -151,7 +151,7 @@ module CoreExtensions
         next if ADMIN_FIELDS_EXCLUDED.include?(field_name)
         next if IDENTIFYING_FIELDS.map(&:to_s).include?(field_name) # Already added at top
         next if dragonfly_fields.any? { |df| field_name == "#{df}_uid" } # Skip dragonfly uid fields only
-        next if belongs_to_fields.include?(field_name) # Skip belongs_to foreign keys
+        next if belongs_to_fields.include?(field_name)
         next if checkboxes.key?(field_name.to_sym) # Skip checkboxes (already added)
 
         # Skip dragonfly cache fields (e.g., image_cache if image is a dragonfly accessor)
@@ -191,15 +191,13 @@ module CoreExtensions
       when 'BSON::ObjectId'
         nil # Skip ObjectId fields
       else
-        :text # Default fallback
+        :text
       end
     end
 
     def string_field_admin_type(field_name)
-      # Check if this field has a corresponding select options method
       return :select if select_method_for?(field_name)
 
-      # Identifying fields get full width
       return { type: :text, full: true } if IDENTIFYING_FIELDS.map(&:to_s).include?(field_name.to_s)
 
       ADMIN_FIELD_PATTERNS.each do |admin_type, pattern|

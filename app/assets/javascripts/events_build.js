@@ -1,7 +1,6 @@
 /* global introJs, autosize, google, initQuestionsPreview */
 
 $(function () {
-  // Load config from JSON script tag or window fallback
   const config = (function () {
     try {
       const el = document.getElementById('events-build-config')
@@ -164,7 +163,6 @@ $(function () {
     const draft = config.draft
     const form = $('#build-event')[0]
 
-    // Set regular form values
     $.each(draft, function (key, value) {
       if (value && typeof value === 'object' && !Array.isArray(value)) return
       const $fields = $(form).find('[name="event[' + key + ']"]')
@@ -227,10 +225,8 @@ $(function () {
     $('.tab-pane:last').find('a.next').remove()
   }
 
-  // Email labels tweaks
   $('label[for$="_email_greeting"], label[for$="_email_body"]').hide()
 
-  // Questions textareas and autosize
   const autosizeFields = [
     ['#event_questions', 8],
     ['#event_feedback_questions', 8],
@@ -267,7 +263,6 @@ $(function () {
     window.scrollTo(0, 0)
   })
 
-  // Evergreen toggle
   $('#event_evergreen').change(function () {
     if ($(this).is(':checked')) {
       $(this).closest('.form-check').parent().show()
@@ -363,20 +358,17 @@ $(function () {
     }
   }
 
-  // Currency symbol updates
   $('#event_currency').change(function () {
     if (typeof $.currencySymbol !== 'undefined') {
       $('.money-symbol').text($.currencySymbol($(this).val()))
     }
   })
 
-  // Donations UI toggle
   $('#event_suggested_donation').keyup(function () {
     if ($(this).val().length > 0) $('#donation-options').show()
     else $('#donation-options').hide()
   }).keyup()
 
-  // Disable controls for non-admin org members
   if (!config.isOrgAdmin) {
     $('input[name="event[featured]"]').prop('disabled', true)
     $('input[name="event[show_emails]"]').prop('disabled', true)
@@ -420,7 +412,6 @@ $(function () {
     $(this).find('button[type=submit]').prop('disabled', true)
   })
 
-  // Live preview for questions
   if (config.eventId) {
     initQuestionsPreview('#event_questions', '/events/' + config.eventId + '/questions')
     initQuestionsPreview('#event_feedback_questions', '/events/' + config.eventId + '/feedback_questions')

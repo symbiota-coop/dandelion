@@ -1,9 +1,5 @@
 /* Select2: our overrides of its Bootstrap 5 theme. Loaded on every page (see _dependencies.erb), after app.css */
 
-/* ==========================================================================
-   Select2
-   ========================================================================== */
-
 .select2-container--bootstrap-5 .select2-selection--single .select2-selection__placeholder {
   font-weight: 400
 }

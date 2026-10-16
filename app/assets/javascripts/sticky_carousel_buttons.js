@@ -8,7 +8,6 @@
 
   window.iFrameResizer = {
     onReady: function () {
-      // Send message to parent when iframe-resizer is ready
       console.log('iframe-resizer ready, sending message to parent');
       window.parentIFrame.sendMessage('iframeLoaded');
     },
@@ -21,7 +20,6 @@
 
         const searchForm = document.getElementById('carousel-buttons-container');
         if (searchForm) {
-          // Store the original position of the search form (once)
           if (originalSearchFormTop === null) {
             originalSearchFormTop = searchForm.offsetTop;
           }
@@ -38,7 +36,6 @@
               searchForm.style.transition = 'opacity 0s ease-out';
             }
 
-            // Clear previous timeout
             if (scrollTimeout) {
               clearTimeout(scrollTimeout);
             }
@@ -67,17 +64,14 @@
             searchForm.style.zIndex = '100';
           } else {
             if (isSticky) {
-              // Remove placeholder
               if (placeholder && placeholder.parentNode) {
                 placeholder.parentNode.removeChild(placeholder);
                 placeholder = null;
               }
 
-              // Remove will-change when not sticky
               searchForm.style.willChange = '';
               isSticky = false;
             }
-            // Revert to normal positioning
             searchForm.style.position = '';
             searchForm.style.transform = '';
             searchForm.style.top = '';

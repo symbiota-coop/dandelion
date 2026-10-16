@@ -129,13 +129,11 @@ namespace :db do
 
     collections = db.collections.sort_by { |c| c.name }
 
-    # Get total database size
     db_stats = db.command(dbStats: 1).first
     total_size = db_stats['dataSize'] || 0
     total_storage = db_stats['storageSize'] || 0
     total_indexes = db_stats['indexSize'] || 0
 
-    # Calculate collection sizes
     collection_data = collections.map do |collection|
       stats = db.command(collStats: collection.name).first
       {
@@ -148,10 +146,8 @@ namespace :db do
       }
     end
 
-    # Sort by storage size (descending)
     collection_data.sort_by! { |c| -c[:storage_size] }
 
-    # Display results
     printf "%-30s %12s %15s %15s %15s %12s\n",
            'Collection', 'Documents', 'Data Size', 'Storage Size', 'Index Size', 'Avg Doc'
     puts '-' * 80
@@ -192,9 +188,7 @@ namespace :db do
     puts "ℹ️  TTL indexes are automatically excluded (used by background monitor, not queries)\n"
 
     collections.each do |collection|
-      # Get index usage stats via $indexStats aggregation
       stats = collection.aggregate([{ '$indexStats' => {} }]).to_a
-      # Get index sizes from collStats
       coll_stats = db.command(collStats: collection.name).first
       index_sizes = coll_stats['indexSizes'] || {}
 

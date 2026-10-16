@@ -27,7 +27,6 @@ module Searchable
         scope = scope.and(:id.in => child_scope.pluck(foreign_key))
       end
 
-      # If query is an email address and model has an email field, search only email
       return scope.and(email: query) if query.match?(EMAIL_REGEX) && fields.key?('email')
 
       if regex_search

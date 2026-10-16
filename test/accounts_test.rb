@@ -549,7 +549,6 @@ class AccountsTest < ActiveSupport::TestCase
 
     assert page.has_content?("OK, you're on the list!")
 
-    # Verify they're resubscribed
     assert_equal false, @organisation.organisationships.find_by(account: existing_account).unsubscribed
     assert_equal false, @activity.activityships.find_by(account: existing_account).unsubscribed
     assert_equal false, @local_group.local_groupships.find_by(account: existing_account).unsubscribed

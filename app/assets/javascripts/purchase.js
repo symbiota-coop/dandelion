@@ -1,7 +1,6 @@
 /* global eventPaymentHandlers */
 
 $(function () {
-  // Load config from JSON script tag or window fallback
   const config = (function () {
     try {
       const el = document.getElementById('purchase-config')
@@ -302,7 +301,6 @@ $(function () {
     })
   })
 
-  // Validate phone number starts with + and provide instant feedback
   $('#account_phone').on('input blur', function () {
     const phoneValue = $(this).val().trim()
     if (phoneValue.length > 0 && !phoneValue.startsWith('+')) {
@@ -367,7 +365,6 @@ $(function () {
     })
     if (halt) { return false }
 
-    // Validate required checkbox groups
     $('[class*="checkbox-group-"][data-required="true"]').each(function () {
       const checkboxGroup = $(this)
       const groupIndex = checkboxGroup.attr('class').match(/checkbox-group-(\d+)/)[1]
@@ -442,7 +439,6 @@ $(function () {
       }
     }
 
-    // Validate phone number: if entered, must start with +
     const phoneField = $('#account_phone')
     if (phoneField.length > 0) {
       const phoneValue = phoneField.val()

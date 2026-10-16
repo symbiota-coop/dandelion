@@ -564,7 +564,6 @@ class Event
 
     relevant_event_ids = (expected_caches.keys + event_ids_with_caches).uniq
 
-    # Process in batches of 1000
     relevant_event_ids.each_slice(1000) do |batch_ids|
       Event.unscoped.in(id: batch_ids).each do |event|
         expected_ids = (expected_caches[event.id] || []).map(&:to_s).sort

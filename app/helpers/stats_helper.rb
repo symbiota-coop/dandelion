@@ -222,7 +222,6 @@ Dandelion::App.helpers do
     # Dependency requirements are at 6+ spaces and have constraints like ">= 5.0"
     matches = content.scan(/^(\s+)#{Regexp.escape(gem_name)}\s+\(([^)]+)\)/)
 
-    # Find the actual gem entry (4 spaces) with a simple version number (not a constraint)
     matches.each do |indent, version|
       # Actual gem entries are at 4 spaces, and version should look like a version number
       # (not contain operators like >=, ~>, <, etc.)

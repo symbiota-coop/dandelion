@@ -35,7 +35,6 @@
       </div>
       <!-- BEGIN #sidebar -->
       <div id="sidebar" class="sidebar sidebar-inverse offcanvas-md offcanvas-start" tabindex="-1" data-bs-backdrop="false" data-bs-scroll="true">
-        <!-- BEGIN scrollbar -->
         <div class="sidebar-scroll">
           <%= partial :nav %>
         </div>
@@ -46,19 +45,14 @@
             if (sidebarScrollPosition) document.currentScript.previousElementSibling.scrollTop = parseInt(sidebarScrollPosition)
           } catch {}
         </script>
-        <!-- END scrollbar -->
-        <!-- BEGIN sidebar-minify-btn -->
         <a onclick="$.post('/sidebar', {minified: $('#page-container').hasClass('page-sidebar-minified') ? false : true});
             $('#sidebar ul.nav li a[data-bs-toggle=tooltip]').tooltip($('#page-container').hasClass('page-sidebar-minified') ? 'disable' : 'enable')
            " href="#" class="sidebar-minify-btn" data-click="sidebar-minify"><i class="bi bi-arrow-left"></i></a>
-        <!-- END sidebar-minify-btn -->
       </div>
       <!-- END #sidebar -->
-      <!-- BEGIN #content -->
       <div id="content" class="content">
         <%= content_blocks[:content].present? ? yield_content(:content) : yield %>
       </div>
-      <!-- END #content -->
     </div>
     <!-- END #page-container -->
 
@@ -70,11 +64,8 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
         </div>
-        <!-- /.modal-content -->
       </div>
-      <!-- /.modal-dialog -->
     </div>
-    <!-- /.modal -->
 
     <!-- On mobile the notifications and messages dropdowns open in this bottom sheet instead -->
     <div class="offcanvas offcanvas-bottom nav-dropdown-sheet" tabindex="-1" id="nav-dropdown-sheet" aria-labelledby="nav-dropdown-sheet-title">

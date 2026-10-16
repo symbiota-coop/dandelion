@@ -27,7 +27,6 @@
     </nav>
   </header>
 
-  <!-- COLOUR -->
   <% design_section 'colour' do %>
     <% design_subsection 'Theme', 'A ramp generated from one value with <code>oklch()</code>. Components use the 500 for fills, 600 for hover, 100 for alert, toast and badge backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints. The 400 is .06 lighter than the 500, or half way to the 200 when the 500 is too light for that, and the 300 is halfway between the 200 and 400, so the steps stay in order however light the colour. Every theme colour is a solid step of this ramp; the only translucent ones are the focus ring, .badge-overlay (the 500 at 70%, over images) and chart projections (the 500 at 50%, and in the contributions chart a 30% fill with a 50% border), so they read as estimates.' do %>
       <%= partial :'design/ramp', locals: {
@@ -184,7 +183,6 @@
     <% end %>
   <% end %>
 
-  <!-- TYPE -->
   <% design_section 'type' do %>
 
     <div class="row g-4">
@@ -232,7 +230,6 @@
     <% end %>
   <% end %>
 
-  <!-- SHAPE -->
   <% design_section 'shape' do %>
 
     <% design_subsection 'Radius', "Bootstrap's radius variables, set to one scale in <code>bootstrap5.scss</code>: controls on the base, surfaces on lg, sheets on xl. Inputs and buttons share a radius at every size (sm, base, lg), so they match side by side. Square corners (0) where an element sits flush against another; 50% for circles." do %>
@@ -332,7 +329,6 @@
     <% end %>
   <% end %>
 
-  <!-- LAYOUT -->
   <% design_section 'layout', 'Fixed dark header (--header-height, 2.8125rem) and a fixed sidebar (--sidebar-width, 14.375rem, minified to --sidebar-width-minified, 3.75rem). Groups of sidebar links can sit under a .nav-header label (--font-size-xs, semibold, --bs-gray-500), as the admin stats links do; minified, it becomes a --bs-gray-800 divider. Sticky panels (.sticky-under-header) sit at --sticky-top, just below the header. Below 768px the sidebar becomes a full-width offcanvas and header icons spread across a second row.' do %>
     <div class="border rounded-3 overflow-hidden shadow">
       <div class="d-flex align-items-center px-3 text-white" style="height: var(--header-height); font-size: 1.125rem; background: var(--gradient-header)">
@@ -369,7 +365,6 @@
     </div>
   <% end %>
 
-  <!-- COMPONENTS -->
   <% design_section 'components' do %>
 
     <% design_subsection 'Buttons', 'Primary and danger are flat: their variant\'s 500 over a transparent border, and the 600 on hover. Other fills (progress bars, text-bg-* elements other than badges, like card headers, and p.action) are the same flat 500. btn-warning is styled the same but not used yet. Secondary is quiet: white with a --bs-border-color border and body text, --bs-secondary-bg on hover. It\'s for dismissive actions like Cancel, Not now and Disconnect. btn-outline-secondary is only for buttons joined to an input (Apply, Remove, Copy) and the donation toggle group. Brand buttons like btn-signal stay flat. Put buttons side by side in <code>d-flex flex-wrap gap-2</code>, not <code>ms-*</code> on the second, so they line up and keep their gap when they wrap on phones.' do %>
@@ -1580,7 +1575,6 @@
     <% end %>
   <% end %>
 
-  <!-- THEMING -->
   <% design_section 'theming', 'Organisations and events set one colour. <code>theme_css_variables</code> sets <code>--theme-500</code>, app.css derives the ramp from it, and every primary button, link, focus ring, crumb, check, progress bar, stats chart, alert and toast tint and date tile month follows. theme.css is only variables: as well as the theme colour, it switches the AI well to the theme ramp (see AI well and ask box), while the default site keeps it lavender as its own accent.' do %>
     <div class="row g-3">
       <% ([[nil, nil]] + themed_colors).each do |color, clamped| %>

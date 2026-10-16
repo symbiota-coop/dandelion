@@ -51,7 +51,6 @@ module OrderFields
       de_fixed_discount_applied: order.fixed_discount_applied
     }
 
-    # Include event question answers if configured
     if event&.organisation&.event_questions_to_include_in_metadata.present? && order.answers.present?
       questions_to_include = event.organisation.event_questions_to_include_in_metadata
 

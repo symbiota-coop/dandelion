@@ -1,62 +1,37 @@
-<!-- Name -->
 <%= partial :'event_stats_row/name', locals: { event: event, organisation: organisation } %>
-<!-- Buttons -->
 <%= partial :'event_stats_row/buttons', locals: { event: event, organisation: organisation } %>
-<!-- Date -->
 <%= partial :'event_stats_row/date', locals: { event: event, organisation: organisation } %>
-<!-- Coordinator -->
 <%= partial :'event_stats_row/coordinator', locals: { event: event, organisation: organisation } %>
-<!-- Organiser -->
 <% if organisation.stripe_client_id %>
   <%= partial :'event_stats_row/organiser', locals: { event: event, organisation: organisation } %>
 <% end %>
-<!-- Facilitators -->
 <%= partial :'event_stats_row/facilitators', locals: { event: event, organisation: organisation } %>
-<!-- Tags -->
 <%= partial :'event_stats_row/tags', locals: { event: event, organisation: organisation } %>
-<!-- Activity -->
 <%= partial :'event_stats_row/activity', locals: { event: event, organisation: organisation } %>
-<!-- Local group -->
 <%= partial :'event_stats_row/local_group', locals: { event: event, organisation: organisation } %>
-<!-- Facebook event -->
 <%= partial :'event_stats_row/facebook_event', locals: { event: event, organisation: organisation } %>
-<!-- 30d views -->
 <%= partial :'event_stats_row/30d_views', locals: { event: event, organisation: organisation } %>
-<!-- Tickets sold-->
 <%= partial :'event_stats_row/tickets_sold', locals: { event: event, organisation: organisation } %>
-<!-- Checked in -->
 <%= partial :'event_stats_row/checked_in', locals: { event: event, organisation: organisation } %>
-<!-- Ticket revenue -->
 <%= partial :'event_stats_row/ticket_revenue', locals: { event: event, organisation: organisation } %>
-<!-- Donations -->
 <%= partial :'event_stats_row/donations', locals: { event: event, organisation: organisation } %>
 
 <% if organisation.stripe_client_id %>
-  <!-- Ticket revenue to revenue sharer -->
   <%= partial :'event_stats_row/ticket_revenue_to_revenue_sharer', locals: { event: event, organisation: organisation } %>
-  <!-- Ticket revenue to organisation -->
   <%= partial :'event_stats_row/ticket_revenue_to_organisation', locals: { event: event, organisation: organisation } %>
-  <!-- Revenue reported by Dandelion -->
   <%= partial :'event_stats_row/revenue_reported_by_dandelion', locals: { event: event, organisation: organisation } %>
-  <!-- Revenue reported by Stripe -->
   <%= partial :'event_stats_row/revenue_reported_by_stripe', locals: { event: event, organisation: organisation } %>
-  <!-- Stripe fees -->
   <%= partial :'event_stats_row/stripe_fees', locals: { event: event, organisation: organisation } %>
 
   <% if event_revenue_admin %>
-    <!-- Profit -->
     <%= partial :'event_stats_row/profit', locals: { event: event, organisation: organisation } %>
-    <!-- Profit less donations, before allocations -->
     <%= partial :'event_stats_row/profit_less_donations_before_allocations', locals: { event: event, organisation: organisation } %>
     <% Event.profit_share_roles.each do |role| %>
       <!-- Allocated to <%= role %> = Profit * profit_share_<%= role %> -->
       <%= partial :'event_stats_row/allocated_to_role', locals: { event: event, organisation: organisation, role: role } %>
     <% end %>
-    <!-- Profit less donations, after allocations -->
     <%= partial :'event_stats_row/profit_less_donations_after_allocations', locals: { event: event, organisation: organisation } %>
-    <!-- Profit including donations, after allocations -->
     <%= partial :'event_stats_row/profit_including_donations_after_allocations', locals: { event: event, organisation: organisation } %>
-    <!-- Remaining to be paid -->
     <%= partial :'event_stats_row/remaining_to_be_paid', locals: { event: event, organisation: organisation } %>
   <% else %>
     <% 9.times do %>
@@ -65,5 +40,4 @@
   <% end %>
 <% end %>
 
-<!-- Feedback -->
 <%= partial :'event_stats_row/feedback', locals: { event: event, organisation: organisation } %>

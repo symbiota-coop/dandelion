@@ -62,7 +62,6 @@ $(function () {
     $('.navbar-toggler').toggleClass('active', e.type === 'show')
   })
 
-  // Sidebar minify
   $('[data-click="sidebar-minify"]').click(function (e) {
     e.preventDefault()
     $('#page-container').toggleClass('page-sidebar-minified')

@@ -66,7 +66,6 @@ module PmailMailgun
       startDate: start_date.iso8601(3)
     }
 
-    # Build query parameters
     params = {
       'reporting-search-metrics' => search_metrics.to_json,
       'reporting-search-metrics-date-range' => date_range.to_json

@@ -46,7 +46,6 @@ module AccountAtproto
       links << link_data
     end
 
-    # Remove duplicates and sort by timestamp (newest first)
     links.uniq { |l| l['url'] }.sort_by { |l| -l['timestamp'] }
   rescue StandardError
     nil

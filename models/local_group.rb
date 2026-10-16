@@ -78,7 +78,6 @@ class LocalGroup
     # validation later rejects the local group update.
     assign_attributes(polygons: polygon_attributes)
 
-    # Ensure polygons were created and are valid
     errors.add(:geometry, 'is invalid - unable to create valid polygons') if geometry.present? && (polygons.empty? || polygons.any? { |p| !p.valid? })
 
     # The 2dsphere index rejects shapes MongoDB considers invalid (crossing edges, unclosed rings),

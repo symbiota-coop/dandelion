@@ -15,7 +15,6 @@
   icon_scale = icon_size / 16
   icon_offset = (svg_size - icon_size) / 2
 
-  # Dynamically embed svg icon
   icon_path = Padrino.root('app', 'assets', 'images', 'icons', "#{image}.svg")
   icon_content = File.read(icon_path)
 %>
@@ -35,7 +34,6 @@
         rx="<%= (corner_radius - (border_width / 2)).round(2) %>" ry="<%= (corner_radius - (border_width / 2)).round(2) %>"
         fill="none" stroke="#000000" stroke-opacity="0.1" stroke-width="<%= border_width %>" />
 
-  <!-- Icon -->
   <g transform="translate(<%= icon_offset.round(2) %>, <%= icon_offset.round(2) %>) scale(<%= icon_scale.round(3) %>)" fill="#000000" opacity="0.5">
     <%== icon_content.gsub(/<svg[^>]*>/, '').gsub(%r{</svg>}, '') %>
   </g>

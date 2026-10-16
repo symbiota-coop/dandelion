@@ -1,4 +1,3 @@
-// Map functionality
 window.DandelionMap = {
   mapOptions: {
     mapTypeControl: false,
@@ -98,7 +97,6 @@ window.DandelionMap = {
 
     if (config.fillScreen) {
       var self = this;
-      // Set height on load and resize
       self.fillScreen();
       $(window).on('resize', function () { self.fillScreen(); });
     }
@@ -107,28 +105,21 @@ window.DandelionMap = {
     window.map = new google.maps.Map(document.getElementById('map-canvas'), Object.assign({ mapId: config.mapId }, this.mapOptions));
     var bounds = new google.maps.LatLngBounds();
 
-    // Initialize info window
     var infowindow = new google.maps.InfoWindow();
     window.mapInfoWindow = infowindow;
 
-    // Create markers
     var markers = this.createMarkers(config.points, infowindow, bounds);
 
-    // Create polygons
     var polygons = this.createPolygons(config.polygonPaths, bounds);
 
-    // Setup clustering
     this.setupClustering(markers, infowindow);
 
-    // Set map bounds/center
     this.setMapBounds(bounds, config);
 
-    // Setup dynamic loading if enabled
     if (config.url) {
       this.setupDynamicLoading(config);
     }
 
-    // Set map height after initialization if dynamic height is enabled
     if (config.fillScreen) {
       this.fillScreen();
     }
@@ -157,7 +148,6 @@ window.DandelionMap = {
       marker.pointId = point.id;
       marker.n = point.n;
 
-      // Add click listener
       this.addMarkerClickListener(marker, infowindow);
 
       bounds.extend(marker.position);
@@ -204,7 +194,6 @@ window.DandelionMap = {
         paths: polygonPaths[i]
       }));
 
-      // Extend bounds with polygon paths
       var paths = polygon.getPaths();
       for (var ii = 0; ii < paths.getLength(); ii++) {
         var path = paths.getAt(ii);
@@ -334,20 +323,17 @@ window.DandelionMap = {
           east: east,
         };
 
-        // Parse URL to extract base path and existing parameters
         var url = config.url;
         var urlParts = url.split('?');
         var basePath = urlParts[0];
         var urlParams = {};
 
         if (urlParts.length > 1) {
-          // Parse existing parameters from url
           urlParams = $.deparam(urlParts[1]);
         }
 
         var queryParams = $.deparam(window.location.search.substring(1));
 
-        // Merge url parameters with dynamic request parameters
         var requestParams = jQuery.extend({}, urlParams, queryParams, q, { display: 'map' });
         var jsonUrl = basePath + '.json?' + $.param(requestParams);
 
@@ -355,7 +341,6 @@ window.DandelionMap = {
         var timeout = self.dynamicLoadingTimeout;
         window.mapTimer = setTimeout(function () {
 
-          // Make JSON request to get new points
           $.ajax({
             url: jsonUrl,
             method: 'GET',
@@ -376,18 +361,15 @@ window.DandelionMap = {
   },
 
   updateMapWithNewData: function (data, config, isFirstLoad) {
-    // Create new markers from JSON data
     var bounds = new google.maps.LatLngBounds();
     var markers = [];
     if (data.points && data.points.length > 0) {
       markers = this.createMarkers(data.points, window.mapInfoWindow, bounds);
     }
 
-    // Swap the clusterer's markers for the new ones
     window.markerClusterer.clearMarkers(true);
     window.markerClusterer.addMarkers(markers);
 
-    // Update points warning
     if (data.pointsCount > (config.pointsLimit || 1000)) {
       $('#points-warning').show();
     } else {

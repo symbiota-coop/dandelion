@@ -52,7 +52,6 @@ class Membership
     if (general = gathering.teams.find_by(name: 'General'))
       general.teamships.create! account: account, gathering: gathering, prevent_notifications: true
     end
-    # Refresh gathering IDs in notification cache for this account
     account.account_notification_cache&.refresh_gathering_ids!
   end
 
@@ -101,7 +100,6 @@ class Membership
         item.subscriptions.and(account: account).destroy_all
       end
     end
-    # Refresh gathering IDs in notification cache for this account
     account.account_notification_cache&.refresh_gathering_ids!
   end
 

@@ -44,12 +44,10 @@ Dandelion::App.controller do
     media_id = message['audio']['id']
     halt 200 unless media_id.to_s.match?(/\A\d+\z/)
 
-    # get the media url
     media_url = "https://graph.facebook.com/v21.0/#{media_id}"
     response = http_client.get(media_url)
     media_download_url = JSON.parse(response.body)['url']
 
-    # download the media
     response = http_client.get(media_download_url)
     audio_bytes = response.body.to_s
 
@@ -57,7 +55,6 @@ Dandelion::App.controller do
     text = OpenRouter.transcribe(audio_bytes, format: 'ogg')
     raise "WhatsApp transcription failed: blank result" if text.blank?
 
-    # clean up the transcript
     text = OpenRouter.chat("Produce a verbatim version of this transcript, just with filler words removed and paragraph breaks added where appropriate. Do not add any text to the beginning or end.\n\n#{text}")
     raise 'WhatsApp transcript cleanup returned blank' if text.blank?
 
@@ -75,7 +72,6 @@ Dandelion::App.controller do
       elsif (current_chunk + "\n\n" + paragraph).length <= 2048
         current_chunk += "\n\n" + paragraph
       else
-        # start new chunk with this paragraph
         chunks << current_chunk
         current_chunk = paragraph
       end

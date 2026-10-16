@@ -1,5 +1,4 @@
 <%
-# Hash to store occurrences
 bi_counts = Hash.new(0)
 
 # Dir.glob skips hidden files. Only text files, as app/assets has videos and images that aren't valid UTF-8
@@ -7,14 +6,12 @@ Dir.glob('{app,models,lib}/**/*.{rb,erb,js,css,md,html}').each do |path|
   next if !File.file?(path) || path.include?('fonts')
 
   File.readlines(path).each do |line|
-    # Find all matches of 'bi-*' and count them
     line.scan(/\bbi-[-\w]+/).each do |match|
       bi_counts[match] += 1
     end
   end
 end
 
-# Sort the hash by occurrence count
 sorted_bi_counts = bi_counts.sort_by { |_key, value| -value }
 %>
 

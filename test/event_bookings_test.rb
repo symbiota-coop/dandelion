@@ -171,7 +171,6 @@ class EventBookingsTest < ActiveSupport::TestCase
     sign_in(@account)
     visit "/e/#{@event.slug}"
 
-    # Verify header and plain text are displayed
     assert page.has_content?('Registration Details')
     assert page.has_content?('Please fill out all fields')
 
@@ -290,12 +289,10 @@ class EventBookingsTest < ActiveSupport::TestCase
     click_button 'RSVP'
     assert page.has_content? 'Thanks for booking'
 
-    # Verify account is associated and subscribed
     assert_associated(@organisation, buyer, :organisationships)
     assert_associated(@activity, buyer, :activityships)
     assert_associated(@local_group, buyer, :local_groupships)
 
-    # Verify they're subscribed (not unsubscribed)
     assert_equal false, @organisation.organisationships.find_by(account: buyer).unsubscribed
     assert_equal false, @activity.activityships.find_by(account: buyer).unsubscribed
     assert_equal false, @local_group.local_groupships.find_by(account: buyer).unsubscribed
@@ -321,7 +318,6 @@ class EventBookingsTest < ActiveSupport::TestCase
     fill_in 'account_postcode', with: '111 28'
     select 'Sweden', from: 'account_country'
 
-    # Check opt-in checkbox
     find('label[for="account_opt_in_organisation"]').click
 
     click_button 'RSVP'
@@ -333,7 +329,6 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert new_account.location.include?('111 28'), "Location should include postcode, got: #{new_account.location}"
     assert_nil new_account.coordinates, 'Checkout should leave geocoding to a background job'
 
-    # Check organisationship was created
     organisationship = @organisation.organisationships.find_by(account: new_account)
     assert organisationship, 'User should be subscribed to organisation'
     assert_nil local_group.local_groupships.find_by(account: new_account)
@@ -368,7 +363,6 @@ class EventBookingsTest < ActiveSupport::TestCase
     click_button 'RSVP'
     assert page.has_content? 'Thanks for booking'
 
-    # Verify they're resubscribed
     assert_equal false, @organisation.organisationships.find_by(account: buyer).unsubscribed
     assert_equal false, @activity.activityships.find_by(account: buyer).unsubscribed
     assert_equal false, @local_group.local_groupships.find_by(account: buyer).unsubscribed

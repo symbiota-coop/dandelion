@@ -25,11 +25,9 @@ recommended_people = @account.recommended_people || []
         <%= partial :'accounts/buttons', locals: { account: account } %>
         <ul class="icon-list mt-3">
           <%
-            # Collect IDs by type
             event_ids = v.select { |connection| connection['type'] == 'Event' }.map { |connection| connection['id'] }
             gathering_ids = v.select { |connection| connection['type'] == 'Gathering' }.map { |connection| connection['id'] }
 
-            # Bulk query events and gatherings
             events = event_ids.any? ? Event.and(:id.in => event_ids).order('start_time desc') : []
             gatherings = gathering_ids.any? ? Gathering.and(:id.in => gathering_ids) : []
           %>

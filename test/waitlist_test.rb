@@ -30,7 +30,6 @@ class WaitlistTest < ActiveSupport::TestCase
     assert page.has_content?('This event is sold out'), 'Should show sold out message'
     assert page.has_content?('Join the waitlist'), 'Should show waitlist option'
 
-    # Fill in waitlist form
     fill_in 'waitship_name', with: 'Waitlist User'
     fill_in 'waitship_email', with: 'waitlist@example.com'
 
@@ -39,7 +38,6 @@ class WaitlistTest < ActiveSupport::TestCase
 
     click_button 'Submit'
 
-    # Should redirect with success message
     assert page.has_current_path?(/added_to_waitlist=true/, url: true), 'Should redirect with waitlist confirmation'
 
     waitlist_account = Account.find_by(email: 'waitlist@example.com')
@@ -68,10 +66,8 @@ class WaitlistTest < ActiveSupport::TestCase
       price: 10
     )
 
-    # Call payment_completed! on the ticket
     ticket.payment_completed!
 
-    # Waitship should be removed
     assert_nil @event.reload.waitships.find_by(account: buyer),
                'Waitship should be removed after ticket payment completed'
   end
@@ -96,11 +92,9 @@ class WaitlistTest < ActiveSupport::TestCase
     buyer = FactoryBot.create(:account)
     @event.waitships.create(account: buyer)
 
-    # Should NOT create activityship for non-open activity
     assert_nil activity.activityships.find_by(account: buyer),
                'Should not create activityship for secret activity'
 
-    # Should still create organisationship
     assert @organisation.organisationships.find_by(account: buyer),
            'Should still create organisationship'
   end

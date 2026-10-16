@@ -38,11 +38,9 @@ $(function () {
           const content = data.dataTransfer.getData('text/html')
 
           if (content) {
-            // We have HTML content from the clipboard.
             const domParser = new DOMParser()
             const documentFragment = domParser.parseFromString(content, 'text/html')
 
-            // Traverse the tree and remove color styles.
             const walker = document.createTreeWalker(
               documentFragment,
               NodeFilter.SHOW_ELEMENT,
@@ -58,7 +56,6 @@ $(function () {
               walker.currentNode.style.removeProperty('background-color')
             }
 
-            // Update the clipboard content.
             data.content = editor.data.processor.toView(documentFragment.body.innerHTML)
           }
         })

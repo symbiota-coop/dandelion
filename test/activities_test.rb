@@ -85,7 +85,6 @@ class ActivitiesTest < ActiveSupport::TestCase
     sign_in(applicant)
     visit "/activities/#{activity.id}/apply"
 
-    # Verify header and plain text are displayed
     assert page.has_content?('Application Form')
     assert page.has_content?('Please fill out all fields')
 

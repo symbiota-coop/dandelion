@@ -89,7 +89,6 @@ module EventAtproto
   def atproto_locations
     locations = []
 
-    # Add physical geo location if available
     if location.present? && location != 'Online' && coordinates.present?
       locations << {
         '$type' => 'community.lexicon.location.geo',
@@ -113,7 +112,6 @@ module EventAtproto
       'name' => name
     }
 
-    # Facebook event URL if present
     if facebook_event_url.present?
       uris << {
         '$type' => 'community.lexicon.calendar.event#uri',
@@ -125,7 +123,6 @@ module EventAtproto
     uris
   end
 
-  # Build the complete ATProto record
   def build_atproto_record
     record = {
       '$type' => ATPROTO_COLLECTION,
@@ -211,12 +208,10 @@ module EventAtproto
     return { action: :skipped, reason: 'atproto_not_enabled' } unless atproto_enabled?
 
     if atproto_uri.blank?
-      # Never published - publish now
       publish_to_atproto_without_delay unless dry_run
       return { action: :published }
     end
 
-    # Already published - refresh the record
     update_atproto_without_delay unless dry_run
     { action: :updated }
   rescue StandardError => e
@@ -235,7 +230,6 @@ module EventAtproto
       cutoff = hours.hours.ago
       results = { published: 0, updated: 0, deleted: 0, skipped: 0, errors: [], dry_run: dry_run }
 
-      # Find events created or updated since the cutoff
       events = Event.and(
         '$or' => [
           { created_at: { '$gte' => cutoff } },
@@ -281,7 +275,6 @@ module EventAtproto
         fix: fix
       }
 
-      # Get all records from AT Protocol
       begin
         remote_records = client.list_records(
           collection: ATPROTO_COLLECTION,
@@ -308,7 +301,6 @@ module EventAtproto
       local_events = Event.and(:atproto_uri.ne => nil).select { |event| event.atproto_record_did == client.did }
       local_by_uri = local_events.index_by(&:atproto_uri)
 
-      # Check each remote record
       remote_records.each do |record|
         uri = record['uri']
         event = local_by_uri[uri]
@@ -338,7 +330,6 @@ module EventAtproto
           expected = event.build_atproto_record
           actual = record['value']
 
-          # Compare key fields
           mismatches = []
           %w[name description startsAt endsAt mode status].each do |field|
             mismatches << field if expected[field] != actual[field]
@@ -369,7 +360,6 @@ module EventAtproto
         results[:missing] << { uri: event.atproto_uri, event_id: event.id.to_s }
         if fix
           begin
-            # Clear the stale URI and republish
             event.set(atproto_uri: nil)
             event.publish_to_atproto_without_delay
           rescue StandardError => e
@@ -380,7 +370,6 @@ module EventAtproto
         results[:errors] << { event_id: event.id.to_s, action: 'check_missing', error: e.message }
       end
 
-      # Summary counts
       results[:summary] = {
         total_remote: remote_records.count,
         total_local: local_events.count,

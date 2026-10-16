@@ -92,7 +92,6 @@ Dandelion::App.controller do
     threads = []
 
     FRONTEND_DEPENDENCIES.each do |base_url, libs|
-      # Skip local files
       next if base_url.start_with?('/')
 
       libs.each do |path, files|
@@ -110,7 +109,6 @@ Dandelion::App.controller do
 
     threads.each(&:join)
 
-    # Sort by date (oldest first, nils at top)
     @dependencies.sort_by! { |d| d[:release_date] || Time.at(0) }
 
     erb :'stats/frontend_dependencies'
@@ -158,7 +156,6 @@ Dandelion::App.controller do
       { path: path, size: File.size(file_path), modified: File.mtime(file_path) }
     end
 
-    # Sort by size (largest first)
     @files.sort_by! { |f| -f[:size] }
     @total_size = @files.sum { |f| f[:size] }
 

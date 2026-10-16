@@ -32,7 +32,6 @@ Dandelion::App.controller do
   get '/youtube_thumb/:id' do
     halt 400 unless params[:id] =~ /\A[A-Za-z0-9_-]{11}\z/
 
-    # load base image
     begin
       base_image = MiniMagick::Image.open("https://i.ytimg.com/vi/#{params[:id]}/sddefault.jpg")
     rescue OpenURI::HTTPError
@@ -44,17 +43,14 @@ Dandelion::App.controller do
     end
     base_image = base_image.crop('640x360+0+60')
 
-    # load overlay image
     overlay_image = MiniMagick::Image.open('app/assets/images/youtube.png')
 
-    # calculate coordinates to place the overlay image in the center
     x_coordinate = (base_image.width - overlay_image.width) / 2
     y_coordinate = (base_image.height - overlay_image.height) / 2
 
-    # create a new image which is the result of the composite operation
     result = base_image.composite(overlay_image) do |c|
       c.compose 'Over' # OverCompositeOp
-      c.geometry "+#{x_coordinate}+#{y_coordinate}" # place overlay image at calculated coordinates
+      c.geometry "+#{x_coordinate}+#{y_coordinate}"
     end
 
     content_type 'image/jpeg'

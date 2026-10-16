@@ -30,10 +30,8 @@
     <%
       current_carousel_ids = Array(params[:carousel_ids]).map(&:to_s)
       if current_carousel_ids.include?(carousel.id.to_s)
-        # Remove this carousel from the list
         new_carousel_ids = current_carousel_ids - [carousel.id.to_s]
       else
-        # Add this carousel to the list
         new_carousel_ids = current_carousel_ids + [carousel.id.to_s]
       end
 

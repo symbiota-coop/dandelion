@@ -6,7 +6,6 @@
       initialView: <%== (params[:list] ? 'listMonth' : 'dayGridMonth').to_json %>,
       initialDate: <%== params[:date].to_json %> || undefined,
       events: function(fetchInfo, successCallback, failureCallback) {
-        // Fetch events from the server
         var currentQuery = window.location.search;
         var params = $.deparam(currentQuery.substring(1));
         delete params.from;
@@ -26,7 +25,7 @@
                 id: event.id,
                 title: isMultiDay ? event.name + ' starts' : event.name,
                 start: event.start_time,
-                end: isMultiDay ? null : event.end_time, // Don't set end for multi-day events
+                end: isMultiDay ? null : event.end_time,
                 allDay: isMultiDay, // Make multi-day events appear as all-day on start date
                 url: '/e/' + event.slug,
                 color: <%== params[:minimal] && @organisation.theme_color ? @organisation.theme_color.to_json : "cssColor('var(--theme-500)')" %>,
@@ -50,12 +49,10 @@
           // Allow default behavior for cmd/ctrl+click to open in new tab
           return;
         }
-        // For regular clicks, open in same window
         window.open(info.event.url, '_parent');
         info.jsEvent.preventDefault();
       } : undefined,
       eventDidMount: function(info) {
-        // Initialize Bootstrap tooltip for each event
         var locationIcon = '';
         if (info.event.extendedProps.location) {
           if (info.event.extendedProps.location === 'Online') {
@@ -69,7 +66,6 @@
           (info.event.extendedProps.location ? locationIcon + info.event.extendedProps.location + '<br>' : '') +
           '<small>' + info.event.extendedProps.when_details + '</small>';
 
-        // Target the specific element for tooltip based on view type
         var tooltipTarget = info.el;
 
         // In list view, target the td.fc-list-event-title a element instead of the tr

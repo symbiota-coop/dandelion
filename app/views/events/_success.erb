@@ -33,7 +33,6 @@
       <% unless @event.evergreen? %>
         <script>
           function showSavedTooltipAndSubmit(element) {
-            // Create tooltip if it doesn't exist
             if (!bootstrap.Tooltip.getInstance(element)) {
               $(element).tooltip({
                 title: 'Saved!',
@@ -42,10 +41,8 @@
               });
             }
 
-            // Show tooltip
             $(element).tooltip('show');
 
-            // Hide and submit
             setTimeout(function() {
               $(element).tooltip('hide');
               $(element.form).submit();

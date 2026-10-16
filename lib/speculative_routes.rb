@@ -32,5 +32,4 @@ module SpeculativeRoutes
   end
 end
 
-# Apply the patch
 Padrino::Routing::ClassMethods.prepend(SpeculativeRoutes::ControllerExtensions)

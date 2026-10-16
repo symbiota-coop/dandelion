@@ -1,7 +1,6 @@
 $(function () {
   'use strict'
 
-  // Constants
   const OPACITY_LOADING = '0.3'
   const OPACITY_LOADED = '1'
 
@@ -275,7 +274,6 @@ $(function () {
       if (hasPlaceholder) {
         pagelet.removeAttr('data-with-placeholder')
       } else {
-        // Insert loading spinner
         const loadingSpinner = '<i class="pagelet-loading bi bi-spin bi-slash-lg"></i>'
 
         if (pagelet.is('tr')) {
@@ -303,7 +301,6 @@ $(function () {
     loadEmptyPagelets()
   })
 
-  // Initial load
   initPageletRefresh()
   loadEmptyPagelets()
 })
