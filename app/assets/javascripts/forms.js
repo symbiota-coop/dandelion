@@ -1,5 +1,10 @@
 // Forms: selects, placeholders, date pickers, lookups, slugs and short URLs, colour pickers, autosizing textareas,
 // and forms that submit themselves
+
+// Date pickers start the week on Monday. Set outside the ready handler so it's in place before any page's own
+// flatpickr calls
+flatpickr.l10ns.default.firstDayOfWeek = 1
+
 $(function () {
   // Scrolling over a focused number field changes its value (1 becomes 0 on a trackpad flick), so let go of the field
   // and scroll the page instead
