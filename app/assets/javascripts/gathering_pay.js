@@ -5,7 +5,7 @@ $(function () {
     try {
       const el = document.getElementById('gathering-pay-config')
       if (el) { return JSON.parse(el.textContent || '{}') }
-    } catch (e) { }
+    } catch { }
     return {}
   })()
 

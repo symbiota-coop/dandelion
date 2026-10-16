@@ -75,7 +75,7 @@ $(function () {
     $('.sidebar .sidebar-scroll').on('scroll', function () {
       try {
         localStorage.setItem('sidebarScrollPosition', $(this).scrollTop())
-      } catch (e) {
+      } catch {
         // storage unavailable
       }
     })

@@ -56,11 +56,9 @@ module Searchable
               remaining_selector[field] = value
             end
           # Skip null checks - Atlas Search equals filter doesn't handle null properly
-          # Move them to $match stage instead where MongoDB can properly distinguish
+          # Leave them to the $match stage instead (else below), where MongoDB can properly distinguish
           # between missing fields and fields explicitly set to null
-          elsif value.nil?
-            remaining_selector[field] = value
-          elsif (search_filter = atlas_search_leaf_filter(field, value))
+          elsif !value.nil? && (search_filter = atlas_search_leaf_filter(field, value))
             search_filters << search_filter
             if (vector_filter = vector_search_leaf_filter(field, value))
               search_filters_vector << vector_filter

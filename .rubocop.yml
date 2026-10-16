@@ -29,8 +29,6 @@ Layout/EndAlignment:
 Security:
   Severity: warning
 
-Lint/DuplicateBranch:
-  IgnoreDuplicateElseBranch: true
 # Our tests save screenshots on purpose (each test's last page, in capybara/<pid>/, and the how-to videos' frames), so
 # save_screenshot isn't a debugging leftover; the rest of Capybara's list (save_and_open_page...) still is
 Lint/Debugger:

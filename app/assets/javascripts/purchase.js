@@ -6,7 +6,7 @@ $(function () {
     try {
       const el = document.getElementById('purchase-config')
       if (el) { return JSON.parse(el.textContent || '{}') }
-    } catch (e) { }
+    } catch { }
     return (window.purchaseConfig || {})
   })()
   const $donationAmount = $('#donation_amount')
@@ -294,7 +294,7 @@ $(function () {
       try {
         const json = xhr.responseJSON || JSON.parse(xhr.responseText || '{}')
         if (json && json.error) { msg = json.error }
-      } catch (err) { }
+      } catch { }
       $('#ticket-type-waitlist-error').text(msg).show()
     }).always(function () {
       $('#ticket-type-waitlist-submit').prop('disabled', false)
@@ -483,7 +483,7 @@ $(function () {
         (handlers[method] || handlers.default)(data)
       }).fail(function (xhr) {
         let json = {}
-        try { json = xhr.responseJSON || JSON.parse(xhr.responseText || '{}') || {} } catch (err) { }
+        try { json = xhr.responseJSON || JSON.parse(xhr.responseText || '{}') || {} } catch { }
         if (json.duplicate && !confirmedDuplicate) {
           purchaseSubmitting = false
           $('#details form button[data-payment-method]').prop('disabled', false)

@@ -48,7 +48,7 @@ $(function () {
     if (!url) return ''
     try {
       return new URL(url, window.location.origin).pathname
-    } catch (e) {
+    } catch {
       return String(url).split('?')[0]
     }
   }
@@ -169,7 +169,7 @@ $(function () {
     let path
     try {
       path = new URL(href, window.location.origin).pathname
-    } catch (e) {
+    } catch {
       path = href
     }
     const request = ($link.data('method') === 'post' || /destroy$/.test(path)) ? $.post : $.get

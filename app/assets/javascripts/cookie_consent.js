@@ -8,7 +8,7 @@ function initCookieConsent () {
     if (!raw) return null
     try {
       return JSON.parse(raw)
-    } catch (e) {
+    } catch {
       return null
     }
   }
@@ -45,7 +45,7 @@ function initCookieConsent () {
     if (!el || !el.getAttribute('data-marketing-cookies')) return []
     try {
       return JSON.parse(el.getAttribute('data-marketing-cookies'))
-    } catch (e) {
+    } catch {
       return []
     }
   }

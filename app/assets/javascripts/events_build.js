@@ -6,7 +6,7 @@ $(function () {
     try {
       const el = document.getElementById('events-build-config')
       if (el) { return JSON.parse(el.textContent || '{}') }
-    } catch (e) { }
+    } catch { }
     return (window.eventsBuildConfig || {})
   })()
 
@@ -148,7 +148,7 @@ $(function () {
         url.searchParams.set('organisation_id', config.organisationId)
       }
       window.history.replaceState({}, '', url)
-    } catch (e) { }
+    } catch { }
   }
 
   $('#ticket_types_add').on('click', function () {

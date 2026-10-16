@@ -111,7 +111,7 @@ const javascript = {
 
 const rules = {
   // Top-level functions are shared with other scripts and inline <script>s, so only flag unused locals
-  'no-unused-vars': ['error', { vars: 'local', caughtErrors: 'none' }],
+  'no-unused-vars': ['error', { vars: 'local' }],
   // Files that define the shared functions above declare them, which is not a redeclaration
   'no-redeclare': ['error', { builtinGlobals: false }],
   'no-empty': ['error', { allowEmptyCatch: true }],

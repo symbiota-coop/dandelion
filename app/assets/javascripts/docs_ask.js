@@ -115,7 +115,7 @@
     try {
       var raw = window.sessionStorage.getItem(cacheKey())
       return raw ? JSON.parse(raw) : null
-    } catch (e) {
+    } catch {
       return null
     }
   }
@@ -123,7 +123,7 @@
   function writeCache (data) {
     try {
       window.sessionStorage.setItem(cacheKey(), JSON.stringify(data))
-    } catch (e) {}
+    } catch {}
   }
 
   function separateLists (markdown) {

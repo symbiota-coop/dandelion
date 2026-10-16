@@ -91,7 +91,7 @@ $.currencySymbol = function (currency) {
 
     // If symbol is compound (>1 char) and ends with $, return original currency code
     return (symbolValue.length > 1 && symbolValue.endsWith('$')) ? currency : symbolValue;
-  } catch (e) {
+  } catch {
     return currency;
   }
 }
