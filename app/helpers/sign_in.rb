@@ -35,28 +35,59 @@ Dandelion::App.helpers do
 
     account.set(failed_sign_in_attempts: 0)
     account.sign_ins.create(request: request, skip_increment: %w[unsubscribe give_feedback subscriptions].any? { |p| request.path.include?(p) })
-    start_session!(account, verified: !sign_in_code.nil?)
+    # Only a code confirms the email here: anyone the email reaches, mail scanners included, can open a link
+    undone = confirm_email_of(account, same_browser: account_set_up_in_this_session?(account)) if sign_in_code && !account.email_confirmed?
+    start_session!(account, verified: !sign_in_code.nil?, via_link: sign_in_code.nil?)
     @signed_in_via_email = true
     account.generate_link_token!
-    if account.sign_ins_count == 1
-      account.set(email_confirmed: true)
-      account.send_activation_notification
-    end
+    account.send_activation_notification if account.sign_ins_count == 1
+    notice = [sign_in_code ? 'Signed in with a sign in code' : 'Signed in via a link', undone].compact.join('. ')
     if sign_in_landing_path? && (return_to = session.delete(:return_to))
+      flash[:notice] = notice if undone
       redirect return_to
     else
       session.delete(:return_to)
-      flash.now[:notice] = sign_in_code ? 'Signed in with a sign in code' : 'Signed in via a link'
+      flash.now[:notice] = notice
     end
   end
 
-  # Every sign in goes through here. verified: signed in with a sign in code (recently_verified?)
-  def start_session!(account, verified: false)
-    session.delete(:verified_at) unless verified || session[:account_id] == account.id.to_s
+  # Every sign in goes through here. verified: signed in with a sign in code (recently_verified?).
+  # via_link: signed in with a link in an email, which anyone the email reaches can open, so unlike signing up, a password,
+  # a provider or a code, it doesn't mark the session as one that set the account up (account_set_up_in_this_session?)
+  def start_session!(account, verified: false, via_link: false)
+    # Restarting the account's own session (after revoke_sessions!, say) keeps what it was started with
+    unless session[:account_id] == account.id.to_s
+      session.delete(:verified_at) unless verified
+      if via_link
+        session.delete(:set_up_account)
+      else
+        session[:set_up_account] = true
+      end
+    end
     session[:account_id] = account.id.to_s
     session[:session_token] = account.session_token!
     session[:verified_at] = Time.now.to_i if verified
     @current_account = account
+  end
+
+  # This session is the account's, and was started by signing up, a password, a provider or a code, not by an emailed link:
+  # whoever set the account up, and whoever confirms its email here, are the same person. Sessions from before the
+  # marker don't have it, as they could have come from links
+  def account_set_up_in_this_session?(account)
+    session_account == account && session[:set_up_account] == true
+  end
+
+  # Confirms the account's email (Account#confirm_email!), and returns what to tell the person about anything it undid
+  def confirm_email_of(account, same_browser:)
+    removed_providers = account.confirm_email!(same_browser: same_browser)
+    return if same_browser
+
+    notice = 'Your email address was confirmed. It was confirmed in a different browser from the one that set this account up, so we signed out other browsers and reset its password'
+    if removed_providers.any?
+      them = removed_providers.one? ? 'it' : 'them'
+      notice += ". #{removed_providers.to_sentence} had been connected to this account before its email address was confirmed, so we disconnected #{them}. If that was you, connect #{them} again from your account settings"
+    end
+    "#{notice}."
   end
 
   # The session's account, while the session carries the account's session_token (revoke_sessions! changes it).
@@ -76,7 +107,7 @@ Dandelion::App.helpers do
       end
     end
 
-    %i[account_id session_token verified_at].each { |k| session.delete(k) }
+    %i[account_id session_token verified_at set_up_account].each { |k| session.delete(k) }
     nil
   end
 

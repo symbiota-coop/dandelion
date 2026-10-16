@@ -10,8 +10,16 @@ Dandelion::App.helpers do
     account.provider_links.build(
       provider: provider.display_name,
       provider_uid: provider_uid,
-      omniauth_hash: omniauth_data
+      omniauth_hash: omniauth_data,
+      before_email_confirmed: !account.email_confirmed? && !omniauth_email_verified?(omniauth_data, account.email)
     )
+  end
+
+  # Google gives an email only once it has verified it, but vouches for its current owner only for its own addresses:
+  # another domain's address may have changed hands since (developers.google.com/identity/sign-in/web/backend-auth)
+  def omniauth_email_verified?(omniauth_data, email)
+    omniauth_email = omniauth_data.dig('info', 'email').to_s.downcase.strip
+    omniauth_data['provider'] == 'google_oauth2' && email && omniauth_email == email.downcase.strip && omniauth_email.end_with?('@gmail.com', '@googlemail.com')
   end
 
   # Fails closed: an unset RECAPTCHA_SKIP_SECRET must not match a missing param (nil == nil)

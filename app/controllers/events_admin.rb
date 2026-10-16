@@ -97,7 +97,7 @@ Dandelion::App.controller do
 
     tickets_table = EmailHelper.render(:_tickets_table, event: @event, account: current_account)
     EmailHelper.html(:tickets, event: @event, order: order, account: current_account, tickets_table: tickets_table, header_image_url: header_image_url) do |content|
-      content.gsub('%recipient.token%', current_account.link_token)
+      content.gsub('%recipient.token%', '') # a preview isn't sent, so it must not show a working link token
     end
   end
 
@@ -118,7 +118,8 @@ Dandelion::App.controller do
         content,
         EmailFields.recipient_variables(
           event: @event,
-          account: current_account
+          account: current_account,
+          token: false
         )
       )
     end
@@ -139,7 +140,8 @@ Dandelion::App.controller do
         content,
         EmailFields.recipient_variables(
           event: @event,
-          account: current_account
+          account: current_account,
+          token: false
         ).merge('feedback_token' => @event.feedback_preview_token)
       )
     end

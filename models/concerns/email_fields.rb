@@ -4,9 +4,11 @@ module EmailFields
   MAGIC_TAGS = %w[firstname lastname fullname event_name event_when event_location event_url at_event_location_if_not_online organisation_name ticket_or_tickets tickets_are description_elements key_information_again].freeze
   RECIPIENT_TAGS = %w[firstname lastname fullname event_when ticket_or_tickets tickets_are description_elements].freeze
 
-  def self.recipient_variables(event:, account:, orders: [])
+  # token: false for previews, which aren't sent: shown on a page, a working link token would let whoever is signed in
+  # confirm an email address they don't receive
+  def self.recipient_variables(event:, account:, orders: [], token: true)
     recipient_tag_values(event: event, account: account, orders: orders)
-      .merge('token' => account&.link_token_for_email, 'id' => account&.id&.to_s)
+      .merge('token' => (account&.link_token_for_email if token), 'id' => account&.id&.to_s)
   end
 
   def self.replace_recipient_variables(text, variables)

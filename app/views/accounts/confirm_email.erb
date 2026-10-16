@@ -1,0 +1,6 @@
+<div class="container">
+  <p>Confirm that <strong><%= current_account.email %></strong> is your email address?</p>
+  <% form_tag '/accounts/confirm_email' do %>
+    <button type="submit" class="btn btn-primary">Confirm my email address</button>
+  <% end %>
+</div>

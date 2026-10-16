@@ -86,7 +86,10 @@ module ActiveSupport
       end
     end
 
-    def sign_in(account)
+    # Factory accounts are unconfirmed, and a code from a new browser would confirm one as someone else (Account#confirm_email!),
+    # signing out its other sessions and resetting its password: confirm: false to test that
+    def sign_in(account, confirm: true)
+      account.set(email_confirmed: true) if confirm
       Capybara.reset_sessions!
       visit "/?sign_in_code=#{account.issue_sign_in_code!}"
     end
@@ -95,7 +98,8 @@ module ActiveSupport
       Padrino.application
     end
 
-    def sign_in_with_rack(account)
+    def sign_in_with_rack(account, confirm: true)
+      account.set(email_confirmed: true) if confirm
       clear_cookies
       get '/', sign_in_code: account.issue_sign_in_code!
       follow_redirect! while last_response.redirect?

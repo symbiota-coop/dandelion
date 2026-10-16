@@ -20,16 +20,35 @@ Dandelion::App.controller do
     redirect '/accounts/edit'
   end
 
+  # The link signs in (sign_in_via_link_token) but confirms only with the button, which a mail scanner opening the link won't press
   get '/confirm_email/:link_token' do
     sign_in_required!
-    if @signed_in_via_email
-      current_account.set(email_confirmed: true)
-      flash[:notice] = 'Your email address was confirmed.'
+    if !@signed_in_via_email
+      flash[:error] = "That confirmation link isn't valid. Please request a new one."
+      redirect '/accounts/edit'
+    elsif current_account.email_confirmed?
+      flash[:notice] = 'Your email address is already confirmed.'
       redirect '/accounts/edit'
     else
+      # Signing in made a new link token, so the button can't carry this one: the session vouches for the link instead
+      session[:confirming_email] = current_account.email
+      erb :'accounts/confirm_email'
+    end
+  end
+
+  post '/accounts/confirm_email' do
+    sign_in_required!
+    confirming_email = session.delete(:confirming_email)
+    unless confirming_email && confirming_email == current_account.email
       flash[:error] = "That confirmation link isn't valid. Please request a new one."
       redirect '/accounts/edit'
     end
+    unless current_account.email_confirmed?
+      undone = confirm_email_of(current_account, same_browser: account_set_up_in_this_session?(current_account))
+      start_session!(current_account) # confirm_email_of may have revoked sessions
+    end
+    flash[:notice] = undone || 'Your email address was confirmed.'
+    redirect '/accounts/edit'
   end
 
   get '/accounts/sign_in' do
@@ -95,7 +114,12 @@ Dandelion::App.controller do
     load_context
 
     validate_recaptcha unless recaptcha_skip_secret_valid?
-    link_omniauth_provider(@account) if session['omniauth.auth'] && params[:omniauth_signup]
+    omniauth_data = session['omniauth.auth'] if params[:omniauth_signup]
+    if omniauth_data
+      link_omniauth_provider(@account, omniauth_data)
+      # Google has shown this is their address (omniauth_email_verified?), so there's nothing to confirm
+      @account.skip_confirmation_email = email_verified_by_omniauth = omniauth_email_verified?(omniauth_data, @account.email)
+    end
 
     saved = begin
       @account.save
@@ -109,6 +133,7 @@ Dandelion::App.controller do
     session.delete('omniauth.auth') if saved || existing_account || !params[:omniauth_signup]
 
     if saved
+      @account.set(email_confirmed: true) if email_verified_by_omniauth
       handle_successful_account_creation
     elsif existing_account
       handle_existing_account(existing_account)

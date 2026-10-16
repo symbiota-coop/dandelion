@@ -169,6 +169,30 @@ class Account
     unset(:sign_in_code_digest, :sign_in_code_expires_at)
   end
 
+  # Someone has shown they get this address's email. Whoever set the account up may not have been them, so unless they
+  # did it in this browser, other sessions end, the password is reset and providers connected before now are removed.
+  # Returns the removed providers
+  def confirm_email!(same_browser:)
+    set(email_confirmed: true)
+    # Links from before before_email_confirmed have no value for it, and could have been connected by anyone
+    unconfirmed_links = provider_links.and('$or' => [{ before_email_confirmed: true }, { before_email_confirmed: nil }])
+    if same_browser
+      unconfirmed_links.update_all(before_email_confirmed: false)
+      []
+    else
+      revoke_sessions!
+      set(crypted_password: ::BCrypt::Password.create(Account.generate_password, cost: ::BCrypt::Engine::MIN_COST)) # nobody is given it
+      unconfirmed_links.pluck(:provider).tap { unconfirmed_links.destroy_all }
+    end
+  end
+
+  # The new address is unconfirmed (AccountValidation), and its owner may not be whoever connected the providers, so
+  # they're treated as connected before it was confirmed: confirm_email! keeps them only if it's confirmed in a browser
+  # that set the account up
+  after_save do
+    provider_links.update_all(before_email_confirmed: true) if previous_changes['email'] && previous_changes['email'][0]
+  end
+
   def link_token_expired?
     Account.link_token_expired?(link_token)
   end

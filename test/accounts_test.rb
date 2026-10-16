@@ -190,16 +190,19 @@ class AccountsTest < ActiveSupport::TestCase
     assert follow.reload.unsubscribed
   end
 
-  test 'email confirmation link confirms the address' do
+  test 'email confirmation link confirms the address with its button' do
     account = FactoryBot.create(:account, email_confirmed: false)
     account.generate_link_token!
     token = account.link_token
 
     get "/confirm_email/#{token}"
-    follow_redirect! while last_response.redirect?
-
-    assert account.reload.email_confirmed
+    refute account.reload.email_confirmed
     assert_equal account.id.to_s, last_request.session[:account_id]
+    assert_includes last_response.body, 'Confirm my email address'
+
+    post '/accounts/confirm_email'
+    follow_redirect! while last_response.redirect?
+    assert account.reload.email_confirmed
     assert_includes last_response.body, 'Your email address was confirmed'
   end
 
@@ -210,10 +213,21 @@ class AccountsTest < ActiveSupport::TestCase
     token = account.reload.link_token
 
     get "/confirm_email/#{token}"
+    post '/accounts/confirm_email'
     follow_redirect! while last_response.redirect?
 
     assert account.reload.email_confirmed
     assert_includes last_response.body, 'Your email address was confirmed'
+  end
+
+  test 'the confirmation button does nothing without the link' do
+    account = FactoryBot.create(:account)
+    sign_in_via_rack(account)
+
+    post '/accounts/confirm_email'
+    follow_redirect! while last_response.redirect?
+    refute account.reload.email_confirmed
+    assert_includes last_response.body, "That confirmation link isn't valid"
   end
 
   test 'email confirmation link rejects a token that does not match the signed-in account' do
@@ -771,6 +785,206 @@ class AccountsTest < ActiveSupport::TestCase
     assert account.unsubscribed_messages
   end
 
+  test 'opening the confirmation link, as a mail scanner does, neither confirms the email nor signs anyone out' do
+    start_omniauth_signup(email: 'scanned@example.com')
+    post '/accounts/new', account: { name: 'Sam Scanned', email: 'scanned@example.com' }, omniauth_signup: '1'
+    account = Account.find_by(email: 'scanned@example.com')
+
+    scanner = Rack::Test::Session.new(app)
+    scanner.get "/confirm_email/#{account.link_token_for_email}"
+    assert_includes scanner.last_response.body, 'Confirm my email address'
+    refute account.reload.email_confirmed
+    assert_equal ['Google'], account.provider_links.map(&:provider)
+    get '/accounts/edit'
+    assert last_response.ok?
+  end
+
+  test 'confirming the email with a code elsewhere ends the session, provider and password of whoever signed up with it' do
+    victim_email = 'signed-up-by-someone-else@example.com'
+    start_omniauth_signup(email: victim_email)
+    post '/accounts/new', account: { name: 'Someone Else', email: victim_email }, omniauth_signup: '1'
+    account = Account.find_by(email: victim_email)
+    assert account.provider_links.find_by(provider: 'Google').before_email_confirmed
+    get '/accounts/edit'
+    assert last_response.ok?
+    crypted_password = account.crypted_password
+
+    victim_browser = Rack::Test::Session.new(app)
+    victim_browser.get '/', sign_in_code: account.issue_sign_in_code!
+    assert_includes victim_browser.last_response.body, 'Google had been connected to this account before its email address was confirmed'
+    assert account.reload.email_confirmed
+    assert_empty account.provider_links
+    refute_equal crypted_password, account.crypted_password
+
+    get '/accounts/edit'
+    assert last_response.redirect?
+    victim_browser.get '/accounts/edit'
+    assert victim_browser.last_response.ok?
+  end
+
+  test 'confirming the email elsewhere resets a password set before it was confirmed' do
+    account = FactoryBot.create(:account)
+    sign_in_via_rack(account)
+    assert_equal account.id.to_s, last_request.session[:account_id]
+
+    victim_browser = Rack::Test::Session.new(app)
+    victim_browser.get '/', sign_in_code: account.issue_sign_in_code!
+    assert account.reload.email_confirmed
+    refute account.password_matches?(account.password)
+
+    get '/accounts/edit'
+    assert last_response.redirect?
+    sign_in_via_rack(account)
+    assert_nil last_request.session[:account_id]
+  end
+
+  test 'confirming the email with a code in the browser that signed up keeps its provider' do
+    start_omniauth_signup(email: 'ethan@example.com')
+    post '/accounts/new', account: { name: 'Ethan Example', email: 'ethan@example.com' }, omniauth_signup: '1'
+    account = Account.find_by(email: 'ethan@example.com')
+    crypted_password = account.crypted_password
+
+    get '/', sign_in_code: account.issue_sign_in_code!
+    assert account.reload.email_confirmed
+    refute account.provider_links.find_by(provider: 'Google').before_email_confirmed
+    assert_equal crypted_password, account.crypted_password
+    get '/accounts/edit'
+    assert last_response.ok?
+  end
+
+  test 'confirming the email with the link elsewhere ends the provider of whoever signed up with it' do
+    start_omniauth_signup(email: 'linked-elsewhere@example.com')
+    post '/accounts/new', account: { name: 'Lina Elsewhere', email: 'linked-elsewhere@example.com' }, omniauth_signup: '1'
+    account = Account.find_by(email: 'linked-elsewhere@example.com')
+
+    victim_browser = Rack::Test::Session.new(app)
+    victim_browser.get "/confirm_email/#{account.link_token_for_email}"
+    victim_browser.post '/accounts/confirm_email'
+    assert account.reload.email_confirmed
+    assert_empty account.provider_links
+    get '/accounts/edit'
+    assert last_response.redirect?
+    victim_browser.get '/accounts/edit'
+    assert victim_browser.last_response.ok?
+  end
+
+  test 'confirming the email with the link in the browser that signed up keeps its provider' do
+    start_omniauth_signup(email: 'linked-here@example.com')
+    post '/accounts/new', account: { name: 'Lena Here', email: 'linked-here@example.com' }, omniauth_signup: '1'
+    account = Account.find_by(email: 'linked-here@example.com')
+
+    get "/confirm_email/#{account.link_token_for_email}"
+    post '/accounts/confirm_email'
+    assert account.reload.email_confirmed
+    refute account.provider_links.find_by(provider: 'Google').before_email_confirmed
+    get '/accounts/edit'
+    assert last_response.ok?
+  end
+
+  test 'confirming the email elsewhere removes providers connected before it was tracked' do
+    account = FactoryBot.create(:account)
+    link = account.provider_links.create!(provider: 'Google', provider_uid: 'google-uid-legacy', omniauth_hash: { 'uid' => 'google-uid-legacy' })
+    ProviderLink.collection.update_one({ _id: link.id }, { '$unset' => { before_email_confirmed: 1 } })
+
+    clear_cookies
+    get '/', sign_in_code: account.issue_sign_in_code!
+    assert account.reload.email_confirmed
+    assert_empty account.provider_links
+  end
+
+  test 'a session from a link that then enters a code confirms the email as someone else' do
+    start_omniauth_signup(email: 'link-then-code@example.com')
+    post '/accounts/new', account: { name: 'Lee Linked', email: 'link-then-code@example.com' }, omniauth_signup: '1'
+    account = Account.find_by(email: 'link-then-code@example.com')
+
+    other_browser = Rack::Test::Session.new(app)
+    other_browser.get '/', link_token: account.link_token_for_email
+    refute account.reload.email_confirmed
+    other_browser.get '/', sign_in_code: account.issue_sign_in_code!
+    assert account.reload.email_confirmed
+    assert_empty account.provider_links
+  end
+
+  test 'changing the email puts its providers on trial until the new address is confirmed' do
+    account = FactoryBot.create(:account)
+    sign_in_with_rack(account)
+    account.provider_links.create!(provider: 'Google', provider_uid: 'google-uid-before-change', omniauth_hash: { 'uid' => 'google-uid-before-change' }, before_email_confirmed: false)
+    post '/accounts/edit', account: { name: account.name, email: 'someone-elses@example.com' }
+    assert_equal 'someone-elses@example.com', account.reload.email
+    refute account.email_confirmed
+    assert account.provider_links.find_by(provider: 'Google').before_email_confirmed
+
+    owner_browser = Rack::Test::Session.new(app)
+    owner_browser.get '/', sign_in_code: account.issue_sign_in_code!
+    assert account.reload.email_confirmed
+    assert_empty account.provider_links
+  end
+
+  test 'email previews do not show the signed-in account a working link token' do
+    create_event(prices: [0])
+    sign_in_with_rack(@account)
+    @account.generate_link_token!
+
+    %w[ticket_email_preview reminder_email_preview feedback_request_email_preview].each do |preview|
+      get "/events/#{@event.id}/#{preview}"
+      assert last_response.ok?, preview
+      refute_includes last_response.body, @account.reload.link_token, preview
+    end
+  end
+
+  test 'a session from before the set up marker confirms the email as someone else' do
+    account = FactoryBot.create(:account)
+    account.provider_links.create!(provider: 'Google', provider_uid: 'google-uid-old-session', omniauth_hash: { 'uid' => 'google-uid-old-session' }, before_email_confirmed: true)
+    clear_cookies
+    env 'rack.session', { 'account_id' => account.id.to_s, 'session_token' => account.session_token! }
+    get '/accounts/edit'
+    assert last_response.ok?
+
+    get '/', sign_in_code: account.issue_sign_in_code!
+    assert account.reload.email_confirmed
+    assert_empty account.provider_links
+    # Still signed in, with the token of the revocation (env above would replay the old session on another request)
+    assert_equal account.session_token, last_request.session[:session_token]
+  end
+
+  test 'saving a provider link from before before_email_confirmed keeps it counted as before confirmation' do
+    account = FactoryBot.create(:account)
+    link = account.provider_links.create!(provider: 'Google', provider_uid: 'google-uid-legacy-save', omniauth_hash: { 'uid' => 'google-uid-legacy-save' })
+    ProviderLink.collection.update_one({ _id: link.id }, { '$unset' => { before_email_confirmed: 1 } })
+
+    loaded = Account.find(account.id)
+    loaded.provider_links.build(provider: 'Ethereum', provider_uid: '0xabc', omniauth_hash: { 'uid' => '0xabc' }, before_email_confirmed: true)
+    loaded.save!
+    refute_equal false, ProviderLink.collection.find(_id: link.id).first['before_email_confirmed']
+
+    ProviderLink.find(link.id).save!
+    assert ProviderLink.collection.find(_id: link.id).first['before_email_confirmed']
+  end
+
+  test 'signing up with Google under its verified Gmail address confirms the email' do
+    start_omniauth_signup(email: 'alice.example@gmail.com')
+    post '/accounts/new', account: { name: 'Alice Example', email: 'alice.example@gmail.com' }, omniauth_signup: '1'
+    account = Account.find_by(email: 'alice.example@gmail.com')
+    assert account.email_confirmed
+    refute account.provider_links.find_by(provider: 'Google').before_email_confirmed
+  end
+
+  test 'signing up with Google under another domain\'s address leaves the email unconfirmed' do
+    start_omniauth_signup
+    post '/accounts/new', account: { name: 'Alice Example', email: 'alice-oauth@example.com' }, omniauth_signup: '1'
+    account = Account.find_by(email: 'alice-oauth@example.com')
+    refute account.email_confirmed
+    assert account.provider_links.find_by(provider: 'Google').before_email_confirmed
+  end
+
+  test 'signing up with Google under its Gmail address but another email leaves the email unconfirmed' do
+    start_omniauth_signup(email: 'alice.example@gmail.com')
+    post '/accounts/new', account: { name: 'Alice Example', email: 'someone-else@gmail.com' }, omniauth_signup: '1'
+    account = Account.find_by(email: 'someone-else@gmail.com')
+    refute account.email_confirmed
+    assert account.provider_links.find_by(provider: 'Google').before_email_confirmed
+  end
+
   test 'leftover omniauth session is not linked on a later signup' do
     start_omniauth_signup
     later = FactoryBot.build_stubbed(:account)
@@ -1041,13 +1255,13 @@ class AccountsTest < ActiveSupport::TestCase
     previous.each { |key, value| ENV[key] = value }
   end
 
-  def start_omniauth_signup
+  def start_omniauth_signup(email: 'alice-oauth@example.com')
     clear_cookies
     OmniAuth.config.test_mode = true
     OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new(
       provider: 'google_oauth2',
       uid: 'google-uid-1',
-      info: { name: 'Alice Example', email: 'alice-oauth@example.com' }
+      info: { name: 'Alice Example', email: email }
     )
     get '/auth/google_oauth2'
     follow_redirect! while last_response.redirect?
