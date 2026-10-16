@@ -3,10 +3,21 @@
 module Daily
   class GenerationFailed < StandardError; end
 
+  # How every story is written, in place of EventsSummary's general instructions: a short news story about a few of
+  # the events, rather than a summary that links them all
+  STYLE = <<~TEXT.freeze
+    Write it as a short newspaper story: 100 to 150 words of prose in one or two paragraphs, with no headline.
+    Pick the three to five events most worth a reader's attention rather than mentioning them all, and say something concrete about each: where it is, what happens there, who it's for.
+    Say only what the events' own descriptions say: don't add details, settings or atmosphere they don't give.
+    Write plainly and warmly, in British English, like a good local reporter. Avoid marketing language and clichés such as "diverse", "vibrant", "enthusiasts", "immersive", "journey" and "something for everyone". No bullet points, italics or headers.
+    Do not mention specific dates or times.
+    Link each event's name the first time it appears, using markdown like [Event Name](URL), and link nothing else.
+  TEXT
+
   ARTICLES = [
     {
       title: "Today's events",
-      prompt: 'Create a two-paragraph summary of these events, happening today. IMPORTANT: Two paragraphs only.',
+      prompt: "The day's lead story: what's on today, from these events.",
       events: lambda { |date|
         Event.live.publicly_visible.browsable
              .and(:description.ne => nil)
@@ -15,7 +26,7 @@ module Daily
     },
     {
       title: 'Feedback report',
-      prompt: 'Create a two-paragraph summary of the feedback on these events. IMPORTANT: Two paragraphs only.',
+      prompt: "What people said about these recent events, from their attendees' feedback: what they valued, and anything they'd change. Put it in your own words, without quoting or naming attendees.",
       use_feedback: true,
       events: lambda { |date|
         Event.live.publicly_visible.browsable
@@ -25,7 +36,7 @@ module Daily
     },
     {
       title: 'Recently listed',
-      prompt: 'Create a two-paragraph summary of these newly-listed event(s). IMPORTANT: Two paragraphs only.',
+      prompt: 'Events newly listed on Dandelion, from these.',
       events: lambda { |date|
         Event.live.publicly_visible.browsable
              .and(:description.ne => nil)
@@ -34,7 +45,7 @@ module Daily
     },
     {
       title: 'Trending events',
-      prompt: 'Create a two-paragraph summary of these trending, upcoming event(s). IMPORTANT: Two paragraphs only.',
+      prompt: 'The upcoming events drawing the most interest right now, from these.',
       events: ->(date) { Event.trending(date, limit: 3) }
     }
   ].freeze
@@ -106,7 +117,8 @@ module Daily
         events = article[:events].call(date)
         next if events.empty?
 
-        { 'title' => article[:title], 'summary' => EventsSummary.generate(article[:prompt], events, use_feedback: article[:use_feedback]) }
+        summary = EventsSummary.generate(article[:prompt], events, use_feedback: article[:use_feedback], general_instructions: STYLE)
+        { 'title' => article[:title], 'summary' => summary }
       end,
       'facilitator_id' => facilitator_id
     }
