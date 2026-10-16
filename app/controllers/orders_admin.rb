@@ -269,7 +269,9 @@ Dandelion::App.controller do
     @ticket = Ticket.find(params[:id]) || not_found
     @event = @ticket.event
     event_admins_only!
-    @ticket.set(ticket_type_id: params[:ticket_type_id])
+    # set skips validation, so check here that the ticket type is this event's
+    ticket_type = @event.ticket_types.find(params[:ticket_type_id]) || not_found
+    @ticket.set(ticket_type_id: ticket_type.id)
     # set bypasses Ticket callbacks, so refresh the event's sold-out caches explicitly
     @event.refresh_sold_out_cache_and_notify_waitlist
     200
