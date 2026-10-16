@@ -217,6 +217,14 @@ Dandelion::App.controller do
     erb :'accounts/api_key'
   end
 
+  post '/accounts/api_key' do
+    sign_in_required!
+    verification_required!(return_to: '/accounts/api_key', notice: "Your API key wasn't replaced: enter the code below, then replace it again.")
+    current_account.replace_api_key!
+    flash[:notice] = 'Your API key was replaced. Anything using the old one, like Zapier or an AI assistant, needs the new one.'
+    redirect '/accounts/api_key'
+  end
+
   get '/accounts/delete' do
     sign_in_required!
     @account = current_account

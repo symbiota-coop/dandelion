@@ -1,8 +1,12 @@
 <%= partial :'accounts/nav' %>
 <div class="container">
-  <p>Your API key connects Dandelion to <a href="/docs/integrations">Zapier and AI assistants</a>. Anyone with it can act as you, so keep it secret. It's replaced when you change your email or password.</p>
+  <p>Your API key connects Dandelion to <a href="/docs/integrations">Zapier and AI assistants</a>. Anyone with it can act as you, so keep it secret.</p>
   <div class="mb-3">
     <label class="form-label" for="api_key">API key</label>
     <input type="text" id="api_key" class="form-control" value="<%= @account.api_key %>" readonly onclick="this.select()">
   </div>
+  <p>If someone else might have it, replace it. Anything using the old one stops working until you give it the new one.</p>
+  <% form_tag '/accounts/api_key' do %>
+    <button type="submit" class="btn btn-outline-primary" data-confirm="Replace your API key? Anything using the old one stops working." data-confirm-label="Replace API key">Replace API key</button>
+  <% end %>
 </div>

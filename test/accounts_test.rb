@@ -707,17 +707,15 @@ class AccountsTest < ActiveSupport::TestCase
     refute_equal new_code, account.reload.issue_sign_in_code!
   end
 
-  test 'revoking sessions ends the API key and calendar feed key' do
+  test 'revoking sessions keeps the API key and calendar feed key' do
     account = FactoryBot.create(:account)
     api_key = account.api_key
     ics_key = account.ensure_ics_key!
 
     account.revoke_sessions!
     account.reload
-    refute_equal api_key, account.api_key
-    assert_nil Account.find_by(api_key: api_key)
-    assert_nil account.ics_key
-    refute_equal ics_key, account.ensure_ics_key!
+    assert_equal api_key, account.api_key
+    assert_equal ics_key, account.ics_key
   end
 
   test 'links with the old sign_in_token param still sign in' do
@@ -818,6 +816,19 @@ class AccountsTest < ActiveSupport::TestCase
     refute_includes last_response.body, account.api_key
   end
 
+  test 'the API key tab replaces the key' do
+    account = FactoryBot.create(:account)
+    api_key = account.api_key
+    sign_in_with_rack(account)
+
+    post '/accounts/api_key'
+    follow_redirect!
+    assert_includes last_response.body, 'Your API key was replaced'
+    refute_equal api_key, account.reload.api_key
+    assert_nil Account.find_by(api_key: api_key)
+    assert_includes last_response.body, account.api_key
+  end
+
   test 'changing the password signs out other sessions and ends the links already sent' do
     account = FactoryBot.create(:account)
     account.generate_link_token!
@@ -909,6 +920,8 @@ class AccountsTest < ActiveSupport::TestCase
     get '/accounts/edit'
     assert last_response.ok?
     crypted_password = account.crypted_password
+    api_key = account.api_key
+    ics_key = account.ensure_ics_key!
 
     victim_browser = Rack::Test::Session.new(app)
     victim_browser.get '/', sign_in_code: account.issue_sign_in_code!
@@ -916,6 +929,9 @@ class AccountsTest < ActiveSupport::TestCase
     assert account.reload.email_confirmed
     assert_empty account.provider_links
     refute_equal crypted_password, account.crypted_password
+    refute_equal api_key, account.api_key
+    assert_nil account.ics_key
+    assert_nil Account.find_by(ics_key: ics_key)
 
     get '/accounts/edit'
     assert last_response.redirect?
