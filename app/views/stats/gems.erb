@@ -17,9 +17,14 @@
       <% @gems.each do |gem| %>
         <tr>
           <td>
-            <a href="https://rubygems.org/gems/<%= gem[:name] %>" target="_blank"><%= gem[:name] %></a>
+            <a href="<%= gem[:url] || "https://rubygems.org/gems/#{gem[:name]}" %>" target="_blank"><%= gem[:name] %></a>
           </td>
-          <td><code><%= gem[:version] %></code></td>
+          <td>
+            <code><%= gem[:version] %></code>
+            <% if gem[:gemfile_version] && gem[:gemfile_version] != gem[:version] %>
+              <span class="badge text-bg-danger ms-1" data-bs-toggle="tooltip" title="The Gemfile asks for <%= gem[:gemfile_version] %>">Gemfile: <%= gem[:gemfile_version] %></span>
+            <% end %>
+          </td>
           <%= partial 'stats/version_bump_cells', locals: { cells: gem[:version_bump_cells] } %>
           <td data-order="<%= gem[:updated_at].to_i %>">
             <% if gem[:updated_at] %>

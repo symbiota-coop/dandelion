@@ -119,7 +119,7 @@ Dandelion::App.controller do
     mutex = Mutex.new
     threads = []
 
-    gemfile_content = File.read(Padrino.root('Gemfile'))
+    gemfile_content = File.read(Padrino.root('Gemfile'), encoding: 'UTF-8')
 
     # Extract gem names (excluding GitHub gems which won't be on RubyGems)
     gem_names = []
@@ -130,6 +130,11 @@ Dandelion::App.controller do
       gem_names << Regexp.last_match(1) if line =~ /gem ['"]([^'"]+)['"]/
     end
     gem_names.uniq!
+
+    threads << Thread.new do
+      ruby_info = fetch_ruby_info(gemfile_content[/^ruby ['"]([^'"]+)['"]/, 1])
+      mutex.synchronize { @gems << ruby_info }
+    end
 
     gem_names.each do |gem_name|
       threads << Thread.new do

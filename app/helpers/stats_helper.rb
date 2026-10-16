@@ -212,6 +212,21 @@ Dandelion::App.helpers do
     nil
   end
 
+  # A row for the gems table: the running Ruby against ruby-lang.org's list of releases, and the Ruby the Gemfile asks for
+  def fetch_ruby_info(gemfile_version)
+    ruby = { name: 'ruby', url: 'https://www.ruby-lang.org/en/downloads/releases/', version: RUBY_VERSION, gemfile_version: gemfile_version,
+             homepage: 'https://www.ruby-lang.org', source_code: 'https://github.com/ruby/ruby', info: 'The Ruby running the app' }
+    response = Faraday.get('https://raw.githubusercontent.com/ruby/www.ruby-lang.org/master/_data/releases.yml')
+    return ruby unless response.status == 200
+
+    releases = YAML.safe_load(response.body, permitted_classes: [Date]).to_h { |release| [release['version'].to_s, release['date']] }
+    stable_versions = releases.keys.reject { |version| version.include?('-') }
+    latest_version = stable_versions.max_by { |version| Gem::Version.new(version) }
+    ruby.merge(version_bump_cells: version_bump_cells(RUBY_VERSION, stable_versions), updated_at: releases[latest_version]&.then { |date| Time.utc(date.year, date.month, date.day) })
+  rescue StandardError
+    ruby
+  end
+
   def get_installed_gem_version(gem_name)
     gemfile_lock_path = Padrino.root('Gemfile.lock')
     return nil unless File.exist?(gemfile_lock_path)
