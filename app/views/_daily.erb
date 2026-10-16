@@ -1,61 +1,89 @@
-<%# The first article leads, across the page in ruled columns; the rest run side by side beneath it %>
+<%# The first article leads, across the page in ruled columns; the rest run on through columns beneath it %>
 <% lead, *others = @edition['articles'] %>
 <% if lead %>
   <article class="newspaper-article newspaper-lead">
     <h2 class="newspaper-headline"><%= lead['title'] %></h2>
-    <div class="newspaper-text">
+    <div class="newspaper-text newspaper-columns">
       <%== Sanitize.fragment(md(lead['summary'].to_s), Sanitize::Config::DANDELION) %>
     </div>
   </article>
 <% end %>
 
-<% if others.any? %>
-  <div class="newspaper-row">
-    <% others.each do |article| %>
-      <article class="newspaper-article">
-        <h2 class="newspaper-headline"><%= article['title'] %></h2>
-        <div class="newspaper-text">
-          <%== Sanitize.fragment(md(article['summary'].to_s), Sanitize::Config::DANDELION) %>
-        </div>
-      </article>
-    <% end %>
-  </div>
-<% end %>
+<%# The other stories and the features: one above the other, or side by side when the stories are long (the script) %>
+<div class="newspaper-body">
+  <% if others.any? %>
+    <div class="newspaper-stories newspaper-columns">
+      <% others.each do |article| %>
+        <article class="newspaper-article">
+          <h2 class="newspaper-headline"><%= article['title'] %></h2>
+          <div class="newspaper-text">
+            <%== Sanitize.fragment(md(article['summary'].to_s), Sanitize::Config::DANDELION) %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% end %>
 
-<%# Seeded by the date, so each date keeps its book and film %>
-<% random = Random.new(@date.jd) %>
-<div class="newspaper-row newspaper-features">
-  <section class="newspaper-feature">
-    <h3 class="newspaper-section">Book of the day</h3>
-    <% book = Library.books.sample(random: random) %>
-    <% if book %>
-      <a href="/books/<%= book[:slug] %>">
-        <img class="newspaper-cover" src="/books/<%= book[:slug] %>.jpg" alt="">
-      </a>
-    <% end %>
-  </section>
-  <section class="newspaper-feature">
-    <h3 class="newspaper-section">Film of the day</h3>
-    <% film = Library.films.sample(random: random) %>
-    <% if film %>
-      <a href="<%= film[:url] %>">
-        <img class="newspaper-cover" src="/films/<%= film[:slug] %>.jpg" alt="">
-      </a>
-    <% end %>
-  </section>
-  <section class="newspaper-feature">
-    <h3 class="newspaper-section">Facilitator of the day</h3>
-    <% account = Account.find(@edition['facilitator_id']) if @edition['facilitator_id'] %>
-    <% if account %>
-      <a href="javascript:;" data-account-username="<%= account.username %>">
-        <img class="newspaper-portrait <%= account.avatar_class %> <%= 'private' if account.private? %>" src="<%= u account.image_thumb_or_gravatar_url %>" alt="">
-      </a>
-      <h4 class="newspaper-byline">
-        <a class="text-body" href="/u/<%= account.username %>"><%= account.name %></a>
-      </h4>
-      <div class="facilitator-info">
-        <%= partial :'accounts/facilitator_info', locals: { account: account } %>
-      </div>
-    <% end %>
-  </section>
+  <%# Seeded by the date, so each date keeps its book and film %>
+  <% random = Random.new(@date.jd) %>
+  <div class="newspaper-row newspaper-features">
+    <section class="newspaper-feature">
+      <h3 class="newspaper-section">Book of the day</h3>
+      <% book = Library.books.sample(random: random) %>
+      <% if book %>
+        <a href="/books/<%= book[:slug] %>">
+          <img class="newspaper-cover" src="/books/<%= book[:slug] %>.jpg" alt="">
+        </a>
+      <% end %>
+    </section>
+    <section class="newspaper-feature">
+      <h3 class="newspaper-section">Film of the day</h3>
+      <% film = Library.films.sample(random: random) %>
+      <% if film %>
+        <a href="<%= film[:url] %>">
+          <img class="newspaper-cover" src="/films/<%= film[:slug] %>.jpg" alt="">
+        </a>
+      <% end %>
+    </section>
+    <section class="newspaper-feature">
+      <h3 class="newspaper-section">Facilitator of the day</h3>
+      <% account = Account.find(@edition['facilitator_id']) if @edition['facilitator_id'] %>
+      <% if account %>
+        <a href="javascript:;" data-account-username="<%= account.username %>">
+          <img class="newspaper-portrait <%= account.avatar_class %> <%= 'private' if account.private? %>" src="<%= u account.image_thumb_or_gravatar_url %>" alt="">
+        </a>
+        <h4 class="newspaper-byline">
+          <a class="text-body" href="/u/<%= account.username %>"><%= account.name %></a>
+        </h4>
+        <div class="facilitator-info">
+          <%= partial :'accounts/facilitator_info', locals: { account: account } %>
+        </div>
+      <% end %>
+    </section>
+  </div>
 </div>
+
+<%# A block of columns taller than most of the window would have readers scroll down a column and back up for the
+    next, so it runs as one column instead: the lead as a feature-width column (.newspaper-single), the other stories
+    beside the features (.newspaper-sidebar on .newspaper-body). Measured in columns each time, so it follows the
+    window as it resizes %>
+<script>
+  $(function () {
+    function fitColumns () {
+      var body = $('.newspaper-body').removeClass('newspaper-sidebar')
+      $('.newspaper-columns').removeClass('newspaper-single').each(function () {
+        var block = $(this)
+        if (parseInt(block.css('column-count'), 10) > 1 && block.outerHeight() > window.innerHeight * 0.75) {
+          if (block.hasClass('newspaper-stories')) {
+            body.addClass('newspaper-sidebar')
+          } else {
+            block.addClass('newspaper-single')
+          }
+        }
+      })
+    }
+    fitColumns()
+    document.fonts.ready.then(fitColumns)
+    $(window).on('resize', fitColumns)
+  })
+</script>

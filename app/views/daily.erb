@@ -5,8 +5,8 @@
     <p class="newspaper-motto">Printed by a co-op, given as a gift</p>
     <div class="newspaper-dateline">
       <span class="newspaper-dateline-side">
-        <% if @edition %>
-          No. <%= Daily.number(@date) %>
+        <% if @edition && (number = Daily.number(@date)) %>
+          No. <%= number %>
         <% end %>
       </span>
       <span class="newspaper-dateline-date">

@@ -49,9 +49,13 @@ module Daily
     JSON.parse(stash.value) if stash
   end
 
-  # The edition's number in the masthead: how many editions there have been up to and including date
+  # The day the Daily first came out, its No. 1
+  FIRST_DATE = Date.new(2025, 1, 31)
+
+  # The edition's number in the masthead, counting a day at a time from FIRST_DATE (not the stashed editions, as
+  # those under the old /daily?date= keys no longer count), or nil before it
   def self.number(date)
-    Stash.and(:key.gt => 'daily/', :key.lte => key(date)).count
+    (date - FIRST_DATE).to_i + 1 if date >= FIRST_DATE
   end
 
   # The latest date with an edition, up to today

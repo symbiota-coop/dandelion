@@ -152,7 +152,7 @@
 }
 
 .newspaper-text {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
   line-height: 1.55;
   hyphens: auto;
 }
@@ -167,6 +167,25 @@
   }
 }
 
+/* Event names are links in the text's own ink, with a fine underline, so a story still reads as print */
+.newspaper-text a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(var(--bs-black-rgb), 0.3);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+  transition: text-shadow var(--transition-fast), text-decoration-color var(--transition-fast);
+}
+
+/* Bold on hover, made by a sideways text shadow rather than font-weight, which would widen the link and reflow its
+   justified column */
+.newspaper-text a:hover {
+  color: inherit;
+  text-decoration-color: currentColor;
+  text-shadow: 0.03em 0 0 currentColor;
+}
+
+
 .newspaper-lead {
   padding-bottom: var(--space-lg);
   margin-bottom: var(--space-lg);
@@ -178,11 +197,11 @@
   font-weight: 800;
   line-height: 1.05;
   text-align: center;
-  margin-bottom: var(--space-lg);
+  /* As far from its baseline to the text's capitals as the rule above is from its own capitals */
+  margin-bottom: calc(var(--space-lg) + var(--space-2xs));
 }
 
 .newspaper-lead .newspaper-text {
-  font-size: var(--font-size-lg);
   column-count: 3;
   column-gap: var(--space-xl);
   column-rule: 1px solid var(--hairline);
@@ -196,7 +215,6 @@
 
 @media (max-width: 767.98px) {
   .newspaper-lead .newspaper-text {
-    font-size: var(--font-size-md);
     column-count: 1;
   }
 }
@@ -210,7 +228,46 @@
   margin-right: var(--space-sm);
 }
 
-/* A row of stories or features, each after the first behind a column rule; stacked between rules on phones */
+/* The other stories run on through ruled columns, as in print, so a long story and a short one balance rather than
+   leaving one column half empty. A headline stays with its story's first lines */
+.newspaper-stories {
+  column-count: 3;
+  column-gap: var(--space-xl);
+  column-rule: 1px solid var(--hairline);
+  margin-bottom: var(--space-lg);
+}
+
+@media (max-width: 991.98px) {
+  .newspaper-stories {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .newspaper-stories {
+    column-count: 1;
+  }
+}
+
+.newspaper-stories .newspaper-headline {
+  break-after: avoid;
+}
+
+.newspaper-stories .newspaper-article + .newspaper-article {
+  margin-top: var(--space-lg);
+}
+
+/* A block of columns taller than the window would have readers scroll down one column and back up for the next, so
+   _daily.erb's script sets it as a single column, as wide as a feature article */
+.newspaper .newspaper-single {
+  column-count: 1;
+  max-width: 40rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* A row of features, each after the first behind a column rule; stacked between rules on small phones, where three
+   would be too narrow, each no wider than 20rem so a cover or portrait never fills a wide screen */
 .newspaper-row {
   display: flex;
   margin-bottom: var(--space-lg);
@@ -227,7 +284,7 @@
   padding-left: var(--space-lg);
 }
 
-@media (max-width: 767.98px) {
+@media (max-width: 575.98px) {
   .newspaper-row {
     flex-direction: column;
   }
@@ -238,14 +295,9 @@
     margin: var(--space-lg) 0 0;
     padding: var(--space-lg) 0 0;
   }
-}
 
-/* A story on its own in the row takes two columns, like the lead */
-@media (min-width: 768px) {
-  .newspaper-row > .newspaper-article:only-child .newspaper-text {
-    column-count: 2;
-    column-gap: var(--space-xl);
-    column-rule: 1px solid var(--hairline);
+  .newspaper-row :is(.newspaper-cover, .newspaper-portrait) {
+    max-width: 20rem;
   }
 }
 
@@ -255,6 +307,44 @@
   border-top: double 0.25rem var(--newspaper-ink);
   padding-top: var(--space-base);
   margin-bottom: 0;
+}
+
+/* Long stories (_daily.erb's script sets .newspaper-sidebar) run as one column. From lg they take the left two
+   thirds, with the features stacked beside them behind a column rule, so the column is a readable width and the
+   space beside it is used */
+.newspaper-sidebar .newspaper-stories {
+  column-count: 1;
+}
+
+@media (min-width: 992px) {
+  .newspaper-sidebar {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .newspaper-sidebar .newspaper-stories {
+    margin-bottom: 0;
+  }
+
+  .newspaper-sidebar .newspaper-features {
+    flex-direction: column;
+    justify-content: flex-start;
+    border-top: 0;
+    border-left: 1px solid var(--hairline);
+    padding: 0 0 0 var(--space-xl);
+  }
+
+  .newspaper-sidebar .newspaper-features > * {
+    flex: none;
+  }
+
+  .newspaper-sidebar .newspaper-features > * + * {
+    border-left: 0;
+    border-top: 1px solid var(--hairline);
+    margin: var(--space-lg) 0 0;
+    padding: var(--space-lg) 0 0;
+  }
 }
 
 .newspaper-section {
