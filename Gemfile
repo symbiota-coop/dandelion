@@ -94,7 +94,7 @@ gem 'sanitize'
 gem 'crawler_detect'
 gem 'rack-attack'
 gem 'rack-cors'
-gem 'rack-utf8_sanitizer', '1.10.1'
+gem 'rack-utf8_sanitizer'
 
 #  Everything else
 gem 'chroma' # for manipulating colours
