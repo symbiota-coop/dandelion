@@ -9,14 +9,15 @@
         <th>Patch</th>
         <th>Release date</th>
         <th>Latest release date</th>
+        <th class="text-end"><span data-bs-toggle="tooltip" title="npm downloads in the last week">Weekly downloads</span></th>
         <th>Size</th>
         <th>Description</th>
         <th>Links</th>
       </tr>
     </thead>
     <tbody>
-      <% @dependencies.each do |dep| %>
-        <tr data-file-urls="<%= dep[:file_urls]&.to_json %>">
+      <% @packages.each do |dep| %>
+        <tr class="<%= 'table-danger' if cooldown_ends_at(dep[:latest_release_date]) %>" data-file-urls="<%= dep[:file_urls]&.to_json %>">
           <td>
             <% if dep[:source] == 'npm' %>
               <a href="https://www.jsdelivr.com/package/npm/<%= dep[:name] %>" target="_blank"><%= dep[:name] %></a>
@@ -28,29 +29,12 @@
           </td>
           <td><code><%= dep[:version] %></code></td>
           <%= partial 'stats/version_bump_cells', locals: { cells: dep[:version_bump_cells] } %>
-          <% [dep[:release_date], dep[:latest_release_date]].each do |date| %>
-            <td data-order="<%= date.to_i %>">
-              <% if date %>
-                <span title="<%= date.strftime('%Y-%m-%d %H:%M:%S UTC') %>">
-                  <%= date.strftime('%Y-%m-%d') %>
-                </span>
-              <% end %>
-            </td>
-          <% end %>
+          <%= partial 'stats/release_date_cells', locals: { package: dep } %>
+          <%= partial 'stats/downloads_cell', locals: { package: dep } %>
           <td class="file-size" data-order="0">
             <small class="text-body-secondary">...</small>
           </td>
-          <td>
-            <span class="small"><%= dep[:description] %></span>
-          </td>
-          <td>
-            <% if dep[:homepage] %>
-              <a href="<%= dep[:homepage] %>" target="_blank" title="Homepage" class="me-1"><i class="bi bi-house"></i></a>
-            <% end %>
-            <% if dep[:repository] %>
-              <a href="<%= dep[:repository].sub(/^git\+/, '') %>" target="_blank" title="Github"><i class="bi bi-github"></i></a>
-            <% end %>
-          </td>
+          <%= partial 'stats/package_info_cells', locals: { package: dep } %>
         </tr>
       <% end %>
     </tbody>
@@ -63,7 +47,7 @@
       paging: false,
       searching: false,
       info: false,
-      order: [[5, 'asc']],
+      order: [[6, 'desc']],
     });
 
     function formatBytes(bytes) {

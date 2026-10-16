@@ -1,0 +1,9 @@
+<% [package[:release_date], package[:latest_release_date]].each do |date| %>
+  <td data-order="<%= date.to_i %>">
+    <% if date %>
+      <span title="<%= date.strftime('%Y-%m-%d %H:%M:%S UTC') %>">
+        <%= date.strftime('%Y-%m-%d') %>
+      </span>
+    <% end %>
+  </td>
+<% end %>

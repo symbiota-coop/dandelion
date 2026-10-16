@@ -147,6 +147,42 @@ Dandelion::App.helpers do
     nil
   end
 
+  # When a release leaves the 7-day cooldown on new versions (AGENTS.md's Dependencies), if it hasn't yet
+  def cooldown_ends_at(release_date)
+    ends_at = release_date + 7.days if release_date
+    ends_at if ends_at && ends_at > Time.now
+  end
+
+  # Runs the block on each item in its own thread, returning the non-nil results newest latest release first (unknown
+  # dates at the bottom), as the tables sort them
+  def fetch_packages(items, &)
+    items.map { |item| Thread.new(item, &) }.filter_map(&:value).sort_by { |package| -package[:latest_release_date].to_i }
+  end
+
+  # The Ruby and the gems the Gemfile names (but not GitHub gems, which aren't on RubyGems)
+  def fetch_gems
+    gemfile_content = File.read(Padrino.root('Gemfile'), encoding: 'UTF-8')
+    gem_names = gemfile_content.each_line.filter_map do |line|
+      next if line.strip.start_with?('#') || line.include?('github:')
+
+      line[/gem ['"]([^'"]+)['"]/, 1]
+    end.uniq
+
+    fetch_packages([:ruby] + gem_names) do |gem_name|
+      gem_name == :ruby ? fetch_ruby_info(gemfile_content[/^ruby ['"]([^'"]+)['"]/, 1]) : fetch_gem_info(gem_name)
+    end
+  end
+
+  # The CDN packages in FRONTEND_DEPENDENCIES, with their files' URLs for the size column
+  def fetch_frontend_dependencies
+    libs = FRONTEND_DEPENDENCIES.reject { |base_url, _| base_url.start_with?('/') }.flat_map do |base_url, paths|
+      paths.map { |path, files| [base_url, path, files] }
+    end
+    fetch_packages(libs) do |base_url, path, files|
+      fetch_frontend_dependency(base_url, path)&.merge(file_urls: files.split.map { |f| "#{base_url}#{path}/#{f}" })
+    end
+  end
+
   def fetch_frontend_dependency(base_url, path)
     uri = URI.parse(base_url.to_s)
     fetch_npm_dependency(path) if uri.host&.downcase == 'cdn.jsdelivr.net' && uri.path == '/npm/'
@@ -171,43 +207,54 @@ Dandelion::App.helpers do
       version_bump_cells: version_bump_cells(version, data['versions']&.keys&.reject { |v| v.include?('-') }),
       release_date: released_at && Time.parse(released_at),
       latest_release_date: latest_released_at && Time.parse(latest_released_at),
+      downloads: fetch_npm_weekly_downloads(name),
       source: 'npm',
       homepage: data['homepage'],
-      repository: data.dig('repository', 'url')&.sub(/\Agit\+/, '')&.sub(%r{\A(git|ssh)://(git@)?}, 'https://')&.sub(/\.git\z/, ''),
-      description: data['description']&.split('.')&.first
+      source_code: data.dig('repository', 'url')&.sub(/\Agit\+/, '')&.sub(%r{\A(git|ssh)://(git@)?}, 'https://')&.sub(/\.git\z/, ''),
+      info: data['description']&.split('.')&.first
     }
   rescue StandardError
     { name: name, version: version, source: 'npm' }
   end
 
-  def fetch_gem_info(gem_name)
-    response = Faraday.get("https://rubygems.org/api/v1/gems/#{gem_name}.json")
-    if response.status == 200
-      data = JSON.parse(response.body)
-      installed_version = get_installed_gem_version(gem_name)
-      version = installed_version || data['version']
-      {
-        name: data['name'],
-        version: version,
-        version_bump_cells: version_bump_cells(version, fetch_rubygems_versions(gem_name)),
-        updated_at: Time.parse(data['version_created_at']),
-        downloads: data['downloads'],
-        homepage: data['homepage_uri'],
-        source_code: data['source_code_uri'],
-        info: data['info']&.to_s&.split('.')&.first
-      }
-    else
-      { name: gem_name, version: nil, version_bump_cells: nil, updated_at: nil, downloads: nil, homepage: nil, source_code: nil, info: nil }
-    end
+  # npm's downloads over the last week, the figure npmjs.com shows
+  def fetch_npm_weekly_downloads(name)
+    response = Faraday.get("https://api.npmjs.org/downloads/point/last-week/#{name.gsub('/', '%2F')}")
+    JSON.parse(response.body)['downloads'] if response.status == 200
   rescue StandardError
-    { name: gem_name, version: nil, version_bump_cells: nil, updated_at: nil, downloads: nil, homepage: nil, source_code: nil, info: nil }
+    nil
   end
 
+  def fetch_gem_info(gem_name)
+    response = Faraday.get("https://rubygems.org/api/v1/gems/#{gem_name}.json")
+    return { name: gem_name } unless response.status == 200
+
+    data = JSON.parse(response.body)
+    version = get_installed_gem_version(gem_name) || data['version']
+    versions = fetch_rubygems_versions(gem_name) || []
+    # The lockfile names a platform gem's platform too (nokogiri 1.18.0-arm64-darwin)
+    released = versions.find { |entry| [entry['number'], "#{entry['number']}-#{entry['platform']}"].include?(version) }
+    {
+      name: data['name'],
+      version: version,
+      version_bump_cells: version_bump_cells(version, versions.map { |entry| entry['number'] }.uniq),
+      release_date: released && Time.parse(released['created_at']),
+      latest_release_date: Time.parse(data['version_created_at']),
+      downloads: data['downloads'],
+      homepage: data['homepage_uri'],
+      source_code: data['source_code_uri'],
+      info: data['info']&.to_s&.split('.')&.first
+    }
+  rescue StandardError
+    { name: gem_name }
+  end
+
+  # A gem's stable releases, newest first, each with its number, platform and created_at
   def fetch_rubygems_versions(gem_name)
     response = Faraday.get("https://rubygems.org/api/v1/versions/#{gem_name}.json")
     return nil unless response.status == 200
 
-    JSON.parse(response.body).reject { |entry| entry['prerelease'] }.map { |entry| entry['number'] }
+    JSON.parse(response.body).reject { |entry| entry['prerelease'] }
   rescue StandardError
     nil
   end
@@ -222,7 +269,8 @@ Dandelion::App.helpers do
     releases = YAML.safe_load(response.body, permitted_classes: [Date]).to_h { |release| [release['version'].to_s, release['date']] }
     stable_versions = releases.keys.reject { |version| version.include?('-') }
     latest_version = stable_versions.max_by { |version| Gem::Version.new(version) }
-    ruby.merge(version_bump_cells: version_bump_cells(RUBY_VERSION, stable_versions), updated_at: releases[latest_version]&.then { |date| Time.utc(date.year, date.month, date.day) })
+    release_time = ->(version) { releases[version]&.then { |date| Time.utc(date.year, date.month, date.day) } }
+    ruby.merge(version_bump_cells: version_bump_cells(RUBY_VERSION, stable_versions), release_date: release_time.call(RUBY_VERSION), latest_release_date: release_time.call(latest_version))
   rescue StandardError
     ruby
   end

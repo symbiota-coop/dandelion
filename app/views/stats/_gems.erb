@@ -7,15 +7,16 @@
         <th>Major</th>
         <th>Minor</th>
         <th>Patch</th>
-        <th>Last updated</th>
+        <th>Release date</th>
+        <th>Latest release date</th>
         <th class="text-end">Downloads</th>
         <th>Description</th>
         <th>Links</th>
       </tr>
     </thead>
     <tbody>
-      <% @gems.each do |gem| %>
-        <tr>
+      <% @packages.each do |gem| %>
+        <tr class="<%= 'table-danger' if cooldown_ends_at(gem[:latest_release_date]) %>">
           <td>
             <a href="<%= gem[:url] || "https://rubygems.org/gems/#{gem[:name]}" %>" target="_blank"><%= gem[:name] %></a>
           </td>
@@ -26,27 +27,9 @@
             <% end %>
           </td>
           <%= partial 'stats/version_bump_cells', locals: { cells: gem[:version_bump_cells] } %>
-          <td data-order="<%= gem[:updated_at].to_i %>">
-            <% if gem[:updated_at] %>
-              <span title="<%= gem[:updated_at].strftime('%Y-%m-%d %H:%M:%S UTC') %>">
-                <%= gem[:updated_at].strftime('%Y-%m-%d') %>
-              </span>
-            <% end %>
-          </td>
-          <td class="text-end" data-order="<%= gem[:downloads] || 0 %>">
-            <%= gem[:downloads]&.to_s&.reverse&.gsub(/(\d{3})(?=\d)/, '\\1,')&.reverse %>
-          </td>
-          <td>
-            <span class="small"><%= gem[:info] %></span>
-          </td>
-          <td>
-            <% if gem[:homepage] %>
-              <a href="<%= gem[:homepage] %>" target="_blank" title="Homepage" class="me-1"><i class="bi bi-house"></i></a>
-            <% end %>
-            <% if gem[:source_code] %>
-              <a href="<%= gem[:source_code] %>" target="_blank" title="Github"><i class="bi bi-github"></i></a>
-            <% end %>
-          </td>
+          <%= partial 'stats/release_date_cells', locals: { package: gem } %>
+          <%= partial 'stats/downloads_cell', locals: { package: gem } %>
+          <%= partial 'stats/package_info_cells', locals: { package: gem } %>
         </tr>
       <% end %>
     </tbody>
@@ -59,7 +42,7 @@
       paging: false,
       searching: false,
       info: false,
-      order: [[5, 'asc']],
+      order: [[6, 'desc']],
     });
   });
 </script>

@@ -86,69 +86,10 @@ Dandelion::App.controller do
     erb :'stats/icons'
   end
 
-  get '/stats/frontend_dependencies' do
-    @dependencies = []
-    mutex = Mutex.new
-    threads = []
-
-    FRONTEND_DEPENDENCIES.each do |base_url, libs|
-      next if base_url.start_with?('/')
-
-      libs.each do |path, files|
-        threads << Thread.new do
-          dep = fetch_frontend_dependency(base_url, path)
-          if dep
-            # Build file URLs for size calculation
-            file_urls = files.split.map { |f| "#{base_url}#{path}/#{f}" }
-            dep[:file_urls] = file_urls
-            mutex.synchronize { @dependencies << dep }
-          end
-        end
-      end
-    end
-
-    threads.each(&:join)
-
-    @dependencies.sort_by! { |d| d[:release_date] || Time.at(0) }
-
-    erb :'stats/frontend_dependencies'
-  end
-
-  get '/stats/gems' do
-    @gems = []
-    mutex = Mutex.new
-    threads = []
-
-    gemfile_content = File.read(Padrino.root('Gemfile'), encoding: 'UTF-8')
-
-    # Extract gem names (excluding GitHub gems which won't be on RubyGems)
-    gem_names = []
-    gemfile_content.each_line do |line|
-      next if line.strip.start_with?('#')
-      next if line.include?('github:')
-
-      gem_names << Regexp.last_match(1) if line =~ /gem ['"]([^'"]+)['"]/
-    end
-    gem_names.uniq!
-
-    threads << Thread.new do
-      ruby_info = fetch_ruby_info(gemfile_content[/^ruby ['"]([^'"]+)['"]/, 1])
-      mutex.synchronize { @gems << ruby_info }
-    end
-
-    gem_names.each do |gem_name|
-      threads << Thread.new do
-        gem_info = fetch_gem_info(gem_name)
-        mutex.synchronize { @gems << gem_info }
-      end
-    end
-
-    threads.each(&:join)
-
-    # Sort by last updated (oldest first to highlight outdated gems, nils at top)
-    @gems.sort_by! { |g| g[:updated_at] || Time.at(0) }
-
-    erb :'stats/gems'
+  get '/stats/packages' do
+    @tab = %w[gems frontend].include?(params[:tab]) ? params[:tab] : 'gems'
+    @packages = @tab == 'gems' ? fetch_gems : fetch_frontend_dependencies
+    erb :'stats/packages'
   end
 
   get '/stats/files' do

@@ -1,0 +1,11 @@
+<div class="nav-wrapper">
+  <ul class="nav nav-tabs">
+    <% { 'gems' => 'Gems', 'frontend' => 'Frontend' }.each do |tab, title| %>
+      <li class="nav-item">
+        <a class="nav-link <%= 'active' if @tab == tab %>" href="/stats/packages?tab=<%= tab %>"><%= title %></a>
+      </li>
+    <% end %>
+  </ul>
+</div>
+
+<%= partial(@tab == 'gems' ? 'stats/gems' : 'stats/frontend_dependencies') %>
