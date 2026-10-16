@@ -963,6 +963,27 @@ class AccountsTest < ActiveSupport::TestCase
     assert last_response.ok?
   end
 
+  test 'a session from a link that changes the email with a code and confirms it there keeps its password and providers' do
+    account = FactoryBot.create(:account)
+    account.set(email_confirmed: true)
+    account.provider_links.create!(provider: 'Google', provider_uid: 'google-uid-email-change', omniauth_hash: { 'uid' => 'google-uid-email-change' }, before_email_confirmed: false)
+    crypted_password = account.crypted_password
+    get '/', link_token: account.link_token_for_email
+
+    post '/accounts/edit', account: { name: account.name, email: 'changed-here@example.com' }
+    assert_equal '/accounts/sign_in_code', URI(last_response.location).path
+    get '/', sign_in_code: account.issue_sign_in_code!
+    post '/accounts/edit', account: { name: account.name, email: 'changed-here@example.com' }
+    assert_equal 'changed-here@example.com', account.reload.email
+
+    get "/confirm_email/#{account.link_token}"
+    post '/accounts/confirm_email'
+    assert account.reload.email_confirmed
+    assert_equal crypted_password, account.crypted_password
+    refute account.provider_links.find_by(provider: 'Google').before_email_confirmed
+    assert_equal account.session_token, last_request.session[:session_token]
+  end
+
   test 'confirming the email elsewhere removes providers connected before it was tracked' do
     account = FactoryBot.create(:account)
     link = account.provider_links.create!(provider: 'Google', provider_uid: 'google-uid-legacy', omniauth_hash: { 'uid' => 'google-uid-legacy' })

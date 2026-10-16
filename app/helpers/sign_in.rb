@@ -66,7 +66,12 @@ Dandelion::App.helpers do
     end
     session[:account_id] = account.id.to_s
     session[:session_token] = account.session_token!
-    session[:verified_at] = Time.now.to_i if verified
+    if verified
+      session[:verified_at] = Time.now.to_i
+      # A code shows this session gets the account's email, so it counts as having set the account up even when it
+      # restarts the account's own session (verification_required!), as when changing the email and confirming it here
+      session[:set_up_account] = true
+    end
     @current_account = account
   end
 
