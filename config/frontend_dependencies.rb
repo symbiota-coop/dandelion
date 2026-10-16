@@ -10,7 +10,7 @@ FRONTEND_DEPENDENCIES = {
     'select2@4.1.0' => 'dist/js/select2.full.min.js dist/css/select2.min.css',
     'select2-bootstrap-5-theme@1.3.0' => 'dist/select2-bootstrap-5-theme.min.css',
     'iframe-resizer@4.4.5' => 'js/iframeResizer.contentWindow.min.js',
-    'slick-carousel@2.0.0' => 'slick/slick.min.js slick/slick.min.css slick/slick-theme.min.css',
+    'slick-carousel@2.0.0' => 'slick/slick.min.js slick/slick.css slick/slick-theme.css',
     'chart.js@4.5.1' => 'dist/chart.umd.min.js',
     'intro.js@8.6.0' => 'minified/intro.min.js minified/introjs.min.css',
     'bootstrap-icons@1.13.2' => 'font/bootstrap-icons.min.css',
@@ -30,3 +30,12 @@ FRONTEND_DEPENDENCIES = {
 
 # Packages whose files are ES modules, loaded with type="module"
 FRONTEND_MODULES = %w[@github/relative-time-element].freeze
+
+# Every CDN file the app loads: FRONTEND_DEPENDENCIES' and those templates load with cdn_tag. Each has a hash in
+# config/frontend_integrity.rb (rake frontend:integrity), so the browser won't run a file that's changed
+FRONTEND_CDN_URLS = lambda do |root|
+  urls = FRONTEND_DEPENDENCIES.select { |base_url, _| base_url.start_with?('http') }.flat_map do |base_url, libs|
+    libs.flat_map { |path, files| files.split.map { |f| "#{base_url}#{path}/#{f}" } }
+  end
+  urls + Dir[File.join(root, 'app/views/**/*.erb')].flat_map { |f| File.read(f, encoding: 'UTF-8').scan(/cdn_tag[ (]+['"]([^'"]+)['"]/).flatten }
+end

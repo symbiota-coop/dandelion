@@ -28,6 +28,9 @@ linters:
   # Requests use jQuery, not fetch (.erb_linters/jquery_requests.rb)
   JqueryRequests:
     enabled: true
+  # CDN files load with cdn_tag, with their hash (.erb_linters/cdn_tags.rb)
+  CdnTags:
+    enabled: true
   # Replaced by RubocopTags (.erb_linters/rubocop_tags.rb), which also checks the conditions of if, unless and elsif tags
   Rubocop:
     enabled: false

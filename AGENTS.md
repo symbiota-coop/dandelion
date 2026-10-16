@@ -44,13 +44,14 @@ Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Rub
 
 ### erb_lint
 
-Our linters, `DesignClasses` and `JqueryRequests`, are in `.erb_linters/`. Disable one on a line with `<%# erb_lint:disable DesignClasses: reason %>`. Their checks on JavaScript calls (`addClass('d-none')`, `fetch`) cover only the JavaScript in a template's Ruby (`onclick: '...'` options), as ESLint checks the template's own scripts and event attributes. Their checks on class names and attributes run on the whole template, so an HTML string in a script can get the same message from both
+Our linters, `DesignClasses`, `JqueryRequests` and `CdnTags`, are in `.erb_linters/`. Disable one on a line with `<%# erb_lint:disable DesignClasses: reason %>`. Their checks on JavaScript calls (`addClass('d-none')`, `fetch`) cover only the JavaScript in a template's Ruby (`onclick: '...'` options), as ESLint checks the template's own scripts and event attributes. Their checks on class names and attributes run on the whole template, so an HTML string in a script can get the same message from both
 
 - `DesignClasses`: To show and hide elements from JS, start them hidden with `style="display: none"` and use jQuery `.show()` / `.hide()` / `.toggle()`, not `d-none` with `addClass` / `removeClass` (Bootstrap's `d-*` classes are `!important`). Keep `d-none d-md-block` and friends for purely responsive hiding
 - `DesignClasses`: Success is the theme colour, so use `-primary`, never `-success`. Badges are `badge text-bg-*`; there is no `.label` and no `badge-*` colour class
 - `DesignClasses`: Bootstrap 5, not 4: `data-bs-*` attributes and logical spacing and alignment (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-end`, `float-start`). `config/bootstrap4_leftovers.json` lists the Bootstrap 4 classes and attributes it flags, with what replaces each; add one there if you find another
 - `DesignClasses`: Selects take `form-select` (`<select>` tags and `select_tag`; the form builder's `select_block` adds it), even ones Select2 replaces, so they look right until it loads
 - `JqueryRequests`: The ESLint `no-restricted-globals` rule below (jQuery, not `fetch`)
+- `CdnTags`: Load a CDN file with `<%= cdn_tag 'https://cdn.jsdelivr.net/npm/x@1.2.3/x.min.js' %>` (a `.css` file gets a stylesheet link; pass `defer: true` or `type: 'module'` as needed), not a bare `<script>` or `<link>`: it adds the file's hash from `config/frontend_integrity.rb` as its `integrity` attribute, so the browser won't run the file if it changes. A file with no hash there is flagged too: run `rake frontend:integrity` (Dependencies)
 
 ### ESLint
 
@@ -80,7 +81,8 @@ Rules no linter covers, checked by `test/lint_test.rb` or `script/lint` (both ru
 - `test_mcp_copies_match_mcp_json`: `.cursor/mcp.json`, `.opencode/opencode.json` and `.codex/config.toml` are copies of `.mcp.json`: only edit `.mcp.json`, then run `rake mcp:sync` (Cloud agents)
 - `test_ci_runs_every_test_file`: CI's test jobs, one per test file, are listed in `.github/workflows/ruby.yml`: add a new test file there (Tests)
 - `test_every_disable_says_why`: every disable comment gives its reason, after `--` (or after `Linter:` for erb_lint), as each linter's section shows
-- `test_dependency_versions_are_exact`: the root `package.json`, the CDN packages (`config/frontend_dependencies.rb`, `layouts/_dependencies.erb`) and the packages rake tasks install name exact versions, so none arrives unchosen (Dependencies)
+- `test_dependency_versions_are_exact`: the root `package.json`, the CDN packages (`config/frontend_dependencies.rb` and each template's `cdn_tag`) and the packages rake tasks install name exact versions, so none arrives unchosen (Dependencies)
+- `test_cdn_files_have_integrity`: every CDN file the app loads has a hash in `config/frontend_integrity.rb`, and no hash is left over (Dependencies)
 - `test_ckeditor_stays_on_37`: CKEditor stays on 37 (Build/vendored code)
 - `script/lint`: `bootstrap5.css` and `ext/ckeditor.js` are built (Build/vendored code), so a commit that changes one without its source (`bootstrap5.scss`, `ckeditor/`, or their rake task) fails
 
@@ -192,6 +194,7 @@ Cooldown: never use a gem or JS package version released less than 7 days ago. T
 - The root `package.json` is only linters: ESLint, which CI runs as `npx eslint` over `app/assets/javascripts` and the templates in `app/views` (`eslint.config.mjs`), and Stylelint, which it runs over `app/assets/stylesheets` and the templates (`stylelint.config.mjs`, which parses templates with PostCSS, also listed; `npm run lint` runs both). It installs from `package-lock.json` (`npm ci`): pin exact versions, and when adding or bumping one run `npm install --before=<the date a week ago>` so its own dependencies are a week old too
 - `ckeditor/` installs from its `yarn.lock`. Yarn 1 has no cooldown, so when refreshing the lockfile (`yarn upgrade`), check the new versions' release dates (`npm view <package> time`) and pin back any that are under a week old
 - When adding or bumping a CDN package in `config/frontend_dependencies.rb`, or a version in a rake task, pick a version at least 7 days old
+- CDN files load with `cdn_tag` (`CdnTags`), whose `integrity` attribute makes the browser refuse a file that's changed since we chose it. After adding or bumping one, run `rake frontend:integrity`, which hashes each CDN file that has no hash yet into `config/frontend_integrity.rb` and drops those nothing loads any more. It keeps the hashes it has rather than trusting the CDN again. Load a file the package ships: jsDelivr minifies a `.min` file a package lacks on the fly, and the task refuses one, as that output can change
 
 Ruby gems:
 
