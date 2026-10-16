@@ -2151,6 +2151,11 @@ table.dataTable.table-sm > thead > tr > th[class*="dt-order"] .dt-column-order {
   --bs-table-active-bg: var(--row-tint);
 }
 
+/* DataTables paints hover as its own grey overlay in the cells' inset shadow, in place of Bootstrap's, which muddies tinted rows: paint Bootstrap's again, so each row hovers in its own --bs-table-hover-bg as tables without DataTables do */
+table.table.dataTable.table-hover > tbody > tr:hover > * {
+  box-shadow: inset 0 0 0 9999px var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
+}
+
 .table-striped > thead > tr > th {
   border-bottom: none;
 }
