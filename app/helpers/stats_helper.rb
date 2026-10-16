@@ -176,15 +176,13 @@ Dandelion::App.helpers do
   # Each npm package the app loads from the CDN (FRONTEND_CDN_URLS), with its files' URLs for the size column, and where
   # it's loaded: on every page (FRONTEND_DEPENDENCIES and the layout's own, jQuery) or by the templates that name its files
   def fetch_frontend_dependencies
-    shared = FRONTEND_DEPENDENCIES.select { |base_url, _| base_url.start_with?('http') }.flat_map do |base_url, libs|
-      libs.flat_map { |path, files| files.split.map { |f| "#{base_url}#{path}/#{f}" } }
-    end
+    shared = FRONTEND_DEPENDENCIES.flat_map { |package, files| files.split.map { |f| FRONTEND_NPM_URL.call(package, f) } }
     views = "#{Padrino.root('app/views')}/"
-    templates = Dir["#{views}**/*.erb"].to_h { |f| [f.delete_prefix(views).delete_suffix('.erb'), File.read(f, encoding: 'UTF-8')] }
+    templates = Dir["#{views}**/*.erb"].to_h { |f| [f.delete_prefix(views).delete_suffix('.erb'), FRONTEND_TEMPLATE_CDN_URLS.call(File.read(f, encoding: 'UTF-8'))] }
     packages = FRONTEND_CDN_URLS.call(Padrino.root).uniq.group_by { |url| url[%r{/npm/((?:@[^/]+/)?[^/]+)/}, 1] }.except(nil)
 
     fetch_packages(packages.to_a) do |path, file_urls|
-      loaded_on = file_urls.intersect?(shared) ? [] : templates.select { |_, source| file_urls.any? { |url| source.include?(url) } }.keys
+      loaded_on = file_urls.intersect?(shared) ? [] : templates.select { |_, urls| urls.intersect?(file_urls) }.keys
       loaded_on = [] if loaded_on == ['layouts/_dependencies']
       fetch_npm_dependency(path).merge(file_urls: file_urls, loaded_on: loaded_on)
     end

@@ -9,7 +9,7 @@
 
 <div class="lavender-wash content-padding-x">
   <div class="row justify-content-center mx-0 py-5">
-    <%= cdn_tag 'https://cdn.jsdelivr.net/npm/typed.js@3.0.0/dist/typed.umd.js' %>
+    <%= cdn_tag 'typed.js', 'dist/typed.umd.js' %>
     <script>
       $(function () {
         if (<%== (ENV['CREATE_VIDEO'] ? true : false).to_json %>) {

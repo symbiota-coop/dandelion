@@ -3,35 +3,57 @@
 module ERBLint
   module Linters
     # CDN files load with cdn_tag, which adds the hash in config/frontend_integrity.rb as their integrity attribute, so the
-    # browser won't run a file that's changed (AGENTS.md, Dependencies)
+    # browser won't run a file that's changed, and an npm package's file at the version frontend/package.json names, so
+    # versions live in one place (AGENTS.md, Dependencies)
     class CdnTags < Linter
       include LinterRegistry
 
       # A script or stylesheet from a CDN, by a path on it (a preconnect link names the host alone)
       BARE_TAG = %r{<(?:script|link)\b[^>]*?\b(?:src|href)=["']https://(?:cdn\.jsdelivr\.net|unpkg\.com|cdnjs\.cloudflare\.com)/}
-      CDN_TAG = /cdn_tag[ (]+['"]([^'"]+)['"]/
-      INTEGRITY_FILE = File.expand_path('../config/frontend_integrity.rb', __dir__)
+      CONFIG = File.expand_path('../config', __dir__)
 
       def run(processed_source)
         source = processed_source.file_content
         source.scan(BARE_TAG) do
           match = Regexp.last_match
-          add_offense(processed_source.to_source_range(match.begin(0)...match.end(0)),
-                      'CdnTags: Load CDN files with `cdn_tag`, which adds the hash the browser checks them against.')
+          offense(processed_source, match.begin(0)...match.end(0), 'Load CDN files with `cdn_tag`, which adds the hash the browser checks them against.')
         end
-        source.scan(CDN_TAG) do
+        source.scan(frontend::FRONTEND_CDN_TAG) do
           match = Regexp.last_match
-          next if integrity.key?(match[1])
-
-          add_offense(processed_source.to_source_range(match.begin(1)...match.end(1)),
-                      "CdnTags: #{match[1]} has no hash in config/frontend_integrity.rb: run `rake frontend:integrity`.")
+          check_cdn_tag(processed_source, match)
         end
       end
 
       private
 
+      def check_cdn_tag(processed_source, match)
+        name, file = match.captures
+        range = match.begin(1)...match.end(file ? 2 : 1)
+        if file && !frontend::FRONTEND_VERSIONS.key?(name)
+          offense(processed_source, range, "#{name} isn't in frontend/package.json: add it there at an exact version.")
+        elsif !file && name.match?(%r{\Ahttps://cdn\.jsdelivr\.net/npm/})
+          offense(processed_source, range, "Name the package and file (`cdn_tag 'package', 'path/file.js'`), so its version comes from frontend/package.json.")
+        elsif !integrity.key?(url = file ? frontend::FRONTEND_NPM_URL.call(name, file) : name)
+          offense(processed_source, range, "#{url} has no hash in config/frontend_integrity.rb: run `rake frontend:integrity`.")
+        end
+      end
+
+      def offense(processed_source, range, message)
+        add_offense(processed_source.to_source_range(range), "CdnTags: #{message}")
+      end
+
+      def frontend
+        @frontend ||= load_config('frontend_dependencies.rb')
+      end
+
       def integrity
-        @integrity ||= Module.new.tap { |m| m.module_eval(File.read(INTEGRITY_FILE)) }::FRONTEND_INTEGRITY
+        @integrity ||= load_config('frontend_integrity.rb')::FRONTEND_INTEGRITY
+      end
+
+      # Each file in a module of its own, with its path, so __dir__ works and nothing leaks into the linter's process
+      def load_config(name)
+        path = File.join(CONFIG, name)
+        Module.new.tap { |m| m.module_eval(File.read(path), path) }
       end
     end
   end

@@ -163,13 +163,14 @@ class LintTest < Minitest::Test
   end
 
   def test_cdn_tags
-    hashed = 'https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js'
     {
       '<script src="https://cdn.jsdelivr.net/npm/x@1.0.0/x.min.js"></script>' => /cdn_tag/,
       %(<script defer src='https://unpkg.com/x@1.0.0/x.js'></script>) => /cdn_tag/,
       '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/x@1.0.0/x.css">' => /cdn_tag/,
-      %(<%= cdn_tag 'https://cdn.jsdelivr.net/npm/x@1.0.0/x.min.js' %>) => /rake frontend:integrity/,
-      %(<%= cdn_tag('https://cdn.jsdelivr.net/npm/x@1.0.0/x.css', defer: true) %>) => /rake frontend:integrity/
+      %(<%= cdn_tag 'https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js' %>) => /Name the package and file/,
+      %(<%= cdn_tag 'not-a-package', 'x.min.js' %>) => %r{isn't in frontend/package\.json},
+      %(<%= cdn_tag('jquery', 'dist/jquery.js', defer: true) %>) => /rake frontend:integrity/,
+      %(<%= cdn_tag 'https://cdn.jsdelivr.net/gh/x/y@abc/y.js' %>) => /rake frontend:integrity/
     }.each do |template, message|
       offenses = erb_offenses(template).select { |linter, _| linter == 'CdnTags' }
       assert_equal 1, offenses.size, "CdnTags on #{template}: #{offenses.inspect}"
@@ -177,7 +178,8 @@ class LintTest < Minitest::Test
     end
 
     [
-      %(<%= cdn_tag '#{hashed}' %>), %(<%= cdn_tag url, defer: true %>),
+      %(<%= cdn_tag 'jquery', 'dist/jquery.min.js' %>), %(<%= cdn_tag package, f, defer: true %>),
+      %(<%= cdn_tag 'https://cdn.jsdelivr.net/gh/tgdwyer/WebCola@aab7e61cd9580c4c89180cc0a30594e12743a242/WebCola/cola.min.js' %>),
       '<link rel="preconnect" href="https://cdn.jsdelivr.net">', '<script src="https://js.stripe.com/v3/" defer></script>'
     ].each { |template| assert_empty erb_offenses(template).select { |linter, _| linter == 'CdnTags' }, template }
   end
@@ -247,8 +249,10 @@ class LintTest < Minitest::Test
 
   def test_dependency_versions_are_exact
     # ckeditor/ installs from its yarn.lock, which pins every version
-    JSON.parse(File.read(File.join(ROOT, 'package.json'))).values_at('dependencies', 'devDependencies').compact.reduce({}, :merge).each do |name, version|
-      assert_match EXACT, version, "package.json: pin #{name} to an exact version"
+    %w[package.json frontend/package.json].each do |manifest|
+      JSON.parse(File.read(File.join(ROOT, manifest))).values_at('dependencies', 'devDependencies').compact.reduce({}, :merge).each do |name, version|
+        assert_match EXACT, version, "#{manifest}: pin #{name} to an exact version"
+      end
     end
 
     packages = cdn_urls.filter_map { |url| url[%r{/npm/((?:@[^/]+/)?[^/]+)/}, 1] }
@@ -261,7 +265,8 @@ class LintTest < Minitest::Test
 
   # Every CDN file the app loads (config/frontend_dependencies.rb)
   def cdn_urls
-    Module.new.tap { |m| m.module_eval(File.read(File.join(ROOT, 'config/frontend_dependencies.rb'))) }::FRONTEND_CDN_URLS.call(ROOT).uniq
+    path = File.join(ROOT, 'config/frontend_dependencies.rb')
+    Module.new.tap { |m| m.module_eval(File.read(path), path) }::FRONTEND_CDN_URLS.call(ROOT).uniq
   end
 
   # AGENTS.md, Dependencies: each CDN file has the hash cdn_tag writes as its integrity attribute (CdnTags checks each
@@ -273,6 +278,11 @@ class LintTest < Minitest::Test
     assert_empty urls - integrity.keys, 'run rake frontend:integrity to hash these CDN files'
     assert_empty integrity.keys - urls, 'nothing loads these: remove them from config/frontend_integrity.rb'
     integrity.each { |url, hash| assert_match %r{\Asha384-[A-Za-z0-9+/]{64}\z}, hash, url }
+
+    # frontend/package.json lists only what the app loads, so Dependabot doesn't propose updates to a package nothing uses
+    listed = JSON.parse(File.read(File.join(ROOT, 'frontend/package.json')))['dependencies'].keys
+    loaded = urls.filter_map { |url| url[%r{/npm/((?:@[^/]+/)?[^/@]+)@}, 1] }.uniq
+    assert_empty listed - loaded, 'nothing loads these: remove them from frontend/package.json'
   end
 
   # AGENTS.md, Build/vendored code: CKEditor 38 and later show a Powered by CKEditor badge under the GPL

@@ -6,25 +6,24 @@
 <link rel="preconnect" href="https://maps.googleapis.com">
 
 <link href="<%= cachebust('/stylesheets/bootstrap5.css') %>" rel="stylesheet">
-<%= cdn_tag 'https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js' %>
+<%= cdn_tag 'jquery', 'dist/jquery.min.js' %>
 
-<% FRONTEND_DEPENDENCIES.each do |base_url, libs| %>
-  <% libs.each do |path, files| %>
-    <% files.split.each do |f| %>
-      <% url = "#{base_url}#{path}/#{f}" %>
-      <% ext = f.split('.').last.to_sym %>
-      <% if base_url == '/' %>
-        <% url = cachebust(url) %>
-        <% if ext == :js %>
-          <script src="<%= url %>" defer></script>
-        <% else %>
-          <link rel="stylesheet" href="<%= url %>">
-        <% end %>
-      <% elsif ext == :js && FRONTEND_MODULES.include?(path.rpartition('@').first) %>
-        <%= cdn_tag url, type: 'module' %>
-      <% else %>
-        <%= cdn_tag url, defer: ext == :js %>
-      <% end %>
+<% FRONTEND_DEPENDENCIES.each do |package, files| %>
+  <% files.split.each do |f| %>
+    <% if f.end_with?('.js') && FRONTEND_MODULES.include?(package) %>
+      <%= cdn_tag package, f, type: 'module' %>
+    <% else %>
+      <%= cdn_tag package, f, defer: f.end_with?('.js') %>
+    <% end %>
+  <% end %>
+<% end %>
+<% FRONTEND_LOCAL_FILES.each do |path, files| %>
+  <% files.split.each do |f| %>
+    <% url = cachebust("/#{path}/#{f}") %>
+    <% if f.end_with?('.js') %>
+      <script src="<%= url %>" defer></script>
+    <% else %>
+      <link rel="stylesheet" href="<%= url %>">
     <% end %>
   <% end %>
 <% end %>

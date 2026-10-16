@@ -68,7 +68,7 @@ LINTERS = [
         \.rubocop\.yml | \.rubocop/.+ | \.erb_lint\.yml | \.erb_linters/.+ | eslint\.config\.mjs | stylelint\.config\.mjs |
         package(-lock)?\.json | config/bootstrap4_leftovers\.json | script/lint | test/lint_test\.rb | AGENTS\.md |
         \.github/workflows/ruby\.yml | \.mcp\.json | \.cursor/mcp\.json | \.opencode/opencode\.json | \.codex/config\.toml |
-        tasks/.+\.rake | config/frontend_dependencies\.rb | config/frontend_integrity\.rb | app/views/layouts/_dependencies\.erb | ckeditor/package\.json
+        tasks/.+\.rake | config/frontend_dependencies\.rb | config/frontend_integrity\.rb | frontend/package\.json | app/views/layouts/_dependencies\.erb | ckeditor/package\.json
       )\z
     }x,
     added: %r{\Atest/.+_test\.rb\z},
