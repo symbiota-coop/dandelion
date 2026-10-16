@@ -173,21 +173,21 @@ Dandelion::App.helpers do
     end
   end
 
-  # The CDN packages in FRONTEND_DEPENDENCIES, with their files' URLs for the size column
+  # Each npm package the app loads from the CDN (FRONTEND_CDN_URLS), with its files' URLs for the size column, and where
+  # it's loaded: on every page (FRONTEND_DEPENDENCIES and the layout's own, jQuery) or by the templates that name its files
   def fetch_frontend_dependencies
-    libs = FRONTEND_DEPENDENCIES.reject { |base_url, _| base_url.start_with?('/') }.flat_map do |base_url, paths|
-      paths.map { |path, files| [base_url, path, files] }
+    shared = FRONTEND_DEPENDENCIES.select { |base_url, _| base_url.start_with?('http') }.flat_map do |base_url, libs|
+      libs.flat_map { |path, files| files.split.map { |f| "#{base_url}#{path}/#{f}" } }
     end
-    fetch_packages(libs) do |base_url, path, files|
-      fetch_frontend_dependency(base_url, path)&.merge(file_urls: files.split.map { |f| "#{base_url}#{path}/#{f}" })
-    end
-  end
+    views = "#{Padrino.root('app/views')}/"
+    templates = Dir["#{views}**/*.erb"].to_h { |f| [f.delete_prefix(views).delete_suffix('.erb'), File.read(f, encoding: 'UTF-8')] }
+    packages = FRONTEND_CDN_URLS.call(Padrino.root).uniq.group_by { |url| url[%r{/npm/((?:@[^/]+/)?[^/]+)/}, 1] }.except(nil)
 
-  def fetch_frontend_dependency(base_url, path)
-    uri = URI.parse(base_url.to_s)
-    fetch_npm_dependency(path) if uri.host&.downcase == 'cdn.jsdelivr.net' && uri.path == '/npm/'
-  rescue URI::InvalidURIError
-    nil
+    fetch_packages(packages.to_a) do |path, file_urls|
+      loaded_on = file_urls.intersect?(shared) ? [] : templates.select { |_, source| file_urls.any? { |url| source.include?(url) } }.keys
+      loaded_on = [] if loaded_on == ['layouts/_dependencies']
+      fetch_npm_dependency(path).merge(file_urls: file_urls, loaded_on: loaded_on)
+    end
   end
 
   def fetch_npm_dependency(path)

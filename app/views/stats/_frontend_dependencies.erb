@@ -13,6 +13,7 @@
         <th>Size</th>
         <th>Description</th>
         <th>Links</th>
+        <th>Loaded on</th>
       </tr>
     </thead>
     <tbody>
@@ -35,6 +36,15 @@
             <small class="text-body-secondary">...</small>
           </td>
           <%= partial 'stats/package_info_cells', locals: { package: dep } %>
+          <td class="small" data-order="<%= dep[:loaded_on].empty? ? '' : dep[:loaded_on].first %>">
+            <% if dep[:loaded_on].empty? %>
+              Every page
+            <% else %>
+              <% dep[:loaded_on].each do |template| %>
+                <code class="d-block"><%= template %></code>
+              <% end %>
+            <% end %>
+          </td>
         </tr>
       <% end %>
     </tbody>
