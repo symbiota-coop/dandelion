@@ -26,7 +26,7 @@ Dandelion::App.controller do
       uri = HttpUrl.parse(url) || halt(406)
 
       uri_params = Rack::Utils.parse_nested_query(uri.query)
-      uri_params.delete('sign_in_token')
+      uri_params.except!('link_token', 'sign_in_token')
       uri.query = (uri_params.to_query if uri_params.any?)
       url = uri.to_s
 

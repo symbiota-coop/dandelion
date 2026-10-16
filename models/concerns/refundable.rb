@@ -47,7 +47,7 @@ module Refundable
     batch_message.from from_email
     batch_message.reply_to(event.email || event.organisation.reply_to)
     batch_message.body_html EmailHelper.html(:refund, event: event, amount: formatted_amount, provider: refund_provider, header_image_url: header_image_url)
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
+    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
     batch_message.finalize if Padrino.env == :production
   end
 end

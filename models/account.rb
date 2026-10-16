@@ -78,6 +78,10 @@ class Account
     ]
   end
 
+  def self.subscription_attributes
+    %w[unsubscribed unsubscribed_messages unsubscribed_feedback unsubscribed_reminders]
+  end
+
   def self.default_currencies
     [''] + CURRENCY_OPTIONS
   end
@@ -98,7 +102,7 @@ class Account
   end
 
   # The time it was made in base 36, padded to 7 characters, then 16 random letters and digits
-  def self.generate_sign_in_token
+  def self.generate_link_token
     "#{Time.now.to_i.to_s(36).rjust(7, '0')}#{SecureRandom.alphanumeric(16)}"
   end
 
@@ -109,29 +113,60 @@ class Account
     ics_key
   end
 
-  def generate_sign_in_token
-    self.sign_in_token = Account.generate_sign_in_token
+  def generate_link_token
+    self.link_token = Account.generate_link_token
   end
 
-  def generate_sign_in_token!
-    set(sign_in_token: Account.generate_sign_in_token)
+  def generate_link_token!
+    set(link_token: Account.generate_link_token)
+    # The old token from before the rename, which would otherwise still sign in: drop this once the rename has run
+    unset(:sign_in_token) if attributes.key?('sign_in_token')
   end
 
-  def sign_in_token_for_email
-    return sign_in_token unless sign_in_token_expired?
+  def link_token_for_email
+    return link_token unless link_token_expired?
 
-    generate_sign_in_token!
-    sign_in_token
+    generate_link_token!
+    link_token
   end
 
-  def sign_in_token_expired?
-    return true if sign_in_token.blank?
+  # A sign in code is emailed only when someone asks for one, unlike link_token, which is in the links of every email,
+  # so signing in with one shows they get this address's email now (recently_verified?). It lasts an hour and works once,
+  # and only its digest is stored. Indexes: sign_in_code_digest_1_unique and sign_in_code_digest_1
+  def issue_sign_in_code!
+    code = SecureRandom.alphanumeric(20)
+    set(sign_in_code_digest: Account.sign_in_code_digest(code), sign_in_code_expires_at: 1.hour.from_now)
+    code
+  end
+
+  def self.sign_in_code_digest(code)
+    OpenSSL::Digest::SHA256.hexdigest(code.to_s)
+  end
+
+  def self.with_sign_in_code(code)
+    return if code.blank?
+
+    self.and(sign_in_code_digest: sign_in_code_digest(code), :sign_in_code_expires_at.gt => Time.now).first
+  end
+
+  # False if another request used the code first
+  def redeem_sign_in_code!(code)
+    Account.and(id: id, sign_in_code_digest: Account.sign_in_code_digest(code))
+           .update_all('$unset' => { sign_in_code_digest: true, sign_in_code_expires_at: true }).modified_count == 1
+  end
+
+  def link_token_expired?
+    Account.link_token_expired?(link_token)
+  end
+
+  def self.link_token_expired?(token)
+    return true if token.blank?
 
     # Tokens made before 11 Oct 2026 are timestamp-hex. Drop this branch once they have all expired
-    timestamp = if sign_in_token.include?('-')
-                  sign_in_token.split('-', 2).first.to_i
+    timestamp = if token.include?('-')
+                  token.split('-', 2).first.to_i
                 else
-                  sign_in_token[0, 7].to_i(36)
+                  token[0, 7].to_i(36)
                 end
     return true if timestamp.zero?
 

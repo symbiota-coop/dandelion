@@ -48,7 +48,7 @@ module OrderNotifications
     batch_message.body_html EmailHelper.html(:order, account: account, order: order, event: event)
 
     event.event_facilitators.each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.sign_in_token_for_email, 'id' => recipient.id.to_s })
+      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -131,7 +131,7 @@ module OrderNotifications
       end
     end
 
-    batch_message.add_recipient(:to, account.email, { 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
+    batch_message.add_recipient(:to, account.email, { 'token' => account.link_token_for_email, 'id' => account.id.to_s })
 
     if ENV['MAILGUN_API_KEY']
       message_ids = batch_message.finalize
@@ -172,7 +172,7 @@ module OrderNotifications
       recipients << {
         'email' => account.email,
         'firstname' => account.firstname || 'there',
-        'token' => account.sign_in_token_for_email,
+        'token' => account.link_token_for_email,
         'id' => account.id.to_s
       }
     end
@@ -217,7 +217,7 @@ module OrderNotifications
     batch_message.body_html EmailHelper.html(:purchase_failed, account: account, event: event, error: error, provider: provider, help: help)
 
     (event.organisation.admins_receiving_feedback + Account.and(admin: true)).uniq.each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.sign_in_token_for_email, 'id' => recipient.id.to_s })
+      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -236,7 +236,7 @@ module OrderNotifications
     batch_message.body_html EmailHelper.html(:refund_failed_order, account: account, event: event, error: error, provider: provider)
 
     (event.contacts + Account.and(admin: true)).uniq.each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.sign_in_token_for_email, 'id' => recipient.id.to_s })
+      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production

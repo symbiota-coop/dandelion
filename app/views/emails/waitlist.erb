@@ -10,9 +10,9 @@
   </p>
   <p>
     <% if defined?(ticket_type) && ticket_type %>
-      <a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>/ticket_type_waitlists?sign_in_token=%recipient.token%">View waitlist</a>
+      <a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>/ticket_type_waitlists?link_token=%recipient.token%">View waitlist</a>
     <% else %>
-      <a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>/waitlist?sign_in_token=%recipient.token%">View waitlist</a>
+      <a href="<%= ENV['BASE_URI'] %>/events/<%= event.id %>/waitlist?link_token=%recipient.token%">View waitlist</a>
     <% end %>
   </p>
 </div>

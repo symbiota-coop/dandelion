@@ -97,7 +97,7 @@ Dandelion::App.controller do
 
     tickets_table = EmailHelper.render(:_tickets_table, event: @event, account: current_account)
     EmailHelper.html(:tickets, event: @event, order: order, account: current_account, tickets_table: tickets_table, header_image_url: header_image_url) do |content|
-      content.gsub('%recipient.token%', current_account.sign_in_token)
+      content.gsub('%recipient.token%', current_account.link_token)
     end
   end
 

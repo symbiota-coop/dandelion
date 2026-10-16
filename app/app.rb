@@ -68,8 +68,10 @@ module Dandelion
       # XHR responses are pagelets and partials that must be fresh, and often share a URL with the full page,
       # so the browser mustn't store them (a stored partial could be shown in place of the page on back navigation)
       cache_control :no_store if request.xhr?
-      if params[:sign_in_token]
-        sign_in_via_token
+      if link_token_param
+        sign_in_via_link_token
+      elsif params[:sign_in_code]
+        sign_in_via_code
       elsif params[:api_key] && request.path.match?(%r{\A/z(/|\.|\z)})
         sign_in_via_api_key
       end
@@ -281,7 +283,7 @@ module Dandelion
       ].join("\n")
 
       Account.and(admin: true).each do |account|
-        batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
+        batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
       end
 
       batch_message.finalize if Padrino.env == :production

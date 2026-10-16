@@ -20,7 +20,7 @@ module AccountValidation
       self.name = username unless name
       self.name = name.split('@').first if name && name.include?('@')
 
-      generate_sign_in_token unless sign_in_token
+      generate_link_token unless link_token
 
       self.location = "#{postcode}, #{country}" if postcode && country
       self.name = name.strip if name

@@ -88,8 +88,7 @@ module ActiveSupport
 
     def sign_in(account)
       Capybara.reset_sessions!
-      account.generate_sign_in_token!
-      visit "/?sign_in_token=#{account.sign_in_token}"
+      visit "/?sign_in_code=#{account.issue_sign_in_code!}"
     end
 
     def app
@@ -98,8 +97,7 @@ module ActiveSupport
 
     def sign_in_with_rack(account)
       clear_cookies
-      account.generate_sign_in_token!
-      get '/', sign_in_token: account.sign_in_token
+      get '/', sign_in_code: account.issue_sign_in_code!
       follow_redirect! while last_response.redirect?
     end
 

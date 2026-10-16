@@ -37,23 +37,23 @@
   <% close_divs << '</div>' %>
   <% } %>
   <%== close_divs %>
-  <p>To continue the conversation, <a href="<%= comment.post.url %>?sign_in_token=%recipient.token%">view the post</a> or reply to this email.</p>
+  <p>To continue the conversation, <a href="<%= comment.post.url %>?link_token=%recipient.token%">view the post</a> or reply to this email.</p>
 </div>
 <div class="footer">
-  <a href="<%= ENV['BASE_URI'] %>/posts/<%= comment.post_id %>/unsubscribe?sign_in_token=%recipient.token%">
+  <a href="<%= ENV['BASE_URI'] %>/posts/<%= comment.post_id %>/unsubscribe?link_token=%recipient.token%">
     Unsubscribe from this post
   </a>
   <% if comment.commentable.is_a?(Team) %>
     <% gathering = comment.commentable.gathering %>
     &middot;
-    <a href="<%= ENV['BASE_URI'] %>/g/<%= gathering.slug %>/teams/<%= comment.commentable_id %>/unsubscribe?sign_in_token=%recipient.token%">
+    <a href="<%= ENV['BASE_URI'] %>/g/<%= gathering.slug %>/teams/<%= comment.commentable_id %>/unsubscribe?link_token=%recipient.token%">
       Unsubscribe from this team
     </a>
   <% end %>
   <% if comment.commentable.respond_to?(:gathering) && comment.commentable.gathering %>
     <% gathering = comment.commentable.gathering %>
     &middot;
-    <a href="<%= ENV['BASE_URI'] %>/g/<%= gathering.slug %>/unsubscribe?sign_in_token=%recipient.token%">
+    <a href="<%= ENV['BASE_URI'] %>/g/<%= gathering.slug %>/unsubscribe?link_token=%recipient.token%">
       Unsubscribe from this gathering
     </a>
   <% end %>

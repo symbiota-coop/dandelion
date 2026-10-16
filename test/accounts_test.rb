@@ -132,14 +132,14 @@ class AccountsTest < ActiveSupport::TestCase
     victim = FactoryBot.create(:account)
     attacker = FactoryBot.create(:account)
     sign_in_with_rack(victim)
-    attacker.generate_sign_in_token!
-    token = attacker.sign_in_token
+    attacker.generate_link_token!
+    token = attacker.link_token
 
-    get '/', sign_in_token: token
+    get '/', link_token: token
     follow_redirect! while last_response.redirect?
 
     assert_equal victim.id.to_s, last_request.session[:account_id]
-    assert_equal token, attacker.reload.sign_in_token
+    assert_equal token, attacker.reload.link_token
     assert_equal 0, attacker.sign_ins.count
   end
 
@@ -192,8 +192,8 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'email confirmation link confirms the address' do
     account = FactoryBot.create(:account, email_confirmed: false)
-    account.generate_sign_in_token!
-    token = account.sign_in_token
+    account.generate_link_token!
+    token = account.link_token
 
     get "/confirm_email/#{token}"
     follow_redirect! while last_response.redirect?
@@ -207,7 +207,7 @@ class AccountsTest < ActiveSupport::TestCase
     account = FactoryBot.create(:account, email_confirmed: false)
     sign_in_with_rack(account)
     account.set(email_confirmed: false)
-    token = account.reload.sign_in_token
+    token = account.reload.link_token
 
     get "/confirm_email/#{token}"
     follow_redirect! while last_response.redirect?
@@ -233,9 +233,9 @@ class AccountsTest < ActiveSupport::TestCase
     buyer = FactoryBot.create(:account)
     sign_in_with_rack(Account.find(stale_id))
     Account.find(stale_id).delete
-    buyer.generate_sign_in_token!
+    buyer.generate_link_token!
 
-    get '/', sign_in_token: buyer.sign_in_token
+    get '/', link_token: buyer.link_token
     follow_redirect! while last_response.redirect?
 
     assert_equal buyer.id.to_s, last_request.session[:account_id]
@@ -336,8 +336,8 @@ class AccountsTest < ActiveSupport::TestCase
     account = FactoryBot.create(:account)
 
     visit "/e/#{@event1.slug}"
-    account.generate_sign_in_token!
-    visit "/e/#{@event2.slug}?sign_in_token=#{account.sign_in_token}"
+    account.generate_link_token!
+    visit "/e/#{@event2.slug}?link_token=#{account.link_token}"
 
     assert page.has_current_path?(%r{/e/#{@event2.slug}}, ignore_query: true),
            "Expected to stay on #{@event2.slug}, got #{page.current_path}"
@@ -349,8 +349,8 @@ class AccountsTest < ActiveSupport::TestCase
     account = FactoryBot.create(:account)
 
     visit "/e/#{@event.slug}"
-    account.generate_sign_in_token!
-    visit "/?sign_in_token=#{account.sign_in_token}"
+    account.generate_link_token!
+    visit "/?link_token=#{account.link_token}"
 
     assert page.has_current_path?(%r{/e/#{@event.slug}}, ignore_query: true),
            "Expected to return to #{@event.slug}, got #{page.current_path}"
@@ -622,7 +622,7 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'connecting a provider while signed in waits for confirmation' do
     account = FactoryBot.create(:account)
-    sign_in_via_rack(account)
+    sign_in_with_rack(account)
     omniauth_callback_as(uid: 'google-uid-connect')
     assert_includes last_response.body, '/accounts/providers/confirm'
     assert_empty account.reload.provider_links
@@ -633,11 +633,104 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'cancelling a provider connection links nothing' do
     account = FactoryBot.create(:account)
-    sign_in_via_rack(account)
+    sign_in_with_rack(account)
     omniauth_callback_as(uid: 'google-uid-cancel')
     post '/accounts/providers/cancel'
     post '/accounts/providers/confirm'
     assert_empty account.reload.provider_links
+  end
+
+  test 'connecting a provider needs a sign in code from the last hour' do
+    account = FactoryBot.create(:account)
+    sign_in_via_rack(account)
+    omniauth_callback_as(uid: 'google-uid-unverified')
+    assert_equal '/accounts/sign_in_code', last_request.path
+    post '/accounts/providers/confirm'
+    assert_empty account.reload.provider_links
+
+    get '/', sign_in_code: account.issue_sign_in_code!
+    follow_redirect! while last_response.redirect?
+    assert_equal '/accounts/providers', last_request.path
+    omniauth_callback_as(uid: 'google-uid-unverified')
+    post '/accounts/providers/confirm'
+    assert_equal ['google-uid-unverified'], account.reload.provider_links.map(&:provider_uid)
+  end
+
+  test 'a sign in code works once' do
+    account = FactoryBot.create(:account)
+    code = account.issue_sign_in_code!
+
+    clear_cookies
+    get '/', sign_in_code: code
+    assert_equal account.id.to_s, last_request.session[:account_id]
+
+    clear_cookies
+    get '/', sign_in_code: code
+    follow_redirect! while last_response.redirect?
+    assert_nil last_request.session[:account_id]
+    assert_includes last_response.body, "That sign in code isn't valid any longer"
+  end
+
+  test 'links with the old sign_in_token param still sign in' do
+    account = FactoryBot.create(:account)
+    account.generate_link_token!
+    clear_cookies
+    get '/', sign_in_token: account.link_token
+    assert_equal account.id.to_s, last_request.session[:account_id]
+  end
+
+  test 'an account the rename has not reached yet still signs in with its link' do
+    account = FactoryBot.create(:account)
+    token = Account.generate_link_token
+    Account.collection.update_one({ _id: account.id }, { '$set' => { sign_in_token: token }, '$unset' => { link_token: 1 } })
+    clear_cookies
+    get '/', link_token: token
+    assert_equal account.id.to_s, last_request.session[:account_id]
+  end
+
+  test 'signing in with a link from before the rename ends the old token' do
+    account = FactoryBot.create(:account)
+    token = Account.generate_link_token
+    Account.collection.update_one({ _id: account.id }, { '$set' => { sign_in_token: token } })
+    clear_cookies
+    get '/', link_token: token
+    assert_nil Account.collection.find(_id: account.id).first['sign_in_token']
+  end
+
+  test 'a session from an email link cannot change the email or password without a code' do
+    account = FactoryBot.create(:account)
+    crypted_password = account.crypted_password
+    account.generate_link_token!
+    clear_cookies
+    get '/', link_token: account.link_token
+
+    post '/accounts/edit', account: { name: account.name, email: 'taken-over@example.com', password: 'taken-over-password' }
+    assert_equal '/accounts/sign_in_code', URI(last_response.location).path
+    account.reload
+    refute_equal 'taken-over@example.com', account.email
+    assert_equal crypted_password, account.crypted_password
+  end
+
+  test 'a session from an email link can still edit the rest of the profile' do
+    account = FactoryBot.create(:account)
+    account.generate_link_token!
+    clear_cookies
+    get '/', link_token: account.link_token
+
+    post '/accounts/edit', account: { name: 'A New Name', email: account.email }
+    assert_equal 'A New Name', account.reload.name
+  end
+
+  test 'the notification settings form cannot change the email' do
+    account = FactoryBot.create(:account)
+    account.generate_link_token!
+    clear_cookies
+    get '/', link_token: account.link_token
+
+    post '/accounts/subscriptions', account: { email: 'taken-over@example.com', unsubscribed_messages: '1' }
+    account.reload
+    refute_equal 'taken-over@example.com', account.email
+    assert account.unsubscribed_messages
   end
 
   test 'leftover omniauth session is not linked on a later signup' do

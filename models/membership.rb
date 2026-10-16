@@ -73,16 +73,16 @@ class Membership
     gathering = self.gathering
 
     sign_in_details = if account.has_signed_in?
-                        %(<a href="#{ENV['BASE_URI']}/g/#{gathering.slug}?sign_in_token=%recipient.token%">Sign in to get involved with the co-creation!</a>)
+                        %(<a href="#{ENV['BASE_URI']}/g/#{gathering.slug}?link_token=%recipient.token%">Sign in to get involved with the co-creation!</a>)
                       else
-                        %(<a href="#{ENV['BASE_URI']}/accounts/edit?sign_in_token=%recipient.token%&slug=#{gathering.slug}">Click here to finish setting up your account and get involved with the co-creation!</a>)
+                        %(<a href="#{ENV['BASE_URI']}/accounts/edit?link_token=%recipient.token%&slug=#{gathering.slug}">Click here to finish setting up your account and get involved with the co-creation!</a>)
                       end
 
     batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
     batch_message.subject "You're now a member of #{gathering.name}"
     batch_message.body_html gathering.welcome_email_html(sign_in_details)
 
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
+    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
 
     batch_message.finalize if Padrino.env == :production
   end

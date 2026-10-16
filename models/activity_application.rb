@@ -52,7 +52,7 @@ class ActivityApplication
     batch_message.body_html EmailHelper.html(:activity_application, account: account, activity: activity, activity_application: activity_application)
 
     activity.admins.each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.sign_in_token_for_email, 'id' => recipient.id.to_s })
+      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -73,7 +73,7 @@ class ActivityApplication
     batch_message.subject "You've been accepted to #{activity.name}"
     batch_message.body_html EmailHelper.html(:accepted, activity: activity)
 
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
+    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
 
     batch_message.finalize if Padrino.env == :production
   end

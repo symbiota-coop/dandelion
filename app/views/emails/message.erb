@@ -8,5 +8,5 @@
   <p><a href="<%= ENV['BASE_URI'] %>/messages/<%= messenger.id %>">View message history</a></p>
 </div>
 <div class="footer">
-  <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?sign_in_token=%recipient.token%">Opt out of email notifications of messages</a>
+  <a href="<%= ENV['BASE_URI'] %>/accounts/subscriptions?link_token=%recipient.token%">Opt out of email notifications of messages</a>
 </div>

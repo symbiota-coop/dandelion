@@ -23,7 +23,7 @@ class PmailLink
   before_validation do
     if url
       errors.add(:url, 'is invalid') unless HttpUrl.valid?(url)
-      errors.add(:url, 'cannot contain sign_in_token') if url.include?('sign_in_token=')
+      errors.add(:url, 'cannot contain a link token') if url.match?(/(link|sign_in)_token=/)
     end
   end
 

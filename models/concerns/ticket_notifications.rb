@@ -80,7 +80,7 @@ module TicketNotifications
     if email
       batch_message.add_recipient(:to, email)
     else
-      batch_message.add_recipient(:to, account.email, { 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'token' => account.link_token_for_email, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -108,7 +108,7 @@ module TicketNotifications
     batch_message.body_html EmailHelper.html(:refund_failed_ticket, account: account, event: event, error: error, provider: provider)
 
     (event.contacts + Account.and(admin: true)).uniq.each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.sign_in_token_for_email, 'id' => recipient.id.to_s })
+      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -130,7 +130,7 @@ module TicketNotifications
     )
 
     [previous_account].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.sign_in_token_for_email, 'id' => account.id.to_s })
+      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -168,7 +168,7 @@ module TicketNotifications
                    event.event_facilitators
                  end
     recipients.each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.sign_in_token_for_email, 'id' => recipient.id.to_s })
+      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production
@@ -189,7 +189,7 @@ module TicketNotifications
     batch_message.body_html EmailHelper.html(:ticket_email_update, account: account, event: event, ticket: ticket)
 
     event.event_facilitators.each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.sign_in_token_for_email, 'id' => recipient.id.to_s })
+      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
     end
 
     batch_message.finalize if Padrino.env == :production

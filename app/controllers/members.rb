@@ -68,7 +68,7 @@ Dandelion::App.controller do
         @account.password = Account.generate_password # not used
         if @account.save
           @account.sign_ins.create(request: request)
-          session[:account_id] = @account.id.to_s
+          start_session!(@account)
         else
           flash[:error] = '<strong>Oops.</strong> Some errors prevented the account from being saved.'
           redirect back

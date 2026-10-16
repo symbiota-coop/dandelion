@@ -125,7 +125,7 @@ Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Chrom
   - Back every `validates_uniqueness_of` with a unique index
   - If nil is allowed, filter it with `partialFilterExpression: { field: { $type: '<BSON type>' } }`, never `$exists: true` (Mongoid stores explicit nulls, which would clash). If nil isn't allowed, use a plain unique index with no filter, but only if every document has the field: documents missing it count as nulls and would clash
   - Beside every `$type`-filtered index, keep a plain non-unique index on the same fields (e.g. `slug_1` beside `slug_1_unique`) unless another plain index starts with them: the planner can't use the filtered one for plain `{ field: x }` queries, including the validation's own. Never drop that plain index, and don't add a `$type` condition to the validation instead
-  - Random values that can't clash, like UUIDs and other `SecureRandom` tokens (`token`, `ics_key`, `sign_in_token`, `DragonflyJob#uid`), get a unique index but no `validates_uniqueness_of` or `exists?` loop, which would cost a query on every create. Short or derived values (`evm_secret`, `DragonflyJob#signature`) keep the validation
+  - Random values that can't clash, like UUIDs and other `SecureRandom` tokens (`token`, `ics_key`, `link_token`, `DragonflyJob#uid`), get a unique index but no `validates_uniqueness_of` or `exists?` loop, which would cost a query on every create. Short or derived values (`evm_secret`, `DragonflyJob#signature`) keep the validation
   - Check index use with the slow query log or `$indexStats` (0 ops means unused)
 
 ## Tracing

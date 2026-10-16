@@ -20,9 +20,9 @@ Dandelion::App.controller do
     redirect '/accounts/edit'
   end
 
-  get '/confirm_email/:sign_in_token' do
+  get '/confirm_email/:link_token' do
     sign_in_required!
-    if @signed_in_via_token
+    if @signed_in_via_email
       current_account.set(email_confirmed: true)
       flash[:notice] = 'Your email address was confirmed.'
       redirect '/accounts/edit'
@@ -60,7 +60,7 @@ Dandelion::App.controller do
       @show_email = true
       erb :'accounts/requested_sign_in_code'
     elsif params[:code]
-      redirect "/?sign_in_token=#{params[:code].strip}"
+      redirect "/?sign_in_code=#{CGI.escape(params[:code].strip)}"
     else
       flash[:error] = "There's no account registered under that email address."
       redirect '/accounts/sign_in'
@@ -162,7 +162,8 @@ Dandelion::App.controller do
   post '/accounts/subscriptions' do
     sign_in_required!
     @account = current_account
-    if @account.update_attributes(mass_assigning(params[:account], Account))
+    # Only the notification settings: changing the email goes through /accounts/edit, which checks it's you
+    if @account.update_attributes(mass_assigning((params[:account] || {}).slice(*Account.subscription_attributes), Account))
       flash[:notice] = 'Your preferences were saved.'
       redirect back
     else
@@ -185,7 +186,14 @@ Dandelion::App.controller do
     end
 
     account_params = params[:account]
-    @account.password = account_params.delete('password') if account_params.is_a?(Hash)
+    if account_params.is_a?(Hash)
+      password = account_params.delete('password')
+      # A browser can fill in the saved password, which changes nothing
+      password = nil if password && @account.crypted_password && @account.password_matches?(password)
+      changing_credentials = password || (account_params['email'] && account_params['email'].downcase.strip != @account.email)
+      verification_required!(return_to: '/accounts/edit', notice: "Your changes weren't saved: to change your email or password, enter the code below, then make the change again.") if changing_credentials
+      @account.password = password
+    end
     if account_params.is_a?(Hash) && @account.update_attributes(mass_assigning(account_params, Account))
       flash[:notice] = '<strong>Awesome!</strong> Your account was updated successfully.'
       @account.notifications_as_notifiable.and(type: 'updated_profile').destroy_all

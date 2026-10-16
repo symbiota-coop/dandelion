@@ -6,6 +6,6 @@
 </div>
 <% if notification.circle.is_a?(Gathering) %>
   <div class="footer">
-    <a href="<%= ENV['BASE_URI'] %>/g/<%= circle.slug %>/unsubscribe?sign_in_token=%recipient.token%">Unsubscribe from this gathering</a>
+    <a href="<%= ENV['BASE_URI'] %>/g/<%= circle.slug %>/unsubscribe?link_token=%recipient.token%">Unsubscribe from this gathering</a>
   </div>
 <% end %>

@@ -259,7 +259,7 @@ class GatheringsTest < ActiveSupport::TestCase
     @gathering.update!(name: 'Gathering &lt;img src="https://name.example/x?t=&amp;#37;recipient.token&amp;#37;"&gt;')
     refute_includes @gathering.name, '%recipient'
     @gathering.set(name: 'Gathering %%recipient.firstname%% [sign_in_details]')
-    sign_in_details = %(<a href="#{ENV['BASE_URI']}/g/#{@gathering.slug}?sign_in_token=%recipient.token%">Sign in</a>)
+    sign_in_details = %(<a href="#{ENV['BASE_URI']}/g/#{@gathering.slug}?link_token=%recipient.token%">Sign in</a>)
     html = @gathering.welcome_email_html(sign_in_details)
 
     assert_match(/<p[^>]*>Gathering /, html)
@@ -267,8 +267,8 @@ class GatheringsTest < ActiveSupport::TestCase
 
     refute_match(%r{src="[^"]*%recipient\.token%}, html)
     refute_match(/<img[^>]*name\.example/, html)
-    assert_includes html, "#{ENV['BASE_URI']}/g/#{@gathering.slug}?sign_in_token=%recipient.token%"
-    assert_equal html.scan('sign_in_token=%recipient.token%').size, html.scan('%recipient.token%').size
+    assert_includes html, "#{ENV['BASE_URI']}/g/#{@gathering.slug}?link_token=%recipient.token%"
+    assert_equal html.scan('link_token=%recipient.token%').size, html.scan('%recipient.token%').size
   end
 
   test 'comment cannot attach a post from another commentable' do

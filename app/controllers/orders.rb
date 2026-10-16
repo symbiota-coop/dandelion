@@ -134,7 +134,7 @@ Dandelion::App.controller do
     halt 403 unless @ticket.account == current_account
     halt 403 unless @ticket.cancellable?
     @ticket.destroy
-    recipient = { 'email' => current_account.email, 'firstname' => current_account.firstname, 'token' => current_account.sign_in_token_for_email, 'id' => current_account.id.to_s }
+    recipient = { 'email' => current_account.email, 'firstname' => current_account.firstname, 'token' => current_account.link_token_for_email, 'id' => current_account.id.to_s }
     Order.delay.send_rsvp_cancelled_email(@event.id.to_s, [recipient])
     if params[:from_confirm]
       redirect "/e/#{@event.slug}"

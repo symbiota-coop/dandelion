@@ -39,6 +39,7 @@ Dandelion::App.controller do
           flash[:error] = "Someone's already connected to that account!"
           redirect '/accounts/providers'
         end
+        verification_required!(return_to: '/accounts/providers', notice: "To connect #{@provider.display_name}, enter the code below, then connect it again.")
         # The OAuth flow can be started by a cross-site GET, so linking waits for a same-origin POST
         session['omniauth.connect'] = env['omniauth.auth']
         @account = current_account
@@ -46,7 +47,7 @@ Dandelion::App.controller do
         erb :'accounts/confirm_provider'
       elsif account # not signed in
         account.sign_ins.create(request: request)
-        session[:account_id] = account.id.to_s
+        start_session!(account)
         flash[:notice] = 'Signed in!'
         redirect session.delete(:return_to) || '/'
       else
@@ -64,6 +65,7 @@ Dandelion::App.controller do
 
   post '/accounts/providers/confirm' do
     sign_in_required!
+    verification_required!(return_to: '/accounts/providers', notice: 'To connect an account, enter the code below, then connect it again.')
     omniauth_data = session.delete('omniauth.connect') || redirect('/accounts/providers')
     @provider = Provider.object(omniauth_data['provider']) || redirect('/accounts/providers')
     provider_uid = omniauth_data['uid'] || omniauth_data.dig('info', 'did')

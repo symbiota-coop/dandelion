@@ -18,7 +18,9 @@ module AccountFields
     field :image_uid, type: String
     field :has_image, type: Mongoid::Boolean
     field :sign_ins_count, type: Integer
-    field :sign_in_token, type: String
+    field :link_token, type: String # the token in the links of every email; was sign_in_token
+    field :sign_in_code_digest, type: String
+    field :sign_in_code_expires_at, type: Time
     field :api_key, type: String
     field :ics_key, type: String
     field :last_active, type: Time

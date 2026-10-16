@@ -174,7 +174,7 @@ class EventsTest < ActiveSupport::TestCase
     refute_match(%r{src="[^"]*%recipient\.token%}, html)
     refute_includes html, 'Workshop %recipient.token%'
     assert_includes html, 'Workshop'
-    assert_includes html, 'sign_in_token=%recipient.token%'
+    assert_includes html, 'link_token=%recipient.token%'
   end
 
   test 'names cannot keep a mailgun recipient token' do
@@ -257,7 +257,7 @@ class EventsTest < ActiveSupport::TestCase
     attendee = FactoryBot.create(:account)
     @event.tickets.create!(account: attendee, ticket_type: @event.ticket_types.first, payment_completed: true)
 
-    get "/e/#{@event.slug}", sign_in_token: attendee.sign_in_token
+    get "/e/#{@event.slug}", link_token: attendee.link_token
     assert_nil @event.discussion_post
 
     post "/events/#{@event.id}/subscribe_discussion"
@@ -273,7 +273,7 @@ class EventsTest < ActiveSupport::TestCase
     create_event(prices: [0])
     outsider = FactoryBot.create(:account)
 
-    get "/e/#{@event.slug}", sign_in_token: outsider.sign_in_token
+    get "/e/#{@event.slug}", link_token: outsider.link_token
     post "/events/#{@event.id}/subscribe_discussion"
     assert_not last_response.ok?
     assert_nil @event.discussion_post
@@ -294,7 +294,7 @@ class EventsTest < ActiveSupport::TestCase
     assert_includes html, '@nobody_here &lt;b&gt;now&lt;/b&gt;'
     assert_includes comment.body_with_additions, %(<a href="#{ENV['BASE_URI']}/u/ada.lovelace">)
 
-    get "/e/#{@event.slug}", sign_in_token: @account.sign_in_token
+    get "/e/#{@event.slug}", link_token: @account.link_token
     assert_includes last_response.body, '<a href="/u/ada.lovelace">Ada Lovelace</a>'
   end
 
@@ -342,7 +342,7 @@ class EventsTest < ActiveSupport::TestCase
 
     refute_match(/<img[^>]*attacker\.example/, html)
     assert_includes html, 'Workshop &lt;img'
-    assert_equal html.scan('sign_in_token=%recipient.token%').size, html.scan('%recipient.token%').size
+    assert_equal html.scan('link_token=%recipient.token%').size, html.scan('%recipient.token%').size
   end
 
   test 'youtube titles are escaped in emails' do

@@ -90,7 +90,7 @@ class Trace
                            .sort_by { |_release, time| time }.reverse
   end
 
-  # Query parameters whose values can sign someone in or grant access (sign_in_token, api_key, ics_key, OAuth codes...)
+  # Query parameters whose values can sign someone in or grant access (link_token, api_key, ics_key, OAuth codes...)
   SECRET_QUERY_PARAM = /token|key|secret|password|code|state|signature/i
 
   # Sentry's request url leaves out the query string, which tells apart e.g. the pages of a paginated list
