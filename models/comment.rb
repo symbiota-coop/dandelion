@@ -26,6 +26,9 @@ class Comment
 
   attr_accessor :via_email
 
+  # A chat comment is only its body, while a thread can open with only a subject
+  validates_presence_of :body, if: :chat?
+
   dragonfly_accessor :file
 
   has_many :comment_reactions, dependent: :destroy

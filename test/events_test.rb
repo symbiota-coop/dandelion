@@ -279,6 +279,25 @@ class EventsTest < ActiveSupport::TestCase
     assert_nil @event.discussion_post
   end
 
+  test 'a discussion comment needs a body' do
+    create_event(prices: [0])
+    attendee = FactoryBot.create(:account)
+    @event.tickets.create!(account: attendee, ticket_type: @event.ticket_types.first, payment_completed: true)
+
+    get "/e/#{@event.slug}", link_token: attendee.link_token
+    post '/comment', comment: { commentable_type: 'Event', commentable_id: @event.id, body: ' ' }
+    assert_not @event.comments.exists?
+    assert_nil @event.discussion_post
+
+    post '/comment', comment: { commentable_type: 'Event', commentable_id: @event.id, body: 'Hello' }
+    comment = @event.comments.first
+    assert_equal 'Hello', comment.body
+
+    post "/comments/#{comment.id}/edit", body: ''
+    assert_equal 400, last_response.status
+    assert_equal 'Hello', comment.reload.body
+  end
+
   test 'comment mentions link to profiles and subscribe the people mentioned' do
     create_event(prices: [0])
     mentioned = FactoryBot.create(:account, name: 'Ada Lovelace', username: 'ada.lovelace')

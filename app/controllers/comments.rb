@@ -43,8 +43,10 @@ Dandelion::App.controller do
     @comment.post = @commentable.posts.find(post_id) || not_found if post_id
     @comment.account = current_account
     @comment.force = true if @comment.allow_force?(current_account) && force_param.present?
-    @comment.post ||= @commentable.discussion_post!(current_account) if @comment.chat?
-    unless @comment.post
+    if @comment.chat?
+      # A blank chat comment fails validation, so it doesn't make the discussion post
+      @comment.post ||= @commentable.discussion_post!(current_account) if @comment.body
+    elsif !@comment.post
       @post = @commentable.posts.create!(account: current_account, subject: subject)
       @comment.post = @post
     end
@@ -66,6 +68,7 @@ Dandelion::App.controller do
     @commentable = @comment.commentable
     halt 403 unless @comment.account.id == current_account.id
     commentable_viewers_only!
+    halt 400 if @comment.chat? && !params[:body]
     @comment.set(body: params[:body])
     200
   end
