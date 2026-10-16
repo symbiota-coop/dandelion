@@ -1,16 +1,37 @@
+require 'digest/keccak'
+
 module EvmTransactions
   extend ActiveSupport::Concern
 
+  EVM_ADDRESS = /\A0x[0-9a-f]{40}\z/i
+
   included do
-    before_validation :strip_evm_address
-    validates_format_of :evm_address, with: /\A0x[0-9a-f]{40}\z/i, allow_nil: true
+    before_validation :clean_evm_address
+    validates_format_of :evm_address, with: EVM_ADDRESS, allow_nil: true
   end
 
-  def strip_evm_address
+  # Strips the address and, if it's in mixed case, checks its EIP-55 checksum: a mistyped character almost always
+  # breaks it, and payments would go to the mistyped address. Wallets copy addresses in mixed case; all lower or all
+  # upper case has no checksum to check
+  def clean_evm_address
     self.evm_address = evm_address&.strip
+    return unless evm_address&.match?(EVM_ADDRESS)
+
+    hex = evm_address.delete_prefix('0x')
+    return if [hex.downcase, hex.upcase].include?(hex) || evm_address == self.class.evm_checksum_address(evm_address)
+
+    errors.add(:evm_address, "doesn't match its checksum, so a character may be mistyped: copy it from your wallet again")
   end
 
   class_methods do
+    # The address with the EIP-55 checksum in its letters' case: each hex letter is upper case where the matching
+    # nibble of the Keccak-256 hash of the lower-case address is 8 or more
+    def evm_checksum_address(address)
+      hex = address.delete_prefix('0x').downcase
+      hash = Digest::Keccak.new(256).hexdigest(hex)
+      "0x#{hex.chars.each_with_index.map { |char, i| hash[i].to_i(16) >= 8 ? char.upcase : char }.join}"
+    end
+
     def evm_transactions(evm_address)
       transactions = []
 

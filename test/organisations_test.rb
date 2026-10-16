@@ -45,6 +45,27 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_includes @organisation.errors[:mailgun_domain], 'must be a domain like mg.example.com'
   end
 
+  test 'evm_address must match its EIP-55 checksum when in mixed case' do
+    create_organisation
+    # EIP-55's own example address, which checksums to this case
+    @organisation.evm_address = ' 0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed '
+    assert @organisation.valid?
+    assert_equal '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed', @organisation.evm_address
+
+    # No checksum to check in one case
+    ['0x5aaeb6053f3e94c9b9a09f33669435e7ef1beaed', '0x5AAEB6053F3E94C9B9A09F33669435E7EF1BEAED'].each do |address|
+      @organisation.evm_address = address
+      assert @organisation.valid?, address
+    end
+
+    # One mistyped character, and one letter in the wrong case
+    ['0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAee', '0x5aaeb6053F3E94C9b9A09f33669435E7Ef1BeAed'].each do |address|
+      @organisation.evm_address = address
+      assert !@organisation.valid?, address
+      assert_includes @organisation.errors[:evm_address], "doesn't match its checksum, so a character may be mistyped: copy it from your wallet again"
+    end
+  end
+
   test 'editing an organisation' do
     create_organisation
     sign_in(@account)

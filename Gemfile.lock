@@ -545,6 +545,7 @@ DEPENDENCIES
   incoming
   irb
   jwt
+  keccak
   luminosity_contrast
   mail
   mailgun-ruby

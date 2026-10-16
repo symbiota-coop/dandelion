@@ -100,6 +100,7 @@ gem 'rack-utf8_sanitizer'
 gem 'chroma' # for manipulating colours
 gem 'digest' # for generating hashes
 gem 'haikunator' # for generating random names
+gem 'keccak' # for EIP-55 checksums on EVM addresses
 gem 'htmlbeautifier' # for beautifying HTML
 gem 'luminosity_contrast' # for WCAG contrast ratio calculations
 gem 'mini_magick' # for image processing
