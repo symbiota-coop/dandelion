@@ -167,6 +167,13 @@
   }
 }
 
+/* Below md everything is one column, with a wider measure than newspaper columns, so the text goes up to body size */
+@media (max-width: 767.98px) {
+  .newspaper-text {
+    font-size: var(--font-size-md);
+  }
+}
+
 /* Event names are links in the text's own ink, with a fine underline, so a story still reads as print */
 .newspaper-text a {
   color: inherit;
