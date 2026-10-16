@@ -11,7 +11,7 @@ Dandelion::App.helpers do
     }
   end
 
-  # A numbered section of the design guide, with an optional intro. Pass HTML in intro as html_safe
+  # A numbered section of the design guide, with an optional intro: HTML, or an array of it for several paragraphs
   def design_section(id, intro = nil, &)
     @design_section = id
     (@design_toc ||= {})[id] = []

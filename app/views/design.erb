@@ -27,8 +27,19 @@
     </nav>
   </header>
 
-  <% design_section 'colour' do %>
-    <% design_subsection 'Theme', 'A ramp generated from one value with <code>oklch()</code>. Components use the 500 for fills, 600 for hover, 100 for alert, toast and badge backgrounds, and 800 for text on those tints. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Tints (50–200) sit at fixed lightness, so they look equally light across hues; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints. The 400 is .06 lighter than the 500, or half way to the 200 when the 500 is too light for that, and the 300 is halfway between the 200 and 400, so the steps stay in order however light the colour. Every theme colour is a solid step of this ramp; the only translucent ones are the focus ring, .badge-overlay (the 500 at 70%, over images) and chart projections (the 500 at 50%, and in the contributions chart a 30% fill with a 50% border), so they read as estimates.' do %>
+  <% design_section 'colour', [
+                   "Every family is a ramp of steps generated from its 500 with <code>oklch()</code>, so steps at the same lightness look equally light whatever the hue. Tints (50–200) sit at fixed lightness; shades (400–800) are relative to the 500, with 800 capped dark enough for text on tints. The 400 is .06 lighter than the 500, or half way to the 200 when the 500 is too light for that (yellow), and the 300 is halfway between the 200 and 400, so the steps stay in order however light the colour.",
+                   "Components use the 500 for fills, 600 for hover, 100 for alert, toast and badge backgrounds, and 800 for text on those tints. Red text (text-danger, form errors) takes red's 600, as the 500 is under 4.5:1 on white.",
+                   "Each 500 is as vivid as sRGB allows at its lightness: green, orange and yellow sit at the edge, and red and lavender, which have more room, stop at four-fifths of theirs, so they sit level with the green rather than glare.",
+                   "Lightness follows the hue, as each colour reads as itself only in a band: yellow only when light, red only when fairly dark. Hues stay clear of their neighbours: red short of both orange-red and pink, orange an amber at 72, set apart from yellow at 90 by lightness as well (their tints, which share a lightness, aren't, so warning badges take the 200), and lavender the default green turned to 300. Yellow's 500 is the lightest, so its 200 to 500 sit close together, set apart more by saturation than lightness."
+                 ] do %>
+    <div class="row g-2">
+      <% [['--color-red-500', 'Red', 'hue 25 · lightness .63'], ['--color-orange-500', 'Orange', 'hue 72 · lightness .79'], ['--color-yellow-500', 'Yellow', 'hue 90 · lightness .86'], ['--color-green-500', 'Green', 'the default theme · lightness .661'], ['--color-lavender-500', 'Lavender', 'hue 300 · lightness .661']].each do |var, title, note| %>
+        <%= partial :'design/swatch', locals: { vars: [var], title: title, note: note, col: 'col-4 col-md' } %>
+      <% end %>
+    </div>
+
+    <% design_subsection 'Green', 'The theme colour: green by default. Organisations and events set <code>--theme-500</code> only (through <code>/theme.css</code>). Every theme colour is a solid step of this ramp; the only translucent ones are the focus ring, .badge-overlay (the 500 at 70%, over images) and chart projections (the 500 at 50%, and in the contributions chart a 30% fill with a 50% border), so they read as estimates.' do %>
       <%= partial :'design/ramp', locals: {
             prefix: '--theme',
             label: '--theme-*',
@@ -47,7 +58,7 @@
       <div class="small text-body-secondary">Bootstrap's <code>rgba(var(--bs-*-rgb))</code> colours need an rgb triplet, so <code>/theme.css</code> also sets <code>--theme-500-rgb</code>.</div>
     <% end %>
 
-    <% design_subsection 'Lavender', "The default site's AI well and <code>.lavender-wash</code> backgrounds. Its steps come from --color-lavender-500, the default green turned to hue 300 at the same lightness and chroma, with the theme ramp's formulas." do %>
+    <% design_subsection 'Lavender', "The default site's AI well and <code>.lavender-wash</code> backgrounds. Its steps come from --color-lavender-500." do %>
       <%= partial :'design/ramp', locals: {
             prefix: '--color-lavender',
             notes: {
@@ -63,7 +74,7 @@
           } %>
     <% end %>
 
-    <% design_subsection 'Yellow', "For highlighted or rewarded things, through <code>text-bg-yellow</code>: Featured, Co-host, rota points, PATCH routes. Its steps come from --color-yellow-500 with the theme ramp's formulas. Yellow's 500 is the lightest (see Warning and danger), so its 200 to 500 sit close together, set apart more by saturation than lightness." do %>
+    <% design_subsection 'Yellow', "For highlighted or rewarded things, through <code>text-bg-yellow</code>: Featured, Co-host, rota points, PATCH routes. Its steps come from --color-yellow-500." do %>
       <%= partial :'design/ramp', locals: {
             prefix: '--color-yellow',
             notes: {
@@ -79,38 +90,42 @@
           } %>
     <% end %>
 
-    <% design_subsection 'Warning and danger', "Two families, used the same way as the theme ramp: each variant class (alert-warning, toast-warning, table-warning, btn-warning, text-bg-warning and the danger ones) sets the steps it uses as <code>--variant-*</code>, and each component maps those to its roles once. The 500 is also Bootstrap's <code>$warning</code> and <code>$danger</code> in bootstrap5.scss, so text-danger, form errors and the like match. The lavender, yellow, orange and red 500s share the default green's oklch chroma, .169, so they are equally saturated; only lightness varies by hue, so each reads true: red .63, green and lavender .661, orange .79, yellow .86. Red, orange and yellow sit at hues 25, 72 and 90: red at 25 so it reads as red rather than orange-red, short of the pinks below 20, and orange's .79 is the lowest lightness that holds hue 72 at that chroma inside sRGB." do %>
-      <% roles = {
-           '50' => 'row background',
-           '100' => 'alert, toast and badge background',
-           '200' => 'row, alert and toast border',
-           '300' => 'not used yet',
-           '400' => 'not used yet',
-           '500' => 'fill: buttons, card headers and other text-bg-* elements that aren\'t badges',
-           '600' => 'button hover',
-           '800' => 'text and links on tints, badge text'
-         }
-         other_uses = {
-           'orange' => {
-             '50' => 'features page section washes',
-             '500' => 'ASN stats: bot % of 30 and over',
-             '400' => 'star icons, feedback stars, map areas, features page',
-             '200' => 'features page divider end'
-           },
-           'red' => {
-             '500' => 'ASN stats: bot % of 60 and over; check-in QR scan line',
-             '400' => 'map: event and organisation markers'
-           }
-         } %>
-      <% [%w[Warning orange warning], %w[Danger red danger]].each do |title, colour, variant| %>
-        <%= partial :'design/ramp', locals: {
-              prefix: "--color-#{colour}",
-              label: title,
-              label_note: "--color-#{colour}-*",
-              notes: roles.merge(other_uses[colour]) { |_, role, uses| role == 'not used yet' ? uses.upcase_first : "#{role}. Also: #{uses}" }
-            } %>
-      <% end %>
-      <div class="small text-body-secondary">Danger badges take the 200, as red's 100 reads pink. table-warning and table-danger rows mix 30% of the way from the 50 to the 200 for hover, stripes and active rows.</div>
+    <% roles = {
+         '50' => 'row background',
+         '100' => 'alert and toast background',
+         '200' => 'row, alert and toast border, badge background',
+         '300' => 'not used yet',
+         '400' => 'not used yet',
+         '500' => 'fill: buttons, card headers and other text-bg-* elements that aren\'t badges',
+         '600' => 'button hover',
+         '800' => 'text and links on tints, badge text'
+       }
+       ramp_notes = ->(uses) { roles.merge(uses) { |_, role, use| role == 'not used yet' ? use.upcase_first : "#{role}. Also: #{use}" } } %>
+
+    <% design_subsection 'Orange', "Warning: each warning class (alert-warning, toast-warning, table-warning, btn-warning, text-bg-warning) sets the steps it uses as <code>--variant-*</code>, and each component maps those to its roles once. The 500 is also Bootstrap's <code>$warning</code> in bootstrap5.scss. table-warning rows mix 30% of the way from the 50 to the 200 for hover, stripes and active rows." do %>
+      <%= partial :'design/ramp', locals: {
+            prefix: '--color-orange',
+            label: 'Warning',
+            label_note: '--color-orange-*',
+            notes: ramp_notes.call(
+              '50' => 'features page section washes',
+              '500' => 'ASN stats: bot % of 30 and over',
+              '400' => 'star icons, feedback stars, map areas, features page',
+              '200' => 'features page divider end'
+            )
+          } %>
+    <% end %>
+
+    <% design_subsection 'Red', "Danger, through the danger classes (alert-danger, toast-danger, table-danger, btn-danger, text-bg-danger), which map its steps to their roles as orange's warning classes do. The 500 is also Bootstrap's <code>$danger</code> in bootstrap5.scss, and its 600 is <code>$form-feedback-invalid-color</code>, so form errors and text-danger (red text) are the 600. Danger badges take the 200, as red's 100 reads pink, as do warning badges (see Orange). table-danger rows mix 30% of the way from the 50 to the 200 for hover, stripes and active rows." do %>
+      <%= partial :'design/ramp', locals: {
+            prefix: '--color-red',
+            label: 'Danger',
+            label_note: '--color-red-*',
+            notes: ramp_notes.call(
+              '500' => 'ASN stats: bot % of 60 and over; check-in QR scan line',
+              '400' => 'map: event and organisation markers'
+            )
+          } %>
     <% end %>
 
     <% design_subsection 'Greys, black and white', "Bootstrap's own variables, set in bootstrap5.scss to near-neutral greys: Bootstrap's lightness steps with a trace of warmth (designed at oklch hue 75, chroma .00225–.003, then rounded to hex). Usage: 100 (<code>--bs-tertiary-bg</code>) body.canvas pages, wells and hovered dropdown, autocomplete and list items, and table stripes · 200 (<code>--bs-secondary-bg</code>) hovered nav links, table rows and secondary buttons, secondary badges and input add-ons · 300 (<code>--bs-border-color</code>) table and secondary button borders · 400 input borders and hr · 500 sidebar sub-menu links and grey borders (comment boxes, the editor) · 600 secondary text and the sidebar's minify button · 700 input add-on text · 800 search bar, sidebar dividers and dark badges in the sidebar · 900 header and sidebar. Body text (<code>--bs-body-color</code>) and emphasis text (<code>--bs-emphasis-color</code>, set to 900 in bootstrap5.scss in place of Bootstrap's black) are the same as 900. Black and white with transparency use <code>rgba(var(--bs-black-rgb), a)</code> and <code>rgba(var(--bs-white-rgb), a)</code>, e.g. shadows and image overlays. Hairlines (card, dropdown, autocomplete and cookie banner borders, event blocks, image-less tiles, date tiles, the onboarding callout, feedback entries, the .chill card header's divider, marketing cards) use <code>--hairline</code>, black at 10%: Bootstrap's <code>--bs-border-color-translucent</code>, set in bootstrap5.scss, so its cards and dropdowns share it." do %>
@@ -397,7 +412,7 @@
       <div class="border rounded p-4 d-flex flex-column gap-3">
         <h4 class="m-0">Full moon gathering <span class="badge text-bg-yellow">Featured</span> <span class="badge text-bg-warning">Locked</span></h4>
         <div>Followers <span class="badge text-bg-primary">128</span> · Tagged <a class="badge text-bg-primary" href="#components">breathwork</a> in <span class="badge text-primary border border-primary">Weekend pass</span> · Paid <span class="badge text-bg-secondary">SPRING: £5</span></div>
-        <div class="spec">.badge · .9375em (1rem in h1–h3) · .4em .85em · pill · badges side by side get .25rem (mb-1) below them from app.css, so the rows don't touch when they wrap (flex rows use gap-1 instead) · weight 600 · primary, secondary, warning, danger and yellow are soft: their variant's 100 behind its 800, so they show on grey as well as white (danger: the 200, as red's 100 reads pink; secondary: --bs-gray-200 and 800); dark, stripe and payment badges are filled · in a selected menu item, sheet item or pill, a primary or secondary badge turns to its 800 with white text, so it sits in the selection · .badge-overlay, for labels over images (the carousel), is filled with its variant's 500 at 70%, white text, square</div>
+        <div class="spec">.badge · .9375em (1rem in h1–h3) · .4em .85em · pill · badges side by side get .25rem (mb-1) below them from app.css, so the rows don't touch when they wrap (flex rows use gap-1 instead) · weight 600 · primary, secondary, warning, danger and yellow are soft: their variant's 100 behind its 800, so they show on grey as well as white (warning and danger: the 200, as orange's 100 is close to yellow's and red's reads pink; secondary: --bs-gray-200 and 800); dark, stripe and payment badges are filled · in a selected menu item, sheet item or pill, a primary or secondary badge turns to its 800 with white text, so it sits in the selection · .badge-overlay, for labels over images (the carousel), is filled with its variant's 500 at 70%, white text, square</div>
       </div>
       <div class="table-responsive">
         <table class="table table-sm mb-0">
