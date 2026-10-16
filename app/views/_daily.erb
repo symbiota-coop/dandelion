@@ -1,58 +1,61 @@
-<% @edition['articles'].each do |article| %>
-  <div class="article">
-    <h2 class="article-title"><%= article['title'] %></h2>
-    <div class="article-content">
-      <%== Sanitize.fragment(md(article['summary'].to_s), Sanitize::Config::DANDELION) %>
+<%# The first article leads, across the page in ruled columns; the rest run side by side beneath it %>
+<% lead, *others = @edition['articles'] %>
+<% if lead %>
+  <article class="newspaper-article newspaper-lead">
+    <h2 class="newspaper-headline"><%= lead['title'] %></h2>
+    <div class="newspaper-text">
+      <%== Sanitize.fragment(md(lead['summary'].to_s), Sanitize::Config::DANDELION) %>
     </div>
+  </article>
+<% end %>
+
+<% if others.any? %>
+  <div class="newspaper-row">
+    <% others.each do |article| %>
+      <article class="newspaper-article">
+        <h2 class="newspaper-headline"><%= article['title'] %></h2>
+        <div class="newspaper-text">
+          <%== Sanitize.fragment(md(article['summary'].to_s), Sanitize::Config::DANDELION) %>
+        </div>
+      </article>
+    <% end %>
   </div>
 <% end %>
 
 <%# Seeded by the date, so each date keeps its book and film %>
 <% random = Random.new(@date.jd) %>
-<div class="row">
-  <div class="col-md-4 pe-md-5">
-    <div class="article single-column">
-      <h3>Book of the day</h3>
-      <div>
-        <% book = Library.books.sample(random: random) %>
-        <% if book %>
-          <a href="/books/<%= book[:slug] %>">
-            <img class="mw-100" src="/books/<%= book[:slug] %>.jpg">
-          </a>
-        <% end %>
+<div class="newspaper-row newspaper-features">
+  <section class="newspaper-feature">
+    <h3 class="newspaper-section">Book of the day</h3>
+    <% book = Library.books.sample(random: random) %>
+    <% if book %>
+      <a href="/books/<%= book[:slug] %>">
+        <img class="newspaper-cover" src="/books/<%= book[:slug] %>.jpg" alt="">
+      </a>
+    <% end %>
+  </section>
+  <section class="newspaper-feature">
+    <h3 class="newspaper-section">Film of the day</h3>
+    <% film = Library.films.sample(random: random) %>
+    <% if film %>
+      <a href="<%= film[:url] %>">
+        <img class="newspaper-cover" src="/films/<%= film[:slug] %>.jpg" alt="">
+      </a>
+    <% end %>
+  </section>
+  <section class="newspaper-feature">
+    <h3 class="newspaper-section">Facilitator of the day</h3>
+    <% account = Account.find(@edition['facilitator_id']) if @edition['facilitator_id'] %>
+    <% if account %>
+      <a href="javascript:;" data-account-username="<%= account.username %>">
+        <img class="newspaper-portrait <%= account.avatar_class %> <%= 'private' if account.private? %>" src="<%= u account.image_thumb_or_gravatar_url %>" alt="">
+      </a>
+      <h4 class="newspaper-byline">
+        <a class="text-body" href="/u/<%= account.username %>"><%= account.name %></a>
+      </h4>
+      <div class="facilitator-info">
+        <%= partial :'accounts/facilitator_info', locals: { account: account } %>
       </div>
-    </div>
-  </div>
-  <div class="col-md-4 pe-md-5">
-    <div class="article single-column">
-      <h3>Film of the day</h3>
-      <div>
-        <% film = Library.films.sample(random: random) %>
-        <% if film %>
-          <a href="<%= film[:url] %>">
-            <img class="mw-100" src="/films/<%= film[:slug] %>.jpg">
-          </a>
-        <% end %>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4 pe-md-5">
-    <div class="article single-column">
-      <h3>Facilitator of the day</h3>
-      <div>
-        <% account = Account.find(@edition['facilitator_id']) if @edition['facilitator_id'] %>
-        <% if account %>
-          <a class="text-decoration-none" href="javascript:;" data-account-username="<%= account.username %>">
-            <img class="w-100 <%= account.avatar_class %> <%= 'private' if account.private? %>" src="<%= u account.image_thumb_or_gravatar_url %>">
-            <h4 class="mt-2">
-              <a class="text-body" href="/u/<%= account.username %>"><%= account.name %></a>
-            </h4>
-            <div class="facilitator-info">
-              <%= partial :'accounts/facilitator_info', locals: { account: account } %>
-            </div>
-          </a>
-        <% end %>
-      </div>
-    </div>
-  </div>
+    <% end %>
+  </section>
 </div>

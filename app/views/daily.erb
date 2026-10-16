@@ -1,27 +1,38 @@
 <link rel="stylesheet" href="<%= cachebust('/stylesheets/daily.css') %>">
 <div class="newspaper">
-  <h1 class="newspaper-title">The Dandelion Daily</h1>
-  <div class="date-navigation">
-    <% if (previous_date = Daily.previous_date(@date)) %>
-      <a href="/daily?date=<%= previous_date.strftime('%Y-%m-%d') %>" class="nav-arrow">
-        <i class="bi bi-arrow-left"></i>
-      </a>
-    <% else %>
-      <span class="nav-arrow disabled">
-        <i class="bi bi-arrow-left"></i>
+  <header class="newspaper-masthead">
+    <h1 class="newspaper-title">The Dandelion Daily</h1>
+    <p class="newspaper-motto">Printed by a co-op, given as a gift</p>
+    <div class="newspaper-dateline">
+      <span class="newspaper-dateline-side">
+        <% if @edition %>
+          No. <%= Daily.number(@date) %>
+        <% end %>
       </span>
-    <% end %>
-    <span><%= @date.strftime("%A, %B %-d, %Y") %></span>
-    <% if (next_date = Daily.next_date(@date)) %>
-      <a href="/daily?date=<%= next_date.strftime('%Y-%m-%d') %>" class="nav-arrow">
-        <i class="bi bi-arrow-right"></i>
-      </a>
-    <% else %>
-      <span class="nav-arrow disabled">
-        <i class="bi bi-arrow-right"></i>
+      <span class="newspaper-dateline-date">
+        <% if (previous_date = Daily.previous_date(@date)) %>
+          <a href="/daily?date=<%= previous_date.strftime('%Y-%m-%d') %>" class="nav-arrow" title="Previous edition" data-bs-toggle="tooltip">
+            <i class="bi bi-arrow-left"></i>
+          </a>
+        <% else %>
+          <span class="nav-arrow disabled">
+            <i class="bi bi-arrow-left"></i>
+          </span>
+        <% end %>
+        <span><%= @date.strftime('%A, %B %-d, %Y') %></span>
+        <% if (next_date = Daily.next_date(@date)) %>
+          <a href="/daily?date=<%= next_date.strftime('%Y-%m-%d') %>" class="nav-arrow" title="Next edition" data-bs-toggle="tooltip">
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        <% else %>
+          <span class="nav-arrow disabled">
+            <i class="bi bi-arrow-right"></i>
+          </span>
+        <% end %>
       </span>
-    <% end %>
-  </div>
+      <span class="newspaper-dateline-side text-end">Price: free</span>
+    </div>
+  </header>
 
   <% if @edition %>
     <%= partial :daily %>
