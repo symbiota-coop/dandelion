@@ -53,7 +53,6 @@
     <% if !@account.email_confirmed? %>
       <p class="field-note"><a data-method="post" href="/confirm_email">Resend confirmation email</a></p>
     <% end %>
-    <%= f.password_block :password %>
     <div class="my-3">
       <%= f.check_box_block :hidden %>
     </div>

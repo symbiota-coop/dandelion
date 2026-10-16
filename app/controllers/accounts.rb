@@ -178,6 +178,36 @@ Dandelion::App.controller do
     erb :'accounts/providers'
   end
 
+  # Asks for a code before showing the form, so what's typed into it isn't lost
+  get '/accounts/password' do
+    sign_in_required!
+    verification_required!(return_to: '/accounts/password', notice: 'To change your password, enter the code below.')
+    @account = current_account
+    erb :'accounts/password'
+  end
+
+  post '/accounts/password' do
+    sign_in_required!
+    verification_required!(return_to: '/accounts/password', notice: "Your password wasn't changed: enter the code below, then change it again.")
+    @account = current_account
+    error = if !params[:password]
+              'Please enter a new password.'
+            elsif params[:password] != params[:password_confirmation]
+              "The passwords didn't match."
+            else
+              @account.password = params[:password]
+              if @account.save
+                @account.revoke_sessions!
+                start_session!(@account)
+                flash[:notice] = 'Your password was changed, and other browsers were signed out.'
+                redirect '/accounts/password'
+              end
+              "Your password wasn't changed: #{@account.errors.full_messages.to_sentence.downcase}."
+            end
+    flash.now[:error] = error
+    erb :'accounts/password'
+  end
+
   get '/accounts/delete' do
     sign_in_required!
     @account = current_account
@@ -212,23 +242,18 @@ Dandelion::App.controller do
 
     account_params = params[:account]
     if account_params.is_a?(Hash)
-      password = account_params.delete('password')
-      # A browser can fill in the saved password, which changes nothing
-      password = nil if password && @account.crypted_password && @account.password_matches?(password)
+      account_params.delete('password') # changed at /accounts/password
       changing_email = account_params['email'] && account_params['email'].downcase.strip != @account.email
-      changing_credentials = password || changing_email
-      verification_required!(return_to: '/accounts/edit', notice: "Your changes weren't saved: to change your email or password, enter the code below, then make the change again.") if changing_credentials
-      @account.password = password
+      verification_required!(return_to: '/accounts/edit', notice: "Your changes weren't saved: to change your email, enter the code below, then make the change again.") if changing_email
     end
     if account_params.is_a?(Hash) && @account.update_attributes(mass_assigning(account_params, Account))
-      if changing_credentials
+      notice = '<strong>Awesome!</strong> Your account was updated successfully.'
+      if changing_email
         @account.revoke_sessions!
         start_session!(@account)
+        @account.send_confirmation_email # after revoke_sessions!, which ends the link token the email carries
+        notice += ' Please click the link in the email we sent to confirm your new email address.'
       end
-      # After revoke_sessions!, which ends the link token the email carries
-      @account.send_confirmation_email if changing_email
-      notice = '<strong>Awesome!</strong> Your account was updated successfully.'
-      notice += ' Please click the link in the email we sent to confirm your new email address.' if changing_email
       flash[:notice] = notice
       @account.notifications_as_notifiable.and(type: 'updated_profile').destroy_all
       @account.notifications_as_notifiable.create! circle: @account, type: 'updated_profile'

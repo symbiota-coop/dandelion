@@ -736,11 +736,39 @@ class AccountsTest < ActiveSupport::TestCase
     clear_cookies
     get '/', link_token: account.link_token
 
-    post '/accounts/edit', account: { name: account.name, email: 'taken-over@example.com', password: 'taken-over-password' }
+    post '/accounts/edit', account: { name: account.name, email: 'taken-over@example.com' }
+    assert_equal '/accounts/sign_in_code', URI(last_response.location).path
+    get '/accounts/password'
+    assert_equal '/accounts/sign_in_code', URI(last_response.location).path
+    post '/accounts/password', password: 'taken-over-password', password_confirmation: 'taken-over-password'
     assert_equal '/accounts/sign_in_code', URI(last_response.location).path
     account.reload
     refute_equal 'taken-over@example.com', account.email
     assert_equal crypted_password, account.crypted_password
+  end
+
+  test 'the profile form no longer changes the password' do
+    account = FactoryBot.create(:account)
+    crypted_password = account.crypted_password
+    sign_in_with_rack(account)
+    post '/accounts/edit', account: { name: 'A New Name', email: account.email, password: 'a-new-password' }
+    account.reload
+    assert_equal 'A New Name', account.name
+    assert_equal crypted_password, account.crypted_password
+  end
+
+  test 'changing the password needs the two passwords to match and to be long enough' do
+    account = FactoryBot.create(:account)
+    crypted_password = account.crypted_password
+    sign_in_with_rack(account)
+    get '/accounts/password'
+    assert last_response.ok?
+
+    post '/accounts/password', password: 'a-new-password', password_confirmation: 'a-different-password'
+    assert_includes last_response.body, "The passwords didn't match."
+    post '/accounts/password', password: 'short', password_confirmation: 'short'
+    assert_includes last_response.body, "Your password wasn't changed"
+    assert_equal crypted_password, account.reload.crypted_password
   end
 
   test 'changing the email sends a confirmation email whose link still works' do
@@ -783,7 +811,7 @@ class AccountsTest < ActiveSupport::TestCase
     link = account.reload.link_token # signing in made a new one
 
     sign_in_with_rack(account)
-    post '/accounts/edit', account: { name: account.name, password: 'a-new-password' }
+    post '/accounts/password', password: 'a-new-password', password_confirmation: 'a-new-password'
     assert account.reload.password_matches?('a-new-password')
     get '/accounts/edit'
     assert last_response.ok?
