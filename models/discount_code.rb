@@ -24,6 +24,7 @@ class DiscountCode
     errors.add(:percentage_discount, 'must be less or equal to 100%') if percentage_discount && percentage_discount > 100
     errors.add(:fixed_discount_currency, 'must be present if there is a fixed discount amount') if fixed_discount_amount && !fixed_discount_currency
     errors.add(:fixed_discount_amount, 'must be positive') if fixed_discount_amount && fixed_discount_amount <= 0
+    errors.add(:maximum_uses, 'must be at least 1, or blank for unlimited uses') if maximum_uses && maximum_uses < 1
   end
 
 
@@ -60,7 +61,7 @@ class DiscountCode
   def self.new_hints
     {
       description: 'Private description, visible only to admins',
-      maximum_uses: 'The maximum number of times this code can be used',
+      maximum_uses: 'The maximum number of times this code can be used. Leave blank for unlimited uses',
       percentage_discount: 'The percentage discount to apply to the order e.g. 50 for 50%',
       fixed_discount_amount: 'The fixed discount to apply to the order e.g. 10 for £10',
       filter: 'Only apply the discount to ticket types where the name contains this term/these terms. Use commas to separate multiple terms'

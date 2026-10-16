@@ -157,6 +157,29 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert page.has_button? "Pay £#{format('%.2f', ((price0 + price1 + price2) * (100 - percentage_discount).to_f / 100) + donation_amount)}"
   end
 
+  test 'discount codes need at least one use, or unlimited' do
+    create_event
+    assert FactoryBot.build(:discount_code, codeable: @event, code: 'UNLIMITED', percentage_discount: 10).valid?
+    assert FactoryBot.build(:discount_code, codeable: @event, code: 'ONCE', percentage_discount: 10, maximum_uses: 1).valid?
+    discount_code = FactoryBot.build(:discount_code, codeable: @event, code: 'NEVER', percentage_discount: 10, maximum_uses: 0)
+    assert !discount_code.valid?
+    assert discount_code.errors[:maximum_uses].any?
+  end
+
+  test 'a used-up discount code says so to the buyer and the organiser' do
+    create_event(prices: [10], suggested_donation: 0)
+    discount_code = FactoryBot.create(:discount_code, codeable: @event, code: (code = 'ONCE'), percentage_discount: 100, maximum_uses: 1)
+    Order.create!(event: @event, account: FactoryBot.create(:account), discount_code: discount_code, value: 0, payment_completed: true, currency: 'GBP')
+    assert discount_code.exhausted?
+    sign_in(@account)
+    visit "/e/#{@event.slug}"
+    fill_in 'discount_code', with: code
+    click_button 'Apply'
+    assert page.has_content? 'The code you entered has been used up'
+    visit "/events/#{@event.id}/discount_codes"
+    assert page.has_css? '.badge', text: 'Used up'
+  end
+
   test 'event with questions' do
     questions = <<~QUESTIONS.strip
       # Registration Details

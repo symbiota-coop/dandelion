@@ -1,6 +1,12 @@
 // Forms: selects, placeholders, date pickers, lookups, slugs and short URLs, colour pickers, autosizing textareas,
 // and forms that submit themselves
 $(function () {
+  // Scrolling over a focused number field changes its value (1 becomes 0 on a trackpad flick), so let go of the field
+  // and scroll the page instead
+  $(document).on('wheel', 'input[type=number]:focus', function () {
+    $(this).blur()
+  })
+
   // Grey a select while its chosen option is a disabled placeholder
   function styleSelectElement (select) {
     $(select).css('color', $(select).find('option:selected').is(':disabled') ? 'var(--bs-secondary-color)' : '')

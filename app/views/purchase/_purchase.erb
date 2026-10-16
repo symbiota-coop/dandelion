@@ -3,11 +3,15 @@
 <% else %>
 <%
 discount_code = nil
+discount_code_used_up = false
 if params[:discount_code]
   discount_code = @event.all_discount_codes.find_by(code: params[:discount_code].upcase)
   if discount_code
     discount_code = nil if !discount_code.applies_to?(@event)
-    discount_code = nil if discount_code.exhausted?
+    if discount_code&.exhausted?
+      discount_code = nil
+      discount_code_used_up = true
+    end
   end
 end
 
@@ -72,7 +76,7 @@ end
               <td class="p-0" colspan="3"></td>
             </tr>
 
-            <%= partial :'purchase/discounts', locals: { discount_code: discount_code } %>
+            <%= partial :'purchase/discounts', locals: { discount_code: discount_code, discount_code_used_up: discount_code_used_up } %>
 
             <%= partial :'purchase/suggested_donation' %>
 

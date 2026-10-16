@@ -81,7 +81,11 @@
       <% else %>
         <% if params[:discount_code] %>
           <div class="alert alert-danger my-1">
-            <p class="mb-0">The code you entered is not valid</p>
+            <% if discount_code_used_up %>
+              <p class="mb-0">The code you entered has been used up</p>
+            <% else %>
+              <p class="mb-0">The code you entered is not valid</p>
+            <% end %>
           </div>
         <% end %>
         <div class="input-group my-1">

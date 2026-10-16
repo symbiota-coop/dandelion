@@ -20,7 +20,7 @@
     <% end %>
     <%= f.text_block :code %>
     <%= f.text_block :description %>
-    <%= f.number_block :maximum_uses %>
+    <%= f.number_block :maximum_uses, min: 1, step: 1, placeholder: 'Unlimited' %>
     <%= f.text_block :filter %>
     <%= f.percentage_block :percentage_discount %>
 
