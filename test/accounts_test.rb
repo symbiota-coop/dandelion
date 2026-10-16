@@ -897,18 +897,25 @@ class AccountsTest < ActiveSupport::TestCase
     assert account.unsubscribed_messages
   end
 
-  test 'opening the confirmation link, as a mail scanner does, neither confirms the email nor signs anyone out' do
+  test 'opening the confirmation link, as a mail scanner does, neither confirms the email, signs anyone out nor uses up the link' do
     start_omniauth_signup(email: 'scanned@example.com')
     post '/accounts/new', account: { name: 'Sam Scanned', email: 'scanned@example.com' }, omniauth_signup: '1'
     account = Account.find_by(email: 'scanned@example.com')
+    token = account.link_token_for_email
 
     scanner = Rack::Test::Session.new(app)
-    scanner.get "/confirm_email/#{account.link_token_for_email}"
+    scanner.get "/confirm_email/#{token}"
     assert_includes scanner.last_response.body, 'Confirm my email address'
     refute account.reload.email_confirmed
     assert_equal ['Google'], account.provider_links.map(&:provider)
     get '/accounts/edit'
     assert last_response.ok?
+
+    get "/confirm_email/#{token}"
+    assert_includes last_response.body, 'Confirm my email address'
+    post '/accounts/confirm_email'
+    assert account.reload.email_confirmed
+    assert_equal ['Google'], account.provider_links.map(&:provider)
   end
 
   test 'confirming the email with a code elsewhere ends the session, provider and password of whoever signed up with it' do

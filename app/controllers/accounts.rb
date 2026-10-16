@@ -30,7 +30,7 @@ Dandelion::App.controller do
       flash[:notice] = 'Your email address is already confirmed.'
       redirect '/accounts/edit'
     else
-      # Signing in made a new link token, so the button can't carry this one: the session vouches for the link instead
+      # The session vouches for the link, so the button needn't carry the link token
       session[:confirming_email] = current_account.email
       erb :'accounts/confirm_email'
     end

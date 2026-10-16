@@ -39,7 +39,9 @@ Dandelion::App.helpers do
     undone = confirm_email_of(account, same_browser: account_set_up_in_this_session?(account)) if sign_in_code && !account.email_confirmed?
     start_session!(account, verified: !sign_in_code.nil?, via_link: sign_in_code.nil?)
     @signed_in_via_email = true
-    account.generate_link_token!
+    # A confirmation link keeps working, so a mail scanner opening it first doesn't use it up before the person clicks it:
+    # it only shows the button that confirms
+    account.generate_link_token! unless request.path.start_with?('/confirm_email/')
     account.send_activation_notification if account.sign_ins_count == 1
     notice = [sign_in_code ? 'Signed in with a sign in code' : 'Signed in via a link', undone].compact.join('. ')
     if sign_in_landing_path? && (return_to = session.delete(:return_to))
