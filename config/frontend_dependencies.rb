@@ -44,7 +44,7 @@ FRONTEND_LOCAL_FILES = {
 # Packages whose files are ES modules, loaded with type="module"
 FRONTEND_MODULES = %w[@github/relative-time-element].freeze
 
-# A cdn_tag call in a template: a package and its file (cdn_tag 'fullcalendar', 'index.global.min.js'), or the URL of a
+# A cdn_tag call in a template: a package and its file (cdn_tag 'fullcalendar', 'all/global.js'), or the URL of a
 # file that isn't an npm package's
 FRONTEND_CDN_TAG = /cdn_tag[ (]+['"]([^'"]+)['"](?:,\s*['"]([^'"]+)['"])?/
 

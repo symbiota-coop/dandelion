@@ -1,0 +1,6 @@
+<%# FullCalendar with its Bootstrap 5 theme, and calendarOptions, the options our calendars share (calendar.js) %>
+<%= cdn_tag 'fullcalendar', 'all/global.js' %>
+<%= cdn_tag '@fullcalendar/bootstrap5', 'global.js' %>
+<%= cdn_tag 'fullcalendar', 'skeleton.css' %>
+<%= cdn_tag '@fullcalendar/bootstrap5', 'theme.css' %>
+<script src="<%= cachebust('/javascripts/calendar.js') %>"></script>

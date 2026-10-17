@@ -2866,36 +2866,53 @@ ul.map-event li {
    Calendar
    ========================================================================== */
 
-#calendar a.fc-event {
-  color: var(--theme-500) !important;
+/* FullCalendar on its Bootstrap 5 theme (events/_fullcalendar.erb). Its elements have no class names of their own, so
+   calendarOptions (calendar.js) adds these calendar-* classes alongside the theme's. Its stylesheet loads after ours,
+   so these rules are scoped to #calendar to win.
+   Day numbers and headings are grey labels, leaving colour to the events. Today is marked by its number in a --theme-500
+   circle, in place of the theme's yellow tint. Toolbar buttons look like .btn-secondary, with the active view filled
+   --theme-500 like the active pill */
+#calendar .calendar-title {
+  font-size: var(--font-size-2xl);
+  white-space: nowrap;
 }
 
-/* FullCalendar's day numbers and headings are anchors without an href, so they'd take the link colour: they're grey labels,
-   leaving colour to the events. Today is marked by its number in a --theme-500 circle, in place of FullCalendar's yellow tint.
-   Toolbar buttons look like .btn-secondary, with the active view filled --theme-500 like the active pill */
-#calendar {
-  --fc-today-bg-color: transparent;
-  --fc-button-text-color: var(--bs-body-color);
-  --fc-button-bg-color: var(--bs-white);
-  --fc-button-border-color: var(--bs-border-color);
-  --fc-button-hover-bg-color: var(--bs-secondary-bg);
-  --fc-button-hover-border-color: var(--bs-border-color);
-  --fc-button-active-bg-color: var(--theme-500);
-  --fc-button-active-border-color: var(--theme-500);
+#calendar .btn.calendar-button {
+  --bs-btn-color: var(--bs-body-color);
+  --bs-btn-bg: var(--bs-white);
+  --bs-btn-border-color: var(--bs-border-color);
+  --bs-btn-hover-color: var(--bs-body-color);
+  --bs-btn-hover-bg: var(--bs-secondary-bg);
+  --bs-btn-hover-border-color: var(--bs-border-color);
+  --bs-btn-active-color: var(--bs-white);
+  --bs-btn-active-bg: var(--theme-500);
+  --bs-btn-active-border-color: var(--theme-500);
+  --bs-btn-disabled-color: var(--bs-body-color);
+  --bs-btn-disabled-bg: var(--bs-white);
+  --bs-btn-disabled-border-color: var(--bs-border-color);
+  --bs-btn-focus-shadow-rgb: var(--theme-500-rgb);
 }
 
-#calendar :is(a.fc-daygrid-day-number, a.fc-col-header-cell-cushion, a.fc-list-day-text, a.fc-list-day-side-text) {
+#calendar .btn:is(.calendar-button-prev, .calendar-button-next) {
+  --bs-btn-border-color: transparent;
+  --bs-btn-hover-border-color: transparent;
+}
+
+#calendar :is(.calendar-day-label, .calendar-day-number) {
   color: var(--bs-secondary-color);
-  text-decoration: none;
 }
 
-#calendar .fc-day-today a.fc-daygrid-day-number {
+/* The theme tints today with bg-warning, which is !important */
+#calendar .calendar-today {
+  background-color: transparent !important;
+}
+
+#calendar .calendar-today .calendar-day-number {
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 1.75em;
   height: 1.75em;
-  margin: var(--space-2xs);
   padding: 0 0.25em;
   border-radius: var(--bs-border-radius-pill);
   background: var(--theme-500);
@@ -2903,69 +2920,19 @@ ul.map-event li {
   font-weight: 600;
 }
 
-/* FullCalendar injects its CSS after ours, so the toolbar's rules are scoped to #calendar to win */
-#calendar .fc-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-xs) var(--space-base);
-  font-size: var(--font-size-base);
-  border-radius: var(--bs-border-radius);
+/* The theme writes event titles in text-body, which is !important, so they take --theme-500 through its colour */
+#calendar .calendar-event {
+  --bs-body-color-rgb: var(--theme-500-rgb);
 }
 
-#calendar .fc-button-group > .fc-button:not(:first-child) {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
-
-#calendar .fc-button-group > .fc-button:not(:last-child) {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-#calendar .fc-button-active {
-  color: var(--bs-white);
-}
-
-#calendar :is(.fc-prev-button, .fc-next-button) {
-  border-color: transparent;
-}
-
-.fc-toolbar-title {
-  white-space: nowrap !important;
-}
-
-.fc-toolbar-chunk {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--space-xs) !important;
-}
-
-.fc-toolbar-chunk .fc-toolbar-title {
-  margin: 0 !important;
-}
-
-/* Add margin between events to prevent squashing */
-.fc-event {
-  margin-bottom: var(--space-2xs) !important;
-}
-
-.fc-event-main {
-  padding: 0 var(--space-2xs) !important;
-}
-
-/* Shorten month names and hide Today button on small screens */
+/* On small screens the title drops a size and Today hides */
 @media (max-width: 767.98px) {
-  .fc-toolbar-title {
-    font-size: var(--font-size-md) !important;
+  #calendar .calendar-title {
+    font-size: var(--font-size-md);
   }
 
-  .fc-button-group {
-    margin-left: 0 !important;
-  }
-
-  .fc-toolbar .fc-today-button {
-    display: none !important;
+  #calendar .btn.calendar-button-today {
+    display: none;
   }
 }
 

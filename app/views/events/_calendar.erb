@@ -1,8 +1,8 @@
-<%= cdn_tag 'fullcalendar', 'index.global.min.js' %>
+<%= partial :'events/fullcalendar' %>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
-    var calendar = new FullCalendar.Calendar(calendarEl, {
+    var calendar = new FullCalendar.Calendar(calendarEl, calendarOptions({
       initialView: <%== (params[:list] ? 'listMonth' : 'dayGridMonth').to_json %>,
       initialDate: <%== params[:date].to_json %> || undefined,
       events: function(fetchInfo, successCallback, failureCallback) {
@@ -66,17 +66,7 @@
           (info.event.extendedProps.location ? locationIcon + info.event.extendedProps.location + '<br>' : '') +
           '<small>' + info.event.extendedProps.when_details + '</small>';
 
-        var tooltipTarget = info.el;
-
-        // In list view, target the td.fc-list-event-title a element instead of the tr
-        if (info.view.type === 'listMonth') {
-          var titleElement = $(info.el).find('td.fc-list-event-title a');
-          if (titleElement.length > 0) {
-            tooltipTarget = titleElement[0];
-          }
-        }
-
-        $(tooltipTarget).tooltip({
+        $(info.el).tooltip({
           title: tooltipContent,
           html: true,
           placement: 'top',
@@ -84,21 +74,9 @@
           container: 'body'
         });
       },
-      headerToolbar: {
-        left: 'today prev,next title',
-        center: '',
-        right: 'dayGridMonth,listMonth'
-      },
-      buttonText: {
-        today: 'Today',
-        month: 'Month',
-        week: 'Week',
-        list: 'List'
-      },
       allDayText: 'All day',
-      height: 'auto',
       aspectRatio: 1.8
-    });
+    }));
 
     calendar.render();
   });

@@ -10,8 +10,8 @@ const libraries = [
   'FullCalendar', 'google', 'grecaptcha', 'iframely', 'introJs', 'jsQR', 'markerClusterer', 'Stripe', 'Typed'
 ]
 const shared = [
-  'cssColor', 'DandelionMap', 'destroyLinkFor', 'drawSpanTreeGuides', 'fixedHeaderHeight', 'hideTooltips', 'initQuestionsPreview', 'onContentLoaded',
-  'placeAutocomplete', 'renderSearchAutocompleteItem', 'scrollMessageThreadToBottom', 'scrollspy'
+  'calendarOptions', 'cssColor', 'DandelionMap', 'destroyLinkFor', 'drawSpanTreeGuides', 'fixedHeaderHeight', 'hideTooltips', 'initQuestionsPreview',
+  'onContentLoaded', 'placeAutocomplete', 'renderSearchAutocompleteItem', 'scrollMessageThreadToBottom', 'scrollspy'
 ]
 // Selects string literals and the static parts of template literals whose text matches a regex (esquery's /.../ syntax),
 // anywhere or as arguments of the calls a parent selector matches
