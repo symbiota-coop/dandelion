@@ -18,7 +18,7 @@
     </thead>
     <tbody>
       <% @packages.each do |dep| %>
-        <tr class="<%= 'table-danger' if cooldown_ends_at(dep[:latest_release_date]) %>" data-file-urls="<%= dep[:file_urls]&.to_json %>">
+        <tr data-file-urls="<%= dep[:file_urls]&.to_json %>">
           <td>
             <% if dep[:source] == 'npm' %>
               <a href="https://www.jsdelivr.com/package/npm/<%= dep[:name] %>" target="_blank"><%= dep[:name] %></a>

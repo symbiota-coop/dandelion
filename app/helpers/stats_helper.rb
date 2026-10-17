@@ -147,10 +147,19 @@ Dandelion::App.helpers do
     nil
   end
 
-  # When a release leaves the 7-day cooldown on new versions (AGENTS.md's Dependencies), if it hasn't yet
-  def cooldown_ends_at(release_date)
-    ends_at = release_date + 7.days if release_date
-    ends_at if ends_at && ends_at > Time.now
+  # Of a package's releases ({ version => release time }), those out of the 7-day cooldown on new versions (AGENTS.md's
+  # Dependencies): the ones we can upgrade to, so the tables offer only these
+  def releases_outside_cooldown(releases)
+    releases.select { |_, released_at| released_at && released_at <= 7.days.ago }
+  end
+
+  # The highest version of a package's releases, and its release time
+  def latest_release(releases)
+    releases.filter_map do |version, released_at|
+      [Gem::Version.new(version), released_at]
+    rescue ArgumentError
+      nil
+    end.max_by(&:first)&.last
   end
 
   # Runs the block on each item in its own thread, returning the non-nil results newest latest release first (unknown
@@ -197,14 +206,15 @@ Dandelion::App.helpers do
 
     data = JSON.parse(response.body)
     released_at = data.dig('time', version)
-    latest_released_at = data.dig('time', data.dig('dist-tags', 'latest'))
+    stable_versions = data['versions']&.keys&.reject { |v| v.include?('-') } || []
+    releases = releases_outside_cooldown(stable_versions.to_h { |v| [v, data.dig('time', v)&.then { |time| Time.parse(time) }] })
 
     {
       name: name,
       version: version,
-      version_bump_cells: version_bump_cells(version, data['versions']&.keys&.reject { |v| v.include?('-') }),
+      version_bump_cells: version_bump_cells(version, releases.keys),
       release_date: released_at && Time.parse(released_at),
-      latest_release_date: latest_released_at && Time.parse(latest_released_at),
+      latest_release_date: latest_release(releases),
       downloads: fetch_npm_weekly_downloads(name),
       source: 'npm',
       homepage: data['homepage'],
@@ -232,12 +242,14 @@ Dandelion::App.helpers do
     versions = fetch_rubygems_versions(gem_name) || []
     # The lockfile names a platform gem's platform too (nokogiri 1.18.0-arm64-darwin)
     released = versions.find { |entry| [entry['number'], "#{entry['number']}-#{entry['platform']}"].include?(version) }
+    # A version's first platform's release, as each platform's gem is pushed separately
+    releases = releases_outside_cooldown(versions.group_by { |entry| entry['number'] }.transform_values { |entries| entries.map { |entry| Time.parse(entry['created_at']) }.min })
     {
       name: data['name'],
       version: version,
-      version_bump_cells: version_bump_cells(version, versions.map { |entry| entry['number'] }.uniq),
+      version_bump_cells: version_bump_cells(version, releases.keys),
       release_date: released && Time.parse(released['created_at']),
-      latest_release_date: Time.parse(data['version_created_at']),
+      latest_release_date: latest_release(releases),
       downloads: data['downloads'],
       homepage: data['homepage_uri'],
       source_code: data['source_code_uri'],
@@ -264,11 +276,11 @@ Dandelion::App.helpers do
     response = Faraday.get('https://raw.githubusercontent.com/ruby/www.ruby-lang.org/master/_data/releases.yml')
     return ruby unless response.status == 200
 
-    releases = YAML.safe_load(response.body, permitted_classes: [Date]).to_h { |release| [release['version'].to_s, release['date']] }
-    stable_versions = releases.keys.reject { |version| version.include?('-') }
-    latest_version = stable_versions.max_by { |version| Gem::Version.new(version) }
-    release_time = ->(version) { releases[version]&.then { |date| Time.utc(date.year, date.month, date.day) } }
-    ruby.merge(version_bump_cells: version_bump_cells(RUBY_VERSION, stable_versions), release_date: release_time.call(RUBY_VERSION), latest_release_date: release_time.call(latest_version))
+    releases = YAML.safe_load(response.body, permitted_classes: [Date]).to_h do |release|
+      [release['version'].to_s, release['date']&.then { |date| Time.utc(date.year, date.month, date.day) }]
+    end
+    stable_releases = releases_outside_cooldown(releases.reject { |version, _| version.include?('-') })
+    ruby.merge(version_bump_cells: version_bump_cells(RUBY_VERSION, stable_releases.keys), release_date: releases[RUBY_VERSION], latest_release_date: latest_release(stable_releases))
   rescue StandardError
     ruby
   end

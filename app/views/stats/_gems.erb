@@ -16,7 +16,7 @@
     </thead>
     <tbody>
       <% @packages.each do |gem| %>
-        <tr class="<%= 'table-danger' if cooldown_ends_at(gem[:latest_release_date]) %>">
+        <tr>
           <td>
             <a href="<%= gem[:url] || "https://rubygems.org/gems/#{gem[:name]}" %>" target="_blank"><%= gem[:name] %></a>
           </td>
