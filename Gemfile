@@ -83,7 +83,6 @@ gem 'geocoder'
 
 # Formatting
 gem 'addressable'
-gem 'html_truncator'
 gem 'redcarpet'
 gem 'reverse_markdown'
 gem 'rinku'

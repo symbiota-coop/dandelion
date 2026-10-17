@@ -216,12 +216,13 @@ class MessagesTest < ActiveSupport::TestCase
     create_messaging_pair
     account2 = create_messenger
     create_message(messenger: @account, messengee: @account1, body: 'With account 1')
-    create_message(messenger: @account, messengee: account2, body: 'With account 2')
+    create_message(messenger: @account, messengee: account2, body: 'With account 2 & friends: see you at the gathering on Saturday')
     sign_in_with_rack(@account)
 
     get '/messages/index', m: 1
     assert_equal 200, last_response.status
     assert_includes last_response.body, account2.name
+    assert_includes last_response.body, 'With account 2 &amp; friends: see you at the…'
     refute_includes last_response.body, @account1.name
     assert_includes last_response.body, 'More'
   end
