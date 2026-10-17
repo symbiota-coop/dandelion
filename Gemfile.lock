@@ -170,7 +170,6 @@ GEM
       logger
     html_truncator (0.4.2)
       nokogiri (~> 1.5)
-    htmlbeautifier (1.4.3)
     htmlentities (4.4.2)
     http (6.0.4)
       http-cookie (~> 1.0)
@@ -540,7 +539,6 @@ DEPENDENCIES
   gocardless_pro
   haikunator
   html_truncator
-  htmlbeautifier
   icalendar
   incoming
   irb
