@@ -1,7 +1,3 @@
-<% if params[:minimal] %>
-  <%== '<div class="container-fluid my-3">' %>
-<% end %>
-
 <%
   view_options = [
     { key: 'list', label: 'List', icon: 'bi-list-task', active: !params[:display].in?(%w[map calendar grid]) },
@@ -34,7 +30,3 @@
     </div>
   <% end %>
 </div>
-
-<% if params[:minimal] %>
-  <%== '</div>' %>
-<% end %>

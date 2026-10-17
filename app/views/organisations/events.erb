@@ -23,10 +23,12 @@
 <% end %>
 <% if params[:no_search] %>
   <% unless params[:no_listings] || params[:no_view_options] %>
-    <%= partial :'events/view_options', locals: { grid_view: true, calendar_view: true } %>
+    <div class="<%= 'container-fluid my-3' if params[:minimal] %>">
+      <%= partial :'events/view_options', locals: { grid_view: true, calendar_view: true } %>
+    </div>
   <% end %>
 <% else %>
-  <div class="<%= params[:minimal] ? 'mb-3 mt-1' : 'my-3' %>">
+  <div class="<%= params[:minimal] ? 'container-fluid mb-3 mt-1' : 'my-3' %>">
     <%= partial :'organisations/events_search_form' %>
   </div>
 <% end %>
