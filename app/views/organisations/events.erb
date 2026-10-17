@@ -33,6 +33,10 @@
   </div>
 <% end %>
 
+<% if params[:minimal] %>
+  <%== '<div id="events-container" class="container-fluid">' %>
+<% end %>
+
 <% if !params[:search] && !params[:event_tag_id] && !params[:page] && !params[:carousel_ids] && !params[:near] && (params[:display] == 'grid' || !params[:display]) %>
   <% @carousels = true %>
   <% if @organisation.featured_events.exists? %>
@@ -49,9 +53,6 @@
   <% end %>
 <% end %>
 
-<% if params[:minimal] %>
-  <%== '<div id="events-container" class="container-fluid">' %>
-<% end %>
 <% if params[:display] == 'map' %>
   <%= partial :'maps/map', locals: { url: "/o/#{@organisation.slug}/events", bounding_box: @bounding_box&.flatten, fill_screen: true } %>
 <% elsif params[:display] == 'calendar' %>
