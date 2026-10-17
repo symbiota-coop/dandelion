@@ -15,8 +15,15 @@
   }
 </script>
 <div class="<% if @carousel_buttons %>text-center text-lg-end<% end %> <% if defined?(mobile_only) && mobile_only %>d-md-none<% end %> mb-3">
+  <% search_open = params[:search] && !params[:display].in?(['map', 'calendar']) %>
   <a href="javascript:;" id="toggle-search" onclick="toggleAdvancedSearch()">
-    <i class="bi <%= (params[:search] && !params[:display].in?(['map', 'calendar'])) ? 'bi-chevron-down' : 'bi-chevron-right' %>" id="search-arrow"></i>
-    <%= (params[:search] && !params[:display].in?(['map', 'calendar'])) ? 'Hide search options' : 'Show search options' %>
+    <% if defined?(hidden_on_mobile) && hidden_on_mobile %>
+      <%# The form starts hidden on phones (search-hidden-on-mobile), whatever it does from md up %>
+      <span class="d-md-none"><i class="bi bi-chevron-right"></i> Show search options</span>
+      <span class="d-none d-md-inline"><i class="bi <%= search_open ? 'bi-chevron-down' : 'bi-chevron-right' %>" id="search-arrow"></i> <%= search_open ? 'Hide search options' : 'Show search options' %></span>
+    <% else %>
+      <i class="bi <%= search_open ? 'bi-chevron-down' : 'bi-chevron-right' %>" id="search-arrow"></i>
+      <%= search_open ? 'Hide search options' : 'Show search options' %>
+    <% end %>
   </a>
 </div>

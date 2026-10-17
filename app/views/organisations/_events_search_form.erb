@@ -13,12 +13,11 @@
   </div>
 <% end %>
 
-<%# The form starts hidden behind the toggle link on the map and calendar, and when there are carousel buttons; on phones it always does, until a search %>
-<% search_open = params[:search] && !params[:display].in?(['map', 'calendar']) %>
+<%# The form starts hidden behind the toggle link on the map and calendar, and when there are carousel buttons until a search; on phones it always does %>
 <% search_toggle = params[:display].in?(['map', 'calendar']) || @carousel_buttons %>
-<%= partial :'events/toggle_search_well', locals: { mobile_only: !search_toggle } %>
+<%= partial :'events/toggle_search_well', locals: { mobile_only: !search_toggle, hidden_on_mobile: true } %>
 
-<div class="search border rounded p-3 pb-lg-0 mb-3 <%= 'mt-3' if params[:minimal] || @carousel_buttons %> <%= 'search-hidden-on-mobile' unless search_open %>" style="<%= 'display: none;' if search_toggle && !search_open %>">
+<div class="search search-hidden-on-mobile border rounded p-3 pb-lg-0 mb-3 <%= 'mt-3' if params[:minimal] || @carousel_buttons %>" style="<%= 'display: none;' if search_toggle && !(params[:search] && !params[:display].in?(['map', 'calendar'])) %>">
 
   <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
     <%= hidden_field_tag :display, value: params[:display] %>
