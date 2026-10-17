@@ -1418,7 +1418,7 @@
       <% end %>
     </div>
 
-    <% design_subsection 'Calendar', 'An organisation\'s events by month or as a list (events/_calendar.erb), with FullCalendar. Events are --theme-500, or in embeds the organisation\'s own colour, so the grid has one colour: today\'s circle and the events. Each has a tooltip with its location and time.' do %>
+    <% design_subsection 'Calendar', 'An organisation\'s events by month or as a list (events/_calendar.erb and calendar.js), with FullCalendar. Events are --theme-500, or in embeds the organisation\'s own colour, so the grid has one colour: today\'s circle and the events. Each has a tooltip with its location and time.' do %>
       <%= partial :'events/fullcalendar' %>
       <div id="calendar"></div>
       <script>
@@ -1427,7 +1427,7 @@
           new FullCalendar.Calendar(document.getElementById('calendar'), calendarOptions({
             initialView: 'dayGridMonth',
             events: [['Ecstatic dance', 4, 19], ['Breathwork', 9, 18], ['Sound bath', 9, 20], ['Community supper', 15, 19], ['Full moon gathering', 21, 20], ['Men\'s circle', 27, 19]].map(function (e) {
-              return { title: e[0], start: d(e[1], e[2]), end: d(e[1], e[2] + 2), url: '#components', color: cssColor('var(--theme-500)') }
+              return { title: e[0], start: d(e[1], e[2]), end: d(e[1], e[2] + 2), url: '#components' }
             }),
             eventDidMount: function (info) {
               $(info.el).tooltip({ title: '<strong>' + info.event.title + '</strong><br><i class="bi bi-geo-alt-fill"></i> London', html: true, placement: 'top', trigger: 'hover', container: 'body' })
@@ -1435,7 +1435,7 @@
           })).render()
         })
       </script>
-      <div class="spec">FullCalendar's Bootstrap 5 theme (events/_fullcalendar.erb), restyled through the calendar-* classes calendarOptions (calendar.js) adds, as its elements have no class names of their own · day numbers and headings --bs-secondary-color · today's number white on a --theme-500 circle, with no day tint · events --theme-500: a dot and title in the month, filled when all-day, a row in the list · toolbar buttons like .btn-secondary, the active view filled --theme-500 like the active pill · prev and next borderless · the title --font-size-2xl, dropping to --font-size-md on mobile, where Today hides</div>
+      <div class="spec">FullCalendar's Bootstrap 5 theme (events/_fullcalendar.erb), restyled through the calendar-* classes calendarOptions (calendar.js) adds, as its elements have no class names of their own · day numbers and headings --bs-secondary-color · today's number white on a --theme-500 circle, with no day tint · events --theme-500, the theme's eventColor (--bs-primary): a dot and title in the month, filled when all-day, a row in the list · toolbar buttons like .btn-secondary, the active view filled --theme-500 like the active pill · prev and next borderless · the title --font-size-2xl, dropping to --font-size-md on mobile, where Today hides (d-none d-md-inline-block)</div>
     <% end %>
 
     <div class="row g-5">

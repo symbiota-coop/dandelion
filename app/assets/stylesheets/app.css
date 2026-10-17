@@ -2925,14 +2925,10 @@ ul.map-event li {
   --bs-body-color-rgb: var(--theme-500-rgb);
 }
 
-/* On small screens the title drops a size and Today hides */
+/* On small screens the title drops a size (and Today hides, by its d-none d-md-inline-block) */
 @media (max-width: 767.98px) {
   #calendar .calendar-title {
     font-size: var(--font-size-md);
-  }
-
-  #calendar .btn.calendar-button-today {
-    display: none;
   }
 }
 

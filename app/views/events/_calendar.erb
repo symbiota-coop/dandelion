@@ -1,84 +1,11 @@
 <%= partial :'events/fullcalendar' %>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
-    var calendar = new FullCalendar.Calendar(calendarEl, calendarOptions({
-      initialView: <%== (params[:list] ? 'listMonth' : 'dayGridMonth').to_json %>,
-      initialDate: <%== params[:date].to_json %> || undefined,
-      events: function(fetchInfo, successCallback, failureCallback) {
-        var currentQuery = window.location.search;
-        var params = $.deparam(currentQuery.substring(1));
-        delete params.from;
-        delete params.to;
-        var queryString = $.param(params);
-        var baseUrl = <%== "/o/#{@organisation.slug}/events.json?from=".to_json %> + fetchInfo.start.toISOString().split('T')[0] + '&to=' + fetchInfo.end.toISOString().split('T')[0];
-        var url = baseUrl + (queryString ? '&' + queryString : '');
-        $.getJSON(url)
-          .then(data => {
-            var events = data.map(function(event) {
-              // For multi-day events, only show the start day
-              var startDate = new Date(event.start_time);
-              var endDate = new Date(event.end_time);
-              var isMultiDay = startDate.toDateString() !== endDate.toDateString();
-
-              return {
-                id: event.id,
-                title: isMultiDay ? event.name + ' starts' : event.name,
-                start: event.start_time,
-                end: isMultiDay ? null : event.end_time,
-                allDay: isMultiDay, // Make multi-day events appear as all-day on start date
-                url: '/e/' + event.slug,
-                color: <%== params[:minimal] && @organisation.theme_color ? @organisation.theme_color.to_json : "cssColor('var(--theme-500)')" %>,
-                extendedProps: {
-                  location: event.location,
-                  when_details: event.when_details
-                }
-              };
-            });
-            successCallback(events);
-          })
-          .catch(error => {
-            console.error('Error fetching events:', error);
-            failureCallback(error);
-          });
-      },
-      // In the minimal (embedded) view, open events in the parent window
-      eventClick: <%== (params[:minimal] ? true : false).to_json %> ? function(info) {
-        // Check for modifier keys (cmd on Mac, ctrl on Windows/Linux)
-        if (info.jsEvent.metaKey || info.jsEvent.ctrlKey) {
-          // Allow default behavior for cmd/ctrl+click to open in new tab
-          return;
-        }
-        window.open(info.event.url, '_parent');
-        info.jsEvent.preventDefault();
-      } : undefined,
-      eventDidMount: function(info) {
-        var locationIcon = '';
-        if (info.event.extendedProps.location) {
-          if (info.event.extendedProps.location === 'Online') {
-            locationIcon = '<i class="bi bi-camera-video-fill"></i> ';
-          } else {
-            locationIcon = '<i class="bi bi-geo-alt-fill"></i> ';
-          }
-        }
-
-        var tooltipContent = '<strong>' + info.event.title + '</strong><br>' +
-          (info.event.extendedProps.location ? locationIcon + info.event.extendedProps.location + '<br>' : '') +
-          '<small>' + info.event.extendedProps.when_details + '</small>';
-
-        $(info.el).tooltip({
-          title: tooltipContent,
-          html: true,
-          placement: 'top',
-          trigger: 'hover',
-          container: 'body'
-        });
-      },
-      allDayText: 'All day',
-      aspectRatio: 1.8
-    }));
-
-    calendar.render();
-  });
-</script>
-<div id="calendar"></div>
+<div
+  id="calendar"
+  data-events-url="<%= "/o/#{@organisation.slug}/events.json" %>"
+  data-view="<%= params[:list] ? 'listMonth' : 'dayGridMonth' %>"
+  data-date="<%= params[:date] %>"
+  <% if params[:minimal] %>
+    data-embed="true"
+    data-event-color="<%= @organisation.theme_color %>"
+  <% end %>>
+</div>
