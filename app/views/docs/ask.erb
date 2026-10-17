@@ -37,7 +37,7 @@
       <%= partial :'docs/support', locals: { skip_ai: true } %>
     </div>
     <%= cdn_tag 'dompurify', 'dist/purify.min.js' %>
-    <%= cdn_tag 'marked', 'marked.min.js' %>
+    <%= cdn_tag 'marked', 'lib/marked.umd.js' %>
     <script src="<%= cachebust('/javascripts/docs_ask.js') %>"></script>
   <% else %>
     <%= partial :'docs/support' %>
