@@ -93,8 +93,6 @@ gem 'rack-cors'
 gem 'rack-utf8_sanitizer'
 
 #  Everything else
-gem 'chroma' # for manipulating colours
 gem 'haikunator' # for generating random names
 gem 'keccak' # for EIP-55 checksums on EVM addresses
-gem 'luminosity_contrast' # for WCAG contrast ratio calculations
 gem 'mini_magick' # for image processing

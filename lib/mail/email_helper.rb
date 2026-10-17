@@ -139,15 +139,17 @@ module EmailHelper
 
   # Emails can't use custom properties, so the theme ramp's steps are approximated here: the 600 for hovers is the
   # theme darkened 5%, and the 200 for blockquote borders is the theme at 33%, which on an email's white is the same
-  # as mixing it two-thirds of the way to white
+  # as mixing it two-thirds of the way to white. A colour that isn't hex (an old event's named colour) is used as it is
   def self.theme_css(color)
-    hover = color.paint.darken(5)
+    hex = color.match?(ColorMath::HEX)
+    hover = hex ? ColorMath.darken(color, 0.05) : color
+    border = hex ? "rgba(#{ColorMath.rgb(color).join(', ')}, 0.33)" : color
     %(
       a { color: #{color}; }
       a:hover { color: #{hover} !important; }
       p.action a { background: #{color}; }
       p.action a:hover { background: #{hover} !important; }
-      blockquote { border-left: 0.25em solid #{color.paint.opacity(0.33)} !important; }
+      blockquote { border-left: 0.25em solid #{border} !important; }
     )
   end
 

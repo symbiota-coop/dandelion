@@ -139,12 +139,12 @@ Dandelion::App.helpers do
 
   def quick_colors(count: 13, saturation_start: 80, saturation_end: 95, lightness: 50, primary: DEFAULT_THEME_COLOR)
     step = 360.0 / count
-    base_hue = Chroma.paint(primary).hsl.h.round
+    base_hue = ColorMath.hsl(primary)[0].round
     colors = (0...count).map do |i|
       next primary if i == 0
 
       saturation = saturation_start + ((saturation_end - saturation_start) * i.to_f / (count - 1))
-      Chroma.paint("hsl(#{(base_hue + (i * step)) % 360}, #{saturation.round}%, #{lightness}%)").to_hex
+      ColorMath.hsl_to_hex((base_hue + (i * step)) % 360, saturation.round / 100.0, lightness / 100.0)
     end
     colors.reject.with_index { |_, i| i == 1 }[0..-4]
   end
@@ -152,30 +152,31 @@ Dandelion::App.helpers do
   # The declarations in theme.css's :root block for a theme colour: its --theme-500 and the rgb triplet Bootstrap's
   # rgba(var(--bs-*-rgb)) colours need, with the accents that follow them. app.css derives the ramp
   def theme_css_variables(hex)
-    color = Chroma.paint(hex)
-    rgb = color.rgb
+    rgb = ColorMath.rgb(hex)
     File.read(Padrino.root('app/assets/stylesheets/theme.css'))[/:root \{(.*?)\}/m, 1].strip
-        .sub(/--theme-500: [^;]+;/, "--theme-500: #{color.to_hex};")
-        .sub(/--theme-500-rgb: [^;]+;/, "--theme-500-rgb: #{rgb.r.round}, #{rgb.g.round}, #{rgb.b.round};")
+        .sub(/--theme-500: [^;]+;/, "--theme-500: #{ColorMath.hex(rgb)};")
+        .sub(/--theme-500-rgb: [^;]+;/, "--theme-500-rgb: #{rgb.join(', ')};")
   end
 
+  # A theme colour white text can sit on: darkened, keeping its hue, to the lightest shade (in whole percents of
+  # lightness and saturation) with min_contrast against white, or lightened to min_lightness if it's darker than that
   def clamp_color(hex, min_contrast: 2, min_lightness: 0.25)
-    hsl = Chroma.paint(hex).hsl
-    if LuminosityContrast.ratio(hex.delete('#'), 'fff') < min_contrast
+    h, s, l = ColorMath.hsl(hex)
+    s = (s * 100).round / 100.0
+    if ColorMath.contrast(hex, '#fff') < min_contrast
       low = 0.0
-      high = hsl.l
+      high = l
       7.times do
         mid = (low + high) / 2.0
-        test_hex = Chroma.paint("hsl(#{hsl.h}, #{(hsl.s * 100).round}%, #{(mid * 100).round}%)").to_hex
-        if LuminosityContrast.ratio(test_hex.delete('#'), 'fff') >= min_contrast
+        if ColorMath.contrast(ColorMath.hsl_to_hex(h, s, (mid * 100).round / 100.0), '#fff') >= min_contrast
           low = mid
         else
           high = mid
         end
       end
-      Chroma.paint("hsl(#{hsl.h}, #{(hsl.s * 100).round}%, #{(low * 100).round}%)").to_hex
-    elsif hsl.l < min_lightness
-      Chroma.paint("hsl(#{hsl.h}, #{(hsl.s * 100).round}%, #{(min_lightness * 100).round}%)").to_hex
+      ColorMath.hsl_to_hex(h, s, (low * 100).round / 100.0)
+    elsif l < min_lightness
+      ColorMath.hsl_to_hex(h, s, min_lightness)
     else
       hex
     end
