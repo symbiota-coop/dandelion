@@ -72,7 +72,7 @@ class Organisation
   end
 
   def self.secret_fields
-    %w[stripe_sk mollie_api_key paypal_secret gocardless_access_token gocardless_endpoint_secret patreon_api_key mailgun_api_key mailgun_webhook_signing_key]
+    %w[stripe_sk mollie_api_key paypal_secret gocardless_access_token gocardless_endpoint_secret mailgun_api_key mailgun_webhook_signing_key]
   end
 
   def self.protected_attributes

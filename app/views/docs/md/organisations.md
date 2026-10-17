@@ -48,7 +48,7 @@ You can also share a [check-in scanner link](/docs/events#checking-people-in) wi
 
 ## Payments
 
-To accept payments for tickets to events created under the organisation, you must add details for Stripe or another payment processor in the Payments tab of your organisation's settings. Stripe is shown by default; click **Set up** for GoCardless, Open Collective, Mollie, PayPal, Crypto, or Patreon.
+To accept payments for tickets to events created under the organisation, you must add details for Stripe or another payment processor in the Payments tab of your organisation's settings. Stripe is shown by default; click **Set up** for GoCardless, Open Collective, Mollie, PayPal or Crypto.
 
 See [Mollie](/docs/events#taking-payments-with-mollie), [PayPal](/docs/events#taking-payments-with-paypal) and [Open Collective](/docs/events#taking-payments-with-open-collective) for setup steps.
 
@@ -84,7 +84,7 @@ Imported events use the feed's event URL as their RSVP/ticket button, so people 
 
 ## Recognising monthly donors
 
-On the Payments tab, click **Set up GoCardless** and/or **Set up Patreon** and provide a GoCardless access token and/or Patreon API key. People with active subscriptions will be recognised as monthly donors/members of the organisation.
+On the Payments tab, click **Set up GoCardless** and provide a GoCardless access token. People with active subscriptions will be recognised as monthly donors/members of the organisation. You can also record a monthly donation by hand on the organisation's members page, once GoCardless is set up or the organisation has monthly donors; clear the amount when someone stops donating.
 
 You can restrict an event to monthly donors by checking **Only allow people making a monthly donation to the organisation to purchase tickets**. Signed-in monthly donors can then buy tickets; others cannot.
 

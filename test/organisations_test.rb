@@ -17,6 +17,25 @@ class OrganisationsTest < ActiveSupport::TestCase
     )
   end
 
+  test 'admins can update or clear a monthly donor recorded from Patreon by hand' do
+    create_organisation(currency: 'GBP')
+    patron = @organisation.organisationships.create!(account: FactoryBot.create(:account), monthly_donation_method: 'Patreon',
+                                                     monthly_donation_amount: 8, monthly_donation_currency: 'USD')
+    @organisation.set(monthly_donors_count: 1)
+    assert @organisation.monthly_donations_enabled?
+    sign_in_with_rack(@account)
+
+    get "/organisationships/#{patron.id}/monthly_donation"
+    assert_includes last_response.body, "/organisationships/#{patron.id}/monthly_donation"
+
+    post "/organisationships/#{patron.id}/monthly_donation", amount: '10'
+    assert_equal ['Other', 10.0, 'GBP'], [patron.reload.monthly_donation_method, patron.monthly_donation_amount, patron.monthly_donation_currency]
+
+    post "/organisationships/#{patron.id}/monthly_donation", amount: ''
+    assert_equal [nil, nil], [patron.reload.monthly_donation_method, patron.monthly_donation_amount]
+    refute patron.monthly_donor?
+  end
+
   test 'creating an organisation' do
     account = FactoryBot.create(:account)
     organisation = FactoryBot.build_stubbed(:organisation)

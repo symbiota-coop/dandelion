@@ -9,7 +9,7 @@ module OrganisationValidation
     validates_numericality_of :fixed_contribution_gbp, :percent_requested, greater_than_or_equal_to: 0, allow_nil: true
 
     before_validation do
-      %w[name patreon_api_key mailgun_api_key mailgun_webhook_signing_key calendar_import_urls].each do |f|
+      %w[name mailgun_api_key mailgun_webhook_signing_key calendar_import_urls].each do |f|
         send("#{f}=", send(f).strip) if send(f)
       end
 
@@ -60,16 +60,6 @@ module OrganisationValidation
           self.image_height_unmagic = image.height
         rescue StandardError, Dragonfly::Shell::CommandFailed
           errors.add(:image, 'is not supported or corrupted')
-        end
-      end
-
-      if patreon_api_key.present?
-        patreon_host = HttpUrl.parse(HttpUrl.normalize(patreon_api_key))&.host&.downcase
-        patreon_page_url = patreon_host == 'patreon.com' || patreon_host&.end_with?('.patreon.com')
-        if patreon_api_key.match?(%r{\Ahttps?://}i) || patreon_page_url
-          errors.add(:patreon_api_key, 'must be a creator access token, not a Patreon page URL')
-        elsif !patreon_api_key.match?(/\A[A-Za-z0-9_-]+\z/)
-          errors.add(:patreon_api_key, 'must be a creator access token')
         end
       end
     end

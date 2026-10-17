@@ -15,7 +15,6 @@ module OrganisationFields
     field :has_image, type: Mongoid::Boolean
     field :plausible_analytics_domain, type: String
     field :simple_analytics_domain, type: String
-    field :patreon_api_key, type: String
     field :mailgun_api_key, type: String
     field :mailgun_domain, type: String
     field :mailgun_region, type: String
@@ -108,7 +107,6 @@ module OrganisationFields
         extra_info_for_ticket_email: 'Extra info for order confirmation email',
         plausible_analytics_domain: 'Plausible Analytics domain',
         simple_analytics_domain: 'Simple Analytics domain',
-        patreon_api_key: 'Patreon API key',
         mailgun_api_key: 'Mailgun API key',
         mailgun_webhook_signing_key: 'Mailgun webhook signing key',
         calendar_import_urls: 'iCal URLs',
@@ -150,7 +148,6 @@ module OrganisationFields
         affiliate_credit_percentage: 'When set, attendees receive a personal affiliate link in the order confirmation email. For each order made via the link, the source receives credit towards future events equal to this % of the order value.',
         add_a_donation_to: "Text to display beside the 'Add a donation' field",
         donation_text: "Text to display below the 'Add a donation' field",
-        patreon_api_key: 'Registers people with active Patreon subscriptions as monthly donors',
         become_a_member_url: 'Link to direct non-members to when they attempt to buy tickets to a members-only event',
         terms_and_conditions_url: "Link to the organisation's terms and conditions of sale",
         terms_and_conditions: 'Terms and conditions to be displayed on the ticket purchase page',

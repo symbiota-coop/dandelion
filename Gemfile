@@ -55,7 +55,6 @@ gem 'ssrf_filter'
 gem 'gocardless_pro'
 gem 'mollie-api-ruby'
 gem 'money'
-gem 'patreon'
 gem 'stripe'
 
 # Mail
