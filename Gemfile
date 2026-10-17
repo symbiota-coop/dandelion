@@ -38,6 +38,7 @@ group :test do
   gem 'cuprite'
   gem 'minitest-mock'
   gem 'minitest-rg'
+  gem 'ruby-openai' # for the how-to videos' narration
 end
 
 # Interacting with other websites
@@ -48,7 +49,6 @@ gem 'jwt'
 gem 'maxmind-geoip2'
 gem 'mcp'
 gem 'octokit'
-gem 'ruby-openai'
 gem 'sentry-delayed_job'
 gem 'sentry-ruby'
 gem 'ssrf_filter'

@@ -99,7 +99,3 @@ Geocoder.configure(
 Timezone::Lookup.config(:google) do |c|
   c.api_key = ENV['GOOGLE_MAPS_API_KEY'] || 'missing_api_key'
 end
-
-OpenAI.configure do |config|
-  config.access_token = ENV['OPENAI_API_KEY']
-end

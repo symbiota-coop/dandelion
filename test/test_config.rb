@@ -68,7 +68,7 @@ module ActiveSupport
       if ENV['CREATE_VIDEO']
         FileUtils.rm_f(Dir.glob("#{Capybara.save_path}/*.{png,mp4}"))
         @video_steps = []
-        @client = OpenAI::Client.new
+        @client = OpenAI::Client.new(access_token: ENV['OPENAI_API_KEY'])
       end
     end
 
