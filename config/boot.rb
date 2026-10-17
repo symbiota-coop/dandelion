@@ -85,10 +85,6 @@ end
 
 Time.zone = ENV['DEFAULT_TIME_ZONE']
 
-Yt.configure do |config|
-  config.api_key = ENV['YOUTUBE_API_KEY']
-end
-
 Geocoder.configure(
   lookup: :google,
   google: {

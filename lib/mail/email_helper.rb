@@ -89,13 +89,18 @@ module EmailHelper
   def self.replace_youtube_oembeds(html)
     html.gsub(%r{<oembed url="https://(?:youtu\.be/|www\.youtube\.com/watch\?v=)(\w+)"></oembed>}) do
       video_id = ::Regexp.last_match(1)
-      begin
-        title = h(Yt::Video.new(id: video_id).title)
-        %(<div><a href="https://www.youtube.com/watch?v=#{video_id}"><img src="#{ENV['BASE_URI']}/youtube_thumb/#{video_id}"></a><span>#{title}</span></div>)
-      rescue Yt::Errors::NoItems
+      if (title = youtube_title(video_id))
+        %(<div><a href="https://www.youtube.com/watch?v=#{video_id}"><img src="#{ENV['BASE_URI']}/youtube_thumb/#{video_id}"></a><span>#{h(title)}</span></div>)
+      else
         %(<div><a href="https://www.youtube.com/watch?v=#{video_id}">link to private YouTube video</a></div>)
       end
     end
+  end
+
+  # A YouTube video's title from its oEmbed, which needs no API key, or nil for a private, deleted or unknown video
+  def self.youtube_title(video_id)
+    response = Faraday.get('https://www.youtube.com/oembed', url: "https://www.youtube.com/watch?v=#{video_id}", format: 'json')
+    JSON.parse(response.body)['title'] if response.success?
   end
 
   def self.mailgun_host(email, default_host)
