@@ -118,8 +118,10 @@ Dandelion::App.controller do
     # Only transactions whose p50, p99 or p100 is over a number of seconds, by default p99 over 2
     @percentile = %w[p50 p99 p100].include?(params[:percentile]) ? params[:percentile] : 'p99'
     @min_s = params[:min_s] ? params[:min_s].to_f : 2
-    # Leaving out the stats pages themselves
-    @summaries = Trace.summary.select { |summary| summary[:"#{@percentile}_ms"] > @min_s * 1000 && summary[:name] !~ %r{\A[A-Z]+ /stats(/|\z)} }
+    # Leaving out the stats pages themselves, and the WhatsApp webhook
+    @summaries = Trace.summary.select do |summary|
+      summary[:"#{@percentile}_ms"] > @min_s * 1000 && summary[:name] !~ %r{\A[A-Z]+ /stats(/|\z)} && summary[:name] != 'POST /whatsapp'
+    end
     @search_summaries = Trace.search_summary
     erb :'stats/transactions'
   end
