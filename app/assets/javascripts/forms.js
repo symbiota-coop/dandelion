@@ -25,7 +25,7 @@ $(function () {
 
     $('form.add-placeholders label[for]').once('placeholders').each(function () {
       const input = $(this).next().children().first()
-      if (!$(input).attr('placeholder')) { $(input).attr('placeholder', $.trim($(this).text())) }
+      if (!$(input).attr('placeholder')) { $(input).attr('placeholder', $(this).text().trim()) }
     })
 
     $('.datepicker').once('flatpickr').flatpickr({

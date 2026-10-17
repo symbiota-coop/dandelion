@@ -31,7 +31,7 @@
     hideTooltips()
     confirming = el
 
-    const ownLabel = $.trim(el.tagName === 'INPUT' ? el.value : el.textContent).replace(/\s+/g, ' ') || el.getAttribute('title') || el.getAttribute('data-bs-original-title')
+    const ownLabel = (el.tagName === 'INPUT' ? el.value : el.textContent).trim().replace(/\s+/g, ' ') || el.getAttribute('title') || el.getAttribute('data-bs-original-title')
     const label = el.getAttribute('data-confirm-label') || (ownLabel && ownLabel.length <= 24 ? ownLabel : 'Confirm')
     const confirmButton = $('<button type="button" class="btn btn-sm">').addClass(danger ? 'btn-danger' : 'btn-primary').text(label)
     const body = $('<div>').append(

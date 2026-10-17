@@ -16,7 +16,7 @@
   $('#deepwiki-question').on('keydown', function (e) {
     if (e.key !== 'Enter' || e.shiftKey) return
     e.preventDefault()
-    if (!$.trim(this.value)) return
+    if (!this.value.trim()) return
     $(this.form).submit()
   })
 </script>
