@@ -54,7 +54,6 @@ Padrino.load!
 require_relative 'sentry_config'
 require_relative 'dragonfly_config'
 require_relative 'frontend_dependencies'
-require_relative 'frontend_integrity'
 
 # Fetch the library's books and films as the app boots, so no request waits on GitHub for them
 Library.books && Library.films unless Padrino.env == :test

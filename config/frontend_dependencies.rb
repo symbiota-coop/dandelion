@@ -7,6 +7,10 @@ FRONTEND_VERSIONS = JSON.parse(File.read(File.expand_path('../frontend/package.j
 # A file of an npm package on jsDelivr, at the version frontend/package.json names
 FRONTEND_NPM_URL = ->(package, file) { "https://cdn.jsdelivr.net/npm/#{package}@#{FRONTEND_VERSIONS.fetch(package)}/#{file}" }
 
+# The hash of each CDN file the app loads, by its URL, from frontend/integrity.json (written by rake frontend:integrity).
+# cdn_tag writes it as the file's integrity attribute, so the browser won't run a file that's changed
+FRONTEND_INTEGRITY = JSON.parse(File.read(File.expand_path('../frontend/integrity.json', __dir__))).freeze
+
 # The npm packages every page loads from jsDelivr, after jQuery, and their files
 FRONTEND_DEPENDENCIES = {
   'jquery-ui' => 'dist/jquery-ui.min.js dist/themes/base/jquery-ui.min.css',
@@ -49,7 +53,7 @@ FRONTEND_CDN_TAG = /cdn_tag[ (]+['"]([^'"]+)['"](?:,\s*['"]([^'"]+)['"])?/
 FRONTEND_TEMPLATE_CDN_URLS = ->(source) { source.scan(FRONTEND_CDN_TAG).map { |name, file| file ? FRONTEND_NPM_URL.(name, file) : name } }
 
 # Every CDN file the app loads: FRONTEND_DEPENDENCIES' and those templates load with cdn_tag. Each has a hash in
-# config/frontend_integrity.rb (rake frontend:integrity), so the browser won't run a file that's changed
+# FRONTEND_INTEGRITY
 FRONTEND_CDN_URLS = lambda do |root|
   urls = FRONTEND_DEPENDENCIES.flat_map { |package, files| files.split.map { |f| FRONTEND_NPM_URL.(package, f) } }
   urls + Dir[File.join(root, 'app/views/**/*.erb')].flat_map { |f| FRONTEND_TEMPLATE_CDN_URLS.(File.read(f, encoding: 'UTF-8')) }

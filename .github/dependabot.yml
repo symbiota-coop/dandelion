@@ -1,7 +1,7 @@
 # Dependabot proposes updates to the packages the app loads from jsDelivr (frontend/package.json). Nothing installs
 # them: config/frontend_dependencies.rb reads the versions. A proposed version's files have no hash yet, so its PR fails
-# CI's lint job until someone checks out the branch, runs rake frontend:integrity and commits the hashes (AGENTS.md,
-# Dependencies)
+# CI's lint job until someone checks out the branch, runs rake frontend:integrity and commits the hashes it writes to
+# frontend/integrity.json (AGENTS.md, Dependencies)
 version: 2
 updates:
   - package-ecosystem: npm

@@ -2,7 +2,7 @@
 
 module ERBLint
   module Linters
-    # CDN files load with cdn_tag, which adds the hash in config/frontend_integrity.rb as their integrity attribute, so the
+    # CDN files load with cdn_tag, which adds the hash in frontend/integrity.json as their integrity attribute, so the
     # browser won't run a file that's changed, and an npm package's file at the version frontend/package.json names, so
     # versions live in one place (AGENTS.md, Dependencies)
     class CdnTags < Linter
@@ -10,7 +10,7 @@ module ERBLint
 
       # A script or stylesheet from a CDN, by a path on it (a preconnect link names the host alone)
       BARE_TAG = %r{<(?:script|link)\b[^>]*?\b(?:src|href)=["']https://(?:cdn\.jsdelivr\.net|unpkg\.com|cdnjs\.cloudflare\.com)/}
-      CONFIG = File.expand_path('../config', __dir__)
+      CONFIG = File.expand_path('../config/frontend_dependencies.rb', __dir__)
 
       def run(processed_source)
         source = processed_source.file_content
@@ -33,8 +33,8 @@ module ERBLint
           offense(processed_source, range, "#{name} isn't in frontend/package.json: add it there at an exact version.")
         elsif !file && name.match?(%r{\Ahttps://cdn\.jsdelivr\.net/npm/})
           offense(processed_source, range, "Name the package and file (`cdn_tag 'package', 'path/file.js'`), so its version comes from frontend/package.json.")
-        elsif !integrity.key?(url = file ? frontend::FRONTEND_NPM_URL.call(name, file) : name)
-          offense(processed_source, range, "#{url} has no hash in config/frontend_integrity.rb: run `rake frontend:integrity`.")
+        elsif !frontend::FRONTEND_INTEGRITY.key?(url = file ? frontend::FRONTEND_NPM_URL.call(name, file) : name)
+          offense(processed_source, range, "#{url} has no hash in frontend/integrity.json: run `rake frontend:integrity`.")
         end
       end
 
@@ -42,18 +42,10 @@ module ERBLint
         add_offense(processed_source.to_source_range(range), "CdnTags: #{message}")
       end
 
+      # config/frontend_dependencies.rb, in a module of its own, with its path, so __dir__ works and nothing leaks into
+      # the linter's process
       def frontend
-        @frontend ||= load_config('frontend_dependencies.rb')
-      end
-
-      def integrity
-        @integrity ||= load_config('frontend_integrity.rb')::FRONTEND_INTEGRITY
-      end
-
-      # Each file in a module of its own, with its path, so __dir__ works and nothing leaks into the linter's process
-      def load_config(name)
-        path = File.join(CONFIG, name)
-        Module.new.tap { |m| m.module_eval(File.read(path), path) }
+        @frontend ||= Module.new.tap { |m| m.module_eval(File.read(CONFIG), CONFIG) }
       end
     end
   end

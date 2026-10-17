@@ -272,11 +272,11 @@ class LintTest < Minitest::Test
   # AGENTS.md, Dependencies: each CDN file has the hash cdn_tag writes as its integrity attribute (CdnTags checks each
   # template's own), and no hash is left over
   def test_cdn_files_have_integrity
-    integrity = Module.new.tap { |m| m.module_eval(File.read(File.join(ROOT, 'config/frontend_integrity.rb'))) }::FRONTEND_INTEGRITY
+    integrity = JSON.parse(File.read(File.join(ROOT, 'frontend/integrity.json')))
     urls = cdn_urls
     refute_empty urls
     assert_empty urls - integrity.keys, 'run rake frontend:integrity to hash these CDN files'
-    assert_empty integrity.keys - urls, 'nothing loads these: remove them from config/frontend_integrity.rb'
+    assert_empty integrity.keys - urls, 'nothing loads these: run rake frontend:integrity, which drops them'
     integrity.each { |url, hash| assert_match %r{\Asha384-[A-Za-z0-9+/]{64}\z}, hash, url }
 
     # frontend/package.json lists only what the app loads, so Dependabot doesn't propose updates to a package nothing uses

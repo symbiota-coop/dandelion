@@ -1,16 +1,17 @@
 namespace :frontend do
-  desc 'Hash each CDN file that has no hash yet into config/frontend_integrity.rb, for the integrity attributes cdn_tag writes, and drop those nothing loads'
+  desc 'Hash each CDN file that has no hash yet into frontend/integrity.json, for the integrity attributes cdn_tag writes, and drop those nothing loads'
   task :integrity do
     require 'faraday'
     require 'digest'
     root = File.expand_path('..', __dir__)
     load File.join(root, 'config/frontend_dependencies.rb') unless defined?(FRONTEND_CDN_URLS)
-    path = File.join(root, 'config/frontend_integrity.rb')
-    load path unless defined?(FRONTEND_INTEGRITY)
+    path = File.join(root, 'frontend/integrity.json')
+    # Read from the file rather than FRONTEND_INTEGRITY, which the app loaded at boot
+    existing = File.exist?(path) ? JSON.parse(File.read(path)) : {}
 
     # A file that already has a hash keeps it, so a file that's changed on the CDN since is refused rather than trusted
     hashes = FRONTEND_CDN_URLS.call(root).uniq.sort.to_h do |url|
-      next [url, FRONTEND_INTEGRITY[url]] if FRONTEND_INTEGRITY[url]
+      next [url, existing[url]] if existing[url]
 
       response = Faraday.get(url)
       raise "#{url}: #{response.status}" unless response.status == 200
@@ -21,12 +22,6 @@ namespace :frontend do
       [url, "sha384-#{Digest::SHA384.base64digest(response.body)}"]
     end
 
-    File.write(path, <<~RUBY)
-      # The hash of each CDN file the app loads, which cdn_tag writes as its integrity attribute. Written by
-      # rake frontend:integrity: run it after adding or removing a CDN file
-      FRONTEND_INTEGRITY = {
-      #{hashes.map { |url, hash| "  '#{url}' => '#{hash}'" }.join(",\n")}
-      }.freeze
-    RUBY
+    File.write(path, "#{JSON.pretty_generate(hashes)}\n")
   end
 end
