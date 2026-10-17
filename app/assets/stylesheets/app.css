@@ -3072,6 +3072,12 @@ table.event-details td {
   translate: 0 -0.047em;
 }
 
+/* The band and the day fade with the tile on hover, or they'd switch at once while it's still fading */
+.event-detail.calendar-date .month,
+.event-detail.calendar-date .day {
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
 .event-detail.calendar-date .month {
   background: var(--theme-50);
   color: var(--theme-800);
