@@ -303,14 +303,15 @@ class EventsTest < ActiveSupport::TestCase
     mentioned = FactoryBot.create(:account, name: 'Ada Lovelace', username: 'ada.lovelace')
     discussion = @event.discussion_post!(@account)
     comment = discussion.comments.create!(account: @account, commentable: @event,
-                                          body: "Thanks @Ada.Lovelace. Write to me@example.com, or ask @nobody_here <b>now</b>")
+                                          body: "Thanks @Ada.Lovelace. Write to me@example.com, or ask @nobody_here <b>now</b>. See https://example.com/a?b=1&c=2.")
 
     assert discussion.subscriptions.and(account: mentioned).exists?
     assert_equal 2, discussion.subscriptions.count
     html = comment.body_html
     assert_includes html, '<a href="/u/ada.lovelace">Ada Lovelace</a>. Write'
-    assert_includes html, 'me@example.com'
+    assert_includes html, '<a href="mailto:me@example.com" target="_blank">me@example.com</a>'
     assert_includes html, '@nobody_here &lt;b&gt;now&lt;/b&gt;'
+    assert_includes html, '<a href="https://example.com/a?b=1&amp;c=2" target="_blank">https://example.com/a?b=1&amp;c=2</a>.'
     assert_includes comment.body_with_additions, %(<a href="#{ENV['BASE_URI']}/u/ada.lovelace">)
 
     get "/e/#{@event.slug}", link_token: @account.link_token

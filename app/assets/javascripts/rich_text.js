@@ -1,8 +1,6 @@
 // Rich text: links, line breaks, Read more and embeds in text from people and from the editor
 $(function () {
   onContentLoaded(function () {
-    $('.linkify').once('linkify').linkify({ target: { url: '_blank' } })
-
     // Shorten long URLs shown as link text to their origin, e.g. https://example.com/...
     $('.compact-urls').once('compact-urls').find('a').each(function () {
       const text = $(this).text()

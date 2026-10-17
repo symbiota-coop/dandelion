@@ -76,7 +76,7 @@ function fixedHeaderHeight () {
 }
 
 // The elements not yet set up under this key, now marked as set up, so code that runs after every ajax request
-// sets each element up once: $('.linkify').once('linkify').linkify(). The mark is a class (once-linkify) rather than
+// sets each element up once: $('.nl2br').once('nl2br').each(...). The mark is a class (once-nl2br) rather than
 // a data attribute because flatpickr copies classes, not data attributes, onto the alt input it adds
 $.fn.once = function (key) {
   return this.not('.once-' + key).addClass('once-' + key)

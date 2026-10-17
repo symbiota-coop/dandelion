@@ -29,8 +29,6 @@ FRONTEND_DEPENDENCIES = {
   'chartjs-plugin-datalabels' => 'dist/chartjs-plugin-datalabels.min.js',
   'autosize' => 'dist/autosize.min.js',
   'countup.js' => 'dist/countUp.umd.js',
-  'linkifyjs' => 'dist/linkify.min.js',
-  'linkify-jquery' => 'dist/linkify-jquery.min.js',
   '@googlemaps/markerclusterer' => 'dist/index.min.js',
   '@melloware/coloris' => 'dist/umd/coloris.min.js dist/coloris.min.css'
 }.freeze

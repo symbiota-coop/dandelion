@@ -51,16 +51,18 @@ class Comment
     @mentioned_accounts ||= mention_tokens.filter_map { |token| mentioned_account(token) }.uniq.index_by(&:username)
   end
 
-  # The body as HTML, with mentions of accounts shown as their names, linked to their profiles
+  # The body as HTML, with mentions of accounts shown as their names, linked to their profiles, and URLs and email
+  # addresses linked (Rinku leaves the mention links alone)
   def body_html(base_uri: '')
     return unless body
 
-    ERB::Util.html_escape(body).to_str.gsub(MENTION_REGEX) do
+    html = ERB::Util.html_escape(body).to_str.gsub(MENTION_REGEX) do
       token = Regexp.last_match(1)
       next "@#{token}" unless (mentioned = mentioned_account(token))
 
       "<a href=\"#{base_uri}/u/#{mentioned.username}\">#{ERB::Util.html_escape(mentioned.name)}</a>#{token[mentioned.username.length..]}"
-    end.html_safe
+    end
+    Rinku.auto_link(html, :all, 'target="_blank"').html_safe
   end
 
   def mention_tokens
