@@ -28,7 +28,7 @@
     { '$group' => { '_id' => '$account_id', 'feedback' => { '$first' => '$$ROOT' } } },
     { '$replaceRoot' => { 'newRoot' => '$feedback' } },
     { '$sort' => { 'created_at' => -1 } },
-    { '$limit' => 10 }
+    { '$limit' => 15 } # the script below shows the first 10 whose image isn't a logo
   ]
 
   EventFeedback.collection.aggregate(pipeline).each { |doc|
@@ -36,9 +36,9 @@
   account = event_feedback.account
   next if account.name.include?('_')
   quote = event_feedback.public_answers.map { |q,a| a if a.present? }.compact.join('<br /><br />').gsub("\n", '<br />')
-  next if quote.length > 500
+  next if quote.empty? || quote.length > 500
   %>
-  <div class="feedback-columns-item">
+  <div class="feedback-columns-item" style="display: none">
 
     <div class="row g-0">
       <div class="col-auto me-2"><i class="bi bi-quote"></i></div>
@@ -67,3 +67,51 @@
   </div>
   <% } %>
 </div>
+<script>
+  $(function () {
+    // An account image whose edges are nearly all one colour (white, transparent or solid) is probably a logo rather
+    // than a photo of the person, so skip that quote. Images that can't be read (no CORS) count as photos.
+    // The image CDN only sends CORS headers when asked, without Vary: Origin, so the copy the browser cached for the
+    // <img> can't be read: ask for a URL of its own
+    function looksLikeLogo (src) {
+      return new Promise(function (resolve) {
+        const img = new Image()
+        img.crossOrigin = 'anonymous'
+        img.onload = function () {
+          try {
+            const size = 50
+            const canvas = document.createElement('canvas')
+            canvas.width = canvas.height = size
+            const ctx = canvas.getContext('2d')
+            ctx.fillStyle = 'white'
+            ctx.fillRect(0, 0, size, size)
+            ctx.drawImage(img, 0, 0, size, size)
+            const data = ctx.getImageData(0, 0, size, size).data
+            const edge = []
+            for (let i = 0; i < size; i++) {
+              edge.push([i, 0], [i, size - 1], [0, i], [size - 1, i])
+            }
+            const pixels = edge.map(function ([x, y]) {
+              const o = (y * size + x) * 4
+              return [data[o], data[o + 1], data[o + 2]]
+            })
+            const mean = [0, 1, 2].map(function (c) { return pixels.reduce(function (sum, p) { return sum + p[c] }, 0) / pixels.length })
+            const plain = pixels.filter(function (p) {
+              return Math.abs(p[0] - mean[0]) + Math.abs(p[1] - mean[1]) + Math.abs(p[2] - mean[2]) < 40
+            }).length
+            resolve(plain / pixels.length >= 0.8)
+          } catch {
+            resolve(false)
+          }
+        }
+        img.onerror = function () { resolve(false) }
+        img.src = src + (src.includes('?') ? '&' : '?') + 'cors'
+      })
+    }
+
+    const items = $('.feedback-columns-item').toArray()
+    Promise.all(items.map(function (item) { return looksLikeLogo($(item).find('img').attr('src')) })).then(function (logos) {
+      $(items.filter(function (_item, i) { return !logos[i] }).slice(0, 10)).fadeIn(150)
+    })
+  })
+</script>
