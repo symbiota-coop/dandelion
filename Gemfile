@@ -59,7 +59,6 @@ gem 'patreon'
 gem 'stripe'
 
 # Mail
-gem 'incoming'
 gem 'mail'
 gem 'mailgun-ruby', require: 'mailgun'
 gem 'premailer'

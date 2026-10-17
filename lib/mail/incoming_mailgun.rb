@@ -1,9 +1,40 @@
-class EmailReceiver < Incoming::Strategies::Mailgun
-  setup api_key: ENV['MAILGUN_WEBHOOK_SIGNING_KEY']
+# Reads the replies to comment emails that Mailgun posts to /inbound/:id
+class EmailReceiver
+  # The reply as [mail, html, plain_text, envelope_sender], or nil unless Mailgun signed the request
+  def self.receive(request)
+    return unless signed_by_mailgun?(request.params)
+
+    new(request).receive(mail_from_params(request.params))
+  end
+
+  # Mailgun signs each webhook with an HMAC-SHA256 of its timestamp and token, keyed with the webhook signing key
+  def self.signed_by_mailgun?(params)
+    key = ENV['MAILGUN_WEBHOOK_SIGNING_KEY']
+    return false if key.blank? || params['signature'].blank?
+
+    expected = OpenSSL::HMAC.hexdigest('SHA256', key, "#{params['timestamp']}#{params['token']}")
+    Rack::Utils.secure_compare(expected, params['signature'].to_s)
+  end
+
+  # The message from the parsed fields Mailgun posts: its headers, plain text and HTML (attachments aren't read)
+  def self.mail_from_params(params)
+    text = params['body-plain']
+    html = params['body-html']
+    header_fields = JSON.parse(params['message-headers'].to_s).to_h
+    Mail.new do
+      headers header_fields
+      body text
+      if html
+        html_part do
+          content_type 'text/html; charset=UTF-8'
+          body html
+        end
+      end
+    end
+  end
 
   def initialize(request)
     @envelope_sender = self.class.authenticated_envelope_sender(request)
-    super
   end
 
   # Webhook signing only proves Mailgun sent the request. Trust MAIL FROM only

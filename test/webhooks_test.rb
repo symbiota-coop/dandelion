@@ -885,6 +885,54 @@ class WebhooksTest < ActiveSupport::TestCase
     end
   end
 
+  # A reply to a comment email as Mailgun posts it, signed with key, from an address SPF passed
+  def inbound_reply_params(account, body, key:, timestamp: Time.now.to_i.to_s)
+    token = SecureRandom.hex(25)
+    {
+      'timestamp' => timestamp, 'token' => token, 'signature' => OpenSSL::HMAC.hexdigest('SHA256', key, "#{timestamp}#{token}"),
+      'sender' => account.email, 'from' => "#{account.name} <#{account.email}>", 'body-plain' => body,
+      'message-headers' => [['From', account.email], ['Subject', 'Re: Discussion'], ['X-Mailgun-Spf', 'Pass']].to_json
+    }
+  end
+
+  def with_mailgun_signing_key(key)
+    previous = ENV['MAILGUN_WEBHOOK_SIGNING_KEY']
+    ENV['MAILGUN_WEBHOOK_SIGNING_KEY'] = key
+    yield
+  ensure
+    ENV['MAILGUN_WEBHOOK_SIGNING_KEY'] = previous
+  end
+
+  test 'a reply to a comment email that Mailgun signed becomes a comment' do
+    create_event
+    discussion = @event.discussion_post!(@account)
+    with_mailgun_signing_key('signing-key') do
+      post "/inbound/#{discussion.id}", inbound_reply_params(@account, 'See you there', key: 'signing-key')
+    end
+    assert_equal 200, last_response.status
+    assert_includes discussion.comments.order('created_at desc').first.body, 'See you there'
+  end
+
+  test 'an inbound email without Mailgun\'s signature is refused' do
+    create_event
+    discussion = @event.discussion_post!(@account)
+    with_mailgun_signing_key('signing-key') do
+      [
+        inbound_reply_params(@account, 'Signed with another key', key: 'another-key'),
+        inbound_reply_params(@account, 'Not signed', key: 'signing-key').except('signature'),
+        inbound_reply_params(@account, 'Timestamp changed', key: 'signing-key').merge('timestamp' => '1')
+      ].each do |params|
+        post "/inbound/#{discussion.id}", params
+        assert_equal 401, last_response.status, params['body-plain']
+      end
+    end
+    with_mailgun_signing_key(nil) do
+      post "/inbound/#{discussion.id}", inbound_reply_params(@account, 'No key set', key: '')
+      assert_equal 401, last_response.status
+    end
+    assert_equal 0, discussion.comments.and(via_email: true).count
+  end
+
   test 'inbound email html does not read stylesheets linked from the message' do
     with_local_stylesheet do |link|
       mail = Mail.new do
