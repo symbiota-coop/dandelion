@@ -28,7 +28,6 @@ gem 'omniauth-google-oauth2'
 gem 'siwe-rb', require: 'siwe'
 
 # Validation and testing
-gem 'better_html'
 gem 'email_address'
 gem 'erb_lint', require: false
 gem 'factory_bot'

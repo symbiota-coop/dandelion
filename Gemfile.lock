@@ -519,7 +519,6 @@ DEPENDENCIES
   activesupport
   addressable
   bcrypt
-  better_html
   capybara
   chroma
   countries
