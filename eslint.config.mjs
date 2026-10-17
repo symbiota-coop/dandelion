@@ -6,11 +6,11 @@ import bootstrap4Leftovers from './config/bootstrap4_leftovers.json' with { type
 // (config/frontend_dependencies.rb and layouts/_dependencies.erb, or a page's own <script src>), and some files and
 // templates define functions others call
 const libraries = [
-  'autosize', 'bootstrap', 'Chart', 'ChartDataLabels', 'ClassicEditor', 'Coloris', 'countUp', 'cytoscape', 'DataTable', 'flatpickr',
+  'autosize', 'bootstrap', 'Chart', 'ChartDataLabels', 'ClassicEditor', 'Coloris', 'cytoscape', 'DataTable', 'flatpickr',
   'FullCalendar', 'google', 'grecaptcha', 'iframely', 'introJs', 'jsQR', 'markerClusterer', 'Stripe', 'Typed'
 ]
 const shared = [
-  'calendarOptions', 'cssColor', 'DandelionMap', 'destroyLinkFor', 'drawSpanTreeGuides', 'fixedHeaderHeight', 'hideTooltips', 'initQuestionsPreview',
+  'calendarOptions', 'countUp', 'cssColor', 'DandelionMap', 'destroyLinkFor', 'drawSpanTreeGuides', 'fixedHeaderHeight', 'hideTooltips', 'initQuestionsPreview',
   'onContentLoaded', 'placeAutocomplete', 'renderSearchAutocompleteItem', 'scrollMessageThreadToBottom', 'scrollspy'
 ]
 // Selects string literals and the static parts of template literals whose text matches a regex (esquery's /.../ syntax),

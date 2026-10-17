@@ -1,9 +1,0 @@
-<script>
-  $(function() {
-    var c = new countUp.CountUp('events-count',
-      <%== @events.count.to_json %>
-    );
-    c.start();
-  })
-</script>
-<span id="events-count">0</span> upcoming events

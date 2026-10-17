@@ -15,6 +15,18 @@ function cssColor (value) {
   return a === 255 ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${Math.round(a / 2.55) / 100})`
 }
 
+// Counts an element's number up from 0 to target over 2 seconds, easing out, with thousands separators
+function countUp (el, target, decimals = 0) {
+  const format = new Intl.NumberFormat('en', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+  let start
+  requestAnimationFrame(function step (now) {
+    start ??= now
+    const t = Math.min((now - start) / 2000, 1)
+    el.textContent = format.format(t < 1 ? target * (1 - Math.pow(2, -10 * t)) * 1024 / 1023 : target)
+    if (t < 1) requestAnimationFrame(step)
+  })
+}
+
 // The link a click was on, if its path ends in destroy. confirm.js asks before following these, and app.js sends them as a POST
 function destroyLinkFor (target) {
   const anchor = target.closest('a[href]')

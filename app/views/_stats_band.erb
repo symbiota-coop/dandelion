@@ -171,7 +171,7 @@
         if (!entry.isIntersecting) return
         observer.unobserve(entry.target)
         var $el = $(entry.target)
-        new countUp.CountUp(entry.target, Number($el.data('count-up')), { decimalPlaces: Number($el.data('decimals') || 0) }).start()
+        countUp(entry.target, Number($el.data('count-up')), Number($el.data('decimals') || 0))
       })
     })
     $('.stats-band [data-count-up]').each(function () { observer.observe(this) })
