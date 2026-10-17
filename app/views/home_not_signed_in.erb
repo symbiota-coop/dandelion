@@ -9,24 +9,45 @@
 
 <div class="lavender-wash content-padding-x">
   <div class="row justify-content-center mx-0 py-5">
-    <%= cdn_tag 'typed.js', 'dist/typed.umd.js' %>
     <script>
       $(function () {
-        if (<%== (ENV['CREATE_VIDEO'] ? true : false).to_json %>) {
-          $('.typewriter').text('regenerative')
-        } else {
-          new Typed('.typewriter', {
-            strings: <%== ADJECTIVES.to_json %>,
-            typeSpeed: 50,
-            loop: true
-          });
+        const $word = $('.typewriter')
+        // A fixed word for the how-to video and under prefers-reduced-motion
+        if (<%== (ENV['CREATE_VIDEO'] ? true : false).to_json %> || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          $word.text('regenerative')
+          return
         }
+        // Types each adjective, pauses, then deletes back to what it shares with the next, and loops
+        const words = <%== ADJECTIVES.to_json %>
+        let i = 0
+        let text = ''
+        let deleting = false
+        function tick () {
+          const next = words[(i + 1) % words.length]
+          let delay
+          if (!deleting) {
+            text = words[i].slice(0, text.length + 1)
+            deleting = text === words[i]
+            delay = deleting ? 700 : 50 + Math.random() * 25
+          } else if (!next.startsWith(text)) {
+            text = text.slice(0, -1)
+            delay = 25
+          } else {
+            i = (i + 1) % words.length
+            deleting = false
+            delay = 50
+          }
+          $word.text(text)
+          setTimeout(tick, delay)
+        }
+        tick()
       })
     </script>
     <div class="col-12 col-lg-7">
       <p id="strapline" class="mb-3 strapline">
         Find and host
-        <strong class="gradient-text typewriter"></strong>
+        <span class="visually-hidden">regenerative</span>
+        <strong class="gradient-text typewriter" aria-hidden="true"></strong>
         <br>
         events and co-created gatherings
       </p>

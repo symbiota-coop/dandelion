@@ -27,7 +27,6 @@
     "marked": "18.1.0",
     "select2": "4.1.0",
     "select2-bootstrap-5-theme": "1.3.0",
-    "slick-carousel": "2.0.0",
-    "typed.js": "3.0.0"
+    "slick-carousel": "2.0.0"
   }
 }

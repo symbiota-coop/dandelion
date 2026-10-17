@@ -35,6 +35,5 @@
   "https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.full.min.js": "sha384-qWCV5w18ycOo5Y83uQtzyZgOVrklbVaF7+p8cbyVohQq/+gvZEf80vvFQ/6B90f9",
   "https://cdn.jsdelivr.net/npm/slick-carousel@2.0.0/slick/slick-theme.css": "sha384-sarvIWMdXatSaCji8NoZV9/K9SjIJLD49ozI9LEHcYGruDEAHkz3SCDraA+2uo0n",
   "https://cdn.jsdelivr.net/npm/slick-carousel@2.0.0/slick/slick.css": "sha384-Keftlm78u7xfBHejsLrhEiv7eZVnyYvQKvr6zUulFtgxW8JtrwrAo8hn/O3Yp+gB",
-  "https://cdn.jsdelivr.net/npm/slick-carousel@2.0.0/slick/slick.min.js": "sha384-5MfYQxWDQgt6TThAM9tk3dZqJNosm/eVLxtQLosoyTz8eFus3yIUO7luxPHqSqpU",
-  "https://cdn.jsdelivr.net/npm/typed.js@3.0.0/dist/typed.umd.js": "sha384-swMjK7d9Y7Vvk7zPwkxWg3wYlRv+PrA3G4V/FyBzjhwNfGKlWHTWJUmnmU8FgBMp"
+  "https://cdn.jsdelivr.net/npm/slick-carousel@2.0.0/slick/slick.min.js": "sha384-5MfYQxWDQgt6TThAM9tk3dZqJNosm/eVLxtQLosoyTz8eFus3yIUO7luxPHqSqpU"
 }
