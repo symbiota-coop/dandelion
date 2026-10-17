@@ -1159,12 +1159,14 @@ p.action a {
   font-size: 0.693rem;
 }
 
-/* A chevron on something that opens in place (a sidebar group) turns to point up while it's open */
-.sidebar .nav-link .caret {
+/* A chevron on something that opens in place (a sidebar group, the search options) turns to point up while it's open */
+.sidebar .nav-link .caret,
+.search-toggle .caret {
   transition: rotate var(--transition-fast);
 }
 
-.sidebar .nav-link[aria-expanded="true"] .caret {
+.sidebar .nav-link[aria-expanded="true"] .caret,
+.search-toggle[aria-expanded="true"] .caret {
   rotate: 180deg;
 }
 
@@ -1732,13 +1734,6 @@ input.flatpickr-mobile-empty:not(:focus)::-webkit-datetime-edit {
 @media (min-width: 576px) {
   .search input[type=submit] {
     margin: 0 !important
-  }
-}
-
-/* A search form that starts hidden behind its toggle link on phones; the link's show() overrides this */
-@media (max-width: 767.98px) {
-  .search.search-hidden-on-mobile {
-    display: none
   }
 }
 
@@ -2417,12 +2412,43 @@ a.ui-button:active,
 }
 
 .search {
-  background: var(--bs-tertiary-bg);
+  background: var(--bs-white);
   box-shadow: var(--bs-box-shadow-sm) !important;
 }
 
+.search-body {
+  padding: var(--space-base);
+}
+
+@media (min-width: 992px) {
+  .search-body {
+    padding-bottom: 0;
+  }
+}
+
+/* The search options' header, the well's top row, with a hairline under it while the form below is open. It slides
+   the form open or shut */
+.search-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  width: 100%;
+  padding: var(--space-sm) var(--space-base);
+  background: none;
+  border: 0;
+  color: var(--bs-emphasis-color);
+  font-weight: 600;
+}
+
+.search-toggle[aria-expanded="true"] {
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* Checkbox chips, outlined like the fields beside them; checked, the outline takes the theme colour */
 .search .form-check-inline {
   background-color: var(--bs-white);
+  box-shadow: inset 0 0 0 1px var(--bs-border-color);
   padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) calc(1.8em + var(--space-2xs));
   border-radius: var(--bs-border-radius);
 }

@@ -13,81 +13,87 @@
   </div>
 <% end %>
 
-<%# The form starts hidden behind the toggle link on the map and calendar, and when there are carousel buttons until a search; on phones it always does %>
-<% search_toggle = params[:display].in?(['map', 'calendar']) || @carousel_buttons %>
-<%= partial :'events/toggle_search_well', locals: { mobile_only: !search_toggle, hidden_on_mobile: true } %>
-
-<div class="search search-hidden-on-mobile border rounded p-3 pb-lg-0 mb-3 <%= 'mt-3' if params[:minimal] || @carousel_buttons %>" style="<%= 'display: none;' if search_toggle && !(params[:search] && !params[:display].in?(['map', 'calendar'])) %>">
-
-  <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
-    <%= hidden_field_tag :display, value: params[:display] %>
-    <%= hidden_field_tag :order, value: params[:order] %>
-    <%= hidden_field_tag :minimal, value: params[:minimal] %>
-    <div class="row gx-2 align-items-end">
-      <div class="form-group col-12 col-sm-auto">
-        <label>Events between</label>
-        <%= text_field_tag :from, class: 'form-control datepicker', placeholder: (@organisation.start_date_placeholder if params[:minimal]), value: (@from.to_fs(:db_local) if @from && !@past) %>
-      </div>
-      <div class="form-group col-12 col-sm-auto">
-        <label>and</label>
-        <%= text_field_tag :to, class: 'form-control datepicker', placeholder: (@organisation.end_date_placeholder if params[:minimal]), value: (@to.to_fs(:db_local) if @to) %>
-      </div>
-      <div class="form-group col-12 col-sm-auto">
-        <label>containing the word</label>
-        <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
-      </div>
-      <div class="form-group col-12 col-sm-auto">
-        <label>near</label>
-        <%= text_field_tag :near, class: 'form-control', value: params[:near], id: 'events-search-near', placeholder: '' %>
-      </div>
-      <% if @carousel_buttons %>
-        <% if params[:carousel_ids] %>
-          <% params[:carousel_ids].each do |carousel_id| %>
-            <%= hidden_field_tag :'carousel_ids[]', value: carousel_id %>
+<%# The form starts hidden on the map and calendar, and when there are carousel buttons until a search %>
+<% search_open = !params[:display].in?(['map', 'calendar']) && (params[:search] || !@carousel_buttons) %>
+<div class="search border rounded mb-3 <%= 'mt-3' if params[:minimal] || @carousel_buttons %>">
+  <%= partial :'events/toggle_search_well', locals: { search_open: search_open } %>
+  <div class="search-body" style="<%= 'display: none;' unless search_open %>">
+    <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
+      <%= hidden_field_tag :display, value: params[:display] %>
+      <%= hidden_field_tag :order, value: params[:order] %>
+      <%= hidden_field_tag :minimal, value: params[:minimal] %>
+      <div class="row gx-2 align-items-end">
+        <div class="form-group col-12 col-sm-auto">
+          <label>Events between</label>
+          <%= text_field_tag :from, class: 'form-control datepicker', placeholder: (@organisation.start_date_placeholder if params[:minimal]), value: (@from.to_fs(:db_local) if @from && !@past) %>
+        </div>
+        <div class="form-group col-12 col-sm-auto">
+          <label>and</label>
+          <%= text_field_tag :to, class: 'form-control datepicker', placeholder: (@organisation.end_date_placeholder if params[:minimal]), value: (@to.to_fs(:db_local) if @to) %>
+        </div>
+        <div class="form-group col-12 col-sm-auto">
+          <label>containing the word</label>
+          <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
+        </div>
+        <div class="form-group col-12 col-sm-auto">
+          <label>near</label>
+          <%= text_field_tag :near, class: 'form-control', value: params[:near], id: 'events-search-near', placeholder: '' %>
+        </div>
+        <% if @carousel_buttons %>
+          <% if params[:carousel_ids] %>
+            <% params[:carousel_ids].each do |carousel_id| %>
+              <%= hidden_field_tag :'carousel_ids[]', value: carousel_id %>
+            <% end %>
           <% end %>
-        <% end %>
-        <% if params[:event_tag_id] %>
-          <%= partial :'organisations/search_event_tags' %>
-        <% end %>
-        <% if @organisation.event_types %>
+          <% if params[:event_tag_id] %>
+            <%= partial :'organisations/search_event_tags' %>
+          <% end %>
+          <% if @organisation.event_types %>
+            <div class="form-group col-12 col-sm-auto">
+              <label>Event type</label>
+              <%= select_tag :event_type, options: [[(@organisation.event_types_placeholder if params[:minimal]), '', {disabled: true, selected: !params[:event_type]}]] + @organisation.event_types.split(',').map { |type| [type, type.parameterize] }, selected: params[:event_type], class: 'form-select select-placeholder' %>
+            </div>
+          <% end %>
           <div class="form-group col-12 col-sm-auto">
-            <label>Event type</label>
-            <%= select_tag :event_type, options: [[(@organisation.event_types_placeholder if params[:minimal]), '', {disabled: true, selected: !params[:event_type]}]] + @organisation.event_types.split(',').map { |type| [type, type.parameterize] }, selected: params[:event_type], class: 'form-select select-placeholder' %>
+            <%= submit_tag 'Search', class: 'btn btn-primary' %>
           </div>
+        <% else %>
+          <%= partial :'organisations/search_event_tags' %>
+          <%
+            # partial :'organisations/search_local_groups'
+          %>
+          <%
+           # partial :'organisations/search_activities'
+          %>
+          <%
+            # partial :'organisations/search_carousels'
+          %>
         <% end %>
-        <div class="form-group col-12 col-sm-auto">
-          <%= submit_tag 'Search', class: 'btn btn-primary' %>
-        </div>
-      <% else %>
-        <%= partial :'organisations/search_event_tags' %>
-        <%
-          # partial :'organisations/search_local_groups'
-        %>
-        <%
-         # partial :'organisations/search_activities'
-        %>
-        <%
-          # partial :'organisations/search_carousels'
-        %>
-      <% end %>
-    </div>
-    <% if !@carousel_buttons %>
-      <div class="row gx-2 align-items-end mt-1">
-        <%= checkbox 'Online', form_group_class: 'col-auto col-sm-auto either-or' %>
-        <%= checkbox 'In person', form_group_class: 'col-auto col-sm-auto either-or' %>
-        <% if @organisation.organisation_tiers.exists? %>
-          <%= checkbox "Members' events", form_group_class: 'col-auto col-sm-auto' %>
-        <% end %>
-        <div class="form-group col-12 col-sm-auto">
-          <%= submit_tag 'Search', class: 'btn btn-primary' %>
-        </div>
       </div>
+      <% if !@carousel_buttons %>
+        <div class="row gx-2 align-items-end mt-1">
+          <%= checkbox 'Online', form_group_class: 'col-auto col-sm-auto either-or' %>
+          <%= checkbox 'In person', form_group_class: 'col-auto col-sm-auto either-or' %>
+          <% if @organisation.organisation_tiers.exists? %>
+            <%= checkbox "Members' events", form_group_class: 'col-auto col-sm-auto' %>
+          <% end %>
+          <div class="form-group col-12 col-sm-auto">
+            <%= submit_tag 'Search', class: 'btn btn-primary' %>
+          </div>
+        </div>
+      <% end %>
+      <%= hidden_field_tag :search, value: 1 %>
     <% end %>
-    <%= hidden_field_tag :search, value: 1 %>
-  <% end %>
 
-  <% unless params[:no_listings] || params[:no_view_options] %>
-    <%= partial :'events/view_options', locals: { grid_view: true, calendar_view: true } %>
-  <% end %>
-
+    <% unless params[:no_listings] || params[:no_view_options] %>
+      <%= partial :'events/view_options', locals: { grid_view: true, calendar_view: true } %>
+    <% end %>
+  </div>
 </div>
+<script>
+  // On phones the form always starts hidden
+  if (window.matchMedia('(max-width: 767.98px)').matches) {
+    $('#toggle-search').attr('aria-expanded', false)
+    $('.search-body').hide()
+  }
+</script>

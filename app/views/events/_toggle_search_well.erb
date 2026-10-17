@@ -1,29 +1,11 @@
 <script>
-  function toggleAdvancedSearch() {
-    var searchWell = $('.search');
-    var toggleLink = $('#toggle-search');
-
-    if (searchWell.is(':visible')) {
-      searchWell.hide();
-      toggleLink.html('<i class="bi bi-chevron-right" id="search-arrow"></i> Show search options');
-      window.dispatchEvent(new Event('resize'));
-    } else {
-      searchWell.show();
-      toggleLink.html('<i class="bi bi-chevron-down" id="search-arrow"></i> Hide search options');
-      window.dispatchEvent(new Event('resize'));
-    }
+  // The search options slide open or shut under their header like the sidebar's groups, and the chevron turns to point up while they're open
+  function toggleAdvancedSearch () {
+    var open = $('#toggle-search').attr('aria-expanded') !== 'true'
+    $('#toggle-search').attr('aria-expanded', open)
+    $('.search-body').stop(true)[open ? 'slideDown' : 'slideUp'](175, function () {
+      window.dispatchEvent(new Event('resize'))
+    })
   }
 </script>
-<div class="<% if @carousel_buttons %>text-center text-lg-end<% end %> <% if defined?(mobile_only) && mobile_only %>d-md-none<% end %> mb-3">
-  <% search_open = params[:search] && !params[:display].in?(['map', 'calendar']) %>
-  <a href="javascript:;" id="toggle-search" onclick="toggleAdvancedSearch()">
-    <% if defined?(hidden_on_mobile) && hidden_on_mobile %>
-      <%# The form starts hidden on phones (search-hidden-on-mobile), whatever it does from md up %>
-      <span class="d-md-none"><i class="bi bi-chevron-right"></i> Show search options</span>
-      <span class="d-none d-md-inline"><i class="bi <%= search_open ? 'bi-chevron-down' : 'bi-chevron-right' %>" id="search-arrow"></i> <%= search_open ? 'Hide search options' : 'Show search options' %></span>
-    <% else %>
-      <i class="bi <%= search_open ? 'bi-chevron-down' : 'bi-chevron-right' %>" id="search-arrow"></i>
-      <%= search_open ? 'Hide search options' : 'Show search options' %>
-    <% end %>
-  </a>
-</div>
+<button type="button" id="toggle-search" class="search-toggle" aria-expanded="<%= search_open ? 'true' : 'false' %>" onclick="toggleAdvancedSearch()"><span><i class="bi bi-funnel me-1"></i> Filter</span> <i class="bi bi-chevron-down caret"></i></button>
