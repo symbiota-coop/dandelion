@@ -5,6 +5,21 @@
     background-size: 7.5em 100%;
     background-repeat: no-repeat;
   }
+
+  /* The typewriter's cursor stays solid while it types, and blinks as it pauses, as typed.js's did */
+  .typewriter-cursor {
+    font-weight: 300;
+  }
+
+  .typewriter-cursor.blink {
+    animation: typewriter-blink 0.7s infinite; /* stylelint-disable-line declaration-property-value-disallowed-list -- the cursor blinks while the typewriter is waiting, like a loading indicator */
+  }
+
+  @keyframes typewriter-blink {
+    50% {
+      opacity: 0;
+    }
+  }
 </style>
 
 <div class="lavender-wash content-padding-x">
@@ -12,11 +27,13 @@
     <script>
       $(function () {
         const $word = $('.typewriter')
-        // A fixed word for the how-to video and under prefers-reduced-motion
+        const $cursor = $('.typewriter-cursor')
+        // A fixed word, with no cursor, for the how-to video and under prefers-reduced-motion
         if (<%== (ENV['CREATE_VIDEO'] ? true : false).to_json %> || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           $word.text('regenerative')
           return
         }
+        $cursor.show()
         // Types each adjective, pauses, then deletes back to what it shares with the next, and loops
         const words = <%== ADJECTIVES.to_json %>
         let i = 0
@@ -38,6 +55,7 @@
             delay = 50
           }
           $word.text(text)
+          $cursor.toggleClass('blink', delay >= 700)
           setTimeout(tick, delay)
         }
         tick()
@@ -47,7 +65,7 @@
       <p id="strapline" class="mb-3 strapline">
         Find and host
         <span class="visually-hidden">regenerative</span>
-        <strong class="gradient-text typewriter" aria-hidden="true"></strong>
+        <strong class="gradient-text typewriter" aria-hidden="true"></strong><span class="typewriter-cursor" aria-hidden="true" style="display: none">|</span>
         <br>
         events and co-created gatherings
       </p>
