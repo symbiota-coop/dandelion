@@ -70,7 +70,7 @@ class Trace
       if status.success? && !output.strip.empty?
         Time.iso8601(output.strip)
       else
-        Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN']).commit('symbiota-coop/dandelion', commit).commit.committer.date
+        Time.iso8601(Github.get("repos/#{Github::REPO}/commits/#{commit}")['commit']['committer']['date'])
       end
     rescue StandardError
       nil

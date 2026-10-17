@@ -1,15 +1,11 @@
 <p class="lead">Dandelion is a <a href="https://fair.io/">fair source</a> project. <a target="_blank" href="https://github.com/symbiota-coop/dandelion">View the code on Github</a> · <a href="/design">See the design guide</a></p>
 
 <%
-client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
-
-repo = "symbiota-coop/dandelion"
-
 page = [(params[:page] || 1).to_i, 1].max
 per_page = 20
 
 # Fetch only the commits needed for this page (GitHub does the pagination)
-github_commits = client.commits(repo, per_page: per_page, page: page)
+github_commits = Github.get("repos/#{Github::REPO}/commits", per_page: per_page, page: page)
 
 # If we got a full page, assume there might be more (so total = page * per_page + 1)
 # This allows the "Next" button to show up without fetching the actual total
@@ -22,7 +18,7 @@ end
 %>
 
 <% if commits.any? %>
-  <% commits.group_by { |c| c.commit.author.date.to_date }.each do |date, day_commits| %>
+  <% commits.group_by { |c| Time.iso8601(c['commit']['author']['date']).to_date }.each do |date, day_commits| %>
     <h5 class="mt-4">Commits on <%= date.strftime('%b %d, %Y') %></h5>
     <div class="table-responsive">
       <table class="table table-sm">
@@ -30,13 +26,13 @@ end
           <% day_commits.each do |commit| %>
             <tr>
               <td style="width: 4.375rem">
-                <a href="<%= commit.html_url %>" target="_blank">
-                  <%= commit.sha[0..6] %>
+                <a href="<%= commit['html_url'] %>" target="_blank">
+                  <%= commit['sha'][0..6] %>
                 </a>
               </td>
               <td>
                 <%== md(
-                Sanitize.fragment(commit.commit.message, Sanitize::Config::DANDELION)
+                Sanitize.fragment(commit['commit']['message'], Sanitize::Config::DANDELION)
                 .gsub(/^Co-authored-by:.*$/i, '')
                 .gsub('\\', '\\\\')
                 .gsub('_', '\_')
