@@ -373,14 +373,12 @@ class Pmail
     return unless signal_configured?
     return unless mailable.is_a?(Event)
 
-    Account.and(:id.in => account_ids).each do |account|
-      next unless account.phone.present?
+    # Everyone gets the same message, so it's one request to the Signal API rather than one per recipient
+    phones = Account.and(:id.in => account_ids, :phone.ne => nil).pluck(:phone)
+    pmail_url = "#{ENV['BASE_URI']}/pmails/#{public_id}"
+    message = "New message about #{mailable.name}\n\nView the message '#{subject}' at #{pmail_url}"
 
-      pmail_url = "#{ENV['BASE_URI']}/pmails/#{public_id}"
-      message = "New message about #{mailable.name}\n\nView the message '#{subject}' at #{pmail_url}"
-
-      send_signal_message(account.phone, message)
-    end
+    send_signal_message(phones, message)
   end
   handle_asynchronously :send_signal_messages
 

@@ -13,11 +13,12 @@ module SignalMessaging
     phone
   end
 
-  def send_signal_message(recipient_phone, message)
+  # One phone or many: many get the same message in one request, rather than a request each
+  def send_signal_message(recipient_phones, message)
     return unless signal_configured?
 
-    recipient_phone = normalize_phone(recipient_phone)
-    return unless recipient_phone
+    recipients = Array(recipient_phones).filter_map { |phone| normalize_phone(phone) }.uniq
+    return if recipients.empty?
 
     conn = Faraday.new(url: ENV['SIGNAL_API_URL']) do |f|
       f.request :json
@@ -30,7 +31,7 @@ module SignalMessaging
       req.body = {
         message: message,
         number: ENV['SIGNAL_PHONE_NUMBER'],
-        recipients: [recipient_phone]
+        recipients: recipients
       }
     end
   rescue StandardError => e
