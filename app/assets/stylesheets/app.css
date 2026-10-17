@@ -1735,6 +1735,13 @@ input.flatpickr-mobile-empty:not(:focus)::-webkit-datetime-edit {
   }
 }
 
+/* A search form that starts hidden behind its toggle link on phones; the link's show() overrides this */
+@media (max-width: 767.98px) {
+  .search.search-hidden-on-mobile {
+    display: none
+  }
+}
+
 .input-group-text {
   padding: 0.375rem var(--space-xs)
 }
