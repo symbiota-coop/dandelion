@@ -8,137 +8,92 @@
 
 <script>
   $(function () {
-    var $table = $('#event_feedbacks');
-    if (!$table.length || $table.hasClass('dataTable') || $(window).width() > 767) return;
-
-    var dateIndex = $table.find('th[data-col-name="date"]').index();
-    var table = $table.DataTable({
-      info: false,
-      paging: false,
-      order: dateIndex >= 0 ? [[dateIndex, 'desc']] : [],
-      searching: false,
-      columnDefs: [{ className: 'control', orderable: false, targets: 0 }],
-      responsive: {
-        auto: false,
-        breakpoints: [
-          { name: 'desktop', width: Infinity },
-          { name: 'mobile', width: 767 }
-        ],
-        details: {
-          renderer: function (api, rowIdx, columns) {
-            var rows = $.map(columns, function (col) {
-              if (!col.hidden) return '';
-              var $data = $('<div>').html(col.data || '');
-              if (!$data.text().trim() && !$data.find('[data-pagelet-url], img, a, button').length) return '';
-              return '<tr><td>' + col.title + '</td><td>' + col.data + '</td></tr>';
-            }).join('');
-            // In a tbody, as Bootstrap 5 styles cells through .table > tbody > tr > td
-            return rows ? $('<table class="table table-sm mb-0 dtr-details"><tbody>' + rows + '</tbody></table>') : false;
-          }
-        }
+    // On phones the .desktop columns are hidden, and the chevron in a row's first cell shows them in a row below it
+    $('#event_feedbacks .feedback-toggle').once('feedback-toggle').on('click', function () {
+      const $row = $(this).closest('tr')
+      if (!$row.next('.feedback-details').length) {
+        const $headers = $('#event_feedbacks thead th')
+        const rows = $row.children('.desktop').map(function () {
+          const $cell = $(this)
+          if (!$cell.text().trim() && !$cell.find('[data-pagelet-url], img, a, button').length) return null
+          return '<tr><th>' + $headers.eq($cell.index()).text() + '</th><td>' + $cell.html() + '</td></tr>'
+        }).get().join('')
+        const $details = $('<tr class="feedback-details"><td colspan="' + $headers.not('.desktop').length + '">' +
+          '<table class="table table-sm table-borderless mb-0"><tbody>' + rows + '</tbody></table></td></tr>')
+        // Copied pagelets load afresh
+        $details.find('[data-pagelet-url]').each(function () {
+          const $p = $(this)
+          $p.removeAttr('data-pagelet-loaded').empty().load($p.attr('data-pagelet-url'))
+        })
+        $row.after($details)
       }
-    });
-
-    table.on('responsive-display.dt', function (e, dt, row, showHide) {
-      if (!showHide || !row.child()) return;
-      row.child().find('[data-pagelet-url]').each(function () {
-        var $p = $(this);
-        $p.removeAttr('data-pagelet-loaded').empty().load($p.attr('data-pagelet-url'));
-      });
-    });
-  });
+      $row.toggleClass('expanded')
+      $(this).attr('aria-expanded', $row.hasClass('expanded'))
+    })
+  })
 </script>
 
 <style>
-  /* DataTables only runs on phones: hide its control column on wider screens, and usernames on phones */
-  @media (min-width: 768px) {
-    #event_feedbacks:not(.dataTable) th:first-child,
-    #event_feedbacks:not(.dataTable) tbody > tr > td:first-child {
-      display: none;
-    }
-  }
-
-  @media (max-width: 767.98px) {
-    #event_feedbacks a[data-account-username] {
-      display: none;
-    }
-    #event_feedbacks th.control,
-    #event_feedbacks td.control {
-      width: 1.875rem;
-      min-width: 1.875rem;
-      max-width: 1.875rem;
-      padding-left: 0;
-      padding-right: 0;
-    }
-  }
-
-  /* Bootstrap chevrons in place of Responsive's expand icon */
-  #event_feedbacks.dtr-inline.collapsed > tbody > tr > td.dtr-control:before {
-    content: "\f285";
-    border: none;
-    font-family: "bootstrap-icons";
-    font-size: 1.125rem;
-    font-style: normal;
-    font-weight: normal;
-    line-height: 1;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background: none;
-    box-shadow: none;
-    color: var(--bs-emphasis-color);
-    margin: 0;
-    width: 1.875rem;
-    text-align: center;
-  }
-
-  #event_feedbacks.dtr-inline.collapsed > tbody > tr.dtr-expanded > td.dtr-control:before {
-    content: "\f282";
-  }
-
-  /* Expanded rows: borderless, with bold labels */
-  #event_feedbacks.collapsed {
-    border-right: none;
-  }
-
-  #event_feedbacks.dtr-inline.collapsed > tbody > tr.child > td:before {
-    content: none !important;
+  #event_feedbacks .feedback-details {
     display: none;
   }
 
-  #event_feedbacks td.child,
-  #event_feedbacks td.child .dtr-details,
-  #event_feedbacks td.child .dtr-details td {
-    border: none;
+  #event_feedbacks .feedback-toggle i {
+    display: inline-block;
+    transition: rotate var(--transition-fast);
   }
 
-  #event_feedbacks td.child .dtr-details td:first-child {
+  #event_feedbacks tr.expanded .feedback-toggle i {
+    rotate: 90deg;
+  }
+
+  #event_feedbacks .feedback-details th {
     width: 1%;
     white-space: nowrap;
     padding-right: 1em;
-    font-weight: bold;
   }
 
-  #event_feedbacks td.child .dtr-details tr {
-    background-color: var(--bs-body-bg);
+  @media (min-width: 768px) {
+    #event_feedbacks .control {
+      display: none;
+    }
+  }
+
+  /* On phones, the .desktop columns and usernames hide, and the chevron shows them */
+  @media (max-width: 767.98px) {
+    #event_feedbacks .desktop,
+    #event_feedbacks a[data-account-username] {
+      display: none;
+    }
+
+    #event_feedbacks .control {
+      width: 1.875rem;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    #event_feedbacks tr.expanded + tr.feedback-details {
+      display: table-row;
+    }
   }
 </style>
 
 <table id="event_feedbacks" class="table">
   <thead>
     <tr>
-      <th data-orderable="false"></th>
-      <th class="all">Name</th>
+      <th class="control"></th>
+      <th>Name</th>
       <% if defined?(event_name) %>
-        <th class="all">Event</th>
+        <th>Event</th>
       <% end %>
       <% if defined?(activity_name) %>
         <th class="desktop">Activity</th>
       <% end %>
-      <th class="all">Rating</th>
+      <th>Rating</th>
       <th class="desktop answers-col">Answers</th>
       <th class="desktop" style="min-width: 20em">Response</th>
-      <th class="all" data-col-name="date">Date</th>
-      <th class="desktop" data-orderable="false"></th>
+      <th>Date</th>
+      <th class="desktop"></th>
     </tr>
   </thead>
   <% v = @event ? event_email_viewer? : false
@@ -146,7 +101,9 @@
   event_feedbacks = event_feedbacks.paginate(page: params[:page], per_page: 10)
   event_feedbacks.each { |event_feedback| account = event_feedback.account %>
   <tr>
-    <td></td>
+    <td class="control">
+      <button type="button" class="btn btn-link text-body p-0 feedback-toggle" aria-expanded="false" aria-label="Show details"><i class="bi bi-chevron-right"></i></button>
+    </td>
     <td>
       <% if !account || event_feedback.anonymous? %>
         Anonymous
@@ -165,7 +122,7 @@
       </td>
     <% end %>
     <% if defined?(activity_name) %>
-      <td>
+      <td class="desktop">
         <% if event_feedback.event && event_feedback.event.activity %>
           <a href="/o/<%= event_feedback.event.activity.organisation.slug %>/a/<%= event_feedback.event.activity.slug %>"><%= event_feedback.event.activity.name %></a>
         <% end %>
@@ -180,7 +137,7 @@
         <% end %>
       </a>
     </td>
-    <td>
+    <td class="desktop">
       <% event_feedback.answers.each_with_index { |qa,i| q = qa[0]; a = qa[1] %>
       <% if a %>
         <div class="mb-3">
@@ -198,20 +155,20 @@
       <% end %>
       <% } if event_feedback.answers %>
     </td>
-    <td>
+    <td class="desktop">
       <% if event_feedback.event && event_feedback.respondable? %>
         <div data-pagelet-url="/event_feedbacks/<%= event_feedback.id %>/response"></div>
       <% end %>
     </td>
-    <td data-sort="<%= event_feedback.created_at.iso8601 %>">
+    <td>
       <%= event_feedback.created_at %>
     </td>
     <% if organisation_admin?(event_feedback.event.try(:organisation)) %>
-      <td>
+      <td class="desktop">
         <a class="btn btn-danger" href="/event_feedbacks/<%= event_feedback.id %>/destroy" data-confirm="Are you sure you want to delete this feedback? It will disappear from admin pages, but remain visible as Removed on public pages."><i class="bi bi-x-lg"></i></a>
       </td>
     <% else %>
-      <td>
+      <td class="desktop">
       </td>
     <% end %>
   </tr>

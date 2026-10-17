@@ -1,6 +1,7 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class EventFeedbacksTest < ActiveSupport::TestCase
+  include Capybara::DSL
   include Rack::Test::Methods
 
   def create_attended_event
@@ -64,6 +65,27 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     refute_includes last_response.body, '<em>Removed</em>'
     refute_includes last_response.body, reviewer.name
     assert_includes last_response.body, live_reviewer.name
+  end
+
+  test 'on phones, a feedback row shows its hidden columns when opened' do
+    create_attended_event
+    @event.event_feedbacks.create!(account: @attendee, rating: 4, answers: [['How was it?', 'Lovely day']])
+
+    sign_in(@account)
+    page.current_window.resize_to(375, 812)
+    visit "/events/#{@event.id}/feedback"
+    assert page.has_css?('#event_feedbacks .feedback-toggle')
+    assert page.has_no_content?('Lovely day')
+
+    find('#event_feedbacks .feedback-toggle').click
+    assert page.has_css?('#event_feedbacks .feedback-details', text: 'Answers')
+    assert page.has_content?('Lovely day')
+
+    find('#event_feedbacks .feedback-toggle').click
+    assert page.has_css?('#event_feedbacks .feedback-toggle[aria-expanded="false"]')
+    assert page.has_no_content?('Lovely day')
+  ensure
+    page.current_window.resize_to(1280, 720)
   end
 
   test 'event page still shows the activity feedback card when every rating has been removed' do
