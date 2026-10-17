@@ -1,7 +1,6 @@
 require 'json'
 
-# The version of each npm package the app loads from jsDelivr, from frontend/package.json, where Dependabot proposes
-# updates
+# The version of each npm package the app loads from jsDelivr, from frontend/package.json
 FRONTEND_VERSIONS = JSON.parse(File.read(File.expand_path('../frontend/package.json', __dir__)))['dependencies'].freeze
 
 # A file of an npm package on jsDelivr, at the version frontend/package.json names

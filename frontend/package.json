@@ -1,7 +1,7 @@
 {
   "name": "dandelion-frontend",
   "private": true,
-  "description": "The packages Dandelion loads from jsDelivr, at the versions it loads. Nothing installs them: config/frontend_dependencies.rb reads the versions, and Dependabot proposes updates",
+  "description": "The packages Dandelion loads from jsDelivr, at the versions it loads. Nothing installs them: config/frontend_dependencies.rb reads the versions",
   "dependencies": {
     "@github/relative-time-element": "5.3.1",
     "@googlemaps/markerclusterer": "2.6.2",

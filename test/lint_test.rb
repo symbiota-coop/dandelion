@@ -279,7 +279,7 @@ class LintTest < Minitest::Test
     assert_empty integrity.keys - urls, 'nothing loads these: run rake frontend:integrity, which drops them'
     integrity.each { |url, hash| assert_match %r{\Asha384-[A-Za-z0-9+/]{64}\z}, hash, url }
 
-    # frontend/package.json lists only what the app loads, so Dependabot doesn't propose updates to a package nothing uses
+    # frontend/package.json lists only what the app loads, so no package nothing uses is kept up to date or raises security alerts
     listed = JSON.parse(File.read(File.join(ROOT, 'frontend/package.json')))['dependencies'].keys
     loaded = urls.filter_map { |url| url[%r{/npm/((?:@[^/]+/)?[^/@]+)@}, 1] }.uniq
     assert_empty listed - loaded, 'nothing loads these: remove them from frontend/package.json'
