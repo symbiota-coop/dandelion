@@ -48,6 +48,8 @@ module AccountFields
     field :youtube_video_url, type: String
     field :sent_first_event_email, type: Time
     field :event_feedbacks_as_facilitator_count, type: Integer
+    field :event_feedbacks_as_facilitator_average_rating, type: Float
+    field :past_events_as_facilitator_count, type: Integer
     field :event_tag_names, type: Array
     %w[email_confirmed updated_profile admin unsubscribed unsubscribed_messages unsubscribed_feedback unsubscribed_reminders block_reply_by_email hidden seen_intro_tour can_reset_passwords has_signed_in legacy_sessions_revoked].each do |b|
       field b.to_sym, type: Mongoid::Boolean

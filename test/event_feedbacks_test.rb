@@ -164,8 +164,12 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     create_feedback(account: @attendee, rating: 4)
     create_feedback(account: unrated_attendee, rating: nil)
     create_feedback(account: deleted_attendee, rating: 2).destroy
+    @event.set(start_time: 2.days.ago, end_time: 1.day.ago)
 
     EventFeedback.update_event_feedbacks_as_facilitator_details
-    assert_equal 1, facilitator.reload.event_feedbacks_as_facilitator_count
+    facilitator.reload
+    assert_equal 1, facilitator.event_feedbacks_as_facilitator_count
+    assert_in_delta 4.0, facilitator.event_feedbacks_as_facilitator_average_rating
+    assert_equal 1, facilitator.past_events_as_facilitator_count
   end
 end

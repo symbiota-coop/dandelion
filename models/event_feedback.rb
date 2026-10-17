@@ -73,12 +73,20 @@ class EventFeedback
   end
 
   def self.update_event_feedbacks_as_facilitator_details
-    Account.and(:event_feedbacks_as_facilitator_count.ne => nil).update_all(event_feedbacks_as_facilitator_count: nil)
+    Account.and(:event_feedbacks_as_facilitator_count.ne => nil).update_all(event_feedbacks_as_facilitator_count: nil, event_feedbacks_as_facilitator_average_rating: nil, past_events_as_facilitator_count: nil)
     event_tags_by_id = EventTag.pluck(:id, :name).to_h
     Account.and(:id.in => EventFacilitation.pluck(:account_id)).each do |account|
       # puts account.username
-      account.set(event_feedbacks_as_facilitator_count: account.unscoped_event_feedbacks_as_facilitator.rated.count)
-      events = Event.past.and(:id.in => account.event_facilitations.pluck(:event_id))
+      event_ids = account.event_facilitations.pluck(:event_id)
+      rated = EventFeedback.unscoped.and(:event_id.in => event_ids).rated
+      events = Event.past.and(:id.in => event_ids)
+      # Cached for facilitator info (accounts/_facilitator_info.erb), which would otherwise run these queries for each
+      # account it shows
+      account.set(
+        event_feedbacks_as_facilitator_count: rated.count,
+        event_feedbacks_as_facilitator_average_rating: rated.avg(:rating)&.round(1),
+        past_events_as_facilitator_count: events.count
+      )
       event_tag_ids = EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id)
       tag_frequency = event_tag_ids.group_by(&:itself).transform_values(&:count)
       event_tag_names = tag_frequency.sort_by { |_id, count| -count }.map { |id, _count| event_tags_by_id[id] }

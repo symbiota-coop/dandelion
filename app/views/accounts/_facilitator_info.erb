@@ -3,5 +3,6 @@
 <% end %>
 
 <% unless defined?(skip_average_rating) %>
-  <%= partial :'event_feedbacks/average_rating', locals: { event_feedbacks: account.unscoped_event_feedbacks_as_facilitator, events: Event.past.and(:id.in => account.event_facilitations.pluck(:event_id)) } %>
+  <%# The rating and counts are cached on the account (EventFeedback.update_event_feedbacks_as_facilitator_details), so a list of facilitators runs no queries for them %>
+  <%= partial :'event_feedbacks/average_rating', locals: { average_rating: account.event_feedbacks_as_facilitator_average_rating, ratings_count: account.event_feedbacks_as_facilitator_count, events_count: account.past_events_as_facilitator_count } %>
 <% end %>

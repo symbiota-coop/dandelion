@@ -1,9 +1,9 @@
-<% if (average_rating = event_feedbacks.average_rating) %>
+<% if average_rating %>
   <div class="average-rating">
     <%= average_rating %><small class="text-body-secondary">/5
-      from <%= pluralize event_feedbacks.rated.count, 'rating' %>
-      <% if defined?(events) %>
-        across <%= pluralize events.count, 'event' %>
+      from <%= pluralize ratings_count, 'rating' %>
+      <% if events_count %>
+        across <%= pluralize events_count, 'event' %>
       <% end %>
     </small>
     <div class="d-lg-inline">
