@@ -1729,6 +1729,11 @@ input.flatpickr-mobile-empty:not(:focus)::-webkit-datetime-edit {
   .searchForm input[type=submit] {
     margin-bottom: var(--space-2xs);
   }
+
+  /* Wrapped rows of fields sit as far apart as the fields beside each other (the row's gx-2 gutter and their margin-right) */
+  .searchForm .row {
+    row-gap: var(--space-xs);
+  }
 }
 
 @media (min-width: 576px) {
