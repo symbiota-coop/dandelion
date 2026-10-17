@@ -95,7 +95,6 @@ GEM
       delayed_job (>= 3.0, < 5)
       mongoid (>= 5.0)
     didkit (0.4.0)
-    digest (3.3.0)
     domain_name (0.7.20261007)
     dragonfly (1.4.2)
       addressable (~> 2.3)
@@ -525,7 +524,6 @@ DEPENDENCIES
   crawler_detect
   cuprite
   delayed_job_mongoid
-  digest
   dragonfly
   dragonfly-s3_data_store
   email_address
