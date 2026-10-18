@@ -4,6 +4,10 @@ FIAT_CURRENCIES = %w[GBP EUR USD SEK DKK NOK CHF MXN CAD AUD NZD SGD PLN].freeze
 # Instant Bank Pay and Direct Debit via GoCardless are UK/Eurozone only.
 GOCARDLESS_CURRENCIES = %w[GBP EUR].freeze
 EVM_CURRENCIES = Token.all.map(&:symbol)
+# Tokens that older events are still priced in, though we no longer take payment in them
+LEGACY_EVM_CURRENCIES = %w[DAI WXDAI].freeze
+# Stablecoins, which DandelionBank converts at the fiat currency they're pegged to
+STABLECOIN_PEGS = { 'DAI' => 'USD', 'WXDAI' => 'USD', 'USDC' => 'USD', 'CUSD' => 'USD', 'BREAD' => 'USD', 'CEUR' => 'EUR' }.freeze
 
 module FiatCurrency
   module_function
@@ -37,7 +41,7 @@ Money::Currency.with_options(priority: 1, symbol_first: true, subunit_to_unit: 1
   currency.register(iso_code: 'DKK', name: 'Danish Krone', symbol: 'DKK ', subunit: 'Øre')
   currency.register(iso_code: 'NOK', name: 'Norwegian Krone', symbol: 'NOK ', subunit: 'Øre')
 
-  EVM_CURRENCIES.each do |c|
+  (EVM_CURRENCIES + LEGACY_EVM_CURRENCIES).each do |c|
     currency.register(iso_code: c, name: c, symbol: "#{c} ", subunit: 'Cent')
   end
 end

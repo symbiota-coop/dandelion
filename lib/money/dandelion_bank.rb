@@ -24,6 +24,11 @@ class DandelionBank < Money::Bank::VariableExchange
 
       usd_rates.select! { |_, rate| rate.is_a?(Numeric) && rate.positive? }
 
+      STABLECOIN_PEGS.each do |coin, fiat|
+        rate = fiat == 'USD' ? 1.0 : usd_rates[fiat]
+        usd_rates[coin] = rate if rate
+      end
+
       usd_rates.each do |currency, rate|
         add_rate('USD', currency, rate)
         add_rate(currency, 'USD', 1.0 / rate)

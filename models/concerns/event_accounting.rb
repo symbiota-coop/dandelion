@@ -65,7 +65,8 @@ module EventAccounting
       Money.new(tickets.complete.sum(:discounted_price) * (percent_requested.to_f / 100) * 100, currency).exchange_to('GBP')
     end
   rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency => e
-    ErrorReporting.capture_exception(e, context: { event_id: id.to_s, currency: currency })
+    # Crypto and community currencies have no exchange rate, so nothing is asked for their ticket sales
+    ErrorReporting.capture_exception(e, context: { event_id: id.to_s, currency: currency }) if FIAT_CURRENCIES.include?(currency)
     Money.new(0, 'GBP')
   end
 
