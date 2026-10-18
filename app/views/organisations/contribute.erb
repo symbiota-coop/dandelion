@@ -21,7 +21,7 @@
       <td><a href="/e/<%= event.slug %>"><%= event.name %></a>, <%= concise_when_details(event) %></td>
       <td>
         <%= m event.contribution_gbp, currency %>
-        <% if event.promotion_fee? %>
+        <% if event.promotion_fee_gbp %>
           <span class="badge text-bg-primary">Promotion fee</span>
         <% elsif event.cap && event.contribution_gbp == event.cap %>
           <span class="badge text-bg-primary">Capped</span>

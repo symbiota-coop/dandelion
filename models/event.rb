@@ -41,7 +41,7 @@ class Event
 
   def self.protected_attributes
     %w[
-      raw_description direct_charges trending carousel_ids atproto_uri fixed_contribution_gbp cap_gbp
+      raw_description direct_charges trending carousel_ids atproto_uri fixed_contribution_gbp cap_gbp promotion_fee_gbp
       cohosts_ids_cache hosts_ids_cache
       sent_feedback_requests_at sent_reminders_at sent_star_reminders_at
       voyage_embedding ai_tagged sold_out_cache sold_out_due_to_sales_end_cache browsable

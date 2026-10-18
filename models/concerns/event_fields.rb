@@ -44,6 +44,7 @@ module EventFields
     field :thank_you_text, type: String
     field :fixed_contribution_gbp, type: Float
     field :cap_gbp, type: Float
+    field :promotion_fee_gbp, type: Float
     field :oc_slug, type: String
     field :tax_rate_id, type: String
     field :gocardless_instalment_count, type: Integer

@@ -15,16 +15,12 @@ module OrganisationAccounting
     EventPaymentMethod.contribution_reminder?(self)
   end
 
-  def contribution_requested(exclude_promotion_fees: false)
+  def contribution_requested
     c = Money.new(0, 'GBP')
     contributable_events.each do |event|
-      c += event.contribution_gbp(exclude_promotion_fee: exclude_promotion_fees)
+      c += event.contribution_gbp
     end
     c.exchange_to(FIAT_CURRENCIES.include?(currency) ? currency : ENV['DEFAULT_CURRENCY'])
-  end
-
-  def auto_topup_contribution_requested
-    contribution_requested(exclude_promotion_fees: true)
   end
 
   def contribution_paid
@@ -78,8 +74,7 @@ module OrganisationAccounting
 
     opts = StripeOpts.call
 
-    # Promotion-fee events still appear in contribution totals, but we do not auto-charge them
-    cr = auto_topup_contribution_requested
+    cr = contribution_requested
     cp = contribution_paid
     return if paid_up_by_contribution?(cr: cr, cp: cp)
 

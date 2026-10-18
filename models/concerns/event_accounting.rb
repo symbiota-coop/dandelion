@@ -5,10 +5,6 @@ module EventAccounting
     def profit_share_roles
       %w[organiser coordinator category_steward social_media]
     end
-
-    def contribution_gbp_fallback
-      25
-    end
   end
 
   included do
@@ -52,15 +48,10 @@ module EventAccounting
     Money.new(fixed_contribution_gbp * 100, 'GBP')
   end
 
-  def promotion_fee?
-    purchase_url.present? || ticket_types.empty?
-  end
-
-  def contribution_gbp(exclude_promotion_fee: false)
-    if promotion_fee?
-      return Money.new(0, 'GBP') if exclude_promotion_fee
-
-      Money.new(Event.contribution_gbp_fallback * 100, 'GBP')
+  # promotion_fee_gbp is what an organisation paid in promotion fees for an event listed before they were scrapped
+  def contribution_gbp
+    if promotion_fee_gbp
+      Money.new(promotion_fee_gbp * 100, 'GBP')
     elsif fixed_contribution
       fixed_contribution
     elsif cap
@@ -73,8 +64,9 @@ module EventAccounting
       percent_requested = organisation.try(:percent_requested) || 1
       Money.new(tickets.complete.sum(:discounted_price) * (percent_requested.to_f / 100) * 100, currency).exchange_to('GBP')
     end
-  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-    Money.new(Event.contribution_gbp_fallback * 100, 'GBP')
+  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency => e
+    ErrorReporting.capture_exception(e, context: { event_id: id.to_s, currency: currency })
+    Money.new(0, 'GBP')
   end
 
   def stripe_revenue

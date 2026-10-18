@@ -359,6 +359,17 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal 'Mollie', EventPaymentMethod.contribution_reminder_label(@organisation)
   end
 
+  test 'events count the promotion fee paid for them, and nothing for events without ticket sales' do
+    create_organisation(currency: 'GBP')
+    create_event(fixed_contribution_gbp: 10)
+    create_event(as: :event2, promotion_fee_gbp: 25)
+    create_event(as: :event3)
+
+    assert_equal Money.new(25 * 100, 'GBP'), @event2.contribution_gbp
+    assert_equal Money.new(0, 'GBP'), @event3.contribution_gbp
+    assert_equal Money.new(35 * 100, 'GBP'), @organisation.contribution_requested
+  end
+
   test 'secret keys are masked in the edit form and kept when left blank' do
     create_organisation(mollie_api_key: 'test_molliekey1234')
     sign_in_with_rack(@account)
