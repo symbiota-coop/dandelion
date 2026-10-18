@@ -1,4 +1,11 @@
 <% form_tag "/organisationships/#{organisationship.id}/notes" do %>
-  <%= text_area_tag :notes, style: 'width: 15em', onblur: '$(this).next().click()', class: 'form-control autosize', value: organisationship.notes, placeholder: 'Notes' %>
-  <%= submit_tag 'Save', class: 'd-none' %>
+  <div class="ask-box" style="width: 15em">
+    <label class="visually-hidden" for="notes-<%= organisationship.id %>">Notes</label>
+    <%= text_area_tag :notes, id: "notes-#{organisationship.id}", rows: 1, onchange: '$(this.form).submit()', class: 'form-control autosize', value: organisationship.notes, placeholder: 'Notes' %>
+    <div class="ask-box-actions">
+      <button type="submit" class="btn btn-primary btn-sm" aria-label="Save notes">
+        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
 <% end %>

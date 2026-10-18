@@ -139,6 +139,10 @@ $(function () {
     const $form = $(this)
     const pagelet = $form.closest('[data-pagelet-url]')
 
+    // A field that submits on change, beside its own submit button, submits twice when the button is clicked straight
+    // after an edit (once on the blur, once on the click), so skip a submit while the form's last one is in flight
+    if ($form.data('submitting')) return false
+
     setPageletLoading(pagelet)
 
     if ($form.hasClass('no-submit')) {
@@ -146,10 +150,13 @@ $(function () {
       return false
     }
 
+    $form.data('submitting', true)
     $.post($form.attr('action'), $form.serialize(), function () {
       reloadPagelet(pagelet, function () { postLoad(pagelet) })
     }).fail(function () {
       setPageletLoaded(pagelet)
+    }).always(function () {
+      $form.removeData('submitting')
     })
 
     return false
