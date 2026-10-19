@@ -26,8 +26,12 @@ Date::DATE_FORMATS.merge!(
   post: ->(date) { date.strftime("#{date.day} %b#{" #{date.year}" unless date.year == Date.today.year}") }
 )
 
+# Ruby's and ActiveSupport's own to_s (Rails 7.1 removed its to_default_s alias), for formats DATE_FORMATS lacks.
+# The guard keeps a reload from aliasing the override below
 module ActiveSupport
   class TimeWithZone
+    alias_method :to_default_s, :to_s unless method_defined?(:to_default_s)
+
     def to_s(format = :default)
       if (formatter = Time::DATE_FORMATS[format])
         if formatter.respond_to?(:call)
@@ -43,6 +47,8 @@ module ActiveSupport
 end
 
 class Time
+  alias_method :to_default_s, :to_s unless method_defined?(:to_default_s)
+
   def to_s(format = :default)
     if (formatter = Time::DATE_FORMATS[format])
       if formatter.respond_to?(:call)
@@ -57,6 +63,8 @@ class Time
 end
 
 class Date
+  alias_method :to_default_s, :to_s unless method_defined?(:to_default_s)
+
   def to_s(format = :default)
     if (formatter = Date::DATE_FORMATS[format])
       if formatter.respond_to?(:call)
