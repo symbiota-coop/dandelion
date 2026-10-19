@@ -194,4 +194,19 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     assert_in_delta 4.0, facilitator.event_feedbacks_as_facilitator_average_rating
     assert_equal 1, facilitator.past_events_as_facilitator_count
   end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Summaries
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  test 'feedback summaries render markdown but not script links or HTML' do
+    account = FactoryBot.build(:account, feedback_summary: 'Loved **this** [read more](javascript:alert(1)), see [site](https://example.com) <img src=x onerror=alert(1)>')
+
+    html = account.feedback_summary_html
+
+    assert_includes html, '<strong>this</strong>'
+    assert_includes html, '<a href="https://example.com">site</a>'
+    refute_includes html, 'href="javascript:'
+    refute_includes html, '<img'
+  end
 end
