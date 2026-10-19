@@ -82,17 +82,17 @@ LINTERS = [
 # Built files, which change only with their source (AGENTS.md, Build/vendored code), so one changed alone was edited by hand
 GENERATED = {
   'app/assets/stylesheets/bootstrap5.css' => {
-    sources: %r{\A(app/assets/stylesheets/bootstrap5\.scss|tasks/bootstrap\.rake)\z},
+    sources: %r{\A(app/assets/stylesheets/bootstrap5\.scss|tasks/build\.rake)\z},
     message: 'is built from bootstrap5.scss: change that and run rake bootstrap:build'
   },
   'app/assets/javascripts/ext/ckeditor.js' => {
-    sources: %r{\A(ckeditor/|tasks/ckeditor\.rake\z)},
+    sources: %r{\A(ckeditor/|tasks/build\.rake\z)},
     message: 'is built from ckeditor/: change ckeditor/src/ckeditor.js and run rake ckeditor:build'
   },
   **%w[jquery-ui-autocomplete.min.js jquery-ui-interactions.min.js].to_h do |file|
     ["app/assets/javascripts/ext/#{file}", {
-      sources: %r{\Atasks/jquery_ui\.rake\z},
-      message: 'is built from jQuery UI by rake jquery_ui:build: change the modules in tasks/jquery_ui.rake and run it'
+      sources: %r{\Atasks/build\.rake\z},
+      message: 'is built from jQuery UI by rake jquery_ui:build: change the modules in tasks/build.rake and run it'
     }]
   end
 }.freeze

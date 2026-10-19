@@ -446,7 +446,7 @@ class LintTest < Minitest::Test
     assert_match(/jquery-ui-autocomplete.min.js is built from jQuery UI/, output)
 
     [%w[app/assets/stylesheets/bootstrap5.css app/assets/stylesheets/bootstrap5.scss], %w[app/assets/javascripts/ext/ckeditor.js ckeditor/yarn.lock],
-     %w[app/assets/javascripts/ext/jquery-ui-autocomplete.min.js tasks/jquery_ui.rake]].each do |files|
+     %w[app/assets/javascripts/ext/jquery-ui-autocomplete.min.js tasks/build.rake]].each do |files|
       output, status = lint('--only', 'eslint', *files)
       assert status.success?, output
     end
