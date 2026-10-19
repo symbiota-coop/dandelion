@@ -268,6 +268,11 @@ class LintTest < Minitest::Test
     packages.flatten.each do |package|
       assert_match EXACT, package.rpartition('@').last, "pin #{package} to an exact version"
     end
+
+    # zizmor.sh installs it with --require-hashes, so it needs a hash too
+    zizmor = File.read(File.join(ROOT, 'script/agent-env/zizmor.txt'))
+    assert_match EXACT, zizmor[/^zizmor==(\S+)/, 1].to_s, 'script/agent-env/zizmor.txt: pin zizmor to an exact version'
+    assert_match(/--hash=sha256:\h{64}/, zizmor, 'script/agent-env/zizmor.txt: give the hash of each of its wheels')
   end
 
   # Every CDN file the app loads (config/frontend_dependencies.rb)
@@ -456,6 +461,31 @@ class LintTest < Minitest::Test
      %w[app/assets/javascripts/ext/jquery-ui-autocomplete.min.js tasks/build.rake]].each do |files|
       output, status = lint('--only', 'eslint', *files)
       assert status.success?, output
+    end
+  end
+
+  def test_script_lint_runs_zizmor_on_workflows
+    skip 'needs zizmor installed (script/agent-env/zizmor.sh)' unless File.exist?(File.join(ROOT, 'tmp/zizmor/bin/zizmor'))
+    Dir.mktmpdir do |dir|
+      workflow = File.join(dir, '.github/workflows/x.yml')
+      FileUtils.mkdir_p(File.dirname(workflow))
+      { 'v4' => false, '11d5960a326750d5838078e36cf38b85af677262 # v4.4.0' => true }.each do |ref, passes|
+        File.write(workflow, <<~YAML)
+          on: push
+          permissions: {}
+          jobs:
+            x:
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@#{ref}
+                  with:
+                    persist-credentials: false
+        YAML
+        output, status = lint('--only', 'zizmor', workflow)
+        output.force_encoding('UTF-8') # zizmor's output has emoji, whatever the locale
+        assert_equal passes, status.success?, output
+        assert_match(/unpinned-uses/, output) unless passes
+      end
     end
   end
 

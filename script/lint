@@ -6,12 +6,14 @@
 #   script/lint --staged    the staged version of each staged file (the pre-commit hook in .githooks)
 #   script/lint --all       everything, as CI does
 #
-# Add --only <linter> (rubocop, erb_lint, eslint, stylelint or lint_test) to run just one, as CI's separate steps do.
+# Add --only <linter> (rubocop, erb_lint, eslint, stylelint, zizmor or lint_test) to run just one, as CI's separate steps do.
 # A changed linter config (or one of our own cops or linters) runs that linter on everything, as CI would, and
 # test/lint_test.rb when a file it checks changes. A built file (bootstrap5.css, ckeditor.js, the jQuery UI builds) given without its source
 # fails, as it was edited by hand.
 # Exits non-zero if any linter fails.
+require 'fileutils'
 require 'open3'
+require 'tmpdir'
 
 $stdout.sync = true # so the summary on stderr comes after the output
 # Messages go to $stderr.puts rather than warn, which prints nothing under RUBYOPT=-W0
@@ -59,6 +61,18 @@ LINTERS = [
     node: true
   },
   {
+    name: 'zizmor',
+    # GitHub Actions workflows and our own actions (a temporary copy's too, as lint_test.rb's)
+    files: %r{(\A|/)\.github/(workflows/[^/]+|actions/.+/action)\.ya?ml\z},
+    configs: %r{\A(\.github/zizmor\.yml|script/agent-env/zizmor\.txt)\z},
+    # Its online audits (actions with known vulnerabilities, a pinned commit that isn't the action's own...) need a GitHub
+    # token, which CI's lint job gives it; elsewhere it runs offline, as a token there may not reach GitHub's API
+    command: %w[tmp/zizmor/bin/zizmor --config .github/zizmor.yml --no-progress] + (ENV['CI'] ? [] : ['--offline']),
+    all: ['.github'],
+    bin: 'tmp/zizmor/bin/zizmor',
+    install: 'script/agent-env/zizmor.sh'
+  },
+  {
     # Tests our checks and the rules under AGENTS.md's Other checks, so runs when what they read changes: our linters and
     # their configs, the files the Other checks compare, and a new test file (which needs listing in ruby.yml). It reads
     # files from disk, even with --staged
@@ -68,7 +82,7 @@ LINTERS = [
         \.rubocop\.yml | \.rubocop/.+ | \.erb_lint\.yml | \.erb_linters/.+ | eslint\.config\.mjs | stylelint\.config\.mjs |
         package(-lock)?\.json | config/bootstrap4_leftovers\.json | script/lint | test/lint_test\.rb | AGENTS\.md |
         \.github/workflows/ruby\.yml | \.mcp\.json | \.cursor/mcp\.json | \.opencode/opencode\.json | \.codex/config\.toml |
-        tasks/.+\.rake | config/frontend_dependencies\.rb | frontend/(package|integrity)\.json | app/views/layouts/_dependencies\.erb | ckeditor/package\.json
+        tasks/.+\.rake | script/agent-env/zizmor\.txt | config/frontend_dependencies\.rb | frontend/(package|integrity)\.json | app/views/layouts/_dependencies\.erb | ckeditor/package\.json
       )\z
     }x,
     added: %r{\Atest/.+_test\.rb\z},
@@ -129,9 +143,10 @@ jobs = LINTERS.flat_map do |linter|
   mine = files.select { |f| f.match?(linter[:files]) } + added.select { |f| linter[:added]&.match?(f) }
   next [] unless all || mine.any?
 
-  # Only the versions package-lock.json installs: npx would otherwise fetch a missing linter, of any age
-  if linter[:node] && !File.exist?("node_modules/.bin/#{linter[:name].downcase}")
-    $stderr.puts "#{linter[:name]} isn't installed, so run npm ci first"
+  # Only the versions package-lock.json (or zizmor.txt) installs: npx would otherwise fetch a missing linter, of any age
+  bin = linter[:bin] || (linter[:node] && "node_modules/.bin/#{linter[:name].downcase}")
+  if bin && !File.exist?(bin)
+    $stderr.puts "#{linter[:name]} isn't installed, so run #{linter[:install] || 'npm ci'} first"
     next [{ name: linter[:name], missing: true }]
   end
 
@@ -143,6 +158,17 @@ jobs = LINTERS.flat_map do |linter|
     templates.each_slice(templates.size.fdiv(WORKERS).ceil).map { |share| { name: linter[:name], command: linter[:command] + share, env: env } }
   elsif all
     [{ name: linter[:name], command: linter[:command] + (linter[:all] || []), env: env }]
+  elsif mode == '--staged' && !linter[:stdin]
+    # A linter that can't read stdin (zizmor) is given a copy of each staged version, at its path in a temporary directory
+    dir = Dir.mktmpdir
+    at_exit { FileUtils.rm_rf(dir) }
+    copies = mine.map do |f|
+      File.join(dir, f).tap do |copy|
+        FileUtils.mkdir_p(File.dirname(copy))
+        File.write(copy, Open3.capture2('git', 'show', ":#{f}").first)
+      end
+    end
+    [{ name: linter[:name], command: linter[:command] + copies, env: env }]
   elsif mode == '--staged'
     # One run per file, given the staged version on stdin, so unstaged edits (yours or another session's) don't count
     mine.map do |f|
