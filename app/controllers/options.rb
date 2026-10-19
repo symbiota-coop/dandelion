@@ -80,6 +80,8 @@ Dandelion::App.controller do
     @option = Option.find(params[:option_id]) || not_found
     @gathering = @option.gathering
     membership_required!
+    # Admins add people to options that are by invitation, from /g/:slug/optionships/new
+    halt 403 if @option.by_invitation
     Optionship.create(account: current_account, option_id: params[:option_id], gathering: @gathering)
     200
   end

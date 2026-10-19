@@ -79,6 +79,23 @@ class GatheringsTest < ActiveSupport::TestCase
     refute other_option.optionships.find_by(account: @account)
   end
 
+  test 'members can join open options but not those by invitation' do
+    create_gathering
+    member = FactoryBot.create(:account)
+    @gathering.memberships.create!(account: member)
+    open_option = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account)
+    invitation_option = @gathering.options.create!(name: 'Cabin', type: 'Accommodation', account: @account, by_invitation: true)
+
+    sign_in_with_rack(member)
+    post '/optionships/create', option_id: open_option.id
+    assert last_response.ok?
+    post '/optionships/create', option_id: invitation_option.id
+    assert_equal 403, last_response.status
+
+    assert open_option.optionships.find_by(account: member)
+    refute invitation_option.optionships.find_by(account: member)
+  end
+
   test 'verdict create rejects mapplication_id from params' do
     create_two_gatherings
     mapplication = @gathering.mapplications.create!(account: FactoryBot.create(:account), status: 'pending')
