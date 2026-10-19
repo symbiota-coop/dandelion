@@ -128,6 +128,24 @@ class AccountsTest < ActiveSupport::TestCase
     end
   end
 
+  test 'Bluesky link cards keep only http and https links' do
+    account = FactoryBot.create(:account)
+    card = lambda do |uri, thumb, n|
+      { 'post' => { 'uri' => "at://did:plc:x/app.bsky.feed.post/#{n}", 'record' => { 'createdAt' => Time.now.iso8601 },
+                    'embed' => { '$type' => 'app.bsky.embed.external#view',
+                                 'external' => { 'uri' => uri, 'title' => 'Card', 'thumb' => thumb } } } }
+    end
+    posts = [
+      card.call('javascript:alert(document.domain)', 'https://cdn.bsky.app/a.jpg', 1),
+      card.call('https://example.com/post', 'javascript:alert(1)', 2)
+    ]
+
+    links = account.stub(:atproto_posts, posts) { account.atproto_links }
+
+    assert_equal(['https://example.com/post'], links.map { |l| l['url'] })
+    assert_nil links.first['image']
+  end
+
   test 'sign in token does not replace an existing session' do
     victim = FactoryBot.create(:account)
     attacker = FactoryBot.create(:account)
