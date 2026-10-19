@@ -8,7 +8,7 @@
 #
 # Add --only <linter> (rubocop, erb_lint, eslint, stylelint or lint_test) to run just one, as CI's separate steps do.
 # A changed linter config (or one of our own cops or linters) runs that linter on everything, as CI would, and
-# test/lint_test.rb when a file it checks changes. A built file (bootstrap5.css, ckeditor.js) given without its source
+# test/lint_test.rb when a file it checks changes. A built file (bootstrap5.css, ckeditor.js, the jQuery UI builds) given without its source
 # fails, as it was edited by hand.
 # Exits non-zero if any linter fails.
 require 'open3'
@@ -88,7 +88,13 @@ GENERATED = {
   'app/assets/javascripts/ext/ckeditor.js' => {
     sources: %r{\A(ckeditor/|tasks/ckeditor\.rake\z)},
     message: 'is built from ckeditor/: change ckeditor/src/ckeditor.js and run rake ckeditor:build'
-  }
+  },
+  **%w[jquery-ui-autocomplete.min.js jquery-ui-interactions.min.js].to_h do |file|
+    ["app/assets/javascripts/ext/#{file}", {
+      sources: %r{\Atasks/jquery_ui\.rake\z},
+      message: 'is built from jQuery UI by rake jquery_ui:build: change the modules in tasks/jquery_ui.rake and run it'
+    }]
+  end
 }.freeze
 
 WORKERS = 4 # linter runs at a time

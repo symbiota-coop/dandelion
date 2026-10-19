@@ -26,6 +26,7 @@
   <%= partial :'rotas/rota', locals: { rota: @rota } %>
 </div>
 <% if @membership.admin? %>
+  <script src="<%= cachebust('/javascripts/ext/jquery-ui-interactions.min.js') %>" defer></script>
   <style>
     .roles li, .rslots li { cursor: move }
   </style>

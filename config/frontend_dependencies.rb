@@ -12,7 +12,6 @@ FRONTEND_INTEGRITY = JSON.parse(File.read(File.expand_path('../frontend/integrit
 
 # The npm packages every page loads from jsDelivr, after jQuery, and their files
 FRONTEND_DEPENDENCIES = {
-  'jquery-ui' => 'dist/jquery-ui.min.js dist/themes/base/jquery-ui.min.css',
   '@github/relative-time-element' => 'dist/bundle.js',
   'flatpickr' => 'dist/flatpickr.min.js dist/flatpickr.min.css',
   'datatables.net' => 'js/dataTables.min.js',
@@ -32,7 +31,9 @@ FRONTEND_DEPENDENCIES = {
 
 # Our own files every page loads
 FRONTEND_LOCAL_FILES = {
-  'javascripts/ext' => 'ckeditor.js',
+  # jQuery UI's autocomplete, built from the modules we use (rake jquery_ui:build). Pages that drag things also load
+  # jquery-ui-interactions.min.js
+  'javascripts/ext' => 'ckeditor.js jquery-ui-autocomplete.min.js',
   'javascripts' => 'utils.js confirm.js pagelets.js map.js places.js cookie_consent.js sidebar.js header_search.js scrollspy.js app.js forms.js comments.js rich_text.js tabs.js wysiwyg.js sheets.js'
 }.freeze
 
