@@ -42,7 +42,7 @@ Dandelion::App.controller do
       next unless File.exist?(path)
 
       name = names[slug] || slug.humanize
-      page = docs_html(md(File.read(path)), slug: slug, name: name)
+      page = docs_html(md(File.read(path), trusted: true), slug: slug, name: name)
       { slug: slug, name: name, html_body: page[:html], headings: page[:headings], sections: page[:sections] }
     end
 

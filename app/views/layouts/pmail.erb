@@ -47,7 +47,7 @@
       <div class="main">
         <% if pmail.markdown? %>
           <%== EmailHelper.rich_text(
-                Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(hard_wrap: true), autolink: true, tables: true).render(pmail.body)
+                MarkdownRenderer.render(pmail.body, hard_wrap: true)
               ) %>
         <% else %>
           <%== EmailHelper.rich_text(pmail.body) %>

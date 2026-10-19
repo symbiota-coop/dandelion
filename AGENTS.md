@@ -157,6 +157,7 @@ Straight after a click or submit, assert something on the new page before checki
 - Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` (`Dandelion/RailsController` checks for Rails habits)
 - Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
 - `lib/form_builder.rb` defines the `_block` helpers like `text_block`, `wysiwyg_block` etc.
+- Render markdown with `md(text)` in views and helpers, or `MarkdownRenderer.render` elsewhere (`lib/markdown_renderer.rb`), never a Redcarpet of your own. Its output is sanitized unless you pass `trusted: true`, which is only for our own files (docs, terms); `hard_wrap: true` turns single newlines into `<br>`, and `inline: true` is for one paragraph of model output
 - You can find documentation at app/views/docs/md. Keep it up to date.
 
 ## Security reviews

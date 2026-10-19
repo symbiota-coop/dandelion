@@ -4,7 +4,7 @@
   <article class="newspaper-article newspaper-lead">
     <h2 class="newspaper-headline"><%= lead['title'] %></h2>
     <div class="newspaper-text newspaper-columns">
-      <%== Sanitize.fragment(md(lead['summary'].to_s), Sanitize::Config::DANDELION) %>
+      <%== md(lead['summary'].to_s) %>
     </div>
   </article>
 <% end %>
@@ -17,7 +17,7 @@
         <article class="newspaper-article">
           <h2 class="newspaper-headline"><%= article['title'] %></h2>
           <div class="newspaper-text">
-            <%== Sanitize.fragment(md(article['summary'].to_s), Sanitize::Config::DANDELION) %>
+            <%== md(article['summary'].to_s) %>
           </div>
         </article>
       <% end %>

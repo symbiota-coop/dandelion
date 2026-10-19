@@ -1,5 +1,5 @@
 <div class="row justify-content-center">
   <div class="col-lg-8">
-    <%== md(open('app/views/privacy.md').read) %>
+    <%== md(File.read('app/views/privacy.md'), trusted: true) %>
   </div>
 </div>

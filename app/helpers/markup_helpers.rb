@@ -12,9 +12,8 @@ Dandelion::App.helpers do
     end
   end
 
-  def md(text, hard_wrap: false)
-    markdown = Redcarpet::Markdown.new(hard_wrap ? Redcarpet::Render::HTML.new(hard_wrap: true) : Redcarpet::Render::HTML, autolink: true, tables: true, fenced_code_blocks: true)
-    markdown.render(text)
+  def md(text, **)
+    MarkdownRenderer.render(text, **)
   end
 
   def docs_html(html, slug:, name:)

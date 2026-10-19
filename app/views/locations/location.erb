@@ -2,7 +2,7 @@
 
 <% if @location.summary %>
   <div data-bs-toggle="tooltip" title="AI-generated summary ✨" class="readable">
-    <%== Sanitize.fragment(md(@location.summary), Sanitize::Config::DANDELION) %>
+    <%== md(@location.summary) %>
   </div>
 <% end %>
 

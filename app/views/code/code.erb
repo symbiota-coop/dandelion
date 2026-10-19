@@ -32,7 +32,7 @@ end
               </td>
               <td>
                 <%== md(
-                Sanitize.fragment(commit['commit']['message'], Sanitize::Config::DANDELION)
+                commit['commit']['message']
                 .gsub(/^Co-authored-by:.*$/i, '')
                 .gsub('\\', '\\\\')
                 .gsub('_', '\_')
