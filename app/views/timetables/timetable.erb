@@ -20,6 +20,8 @@
     <%= partial :'timetables/tactivity_form', locals: { timetable: @timetable } %>
   </div>
   <div class="mt-2">
+    <%# jQuery UI's sortable, for the spaces and slots below, and draggable and droppable, for the activities in the timetable partial, which the pagelet reloads without this page %>
+    <script src="<%= cachebust('/javascripts/ext/jquery-ui-interactions.min.js') %>" defer></script>
     <div data-pagelet-url="/g/<%= @gathering.slug %>/timetables/<%= @timetable.id %>">
       <%= partial :'timetables/timetable', locals: { timetable: @timetable } %>
     </div>

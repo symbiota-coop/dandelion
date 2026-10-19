@@ -84,7 +84,7 @@ Rules no linter covers, checked by `test/lint_test.rb` or `script/lint` (both ru
 - `test_dependency_versions_are_exact`: the root `package.json`, `frontend/package.json` (the CDN packages), the CDN files' URLs and the packages rake tasks install name exact versions, so none arrives unchosen (Dependencies)
 - `test_cdn_files_have_integrity`: every CDN file the app loads has a hash in `frontend/integrity.json`, no hash is left over, and `frontend/package.json` lists only packages the app loads (Dependencies)
 - `test_ckeditor_stays_on_37`: CKEditor stays on 37 (Build/vendored code)
-- `script/lint`: `bootstrap5.css` and `ext/ckeditor.js` are built (Build/vendored code), so a commit that changes one without its source (`bootstrap5.scss`, `ckeditor/`, or their rake task) fails
+- `script/lint`: `bootstrap5.css`, `ext/ckeditor.js` and the jQuery UI builds (`ext/jquery-ui-*.min.js`) are built (Build/vendored code), so a commit that changes one without its source (`bootstrap5.scss`, `ckeditor/`, or their rake task) fails
 
 ## Committing
 
@@ -173,6 +173,7 @@ Straight after a click or submit, assert something on the new page before checki
 
 - CKEditor is our own build in `ckeditor/`, on CKEditor 37.1.0: 38 and later show a Powered by CKEditor badge under the GPL. Never edit `app/assets/javascripts/ext/ckeditor.js`: change `ckeditor/src/ckeditor.js` and run `rake ckeditor:build` (needs Node)
 - Never edit `bootstrap5.css` (compiled vendor CSS): change Bootstrap's variables in `bootstrap5.scss` and run `rake bootstrap:build` (needs Node)
+- jQuery UI is built from just the modules we use, not loaded whole from the CDN: `ext/jquery-ui-autocomplete.min.js` on every page (the header search, messages search and location fields) and `ext/jquery-ui-interactions.min.js` (sortable, draggable, droppable) on the pages that drag things, which load it with `<script ... defer>` after the first. Its theme CSS isn't loaded: the few rules the autocomplete needs are in `app.css`. Never edit the built files: change the modules or the version in `tasks/jquery_ui.rake` and run `rake jquery_ui:build` (needs Node). A widget not in them (`datepicker`, `dialog`, `tooltip`...) isn't loaded
 
 ## Design
 

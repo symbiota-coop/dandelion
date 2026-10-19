@@ -2243,8 +2243,40 @@ body .table > tfoot > tr > th {
    jQuery UI autocomplete
    ========================================================================== */
 
+/* What the autocomplete needs from jQuery UI's base theme, which we don't load (we build only the modules we use, with
+   rake jquery_ui:build): the menu's position and list styles, and hiding the region it announces results in to screen readers */
+.ui-helper-hidden-accessible {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ui-front {
+  z-index: 100;
+}
+
+.ui-menu {
+  list-style: none;
+  margin: 0;
+  outline: 0;
+}
+
+.ui-menu .ui-menu-item {
+  cursor: pointer;
+}
+
 /* jQuery UI puts the menu flush under its input, so it's square at the top, where it joins it, with the base radius below, like Select2's dropdowns */
 .ui-autocomplete {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
   border: 1px solid var(--hairline) !important;
   font-size: var(--font-size-base);
   padding: var(--space-base) 0;
@@ -2294,6 +2326,7 @@ body .table > tfoot > tr > th {
 
 a.ui-menu-item-wrapper {
   display: block;
+  color: var(--bs-body-color);
   text-decoration: none
 }
 
