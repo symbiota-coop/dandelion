@@ -90,6 +90,7 @@ class LintTest < Minitest::Test
         "test 'x' do\n  @a ||= 1\nend" => 1, "it 'x' do\n  @a = 1\nend" => 0, "def setup_a\n  @a = 1\nend\ntest 'x' do\n  @a = 2\nend" => 0
       },
       'Dandelion/MongoidIndex' => { 'index slug: 1' => 1, 'index' => 0, 'events.index(1)' => 0 },
+      'Dandelion/Redcarpet' => { '::Redcarpet::Render::HTML.new' => 1, 'Redcarpet' => 1, 'Foo::Redcarpet' => 0, 'MarkdownRenderer.render(x)' => 0 },
       'Dandelion/RailsController' => {
         'params[:event].permit(:name)' => 1, 'skip_before_action :x' => 1, 'pdf.render' => 0, 'EmailHelper.render(:x)' => 0,
         'require "x"' => 0, 'x.respond_to?(:y)' => 0, 'event.permit(:x)' => 0
@@ -103,6 +104,12 @@ class LintTest < Minitest::Test
   def test_rails_controller_only_checks_controllers
     cop = RuboCop::Cop::Registry.global.find_by_cop_name('Dandelion/RailsController')
     assert_empty cop_offenses(cop, 'render :show', 'app/helpers/x.rb')
+  end
+
+  def test_redcarpet_is_allowed_only_in_markdown_renderer
+    cop = RuboCop::Cop::Registry.global.find_by_cop_name('Dandelion/Redcarpet')
+    assert_empty cop_offenses(cop, 'Redcarpet::Markdown.new(x)', 'lib/markdown_renderer.rb')
+    assert_equal 1, cop_offenses(cop, 'Redcarpet::Markdown.new(x)', 'lib/x.rb').size
   end
 
   def test_agents_md_lists_each_cop

@@ -59,3 +59,7 @@ Dandelion/TestInstanceVariable:
 Dandelion/CapybaraCurrentPath:
   Include:
     - test/**/*_test.rb
+# The one place that uses Redcarpet, for everything else
+Dandelion/Redcarpet:
+  Exclude:
+    - lib/markdown_renderer.rb

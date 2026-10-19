@@ -36,6 +36,7 @@ Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Rub
 - `Dandelion/ParamsBlank`: `lib/param_helpers.rb` runs `blanks_to_nils!` on `params`, so blank values are already nil: just do `if params[:x]` (or `unless`), with no `.present?` or `.blank?`
 - `Dandelion/Presence`: Don't use `.presence`, on `params` or anywhere else
 - `Dandelion/ErrorReporting`: Report rescued errors with `ErrorReporting.capture_exception(e, context:, tags:)`, not `Sentry.capture_exception`
+- `Dandelion/Redcarpet`: Render markdown with `md(text)` in views and helpers, or `MarkdownRenderer.render` elsewhere (`lib/markdown_renderer.rb`, the one place that uses Redcarpet), so it renders the same everywhere. Its output is sanitized unless you pass `trusted: true`, which is only for our own files (docs, terms); `hard_wrap: true` turns single newlines into `<br>`, and `inline: true` is for one paragraph of model output
 - `Dandelion/RailsController`: Controllers are `Dandelion::App.controller` blocks (Padrino), not Rails controllers: `before do`, not `before_action`; `erb`, `partial` or `cp`, not `render`; `redirect`, not `redirect_to`; `provides:` and `content_type`, not `respond_to`; and no strong parameters: pass `params[:x]` through `mass_assigning(params[:x], Model)`. It checks `app/controllers`
 - `Dandelion/CapybaraHasNoAfterClick`: Straight after a click, assert something on the new page before checking something isn't there (`has_no_*`, `assert_no_*`), or that check can pass on the old page. A click whose confirm is dismissed (`dismiss_confirm`) doesn't leave the page. It checks `test`
 - `Dandelion/TestInstanceVariable`: In a test, `@` variables come from helpers (`create_organisation`, `create_event`, `create_gathering`, `create_full_event_hierarchy`, and file-local setup methods); anything created inline in a test is a local. A test may refresh a variable one of its file's helpers sets. It checks `test`
@@ -157,7 +158,6 @@ Straight after a click or submit, assert something on the new page before checki
 - Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` (`Dandelion/RailsController` checks for Rails habits)
 - Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
 - `lib/form_builder.rb` defines the `_block` helpers like `text_block`, `wysiwyg_block` etc.
-- Render markdown with `md(text)` in views and helpers, or `MarkdownRenderer.render` elsewhere (`lib/markdown_renderer.rb`), never a Redcarpet of your own. Its output is sanitized unless you pass `trusted: true`, which is only for our own files (docs, terms); `hard_wrap: true` turns single newlines into `<br>`, and `inline: true` is for one paragraph of model output
 - You can find documentation at app/views/docs/md. Keep it up to date.
 
 ## Security reviews
