@@ -67,6 +67,25 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     assert_includes last_response.body, live_reviewer.name
   end
 
+  test 'single feedback page shows the attendee email only to email viewers' do
+    create_attended_event
+    @event.update!(show_emails: false)
+    facilitator = FactoryBot.create(:account)
+    @event.event_facilitations.create!(account: facilitator)
+    event_feedback = create_feedback(account: @attendee)
+
+    sign_in_with_rack(facilitator)
+    get "/event_feedbacks/#{event_feedback.id}"
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, @attendee.name
+    refute_includes last_response.body, @attendee.email
+
+    sign_in_with_rack(@account)
+    get "/event_feedbacks/#{event_feedback.id}"
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, @attendee.email
+  end
+
   test 'on phones, a feedback row shows its hidden columns when opened' do
     create_attended_event
     @event.event_feedbacks.create!(account: @attendee, rating: 4, answers: [['How was it?', 'Lovely day']])

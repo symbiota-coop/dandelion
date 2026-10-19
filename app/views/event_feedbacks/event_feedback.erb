@@ -16,7 +16,7 @@
       <% if !@event_feedback.account || @event_feedback.anonymous %>
         Anonymous
       <% else %>
-        <a target="_blank" href="/u/<%= @event_feedback.account.username %>"><%= @event_feedback.account.name %> (<%= @event_feedback.account.email %>)</a>
+        <a target="_blank" href="/u/<%= @event_feedback.account.username %>"><%= @event_feedback.account.name %><% if event_email_viewer? %> (<%= @event_feedback.account.email %>)<% end %></a>
       <% end %>
     </td>
   </tr>
