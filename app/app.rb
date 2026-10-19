@@ -68,6 +68,9 @@ module Dandelion
       # XHR responses are pagelets and partials that must be fresh, and often share a URL with the full page,
       # so the browser mustn't store them (a stored partial could be shown in place of the page on back navigation)
       cache_control :no_store if request.xhr?
+      # ...and the other way round, a stored full page mustn't answer a pagelet's request for the same URL (the page
+      # loaded into its own newsfeed on back navigation), so the browser keys its cache by whether a request is XHR
+      response['Vary'] = 'X-Requested-With'
       if link_token_param
         sign_in_via_link_token
       elsif params[:sign_in_code]
