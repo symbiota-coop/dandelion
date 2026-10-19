@@ -54,7 +54,7 @@
 
 <%= partial :'events_build/drafts' %>
 
-<% if @event.errors.exists? %>
+<% if @event.errors.any? %>
   <div class="alert alert-danger">
     <ul class="mb-0">
       <% @event.errors.full_messages.each { |message| %>

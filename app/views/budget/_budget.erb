@@ -8,7 +8,7 @@
       </tr>
       <% Option.types.each { |type| %>
       <% options = @gathering.options.and(type: type).select { |option| option.optionships.exists? } %>
-      <% if options.exists? %>
+      <% if options.any? %>
         <tr>
           <td colspan="2">
             <em><%= type == 'Ticket' ? 'Tickets' : type %></em>

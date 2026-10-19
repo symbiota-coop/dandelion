@@ -33,7 +33,7 @@ module AtprotoSetup
                                   ))
           end
 
-          session[SESSION_DID_KEY] = did
+          session[SESSION_DID_KEY] = did.to_s
           endpoint = resolver.resolve_did(did).pds_endpoint
           auth_server = OmniAuth::Strategies::Atproto.get_authorization_server(endpoint)
           session['authorization_info'] = authorization_info = OmniAuth::Strategies::Atproto.get_authorization_data(auth_server)

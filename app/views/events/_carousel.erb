@@ -28,7 +28,7 @@
   })
 </script>
 <% events = events.to_a %>
-<% if events.exists? %>
+<% if events.any? %>
   <% prefetch_fragments(events.map { |event| event_block_carousel_cache_key(event) }) %>
   <div class="slick-container <% unless defined?(skip_margin) %> mt-5 <% end %> mb-lg-5" id="<%= slick_id %>">
     <% if defined? title %>

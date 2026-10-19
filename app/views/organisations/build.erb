@@ -62,7 +62,7 @@
 
   })
 </script>
-<% if @organisation.errors.exists? %>
+<% if @organisation.errors.any? %>
   <div class="alert alert-danger">
     <ul class="mb-0">
       <% @organisation.errors.full_messages.each { |message| %>

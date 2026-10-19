@@ -39,7 +39,7 @@
 
 <% if !params[:search] && !params[:event_tag_id] && !params[:page] && !params[:carousel_ids] && !params[:near] && (params[:display] == 'grid' || !params[:display]) %>
   <% @carousels = true %>
-  <% if @organisation.featured_events.exists? %>
+  <% if @organisation.featured_events.any? %>
     <div data-with-placeholder data-pagelet-url="/o/<%= @organisation.slug %>/carousels/featured?hide_featured_title=<%= params[:hide_featured_title] %>">
       <%= partial :'events/carousel_placeholder' %>
     </div>
