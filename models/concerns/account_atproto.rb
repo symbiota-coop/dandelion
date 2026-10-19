@@ -32,14 +32,15 @@ module AccountAtproto
       next unless embed['external']
 
       external = embed['external']
-      # Only require URL, image is optional
-      next unless external['uri']
+      # Only require URL, image is optional. The post's author sets both, and the AppView doesn't check their scheme,
+      # so a javascript: URL would run on our origin when the card is clicked
+      next unless HttpUrl.valid?(external['uri'])
 
       link_data = {
         'url' => external['uri'],
         'title' => external['title'] || HttpUrl.host(external['uri']),
         'description' => external['description'],
-        'image' => external['thumb'],
+        'image' => (external['thumb'] if HttpUrl.valid?(external['thumb'])),
         'hash' => post['uri'].split('/').last, # Use post URI as identifier
         'timestamp' => Time.parse(record['createdAt']).to_i * 1000 # Convert to milliseconds
       }
