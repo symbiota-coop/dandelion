@@ -17,7 +17,7 @@ gem 'dragonfly-s3_data_store'
 gem 'mongoid'
 gem 'mongoid_paranoia'
 gem 'redis'
-gem 'will_paginate', github: 'mislav/will_paginate'
+gem 'will_paginate'
 gem 'zstd-ruby'
 
 # Authentication
@@ -63,7 +63,7 @@ gem 'mailgun-ruby', require: 'mailgun'
 gem 'premailer'
 
 # Prawn (PDFs)
-gem 'prawn', github: 'prawnpdf/prawn'
+gem 'prawn'
 gem 'prawn-qrcode'
 gem 'prawn-table'
 gem 'rqrcode'
