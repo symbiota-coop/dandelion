@@ -1,18 +1,3 @@
-GIT
-  remote: https://github.com/mislav/will_paginate.git
-  revision: 50017c3eb0712e7b3a53268a81e81a184b7a49f6
-  specs:
-    will_paginate (4.0.1)
-
-GIT
-  remote: https://github.com/prawnpdf/prawn.git
-  revision: c5be930cdeed13da3f8ecfb2f939e2190ec05a20
-  specs:
-    prawn (2.5.0)
-      matrix (~> 0.4)
-      pdf-core (~> 0.10.0)
-      ttfunk (~> 1.8)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -345,6 +330,10 @@ GEM
     pdf-core (0.10.0)
     pp (0.6.4)
       prettyprint
+    prawn (2.5.0)
+      matrix (~> 0.4)
+      pdf-core (~> 0.10.0)
+      ttfunk (~> 1.8)
     prawn-qrcode (0.6.0)
       prawn (>= 1)
       rqrcode (>= 1.0.0)
@@ -485,6 +474,7 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    will_paginate (4.0.1)
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.8.3)
@@ -534,7 +524,7 @@ DEPENDENCIES
   omniauth-atproto
   omniauth-google-oauth2
   padrino
-  prawn!
+  prawn
   prawn-qrcode
   prawn-table
   premailer
@@ -560,7 +550,7 @@ DEPENDENCIES
   stripe
   timezone
   tzinfo-data
-  will_paginate!
+  will_paginate
   zstd-ruby
 
 RUBY VERSION
