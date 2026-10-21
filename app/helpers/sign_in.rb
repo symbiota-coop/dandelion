@@ -37,6 +37,11 @@ Dandelion::App.helpers do
     account.sign_ins.create(request: request, skip_increment: %w[unsubscribe give_feedback subscriptions].any? { |p| request.path.include?(p) })
     # Only a code confirms the email here: anyone the email reaches, mail scanners included, can open a link
     undone = confirm_email_of(account, same_browser: account_set_up_in_this_session?(account)) if sign_in_code && !account.email_confirmed?
+    # A link to an unconfirmed account opened in a browser that didn't set it up: on the first, sign out the rest. Not the
+    # confirmation link, which mail scanners open, and whose button signs out other browsers anyway (confirm_email_of)
+    if !sign_in_code && !account.email_confirmed? && !request.path.start_with?('/confirm_email/') && !account_set_up_in_this_session?(account)
+      account.end_sessions_for_first_email_sign_in!
+    end
     start_session!(account, verified: !sign_in_code.nil?, via_link: sign_in_code.nil?)
     @signed_in_via_email = true
     # A confirmation link keeps working, so a mail scanner opening it first doesn't use it up before the person clicks it:

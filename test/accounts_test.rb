@@ -970,6 +970,30 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal ['Google'], account.provider_links.map(&:provider)
   end
 
+  test 'the first sign in from a link elsewhere to an unconfirmed account signs out whoever signed up with its email' do
+    start_omniauth_signup(email: 'squatted@example.com')
+    post '/accounts/new', account: { name: 'Sid Squatter', email: 'squatted@example.com' }, omniauth_signup: '1'
+    account = Account.find_by(email: 'squatted@example.com')
+    get '/accounts/edit'
+    assert last_response.ok?
+
+    owner_browser = Rack::Test::Session.new(app)
+    owner_browser.get '/', link_token: account.link_token_for_email
+    refute account.reload.email_confirmed
+    get '/accounts/edit'
+    assert last_response.redirect?
+    owner_browser.get '/accounts/edit'
+    assert owner_browser.last_response.ok?
+
+    # Only the first time: another link elsewhere keeps the owner's browser
+    other_browser = Rack::Test::Session.new(app)
+    other_browser.get '/', link_token: account.reload.link_token_for_email
+    other_browser.get '/accounts/edit'
+    assert other_browser.last_response.ok?
+    owner_browser.get '/accounts/edit'
+    assert owner_browser.last_response.ok?
+  end
+
   test 'confirming the email with a code elsewhere ends the session, provider and password of whoever signed up with it' do
     victim_email = 'signed-up-by-someone-else@example.com'
     start_omniauth_signup(email: victim_email)

@@ -185,9 +185,25 @@ class Account
   # API key and calendar feed key, which integrations and calendar apps hold: only a session that entered a code sees
   # them (/accounts/api_key), and its owner can replace them there
   def revoke_sessions!
-    set(session_token: SecureRandom.uuid, legacy_sessions_revoked: true)
+    end_sessions!
     generate_link_token!
     unset(:sign_in_code_digest, :sign_in_code_nonce, :sign_in_code_expires_at)
+  end
+
+  # Changes the session token, which signs out every browser
+  def end_sessions!
+    set(session_token: SecureRandom.uuid, legacy_sessions_revoked: true)
+  end
+
+  # Whoever set up an account whose email isn't confirmed may not own the address (signing up with someone else's email,
+  # say, so their guest tickets go on it), so the first time someone signs in from a link in its email, in a browser that
+  # didn't set it up, other browsers are signed out (sign_in_from_email). Only the first time, so mail scanners opening
+  # links can't keep signing out the person who set it up. It leaves the links and code already sent, which only the
+  # email's owner has
+  def end_sessions_for_first_email_sign_in!
+    return unless Account.and(id: id, :ended_sessions_for_email_sign_in.ne => true).update_all('$set' => { ended_sessions_for_email_sign_in: true }).modified_count == 1
+
+    end_sessions!
   end
 
   def replace_api_key!

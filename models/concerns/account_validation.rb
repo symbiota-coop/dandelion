@@ -34,6 +34,7 @@ module AccountValidation
         e = EmailAddress.error(email)
         errors.add(:email, "- #{e}") if e
         self.email_confirmed = false
+        self.ended_sessions_for_email_sign_in = false # the new address's owner gets their own first sign in (Account#end_sessions_for_first_email_sign_in!)
       end
 
       %w[email phone location].each do |p|
