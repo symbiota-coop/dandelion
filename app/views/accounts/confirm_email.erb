@@ -1,6 +1,18 @@
 <div class="container">
+  <% if @confirm_email_later %>
+    <p>
+      We signed out other browsers, as this account's email address hasn't been confirmed yet.
+      If someone else might have set this account up, confirm your email address: that also replaces its password and
+      disconnects any accounts like Google that were connected before, so they can't sign back in.
+    </p>
+  <% end %>
   <p>Confirm that <strong><%= current_account.email %></strong> is your email address?</p>
   <% form_tag '/accounts/confirm_email' do %>
-    <button type="submit" class="btn btn-primary">Confirm my email address</button>
+    <div class="d-flex flex-wrap gap-2">
+      <button type="submit" class="btn btn-primary">Confirm my email address</button>
+      <% if @confirm_email_later %>
+        <a href="<%= @confirm_email_later %>" class="btn btn-secondary">Not now</a>
+      <% end %>
+    </div>
   <% end %>
 </div>

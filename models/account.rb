@@ -199,11 +199,14 @@ class Account
   # say, so their guest tickets go on it), so the first time someone signs in from a link in its email, in a browser that
   # didn't set it up, other browsers are signed out (sign_in_from_email). Only the first time, so mail scanners opening
   # links can't keep signing out the person who set it up. It leaves the links and code already sent, which only the
-  # email's owner has
+  # email's owner has. True if a browser had signed in to it (it had a session token), so there may have been someone to
+  # sign out: an account a guest purchase made, say, has never had a session
   def end_sessions_for_first_email_sign_in!
-    return unless Account.and(id: id, :ended_sessions_for_email_sign_in.ne => true).update_all('$set' => { ended_sessions_for_email_sign_in: true }).modified_count == 1
+    return false unless Account.and(id: id, :ended_sessions_for_email_sign_in.ne => true).update_all('$set' => { ended_sessions_for_email_sign_in: true }).modified_count == 1
 
+    had_sessions = session_token.present?
     end_sessions!
+    had_sessions
   end
 
   def replace_api_key!

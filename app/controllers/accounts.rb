@@ -36,8 +36,18 @@ Dandelion::App.controller do
     end
   end
 
+  # Where sign_in_from_email sends the first link sign in to an unconfirmed account in a browser that didn't set it up,
+  # which signed out other browsers
+  get '/accounts/confirm_email' do
+    sign_in_required!
+    redirect '/accounts/edit' unless session[:confirming_email] == current_account.email && !current_account.email_confirmed?
+    @confirm_email_later = session[:confirm_email_later] || '/'
+    erb :'accounts/confirm_email'
+  end
+
   post '/accounts/confirm_email' do
     sign_in_required!
+    session.delete(:confirm_email_later)
     confirming_email = session.delete(:confirming_email)
     unless confirming_email && confirming_email == current_account.email
       flash[:error] = "That confirmation link isn't valid. Please request a new one."

@@ -978,18 +978,30 @@ class AccountsTest < ActiveSupport::TestCase
     assert last_response.ok?
 
     owner_browser = Rack::Test::Session.new(app)
-    owner_browser.get '/', link_token: account.link_token_for_email
+    owner_browser.get "/e/some-event?link_token=#{account.link_token_for_email}&ref=email"
+    assert_equal '/accounts/confirm_email', URI(owner_browser.last_response.location).path
     refute account.reload.email_confirmed
     get '/accounts/edit'
     assert last_response.redirect?
+    owner_browser.get '/accounts/confirm_email'
+    assert_includes owner_browser.last_response.body, 'We signed out other browsers'
+    assert_includes owner_browser.last_response.body, 'href="/e/some-event?ref=email"'
+
+    # Only the first time: another link elsewhere keeps the owner's browser, and doesn't ask
+    other_browser = Rack::Test::Session.new(app)
+    other_browser.get '/', link_token: account.reload.link_token_for_email
+    assert other_browser.last_response.ok?
+    other_browser.get '/accounts/confirm_email'
+    assert_equal '/accounts/edit', URI(other_browser.last_response.location).path
     owner_browser.get '/accounts/edit'
     assert owner_browser.last_response.ok?
 
-    # Only the first time: another link elsewhere keeps the owner's browser
-    other_browser = Rack::Test::Session.new(app)
-    other_browser.get '/', link_token: account.reload.link_token_for_email
-    other_browser.get '/accounts/edit'
-    assert other_browser.last_response.ok?
+    # Confirming replaces the password and providers whoever signed up could sign back in with
+    crypted_password = account.reload.crypted_password
+    owner_browser.post '/accounts/confirm_email'
+    assert account.reload.email_confirmed
+    refute_equal crypted_password, account.crypted_password
+    assert_empty account.provider_links
     owner_browser.get '/accounts/edit'
     assert owner_browser.last_response.ok?
   end

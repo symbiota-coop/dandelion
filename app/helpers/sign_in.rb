@@ -40,7 +40,7 @@ Dandelion::App.helpers do
     # A link to an unconfirmed account opened in a browser that didn't set it up: on the first, sign out the rest. Not the
     # confirmation link, which mail scanners open, and whose button signs out other browsers anyway (confirm_email_of)
     if !sign_in_code && !account.email_confirmed? && !request.path.start_with?('/confirm_email/') && !account_set_up_in_this_session?(account)
-      account.end_sessions_for_first_email_sign_in!
+      signed_out_others = account.end_sessions_for_first_email_sign_in!
     end
     start_session!(account, verified: !sign_in_code.nil?, via_link: sign_in_code.nil?)
     @signed_in_via_email = true
@@ -49,6 +49,14 @@ Dandelion::App.helpers do
     account.generate_link_token! unless request.path.start_with?('/confirm_email/')
     account.send_activation_notification if account.sign_ins_count == 1
     notice = [sign_in_code ? 'Signed in with a sign in code' : 'Signed in via a link', undone].compact.join('. ')
+    # Whoever signed up can still sign back in with their password or providers until the email is confirmed, which
+    # replaces them (confirm_email_of), so ask now. The session vouches for the link, as at /confirm_email/:link_token
+    if signed_out_others && request.get? && !request.xhr?
+      session[:confirming_email] = account.email
+      session[:confirm_email_later] = (sign_in_landing_path? && session.delete(:return_to)) || path_without_link_token
+      flash[:notice] = notice
+      redirect '/accounts/confirm_email'
+    end
     if sign_in_landing_path? && (return_to = session.delete(:return_to))
       flash[:notice] = notice if undone
       redirect return_to
@@ -142,6 +150,12 @@ Dandelion::App.helpers do
   # Links in emails sent before the rename, and in emails organisers have saved, say sign_in_token
   def link_token_param
     params[:link_token] || params[:sign_in_token]
+  end
+
+  # This request's path and query, less the link token that signed it in
+  def path_without_link_token
+    query = Rack::Utils.build_query(Rack::Utils.parse_query(request.query_string).except('link_token', 'sign_in_token'))
+    query.empty? ? request.path : "#{request.path}?#{query}"
   end
 
   def sign_in_landing_path?
