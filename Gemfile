@@ -1,6 +1,6 @@
 source 'https://rubygems.org', cooldown: 7
 
-ruby '4.0.7'
+ruby '4.0.9'
 gem 'activesupport'
 gem 'irb', require: false
 gem 'padrino'

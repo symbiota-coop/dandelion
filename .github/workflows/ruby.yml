@@ -23,7 +23,7 @@ jobs:
     - name: Install Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 4.0.7
+        ruby-version: 4.0.9
         bundler-cache: true
 
     # RuboCop's results from earlier runs, so it only checks files that changed. A new Gemfile.lock, config or cop starts
@@ -109,7 +109,7 @@ jobs:
     - name: Install Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 4.0.7
+        ruby-version: 4.0.9
         bundler-cache: true
 
     - name: Load env from .env.test.example
