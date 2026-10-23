@@ -32,7 +32,17 @@ Dragonfly.app.configure do
       end
     else
       begin
-        dj = DragonflyJob.create(uid: job.store, signature: job.signature)
+        uid = job.store
+        dj = begin
+          DragonflyJob.create(uid: uid, signature: job.signature)
+        rescue Mongo::Error::OperationFailure => e
+          # Another process (a page view, or warm_image_derivatives in the worker) stored the same derivative first:
+          # use theirs and drop our copy
+          raise unless e.code == 11_000 && (existing = DragonflyJob.find_by(signature: job.signature))
+
+          app.datastore.destroy(uid)
+          existing
+        end
         app.datastore.url_for(dj.uid)
       rescue Dragonfly::Job::Fetch::NotFound
         raise if Padrino.env != :development
