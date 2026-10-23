@@ -82,7 +82,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'event order and ticket tools require authentication' do
-    %w[get_event_orders_tool get_event_tickets_tool get_organisation_events_tool get_organisation_followers_tool].each do |name|
+    %w[get_event_orders_tool get_event_tickets_tool get_organisation_events_tool get_organisation_followers_tool get_organisation_orders_tool].each do |name|
       rpc = mcp_tool_call(name, arguments: { slug: 'example' })
 
       assert_equal 200, last_response.status
@@ -201,12 +201,69 @@ class McpTest < ActiveSupport::TestCase
     assert_equal follower.email, match['email']
   end
 
+  test 'organisation admin can list orders across all events, including cohosted ones' do
+    create_event_with_order_and_ticket
+    create_event(prices: [0], as: :event2)
+    later_order = @event2.orders.create!(account: @attendee, currency: @event2.currency, value: 0, payment_completed: true, original_description: 'MCP second event order', opt_in_organisation: true)
+    @event2.orders.create!(account: @attendee, currency: @event2.currency, value: 0, payment_completed: false, original_description: 'MCP incomplete order')
+    other_organisation = FactoryBot.create(:organisation, account: FactoryBot.create(:account))
+    cohosted_event = FactoryBot.create(:event, organisation: other_organisation, prices: [0])
+    cohosted_event.cohostships.create!(organisation: @organisation)
+    cohosted_order = cohosted_event.orders.create!(account: @attendee, currency: cohosted_event.currency, value: 0, payment_completed: true, original_description: 'MCP cohosted order')
+    other_order = FactoryBot.create(:event, organisation: other_organisation, prices: [0]).orders.create!(account: @attendee, currency: 'GBP', value: 0, payment_completed: true, original_description: 'MCP other organisation order')
+    headers = { 'Authorization' => "Bearer #{@account.api_key}" }
+
+    rpc = mcp_tool_call('get_organisation_orders_tool', arguments: { slug: @organisation.slug }, headers: headers)
+    orders = JSON.parse(tool_text(rpc))
+
+    assert_equal 200, last_response.status
+    refute rpc.dig('result', 'isError')
+    order_ids = orders.map { |row| row['id'] }
+    assert_equal [cohosted_order.id.to_s, later_order.id.to_s, @order.id.to_s], order_ids
+    refute_includes order_ids, other_order.id.to_s
+    second = orders.find { |row| row['id'] == later_order.id.to_s }
+    assert_equal @event2.id.to_s, second['event_id']
+    assert_equal @event2.name, second['event_name']
+    assert_equal "#{ENV['BASE_URI']}/e/#{@event2.slug}", second['event_url']
+    assert_equal @attendee.email, second['email']
+    assert second['opt_in_organisation']
+  end
+
+  test 'organisation orders put an order that completes later above newer orders' do
+    create_event_with_order_and_ticket
+    pending_order = @event.orders.create!(account: @attendee, currency: @event.currency, value: 10, payment_completed: false, original_description: 'MCP late payment')
+    newer_order = @event.orders.create!(account: @attendee, currency: @event.currency, value: 0, payment_completed: true, original_description: 'MCP newer order')
+    assert_nil pending_order.completed_at
+    pending_order.payment_completed!
+    headers = { 'Authorization' => "Bearer #{@account.api_key}" }
+
+    orders = JSON.parse(tool_text(mcp_tool_call('get_organisation_orders_tool', arguments: { slug: @organisation.slug }, headers: headers)))
+
+    assert_equal([pending_order.id.to_s, newer_order.id.to_s, @order.id.to_s], orders.map { |row| row['id'] })
+    assert orders.first['completed_at']
+  end
+
+  test 'organisation orders list orders without completed_at last, newest first' do
+    create_event_with_order_and_ticket
+    yesterday_order = @event.orders.create!(account: @attendee, currency: @event.currency, value: 0, payment_completed: true, original_description: 'MCP older order')
+    [@order, yesterday_order].each { |order| order.unset(:completed_at) }
+    @order.set(created_at: 2.days.ago)
+    yesterday_order.set(created_at: 1.day.ago)
+    newer_order = @event.orders.create!(account: @attendee, currency: @event.currency, value: 0, payment_completed: true, original_description: 'MCP newer order')
+    headers = { 'Authorization' => "Bearer #{@account.api_key}" }
+
+    orders = JSON.parse(tool_text(mcp_tool_call('get_organisation_orders_tool', arguments: { slug: @organisation.slug }, headers: headers)))
+
+    assert_equal([newer_order.id.to_s, yesterday_order.id.to_s, @order.id.to_s], orders.map { |row| row['id'] })
+    assert_nil orders.last['completed_at']
+  end
+
   test 'non-admin cannot query organisation events or followers' do
     create_event_with_order_and_ticket
     stranger = FactoryBot.create(:account)
     headers = { 'Authorization' => "Bearer #{stranger.api_key}" }
 
-    %w[get_organisation_events_tool get_organisation_followers_tool].each do |name|
+    %w[get_organisation_events_tool get_organisation_followers_tool get_organisation_orders_tool].each do |name|
       rpc = mcp_tool_call(name, arguments: { slug: @organisation.slug }, headers: headers)
 
       assert_equal 200, last_response.status

@@ -11,6 +11,7 @@ The [Dandelion Zapier integration](https://zapier.com/apps/dandelion/) lets you 
 | Trigger | Description | Endpoint |
 |---------|-------------|----------|
 | Order Confirmed | Triggers when someone purchases tickets to your event | `/z/organisation_event_orders` |
+| Order Confirmed (Organisation) | Triggers when someone purchases tickets to any event your organisation hosts or cohosts, including events created later | `/z/organisation_orders` |
 | Ticket Confirmed | Triggers when a ticket is issued for your event | `/z/organisation_event_tickets` |
 | New Follower | Triggers when someone follows your organisation | `/z/organisation_followers` |
 
@@ -32,6 +33,7 @@ Authenticated tools, which require your API key as a Bearer token:
 - Get the signed-in account
 - Get all events hosted or cohosted by an organisation you admin
 - Get organisation followers from the last 24 hours
+- Get the latest completed orders across all events of an organisation you admin
 - Get all completed orders for an event you admin
 - Get all completed tickets for an event you admin
 
@@ -110,6 +112,13 @@ Returns new followers from the last 24 hours, most recent first.
 ]
 ```
 
+## Organisation orders
+
+Returns the 100 most recently completed orders across all events hosted or cohosted by an organisation you admin, most recently completed first (so an order whose payment confirms later still appears), in the same format as [event orders](#event-orders). Use it to send every booking to another app with one Zap, rather than one per event.
+
+- Zapier: `GET /z/organisation_orders` with organisation `slug` or `id` (`organisation_slug` / `organisation_id` also work)
+- MCP: `get_organisation_orders_tool` with organisation `slug` or `id`
+
 ## Event orders
 
 Returns all completed orders for an event you admin, most recent first.
@@ -132,12 +141,18 @@ Returns all completed orders for an event you admin, most recent first.
     "hear_about": "Social media",
     "via": "instagram-ad",
     "answers": [["Dietary requirements?", "Vegan"]],
+    "event_id": "507f1f77bcf86cd799439012",
+    "event_name": "Summer Workshop",
+    "event_slug": "summer-workshop",
+    "event_url": "https://dandelion.events/e/summer-workshop",
+    "event_start_time": "2024-06-15T14:00:00Z",
+    "completed_at": "2024-01-15T14:25:00Z",
     "created_at": "2024-01-15T14:22:00Z"
   }
 ]
 ```
 
-`email` may be empty depending on event privacy settings.
+`opt_in_organisation` is true when the buyer agreed to receive the organisation's emails. `completed_at` is null for orders completed before October 2026. `email` may be empty depending on event privacy settings.
 
 ## Event tickets
 

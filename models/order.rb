@@ -31,7 +31,7 @@ class Order
   has_many :notifications, as: :notifiable, dependent: :destroy
 
   def self.protected_attributes
-    %w[payment_completed completing_at token]
+    %w[payment_completed completing_at completed_at token]
   end
 
   before_validation do
@@ -126,6 +126,12 @@ class Order
       hear_about: hear_about,
       via: via,
       answers: answers,
+      event_id: event_id&.to_s,
+      event_name: event&.name,
+      event_slug: event&.slug,
+      event_url: event ? "#{ENV['BASE_URI']}/e/#{event.slug}" : nil,
+      event_start_time: event&.start_time&.iso8601,
+      completed_at: completed_at&.iso8601,
       created_at: created_at.iso8601
     }
   end
@@ -147,7 +153,7 @@ class Order
   end
 
   def payment_completed!
-    set(payment_completed: true)
+    set(payment_completed: true, completed_at: Time.now)
     tickets.update_all(payment_completed: true)
     donations.update_all(payment_completed: true)
     tickets.each(&:payment_completed!)

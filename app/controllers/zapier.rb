@@ -16,6 +16,12 @@ Dandelion::App.controller do
     @organisation.recent_followers.map(&:api_hash).to_json
   end
 
+  get '/z/organisation_orders', provides: :json do
+    @organisation = organisation_from_params || not_found
+    organisation_admins_only!
+    @organisation.admin_orders.map { |order| order.api_hash(current_account) }.to_json
+  end
+
   get '/z/organisation_event_orders', provides: :json do
     @event = event_from_params || not_found
     event_admins_only!

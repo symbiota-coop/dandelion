@@ -25,11 +25,15 @@ module OrderFields
     field :transferred, type: Mongoid::Boolean
     field :restored, type: Mongoid::Boolean
     field :completing_at, type: Time
+    field :completed_at, type: Time
 
     field :donation_via_modal, type: Mongoid::Boolean
 
     before_validation do
       self.answers = nil unless answers&.any? { |_q, a| a.present? }
+      # Orders created complete (free ones) are completed now; the rest are stamped by payment_completed!. Only new
+      # orders, so saving an older order doesn't make it look newly completed
+      self.completed_at ||= Time.now if new_record? && payment_completed
     end
   end
 

@@ -151,6 +151,14 @@ class Organisation
     events_including_cohosted.without_heavy_fields.order('start_time desc')
   end
 
+  # The latest completed orders for every event the organisation hosts or cohosts, for Zapier's organisation-wide
+  # Order Confirmed trigger, so new events need no new Zap. Ordered by when they completed rather than were created, so
+  # an order whose payment confirms days later (GoCardless) still reaches the top of the feed; orders from before
+  # completed_at existed sort last, newest first, so the same ones fill the end of the feed on every poll
+  def admin_orders(limit: 100)
+    Order.complete.and(:event_id.in => events_including_cohosted.hinted(Event::HOSTS_INDEX).pluck(:id)).includes(:account, :event).order(completed_at: :desc, created_at: :desc).limit(limit)
+  end
+
   def recent_followers
     organisationships.only(:account_id, :created_at).includes(:account).and(:created_at.gte => 1.day.ago).order('created_at desc')
   end

@@ -170,6 +170,12 @@ module Dandelion
       end
     end
 
+    def self.perform_get_organisation_orders(server_context: nil, slug: nil, id: nil)
+      with_organisation_admin(server_context, slug: slug, id: id) do |account, organisation|
+        tool_json(organisation.admin_orders.map { |order| order.api_hash(account) })
+      end
+    end
+
     def self.perform_get_event_orders(server_context: nil, slug: nil, id: nil)
       with_event_admin(server_context, slug: slug, id: id) do |account, event|
         tool_json(event.admin_orders.map { |order| order.api_hash(account) })
@@ -315,6 +321,20 @@ module Dandelion
           end
         end,
         Class.new(::MCP::Tool) do
+          tool_name 'get_organisation_orders_tool'
+          title 'Get Organisation Orders'
+          description 'Get the 100 most recently completed orders across all events hosted or cohosted by an organisation you admin, by slug or ID. Requires a Bearer API key.'
+          input_schema(properties: {
+                         slug: { type: 'string', description: 'Organisation slug' },
+                         id: { type: 'string', description: 'Organisation ID' }
+                       })
+          annotations(read_only_hint: true, destructive_hint: false)
+
+          define_singleton_method(:call) do |slug: nil, id: nil, server_context: {}|
+            Dandelion::MCP.perform_get_organisation_orders(server_context: server_context, slug: slug, id: id)
+          end
+        end,
+        Class.new(::MCP::Tool) do
           tool_name 'get_event_orders_tool'
           title 'Get Event Orders'
           description 'Get all completed orders for a Dandelion event you admin, by slug or ID. Requires a Bearer API key.'
@@ -351,7 +371,7 @@ module Dandelion
           name: 'dandelion',
           title: 'Dandelion',
           version: '1.0.0',
-          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings. Authenticated tools such as get_me_tool, get_organisation_events_tool, get_organisation_followers_tool, get_event_orders_tool and get_event_tickets_tool require a Bearer API key.',
+          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings. Authenticated tools such as get_me_tool, get_organisation_events_tool, get_organisation_followers_tool, get_organisation_orders_tool, get_event_orders_tool and get_event_tickets_tool require a Bearer API key.',
           tools: tools
         )
         def s.server_context
