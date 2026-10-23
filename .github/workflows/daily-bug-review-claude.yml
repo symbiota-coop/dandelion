@@ -19,9 +19,10 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Load models
         run: grep -E "^[A-Z_]+=" .github/models.env >> "$GITHUB_ENV"
@@ -39,7 +40,7 @@ jobs:
           git_log_cmd: ${{ steps.setup.outputs.git_log_cmd }}
           review_window: ${{ steps.setup.outputs.review_window }}
 
-      - uses: anthropics/claude-code-action@v1
+      - uses: anthropics/claude-code-action@1d6de8cb0c237e7c15e9e1bdf973826ebae490cc # v1.0.248
         if: steps.setup.outputs.has_commits == 'true'
         with:
           show_full_output: true

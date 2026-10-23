@@ -1,0 +1,11 @@
+# zizmor's settings (script/lint runs it on .github)
+rules:
+  # Asks for GitHub's $/ syntax for this repository's own actions, rather than ./. Both run the checked-out copy of
+  # .github/actions, and our workflows only check out this repository's own branches
+  self-repository:
+    disable: true
+  # The bug reviews install their agent's CLI unpinned, so each run gets a CLI that knows the models in models.env
+  adhoc-packages:
+    ignore:
+      - daily-bug-review-codex.yml
+      - daily-bug-review-opencode.yml

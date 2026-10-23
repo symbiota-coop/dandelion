@@ -10,7 +10,7 @@ SUDO=""
 
 export DEBIAN_FRONTEND=noninteractive
 $SUDO apt-get update -qq
-# xz-utils: node.sh's Node tarball is .tar.xz
+# xz-utils: node.sh's Node tarball is .tar.xz. python3-pip: zizmor.sh installs zizmor with pip
 $SUDO apt-get install -y --no-install-recommends \
   autoconf \
   automake \
@@ -28,6 +28,7 @@ $SUDO apt-get install -y --no-install-recommends \
   libyaml-dev \
   libzstd-dev \
   pkg-config \
+  python3-pip \
   sudo \
   tzdata \
   xz-utils \

@@ -46,6 +46,11 @@ else
   done
 fi
 
+# zizmor, the GitHub Actions linter. A linter too, so a failure warns
+if ! bash script/agent-env/zizmor.sh; then
+  echo "WARNING: zizmor isn't installed: run script/agent-env/zizmor.sh" >&2
+fi
+
 # The pre-commit hook, which lints staged files with script/lint
 git config core.hooksPath .githooks
 
