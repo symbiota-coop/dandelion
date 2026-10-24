@@ -1,6 +1,6 @@
 module Asn
   BASELINE_ASN = 2856
-  MIN_BASELINE_PER_HOUR = 100
+  MIN_BASELINE_PER_HOUR = 250
   DETECTION_CONFIGS = [
     { window_length: 1, threshold: 3.0 },
     { window_length: 3, threshold: 1.5 }
