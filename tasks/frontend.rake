@@ -28,7 +28,7 @@ namespace :frontend do
         package, version = match.captures
         released = release_times[package][version] or raise "#{package}@#{version}: not on the npm registry"
         age = Time.now - Time.parse(released)
-        # AGENTS.md's one exception: a release that fixes a security advisory affecting us, named exactly
+        # AGENTS.md's one exception: a release that fixes an important security advisory affecting us, named exactly
         # (COOLDOWN_EXCEPTION=dompurify@3.4.17) once its diff has been read
         if age < 7 * 86_400 && ENV['COOLDOWN_EXCEPTION'] != "#{package}@#{version}"
           raise "#{package}@#{version}: released #{format("%.1f", age / 86_400)} days ago, under the 7-day cooldown"

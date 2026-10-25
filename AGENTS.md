@@ -191,7 +191,7 @@ The design guide (`/design`, `app/views/design.erb`) shows the colours, type, sp
 
 Cooldown: never use a gem or JS package version released less than 7 days ago. This guards against supply-chain attacks on freshly published versions. If a version that was just released can't be found, that's why: wait until it's a week old rather than removing or shortening the cooldown.
 
-The one exception is a release that fixes a security advisory affecting us (we use the vulnerable code, and waiting a week would leave it exploitable). Only a person decides that an advisory qualifies: an agent proposes it and doesn't make the bump on its own. Read the release's diff against the version we're on first (`npm diff --diff=<package>@<old> --diff=<package>@<new>` for npm packages; for gems, `gem fetch` both versions and diff them unpacked) for anything beyond the fix, then bump just that package to just that version, and name the advisory in the commit message:
+The one exception is a release that fixes an important security advisory affecting us (rated high or critical, in code we use, so waiting a week would leave us exploitable). Agents may make this bump themselves, as people may, and say they did in their reply. Read the release's diff against the version we're on first (`npm diff --diff=<package>@<old> --diff=<package>@<new>` for npm packages; for gems, `gem fetch` both versions and diff them unpacked) for anything beyond the fix, then bump just that package to just that version, and name the advisory in the commit message:
 
 - Gems: `bundle update <gem> --conservative --cooldown 0`, which leaves its dependencies where they are
 - CDN packages: set the version in `frontend/package.json`, then `COOLDOWN_EXCEPTION=<package>@<version> rake frontend:integrity`
