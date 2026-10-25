@@ -191,6 +191,12 @@ The design guide (`/design`, `app/views/design.erb`) shows the colours, type, sp
 
 Cooldown: never use a gem or JS package version released less than 7 days ago. This guards against supply-chain attacks on freshly published versions. If a version that was just released can't be found, that's why: wait until it's a week old rather than removing or shortening the cooldown.
 
+The one exception is a release that fixes a security advisory affecting us (we use the vulnerable code, and waiting a week would leave it exploitable). Only a person decides that an advisory qualifies: an agent proposes it and doesn't make the bump on its own. Read the release's diff against the version we're on first (`npm diff --diff=<package>@<old> --diff=<package>@<new>` for npm packages; for gems, `gem fetch` both versions and diff them unpacked) for anything beyond the fix, then bump just that package to just that version, and name the advisory in the commit message:
+
+- Gems: `bundle update <gem> --conservative --cooldown 0`, which leaves its dependencies where they are
+- CDN packages: set the version in `frontend/package.json`, then `COOLDOWN_EXCEPTION=<package>@<version> rake frontend:integrity`
+- Linters: `npm install --save-exact <package>@<version>`, without `--before`
+
 Weekly bumps: every Monday `.github/workflows/dependency-bumps.yml` opens (or updates) one pull request, on the `dependency-bumps` branch, moving the gems (`bundle update --all --minor --strict`), the linters and the CDN packages (`rake dependencies:bump_npm`, which also refreshes `package-lock.json` and runs `rake frontend:integrity`) to their newest minor or patch release out of the cooldown, with `rake dependencies:changes` listing what moved. New major versions, `ckeditor/` and the versions in rake tasks are still bumped by hand. It needs a `DEPENDENCY_BUMPS_TOKEN` secret (contents and pull requests write), as CI doesn't run on a pull request opened with the default token. `lib/package_versions.rb` decides which versions are out of the cooldown, for these tasks and `/stats/packages`
 
 - Gems: the Gemfile's source has `cooldown: 7`, so Bundler enforces it

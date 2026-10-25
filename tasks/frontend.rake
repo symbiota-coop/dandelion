@@ -1,5 +1,5 @@
 namespace :frontend do
-  desc 'Hash each CDN file that has no hash yet into frontend/integrity.json, for the integrity attributes cdn_tag writes, and drop those nothing loads'
+  desc 'Hash each CDN file that has no hash yet into frontend/integrity.json, for the integrity attributes cdn_tag writes, and drop those nothing loads (COOLDOWN_EXCEPTION=package@version lets a security fix under the cooldown through)'
   task :integrity do
     require 'faraday'
     require 'digest'
@@ -28,7 +28,11 @@ namespace :frontend do
         package, version = match.captures
         released = release_times[package][version] or raise "#{package}@#{version}: not on the npm registry"
         age = Time.now - Time.parse(released)
-        raise "#{package}@#{version}: released #{format("%.1f", age / 86_400)} days ago, under the 7-day cooldown" if age < 7 * 86_400
+        # AGENTS.md's one exception: a release that fixes a security advisory affecting us, named exactly
+        # (COOLDOWN_EXCEPTION=dompurify@3.4.17) once its diff has been read
+        if age < 7 * 86_400 && ENV['COOLDOWN_EXCEPTION'] != "#{package}@#{version}"
+          raise "#{package}@#{version}: released #{format("%.1f", age / 86_400)} days ago, under the 7-day cooldown"
+        end
       end
 
       response = Faraday.get(url)
