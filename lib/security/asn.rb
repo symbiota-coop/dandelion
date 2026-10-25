@@ -128,7 +128,10 @@ module Asn
     windows = []
     tz = TZInfo::Timezone.get(TIMEZONE)
     now = tz.to_local(Time.now.utc)
-    window_start = tz.local_time(now.year, now.month, now.day, (now.hour / window_length) * window_length) - (hours * 3600)
+    # When clocks go back the hour repeats, so take the occurrence now is in
+    window_start = tz.local_time(now.year, now.month, now.day, (now.hour / window_length) * window_length) do |periods|
+      periods.find { |p| p.observed_utc_offset == now.utc_offset } || periods.first
+    end - (hours * 3600)
     while window_start < now
       window_end = window_start + (window_length * 3600)
 
