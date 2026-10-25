@@ -45,6 +45,6 @@ Dandelion::App.controller do
   end
 
   get '/map/home' do
-    partial :'maps/map', locals: { url: '/events', fill_screen: true }
+    partial :'maps/map', locals: { url: '/events', fill_screen: true, start_on_interaction: false }
   end
 end

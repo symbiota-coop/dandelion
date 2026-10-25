@@ -1,7 +1,7 @@
-<%# The View as switcher beside a list's Sort by: joined buttons, the chosen one tinted (.segmented, as the All / Mine switch). The labels say what each is, so it has no visible label of its own. Below 992px it's icons only, with tooltips (app.js skips them from 992px, where the labels show) %>
+<%# The View as switcher beside a list's Sort by: joined buttons, the chosen one tinted (.segmented, as the All / Mine switch). The labels say what each is, so it has no visible label of its own. Below 992px it's icons only, with tooltips (app.js skips them from 992px, where the labels show). Crawlers aren't to follow the Map view, as Google bills each map load %>
 <div class="btn-group segmented" role="group" aria-label="View as">
   <% view_options.each do |opt| %>
-    <a data-bs-toggle="tooltip" title="<%= opt[:label] %> view" aria-label="<%= opt[:label] %> view" class="btn btn-outline-primary text-nowrap <%= 'active' if opt[:active] %>" href="<%= view_url(opt[:key], path: (path if defined?(path))) %>">
+    <a data-bs-toggle="tooltip" title="<%= opt[:label] %> view" aria-label="<%= opt[:label] %> view" class="btn btn-outline-primary text-nowrap <%= 'active' if opt[:active] %>" href="<%= view_url(opt[:key], path: (path if defined?(path))) %>"<% if opt[:key] == 'map' %> rel="nofollow"<% end %>>
       <i class="bi <%= opt[:icon] %>"></i> <span class="d-none d-lg-inline"><%= opt[:label] %></span>
     </a>
   <% end %>

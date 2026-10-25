@@ -12,3 +12,5 @@ Disallow: /accounts/delete
 Disallow: /accounts/unsubscribe
 Disallow: /z
 Disallow: /mcp
+# Map views load Google Maps, which bills each load
+Disallow: /*display=map

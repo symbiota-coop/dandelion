@@ -920,4 +920,18 @@ class EventsTest < ActiveSupport::TestCase
     end
     assert_equal 1920, event.reload.image_width_unmagic
   end
+
+  test 'signed-out visitors start the events map by interacting with the page' do
+    visit '/events'
+    assert page.has_css?('a[rel=nofollow][aria-label="Map view"]')
+    visit '/events?display=map'
+    assert page.has_css?('#map-start', text: 'Loading map')
+    assert page.has_no_css?('#map-canvas', visible: true)
+    # Stands in for Google Maps, which bills each map load
+    execute_script 'DandelionMap.initializeMap = function () { window.mapStarted = true }'
+    find('#map-start').hover
+    assert page.has_css?('#map-canvas', visible: true)
+    assert page.has_no_css?('#map-start')
+    assert evaluate_script('window.mapStarted')
+  end
 end
