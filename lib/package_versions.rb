@@ -2,7 +2,9 @@ require 'json'
 require 'time'
 
 # Which versions of a gem or npm package we can move to, under AGENTS.md's Dependencies: never a version released less
-# than 7 days ago. /stats/packages shows them, and rake dependencies:bump_npm moves to them
+# than COOLDOWN_DAYS ago. /stats/packages shows them, rake dependencies:bump_npm moves to them, rake frontend:integrity
+# refuses newer ones, and the npm installs in rake tasks keep to them. The Gemfile's cooldown is the same number
+# (test_gemfile_cooldown_matches)
 module PackageVersions
   COOLDOWN_DAYS = 7
 
@@ -10,9 +12,34 @@ module PackageVersions
   # packages the app loads from jsDelivr (frontend/package.json)
   NPM_MANIFESTS = { 'package.json' => 'devDependencies', 'frontend/package.json' => 'dependencies' }.freeze
 
+  # When the cooldown starts: a version released after this is too new
+  def self.cooldown_start(now = Time.now)
+    now - (COOLDOWN_DAYS * 86_400)
+  end
+
+  # The date for npm install --before, so the packages it installs and their dependencies keep to the cooldown
+  def self.npm_before
+    cooldown_start.strftime('%F')
+  end
+
   # Of a package's releases ({ version => release time }), those out of the cooldown: the ones we can upgrade to
   def self.outside_cooldown(releases, now: Time.now)
-    releases.select { |_, released_at| released_at && released_at <= now - (COOLDOWN_DAYS * 86_400) }
+    releases.select { |_, released_at| released_at && released_at <= cooldown_start(now) }
+  end
+
+  # An npm package's registry document, with its versions and when each was released
+  def self.npm_document(package)
+    require 'faraday'
+    response = Faraday.get("https://registry.npmjs.org/#{package.gsub('/', '%2F')}")
+    raise "#{package}: npm registry #{response.status}" unless response.status == 200
+
+    JSON.parse(response.body)
+  end
+
+  # Whether jsDelivr minified a CDN file itself (a .min file the package doesn't have), as its output can change, so
+  # we load the package's own file instead
+  def self.jsdelivr_minified?(body)
+    body[0, 500].include?('Minified by jsDelivr')
   end
 
   # An npm package's stable releases ({ version => release time }), from its npm registry document

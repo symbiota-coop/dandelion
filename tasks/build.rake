@@ -1,10 +1,10 @@
 # Tasks that build the vendored files in app/assets (AGENTS.md, Build/vendored code). Each needs Node, and a built file
 # changes only with its source, which script/lint checks
+require_relative '../lib/package_versions'
 
 namespace :bootstrap do
   desc 'Compile app/assets/stylesheets/bootstrap5.scss to bootstrap5.css and copy in bootstrap.bundle.min.js (needs Node)'
   task :build do
-    require 'date'
     require 'tmpdir'
 
     stylesheets_dir = File.expand_path('../app/assets/stylesheets', __dir__)
@@ -12,9 +12,9 @@ namespace :bootstrap do
     abort 'rake bootstrap:build needs Node (npm)' unless system('npm --version', out: File::NULL)
 
     Dir.mktmpdir do |dir|
-      # --before keeps to package versions published at least 7 days ago, like the Gemfile's cooldown
+      # --before keeps to package versions out of the cooldown (AGENTS.md's Dependencies)
       puts 'Installing Bootstrap 5.3.8 and Dart Sass...'
-      system('npm', 'install', '--prefix', dir, '--no-save', '--silent', "--before=#{(Date.today - 7).iso8601}", 'bootstrap@5.3.8', 'sass@1.105.0', exception: true)
+      system('npm', 'install', '--prefix', dir, '--no-save', '--silent', "--before=#{PackageVersions.npm_before}", 'bootstrap@5.3.8', 'sass@1.105.0', exception: true)
 
       puts 'Compiling bootstrap5.scss...'
       css_file = File.join(dir, 'bootstrap5.css')
@@ -84,16 +84,15 @@ namespace :jquery_ui do
       'jquery-ui-interactions.min.js' => %w[data scroll-parent plugin widgets/mouse widgets/sortable widgets/draggable widgets/droppable]
     }.freeze
 
-    require 'date'
     require 'tmpdir'
 
     javascripts_dir = File.expand_path('../app/assets/javascripts/ext', __dir__)
     abort 'rake jquery_ui:build needs Node (npm)' unless system('npm --version', out: File::NULL)
 
     Dir.mktmpdir do |dir|
-      # --before keeps to package versions published at least 7 days ago, like the Gemfile's cooldown
+      # --before keeps to package versions out of the cooldown (AGENTS.md's Dependencies)
       puts 'Installing jQuery UI 1.14.2 and Terser...'
-      system('npm', 'install', '--prefix', dir, '--no-save', '--silent', "--before=#{(Date.today - 7).iso8601}", 'jquery-ui@1.14.2', 'terser@5.51.2', exception: true)
+      system('npm', 'install', '--prefix', dir, '--no-save', '--silent', "--before=#{PackageVersions.npm_before}", 'jquery-ui@1.14.2', 'terser@5.51.2', exception: true)
 
       builds.each do |file, modules|
         sources = modules.map { |m| File.join(dir, 'node_modules', 'jquery-ui', 'ui', "#{m}.js") }

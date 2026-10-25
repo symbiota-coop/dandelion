@@ -1,3 +1,5 @@
+require_relative '../lib/package_versions'
+
 namespace :frontend do
   desc 'Hash each CDN file that has no hash yet into frontend/integrity.json, for the integrity attributes cdn_tag writes, and drop those nothing loads (COOLDOWN_EXCEPTION=package@version lets a security fix under the cooldown through)'
   task :integrity do
@@ -11,34 +13,29 @@ namespace :frontend do
     existing = File.exist?(path) ? JSON.parse(File.read(path)) : {}
 
     # When each version of a package was published, from the npm registry, fetched once per package
-    release_times = Hash.new do |h, package|
-      response = Faraday.get("https://registry.npmjs.org/#{package}")
-      raise "#{package}: npm registry #{response.status}" unless response.status == 200
-
-      h[package] = JSON.parse(response.body)['time']
-    end
+    release_times = Hash.new { |h, package| h[package] = PackageVersions.npm_document(package)['time'] }
 
     # A file that already has a hash keeps it, so a file that's changed on the CDN since is refused rather than trusted
     hashes = FRONTEND_CDN_URLS.call(root).uniq.sort.to_h do |url|
       next [url, existing[url]] if existing[url]
 
-      # AGENTS.md's cooldown: hashing a version pins whatever it is, so refuse one released less than 7 days ago, giving a
+      # AGENTS.md's cooldown: hashing a version pins whatever it is, so refuse one still in its cooldown, giving a
       # compromised release time to be found and pulled first. Only npm packages' files have a release date to check
       if (match = url.match(%r{\Ahttps://cdn\.jsdelivr\.net/npm/((?:@[^/]+/)?[^@/]+)@([^/]+)/}))
         package, version = match.captures
         released = release_times[package][version] or raise "#{package}@#{version}: not on the npm registry"
-        age = Time.now - Time.parse(released)
         # AGENTS.md's one exception: a release that fixes an important security advisory affecting us, named exactly
         # (COOLDOWN_EXCEPTION=dompurify@3.4.17) once its diff has been read
-        if age < 7 * 86_400 && ENV['COOLDOWN_EXCEPTION'] != "#{package}@#{version}"
-          raise "#{package}@#{version}: released #{format("%.1f", age / 86_400)} days ago, under the 7-day cooldown"
+        if Time.parse(released) > PackageVersions.cooldown_start && ENV['COOLDOWN_EXCEPTION'] != "#{package}@#{version}"
+          days = (Time.now - Time.parse(released)) / 86_400
+          raise "#{package}@#{version}: released #{format("%.1f", days)} days ago, under the #{PackageVersions::COOLDOWN_DAYS}-day cooldown"
         end
       end
 
       response = Faraday.get(url)
       raise "#{url}: #{response.status}" unless response.status == 200
       # jsDelivr minifies a .min file a package doesn't have itself, and its output can change: load the package's own file
-      raise "#{url}: minified by jsDelivr, not in the package" if response.body[0, 500].include?('Minified by jsDelivr')
+      raise "#{url}: minified by jsDelivr, not in the package" if PackageVersions.jsdelivr_minified?(response.body)
 
       puts url
       [url, "sha384-#{Digest::SHA384.base64digest(response.body)}"]

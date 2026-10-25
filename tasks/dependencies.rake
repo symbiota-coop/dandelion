@@ -13,10 +13,7 @@ namespace :dependencies do
       path = File.join(root, manifest)
       json = JSON.parse(File.read(path))
       json[key] = json[key].to_h do |package, version|
-        response = Faraday.get("https://registry.npmjs.org/#{package.gsub('/', '%2F')}")
-        raise "#{package}: npm registry #{response.status}" unless response.status == 200
-
-        newest = PackageVersions.newest_in_major(version, PackageVersions.npm_releases(JSON.parse(response.body)))
+        newest = PackageVersions.newest_in_major(version, PackageVersions.npm_releases(PackageVersions.npm_document(package)))
         next [package, version] if newest == version
 
         # A CDN package keeps its version if a file the app loads isn't in the new one, or would be minified by jsDelivr
@@ -25,7 +22,7 @@ namespace :dependencies do
           files = cdn_urls.select { |url| url.start_with?("https://cdn.jsdelivr.net/npm/#{package}@#{version}/") }
           missing = files.map { |url| url.sub("@#{version}/", "@#{newest}/") }.find do |url|
             file = Faraday.get(url)
-            file.status != 200 || file.body[0, 500].include?('Minified by jsDelivr')
+            file.status != 200 || PackageVersions.jsdelivr_minified?(file.body)
           end
           if missing
             warn "#{package}: keeping #{version}, as #{missing} isn't in #{newest}"
@@ -41,7 +38,7 @@ namespace :dependencies do
 
     Dir.chdir(root) do
       # The linters' own dependencies a week old too (AGENTS.md's Dependencies)
-      sh "npm install --before=#{(Time.now - (PackageVersions::COOLDOWN_DAYS * 86_400)).strftime('%F')}"
+      sh "npm install --before=#{PackageVersions.npm_before}"
       # In a process of its own, as FRONTEND_VERSIONS here still has the versions from before
       sh 'rake frontend:integrity'
     end

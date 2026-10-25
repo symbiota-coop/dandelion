@@ -270,6 +270,14 @@ class LintTest < Minitest::Test
     end
   end
 
+  # AGENTS.md, Dependencies: Bundler's cooldown (the Gemfile's source) is PackageVersions::COOLDOWN_DAYS, which the rake
+  # tasks and /stats/packages use
+  def test_gemfile_cooldown_matches
+    require File.join(ROOT, 'lib/package_versions')
+    gemfile_cooldown = File.read(File.join(ROOT, 'Gemfile'), encoding: 'UTF-8')[/^source .*cooldown: (\d+)/, 1]
+    assert_equal PackageVersions::COOLDOWN_DAYS.to_s, gemfile_cooldown, "the Gemfile's source should have cooldown: #{PackageVersions::COOLDOWN_DAYS}"
+  end
+
   # AGENTS.md, Dependencies: the daily bump (rake dependencies:bump_npm) moves only to a release out of the 7-day
   # cooldown, in the same major version
   def test_dependency_bumps_keep_to_the_cooldown_and_major_version
