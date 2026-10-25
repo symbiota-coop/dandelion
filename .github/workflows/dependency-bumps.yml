@@ -1,6 +1,6 @@
 name: Dependency bumps
 
-# Weekly, one pull request that moves the gems, the linters (package.json) and the CDN packages (frontend/package.json)
+# Daily, one pull request that moves the gems, the linters (package.json) and the CDN packages (frontend/package.json)
 # to their newest minor or patch release out of the 7-day cooldown (AGENTS.md's Dependencies). Bundler enforces the
 # cooldown on gems (the Gemfile's cooldown: 7), and rake dependencies:bump_npm on npm packages. New major versions are
 # left for a person to choose (/stats/packages lists them). Each run updates the same pull request while it's open
@@ -9,7 +9,7 @@ name: Dependency bumps
 # write on this repository. With the default GITHUB_TOKEN, CI wouldn't run on the pull request
 on:
   schedule:
-    - cron: '0 5 * * 1'
+    - cron: '0 5 * * *'
   workflow_dispatch:
 
 permissions:
@@ -59,6 +59,6 @@ jobs:
             frontend/package.json
             frontend/integrity.json
           commit-message: Bump gems and npm packages
-          title: Weekly dependency bumps
+          title: Dependency bumps
           body-path: ${{ runner.temp }}/changes.md
           labels: dependencies

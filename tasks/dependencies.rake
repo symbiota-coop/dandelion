@@ -47,7 +47,7 @@ namespace :dependencies do
     end
   end
 
-  desc 'The gems and npm packages whose versions differ from the last commit, as Markdown (the weekly bump pull request)'
+  desc 'The gems and npm packages whose versions differ from the last commit, as Markdown (the daily bump pull request)'
   task :changes do
     require 'bundler'
     root = File.expand_path('..', __dir__)

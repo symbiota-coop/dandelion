@@ -270,7 +270,7 @@ class LintTest < Minitest::Test
     end
   end
 
-  # AGENTS.md, Dependencies: the weekly bump (rake dependencies:bump_npm) moves only to a release out of the 7-day
+  # AGENTS.md, Dependencies: the daily bump (rake dependencies:bump_npm) moves only to a release out of the 7-day
   # cooldown, in the same major version
   def test_dependency_bumps_keep_to_the_cooldown_and_major_version
     require File.join(ROOT, 'lib/package_versions')
