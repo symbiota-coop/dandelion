@@ -150,7 +150,7 @@ Dandelion::App.helpers do
   # Of a package's releases ({ version => release time }), those out of the 7-day cooldown on new versions (AGENTS.md's
   # Dependencies): the ones we can upgrade to, so the tables offer only these
   def releases_outside_cooldown(releases)
-    releases.select { |_, released_at| released_at && released_at <= 7.days.ago }
+    PackageVersions.outside_cooldown(releases)
   end
 
   # The highest version of a package's releases, and its release time
@@ -206,8 +206,7 @@ Dandelion::App.helpers do
 
     data = JSON.parse(response.body)
     released_at = data.dig('time', version)
-    stable_versions = data['versions']&.keys&.reject { |v| v.include?('-') } || []
-    releases = releases_outside_cooldown(stable_versions.to_h { |v| [v, data.dig('time', v)&.then { |time| Time.parse(time) }] })
+    releases = releases_outside_cooldown(PackageVersions.npm_releases(data))
 
     {
       name: name,

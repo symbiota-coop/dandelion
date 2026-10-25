@@ -270,6 +270,20 @@ class LintTest < Minitest::Test
     end
   end
 
+  # AGENTS.md, Dependencies: the weekly bump (rake dependencies:bump_npm) moves only to a release out of the 7-day
+  # cooldown, in the same major version
+  def test_dependency_bumps_keep_to_the_cooldown_and_major_version
+    require File.join(ROOT, 'lib/package_versions')
+    now = Time.utc(2026, 10, 25)
+    releases = { '1.2.0' => now - (30 * 86_400), '1.3.0' => now - (8 * 86_400), '1.4.0' => now - (2 * 86_400), '1.10.0-beta.1' => now - (9 * 86_400), '2.0.0' => now - (20 * 86_400), '1.5.0' => nil }
+    assert_equal '1.3.0', PackageVersions.newest_in_major('1.2.0', releases, now: now)
+    assert_equal '1.3.0', PackageVersions.newest_in_major('1.3.0', releases, now: now)
+    assert_equal '0.9.0', PackageVersions.newest_in_major('0.9.0', releases, now: now)
+
+    registry = { 'versions' => { '1.0.0' => {}, '1.1.0-rc.1' => {} }, 'time' => { '1.0.0' => '2026-01-01T00:00:00.000Z', '1.1.0-rc.1' => '2026-02-01T00:00:00.000Z' } }
+    assert_equal({ '1.0.0' => Time.utc(2026, 1, 1) }, PackageVersions.npm_releases(registry))
+  end
+
   # Every CDN file the app loads (config/frontend_dependencies.rb)
   def cdn_urls
     path = File.join(ROOT, 'config/frontend_dependencies.rb')

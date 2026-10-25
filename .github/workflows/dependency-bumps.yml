@@ -1,0 +1,64 @@
+name: Dependency bumps
+
+# Weekly, one pull request that moves the gems, the linters (package.json) and the CDN packages (frontend/package.json)
+# to their newest minor or patch release out of the 7-day cooldown (AGENTS.md's Dependencies). Bundler enforces the
+# cooldown on gems (the Gemfile's cooldown: 7), and rake dependencies:bump_npm on npm packages. New major versions are
+# left for a person to choose (/stats/packages lists them). Each run updates the same pull request while it's open
+#
+# Needs a DEPENDENCY_BUMPS_TOKEN secret: a fine-grained token (or GitHub App token) with contents and pull requests
+# write on this repository. With the default GITHUB_TOKEN, CI wouldn't run on the pull request
+on:
+  schedule:
+    - cron: '0 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dependency-bumps
+  cancel-in-progress: true
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v4
+
+      # No bundler-cache, which installs in deployment mode, where the lockfile can't change
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 4.0.9
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Bump gems
+        run: bundle update --all --minor --strict
+
+      - name: Bump npm packages
+        run: bundle exec rake dependencies:bump_npm
+
+      - name: List the changes
+        run: bundle exec rake dependencies:changes > "$RUNNER_TEMP/changes.md"
+
+      - name: Open or update the pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.DEPENDENCY_BUMPS_TOKEN }}
+          branch: dependency-bumps
+          delete-branch: true
+          add-paths: |
+            Gemfile.lock
+            package.json
+            package-lock.json
+            frontend/package.json
+            frontend/integrity.json
+          commit-message: Bump gems and npm packages
+          title: Weekly dependency bumps
+          body-path: ${{ runner.temp }}/changes.md
+          labels: dependencies
