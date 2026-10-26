@@ -925,7 +925,7 @@ class EventsTest < ActiveSupport::TestCase
     visit '/events'
     assert page.has_css?('a[rel=nofollow][aria-label="Map view"]')
     visit '/events?display=map'
-    assert page.has_css?('#map-start', text: 'Loading map')
+    assert page.has_css?('#map-start', text: 'Click to view map')
     assert page.has_no_css?('#map-canvas', visible: true)
     # Stands in for Google Maps, which bills each map load
     execute_script 'DandelionMap.initializeMap = function () { window.mapStarted = true }'
