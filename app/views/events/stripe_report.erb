@@ -57,8 +57,13 @@
   </div>
 
   <h2 class="mt-4">Charges</h2>
+  <script>
+    $(function () {
+      $('#stripe-report-charges').DataTable({info: false, paging: false, searching: false, order: [[0, "desc"]]});
+    })
+  </script>
   <div class="table-responsive">
-    <table class="table table-sm table-striped">
+    <table class="table table-sm table-striped" id="stripe-report-charges">
       <thead>
         <tr>
           <th>Date</th>
@@ -71,15 +76,15 @@
           <th class="text-end">Revenue</th>
           <th class="text-end">Stripe fees</th>
           <th class="text-end">Net</th>
-          <th></th>
+          <th data-orderable="false"></th>
         </tr>
       </thead>
       <tbody>
         <% @stripe_report[:charges].each do |charge| %>
           <% order = @orders[charge[:order_id]] %>
           <tr>
-            <td><%= charge[:created].to_fs(:db_local) %></td>
-            <td>
+            <td data-sort="<%= charge[:created].iso8601 %>"><%= charge[:created].to_fs(:db_local) %></td>
+            <td data-sort="<%= charge[:name] %>">
               <% if order && order.account %>
                 <a href="/events/<%= @event.id %>/orders?q=<%= CGI.escape(order.account.email) %><% if order.deleted? %>&deleted=1<% end %>"><%= charge[:name] || order.account.name %></a>
               <% else %>
@@ -92,14 +97,14 @@
                 <span class="badge text-bg-danger">Disputed</span>
               <% end %>
             </td>
-            <td class="text-end"><%= m charge[:gross], charge[:currency] %></td>
-            <td class="text-end"><%= m charge[:refunded], charge[:currency] if charge[:refunded].positive? %></td>
+            <td class="text-end" data-sort="<%= charge[:gross].to_f %>"><%= m charge[:gross], charge[:currency] %></td>
+            <td class="text-end" data-sort="<%= charge[:refunded].to_f %>"><%= m charge[:refunded], charge[:currency] if charge[:refunded].positive? %></td>
             <% if application_fees %>
-              <td class="text-end"><%= m charge[:application_fees], charge[:currency] if charge[:application_fees].positive? %></td>
+              <td class="text-end" data-sort="<%= charge[:application_fees].to_f %>"><%= m charge[:application_fees], charge[:currency] if charge[:application_fees].positive? %></td>
             <% end %>
-            <td class="text-end"><%= m charge[:revenue], charge[:currency] %></td>
-            <td class="text-end"><%= m charge[:fees], charge[:currency] %></td>
-            <td class="text-end fw-bold"><%= m charge[:net], charge[:currency] %></td>
+            <td class="text-end" data-sort="<%= charge[:revenue].to_f %>"><%= m charge[:revenue], charge[:currency] %></td>
+            <td class="text-end" data-sort="<%= charge[:fees].to_f %>"><%= m charge[:fees], charge[:currency] %></td>
+            <td class="text-end fw-bold" data-sort="<%= charge[:net].to_f %>"><%= m charge[:net], charge[:currency] %></td>
             <td class="text-end">
               <a target="_blank" href="https://dashboard.stripe.com/<%= 'test/' unless charge[:livemode] %>payments/<%= charge[:payment_intent] %>" data-bs-toggle="tooltip" title="View in Stripe"><i class="bi bi-box-arrow-up-right"></i></a>
             </td>
