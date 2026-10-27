@@ -18,10 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      with:
+        persist-credentials: false
 
     - name: Install Ruby
-      uses: ruby/setup-ruby@v1
+      uses: ruby/setup-ruby@824c0e29fdfc7d689c191c27acc969d2d04b7dd8 # v1.331.0
       with:
         ruby-version: 4.0.9
         bundler-cache: true
@@ -29,7 +31,7 @@ jobs:
     # RuboCop's results from earlier runs, so it only checks files that changed. A new Gemfile.lock, config or cop starts
     # afresh, as their hashes are in the key
     - name: Cache RuboCop's results
-      uses: actions/cache@v4
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       with:
         path: ~/.cache/rubocop_cache
         key: rubocop-${{ hashFiles('Gemfile.lock', '.rubocop.yml', '.rubocop/**') }}-${{ github.sha }}
@@ -43,7 +45,7 @@ jobs:
       run: script/lint --all --only erb_lint
 
     - name: Install Node
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
       with:
         node-version-file: .nvmrc
         cache: npm
@@ -56,6 +58,19 @@ jobs:
 
     - name: Run Stylelint
       run: script/lint --all --only stylelint
+
+    # uvx runs the zizmor version script/lint names
+    - name: Install uv
+      uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+      with:
+        version: 0.13.1
+
+    # With GH_TOKEN, zizmor runs its online audits too (impostor commits, known-vulnerable actions, tag comments that
+    # don't match their commits)
+    - name: Run zizmor
+      run: script/lint --all --only zizmor
+      env:
+        GH_TOKEN: ${{ github.token }}
 
     # Tests our own checks; here rather than in the test matrix, as it needs Node for the ESLint and Stylelint tests
     - name: Test the linters
@@ -104,10 +119,12 @@ jobs:
           - webhooks
     steps:
     - name: Git checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      with:
+        persist-credentials: false
 
     - name: Install Ruby
-      uses: ruby/setup-ruby@v1
+      uses: ruby/setup-ruby@824c0e29fdfc7d689c191c27acc969d2d04b7dd8 # v1.331.0
       with:
         ruby-version: 4.0.9
         bundler-cache: true
@@ -120,7 +137,7 @@ jobs:
         done
 
     - name: Run test (${{ matrix.test_file }})
-      uses: nick-fields/retry@v3
+      uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
       with:
         timeout_minutes: 10
         max_attempts: 3

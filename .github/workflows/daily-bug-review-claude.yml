@@ -19,27 +19,28 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Load models
         run: grep -E "^[A-Z_]+=" .github/models.env >> "$GITHUB_ENV"
 
       - name: Setup
         id: setup
-        uses: ./.github/actions/bug-review-setup
+        uses: $/.github/actions/bug-review-setup
 
       - name: Load prompt
         if: steps.setup.outputs.has_commits == 'true'
         id: prompt
-        uses: ./.github/actions/bug-review-prompt
+        uses: $/.github/actions/bug-review-prompt
         with:
           title_prefix: '[Claude] '
           git_log_cmd: ${{ steps.setup.outputs.git_log_cmd }}
           review_window: ${{ steps.setup.outputs.review_window }}
 
-      - uses: anthropics/claude-code-action@v1
+      - uses: anthropics/claude-code-action@db77d4d3c98f3f6380e7cd45ffba2342a3dbde3c # v1.0.254
         if: steps.setup.outputs.has_commits == 'true'
         with:
           show_full_output: true

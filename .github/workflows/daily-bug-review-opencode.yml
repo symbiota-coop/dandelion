@@ -18,21 +18,22 @@ jobs:
       issues: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Load models
         run: grep -E "^[A-Z_]+=" .github/models.env >> "$GITHUB_ENV"
 
       - name: Setup
         id: setup
-        uses: ./.github/actions/bug-review-setup
+        uses: $/.github/actions/bug-review-setup
 
       - name: Load prompt
         if: steps.setup.outputs.has_commits == 'true'
         id: prompt
-        uses: ./.github/actions/bug-review-prompt
+        uses: $/.github/actions/bug-review-prompt
         with:
           title_prefix: '[opencode] '
           git_log_cmd: ${{ steps.setup.outputs.git_log_cmd }}
@@ -40,7 +41,7 @@ jobs:
 
       - name: Install opencode
         if: steps.setup.outputs.has_commits == 'true'
-        run: npm install -g opencode-ai
+        run: npm install -g opencode-ai --before="$(date -u -d "7 days ago" +%F)" # zizmor: ignore[adhoc-packages] -- the latest release at least 7 days old (the cooldown), so new models work
 
       - name: Run bug review
         if: steps.setup.outputs.has_commits == 'true'

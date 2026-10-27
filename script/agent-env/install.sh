@@ -46,6 +46,15 @@ else
   done
 fi
 
+# uv, whose uvx runs zizmor (script/lint) on the GitHub Actions workflows. A linter only, so a failure warns
+if ! command -v uvx >/dev/null; then
+  SUDO=""
+  [ "$(id -u)" -ne 0 ] && SUDO="sudo"
+  if ! curl -LsSf https://astral.sh/uv/0.13.1/install.sh | $SUDO env UV_INSTALL_DIR=/usr/local/bin UV_NO_MODIFY_PATH=1 sh; then
+    echo "WARNING: uv failed to install, so zizmor can't run: install uv (https://docs.astral.sh/uv/)" >&2
+  fi
+fi
+
 # The pre-commit hook, which lints staged files with script/lint
 git config core.hooksPath .githooks
 
