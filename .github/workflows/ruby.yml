@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         persist-credentials: false
 
@@ -31,7 +31,7 @@ jobs:
     # RuboCop's results from earlier runs, so it only checks files that changed. A new Gemfile.lock, config or cop starts
     # afresh, as their hashes are in the key
     - name: Cache RuboCop's results
-      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ~/.cache/rubocop_cache
         key: rubocop-${{ hashFiles('Gemfile.lock', '.rubocop.yml', '.rubocop/**') }}-${{ github.sha }}
@@ -45,7 +45,7 @@ jobs:
       run: script/lint --all --only erb_lint
 
     - name: Install Node
-      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
       with:
         node-version-file: .nvmrc
         cache: npm
@@ -119,7 +119,7 @@ jobs:
           - webhooks
     steps:
     - name: Git checkout
-      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         persist-credentials: false
 
@@ -137,7 +137,7 @@ jobs:
         done
 
     - name: Run test (${{ matrix.test_file }})
-      uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
       with:
         timeout_minutes: 10
         max_attempts: 3
