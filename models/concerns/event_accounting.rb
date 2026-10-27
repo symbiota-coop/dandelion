@@ -125,6 +125,12 @@ module EventAccounting
       currency = balance_transaction.currency.upcase
       # Application fees are donations to Dandelion, not Stripe's fees
       application_fee, fee = balance_transaction.fee_details.partition { |fee_detail| fee_detail.type == 'application_fee' }.map { |fee_details| fee_details.sum(&:amount) }
+      # Refunding a whole order refunds its donation to Dandelion too. The charge doesn't say how much was refunded, so ask
+      # for the application fee, which is Dandelion's, with Dandelion's own key
+      if application_fee.positive? && charge.amount_refunded.positive? && charge.application_fee && organisation.stripe_connect_json
+        application_fee_refunded = Stripe::ApplicationFee.retrieve(charge.application_fee, opts.except(:stripe_account)).amount_refunded
+        application_fee -= (application_fee_refunded * (balance_transaction.exchange_rate || 1)).round
+      end
       row = {
         payment_intent: charge.payment_intent,
         livemode: charge.livemode,
@@ -139,7 +145,8 @@ module EventAccounting
         fees: Money.new(fee, currency),
         application_fees: Money.new(application_fee, currency)
       }
-      # Revenue is what Dandelion counts as the event's revenue: what was paid, less refunds and donations to Dandelion
+      # Revenue is what Dandelion counts as the event's revenue: what was paid, less refunds and the donations to Dandelion
+      # it kept
       row[:revenue] = row[:gross] - row[:refunded] - row[:application_fees]
       row[:net] = row[:revenue] - row[:fees]
       charges << row
