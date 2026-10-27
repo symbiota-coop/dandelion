@@ -299,6 +299,11 @@ class LintTest < Minitest::Test
     end
   end
 
+  def test_iframe_resizer_stays_on_4
+    version = JSON.parse(File.read(File.join(ROOT, 'frontend/package.json')))['dependencies']['iframe-resizer']
+    assert_match(/\A4\./, version, "iframe-resizer #{version}: keep iframe-resizer on 4")
+  end
+
   def node_modules!
     skip 'needs ESLint and Stylelint installed (npm ci)' unless %w[eslint stylelint].all? { |tool| File.exist?(File.join(ROOT, 'node_modules/.bin', tool)) }
   end
