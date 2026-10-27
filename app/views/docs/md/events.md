@@ -285,6 +285,8 @@ Dandelion does not take any money from ticket sales. Your chosen payment process
 - [PayPal fees](https://www.paypal.com/uk/business/paypal-business-fees)
 - [Open Collective fees](https://opencollective.com/)
 
+If you take payments with Stripe, go to **Stripe report** in an event's dropdown to see what Stripe took for it: charges, refunds (including those made in Stripe's dashboard), Stripe's fees and what reached your account. It's fetched from Stripe when you load the page, in the currency your Stripe account pays out in.
+
 Alternatively, you can accept completely fee-free crypto payments via Gnosis, Celo or Base. Go to the Payments tab in your organisation's settings, click **Set up Crypto**, and enter an Ethereum-compatible wallet address. Copy it straight from your wallet: a mixed-case address carries a checksum, and Dandelion won't save one whose checksum doesn't match, as that usually means a character was mistyped.
 
 ## About the suggested contribution

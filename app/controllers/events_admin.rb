@@ -199,6 +199,19 @@ Dandelion::App.controller do
     erb :'events/stats'
   end
 
+  get '/events/:id/stripe_report' do
+    @event = Event.unscoped.find(params[:id]) || not_found
+    event_revenue_admins_only!
+    not_found if @event.organisation.stripe_client_id || !(@event.organisation.stripe_connect_json || @event.organisation.stripe_sk)
+    begin
+      @stripe_report = @event.stripe_report
+      @orders = Order.unscoped.and(:id.in => @stripe_report[:charges].map { |charge| charge[:order_id] }.compact).index_by { |order| order.id.to_s }
+    rescue Stripe::StripeError => e
+      @stripe_error = e.message
+    end
+    erb :'events/stripe_report'
+  end
+
   get '/events/:id/waitlist' do
     @event = Event.find(params[:id]) || not_found
     event_admins_only!

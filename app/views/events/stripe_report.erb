@@ -1,0 +1,107 @@
+<%= partial :'events/nav', locals: { event: @event } %>
+
+<p class="text-body-secondary">
+  Fetched from Stripe as you load the page, so refunds made in Stripe's dashboard are included. Charges from the last
+  minute or so may not show yet. Amounts are in the currency your Stripe account pays out in. Dispute fees aren't included.
+</p>
+
+<% if @stripe_error %>
+  <div class="alert alert-danger">Stripe returned an error: <%= @stripe_error %></div>
+<% elsif @stripe_report[:charges].empty? %>
+  <p>No Stripe charges for this event.</p>
+<% else %>
+  <% totals = @stripe_report[:totals] %>
+  <% application_fees = totals.any? { |total| total[:application_fees].positive? } %>
+  <div class="table-responsive">
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <% if totals.length > 1 %>
+            <th>Currency</th>
+          <% end %>
+          <th class="text-end">Charges</th>
+          <th class="text-end">Gross</th>
+          <th class="text-end">Refunded</th>
+          <th class="text-end">Stripe fees</th>
+          <% if application_fees %>
+            <th class="text-end">Donations to Dandelion</th>
+          <% end %>
+          <th class="text-end">Net</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% totals.each do |total| %>
+          <tr>
+            <% if totals.length > 1 %>
+              <td><%= total[:currency] %></td>
+            <% end %>
+            <td class="text-end">
+              <%= total[:charges] %>
+              <% if total[:disputed].positive? %>
+                <span class="badge text-bg-danger"><%= total[:disputed] %> disputed</span>
+              <% end %>
+            </td>
+            <td class="text-end"><%= m total[:gross], total[:currency] %></td>
+            <td class="text-end"><%= m total[:refunded], total[:currency] %></td>
+            <td class="text-end"><%= m total[:fees], total[:currency] %></td>
+            <% if application_fees %>
+              <td class="text-end"><%= m total[:application_fees], total[:currency] %></td>
+            <% end %>
+            <td class="text-end fw-bold"><%= m total[:net], total[:currency] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="mt-4">Charges</h2>
+  <div class="table-responsive">
+    <table class="table table-sm table-striped">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Customer</th>
+          <th class="text-end">Gross</th>
+          <th class="text-end">Refunded</th>
+          <th class="text-end">Stripe fees</th>
+          <% if application_fees %>
+            <th class="text-end">Donations to Dandelion</th>
+          <% end %>
+          <th class="text-end">Net</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @stripe_report[:charges].each do |charge| %>
+          <% order = @orders[charge[:order_id]] %>
+          <tr>
+            <td><%= charge[:created].to_fs(:db_local) %></td>
+            <td>
+              <% if order && order.account %>
+                <a href="/events/<%= @event.id %>/orders?q=<%= CGI.escape(order.account.email) %><% if order.deleted? %>&deleted=1<% end %>"><%= charge[:name] || order.account.name %></a>
+              <% else %>
+                <%= charge[:name] %>
+              <% end %>
+              <% if charge[:email] && event_email_viewer? %>
+                <br><span class="text-body-secondary"><%= charge[:email] %></span>
+              <% end %>
+              <% if charge[:disputed] %>
+                <span class="badge text-bg-danger">Disputed</span>
+              <% end %>
+            </td>
+            <td class="text-end"><%= m charge[:gross], charge[:currency] %></td>
+            <td class="text-end"><%= m charge[:refunded], charge[:currency] if charge[:refunded].positive? %></td>
+            <td class="text-end"><%= m charge[:fees], charge[:currency] %></td>
+            <% if application_fees %>
+              <td class="text-end"><%= m charge[:application_fees], charge[:currency] if charge[:application_fees].positive? %></td>
+            <% end %>
+            <td class="text-end fw-bold"><%= m charge[:net], charge[:currency] %></td>
+            <td class="text-end">
+              <a target="_blank" href="https://dashboard.stripe.com/<%= 'test/' unless charge[:livemode] %>payments/<%= charge[:payment_intent] %>" data-bs-toggle="tooltip" title="View in Stripe"><i class="bi bi-box-arrow-up-right"></i></a>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

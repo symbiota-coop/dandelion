@@ -112,6 +112,44 @@ module EventAccounting
     end
   end
 
+  # This event's Stripe charges, found by the de_event_id in their metadata and fetched live from Stripe for the Stripe
+  # report rather than stored, so refunds made in Stripe's dashboard show. Each charge and the totals are in the
+  # currency the organisation's Stripe account settles in (a refund is converted at its charge's exchange rate)
+  def stripe_report
+    opts = StripeOpts.call(api_key: organisation.stripe_connect_json ? ENV['STRIPE_SK'] : organisation.stripe_sk, stripe_account: organisation.stripe_user_id)
+    charges = []
+    Stripe::Charge.search({ query: "metadata['de_event_id']:'#{id}'", limit: 100, expand: ['data.balance_transaction'] }, opts).auto_paging_each do |charge|
+      balance_transaction = charge.balance_transaction
+      next unless charge.status == 'succeeded' && balance_transaction.is_a?(Stripe::BalanceTransaction)
+
+      currency = balance_transaction.currency.upcase
+      # Application fees are donations to Dandelion, not Stripe's fees
+      application_fee, fee = balance_transaction.fee_details.partition { |fee_detail| fee_detail.type == 'application_fee' }.map { |fee_details| fee_details.sum(&:amount) }
+      row = {
+        payment_intent: charge.payment_intent,
+        livemode: charge.livemode,
+        created: Time.at(charge.created),
+        name: charge.metadata['de_account_name'],
+        email: charge.metadata['de_account_email'],
+        order_id: charge.metadata['de_order_id'],
+        disputed: charge.disputed,
+        currency: currency,
+        gross: Money.new(balance_transaction.amount, currency),
+        refunded: Money.new((charge.amount_refunded * (balance_transaction.exchange_rate || 1)).round, currency),
+        fees: Money.new(fee, currency),
+        application_fees: Money.new(application_fee, currency)
+      }
+      row[:net] = row[:gross] - row[:refunded] - row[:fees] - row[:application_fees]
+      charges << row
+    end
+
+    totals = charges.group_by { |charge| charge[:currency] }.map do |currency, currency_charges|
+      sums = %i[gross refunded fees application_fees net].to_h { |column| [column, currency_charges.sum(Money.new(0, currency)) { |charge| charge[column] }] }
+      { currency: currency, charges: currency_charges.length, disputed: currency_charges.count { |charge| charge[:disputed] } }.merge(sums)
+    end
+    { charges: charges, totals: totals }
+  end
+
   def stripe_profit
     stripe_revenue - stripe_fees + Money.new(stripe_revenue_adjustment * 100, currency)
   end
