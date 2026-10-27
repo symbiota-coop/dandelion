@@ -197,6 +197,44 @@ Dandelion::App.helpers do
     end
   end
 
+  # Each action the workflows and our own actions in .github use (uses: owner/repo[/path]@sha # v1.2.3), by repository,
+  # with the releases their comments name and the files that use it. Actions in this repository ($/...) aren't listed
+  def fetch_github_actions
+    uses = Dir[Padrino.root('.github/{workflows/*,actions/*/action}.{yml,yaml}')].flat_map do |file|
+      File.read(file, encoding: 'UTF-8').scan(%r{uses:\s*([\w.-]+/[\w.-]+)[^@\s]*@(\S+)(?:\s*#\s*(\S+))?}).map do |repo, ref, version|
+        { repo: repo, version: version || ref, file: file.delete_prefix("#{Padrino.root}/") }
+      end
+    end
+
+    fetch_packages(uses.group_by { |use| use[:repo] }.to_a) do |repo, repo_uses|
+      fetch_github_action(repo, repo_uses.map { |use| use[:version] }.uniq).merge(used_in: repo_uses.map { |use| use[:file] }.uniq)
+    end
+  end
+
+  # An action's repository and its releases (the latest 100, so an old pin of an action that releases often may have no
+  # release date), against the first of the releases we pin it to
+  def fetch_github_action(repo, versions)
+    data = Github.get("repos/#{repo}")
+    published = Github.get("repos/#{repo}/releases", per_page: 100).reject { |release| release['draft'] || release['prerelease'] }
+    tags = published.to_h { |release| [release['tag_name'].delete_prefix('v'), Time.parse(release['published_at'])] }
+    releases = releases_outside_cooldown(tags)
+    version = versions.first.delete_prefix('v')
+    {
+      name: repo,
+      version: versions.first,
+      versions: versions,
+      version_bump_cells: version_bump_cells(version, releases.keys),
+      release_date: tags[version],
+      latest_release_date: latest_release(releases),
+      downloads: data['stargazers_count'],
+      homepage: data['homepage'],
+      source_code: data['html_url'],
+      info: data['description']&.split('.')&.first
+    }
+  rescue StandardError
+    { name: repo, version: versions.first, versions: versions }
+  end
+
   def fetch_npm_dependency(path)
     # jsDelivr npm format: 'package@version' => 'files' (the package may be scoped: '@scope/package@version')
     name, _, version = path.rpartition('@')

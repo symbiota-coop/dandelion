@@ -1,6 +1,6 @@
 <div class="nav-wrapper">
   <ul class="nav nav-tabs">
-    <% { 'gems' => 'Gems', 'frontend' => 'Frontend' }.each do |tab, title| %>
+    <% { 'gems' => 'Gems', 'frontend' => 'Frontend', 'actions' => 'GitHub Actions' }.each do |tab, title| %>
       <li class="nav-item">
         <a class="nav-link <%= 'active' if @tab == tab %>" href="/stats/packages?tab=<%= tab %>"><%= title %></a>
       </li>
@@ -8,4 +8,4 @@
   </ul>
 </div>
 
-<%= partial(@tab == 'gems' ? 'stats/gems' : 'stats/frontend_dependencies') %>
+<%= partial({ 'gems' => 'stats/gems', 'frontend' => 'stats/frontend_dependencies', 'actions' => 'stats/github_actions' }[@tab]) %>

@@ -1,4 +1,4 @@
-# Reads Dandelion's repository through the GitHub REST API, as GITHUB_ACCESS_TOKEN when it's set
+# Reads Dandelion's repository (and the actions its workflows use) through the GitHub REST API, as GITHUB_ACCESS_TOKEN when it's set
 module Github
   REPO = 'symbiota-coop/dandelion'.freeze
 

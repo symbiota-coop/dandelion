@@ -1,0 +1,54 @@
+<div class="table-responsive">
+  <table id="github-actions-table" class="table table-hover">
+    <thead>
+      <tr>
+        <th>Action</th>
+        <th>Version</th>
+        <th>Major</th>
+        <th>Minor</th>
+        <th>Patch</th>
+        <th>Release date</th>
+        <th>Latest release date</th>
+        <th class="text-end">Stars</th>
+        <th>Description</th>
+        <th>Links</th>
+        <th>Used in</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @packages.each do |action| %>
+        <tr>
+          <td>
+            <a href="https://github.com/<%= action[:name] %>/releases" target="_blank"><%= action[:name] %></a>
+          </td>
+          <td>
+            <code><%= action[:version] %></code>
+            <% if action[:versions].size > 1 %>
+              <span class="badge text-bg-danger ms-1" data-bs-toggle="tooltip" title="Pinned to <%= action[:versions].join(', ') %> in different files"><%= action[:versions].size %> versions</span>
+            <% end %>
+          </td>
+          <%= partial 'stats/version_bump_cells', locals: { cells: action[:version_bump_cells] } %>
+          <%= partial 'stats/release_date_cells', locals: { package: action } %>
+          <%= partial 'stats/downloads_cell', locals: { package: action } %>
+          <%= partial 'stats/package_info_cells', locals: { package: action } %>
+          <td class="small" data-order="<%= action[:used_in].first %>">
+            <% action[:used_in].each do |file| %>
+              <code class="d-block"><%= file %></code>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  $(function() {
+    $('#github-actions-table').DataTable({
+      paging: false,
+      searching: false,
+      info: false,
+      order: [[6, 'desc']],
+    });
+  });
+</script>

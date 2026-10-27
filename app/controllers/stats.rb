@@ -87,8 +87,12 @@ Dandelion::App.controller do
   end
 
   get '/stats/packages' do
-    @tab = %w[gems frontend].include?(params[:tab]) ? params[:tab] : 'gems'
-    @packages = @tab == 'gems' ? fetch_gems : fetch_frontend_dependencies
+    @tab = %w[gems frontend actions].include?(params[:tab]) ? params[:tab] : 'gems'
+    @packages = case @tab
+                when 'gems' then fetch_gems
+                when 'frontend' then fetch_frontend_dependencies
+                else fetch_github_actions
+                end
     erb :'stats/packages'
   end
 
