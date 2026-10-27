@@ -139,12 +139,14 @@ module EventAccounting
         fees: Money.new(fee, currency),
         application_fees: Money.new(application_fee, currency)
       }
-      row[:net] = row[:gross] - row[:refunded] - row[:fees] - row[:application_fees]
+      # Revenue is what Dandelion counts as the event's revenue: what was paid, less refunds and donations to Dandelion
+      row[:revenue] = row[:gross] - row[:refunded] - row[:application_fees]
+      row[:net] = row[:revenue] - row[:fees]
       charges << row
     end
 
     totals = charges.group_by { |charge| charge[:currency] }.map do |currency, currency_charges|
-      sums = %i[gross refunded fees application_fees net].to_h { |column| [column, currency_charges.sum(Money.new(0, currency)) { |charge| charge[column] }] }
+      sums = %i[gross refunded application_fees revenue fees net].to_h { |column| [column, currency_charges.sum(Money.new(0, currency)) { |charge| charge[column] }] }
       { currency: currency, charges: currency_charges.length, disputed: currency_charges.count { |charge| charge[:disputed] } }.merge(sums)
     end
     { charges: charges, totals: totals }

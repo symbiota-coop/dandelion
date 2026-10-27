@@ -22,10 +22,11 @@
           <th class="text-end">Charges</th>
           <th class="text-end">Gross</th>
           <th class="text-end">Refunded</th>
-          <th class="text-end">Stripe fees</th>
           <% if application_fees %>
             <th class="text-end">Donations to Dandelion</th>
           <% end %>
+          <th class="text-end">Revenue</th>
+          <th class="text-end">Stripe fees</th>
           <th class="text-end">Net</th>
         </tr>
       </thead>
@@ -43,10 +44,11 @@
             </td>
             <td class="text-end"><%= m total[:gross], total[:currency] %></td>
             <td class="text-end"><%= m total[:refunded], total[:currency] %></td>
-            <td class="text-end"><%= m total[:fees], total[:currency] %></td>
             <% if application_fees %>
               <td class="text-end"><%= m total[:application_fees], total[:currency] %></td>
             <% end %>
+            <td class="text-end"><%= m total[:revenue], total[:currency] %></td>
+            <td class="text-end"><%= m total[:fees], total[:currency] %></td>
             <td class="text-end fw-bold"><%= m total[:net], total[:currency] %></td>
           </tr>
         <% end %>
@@ -63,10 +65,11 @@
           <th>Customer</th>
           <th class="text-end">Gross</th>
           <th class="text-end">Refunded</th>
-          <th class="text-end">Stripe fees</th>
           <% if application_fees %>
             <th class="text-end">Donations to Dandelion</th>
           <% end %>
+          <th class="text-end">Revenue</th>
+          <th class="text-end">Stripe fees</th>
           <th class="text-end">Net</th>
           <th></th>
         </tr>
@@ -91,10 +94,11 @@
             </td>
             <td class="text-end"><%= m charge[:gross], charge[:currency] %></td>
             <td class="text-end"><%= m charge[:refunded], charge[:currency] if charge[:refunded].positive? %></td>
-            <td class="text-end"><%= m charge[:fees], charge[:currency] %></td>
             <% if application_fees %>
               <td class="text-end"><%= m charge[:application_fees], charge[:currency] if charge[:application_fees].positive? %></td>
             <% end %>
+            <td class="text-end"><%= m charge[:revenue], charge[:currency] %></td>
+            <td class="text-end"><%= m charge[:fees], charge[:currency] %></td>
             <td class="text-end fw-bold"><%= m charge[:net], charge[:currency] %></td>
             <td class="text-end">
               <a target="_blank" href="https://dashboard.stripe.com/<%= 'test/' unless charge[:livemode] %>payments/<%= charge[:payment_intent] %>" data-bs-toggle="tooltip" title="View in Stripe"><i class="bi bi-box-arrow-up-right"></i></a>
