@@ -39,7 +39,7 @@
           <th class="col-count">Count</th>
           <th class="col-mult">&times; baseline</th>
           <th class="col-mult">&times; threshold</th>
-          <th class="col-bot">Bar</th>
+          <th class="col-bot">Blocked over</th>
           <th class="col-actions"></th>
         </tr>
       </thead>
@@ -48,6 +48,7 @@
           <% window[:asns].each_with_index do |row, i| %>
             <% blocked = @blocked_asns.include?(row['asn'].to_s) %>
             <% bp = @bot_pct[row['asn'].to_s] %>
+            <% bar = Asn.autoblock_bot_bar(@asn_countries[row['asn'].to_s], row['ratio']) %>
             <% mult = window[:baseline] > 0 ? (row['count'].to_f / window[:baseline]).round(1) : nil %>
             <tr class="<%= 'asn-window-start' if i.zero? %> <%= 'table-danger' if blocked %>">
               <td><%== i.zero? ? "#{window[:start].strftime('%a %d %b %H:%M')} &ndash; #{window[:end].strftime('%H:%M')}" : '' %></td>
@@ -62,11 +63,12 @@
               <td><a href="https://radar.cloudflare.com/as<%= row['asn'] %>" target="_blank"><code><%= row['asn'] %></code></a></td>
               <td class="text-truncate"><%= row['description'] %></td>
               <td><%= @asn_countries[row['asn'].to_s] %></td>
-              <td<%== bp ? " style=\"color: #{bp[:bot] >= 60 ? 'var(--color-red-500)' : bp[:bot] >= 30 ? 'var(--color-orange-500)' : 'var(--theme-500)'}\"" : '' %>><%== bp ? "#{bp[:bot]}%" : '&ndash;' %></td>
+              <%# Red when it's over the bar it would be blocked over, orange from halfway there %>
+              <td<%== bp ? " style=\"color: #{bp[:bot] > bar ? 'var(--color-red-500)' : bp[:bot] >= bar / 2 ? 'var(--color-orange-500)' : 'var(--theme-500)'}\"" : '' %>><%== bp ? "#{bp[:bot]}%" : '&ndash;' %></td>
               <td><%= row['count'] %></td>
               <td><%== mult ? "#{mult}&times;" : '&ndash;' %></td>
               <td><%== "#{row['ratio'].round(2)}&times;" %></td>
-              <td><%= Asn.autoblock_bot_bar(@asn_countries[row['asn'].to_s], row['ratio']) %>%</td>
+              <td><%= bar < 100 ? "#{bar}%" : 'never' %></td>
                 <td class="text-nowrap">
                   <% if blocked %>
                     <form method="post" action="/stats/asns/unblock/<%= row['asn'] %>" class="d-inline">
