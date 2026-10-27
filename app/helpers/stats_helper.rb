@@ -198,11 +198,11 @@ Dandelion::App.helpers do
   end
 
   # Each action the workflows and our own actions in .github use (uses: owner/repo[/path]@sha # v1.2.3), by repository,
-  # with the releases their comments name and the files that use it. Actions in this repository ($/...) aren't listed
+  # with the releases their comments name (less the v, as the other tabs show versions) and the files that use it. Actions in this repository ($/...) aren't listed
   def fetch_github_actions
     uses = Dir[Padrino.root('.github/{workflows/*,actions/*/action}.{yml,yaml}')].flat_map do |file|
       File.read(file, encoding: 'UTF-8').scan(%r{uses:\s*([\w.-]+/[\w.-]+)[^@\s]*@(\S+)(?:\s*#\s*(\S+))?}).map do |repo, ref, version|
-        { repo: repo, version: version || ref, file: file.delete_prefix("#{Padrino.root}/") }
+        { repo: repo, version: (version || ref).delete_prefix('v'), file: file.delete_prefix("#{Padrino.root}/") }
       end
     end
 
@@ -218,10 +218,10 @@ Dandelion::App.helpers do
     published = Github.get("repos/#{repo}/releases", per_page: 100).reject { |release| release['draft'] || release['prerelease'] }
     tags = published.to_h { |release| [release['tag_name'].delete_prefix('v'), Time.parse(release['published_at'])] }
     releases = releases_outside_cooldown(tags)
-    version = versions.first.delete_prefix('v')
+    version = versions.first
     {
       name: repo,
-      version: versions.first,
+      version: version,
       versions: versions,
       version_bump_cells: version_bump_cells(version, releases.keys),
       release_date: tags[version],
