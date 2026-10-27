@@ -1,13 +1,17 @@
 module Asn
   BASELINE_ASN = 2856
   MIN_BASELINE_PER_HOUR = 250
+  # An ASN is listed and scored from listed_from × baseline. Its ratio is its count over threshold × baseline, and its bot
+  # % has to beat its country's threshold divided by that ratio: so more requests, a lower bar, and fewer, a higher one
   DETECTION_CONFIGS = [
-    { window_length: 1, threshold: 3.0 },
-    { window_length: 3, threshold: 1.5 }
+    { window_length: 1, listed_from: 1.5, threshold: 3.0 },
+    { window_length: 3, listed_from: 0.75, threshold: 1.5 }
   ].freeze
   MAX_WINDOW_LENGTH = DETECTION_CONFIGS.map { |c| c[:window_length] }.max
   TIMEZONE = 'Europe/Stockholm'
 
+  # Big residential ISPs run 10-20% bot, so a surge from one never blocks it
+  AUTOBLOCK_BOT_PCT_FLOOR = 20
   AUTOBLOCK_BOT_PCT_DEFAULT = 50
   AUTOBLOCK_BOT_PCT_LOW = 25
   AUTOBLOCK_BOT_PCT_LOW_COUNTRIES = %w[CN RU IN ID VN HK SG MX ZA BR IQ].freeze
@@ -31,6 +35,10 @@ module Asn
     return AUTOBLOCK_BOT_PCT_HIGH if AUTOBLOCK_BOT_PCT_HIGH_COUNTRIES.include?(country)
 
     AUTOBLOCK_BOT_PCT_LOW_COUNTRIES.include?(country) ? AUTOBLOCK_BOT_PCT_LOW : AUTOBLOCK_BOT_PCT_DEFAULT
+  end
+
+  def self.autoblock_bot_bar(country, ratio)
+    [autoblock_bot_threshold(country) / ratio, AUTOBLOCK_BOT_PCT_FLOOR].max.round(1)
   end
 
   def self.conn
@@ -118,13 +126,14 @@ module Asn
         hours: hours || config[:window_length],
         legit_asns: legit_asns,
         window_length: config[:window_length],
+        listed_from: config[:listed_from],
         threshold: config[:threshold]
       )
     end
     windows.sort_by { |w| -w[:start].to_i }
   end
 
-  def self.suspicious_windows(rows:, hours:, legit_asns:, window_length:, threshold:)
+  def self.suspicious_windows(rows:, hours:, legit_asns:, window_length:, listed_from:, threshold:)
     windows = []
     tz = TZInfo::Timezone.get(TIMEZONE)
     now = tz.to_local(Time.now.utc)
@@ -150,12 +159,13 @@ module Asn
 
       filtered = by_asn.select do |r|
         r['asn'].to_s != BASELINE_ASN.to_s &&
-          r['count'] > baseline_count * threshold &&
+          r['count'] > baseline_count * listed_from &&
           !legit_asns.include?(r['asn'].to_s) &&
           !skip_autoblock_for_description?(r['description'])
-      end.sort_by { |r| -r['count'] }
+      end
+      filtered = filtered.map { |r| r.merge('ratio' => r['count'].to_f / (baseline_count * threshold)) }.sort_by { |r| -r['count'] }
 
-      windows << { start: window_start, end: window_end, baseline: baseline_count, window_length: window_length, threshold: threshold, asns: filtered } if filtered.any?
+      windows << { start: window_start, end: window_end, baseline: baseline_count, window_length: window_length, listed_from: listed_from, threshold: threshold, asns: filtered } if filtered.any?
       window_start = window_end
     end
     windows.reverse!
@@ -249,7 +259,9 @@ module Asn
     blocked = blocked_asns(rule)
     legit = legit_asns
     windows = all_suspicious_windows(rows: rows, legit_asns: legit)
-    candidates = windows.flat_map { |w| w[:asns].map { |r| r['asn'].to_s } }.uniq - blocked
+    ratios = {}
+    windows.each { |w| w[:asns].each { |r| ratios[r['asn'].to_s] = [ratios[r['asn'].to_s] || 0, r['ratio']].max } }
+    candidates = ratios.keys - blocked
 
     bot_pct = nil
     asn_details = nil
@@ -264,13 +276,17 @@ module Asn
     puts "[ASN autoblock] candidates #{candidates.map { |a| "#{a} country=#{asn_countries[a] || 'unknown'}" }.join(', ')}"
     puts "[ASN autoblock] bot_classifications=#{bot_pct.size}"
     puts "[ASN autoblock] country_lookups=#{asn_countries.size}"
-    to_block = bot_pct.select do |asn, v|
+    scored = bot_pct.to_h do |asn, v|
+      [asn, v.merge(ratio: ratios[asn].round(2), bar: autoblock_bot_bar(asn_countries[asn], ratios[asn]))]
+    end
+    puts "[ASN autoblock] scored #{scored.map { |asn, v| "#{asn}:#{v[:bot]}% bar=#{v[:bar]}% ratio=#{v[:ratio]}" }.join(', ')}"
+    to_block = scored.select do |asn, v|
       next false if skip_autoblock_for_description?(asn_names[asn])
 
-      v[:bot] > autoblock_bot_threshold(asn_countries[asn])
+      v[:bot] > v[:bar]
     end
     if to_block.empty?
-      puts '[ASN autoblock] nothing to block (no candidate above bot threshold)'
+      puts '[ASN autoblock] nothing to block (no candidate above its bot bar)'
       puts '[ASN autoblock] done'
       return
     end
@@ -285,10 +301,9 @@ module Asn
       next if current.include?(asn.to_s)
 
       country = asn_countries[asn]
-      threshold = autoblock_bot_threshold(country)
       new_expression = "#{new_expression} or (ip.src.asnum eq #{asn})"
       newly_blocked << [asn, v]
-      puts "[ASN autoblock] blocked ASN #{asn} (#{v[:bot]}% bot, threshold #{threshold}%, #{country || 'country unknown'})"
+      puts "[ASN autoblock] blocked ASN #{asn} (#{v[:bot]}% bot, bar #{v[:bar]}% at #{v[:ratio]}× threshold, #{country || 'country unknown'})"
     end
 
     if new_expression == rule['expression']
@@ -317,6 +332,7 @@ module Asn
       subject: "[ASN blocked] #{asn} (#{v[:bot]}% bot)",
       body_text: [
         "ASN #{asn} was automatically blocked due to suspicious bot traffic.",
+        "It was #{v[:bot]}% bot, over a bar of #{v[:bar]}% at #{v[:ratio]}× its window's threshold.",
         "Review blocks at #{ENV['BASE_URI']}/stats/asns"
       ].join("\n")
     )

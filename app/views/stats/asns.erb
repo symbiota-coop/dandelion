@@ -18,8 +18,10 @@
   Last <%= pluralize(@hours, 'hour') %> &middot;
   <% Asn::DETECTION_CONFIGS.each_with_index do |config, i| %>
     <%== i.zero? ? '' : ' &middot; ' %>
-    <%= config[:window_length] %>h window, &ge;<%= config[:threshold] %>&times; baseline (AS<%= Asn::BASELINE_ASN %>)
+    <%= config[:window_length] %>h window, listed from <%= config[:listed_from] %>&times;, threshold <%= config[:threshold] %>&times; baseline (AS<%= Asn::BASELINE_ASN %>)
   <% end %>
+  <br>
+  Blocked when bot % beats the country's bot % divided by &times; threshold (at least <%= Asn::AUTOBLOCK_BOT_PCT_FLOOR %>%)
 </p>
 
 <% if @windows.any? %>
@@ -36,6 +38,8 @@
           <th class="col-bot">Bot %</th>
           <th class="col-count">Count</th>
           <th class="col-mult">&times; baseline</th>
+          <th class="col-mult">&times; threshold</th>
+          <th class="col-bot">Bar</th>
           <th class="col-actions"></th>
         </tr>
       </thead>
@@ -49,7 +53,7 @@
               <td><%== i.zero? ? "#{window[:start].strftime('%a %d %b %H:%M')} &ndash; #{window[:end].strftime('%H:%M')}" : '' %></td>
               <td>
                 <% if i.zero? %>
-                  <span class="badge text-bg-secondary" title="<%= window[:window_length] %>-hour window, threshold &ge;<%= window[:threshold] %>&times; baseline">
+                  <span class="badge text-bg-secondary" title="<%= window[:window_length] %>-hour window, listed from <%= window[:listed_from] %>&times;, threshold <%= window[:threshold] %>&times; baseline">
                     <%= window[:window_length] %>h
                   </span>
                 <% end %>
@@ -61,6 +65,8 @@
               <td<%== bp ? " style=\"color: #{bp[:bot] >= 60 ? 'var(--color-red-500)' : bp[:bot] >= 30 ? 'var(--color-orange-500)' : 'var(--theme-500)'}\"" : '' %>><%== bp ? "#{bp[:bot]}%" : '&ndash;' %></td>
               <td><%= row['count'] %></td>
               <td><%== mult ? "#{mult}&times;" : '&ndash;' %></td>
+              <td><%== "#{row['ratio'].round(2)}&times;" %></td>
+              <td><%= Asn.autoblock_bot_bar(@asn_countries[row['asn'].to_s], row['ratio']) %>%</td>
                 <td class="text-nowrap">
                   <% if blocked %>
                     <form method="post" action="/stats/asns/unblock/<%= row['asn'] %>" class="d-inline">
