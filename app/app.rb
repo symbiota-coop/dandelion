@@ -132,8 +132,6 @@ module Dandelion
       erb :not_found, layout: :application
     end
 
-    ###
-
     head '/' do
       200
     end

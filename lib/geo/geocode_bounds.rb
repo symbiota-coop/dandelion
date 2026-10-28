@@ -28,7 +28,6 @@ module GeocodeBounds
       end
     end
 
-    # Always ensure minimum 25km bounding box
     lat, lng = result.coordinates
     min_km = 25
     # Approximate degrees per kilometer (varies by latitude, but good enough for a 25km box)

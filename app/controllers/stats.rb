@@ -265,8 +265,6 @@ Dandelion::App.controller do
     redirect '/stats/asns'
   end
 
-  ###
-
   get '/raise' do
     msg = params[:message] || 'test error'
     raise msg unless params[:detail]

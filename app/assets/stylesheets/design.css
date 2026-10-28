@@ -51,7 +51,6 @@
   color: var(--bs-body-color);
 }
 
-/* Section headers */
 #design-nav .design-nav-section {
   margin-top: var(--space-sm);
   font-weight: 700;

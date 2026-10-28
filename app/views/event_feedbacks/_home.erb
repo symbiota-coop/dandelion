@@ -7,16 +7,13 @@
 </style>
 <div class="feedback-columns mt-5">
   <%
-  # Use aggregation to join with accounts and events at database level
-  # Step 1: Find eligible accounts (this should be fast with proper indexes)
   eligible_account_ids = Account.and(
     :has_image => true,
     :has_signed_in => true,
     :hidden => false,
   ).pluck(:id)
 
-  # Step 2: Find the most recent 5-star feedback from each eligible account
-  # Using a simpler aggregation that only works with filtered account IDs
+  # Find the most recent 5-star feedback from each eligible account
   pipeline = [
     { '$match' => {
       'deleted_at' => nil,

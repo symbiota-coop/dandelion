@@ -81,7 +81,7 @@ Dandelion::App.helpers do
     if url =~ %r{(?:youtube\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/\s]{11})}
       "https://www.youtube.com/embed/#{Regexp.last_match(1)}"
     else
-      url # Return original URL if it doesn't match YouTube format
+      url
     end
   end
 

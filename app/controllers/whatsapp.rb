@@ -66,7 +66,6 @@ Dandelion::App.controller do
     chunks = []
     current_chunk = ''
     text.split(/\n\n+/).each do |paragraph|
-      # paragraph fits in current chunk
       if current_chunk.empty?
         current_chunk = paragraph
       elsif (current_chunk + "\n\n" + paragraph).length <= 2048

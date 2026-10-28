@@ -69,7 +69,6 @@ class StripeRowSplitter
         results << ticket_row
       end
 
-      # Only create donation row if there's a donation to the organisation
       if donation_amount > 0
         donation_row = row.to_h
         # Format donation amount without trailing zeros if it's a whole number
