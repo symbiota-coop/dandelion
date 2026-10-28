@@ -146,6 +146,29 @@ class EventsTest < ActiveSupport::TestCase
     assert_nil @event.locked_error_provider
   end
 
+  test 'a duplicated event says it is a copy until it is first saved' do
+    create_event(prices: [0])
+    sign_in(@account)
+    duplicate = @event.duplicate!(@account)
+    assert_equal @event, duplicate.duplicated_from
+
+    visit "/e/#{duplicate.slug}/edit"
+    assert page.has_content?("This is a duplicate of #{@event.name}")
+    assert page.has_link?(@event.name, href: "/e/#{@event.slug}/edit")
+    visit "/e/#{@event.slug}/edit"
+    assert page.has_content?('Event title')
+    assert page.has_no_content?('duplicate of')
+
+    duplicate.name = nil
+    refute duplicate.save
+    assert_equal @event, duplicate.duplicated_from, 'A save that fails validation keeps the banner'
+    duplicate.reload.save!
+    assert_nil duplicate.reload.duplicated_from_id
+    visit "/e/#{duplicate.slug}/edit"
+    assert page.has_content?('Event title')
+    assert page.has_no_content?('duplicate of')
+  end
+
   test 'ticket email strips event-handler attributes from editor HTML' do
     create_event(
       prices: [0],

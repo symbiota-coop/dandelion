@@ -182,7 +182,7 @@ Ticket groups are created on the Tickets tab when editing your event. To assign 
 
 2. **Create multiple events under a single Activity:** Create an Activity under your Organisation (see the [Organisations](/docs/organisations) page for details on how to do this), and then create multiple events under this activity. Share the link to the Activity for people to view all available dates.
 
-(If the events are the same/very similar, you can create the first event, then duplicate it for all the dates the event occurs by selecting 'Duplicate event' in the event dropdown of the initial event.)
+(If the events are the same/very similar, you can create the first event, then duplicate it for all the dates the event occurs by selecting 'Duplicate event' in the event dropdown of the initial event.) The duplicate starts locked, and says which event it's a duplicate of until you first save it.
 
 ## Cancelling/deleting an event
 

@@ -76,7 +76,7 @@ Dandelion::App.controller do
     event_admins_only!
     duplicate_event_prerequisites!
     duplicated_event = @event.duplicate!(current_account)
-    redirect "/e/#{duplicated_event.slug}/edit?duplicated=1"
+    redirect "/e/#{duplicated_event.slug}/edit"
   end
 
   get '/events/:id/ticket_email' do

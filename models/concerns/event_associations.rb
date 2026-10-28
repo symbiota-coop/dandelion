@@ -12,6 +12,7 @@ module EventAssociations
     belongs_to_without_parent_validation :organiser, class_name: 'Account', inverse_of: :events_organising, optional: true
     belongs_to_without_parent_validation :last_saved_by, class_name: 'Account', inverse_of: :events_last_saver, optional: true
     belongs_to_without_parent_validation :gathering, optional: true
+    belongs_to_without_parent_validation :duplicated_from, class_name: 'Event', inverse_of: nil, optional: true
 
     has_many :fragments, dependent: :destroy
 

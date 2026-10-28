@@ -4,6 +4,7 @@ module EventDuplication
   def duplicate!(account)
     event = Event.create!(
       duplicate: true,
+      duplicated_from: self,
       name: name,
       start_time: start_time,
       end_time: end_time,

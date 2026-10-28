@@ -177,6 +177,12 @@ module EventValidation
       end
     end
 
+    # A copy shows which event it was copied from until it's first saved, so it's not mistaken for the original.
+    # Cleared before save rather than before validation, so a save that fails validation keeps the banner
+    before_save do
+      self.duplicated_from = nil if duplicated_from_id && persisted?
+    end
+
     after_save do
       update_embedding_with_retries if Padrino.env == :production
     end

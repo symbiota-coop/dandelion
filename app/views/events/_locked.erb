@@ -1,39 +1,58 @@
-<% if params[:duplicated] %>
-  <div class="alert alert-primary">
-    <p class="mb-0">
-      The event was duplicated, and you're now editing the duplicate.
-    </p>
-  </div>
-<% end %>
-<% if @event.locked? || (@event.organisation && !@event.organisation.payment_method? && @event.paid_tickets?) %>
-  <div class="alert alert-warning">
-    <% if @event.locked? && event_lock_admin? && @event.locked_error %>
-      <%== EmailHelper.render(:_purchase_error, account: nil, event: @event, provider: @event.locked_error_provider, message: @event.locked_error, help: EventPaymentMethod.dashboard_help_for(@event.locked_error_provider)) %>
-      <% if @event.organisation && !@event.organisation.payment_method? && @event.paid_tickets? %>
+<% copy_of = @event.duplicated_from if event_admin? %>
+<% payment_method_missing = @event.organisation && !@event.organisation.payment_method? && @event.paid_tickets? %>
+<% warning = @event.locked? || payment_method_missing %>
+<% if copy_of || warning %>
+  <div class="alert alert-<%= warning ? 'warning' : 'primary' %>">
+    <% if copy_of %>
+      <% original_when = concise_when_details(copy_of) %>
+      <% original = capture do %><a href="/e/<%= copy_of.slug %>/edit"><%= copy_of.name %><%= " (#{original_when})" if original_when %></a><% end %>
+      <% if @event.locked? && event_lock_admin? && !@event.locked_error && !payment_method_missing %>
+        <%# The usual case: a new copy is locked, so one sentence says what it is and how to unlock it %>
         <p>
-          You must <a href="/o/<%= @event.organisation.slug %>/edit">add details for Stripe or another payment processor in the Payments tab of your organisation</a> to take payments.
+          <i class="bi bi-copy"></i>
+          <% if request.path.include?('/edit') %>
+            This is a duplicate of <%== original.strip %>, currently visible to event admins only: make your edits, then uncheck the Locked checkbox and save to unlock it.
+          <% else %>
+            This is a duplicate of <%== original.strip %>, currently visible to event admins only: <a href="/events/<%= @event.id %>/edit">make your edits</a>, then uncheck the Locked checkbox and save to unlock it.
+          <% end %>
+        </p>
+        <% warning = false %>
+      <% else %>
+        <p>
+          <i class="bi bi-copy"></i>
+          This is a duplicate of <%== original.strip %>. Make your edits here.
         </p>
       <% end %>
-    <% else %>
-      <p class="mb-0">
-        <i class="bi bi-exclamation-triangle-fill"></i>
-        <% if @event.locked? && event_lock_admin? %>
-          This event is currently locked and visible to event admins only.
+    <% end %>
+    <% if warning %>
+      <% if @event.locked? && event_lock_admin? && @event.locked_error %>
+        <%== EmailHelper.render(:_purchase_error, account: nil, event: @event, provider: @event.locked_error_provider, message: @event.locked_error, help: EventPaymentMethod.dashboard_help_for(@event.locked_error_provider)) %>
+        <% if payment_method_missing %>
+          <p>
+            You must <a href="/o/<%= @event.organisation.slug %>/edit">add details for Stripe or another payment processor in the Payments tab of your organisation</a> to take payments.
+          </p>
         <% end %>
-        <% if @event.organisation && !@event.organisation.payment_method? && @event.paid_tickets? %>
-          You must <a href="/o/<%= @event.organisation.slug %>/edit">add details for Stripe or another payment processor in the Payments tab of your organisation</a> to take payments.
-        <% elsif @event.locked? %>
-          <% if event_lock_admin? %>
-            <% if request.path.include?('/edit') %>
-              Uncheck the Locked checkbox and save to unlock it.
-            <% else %>
-              <a href="/events/<%= @event.id %>/edit">Edit the event</a>, uncheck the Locked checkbox and save to unlock it.
-            <% end %>
-          <% else %>
-            The event has been submitted for review. It's currently locked and visible to event admins only.
+      <% else %>
+        <p class="mb-0">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <% if @event.locked? && event_lock_admin? %>
+            This event is currently locked and visible to event admins only.
           <% end %>
-        <% end %>
-      </p>
+          <% if payment_method_missing %>
+            You must <a href="/o/<%= @event.organisation.slug %>/edit">add details for Stripe or another payment processor in the Payments tab of your organisation</a> to take payments.
+          <% elsif @event.locked? %>
+            <% if event_lock_admin? %>
+              <% if request.path.include?('/edit') %>
+                Uncheck the Locked checkbox and save to unlock it.
+              <% else %>
+                <a href="/events/<%= @event.id %>/edit">Edit the event</a>, uncheck the Locked checkbox and save to unlock it.
+              <% end %>
+            <% else %>
+              The event has been submitted for review. It's currently locked and visible to event admins only.
+            <% end %>
+          <% end %>
+        </p>
+      <% end %>
     <% end %>
   </div>
 <% end %>

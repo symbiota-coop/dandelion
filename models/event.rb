@@ -389,7 +389,7 @@ class Event
     if start_time.to_date == end_time.to_date
       start_time.to_date
     else
-      "#{start_time.to_date} – #{end_time.to_date} #{z if with_zone}"
+      "#{start_time.to_date} – #{end_time.to_date}#{" #{z}" if with_zone}"
     end
   end
 
