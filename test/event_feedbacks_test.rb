@@ -51,6 +51,37 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     assert_includes last_response.body, @event.name
   end
 
+  test 'public lists and the event page leave out feedback on secret events' do
+    create_attended_event
+    facilitator = FactoryBot.create(:account)
+    create_event(as: :secret_event, activity: @activity, secret: true, name: 'Hidden Gathering')
+    [@event, @secret_event].each { |event| event.event_facilitations.create!(account: facilitator) }
+    reviewer = FactoryBot.create(:account, name: 'Secret Reviewer')
+    event_feedback = create_feedback(account: reviewer, event: @secret_event, rating: 5)
+
+    assert_equal 0, event_feedback.notifications.count
+    ["/activities/#{@activity.id}/show_feedback", "/o/#{@organisation.slug}/show_feedback", "/accounts/#{facilitator.id}/show_feedback"].each do |path|
+      get path, minimal: 1
+      assert_equal 200, last_response.status
+      refute_includes last_response.body, reviewer.name, path
+      refute_includes last_response.body, @secret_event.name, path
+    end
+
+    get "/e/#{@event.slug}"
+    assert_equal 200, last_response.status
+    refute_includes last_response.body, 'id="feedback"'
+  end
+
+  test 'making an event secret removes its feedback notifications' do
+    create_attended_event
+    event_feedback = create_feedback(account: @attendee, rating: 5)
+    assert_equal 1, event_feedback.notifications.count
+
+    @event.update!(secret: true)
+
+    assert_equal 0, event_feedback.notifications.count
+  end
+
   test 'admin event feedback page hides deleted feedback' do
     create_attended_event
     reviewer = FactoryBot.create(:account, name: 'Removed Reviewer')

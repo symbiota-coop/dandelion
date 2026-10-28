@@ -99,8 +99,10 @@ module OrganisationAssociations
     EventFeedback.and(:event_id.in => events_including_cohosted.pluck(:id))
   end
 
-  def unscoped_event_feedbacks
-    EventFeedback.unscoped.and(:event_id.in => events_including_cohosted.pluck(:id))
+  # The feedback the organisation's public feedback list shows: removed feedback too (it reads Removed), but none from
+  # secret events
+  def public_event_feedbacks
+    EventFeedback.unscoped.and(:event_id.in => events_including_cohosted.publicly_visible.pluck(:id))
   end
 
   def event_tags

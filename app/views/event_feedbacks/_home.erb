@@ -19,6 +19,7 @@
   # Using a simpler aggregation that only works with filtered account IDs
   pipeline = [
     { '$match' => {
+      'deleted_at' => nil,
       'anonymous' => false,
       'has_public_answers' => true,
       'rating' => 5,
@@ -35,6 +36,7 @@
   event_feedback = EventFeedback.new(doc.select { |k, _v| EventFeedback.fields.keys.include?(k.to_s) })
   account = event_feedback.account
   next if account.name.include?('_')
+  next if !event_feedback.event || event_feedback.event.secret?
   quote = event_feedback.public_answers.map { |q,a| a if a.present? }.compact.join('<br /><br />').gsub("\n", '<br />')
   next if quote.empty? || quote.length > 500
   %>

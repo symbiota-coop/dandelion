@@ -51,7 +51,7 @@ class EventFeedback
 
   after_create do
     clear_event_feedback_report_stash
-    notifications.create! circle: circle, type: 'left_feedback' unless anonymous
+    notifications.create! circle: circle, type: 'left_feedback' unless anonymous || event&.secret?
   end
 
   def self.rated

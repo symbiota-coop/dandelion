@@ -62,7 +62,7 @@
   </div>
 <% end %>
 
-<% if @organisation.unscoped_event_feedbacks.exists? %>
+<% if @organisation.public_event_feedbacks.exists? %>
   <h2 id="feedback" class="mt-5">Feedback on <%= @organisation.name %> events</h2>
   <div data-with-placeholder class="mt-3" data-pagelet-url="/o/<%= @organisation.slug %>/show_feedback">
     <%= partial :placeholder %>

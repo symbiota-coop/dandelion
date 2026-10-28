@@ -60,7 +60,7 @@ class Organisation
   end
 
   def feedback_summaries_source
-    event_feedbacks
+    public_event_feedbacks.and(deleted_at: nil)
   end
 
   def feedback_summary_log_label
@@ -68,7 +68,7 @@ class Organisation
   end
 
   def feedback_summary_prompt
-    "Provide a one-paragraph summary of the feedback on the events of this organisation, #{name}. Focus on the positives. The feedback:\n\n#{event_feedbacks.joined}"
+    "Provide a one-paragraph summary of the feedback on the events of this organisation, #{name}. Focus on the positives. The feedback:\n\n#{feedback_summaries_source.joined}"
   end
 
   def self.secret_fields

@@ -55,7 +55,7 @@ class Activity
   end
 
   def feedback_summaries_source
-    event_feedbacks
+    public_event_feedbacks.and(deleted_at: nil)
   end
 
   def feedback_summary_log_label
@@ -63,7 +63,7 @@ class Activity
   end
 
   def feedback_summary_prompt
-    "Provide a one-paragraph summary of the feedback on this activity (family of events), #{name}, hosted by #{organisation.name}. Focus on the positives. The feedback:\n\n#{event_feedbacks.joined}"
+    "Provide a one-paragraph summary of the feedback on this activity (family of events), #{name}, hosted by #{organisation.name}. Focus on the positives. The feedback:\n\n#{feedback_summaries_source.joined}"
   end
 
   def self.new_hints
@@ -111,8 +111,10 @@ class Activity
     EventFeedback.and(:event_id.in => all_feedback_event_ids)
   end
 
-  def unscoped_event_feedbacks
-    EventFeedback.unscoped.and(:event_id.in => all_feedback_event_ids)
+  # The feedback the activity's public feedback list shows: removed feedback too (it reads Removed), but none from
+  # secret events
+  def public_event_feedbacks
+    EventFeedback.unscoped.and(:event_id.in => events.publicly_visible.pluck(:id) + events_as_feedback_activity.publicly_visible.pluck(:id))
   end
 
   def event_tags

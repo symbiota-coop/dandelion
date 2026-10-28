@@ -141,8 +141,10 @@ module AccountAssociations
     EventFeedback.and(:event_id.in => event_facilitations.pluck(:event_id))
   end
 
-  def unscoped_event_feedbacks_as_facilitator
-    EventFeedback.unscoped.and(:event_id.in => event_facilitations.pluck(:event_id))
+  # The feedback the facilitator's public feedback list shows: removed feedback too (it reads Removed), but none from
+  # secret events
+  def public_event_feedbacks_as_facilitator
+    EventFeedback.unscoped.and(:event_id.in => Event.and(:id.in => event_facilitations.pluck(:event_id)).publicly_visible.pluck(:id))
   end
 
   def network_notifications

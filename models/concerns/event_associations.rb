@@ -160,6 +160,13 @@ module EventAssociations
     a.uniq
   end
 
+  # A secret event's feedback is left out of public feedback lists (public_event_feedbacks), so when an event becomes
+  # secret, remove the left_feedback notifications made while it was public, which name the event in the reviewer's
+  # followers' feeds
+  def destroy_feedback_notifications
+    Notification.and(notifiable_type: 'EventFeedback', :notifiable_id.in => EventFeedback.unscoped.and(event_id: id).pluck(:id)).destroy_all
+  end
+
   def contacts
     a = [account, revenue_sharer, coordinator].compact
     a += event_facilitators
