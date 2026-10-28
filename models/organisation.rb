@@ -72,7 +72,7 @@ class Organisation
   end
 
   def self.secret_fields
-    %w[stripe_sk mollie_api_key paypal_secret gocardless_access_token gocardless_endpoint_secret mailgun_api_key mailgun_webhook_signing_key]
+    %w[stripe_sk mollie_api_key paypal_secret gocardless_access_token gocardless_endpoint_secret patreon_client_secret patreon_refresh_token mailgun_api_key mailgun_webhook_signing_key]
   end
 
   def self.protected_attributes
@@ -85,6 +85,7 @@ class Organisation
       followers_count subscribed_accounts_count monthly_donors_count monthly_donations_count
       feedback_summary feedback_summary_last_refreshed_at feedback_summary_requested_at feedback_summary_failed_at
       calendar_import_last_synced_at calendar_import_last_sync_error calendar_import_feed_calendar_names atproto_did
+      patreon_sync_error
     ]
   end
 

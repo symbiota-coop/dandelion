@@ -71,6 +71,7 @@ namespace :late do
     end
     puts 'sync monthly donations'
     Organisation.and(:gocardless_subscriptions => true, :gocardless_access_token.ne => nil).each(&:sync_with_gocardless)
+    Organisation.and(:patreon_refresh_token.ne => nil).each(&:sync_with_patreon)
     puts 'sync stripe subscriptions'
     Account.reconcile_stripe_subscriptions
     puts 'stripe transfers'

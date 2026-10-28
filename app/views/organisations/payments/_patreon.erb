@@ -1,0 +1,18 @@
+<div class="card mb-3" id="payment-patreon">
+  <h3 class="card-header text-bg-primary">Patreon</h3>
+  <div class="card-body">
+    <p>
+      Go to
+      <a href="https://www.patreon.com/portal/registration/register-clients">Clients &amp; API Keys</a>
+      in the Patreon developer portal, create a client (for <code>Redirect URIs</code>, enter <%= ENV['BASE_URI'] %>), and copy its
+      <code>Client ID</code>, <code>Client Secret</code> and <code>Creator's Refresh Token</code>.
+      Each night, Dandelion registers people with active Patreon pledges as monthly donors.
+    </p>
+    <% if @organisation.patreon_sync_error %>
+      <div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill"></i> The last Patreon sync failed: <%= @organisation.patreon_sync_error %></div>
+    <% end %>
+    <%= f.text_block :patreon_client_id %>
+    <%= f.secret_block :patreon_client_secret %>
+    <%= f.secret_block :patreon_refresh_token %>
+  </div>
+</div>

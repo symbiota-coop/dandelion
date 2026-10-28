@@ -17,6 +17,70 @@ class OrganisationsTest < ActiveSupport::TestCase
     )
   end
 
+  # A Faraday connection that answers Patreon's token and members requests from stubs: members is a list of
+  # [member, pledge events]
+  def patreon_connection(members: [], token_status: 200)
+    stubs = Faraday::Adapter::Test::Stubs.new
+    json = { 'Content-Type' => 'application/json' }
+    stubs.post('/api/oauth2/token') do
+      [token_status, json, (token_status == 200 ? { access_token: 'access', refresh_token: 'new-refresh' } : { error: 'invalid_grant' }).to_json]
+    end
+    stubs.get('/api/oauth2/v2/campaigns') { [200, json, { data: [{ id: '1', type: 'campaign', attributes: { currency: 'USD' } }] }.to_json] }
+    stubs.get('/api/oauth2/v2/campaigns/1/members') do
+      data = members.map.with_index do |(attributes, events), i|
+        { id: "m#{i}", type: 'member', attributes: attributes,
+          relationships: { pledge_history: { data: events.map.with_index { |_, j| { id: "e#{i}-#{j}", type: 'pledge-event' } } } } }
+      end
+      included = members.each_with_index.flat_map do |(_, events), i|
+        events.map.with_index { |attributes, j| { id: "e#{i}-#{j}", type: 'pledge-event', attributes: attributes } }
+      end
+      [200, json, { data: data, included: included, meta: { pagination: { cursors: { next: nil } } } }.to_json]
+    end
+    Faraday.new(url: OrganisationMonthlyDonations::PATREON_API) do |f|
+      f.request :url_encoded
+      f.response :raise_error
+      f.response :json
+      f.adapter :test, stubs
+    end
+  end
+
+  test 'syncing Patreon records active patrons in the currency they pay and clears those who stopped' do
+    create_organisation(currency: 'GBP', patreon_client_id: 'client', patreon_client_secret: 'secret', patreon_refresh_token: 'refresh')
+    recorded_by_hand = @organisation.organisationships.create!(account: FactoryBot.create(:account, email: 'jl@example.com'), monthly_donation_method: 'Other',
+                                                               monthly_donation_amount: 11.5, monthly_donation_currency: 'GBP', sent_monthly_donation_welcome: true)
+    lapsed = @organisation.organisationships.create!(account: FactoryBot.create(:account), monthly_donation_method: 'Patreon',
+                                                     monthly_donation_amount: 5, monthly_donation_currency: 'USD', sent_monthly_donation_welcome: true)
+    members = [
+      [{ email: 'JL@example.com', full_name: 'JL', patron_status: 'active_patron', pledge_relationship_start: '2026-09-14T10:00:00.000+00:00', pledge_cadence: 1, currently_entitled_amount_cents: 800 },
+       [{ type: 'pledge_start', amount_cents: 1000, currency_code: 'CAD', date: '2026-09-14T10:00:00.000+00:00' },
+        { type: 'subscription', amount_cents: 1000, currency_code: 'CAD', date: '2026-10-01T10:00:00.000+00:00' },
+        { type: 'pledge_upgrade', amount_cents: 1150, currency_code: 'CAD', date: '2026-10-10T10:00:00.000+00:00' }]],
+      [{ email: 'declined@example.com', full_name: 'Declined', patron_status: 'declined_patron', currently_entitled_amount_cents: 500 }, []]
+    ]
+
+    @organisation.stub(:patreon_connection, patreon_connection(members: members)) { @organisation.sync_with_patreon }
+
+    assert_equal ['Patreon', 11.5, 'CAD', Date.new(2026, 9, 14), false],
+                 [recorded_by_hand.reload.monthly_donation_method, recorded_by_hand.monthly_donation_amount, recorded_by_hand.monthly_donation_currency,
+                  recorded_by_hand.monthly_donation_start_date, recorded_by_hand.monthly_donation_annual]
+    assert_nil lapsed.reload.monthly_donation_method
+    assert_nil Account.find_by(email: 'declined@example.com')
+    assert_equal 'new-refresh', @organisation.reload.patreon_refresh_token
+    assert_nil @organisation.patreon_sync_error
+  end
+
+  test 'a rejected Patreon refresh token is reported and leaves patrons as they were' do
+    create_organisation(currency: 'GBP', patreon_client_id: 'client', patreon_client_secret: 'secret', patreon_refresh_token: 'refresh')
+    patron = @organisation.organisationships.create!(account: FactoryBot.create(:account), monthly_donation_method: 'Patreon',
+                                                     monthly_donation_amount: 5, monthly_donation_currency: 'USD', sent_monthly_donation_welcome: true)
+
+    @organisation.stub(:patreon_connection, patreon_connection(token_status: 400)) { @organisation.sync_with_patreon }
+
+    assert_equal ['Patreon', 5.0], [patron.reload.monthly_donation_method, patron.monthly_donation_amount]
+    assert_includes @organisation.reload.patreon_sync_error, 'refresh token'
+    assert_equal 'refresh', @organisation.patreon_refresh_token
+  end
+
   test 'admins can update or clear a monthly donor recorded from Patreon by hand' do
     create_organisation(currency: 'GBP')
     patron = @organisation.organisationships.create!(account: FactoryBot.create(:account), monthly_donation_method: 'Patreon',

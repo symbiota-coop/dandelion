@@ -30,6 +30,12 @@ module OrganisationPaymentMethods
     field :gocardless_instalments, type: Mongoid::Boolean
     field :gocardless_subscriptions, type: Mongoid::Boolean
 
+    # Patreon: monthly donors, synced nightly with API v2
+    field :patreon_client_id, type: String
+    field :patreon_client_secret, type: String
+    field :patreon_refresh_token, type: String
+    field :patreon_sync_error, type: String
+
     # EVM (crypto)
     field :evm_address, type: String
 
@@ -40,7 +46,7 @@ module OrganisationPaymentMethods
     validates_format_of :stripe_pk, with: /\A[a-z0-9_]+\z/i, allow_nil: true
 
     before_validation do
-      %w[mollie_api_key paypal_client_id paypal_secret gocardless_access_token gocardless_endpoint_secret evm_address oc_slug].each do |f|
+      %w[mollie_api_key paypal_client_id paypal_secret gocardless_access_token gocardless_endpoint_secret patreon_client_id patreon_client_secret patreon_refresh_token evm_address oc_slug].each do |f|
         send("#{f}=", send(f).strip) if send(f)
       end
 
@@ -67,6 +73,12 @@ module OrganisationPaymentMethods
 
       errors.add(:gocardless_instant_bank_pay, 'requires GoCardless webhook secret') if gocardless_instant_bank_pay && !gocardless_endpoint_secret
       errors.add(:gocardless_instalments, 'requires GoCardless webhook secret') if gocardless_instalments && !gocardless_endpoint_secret
+
+      patreon_fields = %i[patreon_client_id patreon_client_secret patreon_refresh_token]
+      if patreon_fields.any? { |f| send(f) }
+        patreon_fields.each { |f| errors.add(f, 'must be provided if other Patreon details have been provided') unless send(f) }
+      end
+      self.patreon_sync_error = nil if patreon_refresh_token_changed?
     end
   end
 
@@ -86,6 +98,9 @@ module OrganisationPaymentMethods
         gocardless_instant_bank_pay: 'Enable GoCardless Instant Bank Pay',
         gocardless_instalments: 'Enable GoCardless Instalments',
         gocardless_subscriptions: 'Register people with active GoCardless subscriptions as monthly donors',
+        patreon_client_id: 'Patreon client ID',
+        patreon_client_secret: 'Patreon client secret',
+        patreon_refresh_token: "Patreon creator's refresh token",
         evm_address: 'EVM address',
         oc_slug: 'Open Collective slug',
         tax_rate_id: 'Stripe tax rate ID'
@@ -104,6 +119,7 @@ module OrganisationPaymentMethods
         paypal_sandbox: 'Use the sandbox API. You must paste sandbox client ID and secret from the Sandbox tab of Apps & Credentials — live credentials will fail.',
         gocardless_instant_bank_pay: 'Shown at checkout for GBP and EUR events only (UK and supported Eurozone countries)',
         gocardless_instalments: 'Shown at checkout for GBP and EUR events only. Set the number of instalments on each event.',
+        patreon_refresh_token: "Dandelion renews it each night, so it won't match the one Patreon shows after the first sync",
         evm_address: 'Ethereum-compatible wallet address for receiving tokens via Gnosis, Celo or Base',
         oc_slug: 'Open Collective organisation slug',
         tax_rate_id: 'Stripe tax rate ID to apply to ticket purchases'
