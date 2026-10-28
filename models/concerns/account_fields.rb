@@ -53,7 +53,7 @@ module AccountFields
     field :event_feedbacks_as_facilitator_average_rating, type: Float
     field :past_events_as_facilitator_count, type: Integer
     field :event_tag_names, type: Array
-    %w[email_confirmed updated_profile admin unsubscribed unsubscribed_messages unsubscribed_feedback unsubscribed_reminders block_reply_by_email hidden seen_intro_tour can_reset_passwords has_signed_in legacy_sessions_revoked ended_sessions_for_email_sign_in].each do |b|
+    %w[email_confirmed updated_profile admin unsubscribed unsubscribed_messages unsubscribed_feedback unsubscribed_reminders block_reply_by_email hidden seen_intro_tour can_reset_passwords has_signed_in legacy_sessions_revoked ended_sessions_for_email_sign_in confirm_email_prompt_owed].each do |b|
       field b.to_sym, type: Mongoid::Boolean
     end
 

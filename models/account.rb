@@ -200,12 +200,15 @@ class Account
   # didn't set it up, other browsers are signed out (sign_in_from_email). Only the first time, so mail scanners opening
   # links can't keep signing out the person who set it up. It leaves the links and code already sent, which only the
   # email's owner has. True if a browser had signed in to it (it had a session token), so there may have been someone to
-  # sign out: an account a guest purchase made, say, has never had a session
+  # sign out: an account a guest purchase made, say, has never had a session. Then the email's owner is asked to confirm it
+  # (confirm_email_prompt_owed) at each link sign in until they confirm or say not now, as the first may have been a mail
+  # scanner's
   def end_sessions_for_first_email_sign_in!
     return false unless Account.and(id: id, :ended_sessions_for_email_sign_in.ne => true).update_all('$set' => { ended_sessions_for_email_sign_in: true }).modified_count == 1
 
     had_sessions = session_token.present?
     end_sessions!
+    set(confirm_email_prompt_owed: true) if had_sessions
     had_sessions
   end
 
@@ -221,7 +224,7 @@ class Account
   # did it in this browser, other sessions end, the password, API key and calendar feed key are replaced and providers
   # connected before now are removed. Returns the removed providers
   def confirm_email!(same_browser:)
-    set(email_confirmed: true)
+    set(email_confirmed: true, confirm_email_prompt_owed: false)
     # Links from before before_email_confirmed have no value for it, and could have been connected by anyone
     unconfirmed_links = provider_links.and('$or' => [{ before_email_confirmed: true }, { before_email_confirmed: nil }])
     if same_browser

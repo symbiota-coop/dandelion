@@ -37,10 +37,11 @@ Dandelion::App.helpers do
     account.sign_ins.create(request: request, skip_increment: %w[unsubscribe give_feedback subscriptions].any? { |p| request.path.include?(p) })
     # Only a code confirms the email here: anyone the email reaches, mail scanners included, can open a link
     undone = confirm_email_of(account, same_browser: account_set_up_in_this_session?(account)) if sign_in_code && !account.email_confirmed?
-    # A link to an unconfirmed account opened in a browser that didn't set it up: on the first, sign out the rest. Not the
+    # A link to an unconfirmed account opened as a page in a browser that didn't set it up: on the first, sign out the rest,
+    # and ask to confirm until they do or say not now. Not a HEAD or XHR request, which can't show the page asking. Not the
     # confirmation link, which mail scanners open, and whose button signs out other browsers anyway (confirm_email_of)
-    if !sign_in_code && !account.email_confirmed? && !request.path.start_with?('/confirm_email/') && !account_set_up_in_this_session?(account)
-      signed_out_others = account.end_sessions_for_first_email_sign_in!
+    if !sign_in_code && request.get? && !request.xhr? && !account.email_confirmed? && !request.path.start_with?('/confirm_email/') && !account_set_up_in_this_session?(account)
+      ask_to_confirm = account.end_sessions_for_first_email_sign_in! || account.confirm_email_prompt_owed?
     end
     start_session!(account, verified: !sign_in_code.nil?, via_link: sign_in_code.nil?)
     @signed_in_via_email = true
@@ -51,7 +52,7 @@ Dandelion::App.helpers do
     notice = [sign_in_code ? 'Signed in with a sign in code' : 'Signed in via a link', undone].compact.join('. ')
     # Whoever signed up can still sign back in with their password or providers until the email is confirmed, which
     # replaces them (confirm_email_of), so ask now. The session vouches for the link, as at /confirm_email/:link_token
-    if signed_out_others && request.get? && !request.xhr?
+    if ask_to_confirm
       session[:confirming_email] = account.email
       session[:confirm_email_later] = (sign_in_landing_path? && session.delete(:return_to)) || path_without_link_token
       flash[:notice] = notice

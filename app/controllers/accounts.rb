@@ -45,6 +45,14 @@ Dandelion::App.controller do
     erb :'accounts/confirm_email'
   end
 
+  # Not now: stop asking at each link sign in (Account#end_sessions_for_first_email_sign_in!)
+  post '/accounts/confirm_email/later' do
+    sign_in_required!
+    confirming_email = session.delete(:confirming_email)
+    current_account.set(confirm_email_prompt_owed: false) if confirming_email && confirming_email == current_account.email
+    redirect session.delete(:confirm_email_later) || '/'
+  end
+
   post '/accounts/confirm_email' do
     sign_in_required!
     session.delete(:confirm_email_later)

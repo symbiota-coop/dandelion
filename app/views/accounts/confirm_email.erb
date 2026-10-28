@@ -11,7 +11,7 @@
     <div class="d-flex flex-wrap gap-2">
       <button type="submit" class="btn btn-primary">Confirm my email address</button>
       <% if @confirm_email_later %>
-        <a href="<%= @confirm_email_later %>" class="btn btn-secondary">Not now</a>
+        <a data-method="post" href="/accounts/confirm_email/later" class="btn btn-secondary">Not now</a>
       <% end %>
     </div>
   <% end %>

@@ -985,14 +985,13 @@ class AccountsTest < ActiveSupport::TestCase
     assert last_response.redirect?
     owner_browser.get '/accounts/confirm_email'
     assert_includes owner_browser.last_response.body, 'We signed out other browsers'
-    assert_includes owner_browser.last_response.body, 'href="/e/some-event?ref=email"'
+    assert_includes owner_browser.last_response.body, 'data-method="post" href="/accounts/confirm_email/later"'
+    assert_equal '/e/some-event?ref=email', owner_browser.last_request.session[:confirm_email_later]
 
-    # Only the first time: another link elsewhere keeps the owner's browser, and doesn't ask
+    # Only the first time signs out: another link elsewhere keeps the owner's browser, though it asks again, as nobody has answered
     other_browser = Rack::Test::Session.new(app)
     other_browser.get '/', link_token: account.reload.link_token_for_email
-    assert other_browser.last_response.ok?
-    other_browser.get '/accounts/confirm_email'
-    assert_equal '/accounts/edit', URI(other_browser.last_response.location).path
+    assert_equal '/accounts/confirm_email', URI(other_browser.last_response.location).path
     owner_browser.get '/accounts/edit'
     assert owner_browser.last_response.ok?
 
@@ -1004,6 +1003,52 @@ class AccountsTest < ActiveSupport::TestCase
     assert_empty account.provider_links
     owner_browser.get '/accounts/edit'
     assert owner_browser.last_response.ok?
+  end
+
+  test 'a mail scanner opening a link to an unconfirmed account first still leaves the owner asked to confirm' do
+    start_omniauth_signup(email: 'prefetched@example.com')
+    post '/accounts/new', account: { name: 'Pat Prefetched', email: 'prefetched@example.com' }, omniauth_signup: '1'
+    account = Account.find_by(email: 'prefetched@example.com')
+
+    # A HEAD request can't show the page asking, so it signs nobody out
+    scanner = Rack::Test::Session.new(app)
+    scanner.head "/e/some-event?link_token=#{account.link_token_for_email}"
+    refute account.reload.ended_sessions_for_email_sign_in
+    get '/accounts/edit'
+    assert last_response.ok?
+
+    # A GET does, but its scanner never answers, so the owner's next link asks
+    scanner.get "/e/some-event?link_token=#{account.reload.link_token_for_email}"
+    assert_equal '/accounts/confirm_email', URI(scanner.last_response.location).path
+    assert account.reload.confirm_email_prompt_owed
+    get '/accounts/edit'
+    assert last_response.redirect?
+
+    owner_browser = Rack::Test::Session.new(app)
+    owner_browser.get '/', link_token: account.reload.link_token_for_email
+    assert_equal '/accounts/confirm_email', URI(owner_browser.last_response.location).path
+    owner_browser.post '/accounts/confirm_email'
+    assert account.reload.email_confirmed
+    refute account.confirm_email_prompt_owed
+    assert_empty account.provider_links
+  end
+
+  test 'not now stops asking to confirm at each link sign in' do
+    start_omniauth_signup(email: 'not-now@example.com')
+    post '/accounts/new', account: { name: 'Nat Notnow', email: 'not-now@example.com' }, omniauth_signup: '1'
+    account = Account.find_by(email: 'not-now@example.com')
+
+    owner_browser = Rack::Test::Session.new(app)
+    owner_browser.get "/e/some-event?link_token=#{account.link_token_for_email}&ref=email"
+    assert_equal '/accounts/confirm_email', URI(owner_browser.last_response.location).path
+    owner_browser.post '/accounts/confirm_email/later'
+    assert_equal '/e/some-event?ref=email', URI(owner_browser.last_response.location).request_uri
+    refute account.reload.confirm_email_prompt_owed
+    refute account.email_confirmed
+
+    other_browser = Rack::Test::Session.new(app)
+    other_browser.get '/', link_token: account.reload.link_token_for_email
+    assert other_browser.last_response.ok?
   end
 
   test 'confirming the email with a code elsewhere ends the session, provider and password of whoever signed up with it' do
