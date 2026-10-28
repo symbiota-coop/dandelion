@@ -390,9 +390,14 @@ Dandelion::App.controller do
     if !admin? && @organisation.feedback_summary_last_refreshed_at && @organisation.feedback_summary_last_refreshed_at > 24.hours.ago
       flash[:error] = 'Feedback summary can only be refreshed once per day'
     else
-      @organisation.feedback_summary!
+      @organisation.request_feedback_summary!
     end
-    redirect back('#feedback')
+    request.xhr? ? 200 : redirect(back('#feedback'))
+  end
+
+  get '/organisations/:id/feedback_summary' do
+    @organisation = Organisation.find(params[:id]) || not_found
+    partial :'event_feedbacks/feedback_summary', locals: { contents_only: true }
   end
 
   post '/organisations/:id/feedback_summary/delete' do

@@ -81,6 +81,8 @@ module OrganisationFields
     field :fixed_contribution_gbp, type: Float
     field :feedback_summary, type: String
     field :feedback_summary_last_refreshed_at, type: Time
+    field :feedback_summary_requested_at, type: Time
+    field :feedback_summary_failed_at, type: Time
     field :use_event_slugs_in_order_descriptions, type: Mongoid::Boolean
     field :percent_requested, type: Float
     field :event_types, type: String

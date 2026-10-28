@@ -34,6 +34,8 @@ class Activity
   field :extra_info_for_acceptance_email, type: String
   field :feedback_summary, type: String
   field :feedback_summary_last_refreshed_at, type: Time
+  field :feedback_summary_requested_at, type: Time
+  field :feedback_summary_failed_at, type: Time
   field :slug, type: String
 
   %w[hide_image hide_location hide_date_of_birth hide_gender].each do |b|
@@ -41,7 +43,7 @@ class Activity
   end
 
   def self.protected_attributes
-    %w[feedback_summary feedback_summary_last_refreshed_at has_image]
+    %w[feedback_summary feedback_summary_last_refreshed_at feedback_summary_requested_at feedback_summary_failed_at has_image]
   end
 
   def self.search_fields

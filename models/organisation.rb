@@ -83,7 +83,7 @@ class Organisation
       hide_from_homepage allow_iframes psychedelic allow_purchase_url no_referrer
       contribution_requested_gbp_cache contribution_paid_gbp_cache
       followers_count subscribed_accounts_count monthly_donors_count monthly_donations_count
-      feedback_summary feedback_summary_last_refreshed_at
+      feedback_summary feedback_summary_last_refreshed_at feedback_summary_requested_at feedback_summary_failed_at
       calendar_import_last_synced_at calendar_import_last_sync_error calendar_import_feed_calendar_names atproto_did
     ]
   end

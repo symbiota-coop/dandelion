@@ -17,7 +17,7 @@ $(function () {
     if (pageIsVisible) {
       $('[data-pagelet-refresh][data-pagelet-refresh-registered]').each(function () {
         const pagelet = $(this)
-        if (!pagelet[0].hasAttribute('data-pagelet-refresh-paused') && $.contains(document, pagelet[0])) {
+        if (!pagelet[0].hasAttribute('data-pagelet-refresh-paused') && $.contains(document, pagelet[0]) && pageletRefreshWanted(pagelet)) {
           reloadPagelet(pagelet, function (changed) {
             bindRefreshPauseForPagelet(pagelet)
             if (changed) refreshAlsoPagelet(pagelet)
@@ -70,6 +70,13 @@ $(function () {
       const alsoPagelet = findPageletsByUrl(url)
       if (alsoPagelet.length) reloadPagelet(alsoPagelet)
     })
+  }
+
+  // A pagelet with data-pagelet-refresh-while refreshes only while its content has an element matching that selector,
+  // like a summary's "Generating…" line
+  function pageletRefreshWanted (pagelet) {
+    const selector = pagelet.attr('data-pagelet-refresh-while')
+    return !selector || pagelet.find(selector).length > 0
   }
 
   function bindRefreshPauseForPagelet (pagelet) {
@@ -236,7 +243,7 @@ $(function () {
           return
         }
 
-        if (!pagelet[0].hasAttribute('data-pagelet-refresh-paused')) {
+        if (!pagelet[0].hasAttribute('data-pagelet-refresh-paused') && pageletRefreshWanted(pagelet)) {
           reloadPagelet(pagelet, function (changed) {
             bindRefreshPauseForPagelet(pagelet)
             if (changed) refreshAlsoPagelet(pagelet)

@@ -1,0 +1,47 @@
+<%
+  summarisable, path, manager = if @activity
+                                  [@activity, "/activities/#{@activity.id}/feedback_summary", activity_admin?]
+                                elsif @account
+                                  [@account, "/accounts/#{@account.id}/feedback_summary", admin? || (current_account && @account == current_account)]
+                                elsif @organisation
+                                  [@organisation, "/organisations/#{@organisation.id}/feedback_summary", organisation_admin?]
+                                end
+%>
+<% generating = summarisable.feedback_summary_generating? %>
+<%# The pagelet's own route renders just its contents. While a summary generates, the pagelet refreshes until it's done %>
+<% unless defined?(contents_only) %>
+<div data-pagelet-url="<%= path %>" data-pagelet-refresh="3" data-pagelet-refresh-while="[data-feedback-summary-generating]">
+<% end %>
+  <% if summarisable.feedback_summary %>
+    <div class="ai-well my-3 readable" data-bs-toggle="tooltip" title="AI-generated summary ✨">
+      <%= summarisable.feedback_summary_html %>
+    </div>
+  <% end %>
+  <% if manager %>
+    <div class="mt-1">
+      <% if generating %>
+        <span class="text-body-secondary" data-feedback-summary-generating><i class="bi bi-spin bi-slash-lg"></i> Generating feedback summary… this can take a minute</span>
+      <% else %>
+        <% if summarisable.feedback_summary_failed_at %>
+          <span class="text-danger">Couldn't generate a feedback summary ·</span>
+        <% end %>
+        <% if admin? || (summarisable.feedback_summary_last_refreshed_at.nil? || summarisable.feedback_summary_last_refreshed_at <= 24.hours.ago) %>
+          <% if summarisable.feedback_summary_failed_at %>
+            <a class="pagelet-trigger" data-method="post" href="<%= path %>">Try again</a>
+          <% elsif summarisable.feedback_summary_last_refreshed_at.nil? %>
+            <a class="pagelet-trigger" data-method="post" href="<%= path %>">Refresh feedback summary</a>
+          <% else %>
+            <span class="text-body-secondary">Last updated <%= timeago summarisable.feedback_summary_last_refreshed_at %> ·</span> <a class="pagelet-trigger" data-method="post" href="<%= path %>">Refresh</a>
+          <% end %>
+        <% else %>
+          <span class="text-body-secondary">Refresh again in <%= distance_of_time_in_words(Time.now, summarisable.feedback_summary_last_refreshed_at + 24.hours) %></span>
+        <% end %>
+        <% if summarisable.feedback_summary %>
+          <span class="text-body-secondary"> · </span><a data-method="post" href="<%= path %>/delete" data-confirm="Are you sure you want to remove this feedback summary?">Remove</a>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+<% unless defined?(contents_only) %>
+</div>
+<% end %>

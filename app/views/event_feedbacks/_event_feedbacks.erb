@@ -1,75 +1,7 @@
 <%= partial :'event_feedbacks/rating_breakdown', locals: { event_feedbacks: event_feedbacks } %>
 
 <% if !params[:minimal] %>
-
-  <% if @activity %>
-    <% if @activity.feedback_summary %>
-      <div class="ai-well my-3 readable" data-bs-toggle="tooltip" title="AI-generated summary ✨">
-        <%= @activity.feedback_summary_html %>
-      </div>
-    <% end %>
-    <% if activity_admin? %>
-      <div class="mt-1">
-        <% if admin? || (@activity.feedback_summary_last_refreshed_at.nil? || @activity.feedback_summary_last_refreshed_at <= 24.hours.ago) %>
-          <% if @activity.feedback_summary_last_refreshed_at.nil? %>
-            <a data-method="post" href="/activities/<%= @activity.id %>/feedback_summary">Refresh feedback summary</a>
-          <% else %>
-            <span class="text-body-secondary">Last updated <%= timeago @activity.feedback_summary_last_refreshed_at %> ·</span> <a data-method="post" href="/activities/<%= @activity.id %>/feedback_summary">Refresh</a>
-          <% end %>
-        <% else %>
-          <span class="text-body-secondary">Refresh again in <%= distance_of_time_in_words(Time.now, @activity.feedback_summary_last_refreshed_at + 24.hours) %></span>
-        <% end %>
-        <% if @activity.feedback_summary %>
-          <span class="text-body-secondary"> · </span><a data-method="post" href="/activities/<%= @activity.id %>/feedback_summary/delete" data-confirm="Are you sure you want to remove this feedback summary?">Remove</a>
-        <% end %>
-      </div>
-    <% end %>
-  <% elsif @account %>
-    <% if @account.feedback_summary %>
-      <div class="ai-well my-3 readable" data-bs-toggle="tooltip" title="AI-generated summary ✨">
-        <%= @account.feedback_summary_html %>
-      </div>
-    <% end %>
-    <% if (admin? || (current_account && @account == current_account)) %>
-      <div class="mt-1">
-        <% if admin? || (@account.feedback_summary_last_refreshed_at.nil? || @account.feedback_summary_last_refreshed_at <= 24.hours.ago) %>
-          <% if @account.feedback_summary_last_refreshed_at.nil? %>
-            <a data-method="post" href="/accounts/<%= @account.id %>/feedback_summary">Refresh feedback summary</a>
-          <% else %>
-            <span class="text-body-secondary">Last updated <%= timeago @account.feedback_summary_last_refreshed_at %> ·</span> <a data-method="post" href="/accounts/<%= @account.id %>/feedback_summary">Refresh</a>
-          <% end %>
-        <% else %>
-          <span class="text-body-secondary">Refresh again in <%= distance_of_time_in_words(Time.now, @account.feedback_summary_last_refreshed_at + 24.hours) %></span>
-        <% end %>
-        <% if @account.feedback_summary %>
-          <span class="text-body-secondary"> · </span><a data-method="post" href="/accounts/<%= @account.id %>/feedback_summary/delete" data-confirm="Are you sure you want to remove this feedback summary?">Remove</a>
-        <% end %>
-      </div>
-    <% end %>
-  <% elsif @organisation %>
-    <% if @organisation.feedback_summary %>
-      <div class="ai-well my-3 readable" data-bs-toggle="tooltip" title="AI-generated summary ✨">
-        <%= @organisation.feedback_summary_html %>
-      </div>
-    <% end %>
-    <% if organisation_admin? %>
-      <div class="mt-1">
-        <% if admin? || (@organisation.feedback_summary_last_refreshed_at.nil? || @organisation.feedback_summary_last_refreshed_at <= 24.hours.ago) %>
-          <% if @organisation.feedback_summary_last_refreshed_at.nil? %>
-            <a data-method="post" href="/organisations/<%= @organisation.id %>/feedback_summary">Refresh feedback summary</a>
-          <% else %>
-            <span class="text-body-secondary">Last updated <%= timeago @organisation.feedback_summary_last_refreshed_at %> ·</span> <a data-method="post" href="/organisations/<%= @organisation.id %>/feedback_summary">Refresh</a>
-          <% end %>
-        <% else %>
-          <span class="text-body-secondary">Refresh again in <%= distance_of_time_in_words(Time.now, @organisation.feedback_summary_last_refreshed_at + 24.hours) %></span>
-        <% end %>
-        <% if @organisation.feedback_summary %>
-          <span class="text-body-secondary"> · </span><a data-method="post" href="/organisations/<%= @organisation.id %>/feedback_summary/delete" data-confirm="Are you sure you want to remove this feedback summary?">Remove</a>
-        <% end %>
-      </div>
-    <% end %>
-  <% end %>
-
+  <%= partial :'event_feedbacks/feedback_summary' %>
 <% end %>
 
 <% event_feedbacks = event_feedbacks.and(:rating.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 10) %>
