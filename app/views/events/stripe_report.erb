@@ -86,7 +86,7 @@
             <td data-sort="<%= charge[:created].iso8601 %>"><%= charge[:created].to_fs(:db_local) %></td>
             <td data-sort="<%= charge[:name] %>">
               <% if order && order.account %>
-                <a href="/events/<%= @event.id %>/orders?q=<%= CGI.escape(order.account.email) %><% if order.deleted? %>&deleted=1<% end %>"><%= charge[:name] || order.account.name %></a>
+                <a href="/events/<%= @event.id %>/orders?q=<%= CGI.escape(event_email_viewer? ? order.account.email : order.account.username) %><% if order.deleted? %>&deleted=1<% end %>"><%= charge[:name] || order.account.name %></a>
               <% else %>
                 <%= charge[:name] %>
               <% end %>
