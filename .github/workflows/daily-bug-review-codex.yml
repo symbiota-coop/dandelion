@@ -65,6 +65,7 @@ jobs:
           set +e
           codex exec --dangerously-bypass-approvals-and-sandbox \
             --model "$CODEX_MODEL" \
+            -c model_reasoning_effort="$CODEX_EFFORT" \
             --output-last-message "$codex_result" \
             "$PROMPT_TEXT" \
             2> >(tee "$codex_err" >&2)

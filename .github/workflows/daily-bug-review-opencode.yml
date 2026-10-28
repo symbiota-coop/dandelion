@@ -59,7 +59,7 @@ jobs:
           # and errors on stderr, as a model call that fails can otherwise end the run with no event to say why.
           # The JSON events are kept for the summary, and shown in the log as a trace of what it's doing
           set +e
-          opencode run --auto --model "$OPENCODE_MODEL" \
+          opencode run --auto --model "$OPENCODE_MODEL" --variant "$OPENCODE_EFFORT" \
             --format json \
             --print-logs --log-level WARN \
             "$PROMPT_TEXT" \
