@@ -15,14 +15,19 @@ module PaginateWithLimit
       if options[:page_links] == false
         paginate_without_limit(options.merge(page: clamped_page))
       else
-        capped_count = [max_limit, count].min
+        total = count
+        capped_count = [max_limit, total].min
 
         max_page = (capped_count.to_f / per_page).ceil
         max_page = 1 if max_page < 1
 
         final_page = clamped_page.clamp(1, max_page)
 
-        paginate_without_limit(options.merge(total_entries: capped_count, page: final_page))
+        # total_entries is capped so pages stop at max_allowed_page; uncapped_total_entries keeps the real count,
+        # which was counted anyway, for pagination_details to show
+        paginate_without_limit(options.merge(total_entries: capped_count, page: final_page)).tap do |collection|
+          collection.define_singleton_method(:uncapped_total_entries) { total }
+        end
       end
     else
       paginate_without_limit(options)
