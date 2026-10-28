@@ -63,15 +63,16 @@ namespace :late do
     MonthlyContributionsCalculator.calculate
     puts 'MaxMinder upload'
     MaxMinder.upload
+    # Before set_counts, so the monthly donation totals include tonight's donors
+    puts 'sync monthly donations'
+    Organisation.and(:gocardless_subscriptions => true, :gocardless_access_token.ne => nil).each(&:sync_with_gocardless)
+    Organisation.and(:patreon_refresh_token.ne => nil).each(&:sync_with_patreon)
     puts 'set counts, update paid up status and stripe topup'
     Organisation.all.each do |organisation|
       organisation.set_counts
       organisation.update_paid_up_without_delay
       organisation.stripe_topup if organisation.stripe_customer_id
     end
-    puts 'sync monthly donations'
-    Organisation.and(:gocardless_subscriptions => true, :gocardless_access_token.ne => nil).each(&:sync_with_gocardless)
-    Organisation.and(:patreon_refresh_token.ne => nil).each(&:sync_with_patreon)
     puts 'sync stripe subscriptions'
     Account.reconcile_stripe_subscriptions
     puts 'stripe transfers'
