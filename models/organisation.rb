@@ -97,7 +97,7 @@ class Organisation
   end
 
   def set_counts
-    monthly_rows = organisationships.and(:monthly_donation_method.ne => nil).and(:monthly_donation_method.ne => 'Other').pluck(:monthly_donation_amount, :monthly_donation_currency)
+    monthly_rows = organisationships.and(:monthly_donation_method.ne => nil).pluck(:monthly_donation_amount, :monthly_donation_currency)
     monthly_donations_count = monthly_rows.map do |amount, currency|
       next Money.new(0, 'GBP') if amount.nil? || currency.blank?
 

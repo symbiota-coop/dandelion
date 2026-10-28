@@ -33,6 +33,8 @@ class OrganisationsTest < ActiveSupport::TestCase
 
     post "/organisationships/#{patron.id}/monthly_donation", amount: '10'
     assert_equal 'GBP', patron.reload.monthly_donation_currency
+    @organisation.set_counts
+    assert_equal '£10', @organisation.reload.monthly_donations_count
 
     post "/organisationships/#{patron.id}/monthly_donation", amount: ''
     assert_equal [nil, nil], [patron.reload.monthly_donation_method, patron.monthly_donation_amount]
