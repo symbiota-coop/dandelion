@@ -184,8 +184,10 @@ class Organisation
     "#{ENV['BASE_URI']}/o/#{slug}/mailgun_webhook"
   end
 
+  # Only the organisation's own key: Dandelion's (MAILGUN_WEBHOOK_SIGNING_KEY) signs events for every organisation, so
+  # accepting it here would let an event signed for one organisation be replayed to another's webhook
   def mailgun_webhook_authentic?(signature)
-    signing_key = mailgun_webhook_signing_key.present? ? mailgun_webhook_signing_key : ENV['MAILGUN_WEBHOOK_SIGNING_KEY']
+    signing_key = mailgun_webhook_signing_key
     return false if signing_key.blank? || !signature.is_a?(Hash)
 
     timestamp = signature['timestamp'].to_s

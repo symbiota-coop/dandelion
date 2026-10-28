@@ -933,6 +933,36 @@ class WebhooksTest < ActiveSupport::TestCase
     assert_equal 0, discussion.comments.and(via_email: true).count
   end
 
+  # A Mailgun click event for pmail, signed with key
+  def mailgun_click_event(pmail, key:)
+    timestamp = Time.now.to_i.to_s
+    token = SecureRandom.hex(25)
+    {
+      'signature' => { 'timestamp' => timestamp, 'token' => token, 'signature' => OpenSSL::HMAC.hexdigest('SHA256', key, "#{timestamp}#{token}") },
+      'event-data' => { 'event' => 'clicked', 'tags' => [pmail.id.to_s], 'url' => 'https://example.com/page' }
+    }.to_json
+  end
+
+  test 'a click webhook signed with the organisation\'s key is counted' do
+    create_organisation(mailgun_webhook_signing_key: 'organisation-key')
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone')
+    post "/o/#{@organisation.slug}/mailgun_webhook", mailgun_click_event(pmail, key: 'organisation-key'), 'CONTENT_TYPE' => 'application/json'
+    assert_equal 200, last_response.status
+    assert_equal 1, pmail.pmail_links.count
+  end
+
+  test 'a click webhook signed with Dandelion\'s key is refused' do
+    with_mailgun_signing_key('dandelion-key') do
+      [nil, 'organisation-key'].each do |organisation_key|
+        organisation = FactoryBot.create(:organisation, account: FactoryBot.create(:account), mailgun_webhook_signing_key: organisation_key)
+        pmail = FactoryBot.create(:pmail, organisation: organisation, recipient_kind: 'everyone')
+        post "/o/#{organisation.slug}/mailgun_webhook", mailgun_click_event(pmail, key: 'dandelion-key'), 'CONTENT_TYPE' => 'application/json'
+        assert_equal 401, last_response.status
+        assert_equal 0, pmail.pmail_links.count
+      end
+    end
+  end
+
   test 'inbound email html does not read stylesheets linked from the message' do
     with_local_stylesheet do |link|
       mail = Mail.new do
