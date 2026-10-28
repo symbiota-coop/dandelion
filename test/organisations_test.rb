@@ -28,8 +28,11 @@ class OrganisationsTest < ActiveSupport::TestCase
     get "/organisationships/#{patron.id}/monthly_donation"
     assert_includes last_response.body, "/organisationships/#{patron.id}/monthly_donation"
 
+    post "/organisationships/#{patron.id}/monthly_donation", amount: '10', currency: 'USD'
+    assert_equal ['Other', 10.0, 'USD'], [patron.reload.monthly_donation_method, patron.monthly_donation_amount, patron.monthly_donation_currency]
+
     post "/organisationships/#{patron.id}/monthly_donation", amount: '10'
-    assert_equal ['Other', 10.0, 'GBP'], [patron.reload.monthly_donation_method, patron.monthly_donation_amount, patron.monthly_donation_currency]
+    assert_equal 'GBP', patron.reload.monthly_donation_currency
 
     post "/organisationships/#{patron.id}/monthly_donation", amount: ''
     assert_equal [nil, nil], [patron.reload.monthly_donation_method, patron.monthly_donation_amount]

@@ -376,10 +376,11 @@ Dandelion::App.controller do
     @organisation = organisationship.organisation
     organisation_admins_only!
     # A blank amount means they no longer donate
+    currency = params[:currency] if FIAT_CURRENCIES.include?(params[:currency]) || params[:currency] == organisationship.monthly_donation_currency
     organisationship.update_attributes(
       monthly_donation_amount: params[:amount],
       monthly_donation_method: ('Other' if params[:amount]),
-      monthly_donation_currency: (@organisation.currency if params[:amount])
+      monthly_donation_currency: ((currency || @organisation.currency) if params[:amount])
     )
     200
   end
