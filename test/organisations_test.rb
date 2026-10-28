@@ -81,28 +81,52 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal 'refresh', @organisation.patreon_refresh_token
   end
 
-  test 'admins can update or clear a monthly donor recorded from Patreon by hand' do
+  test 'admins can record, update or clear a monthly donor by hand, but not one synced from Patreon' do
     create_organisation(currency: 'GBP')
-    patron = @organisation.organisationships.create!(account: FactoryBot.create(:account), monthly_donation_method: 'Patreon',
-                                                     monthly_donation_amount: 8, monthly_donation_currency: 'USD')
+    donor = @organisation.organisationships.create!(account: FactoryBot.create(:account), sent_monthly_donation_welcome: true)
     @organisation.set(monthly_donors_count: 1)
     assert @organisation.monthly_donations_enabled?
     sign_in_with_rack(@account)
 
-    get "/organisationships/#{patron.id}/monthly_donation"
-    assert_includes last_response.body, "/organisationships/#{patron.id}/monthly_donation"
+    get "/organisationships/#{donor.id}/monthly_donation"
+    assert_includes last_response.body, "/organisationships/#{donor.id}/monthly_donation"
 
-    post "/organisationships/#{patron.id}/monthly_donation", amount: '10', currency: 'USD'
-    assert_equal ['Other', 10.0, 'USD'], [patron.reload.monthly_donation_method, patron.monthly_donation_amount, patron.monthly_donation_currency]
+    post "/organisationships/#{donor.id}/monthly_donation", amount: '10', currency: 'USD'
+    assert_equal ['Other', 10.0, 'USD'], [donor.reload.monthly_donation_method, donor.monthly_donation_amount, donor.monthly_donation_currency]
 
-    post "/organisationships/#{patron.id}/monthly_donation", amount: '10'
-    assert_equal 'GBP', patron.reload.monthly_donation_currency
+    post "/organisationships/#{donor.id}/monthly_donation", amount: '10'
+    assert_equal 'GBP', donor.reload.monthly_donation_currency
     @organisation.set_counts
     assert_equal '£10', @organisation.reload.monthly_donations_count
 
-    post "/organisationships/#{patron.id}/monthly_donation", amount: ''
-    assert_equal [nil, nil], [patron.reload.monthly_donation_method, patron.monthly_donation_amount]
-    refute patron.monthly_donor?
+    post "/organisationships/#{donor.id}/monthly_donation", amount: ''
+    assert_equal [nil, nil], [donor.reload.monthly_donation_method, donor.monthly_donation_amount]
+    refute donor.monthly_donor?
+
+    patron = @organisation.organisationships.create!(account: FactoryBot.create(:account), monthly_donation_method: 'Patreon',
+                                                     monthly_donation_amount: 8, monthly_donation_currency: 'USD', sent_monthly_donation_welcome: true)
+    get "/organisationships/#{patron.id}/monthly_donation"
+    assert_includes last_response.body, 'via Patreon'
+    refute_includes last_response.body, "/organisationships/#{patron.id}/monthly_donation"
+
+    post "/organisationships/#{patron.id}/monthly_donation", amount: '10'
+    assert_equal 403, last_response.status
+    assert_equal ['Patreon', 8.0], [patron.reload.monthly_donation_method, patron.monthly_donation_amount]
+  end
+
+  test 'admins can filter members by how they donate monthly' do
+    create_organisation
+    { 'patron@example.com' => 'Patreon', 'direct-debit@example.com' => 'GoCardless', 'follower@example.com' => nil }.each do |email, method|
+      @organisation.organisationships.create!(account: FactoryBot.create(:account, email: email), monthly_donation_method: method,
+                                              monthly_donation_amount: (5 if method), monthly_donation_currency: ('GBP' if method), sent_monthly_donation_welcome: true)
+    end
+    sign_in_with_rack(@account)
+
+    { 'Patreon' => ['patron@example.com'], 'All' => ['patron@example.com', 'direct-debit@example.com'], 'None' => ['follower@example.com'],
+      '' => ['patron@example.com', 'direct-debit@example.com', 'follower@example.com'] }.each do |filter, emails|
+      get "/o/#{@organisation.slug}/followers", monthly_donor: filter
+      assert_equal emails.sort, %w[patron@example.com direct-debit@example.com follower@example.com].select { |e| last_response.body.include?(e) }.sort, filter
+    end
   end
 
   test 'creating an organisation' do

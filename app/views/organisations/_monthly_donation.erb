@@ -1,4 +1,4 @@
-<% if @organisation && @organisation.monthly_donations_enabled? && organisationship.monthly_donation_method.in?([nil, 'Other', 'Patreon']) %>
+<% if @organisation && @organisation.monthly_donations_enabled? && organisationship.monthly_donation_method.in?([nil, 'Other']) %>
   <% form_tag "/organisationships/#{organisationship.id}/monthly_donation", class: 'form-inline' do %>
     <% currency = organisationship.monthly_donation_currency || @organisation.currency %>
     <div class="input-group">

@@ -8,8 +8,10 @@
         <label>Search people</label>
         <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
       </div>
-      <%= checkbox 'Monthly donor', form_group_class: 'col-12 col-sm-auto' %>
-      <%= checkbox 'Not a monthly donor', form_group_class: 'col-12 col-sm-auto' %>
+      <div class="form-group col-12 col-sm-auto">
+        <label for="monthly_donor">Monthly donor</label>
+        <%= select_tag :monthly_donor, options: [['', ''], %w[All All]] + Organisationship.monthly_donation_methods.compact_blank.map { |m| [m, m] } + [%w[None None]], selected: params[:monthly_donor], id: 'monthly_donor', class: 'form-select' %>
+      </div>
       <%= checkbox 'Connected to Stripe', form_group_class: 'col-12 col-sm-auto' %>
       <%= checkbox 'Subscribed to mailer', form_group_class: 'col-12 col-sm-auto' %>
       <%= checkbox 'Admin', form_group_class: 'col-12 col-sm-auto' %>

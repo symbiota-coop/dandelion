@@ -200,8 +200,11 @@ Dandelion::App.controller do
     organisation_admins_only!
     @organisationships = @organisation.organisationships.includes(:account).order('created_at desc')
     @organisationships = @organisationships.and(:account_id.in => Account.search(params[:q], @organisation.members).pluck(:id)) if params[:q]
-    @organisationships = @organisationships.and(:monthly_donation_method.ne => nil) if params[:monthly_donor]
-    @organisationships = @organisationships.and(monthly_donation_method: nil) if params[:not_a_monthly_donor]
+    case params[:monthly_donor]
+    when 'All' then @organisationships = @organisationships.and(:monthly_donation_method.ne => nil)
+    when 'None' then @organisationships = @organisationships.and(monthly_donation_method: nil)
+    when *Organisationship.monthly_donation_methods.compact_blank then @organisationships = @organisationships.and(monthly_donation_method: params[:monthly_donor])
+    end
     @organisationships = @organisationships.and(:stripe_connect_json.ne => nil) if params[:connected_to_stripe]
     if params[:subscribed_to_mailer]
       # Filter to org-subscribed, then exclude globally unsubscribed
@@ -375,6 +378,8 @@ Dandelion::App.controller do
     organisationship = Organisationship.find(params[:id]) || not_found
     @organisation = organisationship.organisation
     organisation_admins_only!
+    # Donations from GoCardless and Patreon come from their syncs
+    halt 403 unless organisationship.monthly_donation_method.in?([nil, 'Other'])
     # A blank amount means they no longer donate
     currency = params[:currency] if FIAT_CURRENCIES.include?(params[:currency]) || params[:currency] == organisationship.monthly_donation_currency
     organisationship.update_attributes(
