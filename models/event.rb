@@ -46,7 +46,7 @@ class Event
       sent_feedback_requests_at sent_reminders_at sent_star_reminders_at
       voyage_embedding ai_tagged sold_out_cache sold_out_due_to_sales_end_cache browsable
       calendar_import_feed_url calendar_import_uid calendar_import_source_url calendar_import_last_synced_at
-      locked_error locked_error_provider
+      locked_error locked_error_provider page_views_count
     ]
   end
 
@@ -148,8 +148,11 @@ class Event
     end.name
   end
 
-  def page_views_count
-    PageView.and('$or' => [{ path: "/e/#{slug}" }, { path: "/events/#{id}" }]).count
+  # Counts a view of the event page, until the event starts, so the count stays as it was when the event began
+  def count_page_view
+    return if start_time && start_time <= Time.now
+
+    inc(page_views_count: 1)
   end
 
   def donations_to_dandelion?

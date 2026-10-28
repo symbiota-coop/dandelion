@@ -160,7 +160,7 @@ Dandelion::App.helpers do
   def build_events_stats_csv(events, organisation)
     CSV.generate do |csv|
       headers = ['name']
-      headers_basic = %w[date coordinator organiser facilitators tags activity local_group facebook_event 30d_views tickets_sold checked_in ticket_revenue donations]
+      headers_basic = %w[date coordinator organiser facilitators tags activity local_group facebook_event views tickets_sold checked_in ticket_revenue donations]
       headers += headers_basic
 
       if organisation.stripe_client_id

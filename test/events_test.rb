@@ -252,6 +252,19 @@ class EventsTest < ActiveSupport::TestCase
     assert_includes last_response.body, '&lt;img src=x onerror=alert(1)&gt;'
   end
 
+  test 'event page views are counted until the event starts' do
+    create_event(prices: [0])
+
+    2.times { get "/e/#{@event.slug}" }
+    get "/e/#{@event.slug}.json"
+    assert_equal 2, @event.reload.page_views_count
+
+    @event.set(start_time: 1.hour.ago)
+    get "/e/#{@event.slug}"
+    assert last_response.ok?
+    assert_equal 2, @event.reload.page_views_count
+  end
+
   test 'email notifications for a discussion nobody has written in yet make its post' do
     create_event(prices: [0])
     attendee = FactoryBot.create(:account)

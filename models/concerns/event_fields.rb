@@ -66,6 +66,8 @@ module EventFields
     field :terms_and_conditions, type: String
     field :locked_error, type: String
     field :locked_error_provider, type: String
+    # Views of the event page, counted until the event starts (Event#count_page_view)
+    field :page_views_count, type: Integer, default: 0
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer

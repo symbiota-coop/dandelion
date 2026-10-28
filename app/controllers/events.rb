@@ -238,6 +238,7 @@ Dandelion::App.controller do
     case content_type
     when :html
       @hide_right_nav = true
+      @event.count_page_view if !request.xhr? && !request.is_crawler?
 
       if params[:ticket_form_only]
         partial :'purchase/purchase', layout: :minimal
