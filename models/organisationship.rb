@@ -323,6 +323,6 @@ class Organisationship
   end
 
   def self.monthly_donation_methods
-    [''] + %w[GoCardless Patreon PayPal Other]
+    [''] + %w[GoCardless Patreon Other]
   end
 end
