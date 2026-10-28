@@ -46,8 +46,9 @@ module Almanac
     c0 + (c1 * t) + (c2 * (t**2)) + (c3 * (t**3)) + (c4 * (t**4))
   end
 
+  # A Julian Day starts at noon UTC, and DateTime.jd's days at midnight
   def self.jde_to_date(jde)
-    DateTime.jd(jde).to_date
+    DateTime.jd(jde + 0.5).to_date
   end
 
   def self.midpoint_date(jde_a, jde_b)

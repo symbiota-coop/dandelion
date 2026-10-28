@@ -163,6 +163,14 @@
       letter-spacing: 0.05em;
     }
 
+    .sabbat-date {
+      font-family: 'EB Garamond', serif;
+      font-size: 8.5px;
+      font-style: italic;
+      fill: var(--cream-dim);
+      letter-spacing: 0.04em;
+    }
+
     .center-circle text {
       font-family: 'Cinzel Decorative', cursive;
       fill: var(--gold-light);
@@ -275,8 +283,6 @@
       flex-shrink: 0;
       filter: drop-shadow(0 0 8px currentColor);
     }
-
-    .panel-title-block {}
 
     .panel-date {
       font-family: 'Cinzel', serif;
@@ -433,17 +439,65 @@
       align-self: stretch;
     }
 
-    .hemi-note {
-      font-size: 0.78rem;
-      font-style: italic;
-      color: var(--cream-dim);
-      opacity: 0;
-      transition: opacity 0.4s;
-      min-height: 1.1em;
+    .hemi-btn:focus-visible,
+    .now-line button:focus-visible {
+      outline: 1px solid var(--gold-light);
+      outline-offset: 2px;
     }
 
-    .hemi-note.visible {
-      opacity: 1;
+    /* Today: the moon and the next festival */
+    .now-line {
+      position: relative;
+      z-index: 1;
+      margin-top: 0.9rem;
+      font-size: 1rem;
+      color: var(--cream-dim);
+      text-align: center;
+      padding: 0 1rem;
+    }
+
+    .now-line button {
+      font: inherit;
+      color: var(--gold-light);
+      background: none;
+      border: none;
+      border-bottom: 1px dotted var(--gold-dim);
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .today-marker {
+      pointer-events: none;
+    }
+
+    .segment:focus {
+      outline: none;
+    }
+
+    .segment:focus-visible .segment-fill {
+      stroke: var(--gold-light);
+      stroke-width: 2.5;
+    }
+
+    .panel-when {
+      font-size: 0.92rem;
+      font-style: italic;
+      color: var(--cream-dim);
+      margin-top: 0.15rem;
+    }
+
+    .panel-when strong {
+      font-style: normal;
+      font-weight: 500;
+      color: var(--gold-light);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .panel-prompt .prompt-symbol,
+      .panel-content {
+        animation: none;
+      }
     }
   </style>
 </head>
@@ -453,35 +507,34 @@
   <header>
     <h1>Wheel of the Year</h1>
     <p>Eight seasonal festivals marking the turning of the year</p>
+    <div class="now-line" id="now-line"></div>
   </header>
 
   <div class="rule"></div>
 
   <div class="hemisphere-row">
-    <div class="hemisphere-toggle">
-      <button class="hemi-btn active" id="btn-nh" onclick="setHemisphere('north')">&#8679; Northern Hemisphere</button>
+    <div class="hemisphere-toggle" role="group" aria-label="Hemisphere">
+      <button class="hemi-btn active" id="btn-nh" aria-pressed="true" onclick="setHemisphere('north')">&#8679; Northern Hemisphere</button>
       <div class="hemi-divider"></div>
-      <button class="hemi-btn" id="btn-sh" onclick="setHemisphere('south')">&#8681; Southern Hemisphere</button>
+      <button class="hemi-btn" id="btn-sh" aria-pressed="false" onclick="setHemisphere('south')">&#8681; Southern Hemisphere</button>
     </div>
   </div>
 
   <div class="main-layout">
     <div class="wheel-container">
-      <svg id="wheel-svg" viewBox="-260 -260 520 520" xmlns="http://www.w3.org/2000/svg"></svg>
+      <svg id="wheel-svg" viewBox="-260 -260 520 520" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="The eight festivals, clockwise from Yule"></svg>
     </div>
 
-    <div class="info-panel" id="info-panel">
+    <div class="info-panel" id="info-panel" aria-live="polite">
       <div class="panel-prompt" id="panel-prompt">
         <div class="prompt-symbol">☽ ✦ ☾</div>
-        <p>Click any segment of the Wheel to explore the eight festivals of the year</p>
+        <p>Click any segment of the Wheel to explore the eight festivals of the year. The gold hand shows where we are today</p>
       </div>
       <div class="panel-content" id="panel-content"></div>
     </div>
   </div>
 
   <script>
-    const TAU = Math.PI * 2;
-
     // 8 sabbats, starting from Yule (Winter Solstice) at top, going clockwise
     // Angles: 0 = top, clockwise. Each sabbat 45° apart.
     // Order clockwise from top: Yule, Imbolc, Ostara, Beltane, Litha, Lughnasadh, Mabon, Samhain
@@ -491,12 +544,11 @@
         name: 'Yule',
         alt: 'Winter Solstice',
         type: 'solar',
-        date: { north: 'December 21', south: 'June 21' },
+        event: 'december_solstice',
         angle: 0,
         icon: '❄️',
         color: '#6ab4c8',
         colorDark: '#2a6a88',
-        seasonLabel: { north: 'WINTER', south: 'WINTER' },
         desc: 'Yule marks the longest night and the rebirth of the Sun. As the wheel turns and light begins its slow return, ancients lit great bonfires to welcome the returning king of light. The world holds its breath, then exhales into the growing dawn.',
         traditions: ['Holly & Oak Kings', 'Yule Log', 'Evergreens', 'Candle Vigils'],
         themes: 'Rebirth, Light returning, Hope',
@@ -508,12 +560,11 @@
         name: 'Imbolc',
         alt: "Brigid's Day · Candlemas",
         type: 'cross',
-        date: { north: 'February 1–2', south: 'August 1–2' },
+        traditional: { north: '1–2 February', south: '1–2 August' },
         angle: 45,
         icon: '🕯️',
         color: '#c8a0d8',
         colorDark: '#6a3a88',
-        seasonLabel: { north: '', south: '' },
         desc: 'Imbolc means "in the belly," honoring the first stirrings of spring within the frozen earth. Sacred to Brigid, goddess of fire, healing, and poetry, this festival celebrates the return of fertility and the quickening of the land under snow.',
         traditions: ['Brigid Crosses', 'Candle Blessing', 'Fire Divination', 'Spring Cleaning'],
         themes: 'Awakening, Purification, New beginnings',
@@ -525,12 +576,11 @@
         name: 'Ostara',
         alt: 'Spring Equinox',
         type: 'solar',
-        date: { north: 'March 20–21', south: 'September 22–23' },
+        event: 'march_equinox',
         angle: 90,
         icon: '🌸',
         color: '#c06080',
         colorDark: '#803050',
-        seasonLabel: { north: 'SPRING', south: 'SPRING' },
         desc: 'At Ostara, day and night stand in perfect balance before light triumphs. Named for the Germanic dawn goddess Ēostre, this is a festival of fertility, seeds, and new life. Hares run wild, eggs are hidden, and the world blooms into color.',
         traditions: ['Egg Decoration', 'Seed Planting', 'Balance Rituals', 'Dawn Vigil'],
         themes: 'Balance, Fertility, New growth',
@@ -542,12 +592,11 @@
         name: 'Beltane',
         alt: 'May Day',
         type: 'cross',
-        date: { north: 'May 1', south: 'November 1' },
+        traditional: { north: '1 May', south: '31 October – 1 November' },
         angle: 135,
         icon: '🔥',
         color: '#e07020',
         colorDark: '#904010',
-        seasonLabel: { north: '', south: '' },
         desc: 'Beltane blazes with the full fire of spring becoming summer. Fires were lit on every hill; cattle driven between them for protection. Maypoles rose as symbols of sacred union, and the veil between worlds thinned, inviting the fae to walk among us.',
         traditions: ['Beltane Fires', 'Maypole Dance', 'Green Man', 'Handfasting'],
         themes: 'Passion, Union, Fertility at peak',
@@ -559,12 +608,11 @@
         name: 'Litha',
         alt: 'Midsummer · Summer Solstice',
         type: 'solar',
-        date: { north: 'June 21', south: 'December 21' },
+        event: 'june_solstice',
         angle: 180,
         icon: '☀️',
         color: '#d4a020',
         colorDark: '#8a6010',
-        seasonLabel: { north: 'SUMMER', south: 'SUMMER' },
         desc: 'Litha is the zenith — the longest day, when the Sun pauses at the height of its power before beginning its slow descent. Midsummer bonfires burned through the night; faeries were said to roam freely. It is a moment of radiant fullness before the waning begins.',
         traditions: ['Midsummer Bonfires', 'Flower Crowns', 'Well Dressing', 'Sun Wheels'],
         themes: 'Fullness, Power, Celebration before waning',
@@ -576,12 +624,11 @@
         name: 'Lughnasadh',
         alt: 'Lammas · First Harvest',
         type: 'cross',
-        date: { north: 'August 1', south: 'February 1' },
+        traditional: { north: '1 August', south: '1 February' },
         angle: 225,
         icon: '🌾',
         color: '#a0b030',
         colorDark: '#507010',
-        seasonLabel: { north: '', south: '' },
         desc: 'Lughnasadh, named for the god Lugh, marks the first harvest — grain cut, bread baked from new wheat. It is a time of both abundance and bittersweet awareness: the Sun King weakens as the harvest grows. Games, feasting, and sacrifice honored the turning year.',
         traditions: ['Bread Baking', 'Grain Dollies', 'Harvest Games', 'Offerings to Lugh'],
         themes: 'First harvest, Sacrifice, Abundance',
@@ -593,12 +640,11 @@
         name: 'Mabon',
         alt: 'Autumn Equinox',
         type: 'solar',
-        date: { north: 'September 22–23', south: 'March 20–21' },
+        event: 'september_equinox',
         angle: 270,
         icon: '🍂',
         color: '#b05820',
         colorDark: '#703010',
-        seasonLabel: { north: 'AUTUMN', south: 'AUTUMN' },
         desc: 'Mabon brings the second balance point of the year as darkness begins to gain. The second harvest is gathered; leaves catch flame in amber and crimson. Named for the Welsh divine child, this equinox invites gratitude for what has been reaped and release of what must fall.',
         traditions: ['Apple Harvest', 'Gratitude Altars', 'Ancestor Honoring', 'Wine Making'],
         themes: 'Balance, Gratitude, Preparation for darkness',
@@ -610,12 +656,11 @@
         name: 'Samhain',
         alt: 'All Hallows · Ancestor Night',
         type: 'cross',
-        date: { north: 'October 31', south: 'April 30' },
+        traditional: { north: '31 October', south: '30 April – 1 May' },
         angle: 315,
         icon: '🌑',
         color: '#7040b0',
         colorDark: '#3a1870',
-        seasonLabel: { north: '', south: '' },
         desc: 'Samhain is the great hinge of the year — the end and the beginning, when the veil between the living and the dead grows thin as gossamer. The final harvest is brought in, the last fires extinguished and relit from the sacred flame. Ancestors are welcomed home.',
         traditions: ['Dumb Supper', 'Jack-o-Lanterns', 'Ancestor Altars', 'Divination'],
         themes: 'Death, Transition, Ancestral communion',
@@ -624,18 +669,56 @@
       },
     ];
 
-    let hemisphere = 'north';
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const DAY = 1000 * 60 * 60 * 24;
+
+    // Meeus's equinox and solstice coefficients, matching lib/almanac.rb
+    const SOLAR_EVENT_COEFFICIENTS = {
+      march_equinox: [2451623.80984, 365242.37404, 0.05169, -0.00411, -0.00057],
+      june_solstice: [2451716.56767, 365241.62603, 0.00325, 0.00888, -0.00030],
+      september_equinox: [2451810.21715, 365242.01767, -0.11575, 0.00337, 0.00078],
+      december_solstice: [2451900.05952, 365242.74049, -0.06223, -0.00823, 0.00032],
+    };
+
+    // In the south each solar festival falls on the opposite solstice or equinox
+    const SOUTHERN_EVENT = {
+      december_solstice: 'june_solstice',
+      june_solstice: 'december_solstice',
+      march_equinox: 'september_equinox',
+      september_equinox: 'march_equinox',
+    };
+
+    // Timezones south of the equator, for guessing the hemisphere on a first visit
+    const SOUTHERN_TIMEZONES = /^(Australia|Antarctica)\/|^Pacific\/(Auckland|Chatham|Fiji|Tongatapu|Apia|Noumea|Efate|Port_Moresby)|^America\/(Argentina|Santiago|Sao_Paulo|Montevideo|Asuncion|La_Paz|Lima|Punta_Arenas)|^Africa\/(Johannesburg|Maputo|Harare|Windhoek|Gaborone|Lusaka|Maseru|Mbabane|Blantyre|Lubumbashi|Luanda|Dar_es_Salaam)|^Indian\/(Mauritius|Reunion|Antananarivo)|^Atlantic\/Stanley/;
+
+    function storedHemisphere () {
+      try {
+        const stored = localStorage.getItem('wheel-of-the-year-hemisphere');
+        if (stored === 'north' || stored === 'south') return stored;
+      } catch (e) { /* storage unavailable */ }
+      try {
+        if (SOUTHERN_TIMEZONES.test(Intl.DateTimeFormat().resolvedOptions().timeZone)) return 'south';
+      } catch (e) { /* no Intl */ }
+      return 'north';
+    }
+
+    let hemisphere = storedHemisphere();
 
     const svg = document.getElementById('wheel-svg');
     const infoPanel = document.getElementById('info-panel');
     const panelPrompt = document.getElementById('panel-prompt');
     const panelContent = document.getElementById('panel-content');
+    const nowLine = document.getElementById('now-line');
 
     const R_OUTER = 240;
-    const R_INNER_LABEL = 170;
-    const R_ICON = 205;
     const R_RING = 140;
     const R_INNER = 70;
+
+    function svgEl (tag, attrs) {
+      const el = document.createElementNS(SVG_NS, tag);
+      Object.entries(attrs || {}).forEach(([k, v]) => el.setAttribute(k, v));
+      return el;
+    }
 
     function polarToXY (angleDeg, r) {
       // 0 deg = top, clockwise
@@ -650,11 +733,85 @@
       return `M ${cx + x1} ${cy + y1} A ${r} ${r} 0 ${largeArc} 1 ${cx + x2} ${cy + y2}`;
     }
 
+    // === DATES ===
+
+    function solarInstant (event, year) {
+      const [c0, c1, c2, c3, c4] = SOLAR_EVENT_COEFFICIENTS[event];
+      const t = (year - 2000) / 1000;
+      const jde = c0 + c1 * t + c2 * t ** 2 + c3 * t ** 3 + c4 * t ** 4;
+      return new Date((jde - 2440587.5) * DAY);
+    }
+
+    // Every festival from two years back to two years on, in order. The cross-quarter days are the astronomical
+    // midpoints between the solstices and equinoxes either side of them
+    function festivalTimeline (hemi) {
+      const thisYear = new Date().getFullYear();
+      const solar = [];
+      for (let year = thisYear - 2; year <= thisYear + 2; year++) {
+        sabbats.forEach((s, index) => {
+          if (!s.event) return;
+          const event = hemi === 'south' ? SOUTHERN_EVENT[s.event] : s.event;
+          solar.push({ index, date: solarInstant(event, year) });
+        });
+      }
+      solar.sort((a, b) => a.date - b.date);
+
+      const timeline = [];
+      solar.forEach((a, i) => {
+        timeline.push(a);
+        const b = solar[i + 1];
+        if (b) timeline.push({ index: (a.index + 1) % sabbats.length, date: new Date((a.date.getTime() + b.date.getTime()) / 2) });
+      });
+      return timeline;
+    }
+
+    function startOfDay (date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
+    // Whole calendar days from today to date, in the viewer's timezone
+    function daysFromToday (date) {
+      return Math.round((startOfDay(date) - startOfDay(new Date())) / DAY);
+    }
+
+    function relativeDays (days) {
+      if (days === 0) return 'today';
+      if (days === 1) return 'tomorrow';
+      if (days === -1) return 'yesterday';
+      return days > 0 ? `in ${days} days` : `${-days} days ago`;
+    }
+
+    const dateFormat = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
+    const shortDateFormat = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short' });
+
+    // The festival's next date, counting today
+    function nextOccurrence (index) {
+      return timeline.find(o => o.index === index && daysFromToday(o.date) >= 0);
+    }
+
+    // Where today falls on the wheel, between the last festival and the next
+    function todayAngle () {
+      const now = new Date();
+      const i = timeline.findIndex(o => o.date > now);
+      const prev = timeline[i - 1];
+      const next = timeline[i];
+      const fraction = (now - prev.date) / (next.date - prev.date);
+      return sabbats[prev.index].angle + 45 * fraction;
+    }
+
+    function directionFor (direction) {
+      if (hemisphere === 'north') return direction;
+      return direction.replace(/North|South/g, d => (d === 'North' ? 'South' : 'North'));
+    }
+
+    let timeline = festivalTimeline(hemisphere);
+
+    // === WHEEL ===
+
     function createSegment (sabbat, index) {
       const startAngle = sabbat.angle - 22.5;
       const endAngle = sabbat.angle + 22.5;
 
-      // Outer segment path
       const [ox1, oy1] = polarToXY(startAngle, R_OUTER);
       const [ox2, oy2] = polarToXY(endAngle, R_OUTER);
       const [ix1, iy1] = polarToXY(startAngle, R_RING);
@@ -662,115 +819,82 @@
 
       const path = `M ${ox1} ${oy1} A ${R_OUTER} ${R_OUTER} 0 0 1 ${ox2} ${oy2} L ${ix2} ${iy2} A ${R_RING} ${R_RING} 0 0 0 ${ix1} ${iy1} Z`;
 
-      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      g.setAttribute('class', 'segment');
+      const g = svgEl('g', {
+        class: 'segment',
+        tabindex: '0',
+        role: 'button',
+        'aria-pressed': 'false',
+        'aria-label': `${sabbat.name}, ${sabbat.alt}`,
+      });
       g.dataset.id = sabbat.id;
-      g.dataset.index = index;
 
-      // Segment fill
-      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      p.setAttribute('d', path);
-      p.setAttribute('fill', sabbat.colorDark);
-      p.setAttribute('stroke', '#0d0a06');
-      p.setAttribute('stroke-width', '1.5');
-      g.appendChild(p);
+      g.appendChild(svgEl('path', { d: path, class: 'segment-fill', fill: sabbat.colorDark, stroke: '#0d0a06', 'stroke-width': '1.5' }));
 
       // Gradient overlay
       const gradId = `grad-${sabbat.id}`;
-      const defs = svg.querySelector('defs') || (() => { const d = document.createElementNS('http://www.w3.org/2000/svg', 'defs'); svg.appendChild(d); return d; })();
-      const grad = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
-      grad.setAttribute('id', gradId);
-      grad.setAttribute('cx', '50%'); grad.setAttribute('cy', '50%');
-      grad.setAttribute('r', '50%');
-      const s1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-      s1.setAttribute('offset', '0%');
-      s1.setAttribute('stop-color', sabbat.color);
-      s1.setAttribute('stop-opacity', '0.3');
-      const s2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-      s2.setAttribute('offset', '100%');
-      s2.setAttribute('stop-color', sabbat.color);
-      s2.setAttribute('stop-opacity', '0');
-      grad.appendChild(s1); grad.appendChild(s2);
-      defs.appendChild(grad);
-
-      const p2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      p2.setAttribute('d', path);
-      p2.setAttribute('fill', `url(#${gradId})`);
-      p2.setAttribute('stroke', 'none');
-      g.appendChild(p2);
+      const grad = svgEl('radialGradient', { id: gradId, cx: '50%', cy: '50%', r: '50%' });
+      grad.appendChild(svgEl('stop', { offset: '0%', 'stop-color': sabbat.color, 'stop-opacity': '0.3' }));
+      grad.appendChild(svgEl('stop', { offset: '100%', 'stop-color': sabbat.color, 'stop-opacity': '0' }));
+      svg.querySelector('defs').appendChild(grad);
+      g.appendChild(svgEl('path', { d: path, fill: `url(#${gradId})`, stroke: 'none' }));
 
       // Rim arc highlight
-      const rimPath = describeArc(0, 0, R_OUTER - 1, startAngle + 0.5, endAngle - 0.5);
-      const rim = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      rim.setAttribute('d', rimPath);
-      rim.setAttribute('fill', 'none');
-      rim.setAttribute('stroke', sabbat.color);
-      rim.setAttribute('stroke-width', '2.5');
-      rim.setAttribute('opacity', '0.6');
-      g.appendChild(rim);
+      g.appendChild(svgEl('path', {
+        d: describeArc(0, 0, R_OUTER - 1, startAngle + 0.5, endAngle - 0.5),
+        fill: 'none',
+        stroke: sabbat.color,
+        'stroke-width': '2.5',
+        opacity: '0.6',
+      }));
 
-      // Type indicator (solar = diamond dot, cross = circle dot) at mid-outer edge
-      const midAngle = sabbat.angle;
-      const [mx, my] = polarToXY(midAngle, R_OUTER - 12);
-      const indicator = document.createElementNS('http://www.w3.org/2000/svg', sabbat.type === 'solar' ? 'rect' : 'circle');
+      // Type indicator (solar = diamond, cross-quarter = circle) at mid-outer edge
+      const [mx, my] = polarToXY(sabbat.angle, R_OUTER - 12);
       if (sabbat.type === 'solar') {
-        indicator.setAttribute('x', mx - 5);
-        indicator.setAttribute('y', my - 5);
-        indicator.setAttribute('width', '10');
-        indicator.setAttribute('height', '10');
-        indicator.setAttribute('transform', `rotate(45, ${mx}, ${my})`);
-        indicator.setAttribute('fill', sabbat.color);
-        indicator.setAttribute('opacity', '0.9');
+        g.appendChild(svgEl('rect', { x: mx - 5, y: my - 5, width: 10, height: 10, transform: `rotate(45, ${mx}, ${my})`, fill: sabbat.color, opacity: '0.9' }));
       } else {
-        indicator.setAttribute('cx', mx);
-        indicator.setAttribute('cy', my);
-        indicator.setAttribute('r', '5');
-        indicator.setAttribute('fill', sabbat.color);
-        indicator.setAttribute('opacity', '0.9');
+        g.appendChild(svgEl('circle', { cx: mx, cy: my, r: 5, fill: sabbat.color, opacity: '0.9' }));
       }
-      g.appendChild(indicator);
 
-      // Sabbat name label - rotated along spoke
-      const labelR = (R_RING + R_OUTER) / 2 - 12;
-      const [lx, ly] = polarToXY(midAngle, labelR);
-      const labelAngle = midAngle; // rotation for text
-
-      const textG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      textG.setAttribute('transform', `translate(${lx}, ${ly}) rotate(${midAngle})`);
-
-      const nameText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      nameText.setAttribute('class', 'sabbat-label');
-      nameText.setAttribute('x', '0');
-      nameText.setAttribute('y', '0');
+      // Name and next date, along the spoke, turned the right way up in the lower half of the wheel
+      const [lx, ly] = polarToXY(sabbat.angle, (R_RING + R_OUTER) / 2 - 12);
+      const upright = sabbat.angle > 90 && sabbat.angle < 270 ? sabbat.angle + 180 : sabbat.angle;
+      const textG = svgEl('g', { transform: `translate(${lx}, ${ly}) rotate(${upright})` });
+      const nameText = svgEl('text', { class: 'sabbat-label', x: 0, y: -5 });
       nameText.textContent = sabbat.name.toUpperCase();
       textG.appendChild(nameText);
+      textG.appendChild(svgEl('text', { class: 'sabbat-label sabbat-date', x: 0, y: 9 }));
       g.appendChild(textG);
 
       g.addEventListener('click', () => selectSabbat(index));
+      g.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectSabbat(index);
+        } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          const step = (e.key === 'ArrowRight' || e.key === 'ArrowDown') ? 1 : -1;
+          const next = (index + step + sabbats.length) % sabbats.length;
+          segments()[next].focus();
+          selectSabbat(next, { keep: true });
+        } else if (e.key === 'Escape' && activeIndex !== null) {
+          selectSabbat(activeIndex);
+        }
+      });
       return g;
     }
 
-    function buildWheel () {
-      // Defs
-      const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-      svg.appendChild(defs);
+    function segments () {
+      return Array.from(svg.querySelectorAll('.segment'));
+    }
 
-      // Background circle
-      const bg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      bg.setAttribute('cx', '0'); bg.setAttribute('cy', '0'); bg.setAttribute('r', R_OUTER.toString());
-      bg.setAttribute('fill', '#0a0806');
-      bg.setAttribute('stroke', 'rgba(201,168,76,0.2)');
-      bg.setAttribute('stroke-width', '1');
-      svg.appendChild(bg);
+    function buildWheel () {
+      svg.appendChild(svgEl('defs'));
+
+      svg.appendChild(svgEl('circle', { cx: 0, cy: 0, r: R_OUTER, fill: '#0a0806', stroke: 'rgba(201,168,76,0.2)', 'stroke-width': '1' }));
 
       // Concentric decorative rings
       [R_RING, R_INNER + 30, R_INNER].forEach((r, i) => {
-        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        c.setAttribute('cx', '0'); c.setAttribute('cy', '0'); c.setAttribute('r', r.toString());
-        c.setAttribute('fill', 'none');
-        c.setAttribute('stroke', `rgba(201,168,76,${i === 0 ? 0.35 : 0.2})`);
-        c.setAttribute('stroke-width', i === 0 ? '1.5' : '0.8');
-        svg.appendChild(c);
+        svg.appendChild(svgEl('circle', { cx: 0, cy: 0, r, fill: 'none', stroke: `rgba(201,168,76,${i === 0 ? 0.35 : 0.2})`, 'stroke-width': i === 0 ? '1.5' : '0.8' }));
       });
 
       // Spoke lines (dividers)
@@ -778,160 +902,173 @@
         const angle = i * 45 - 22.5;
         const [x1, y1] = polarToXY(angle, R_INNER);
         const [x2, y2] = polarToXY(angle, R_OUTER);
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-        line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-        line.setAttribute('stroke', 'rgba(201,168,76,0.25)');
-        line.setAttribute('stroke-width', '0.8');
-        svg.appendChild(line);
+        svg.appendChild(svgEl('line', { x1, y1, x2, y2, stroke: 'rgba(201,168,76,0.25)', 'stroke-width': '0.8' }));
       }
 
-      // Segments
-      sabbats.forEach((s, i) => {
-        const g = createSegment(s, i);
-        svg.appendChild(g);
-      });
+      sabbats.forEach((s, i) => svg.appendChild(createSegment(s, i)));
 
-      // Season labels (in inner ring) — stored for hemisphere swapping
-      // NH: Winter=top(0°), Spring=right(90°), Summer=bottom(180°), Autumn=left(270°)
-      // SH: same wheel positions but seasons are flipped
-      const seasonPositions = [
-        { angle: 0, nh: 'WINTER', sh: 'WINTER' },
-        { angle: 90, nh: 'SPRING', sh: 'SPRING' },
-        { angle: 180, nh: 'SUMMER', sh: 'SUMMER' },
-        { angle: 270, nh: 'AUTUMN', sh: 'AUTUMN' },
-      ];
-      seasonPositions.forEach(({ angle, nh, sh }, i) => {
-        // Spring (90°) and Autumn (270°) pulled inward to avoid overlapping segments
+      // Season labels in the inner ring. Spring (90°) and Autumn (270°) are pulled inward to clear the segments
+      [[0, 'WINTER'], [90, 'SPRING'], [180, 'SUMMER'], [270, 'AUTUMN']].forEach(([angle, season]) => {
         const r = (angle === 90 || angle === 270) ? R_INNER + 32 : R_INNER + 50;
         const [sx, sy] = polarToXY(angle, r);
-        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        t.setAttribute('class', 'season-label');
-        t.setAttribute('id', 'season-label-' + i);
         const xOffset = (angle === 270) ? -4 : (angle === 90) ? 2 : 0;
-        t.setAttribute('x', sx + xOffset); t.setAttribute('y', sy);
-        t.textContent = nh;
-        t.dataset.nh = nh;
-        t.dataset.sh = sh;
+        const t = svgEl('text', { class: 'season-label', x: sx + xOffset, y: sy });
+        t.textContent = season;
         svg.appendChild(t);
       });
 
-      // Equinox/Solstice direction ticks (short lines at 0,90,180,270 in center ring)
+      // Solstice ticks
       [0, 180].forEach(angle => {
         const [x1, y1] = polarToXY(angle, R_INNER + 30);
         const [x2, y2] = polarToXY(angle, R_INNER + 38);
-        const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        tick.setAttribute('x1', x1); tick.setAttribute('y1', y1);
-        tick.setAttribute('x2', x2); tick.setAttribute('y2', y2);
-        tick.setAttribute('stroke', 'rgba(201,168,76,0.5)'); tick.setAttribute('stroke-width', '1.5');
-        svg.appendChild(tick);
+        svg.appendChild(svgEl('line', { x1, y1, x2, y2, stroke: 'rgba(201,168,76,0.5)', 'stroke-width': '1.5' }));
       });
 
-      // Center inner circle fill
-      const centerFill = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      centerFill.setAttribute('cx', '0'); centerFill.setAttribute('cy', '0'); centerFill.setAttribute('r', R_INNER.toString());
-      centerFill.setAttribute('fill', '#0d0a06');
-      centerFill.setAttribute('stroke', 'rgba(201,168,76,0.5)');
-      centerFill.setAttribute('stroke-width', '1');
-      svg.appendChild(centerFill);
+      // Today's hand, from the centre out to the rim
+      const marker = svgEl('g', { class: 'today-marker', id: 'today-marker' });
+      marker.appendChild(svgEl('line', { x1: 0, y1: -R_INNER, x2: 0, y2: -(R_OUTER + 6), stroke: '#e8c96a', 'stroke-width': '1.5', 'stroke-linecap': 'round', opacity: '0.85' }));
+      marker.appendChild(svgEl('circle', { cx: 0, cy: -(R_OUTER + 6), r: 4.5, fill: '#e8c96a', stroke: '#0d0a06', 'stroke-width': '1.5' }));
+      const markerTitle = svgEl('title');
+      markerTitle.textContent = 'Today';
+      marker.appendChild(markerTitle);
+      svg.appendChild(marker);
 
-      // Moon phase in center
+      // Centre, with the moon's phase
+      svg.appendChild(svgEl('circle', { cx: 0, cy: 0, r: R_INNER, fill: '#0d0a06', stroke: 'rgba(201,168,76,0.5)', 'stroke-width': '1' }));
+
       const moon = getMoonPhase();
-
-      const moonGlyph = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      moonGlyph.setAttribute('x', '0'); moonGlyph.setAttribute('y', '4');
-      moonGlyph.setAttribute('text-anchor', 'middle');
-      moonGlyph.setAttribute('dominant-baseline', 'middle');
-      moonGlyph.setAttribute('font-family', 'serif');
-      moonGlyph.setAttribute('font-size', '26');
-      moonGlyph.setAttribute('fill', '#c4b89a');
+      const moonGlyph = svgEl('text', { x: 0, y: 2, 'text-anchor': 'middle', 'dominant-baseline': 'middle', 'font-family': 'serif', 'font-size': '26', fill: '#c4b89a' });
       moonGlyph.textContent = moon.emoji;
       svg.appendChild(moonGlyph);
 
-      const moonLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      moonLabel.setAttribute('x', '0'); moonLabel.setAttribute('y', '28');
-      moonLabel.setAttribute('text-anchor', 'middle');
-      moonLabel.setAttribute('font-family', 'Cinzel, serif');
-      moonLabel.setAttribute('font-size', '7');
-      moonLabel.setAttribute('fill', '#c4b89a');
-      moonLabel.setAttribute('letter-spacing', '1');
+      const moonLabel = svgEl('text', { x: 0, y: 28, 'text-anchor': 'middle', 'font-family': 'Cinzel, serif', 'font-size': '7', fill: '#c4b89a', 'letter-spacing': '1' });
       moonLabel.textContent = moon.name.toUpperCase();
       svg.appendChild(moonLabel);
+
+      const moonNext = svgEl('text', { x: 0, y: -26, 'text-anchor': 'middle', 'font-family': 'EB Garamond, serif', 'font-style': 'italic', 'font-size': '9', fill: '#8a6f2e' });
+      moonNext.textContent = moon.next;
+      svg.appendChild(moonNext);
+    }
+
+    // Everything that depends on the hemisphere: the dates under the names, today's hand and the line under the title
+    function updateDates () {
+      timeline = festivalTimeline(hemisphere);
+
+      segments().forEach((g, i) => {
+        g.querySelector('.sabbat-date').textContent = shortDateFormat.format(nextOccurrence(i).date);
+      });
+
+      document.getElementById('today-marker').setAttribute('transform', `rotate(${todayAngle()})`);
+
+      const next = timeline.find(o => daysFromToday(o.date) >= 0);
+      const days = daysFromToday(next.date);
+      const moon = getMoonPhase();
+      nowLine.textContent = `${moon.emoji} ${moon.name} · `;
+      const link = document.createElement('button');
+      link.type = 'button';
+      link.textContent = days === 0 ? `Happy ${sabbats[next.index].name}!` : `${sabbats[next.index].name} ${relativeDays(days)}`;
+      link.addEventListener('click', () => {
+        if (activeIndex !== next.index) selectSabbat(next.index);
+      });
+      nowLine.appendChild(link);
     }
 
     let activeIndex = null;
 
-    function selectSabbat (index) {
-      if (activeIndex === index) {
-        activeIndex = null;
-        document.querySelectorAll('.segment').forEach(g => g.classList.remove('active', 'dimmed'));
-        infoPanel.classList.remove('has-selection');
-        panelPrompt.classList.remove('hidden');
-        panelContent.classList.remove('visible');
+    function clearSelection () {
+      activeIndex = null;
+      segments().forEach(g => {
+        g.classList.remove('active', 'dimmed');
+        g.setAttribute('aria-pressed', 'false');
+      });
+      infoPanel.classList.remove('has-selection');
+      panelPrompt.classList.remove('hidden');
+      panelContent.classList.remove('visible');
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+
+    function selectSabbat (index, { keep } = {}) {
+      if (activeIndex === index && !keep) {
+        clearSelection();
         return;
       }
       activeIndex = index;
 
-      // Update segment classes
-      document.querySelectorAll('.segment').forEach((g, i) => {
-        g.classList.remove('active', 'dimmed');
-        if (i === index) g.classList.add('active');
-        else g.classList.add('dimmed');
+      segments().forEach((g, i) => {
+        g.classList.toggle('active', i === index);
+        g.classList.toggle('dimmed', i !== index);
+        g.setAttribute('aria-pressed', i === index ? 'true' : 'false');
       });
 
       const s = sabbats[index];
-      const dateStr = typeof s.date === 'object' ? s.date[hemisphere] : s.date;
+      const next = nextOccurrence(index);
+      const days = daysFromToday(next.date);
+      const when = `<strong>${dateFormat.format(next.date)}</strong> · ${relativeDays(days)}`;
+      const whenLines = s.type === 'solar'
+        ? `<div class="panel-when">${when}</div>`
+        : `<div class="panel-when">Traditionally ${s.traditional[hemisphere]}</div>
+           <div class="panel-when">Astronomical midpoint ${when}</div>`;
+
       infoPanel.classList.add('has-selection');
       panelPrompt.classList.add('hidden');
 
       panelContent.innerHTML = `
     <div class="panel-header">
       <div class="panel-icon" style="color:${s.color}">${s.icon}</div>
-      <div class="panel-title-block">
-        <div class="panel-date">${dateStr}</div>
+      <div>
         <div class="panel-name">${s.name}</div>
         <div class="panel-alt">${s.alt}</div>
         <span class="panel-type-badge ${s.type === 'solar' ? 'badge-solar' : 'badge-cross'}">${s.type === 'solar' ? '◈ Solar Festival' : '● Cross-Quarter Day'}</span>
       </div>
     </div>
+    <div>${whenLines}</div>
     <div class="panel-body">${s.desc}</div>
     <div class="detail-item">
       <div class="detail-label">Themes</div>
       <div class="detail-value">${s.themes}</div>
     </div>
+    <div class="panel-details">
+      <div class="detail-item">
+        <div class="detail-label">Element</div>
+        <div class="detail-value">${s.element}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Direction</div>
+        <div class="detail-value">${directionFor(s.direction)}</div>
+      </div>
+    </div>
+    <div>
+      <div class="detail-label">Traditions</div>
+      <div class="traditions-list">${s.traditions.map(t => `<span class="tradition-tag">${t}</span>`).join('')}</div>
+    </div>
   `;
 
       panelContent.classList.add('visible');
+      history.replaceState(null, '', `#${s.id}`);
     }
 
     function setHemisphere (hemi) {
       if (hemisphere === hemi) return;
       hemisphere = hemi;
+      try { localStorage.setItem('wheel-of-the-year-hemisphere', hemi); } catch (e) { /* storage unavailable */ }
+      showHemisphere();
+    }
 
-      // Toggle buttons
-      document.getElementById('btn-nh').classList.toggle('active', hemi === 'north');
-      document.getElementById('btn-sh').classList.toggle('active', hemi === 'south');
-
-      // Show/hide note
-      // Update season labels on the wheel
-      document.querySelectorAll('[id^="season-label-"]').forEach(el => {
-        el.textContent = el.dataset[hemi === 'north' ? 'nh' : 'sh'];
+    function showHemisphere () {
+      ['north', 'south'].forEach(h => {
+        const btn = document.getElementById(h === 'north' ? 'btn-nh' : 'btn-sh');
+        btn.classList.toggle('active', h === hemisphere);
+        btn.setAttribute('aria-pressed', h === hemisphere ? 'true' : 'false');
       });
-
-      // Refresh panel if a sabbat is selected
-      if (activeIndex !== null) {
-        const prev = activeIndex;
-        activeIndex = null;
-        selectSabbat(prev);
-      }
+      updateDates();
+      if (activeIndex !== null) selectSabbat(activeIndex, { keep: true });
     }
 
     function getMoonPhase () {
       // Synodic month and reference new moon matching lib/almanac.rb
       const LUNAR_MONTH = 29.530588853;
       const knownNewMoon = Date.UTC(2000, 0, 6, 6, 14, 0); // Jan 6, 2000 06:14 UTC
-      const now = Date.now();
-      const elapsedDays = (now - knownNewMoon) / (1000 * 60 * 60 * 24);
+      const elapsedDays = (Date.now() - knownNewMoon) / DAY;
       const moonAge = ((elapsedDays % LUNAR_MONTH) + LUNAR_MONTH) % LUNAR_MONTH;
 
       // Phase boundaries matching lib/almanac.rb
@@ -945,11 +1082,24 @@
         { max: 23.14, name: 'Last Quarter', emoji: '🌗' },
         { max: LUNAR_MONTH, name: 'Waning Crescent', emoji: '🌘' },
       ];
+      const phase = phases.find(p => moonAge < p.max) || phases[0];
 
-      return phases.find(p => moonAge < p.max) || phases[0];
+      // Days to the next full or new moon, whichever comes first (full at half a lunar month)
+      const toFull = ((LUNAR_MONTH / 2 - moonAge) + LUNAR_MONTH) % LUNAR_MONTH;
+      const toNew = LUNAR_MONTH - moonAge;
+      const [days, which] = toFull < toNew ? [toFull, 'full'] : [toNew, 'new'];
+      const rounded = Math.round(days);
+      const next = rounded === 0 ? `${which} moon today` : `${which} moon in ${rounded} day${rounded === 1 ? '' : 's'}`;
+
+      return { ...phase, next };
     }
 
     buildWheel();
+    showHemisphere();
+
+    // Open the festival in the URL (#samhain), or else the next one
+    const linked = sabbats.findIndex(s => `#${s.id}` === location.hash);
+    selectSabbat(linked >= 0 ? linked : timeline.find(o => daysFromToday(o.date) >= 0).index);
   </script>
 </body>
 
