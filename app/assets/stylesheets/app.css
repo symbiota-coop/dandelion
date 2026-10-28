@@ -1723,6 +1723,16 @@ input.flatpickr-mobile-empty:not(:focus)::-webkit-datetime-edit {
   .searchForm .form-check {
     margin-top: var(--space-xs);
   }
+
+  /* The fields stack, but a run of checkboxes sits side by side as space allows, with the button on a line of its own */
+  .searchForm .form-group:has(> .form-check-inline) {
+    display: inline-block;
+    margin-right: var(--space-sm);
+  }
+
+  .searchForm input[type=submit] {
+    display: block;
+  }
 }
 
 @media (min-width: 576px) {
