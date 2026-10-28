@@ -1,4 +1,13 @@
 Dandelion::App.helpers do
+  # Answers the block's repeated queries from memory (the driver's query cache), for a list whose items mostly load
+  # the same few records, like a newsfeed's. The driver keeps what it cached until it's cleared, so it's cleared
+  # afterwards, or later requests on the same thread would read stale results
+  def with_query_cache(&)
+    Mongo::QueryCache.cache(&)
+  ensure
+    Mongo::QueryCache.clear
+  end
+
   def back(fragment = nil)
     uri = internal_redirect_uri(request.referer) || URI.parse('/')
     params = uri.query ? Rack::Utils.parse_query(uri.query) : {}
