@@ -12,7 +12,14 @@
 <% unless defined?(contents_only) %>
 <div data-pagelet-url="<%= path %>" data-pagelet-refresh="3" data-pagelet-refresh-while="[data-feedback-summary-generating]">
 <% end %>
-  <% if summarisable.feedback_summary %>
+  <%# While a summary generates, managers (whose pagelet refreshes until it's done) see placeholder lines in its place %>
+  <% if generating && manager %>
+    <div class="my-3 readable placeholder-glow">
+      <% [100, 95, 100, 60].each do |width| %>
+        <span class="placeholder d-block mb-2" style="width: <%= width %>%"></span>
+      <% end %>
+    </div>
+  <% elsif summarisable.feedback_summary %>
     <div class="ai-well my-3 readable" data-bs-toggle="tooltip" title="AI-generated summary ✨">
       <%= summarisable.feedback_summary_html %>
     </div>
@@ -20,7 +27,7 @@
   <% if manager %>
     <div class="mt-1">
       <% if generating %>
-        <span class="text-body-secondary" data-feedback-summary-generating><i class="bi bi-spin bi-slash-lg"></i> Generating feedback summary… this can take a minute</span>
+        <span class="text-body-secondary" data-feedback-summary-generating>Generating feedback summary…</span>
       <% else %>
         <% if summarisable.feedback_summary_failed_at %>
           <span class="text-danger">Couldn't generate a feedback summary ·</span>
