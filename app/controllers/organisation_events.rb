@@ -51,6 +51,8 @@ Dandelion::App.controller do
     @events = apply_online_in_person_filter(@events)
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     @events = @events.and(featured: true) if params[:featured]
+    # Past events with a recording (recordings implies past for HTML and JSON)
+    @events = @events.and(has_recording: true) if params[:recordings]
     if params[:featured_or_course]
       @events = @events.and(:id.in =>
         @organisation.events.and(featured: true).pluck(:id) +
@@ -59,7 +61,7 @@ Dandelion::App.controller do
     case content_type
     when :html
       @events = @events.without_heavy_fields
-      if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
+      if params[:past] || params[:recordings] || (carousel && carousel.name.downcase.include?('past events'))
         @past = true
         @events = @events.past
       else
@@ -94,7 +96,7 @@ Dandelion::App.controller do
         @events = @events.without(:extra_info_for_ticket_email, :voyage_embedding)
         @events = @events.live
 
-        if params[:past] || (carousel && carousel.name.downcase.include?('past events'))
+        if params[:past] || params[:recordings] || (carousel && carousel.name.downcase.include?('past events'))
           @past = true
           @events = @events.past
         else

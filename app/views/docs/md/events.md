@@ -393,6 +393,8 @@ Embed an [iframe](https://www.techtarget.com/whatis/definition/IFrame-Inline-Fra
 
 You can also experiment with the parameters `hide_featured_title`, `no_search`, `no_view_options`, `no_listings` and `first_carousel_only` e.g. `?minimal=1&hide_featured_title=1&no_search=1&no_view_options=1&no_listings=1&first_carousel_only=1`
 
+To show past events with a [recording](#event-recordings), most recent first, add `recordings=1` (and `search=1` to leave out the carousels, `display=grid` for a grid) e.g. `?minimal=1&recordings=1&search=1&no_search=1&no_view_options=1&display=grid`. `past=1` shows all past events.
+
 Put this in your head to set the iframe to the correct height:
 
 ```html

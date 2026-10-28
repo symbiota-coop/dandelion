@@ -4,7 +4,7 @@
   </div>
 <% else %>
   <% unless params[:no_listings] %>
-    <% if !params[:minimal] || params[:past] %>
+    <% if !params[:minimal] || params[:past] || params[:recordings] %>
       <% @events = @events.paginate(page: params[:page], per_page: (params[:per_page] || 20)) %>
       <%= partial :'events/blocks', locals: { events: @events } %>
       <div class="mt-3">
