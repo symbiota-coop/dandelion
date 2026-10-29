@@ -112,8 +112,13 @@
     color: var(--theme-800);
     background: var(--theme-50);
     border-radius: var(--bs-border-radius-pill);
-    padding: var(--space-2xs) var(--space-sm);
-    font-size: var(--font-size-base);
+    padding: var(--space-2xs) var(--space-xs);
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+  }
+  /* Smaller in a phone's half-width cell, so the pill keeps to one line */
+  @container (min-width: 36rem) {
+    .stats-band-visual .zero { padding: var(--space-2xs) var(--space-sm); font-size: var(--font-size-base); }
   }
 </style>
 
