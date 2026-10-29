@@ -1,4 +1,5 @@
-# Moon phase and Wheel of the Year (no external gems).
+# Moon phase and Wheel of the Year (no external gems), for the header's moon and the Wheel of the Year page
+# (app/assets/wheel-of-the-year.html, which loads wheel_of_the_year from /wheel-of-the-year.json).
 # Moon: based on known new moon reference and synodic month length.
 # Wheel: 8 sabbats (4 solar + 4 cross-quarter); solar dates use astronomical approximations.
 module Almanac
@@ -46,47 +47,72 @@ module Almanac
     c0 + (c1 * t) + (c2 * (t**2)) + (c3 * (t**3)) + (c4 * (t**4))
   end
 
-  def self.jde_to_date(jde)
-    DateTime.jd(jde).to_date
+  # The festivals in order round the wheel from Yule: the solar ones with their solstice or equinox in each hemisphere,
+  # and the cross-quarter days with their traditional dates
+  FESTIVALS = [
+    { id: 'yule', name: 'Yule', north: :december_solstice, south: :june_solstice },
+    { id: 'imbolc', name: 'Imbolc', traditional: { north: '1st–2nd February', south: '1st–2nd August' } },
+    { id: 'ostara', name: 'Ostara', north: :march_equinox, south: :september_equinox },
+    { id: 'beltane', name: 'Beltane', traditional: { north: '1st May', south: '31st October – 1st November' } },
+    { id: 'litha', name: 'Litha', north: :june_solstice, south: :december_solstice },
+    { id: 'lughnasadh', name: 'Lughnasadh', traditional: { north: '1st August', south: '1st February' } },
+    { id: 'mabon', name: 'Mabon', north: :september_equinox, south: :march_equinox },
+    { id: 'samhain', name: 'Samhain', traditional: { north: '31st October', south: '30th April – 1st May' } }
+  ].freeze
+
+  # A traditional date's first day in a year: '31st October – 1st November' is 31 October
+  def self.traditional_date(text, year)
+    Date.new(year, Date::MONTHNAMES.index(text[/[A-Z][a-z]+/]), text[/\d+/].to_i)
   end
 
-  def self.midpoint_date(jde_a, jde_b)
-    jde_to_date((jde_a + jde_b) / 2.0)
+  # A Julian Day counts from noon UTC, and the Unix epoch is JD 2440587.5
+  def self.solar_time(event, year)
+    Time.at((solar_jde(event, year) - 2_440_587.5) * 86_400).utc
   end
 
-  def self.sabbats_for_year(year)
-    yule_previous_jde = solar_jde(:december_solstice, year - 1)
-    ostara_jde = solar_jde(:march_equinox, year)
-    litha_jde = solar_jde(:june_solstice, year)
-    mabon_jde = solar_jde(:september_equinox, year)
-    yule_jde = solar_jde(:december_solstice, year)
+  # Every festival in the given years, in order, with the date it's kept. A solar festival is kept on its solstice or
+  # equinox (at), a cross-quarter day on its traditional date, with its astronomical midpoint between the solstices and
+  # equinoxes either side of it (at)
+  def self.festival_timeline(years, hemisphere: :north)
+    solar = years.flat_map do |year|
+      FESTIVALS.each_with_index.filter_map { |festival, i| [i, solar_time(festival[hemisphere], year)] if festival[hemisphere] }
+    end.sort_by(&:last)
 
-    [
-      { name: 'Imbolc', date: midpoint_date(yule_previous_jde, ostara_jde), solar: false },
-      { name: 'Ostara', date: jde_to_date(ostara_jde), solar: true },
-      { name: 'Beltane', date: midpoint_date(ostara_jde, litha_jde), solar: false },
-      { name: 'Litha', date: jde_to_date(litha_jde), solar: true },
-      { name: 'Lammas', date: midpoint_date(litha_jde, mabon_jde), solar: false },
-      { name: 'Mabon', date: jde_to_date(mabon_jde), solar: true },
-      { name: 'Samhain', date: midpoint_date(mabon_jde, yule_jde), solar: false },
-      { name: 'Yule', date: jde_to_date(yule_jde), solar: true }
-    ]
+    solar.each_with_index.flat_map do |(i, at), n|
+      entries = [{ festival: FESTIVALS[i], at: at, date: at.to_date }]
+      if (following = solar[n + 1])
+        cross = FESTIVALS[(i + 1) % FESTIVALS.size]
+        midpoint = Time.at((at.to_r + following.last.to_r) / 2).utc
+        entries << { festival: cross, at: midpoint, date: traditional_date(cross[:traditional][hemisphere], midpoint.year) }
+      end
+      entries
+    end
   end
 
   def self.next_sabbat(date = Date.today)
     today = date.is_a?(Date) ? date : date.to_date
-    year = today.year
-
-    all_dates = [year, year + 1].flat_map do |y|
-      sabbats_for_year(y).map { |sabbat| [sabbat[:date], sabbat] }
-    end
-
-    all_dates.select { |d, _| d >= today }.min_by { |d, _| d }
+    entry = festival_timeline((today.year - 1)..(today.year + 1)).find { |e| e[:date] >= today }
+    [entry[:date], entry[:festival]]
   end
 
   def self.days_until_next_sabbat(date = Date.today)
     sabbat_date, sabbat = next_sabbat(date)
     today = date.is_a?(Date) ? date : date.to_date
     [(sabbat_date - today).to_i, sabbat[:name]]
+  end
+
+  # What the Wheel of the Year page shows: the festivals, in order, with their names and traditional dates; each one
+  # from two years back to two years on in each hemisphere, with its solstice, equinox or midpoint (at), which the page
+  # turns into dates in the viewer's timezone, and a cross-quarter day's traditional date (date)
+  def self.wheel_of_the_year(time = Time.now)
+    years = (time.year - 2)..(time.year + 2)
+    {
+      festivals: FESTIVALS.map { |festival| festival.slice(:id, :name, :traditional) },
+      timeline: %i[north south].to_h do |hemisphere|
+        [hemisphere, festival_timeline(years, hemisphere: hemisphere).map do |e|
+          { id: e[:festival][:id], at: e[:at].iso8601, date: (e[:date].iso8601 if e[:festival][:traditional]) }.compact
+        end]
+      end
+    }
   end
 end

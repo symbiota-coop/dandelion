@@ -335,6 +335,10 @@ module Dandelion
       erb :design
     end
 
+    get '/wheel-of-the-year.json', provides: :json do
+      Almanac.wheel_of_the_year.to_json
+    end
+
     get '/features' do
       @no_content_padding_bottom = true
       @title = 'Features'

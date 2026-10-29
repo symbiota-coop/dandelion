@@ -6,40 +6,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wheel of the Year</title>
   <link
-    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Uncial+Antiqua&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
     rel="stylesheet">
+  <!-- The site's Bootstrap and jQuery: the jQuery version and hash as frontend/package.json and integrity.json give them -->
+  <link href="/stylesheets/bootstrap5.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js" integrity="sha384-fgGyf7Mo7DURSOMnOy7ed+dkq5Job205Gnzu6QIg0BOHKaqt4D76Dt8VlDCzcMHV" crossorigin="anonymous"></script>
   <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
     :root {
       --bg: #0d0a06;
-      --bg2: #12100a;
-      --gold: #c9a84c;
+      --gold-rgb: 201, 168, 76;
+      --gold: rgb(var(--gold-rgb));
       --gold-light: #e8c96a;
       --gold-dim: #8a6f2e;
       --cream: #f0e8d5;
       --cream-dim: #c4b89a;
-      --ember: #c0522a;
-      --frost: #6ab4c8;
-      --leaf: #5a8a3c;
-      --bloom: #c06080;
-      --shadow: rgba(0, 0, 0, 0.8);
     }
 
     body {
       background: var(--bg);
       color: var(--cream);
       font-family: 'EB Garamond', serif;
+      font-weight: 400; /* the site's Bootstrap sets 500 */
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       overflow-x: hidden;
       position: relative;
     }
@@ -64,71 +52,141 @@
       z-index: 0;
     }
 
-    header {
-      text-align: center;
-      padding: 3rem 2rem 1.5rem;
+    /* Header: the title on the left, the hemisphere on the right, over a gold rule */
+    /* Wider than the site's Bootstrap .container-xl (1140px), so the panel has room beside a large wheel */
+    header,
+    main {
+      max-width: 82.5rem;
       position: relative;
       z-index: 1;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      left: 1rem;
+      right: 1rem;
+      bottom: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--gold-dim), transparent);
     }
 
     header h1 {
-      font-family: 'Cinzel Decorative', cursive;
-      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      font-family: 'Uncial Antiqua', serif;
+      font-weight: 400;
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
       color: var(--gold-light);
       letter-spacing: 0.08em;
-      text-shadow: 0 0 40px rgba(201, 168, 76, 0.5), 0 2px 4px black;
+      text-shadow: 0 0 40px rgba(var(--gold-rgb), 0.5), 0 2px 4px black;
       line-height: 1.2;
     }
 
-    header p {
-      margin-top: 0.8rem;
-      font-size: 1.05rem;
-      color: var(--cream-dim);
+    /* The page's quieter lines */
+    header p,
+    .panel-prompt p,
+    .panel-alt,
+    .panel-when {
       font-style: italic;
+      color: var(--cream-dim);
+    }
+
+    header p,
+    .panel-prompt p {
       letter-spacing: 0.05em;
     }
 
-    .main-layout {
-      display: grid;
-      grid-template-columns: 1fr minmax(300px, 460px);
-      gap: 2.5rem;
-      width: 100%;
-      max-width: 1200px;
-      padding: 1rem 2rem 0;
-      position: relative;
-      z-index: 1;
-      align-items: stretch;
+    /* Small labels, in Cinzel */
+    .season-label,
+    .sabbat-label,
+    .today-date,
+    .festival-type,
+    .detail-label,
+    .tradition-tag,
+    .btn-hemi {
+      font-family: 'Cinzel', serif;
     }
 
-    @media (max-width: 860px) {
-      .main-layout {
-        grid-template-columns: 1fr;
-        padding-bottom: 4rem;
-      }
+    .festival-type,
+    .detail-label,
+    .btn-hemi {
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .festival-type,
+    .detail-label {
+      font-size: 0.85rem;
     }
 
     /* === WHEEL === */
-    .wheel-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      min-height: 0;
-      align-self: stretch;
-    }
-
     #wheel-svg {
+      display: block;
       width: 100%;
-      max-width: 490px;
+      max-width: max(20rem, min(44rem, 100vh - 9rem));
       height: auto;
-      filter: drop-shadow(0 0 30px rgba(201, 168, 76, 0.12));
-      cursor: pointer;
+      filter: drop-shadow(0 0 30px rgba(var(--gold-rgb), 0.12));
       overflow: visible;
     }
 
+    #wheel-svg text {
+      text-anchor: middle;
+      dominant-baseline: middle;
+      pointer-events: none;
+    }
+
+    .wheel-face {
+      fill: #0a0806;
+      stroke: rgba(var(--gold-rgb), 0.2);
+    }
+
+    .ring {
+      fill: none;
+      stroke: rgba(var(--gold-rgb), 0.35);
+      stroke-width: 1.5;
+    }
+
+    .ring.inner {
+      stroke: rgba(var(--gold-rgb), 0.2);
+      stroke-width: 0.8;
+    }
+
+    .spoke {
+      stroke: rgba(var(--gold-rgb), 0.25);
+      stroke-width: 0.8;
+    }
+
+    .tick {
+      stroke: rgba(var(--gold-rgb), 0.5);
+      stroke-width: 1.5;
+    }
+
+    .centre {
+      fill: var(--bg);
+      stroke: rgba(var(--gold-rgb), 0.5);
+    }
+
+    .segment-fill {
+      stroke: var(--bg);
+      stroke-width: 1.5;
+    }
+
+    .segment-rim {
+      fill: none;
+      stroke-width: 2.5;
+      opacity: 0.6;
+    }
+
+    .segment-mark {
+      opacity: 0.9;
+    }
+
     .segment {
-      transition: filter 0.25s, opacity 0.25s;
+      transition: filter 0.25s;
       cursor: pointer;
+    }
+
+    .segment > * {
+      transition: opacity 0.25s;
     }
 
     .segment:hover {
@@ -139,35 +197,90 @@
       filter: brightness(1.5) drop-shadow(0 0 10px currentColor);
     }
 
-    .segment.dimmed {
-      opacity: 0.45;
+    /* The other festivals fade back, their names less than their colours so they stay readable */
+    .segment.dimmed > :not(g) {
+      opacity: 0.4;
+    }
+
+    .segment.dimmed > g {
+      opacity: 0.6;
     }
 
     .season-label {
-      font-family: 'Cinzel', serif;
       font-size: 11px;
       fill: var(--cream-dim);
-      text-anchor: middle;
-      dominant-baseline: middle;
-      pointer-events: none;
-      letter-spacing: 0.12em;
-    }
-
-    .sabbat-label {
-      font-family: 'Cinzel', serif;
-      font-size: 9.5px;
-      fill: var(--cream);
-      text-anchor: middle;
-      dominant-baseline: middle;
-      pointer-events: none;
       letter-spacing: 0.05em;
     }
 
-    .center-circle text {
-      font-family: 'Cinzel Decorative', cursive;
+    .sabbat-label {
+      font-size: 14px;
+      fill: var(--cream);
+      letter-spacing: 0.05em;
+    }
+
+    .sabbat-date {
+      font-family: 'EB Garamond', serif;
+      font-size: 12px;
+      fill: var(--cream-dim);
+      letter-spacing: 0.04em;
+    }
+
+    /* Today, in the centre: the weekday, the date and the next festival */
+    .today-weekday,
+    .today-next {
+      font-family: 'EB Garamond', serif;
+    }
+
+    .today-weekday,
+    .today-date {
       fill: var(--gold-light);
-      text-anchor: middle;
-      dominant-baseline: middle;
+    }
+
+    .today-weekday {
+      font-size: 14px;
+      font-variant-caps: all-small-caps;
+      letter-spacing: 0.1em;
+    }
+
+    .today-date {
+      font-size: 15px;
+      letter-spacing: 0.02em;
+    }
+
+    .today-date .ordinal {
+      font-size: 0.7em;
+    }
+
+    .today-next {
+      font-size: 12px;
+      font-style: italic;
+      fill: var(--cream-dim);
+    }
+
+    .today-marker {
+      pointer-events: none;
+    }
+
+    .today-marker line {
+      stroke: var(--gold-light);
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      opacity: 0.85;
+    }
+
+    .today-marker circle {
+      fill: var(--gold-light);
+      stroke: var(--bg);
+      stroke-width: 1.5;
+    }
+
+    .segment:focus {
+      outline: none;
+    }
+
+    .segment:focus-visible .segment-fill {
+      stroke: var(--gold-light);
+      stroke-width: 2.5;
     }
 
     /* === INFO PANEL === */
@@ -178,36 +291,20 @@
       padding: 2rem;
       position: sticky;
       top: 1.5rem;
-      height: 100%;
-      align-self: stretch;
       min-height: 390px;
-      box-shadow: 0 0 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(201, 168, 76, 0.1);
+      scroll-margin-top: 1rem;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(var(--gold-rgb), 0.1);
       transition: border-color 0.4s;
     }
 
     .info-panel.has-selection {
       border-color: var(--gold);
-      box-shadow: 0 0 60px rgba(0, 0, 0, 0.6), 0 0 20px rgba(201, 168, 76, 0.08), inset 0 1px 0 rgba(201, 168, 76, 0.15);
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.6), 0 0 20px rgba(var(--gold-rgb), 0.08), inset 0 1px 0 rgba(var(--gold-rgb), 0.15);
     }
 
     .panel-prompt {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
       min-height: 350px;
-      text-align: center;
       color: var(--cream-dim);
-      gap: 1rem;
-      opacity: 1;
-      transition: opacity 0.3s;
-    }
-
-    .panel-prompt.hidden {
-      opacity: 0;
-      pointer-events: none;
-      position: absolute;
     }
 
     .panel-prompt .prompt-symbol {
@@ -231,22 +328,12 @@
     }
 
     .panel-prompt p {
-      font-size: 1rem;
-      font-style: italic;
-      letter-spacing: 0.05em;
       line-height: 1.6;
       max-width: 260px;
     }
 
     .panel-content {
-      display: none;
-      flex-direction: column;
-      gap: 1rem;
       animation: fadeIn 0.4s ease;
-    }
-
-    .panel-content.visible {
-      display: flex;
     }
 
     @keyframes fadeIn {
@@ -262,115 +349,73 @@
     }
 
     .panel-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+      border-bottom: 1px solid rgba(var(--gold-rgb), 0.2);
     }
 
     .panel-icon {
       font-size: 2.8rem;
       line-height: 1;
-      flex-shrink: 0;
       filter: drop-shadow(0 0 8px currentColor);
     }
 
-    .panel-title-block {}
-
-    .panel-date {
-      font-family: 'Cinzel', serif;
-      font-size: 0.72rem;
-      color: var(--gold);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      margin-bottom: 0.2rem;
-    }
-
     .panel-name {
-      font-family: 'Cinzel Decorative', cursive;
+      font-family: 'Uncial Antiqua', serif;
+      font-weight: 400;
       font-size: 1.55rem;
       color: var(--gold-light);
       line-height: 1.15;
-      text-shadow: 0 0 20px rgba(201, 168, 76, 0.4);
+      text-shadow: 0 0 20px rgba(var(--gold-rgb), 0.4);
     }
 
     .panel-alt {
-      font-style: italic;
-      font-size: 0.88rem;
-      color: var(--cream-dim);
+      font-size: 1rem;
       margin-top: 0.15rem;
     }
 
-    .panel-type-badge {
-      display: inline-block;
-      font-family: 'Cinzel', serif;
-      font-size: 0.62rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      padding: 0.2rem 0.7rem;
+    /* On Bootstrap's .badge */
+    .festival-type {
+      font-weight: 400;
       border-radius: 2px;
-      margin-top: 0.5rem;
     }
 
-    .badge-cross {
-      background: rgba(201, 168, 76, 0.15);
+    .festival-type.cross {
+      background: rgba(var(--gold-rgb), 0.15);
       color: var(--gold);
       border: 1px solid var(--gold-dim);
     }
 
-    .badge-solar {
+    .festival-type.solar {
       background: rgba(255, 200, 80, 0.1);
       color: #f0c040;
       border: 1px solid rgba(240, 192, 64, 0.4);
     }
 
     .panel-body {
-      font-size: 1rem;
-      line-height: 1.75;
-      color: var(--cream);
-    }
-
-    .panel-details {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.7rem;
-      margin-top: 0.5rem;
+      font-size: 1.15rem;
+      line-height: 1.7;
     }
 
     .detail-item {
       background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(201, 168, 76, 0.12);
+      border: 1px solid rgba(var(--gold-rgb), 0.12);
       border-radius: 3px;
       padding: 0.6rem 0.8rem;
     }
 
     .detail-label {
-      font-family: 'Cinzel', serif;
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
       color: var(--gold-dim);
       margin-bottom: 0.25rem;
     }
 
     .detail-value {
-      font-size: 0.88rem;
+      font-size: 1rem;
       color: var(--cream-dim);
       line-height: 1.4;
     }
 
-    .traditions-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-top: 0.8rem;
-    }
-
     .tradition-tag {
-      font-family: 'Cinzel', serif;
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
       color: var(--cream-dim);
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -378,264 +423,219 @@
       padding: 0.2rem 0.6rem;
     }
 
-    /* Decorative rule */
-    .rule {
-      width: 100%;
-      max-width: 400px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
+    /* Hemisphere toggle: a Bootstrap button group in the page's gold */
+    .btn-hemi {
+      --bs-btn-color: var(--cream-dim);
+      --bs-btn-bg: rgba(255, 255, 255, 0.03);
+      --bs-btn-border-color: var(--gold-dim);
+      --bs-btn-hover-color: var(--cream);
+      --bs-btn-hover-bg: rgba(var(--gold-rgb), 0.15);
+      --bs-btn-hover-border-color: var(--gold-dim);
+      --bs-btn-active-color: var(--bg);
+      --bs-btn-active-bg: var(--gold-dim);
+      --bs-btn-active-border-color: var(--gold-dim);
+      --bs-btn-border-radius: 3px;
+      font-size: 0.8rem;
+      padding: 0.4rem 1.2rem;
     }
 
-    /* Hemisphere toggle */
-    .hemisphere-row {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.4rem;
-      position: relative;
-      z-index: 1;
-      margin: 1rem auto 0;
+    .btn-hemi:focus-visible {
+      outline: 1px solid var(--gold-light);
+      outline-offset: 2px;
     }
 
-    .hemisphere-toggle {
-      display: flex;
-      align-items: stretch;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--gold-dim);
-      border-radius: 3px;
-      overflow: hidden;
+    .panel-when {
+      font-size: 1.05rem;
+      margin-top: 0.15rem;
     }
 
-    .hemi-btn {
-      font-family: 'Cinzel', serif;
-      font-size: 0.68rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 0.45rem 1.2rem;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      color: var(--cream-dim);
-      transition: background 0.2s, color 0.2s;
+    .panel-when strong {
+      font-style: normal;
+      font-weight: 500;
+      color: var(--gold-light);
     }
 
-    .hemi-btn.active {
-      background: var(--gold-dim);
-      color: #0d0a06;
+    /* Beside the panel: a set size, no taller than the window below the header and leaving the panel room, and the
+       panel takes the rest of the row */
+    @media (min-width: 992px) {
+      #wheel-svg {
+        width: max(20rem, min(44rem, 100vh - 9rem, 50vw));
+      }
     }
 
-    .hemi-divider {
-      width: 1px;
-      background: var(--gold-dim);
-      align-self: stretch;
+    @media (max-width: 575.98px) {
+      .info-panel {
+        padding: 1.5rem;
+      }
+
+      /* Phones: the wheel reaches into the page's side margins */
+      #wheel-svg {
+        width: calc(100% + 1.5rem);
+        max-width: none;
+        margin: 0 -0.75rem;
+      }
     }
 
-    .hemi-note {
-      font-size: 0.78rem;
-      font-style: italic;
-      color: var(--cream-dim);
-      opacity: 0;
-      transition: opacity 0.4s;
-      min-height: 1.1em;
-    }
+    @media (prefers-reduced-motion: reduce) {
 
-    .hemi-note.visible {
-      opacity: 1;
+      .panel-prompt .prompt-symbol,
+      .panel-content {
+        animation: none;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <header>
-    <h1>Wheel of the Year</h1>
-    <p>Eight seasonal festivals marking the turning of the year</p>
+  <header class="container-fluid px-3 py-3 py-sm-4 mb-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+    <div>
+      <h1 class="mb-1">Wheel of the Year</h1>
+      <p class="mb-0">Eight seasonal festivals marking the turning of the year</p>
+    </div>
+    <div class="btn-group" role="group" aria-label="Hemisphere">
+      <button type="button" class="btn btn-hemi" data-hemisphere="north" aria-pressed="true">&#8679; Northern</button>
+      <button type="button" class="btn btn-hemi" data-hemisphere="south" aria-pressed="false">&#8681; Southern</button>
+    </div>
   </header>
 
-  <div class="rule"></div>
-
-  <div class="hemisphere-row">
-    <div class="hemisphere-toggle">
-      <button class="hemi-btn active" id="btn-nh" onclick="setHemisphere('north')">&#8679; Northern Hemisphere</button>
-      <div class="hemi-divider"></div>
-      <button class="hemi-btn" id="btn-sh" onclick="setHemisphere('south')">&#8681; Southern Hemisphere</button>
-    </div>
-  </div>
-
-  <div class="main-layout">
-    <div class="wheel-container">
-      <svg id="wheel-svg" viewBox="-260 -260 520 520" xmlns="http://www.w3.org/2000/svg"></svg>
-    </div>
-
-    <div class="info-panel" id="info-panel">
-      <div class="panel-prompt" id="panel-prompt">
-        <div class="prompt-symbol">☽ ✦ ☾</div>
-        <p>Click any segment of the Wheel to explore the eight festivals of the year</p>
+  <main class="container-fluid px-3 pb-5">
+    <div class="row g-4">
+      <!-- At the top of its column, so a longer description beside it doesn't push it down -->
+      <div class="col-lg-auto d-flex justify-content-center align-items-start">
+        <svg id="wheel-svg" viewBox="-254 -254 508 508" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="The eight festivals, clockwise from Yule"></svg>
       </div>
-      <div class="panel-content" id="panel-content"></div>
+
+      <div class="col-lg">
+        <div class="info-panel" id="info-panel" aria-live="polite">
+          <div id="panel-prompt">
+            <div class="panel-prompt d-flex flex-column align-items-center justify-content-center gap-3 text-center">
+              <div class="prompt-symbol">☽ ✦ ☾</div>
+              <p class="mb-0">Click any segment of the Wheel to explore the eight festivals of the year. The gold hand shows where we are today</p>
+            </div>
+          </div>
+          <div class="panel-content" id="panel-content" style="display: none"></div>
+        </div>
+      </div>
     </div>
-  </div>
+  </main>
 
   <script>
-    const TAU = Math.PI * 2;
-
-    // 8 sabbats, starting from Yule (Winter Solstice) at top, going clockwise
-    // Angles: 0 = top, clockwise. Each sabbat 45° apart.
-    // Order clockwise from top: Yule, Imbolc, Ostara, Beltane, Litha, Lughnasadh, Mabon, Samhain
-    const sabbats = [
-      {
-        id: 'yule',
-        name: 'Yule',
+    // Each festival's text, colours and icon. Their names, order (clockwise from Yule at the top, 45° apart), kinds
+    // and traditional dates come from lib/almanac.rb
+    const FESTIVAL_TEXT = {
+      yule: {
         alt: 'Winter Solstice',
-        type: 'solar',
-        date: { north: 'December 21', south: 'June 21' },
-        angle: 0,
         icon: '❄️',
         color: '#6ab4c8',
         colorDark: '#2a6a88',
-        seasonLabel: { north: 'WINTER', south: 'WINTER' },
         desc: 'Yule marks the longest night and the rebirth of the Sun. As the wheel turns and light begins its slow return, ancients lit great bonfires to welcome the returning king of light. The world holds its breath, then exhales into the growing dawn.',
         traditions: ['Holly & Oak Kings', 'Yule Log', 'Evergreens', 'Candle Vigils'],
         themes: 'Rebirth, Light returning, Hope',
-        element: 'Earth & Fire',
-        direction: 'North',
       },
-      {
-        id: 'imbolc',
-        name: 'Imbolc',
+      imbolc: {
         alt: "Brigid's Day · Candlemas",
-        type: 'cross',
-        date: { north: 'February 1–2', south: 'August 1–2' },
-        angle: 45,
         icon: '🕯️',
         color: '#c8a0d8',
         colorDark: '#6a3a88',
-        seasonLabel: { north: '', south: '' },
         desc: 'Imbolc means "in the belly," honoring the first stirrings of spring within the frozen earth. Sacred to Brigid, goddess of fire, healing, and poetry, this festival celebrates the return of fertility and the quickening of the land under snow.',
         traditions: ['Brigid Crosses', 'Candle Blessing', 'Fire Divination', 'Spring Cleaning'],
         themes: 'Awakening, Purification, New beginnings',
-        element: 'Fire & Water',
-        direction: 'Northeast',
       },
-      {
-        id: 'ostara',
-        name: 'Ostara',
+      ostara: {
         alt: 'Spring Equinox',
-        type: 'solar',
-        date: { north: 'March 20–21', south: 'September 22–23' },
-        angle: 90,
         icon: '🌸',
         color: '#c06080',
         colorDark: '#803050',
-        seasonLabel: { north: 'SPRING', south: 'SPRING' },
         desc: 'At Ostara, day and night stand in perfect balance before light triumphs. Named for the Germanic dawn goddess Ēostre, this is a festival of fertility, seeds, and new life. Hares run wild, eggs are hidden, and the world blooms into color.',
         traditions: ['Egg Decoration', 'Seed Planting', 'Balance Rituals', 'Dawn Vigil'],
         themes: 'Balance, Fertility, New growth',
-        element: 'Air',
-        direction: 'East',
       },
-      {
-        id: 'beltane',
-        name: 'Beltane',
+      beltane: {
         alt: 'May Day',
-        type: 'cross',
-        date: { north: 'May 1', south: 'November 1' },
-        angle: 135,
         icon: '🔥',
         color: '#e07020',
         colorDark: '#904010',
-        seasonLabel: { north: '', south: '' },
         desc: 'Beltane blazes with the full fire of spring becoming summer. Fires were lit on every hill; cattle driven between them for protection. Maypoles rose as symbols of sacred union, and the veil between worlds thinned, inviting the fae to walk among us.',
         traditions: ['Beltane Fires', 'Maypole Dance', 'Green Man', 'Handfasting'],
         themes: 'Passion, Union, Fertility at peak',
-        element: 'Fire',
-        direction: 'Southeast',
       },
-      {
-        id: 'litha',
-        name: 'Litha',
+      litha: {
         alt: 'Midsummer · Summer Solstice',
-        type: 'solar',
-        date: { north: 'June 21', south: 'December 21' },
-        angle: 180,
         icon: '☀️',
         color: '#d4a020',
         colorDark: '#8a6010',
-        seasonLabel: { north: 'SUMMER', south: 'SUMMER' },
         desc: 'Litha is the zenith — the longest day, when the Sun pauses at the height of its power before beginning its slow descent. Midsummer bonfires burned through the night; faeries were said to roam freely. It is a moment of radiant fullness before the waning begins.',
         traditions: ['Midsummer Bonfires', 'Flower Crowns', 'Well Dressing', 'Sun Wheels'],
         themes: 'Fullness, Power, Celebration before waning',
-        element: 'Fire & Air',
-        direction: 'South',
       },
-      {
-        id: 'lughnasadh',
-        name: 'Lughnasadh',
+      lughnasadh: {
         alt: 'Lammas · First Harvest',
-        type: 'cross',
-        date: { north: 'August 1', south: 'February 1' },
-        angle: 225,
         icon: '🌾',
         color: '#a0b030',
         colorDark: '#507010',
-        seasonLabel: { north: '', south: '' },
         desc: 'Lughnasadh, named for the god Lugh, marks the first harvest — grain cut, bread baked from new wheat. It is a time of both abundance and bittersweet awareness: the Sun King weakens as the harvest grows. Games, feasting, and sacrifice honored the turning year.',
         traditions: ['Bread Baking', 'Grain Dollies', 'Harvest Games', 'Offerings to Lugh'],
         themes: 'First harvest, Sacrifice, Abundance',
-        element: 'Earth & Fire',
-        direction: 'Southwest',
       },
-      {
-        id: 'mabon',
-        name: 'Mabon',
+      mabon: {
         alt: 'Autumn Equinox',
-        type: 'solar',
-        date: { north: 'September 22–23', south: 'March 20–21' },
-        angle: 270,
         icon: '🍂',
         color: '#b05820',
         colorDark: '#703010',
-        seasonLabel: { north: 'AUTUMN', south: 'AUTUMN' },
         desc: 'Mabon brings the second balance point of the year as darkness begins to gain. The second harvest is gathered; leaves catch flame in amber and crimson. Named for the Welsh divine child, this equinox invites gratitude for what has been reaped and release of what must fall.',
         traditions: ['Apple Harvest', 'Gratitude Altars', 'Ancestor Honoring', 'Wine Making'],
         themes: 'Balance, Gratitude, Preparation for darkness',
-        element: 'Water & Air',
-        direction: 'West',
       },
-      {
-        id: 'samhain',
-        name: 'Samhain',
+      samhain: {
         alt: 'All Hallows · Ancestor Night',
-        type: 'cross',
-        date: { north: 'October 31', south: 'April 30' },
-        angle: 315,
         icon: '🌑',
         color: '#7040b0',
         colorDark: '#3a1870',
-        seasonLabel: { north: '', south: '' },
         desc: 'Samhain is the great hinge of the year — the end and the beginning, when the veil between the living and the dead grows thin as gossamer. The final harvest is brought in, the last fires extinguished and relit from the sacred flame. Ancestors are welcomed home.',
         traditions: ['Dumb Supper', 'Jack-o-Lanterns', 'Ancestor Altars', 'Divination'],
         themes: 'Death, Transition, Ancestral communion',
-        element: 'Water',
-        direction: 'Northwest',
       },
-    ];
+    };
 
-    let hemisphere = 'north';
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const DAY = 1000 * 60 * 60 * 24;
+
+    // Timezones south of the equator, for guessing the hemisphere on a first visit
+    const SOUTHERN_TIMEZONES = /^(Australia|Antarctica)\/|^Pacific\/(Auckland|Chatham|Fiji|Tongatapu|Apia|Noumea|Efate|Port_Moresby)|^America\/(Argentina|Santiago|Sao_Paulo|Montevideo|Asuncion|La_Paz|Lima|Punta_Arenas)|^Africa\/(Johannesburg|Maputo|Harare|Windhoek|Gaborone|Lusaka|Maseru|Mbabane|Blantyre|Lubumbashi|Luanda|Dar_es_Salaam)|^Indian\/(Mauritius|Reunion|Antananarivo)|^Atlantic\/Stanley/;
+
+    function storedHemisphere () {
+      try {
+        const stored = localStorage.getItem('wheel-of-the-year-hemisphere');
+        if (stored === 'north' || stored === 'south') return stored;
+      } catch (e) { /* storage unavailable */ }
+      try {
+        if (SOUTHERN_TIMEZONES.test(Intl.DateTimeFormat().resolvedOptions().timeZone)) return 'south';
+      } catch (e) { /* no Intl */ }
+      return 'north';
+    }
+
+    let hemisphere = storedHemisphere();
 
     const svg = document.getElementById('wheel-svg');
-    const infoPanel = document.getElementById('info-panel');
-    const panelPrompt = document.getElementById('panel-prompt');
-    const panelContent = document.getElementById('panel-content');
+    const $infoPanel = $('#info-panel');
+    const $panelPrompt = $('#panel-prompt');
+    const $panelContent = $('#panel-content');
 
     const R_OUTER = 240;
-    const R_INNER_LABEL = 170;
-    const R_ICON = 205;
     const R_RING = 140;
     const R_INNER = 70;
+
+    function svgEl (tag, attrs, text) {
+      const el = document.createElementNS(SVG_NS, tag);
+      Object.entries(attrs || {}).forEach(([k, v]) => el.setAttribute(k, v));
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    function draw (parent, tag, attrs, text) {
+      return parent.appendChild(svgEl(tag, attrs, text));
+    }
 
     function polarToXY (angleDeg, r) {
       // 0 deg = top, clockwise
@@ -650,11 +650,77 @@
       return `M ${cx + x1} ${cy + y1} A ${r} ${r} 0 ${largeArc} 1 ${cx + x2} ${cy + y2}`;
     }
 
-    function createSegment (sabbat, index) {
-      const startAngle = sabbat.angle - 22.5;
-      const endAngle = sabbat.angle + 22.5;
+    // === DATES ===
 
-      // Outer segment path
+    // Every festival from two years back to two years on, in order, from lib/almanac.rb
+    // A cross-quarter day falls on its traditional date, in the viewer's timezone, with its astronomical midpoint beside it
+    function festivalTimeline (hemi) {
+      return almanac.timeline[hemi].map(o => ({
+        index: sabbats.findIndex(s => s.id === o.id),
+        date: o.date ? new Date(`${o.date}T00:00`) : new Date(o.at),
+        midpoint: o.date && new Date(o.at),
+      }));
+    }
+
+    function startOfDay (date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
+    // Whole calendar days from today to date, in the viewer's timezone
+    function daysFromToday (date) {
+      return Math.round((startOfDay(date) - startOfDay(new Date())) / DAY);
+    }
+
+    function relativeDays (days) {
+      if (days === 0) return 'today';
+      if (days === 1) return 'tomorrow';
+      if (days === -1) return 'yesterday';
+      return days > 0 ? `in ${days} days` : `${-days} days ago`;
+    }
+
+    const shortWeekdayFormat = new Intl.DateTimeFormat('en-GB', { weekday: 'short' });
+    const shortDateFormat = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short' });
+    const monthFormat = new Intl.DateTimeFormat('en-GB', { month: 'long' });
+    const ordinalRules = new Intl.PluralRules('en-GB', { type: 'ordinal' });
+    const ORDINAL_SUFFIXES = { one: 'st', two: 'nd', few: 'rd', other: 'th' };
+
+    // 21 → 'st'
+    function ordinalSuffix (day) {
+      return ORDINAL_SUFFIXES[ordinalRules.select(day)];
+    }
+
+    // Long dates have ordinal days: Sat, 31st October 2026
+    function longDate (date) {
+      return `${shortWeekdayFormat.format(date)}, ${date.getDate()}${ordinalSuffix(date.getDate())} ${monthFormat.format(date)} ${date.getFullYear()}`;
+    }
+    const weekdayFormat = new Intl.DateTimeFormat('en-GB', { weekday: 'long' });
+
+    // The festival's next date, counting today
+    function nextOccurrence (index) {
+      return timeline.find(o => o.index === index && daysFromToday(o.date) >= 0);
+    }
+
+    // Where today falls on the wheel, between the last festival and the next
+    function todayAngle () {
+      const now = new Date();
+      const i = timeline.findIndex(o => o.date > now);
+      const prev = timeline[i - 1];
+      const next = timeline[i];
+      const fraction = (now - prev.date) / (next.date - prev.date);
+      return 45 * (prev.index + fraction);
+    }
+
+    let almanac;
+    let sabbats;
+    let timeline;
+
+    // === WHEEL ===
+
+    function createSegment (sabbat, index) {
+      const angle = index * 45;
+      const startAngle = angle - 22.5;
+      const endAngle = angle + 22.5;
+
       const [ox1, oy1] = polarToXY(startAngle, R_OUTER);
       const [ox2, oy2] = polarToXY(endAngle, R_OUTER);
       const [ix1, iy1] = polarToXY(startAngle, R_RING);
@@ -662,294 +728,222 @@
 
       const path = `M ${ox1} ${oy1} A ${R_OUTER} ${R_OUTER} 0 0 1 ${ox2} ${oy2} L ${ix2} ${iy2} A ${R_RING} ${R_RING} 0 0 0 ${ix1} ${iy1} Z`;
 
-      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      g.setAttribute('class', 'segment');
-      g.dataset.id = sabbat.id;
-      g.dataset.index = index;
+      const g = svgEl('g', {
+        class: 'segment',
+        tabindex: '0',
+        role: 'button',
+        'aria-pressed': 'false',
+        'aria-label': `${sabbat.name}, ${sabbat.alt}`,
+        'data-id': sabbat.id,
+      });
 
-      // Segment fill
-      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      p.setAttribute('d', path);
-      p.setAttribute('fill', sabbat.colorDark);
-      p.setAttribute('stroke', '#0d0a06');
-      p.setAttribute('stroke-width', '1.5');
-      g.appendChild(p);
+      draw(g, 'path', { d: path, class: 'segment-fill', fill: sabbat.colorDark });
 
       // Gradient overlay
       const gradId = `grad-${sabbat.id}`;
-      const defs = svg.querySelector('defs') || (() => { const d = document.createElementNS('http://www.w3.org/2000/svg', 'defs'); svg.appendChild(d); return d; })();
-      const grad = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
-      grad.setAttribute('id', gradId);
-      grad.setAttribute('cx', '50%'); grad.setAttribute('cy', '50%');
-      grad.setAttribute('r', '50%');
-      const s1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-      s1.setAttribute('offset', '0%');
-      s1.setAttribute('stop-color', sabbat.color);
-      s1.setAttribute('stop-opacity', '0.3');
-      const s2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-      s2.setAttribute('offset', '100%');
-      s2.setAttribute('stop-color', sabbat.color);
-      s2.setAttribute('stop-opacity', '0');
-      grad.appendChild(s1); grad.appendChild(s2);
-      defs.appendChild(grad);
-
-      const p2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      p2.setAttribute('d', path);
-      p2.setAttribute('fill', `url(#${gradId})`);
-      p2.setAttribute('stroke', 'none');
-      g.appendChild(p2);
+      const grad = draw(svg.querySelector('defs'), 'radialGradient', { id: gradId });
+      draw(grad, 'stop', { offset: '0%', 'stop-color': sabbat.color, 'stop-opacity': '0.3' });
+      draw(grad, 'stop', { offset: '100%', 'stop-color': sabbat.color, 'stop-opacity': '0' });
+      draw(g, 'path', { d: path, fill: `url(#${gradId})` });
 
       // Rim arc highlight
-      const rimPath = describeArc(0, 0, R_OUTER - 1, startAngle + 0.5, endAngle - 0.5);
-      const rim = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      rim.setAttribute('d', rimPath);
-      rim.setAttribute('fill', 'none');
-      rim.setAttribute('stroke', sabbat.color);
-      rim.setAttribute('stroke-width', '2.5');
-      rim.setAttribute('opacity', '0.6');
-      g.appendChild(rim);
+      draw(g, 'path', { d: describeArc(0, 0, R_OUTER - 1, startAngle + 0.5, endAngle - 0.5), class: 'segment-rim', stroke: sabbat.color });
 
-      // Type indicator (solar = diamond dot, cross = circle dot) at mid-outer edge
-      const midAngle = sabbat.angle;
-      const [mx, my] = polarToXY(midAngle, R_OUTER - 12);
-      const indicator = document.createElementNS('http://www.w3.org/2000/svg', sabbat.type === 'solar' ? 'rect' : 'circle');
+      // Type indicator (solar = diamond, cross-quarter = circle) at mid-outer edge
+      const [mx, my] = polarToXY(angle, R_OUTER - 12);
       if (sabbat.type === 'solar') {
-        indicator.setAttribute('x', mx - 5);
-        indicator.setAttribute('y', my - 5);
-        indicator.setAttribute('width', '10');
-        indicator.setAttribute('height', '10');
-        indicator.setAttribute('transform', `rotate(45, ${mx}, ${my})`);
-        indicator.setAttribute('fill', sabbat.color);
-        indicator.setAttribute('opacity', '0.9');
+        draw(g, 'rect', { x: mx - 5, y: my - 5, width: 10, height: 10, transform: `rotate(45, ${mx}, ${my})`, class: 'segment-mark', fill: sabbat.color });
       } else {
-        indicator.setAttribute('cx', mx);
-        indicator.setAttribute('cy', my);
-        indicator.setAttribute('r', '5');
-        indicator.setAttribute('fill', sabbat.color);
-        indicator.setAttribute('opacity', '0.9');
+        draw(g, 'circle', { cx: mx, cy: my, r: 5, class: 'segment-mark', fill: sabbat.color });
       }
-      g.appendChild(indicator);
 
-      // Sabbat name label - rotated along spoke
-      const labelR = (R_RING + R_OUTER) / 2 - 12;
-      const [lx, ly] = polarToXY(midAngle, labelR);
-      const labelAngle = midAngle; // rotation for text
+      // Name and next date, along the spoke, turned the right way up in the lower half of the wheel
+      const [lx, ly] = polarToXY(angle, (R_RING + R_OUTER) / 2 - 12);
+      const upright = angle > 90 && angle < 270 ? angle + 180 : angle;
+      const textG = draw(g, 'g', { transform: `translate(${lx}, ${ly}) rotate(${upright})` });
+      draw(textG, 'text', { class: 'sabbat-label', y: -8 }, sabbat.name.toUpperCase());
+      draw(textG, 'text', { class: 'sabbat-label sabbat-date', y: 11 });
 
-      const textG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      textG.setAttribute('transform', `translate(${lx}, ${ly}) rotate(${midAngle})`);
-
-      const nameText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      nameText.setAttribute('class', 'sabbat-label');
-      nameText.setAttribute('x', '0');
-      nameText.setAttribute('y', '0');
-      nameText.textContent = sabbat.name.toUpperCase();
-      textG.appendChild(nameText);
-      g.appendChild(textG);
-
-      g.addEventListener('click', () => selectSabbat(index));
+      $(g).on('click', () => {
+        selectSabbat(index);
+        // With the panel under the wheel (below Bootstrap's lg), take the reader to it
+        if (activeIndex === index && window.matchMedia('(max-width: 991.98px)').matches) {
+          const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          $infoPanel[0].scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+        }
+      }).on('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectSabbat(index);
+        } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          const step = (e.key === 'ArrowRight' || e.key === 'ArrowDown') ? 1 : -1;
+          const next = (index + step + sabbats.length) % sabbats.length;
+          segments().eq(next).trigger('focus');
+          selectSabbat(next, { keep: true });
+        } else if (e.key === 'Escape' && activeIndex !== null) {
+          selectSabbat(activeIndex);
+        }
+      });
       return g;
     }
 
+    function segments () {
+      return $(svg).find('.segment');
+    }
+
     function buildWheel () {
-      // Defs
-      const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-      svg.appendChild(defs);
+      draw(svg, 'defs');
+      draw(svg, 'circle', { r: R_OUTER, class: 'wheel-face' });
+      draw(svg, 'circle', { r: R_RING, class: 'ring' });
+      draw(svg, 'circle', { r: R_INNER, class: 'ring inner' });
 
-      // Background circle
-      const bg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      bg.setAttribute('cx', '0'); bg.setAttribute('cy', '0'); bg.setAttribute('r', R_OUTER.toString());
-      bg.setAttribute('fill', '#0a0806');
-      bg.setAttribute('stroke', 'rgba(201,168,76,0.2)');
-      bg.setAttribute('stroke-width', '1');
-      svg.appendChild(bg);
-
-      // Concentric decorative rings
-      [R_RING, R_INNER + 30, R_INNER].forEach((r, i) => {
-        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        c.setAttribute('cx', '0'); c.setAttribute('cy', '0'); c.setAttribute('r', r.toString());
-        c.setAttribute('fill', 'none');
-        c.setAttribute('stroke', `rgba(201,168,76,${i === 0 ? 0.35 : 0.2})`);
-        c.setAttribute('stroke-width', i === 0 ? '1.5' : '0.8');
-        svg.appendChild(c);
-      });
-
-      // Spoke lines (dividers)
+      // Spokes between the festivals
       for (let i = 0; i < 8; i++) {
-        const angle = i * 45 - 22.5;
-        const [x1, y1] = polarToXY(angle, R_INNER);
-        const [x2, y2] = polarToXY(angle, R_OUTER);
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-        line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-        line.setAttribute('stroke', 'rgba(201,168,76,0.25)');
-        line.setAttribute('stroke-width', '0.8');
-        svg.appendChild(line);
+        const [x1, y1] = polarToXY(i * 45 - 22.5, R_INNER);
+        const [x2, y2] = polarToXY(i * 45 - 22.5, R_OUTER);
+        draw(svg, 'line', { x1, y1, x2, y2, class: 'spoke' });
       }
 
-      // Segments
-      sabbats.forEach((s, i) => {
-        const g = createSegment(s, i);
-        svg.appendChild(g);
+      sabbats.forEach((s, i) => svg.appendChild(createSegment(s, i)));
+
+      // Season names halfway across the inner ring, along it like the festivals' names
+      [[0, 'WINTER'], [90, 'SPRING'], [180, 'SUMMER'], [270, 'AUTUMN']].forEach(([angle, season]) => {
+        const [sx, sy] = polarToXY(angle, (R_INNER + R_RING) / 2);
+        draw(svg, 'text', { class: 'season-label', transform: `translate(${sx}, ${sy}) rotate(${angle === 180 ? 0 : angle})` }, season);
       });
 
-      // Season labels (in inner ring) — stored for hemisphere swapping
-      // NH: Winter=top(0°), Spring=right(90°), Summer=bottom(180°), Autumn=left(270°)
-      // SH: same wheel positions but seasons are flipped
-      const seasonPositions = [
-        { angle: 0, nh: 'WINTER', sh: 'WINTER' },
-        { angle: 90, nh: 'SPRING', sh: 'SPRING' },
-        { angle: 180, nh: 'SUMMER', sh: 'SUMMER' },
-        { angle: 270, nh: 'AUTUMN', sh: 'AUTUMN' },
-      ];
-      seasonPositions.forEach(({ angle, nh, sh }, i) => {
-        // Spring (90°) and Autumn (270°) pulled inward to avoid overlapping segments
-        const r = (angle === 90 || angle === 270) ? R_INNER + 32 : R_INNER + 50;
-        const [sx, sy] = polarToXY(angle, r);
-        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        t.setAttribute('class', 'season-label');
-        t.setAttribute('id', 'season-label-' + i);
-        const xOffset = (angle === 270) ? -4 : (angle === 90) ? 2 : 0;
-        t.setAttribute('x', sx + xOffset); t.setAttribute('y', sy);
-        t.textContent = nh;
-        t.dataset.nh = nh;
-        t.dataset.sh = sh;
-        svg.appendChild(t);
-      });
-
-      // Equinox/Solstice direction ticks (short lines at 0,90,180,270 in center ring)
+      // Solstice ticks, just inside the festivals
       [0, 180].forEach(angle => {
-        const [x1, y1] = polarToXY(angle, R_INNER + 30);
-        const [x2, y2] = polarToXY(angle, R_INNER + 38);
-        const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        tick.setAttribute('x1', x1); tick.setAttribute('y1', y1);
-        tick.setAttribute('x2', x2); tick.setAttribute('y2', y2);
-        tick.setAttribute('stroke', 'rgba(201,168,76,0.5)'); tick.setAttribute('stroke-width', '1.5');
-        svg.appendChild(tick);
+        const [x1, y1] = polarToXY(angle, R_RING - 8);
+        const [x2, y2] = polarToXY(angle, R_RING);
+        draw(svg, 'line', { x1, y1, x2, y2, class: 'tick' });
       });
 
-      // Center inner circle fill
-      const centerFill = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      centerFill.setAttribute('cx', '0'); centerFill.setAttribute('cy', '0'); centerFill.setAttribute('r', R_INNER.toString());
-      centerFill.setAttribute('fill', '#0d0a06');
-      centerFill.setAttribute('stroke', 'rgba(201,168,76,0.5)');
-      centerFill.setAttribute('stroke-width', '1');
-      svg.appendChild(centerFill);
+      // Today's hand, from the centre out to the rim
+      const marker = draw(svg, 'g', { class: 'today-marker', id: 'today-marker' });
+      draw(marker, 'line', { y1: -R_INNER, y2: -(R_OUTER + 6) });
+      draw(marker, 'circle', { cy: -(R_OUTER + 6), r: 4.5 });
+      draw(marker, 'title', {}, 'Today');
 
-      // Moon phase in center
-      const moon = getMoonPhase();
+      // Centre, with today: what the hand points at
+      const now = new Date();
+      draw(svg, 'circle', { r: R_INNER, class: 'centre' });
+      draw(svg, 'text', { y: -24, class: 'today-weekday' }, weekdayFormat.format(now));
+      const date = draw(svg, 'text', { class: 'today-date' }, now.getDate());
+      draw(date, 'tspan', { class: 'ordinal' }, ordinalSuffix(now.getDate()));
+      date.append(` ${monthFormat.format(now)}`);
+      draw(svg, 'text', { y: 25, class: 'today-next', id: 'today-next' });
+    }
 
-      const moonGlyph = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      moonGlyph.setAttribute('x', '0'); moonGlyph.setAttribute('y', '4');
-      moonGlyph.setAttribute('text-anchor', 'middle');
-      moonGlyph.setAttribute('dominant-baseline', 'middle');
-      moonGlyph.setAttribute('font-family', 'serif');
-      moonGlyph.setAttribute('font-size', '26');
-      moonGlyph.setAttribute('fill', '#c4b89a');
-      moonGlyph.textContent = moon.emoji;
-      svg.appendChild(moonGlyph);
+    // Everything that depends on the hemisphere: the dates under the names, today's hand and the next festival in the
+    // centre
+    function updateDates () {
+      timeline = festivalTimeline(hemisphere);
 
-      const moonLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      moonLabel.setAttribute('x', '0'); moonLabel.setAttribute('y', '28');
-      moonLabel.setAttribute('text-anchor', 'middle');
-      moonLabel.setAttribute('font-family', 'Cinzel, serif');
-      moonLabel.setAttribute('font-size', '7');
-      moonLabel.setAttribute('fill', '#c4b89a');
-      moonLabel.setAttribute('letter-spacing', '1');
-      moonLabel.textContent = moon.name.toUpperCase();
-      svg.appendChild(moonLabel);
+      segments().each((i, g) => {
+        $(g).find('.sabbat-date').text(shortDateFormat.format(nextOccurrence(i).date));
+      });
+
+      $('#today-marker').attr('transform', `rotate(${todayAngle()})`);
+
+      const next = timeline.find(o => daysFromToday(o.date) >= 0);
+      const days = daysFromToday(next.date);
+      const name = sabbats[next.index].name;
+      $('#today-next').text(days === 0 ? `Happy ${name}!` : `${days === 1 ? '1 day' : `${days} days`} to ${name}`);
     }
 
     let activeIndex = null;
 
-    function selectSabbat (index) {
-      if (activeIndex === index) {
-        activeIndex = null;
-        document.querySelectorAll('.segment').forEach(g => g.classList.remove('active', 'dimmed'));
-        infoPanel.classList.remove('has-selection');
-        panelPrompt.classList.remove('hidden');
-        panelContent.classList.remove('visible');
+    function clearSelection () {
+      activeIndex = null;
+      segments().removeClass('active dimmed').attr('aria-pressed', 'false');
+      $infoPanel.removeClass('has-selection');
+      $panelPrompt.show();
+      $panelContent.hide();
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+
+    function selectSabbat (index, { keep } = {}) {
+      if (activeIndex === index && !keep) {
+        clearSelection();
         return;
       }
       activeIndex = index;
 
-      // Update segment classes
-      document.querySelectorAll('.segment').forEach((g, i) => {
-        g.classList.remove('active', 'dimmed');
-        if (i === index) g.classList.add('active');
-        else g.classList.add('dimmed');
+      segments().each((i, g) => {
+        $(g).toggleClass('active', i === index).toggleClass('dimmed', i !== index).attr('aria-pressed', i === index ? 'true' : 'false');
       });
 
       const s = sabbats[index];
-      const dateStr = typeof s.date === 'object' ? s.date[hemisphere] : s.date;
-      infoPanel.classList.add('has-selection');
-      panelPrompt.classList.add('hidden');
+      const next = nextOccurrence(index);
+      const days = daysFromToday(next.date);
+      const when = `<strong>${longDate(next.date)}</strong> · ${relativeDays(days)}`;
+      const whenLines = s.type === 'solar'
+        ? `<div class="panel-when">${when}</div>`
+        : `<div class="panel-when">${when}</div>
+           <div class="panel-when">Traditionally ${s.traditional[hemisphere]} · astronomical midpoint ${shortDateFormat.format(next.midpoint)}</div>`;
 
-      panelContent.innerHTML = `
-    <div class="panel-header">
-      <div class="panel-icon" style="color:${s.color}">${s.icon}</div>
-      <div class="panel-title-block">
-        <div class="panel-date">${dateStr}</div>
-        <div class="panel-name">${s.name}</div>
-        <div class="panel-alt">${s.alt}</div>
-        <span class="panel-type-badge ${s.type === 'solar' ? 'badge-solar' : 'badge-cross'}">${s.type === 'solar' ? '◈ Solar Festival' : '● Cross-Quarter Day'}</span>
-      </div>
-    </div>
-    <div class="panel-body">${s.desc}</div>
-    <div class="detail-item">
-      <div class="detail-label">Themes</div>
-      <div class="detail-value">${s.themes}</div>
-    </div>
-  `;
+      $infoPanel.addClass('has-selection');
+      $panelPrompt.hide();
 
-      panelContent.classList.add('visible');
+      // The festivals' text is the page's own, above
+      $panelContent.html(`
+        <div class="d-flex flex-column gap-3">
+          <div class="panel-header d-flex align-items-start gap-3 pb-3">
+            <div class="panel-icon flex-shrink-0" style="color:${s.color}">${s.icon}</div>
+            <div>
+              <div class="panel-name">${s.name}</div>
+              <div class="panel-alt">${s.alt}</div>
+              <span class="badge festival-type ${s.type} mt-2">${s.type === 'solar' ? '◈ Solar Festival' : '● Cross-Quarter Day'}</span>
+            </div>
+          </div>
+          <div>${whenLines}</div>
+          <div class="panel-body">${s.desc}</div>
+          <div class="detail-item">
+            <div class="detail-label">Themes</div>
+            <div class="detail-value">${s.themes}</div>
+          </div>
+          <div>
+            <div class="detail-label">Traditions</div>
+            <div class="d-flex flex-wrap gap-2 mt-2">${s.traditions.map(t => `<span class="tradition-tag">${t}</span>`).join('')}</div>
+          </div>
+        </div>
+      `).show();
+      history.replaceState(null, '', `#${s.id}`);
     }
 
     function setHemisphere (hemi) {
       if (hemisphere === hemi) return;
       hemisphere = hemi;
+      try { localStorage.setItem('wheel-of-the-year-hemisphere', hemi); } catch (e) { /* storage unavailable */ }
+      showHemisphere();
+    }
 
-      // Toggle buttons
-      document.getElementById('btn-nh').classList.toggle('active', hemi === 'north');
-      document.getElementById('btn-sh').classList.toggle('active', hemi === 'south');
-
-      // Show/hide note
-      // Update season labels on the wheel
-      document.querySelectorAll('[id^="season-label-"]').forEach(el => {
-        el.textContent = el.dataset[hemi === 'north' ? 'nh' : 'sh'];
+    function showHemisphere () {
+      $('.btn-hemi').each((i, btn) => {
+        const on = $(btn).data('hemisphere') === hemisphere;
+        $(btn).toggleClass('active', on).attr('aria-pressed', on ? 'true' : 'false');
       });
-
-      // Refresh panel if a sabbat is selected
-      if (activeIndex !== null) {
-        const prev = activeIndex;
-        activeIndex = null;
-        selectSabbat(prev);
-      }
+      updateDates();
+      if (activeIndex !== null) selectSabbat(activeIndex, { keep: true });
     }
 
-    function getMoonPhase () {
-      // Synodic month and reference new moon matching lib/almanac.rb
-      const LUNAR_MONTH = 29.530588853;
-      const knownNewMoon = Date.UTC(2000, 0, 6, 6, 14, 0); // Jan 6, 2000 06:14 UTC
-      const now = Date.now();
-      const elapsedDays = (now - knownNewMoon) / (1000 * 60 * 60 * 24);
-      const moonAge = ((elapsedDays % LUNAR_MONTH) + LUNAR_MONTH) % LUNAR_MONTH;
+    $('.btn-hemi').on('click', function () {
+      setHemisphere($(this).data('hemisphere'));
+    });
 
-      // Phase boundaries matching lib/almanac.rb
-      const phases = [
-        { max: 1, name: 'New Moon', emoji: '🌑' },
-        { max: 6.38, name: 'Waxing Crescent', emoji: '🌒' },
-        { max: 8.38, name: 'First Quarter', emoji: '🌓' },
-        { max: 13.76, name: 'Waxing Gibbous', emoji: '🌔' },
-        { max: 15.76, name: 'Full Moon', emoji: '🌕' },
-        { max: 21.14, name: 'Waning Gibbous', emoji: '🌖' },
-        { max: 23.14, name: 'Last Quarter', emoji: '🌗' },
-        { max: LUNAR_MONTH, name: 'Waning Crescent', emoji: '🌘' },
-      ];
+    // The festivals and their dates, from lib/almanac.rb
+    $.getJSON('/wheel-of-the-year.json', data => {
+      almanac = data;
+      sabbats = data.festivals.map(f => ({ ...f, type: f.traditional ? 'cross' : 'solar', ...FESTIVAL_TEXT[f.id] }));
+      buildWheel();
+      showHemisphere();
 
-      return phases.find(p => moonAge < p.max) || phases[0];
-    }
-
-    buildWheel();
+      // Open the festival in the URL (#samhain), or else the next one
+      const linked = sabbats.findIndex(s => `#${s.id}` === location.hash);
+      selectSabbat(linked >= 0 ? linked : timeline.find(o => daysFromToday(o.date) >= 0).index);
+    });
   </script>
 </body>
 
