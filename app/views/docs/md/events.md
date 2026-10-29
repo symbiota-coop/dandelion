@@ -289,15 +289,23 @@ If you take payments with Stripe, go to **Stripe report** in an event's dropdown
 
 Alternatively, you can accept completely fee-free crypto payments via Gnosis, Celo or Base. Go to the Payments tab in your organisation's settings, click **Set up Crypto**, and enter an Ethereum-compatible wallet address. Copy it straight from your wallet: a mixed-case address carries a checksum, and Dandelion won't save one whose checksum doesn't match, as that usually means a character was mistyped.
 
-## About the suggested contribution
+## Donations and the suggested contribution
 
-Dandelion operates on a donation/gift economy basis. We ask for donations from organisations, and from ticket purchasers at checkout.
+Dandelion takes nothing from your ticket sales and charges no fees. It runs as a gift economy instead, on what people choose to give.
 
-**From organisations:** We ask for a donation of 1% of ticket sales. There's no charge for events that don't sell tickets on Dandelion. Click your organisation dropdown and select Contribute to make a contribution.
+### Donations at checkout
 
-**From ticket purchasers at checkout:** By default, donations from ticket purchasers at checkout go to Dandelion. However, if your organisation meets the suggested contribution of 1% of ticket sales, we pass on **future** donations to your organisation instead.
+Every checkout has a box where ticket buyers can add a donation on top of their tickets. When you take payments with Stripe, these donations go to **Dandelion** by default, and that's how Dandelion is mostly funded.
 
-The easiest way to ensure that donations always go to your organisation is to **enable auto top-up** on the Contribute page.
+### The suggested contribution
+
+If you'd like donations at checkout to go to **your organisation** instead, we ask your organisation to contribute 1% of its ticket sales to Dandelion, to make up for the donations Dandelion no longer receives. You pay it yourself: click your organisation's dropdown and select **Contribute**. Dandelion never takes it out of your ticket sales.
+
+It's a running total across all your events, not a one-off payment or a monthly fee. Every ticket sale adds 1% of its price to it, and events that don't sell tickets on Dandelion add nothing. The Contribute page shows how much your events have added up to, how much you've contributed and what's left.
+
+While you're keeping up with it (you've contributed at least 90% of it, with no more than £100 outstanding), checkout donations go to your organisation, and the settings on an event's **Donations** tab (the suggested and minimum donation, and the text beside them) take effect. As you sell more tickets you can fall behind again, and checkout donations then go back to Dandelion until you catch up.
+
+The easiest way to stay caught up is to **enable auto top-up** on the Contribute page. Dandelion then tops you up to 100% whenever you fall behind, and checkout donations always go to your organisation.
 
 ## Sending confirmation to other ticketholders
 
