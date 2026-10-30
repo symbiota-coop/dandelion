@@ -26,7 +26,7 @@
     </a>
   </li>
   <li class="nav-item">
-    <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if request.path == '/daily' %>" href="/daily" data-bs-toggle="tooltip" title="Dandelion Daily" data-bs-placement="right">
+    <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if request.path == '/daily' || request.path.start_with?('/daily/') %>" href="/daily" data-bs-toggle="tooltip" title="Dandelion Daily" data-bs-placement="right">
       <i class="bi bi-newspaper"></i>
       <span>Dandelion Daily</span>
     </a>

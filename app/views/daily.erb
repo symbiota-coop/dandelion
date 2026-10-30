@@ -21,7 +21,7 @@
           <% if location == @location %>
             <span class="newspaper-edition-current"><%= location.name %></span>
           <% else %>
-            <a href="/locations/<%= location.name %>/daily?date=<%= date %>"><%= location.name %></a>
+            <a href="/daily/<%= location.name %>?date=<%= date %>"><%= location.name %></a>
           <% end %>
         <% end %>
       </nav>

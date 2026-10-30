@@ -1,7 +1,7 @@
 <%= cp :'locations/header', key: "/locations/#{@location.name}/header", locals: { location: @location, events: @events } %>
 
 <%# The summary, ending with a link to the location's Daily once it has one %>
-<% daily_link = "[Read more in the #{@location.name} Daily](/locations/#{ERB::Util.url_encode(@location.name)}/daily)" if Daily.latest_date(location: @location) %>
+<% daily_link = "[Read more in the #{@location.name} Daily](/daily/#{ERB::Util.url_encode(@location.name)})" if Daily.latest_date(location: @location) %>
 <% if @location.summary || daily_link %>
   <div class="readable"<% if @location.summary %> data-bs-toggle="tooltip" title="AI-generated summary ✨"<% end %>>
     <%== md([@location.summary, daily_link].compact.join(' ')) %>

@@ -1,5 +1,5 @@
 # The Dandelion Daily (/daily): each date's AI-written articles and facilitator of the day, worked out once and kept
-# in a Stash. Each Location with a Signal group has its own edition too (/locations/:name/daily), from the events in
+# in a Stash. Each Location with a Signal group has its own edition too (/daily/:name), from the events in
 # its area. Only late:errands makes them, with Daily.publish(Date.today) and Daily.publish(Date.today, location:);
 # the pages just show what's been kept
 module Daily
