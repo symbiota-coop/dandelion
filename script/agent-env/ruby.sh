@@ -7,6 +7,7 @@ RUBY_VERSION="$(sed -nE "s/^ruby '([^']+)'.*/\1/p" Gemfile)"
 
 [ "$(ruby -e 'print RUBY_VERSION' 2>/dev/null || true)" = "$RUBY_VERSION" ] && exit 0
 
+# shellcheck source=/dev/null # the image's, so not ours to check
 . /etc/os-release
 case "$(uname -m)" in
   x86_64) ruby_arch=x64 ;;

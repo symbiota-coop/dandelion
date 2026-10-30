@@ -62,7 +62,7 @@ jobs:
     - name: Run Herb
       run: script/lint --all --only herb
 
-    # uvx runs the zizmor version script/lint names
+    # uvx runs the zizmor and ShellCheck versions script/lint names
     - name: Install uv
       uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
       with:
@@ -74,6 +74,9 @@ jobs:
       run: script/lint --all --only zizmor
       env:
         GH_TOKEN: ${{ github.token }}
+
+    - name: Run ShellCheck
+      run: script/lint --all --only shellcheck
 
     # Tests our own checks; here rather than in the test matrix, as it needs Node for the ESLint and Stylelint tests
     - name: Test the linters

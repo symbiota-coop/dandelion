@@ -92,13 +92,17 @@ zizmor (https://docs.zizmor.sh) audits the GitHub Actions workflows and actions 
 - `artipacked`: Checkouts set `persist-credentials: false`, unless a later step pushes with git
 - `self-repository`: Actions in this repository are `uses: $/.github/actions/...`, not `./.github/actions/...`
 
+### ShellCheck
+
+ShellCheck (https://www.shellcheck.net) checks the shell scripts (`*.sh`, like `script/agent-env/`, and the hooks in `.githooks`) with all its checks, run by `uvx` from the `shellcheck-py` package, which ships its binary. Disable one on the line above with `# shellcheck disable=SC2086 # reason` (ShellCheck can't parse `--` after a directive). A script that sources a file outside the repository (`/etc/os-release`) says so with `# shellcheck source=/dev/null`, which isn't a disable.
+
 ### Other checks
 
 Rules no linter covers, checked by `test/lint_test.rb` or `script/lint` (both run by CI's lint job and the pre-commit hook). Each names its check.
 
 - `test_mcp_copies_match_mcp_json`: `.cursor/mcp.json`, `.opencode/opencode.json` and `.codex/config.toml` are copies of `.mcp.json`: only edit `.mcp.json`, then run `rake mcp:sync` (Cloud agents)
 - `test_ci_runs_every_test_file`: CI's test jobs, one per test file, are listed in `.github/workflows/ruby.yml`: add a new test file there (Tests)
-- `test_every_disable_says_why`: every disable comment gives its reason, after `--` (or after `Linter:` for erb_lint, or in an ERB comment on the line above for Herb), including zizmor's in `.github`, as each linter's section shows
+- `test_every_disable_says_why`: every disable comment gives its reason, after `--` (or after `Linter:` for erb_lint, or in an ERB comment on the line above for Herb), including zizmor's in `.github` and ShellCheck's (after `#`), as each linter's section shows
 - `test_dependency_versions_are_exact`: the root `package.json`, `frontend/package.json` (the CDN packages), the CDN files' URLs and the packages rake tasks install name exact versions, so none arrives unchosen (Dependencies)
 - `test_cdn_files_have_integrity`: every CDN file the app loads has a hash in `frontend/integrity.json`, no hash is left over, and `frontend/package.json` lists only packages the app loads (Dependencies)
 - `test_ckeditor_stays_on_37`: CKEditor stays on 37 (Build/vendored code)
@@ -109,13 +113,13 @@ Rules no linter covers, checked by `test/lint_test.rb` or `script/lint` (both ru
 
 Commit only the changes you made: other sessions may be editing the same checkout, so stage your files by name rather than with `git add -A` or `git commit -a`.
 
-`script/lint` runs our linters, RuboCop, erb_lint, ESLint, Stylelint, Herb and zizmor, each on the files of its kind. CI's lint job (`.github/workflows/ruby.yml`) runs it too, so it is the one place their commands and flags are set: change a linter's flags or add a linter there, not in the workflow. Run it on the files you added or changed as you go, and fix what it reports:
+`script/lint` runs our linters, RuboCop, erb_lint, ESLint, Stylelint, Herb, zizmor and ShellCheck, each on the files of its kind. CI's lint job (`.github/workflows/ruby.yml`) runs it too, so it is the one place their commands and flags are set: change a linter's flags or add a linter there, not in the workflow. Run it on the files you added or changed as you go, and fix what it reports:
 
 ```bash
 script/lint <files>
 ```
 
-If a linter's config is among them (`.rubocop.yml`, `.rubocop/`, `.erb_lint.yml`, `.erb_linters/`, `eslint.config.mjs`, `stylelint.config.mjs`, `.herb.yml`, `package.json`, `zizmor.yml`), it runs that linter on everything, as CI does; `script/lint --all` runs them all, and `--only <linter>` just one. Run `npm ci` first if `node_modules` is missing, and install uv (https://docs.astral.sh/uv/) if `uvx` is.
+If a linter's config is among them (`.rubocop.yml`, `.rubocop/`, `.erb_lint.yml`, `.erb_linters/`, `eslint.config.mjs`, `stylelint.config.mjs`, `.herb.yml`, `package.json`, `zizmor.yml`, `.shellcheckrc`), it runs that linter on everything, as CI does; `script/lint --all` runs them all, and `--only <linter>` just one. Run `npm ci` first if `node_modules` is missing, and install uv (https://docs.astral.sh/uv/) if `uvx` is.
 
 The pre-commit hook (`.githooks/pre-commit`) runs `script/lint --staged`, which lints the staged version of each staged file, so another session's unstaged edits don't count (`test/lint_test.rb`, which it runs when you commit a file it checks, reads from disk). Git runs it once `core.hooksPath` is `.githooks`, which `script/agent-env/install.sh` sets; in a checkout of your own, run `git config core.hooksPath .githooks` once. If it fails, fix the offenses (or disable a check where its rule genuinely doesn't apply, as above) and commit again. Never skip it with `--no-verify`.
 
@@ -126,7 +130,7 @@ The pre-commit hook (`.githooks/pre-commit`) runs `script/lint --staged`, which 
 
 ## Cloud agents (Cursor, Claude Code)
 
-Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Chromium, MongoDB), `ruby.sh` (the Gemfile's Ruby, for images without it), `node.sh` (the Node in `.nvmrc`, which CI's setup-node also reads, for images without its major; installed at a prefix of its own rather than over the image's Node), `browser-path.sh` (prints the Chromium for `BROWSER_PATH`), `install.sh` (bundle install, npm ci for the linters and uv for zizmor, which only warn if they fail, `.env` files, the pre-commit hook), `start-services.sh` (starts MongoDB) and `start-web.sh` (starts Puma in the background, logging to `log/web.log`, for environments with no terminal to keep it in). A tool's own setup only calls these, plus anything that applies to that tool alone (Claude Code's proxy CA and `CLAUDE_ENV_FILE`).
+Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Chromium, MongoDB), `ruby.sh` (the Gemfile's Ruby, for images without it), `node.sh` (the Node in `.nvmrc`, which CI's setup-node also reads, for images without its major; installed at a prefix of its own rather than over the image's Node), `browser-path.sh` (prints the Chromium for `BROWSER_PATH`), `install.sh` (bundle install, npm ci for the linters and uv for zizmor and ShellCheck, which only warn if they fail, `.env` files, the pre-commit hook), `start-services.sh` (starts MongoDB) and `start-web.sh` (starts Puma in the background, logging to `log/web.log`, for environments with no terminal to keep it in). A tool's own setup only calls these, plus anything that applies to that tool alone (Claude Code's proxy CA and `CLAUDE_ENV_FILE`).
 
 - Cursor: `.cursor/environment.json` and `.cursor/Dockerfile`. After boot, `start` forks Mongo; a `web` terminal keeps `foreman start -e .env web` running (Puma on port 3000, logs in that session). That terminal is a tmux session, so the Dockerfile installs tmux.
 - Claude Code on the web: a `SessionStart` hook in `.claude/settings.json` runs `.claude/remote-setup.sh`. Project MCP servers come from the committed `.mcp.json`, whose `${VAR}`s are filled from the cloud environment's variables (and from your shell locally). Other tools don't read it, so each has its own committed copy of the same servers, with secrets read from the environment rather than written in: `.cursor/mcp.json` (`${env:VAR}`), `.codex/config.toml` (`env_vars` and `bearer_token_env_var`; Codex only reads it in trusted projects) and `.opencode/opencode.json` (`{env:VAR}`). Only edit `.mcp.json`, then run `rake mcp:sync` to write the others. Variables in `.mcp.json` can't have defaults (`${VAR:-x}`), as the others can't express them. Cursor cloud agents don't read any repo MCP file; their MCP servers are set up in the Cursor dashboard
@@ -210,7 +214,7 @@ The design guide (`/design`, `app/views/design.erb`) shows the colours, type, sp
 Cooldown: never use a gem or JS package version released less than 7 days ago. This guards against supply-chain attacks on freshly published versions. If a version that was just released can't be found, that's why: wait until it's a week old rather than removing or shortening the cooldown.
 
 - Gems: the Gemfile's source has `cooldown: 7`, so Bundler enforces it
-- GitHub Actions are pinned to a commit of a release at least 7 days old, with the release as a comment (`unpinned-uses`, under zizmor), but for ruby/setup-ruby when the Gemfile's Ruby is newer than that release knows: then it's the first release that knows it. zizmor's own version is in `script/lint`, and uv's in `.github/workflows/ruby.yml` and `script/agent-env/install.sh`
+- GitHub Actions are pinned to a commit of a release at least 7 days old, with the release as a comment (`unpinned-uses`, under zizmor), but for ruby/setup-ruby when the Gemfile's Ruby is newer than that release knows: then it's the first release that knows it. zizmor's and ShellCheck's own versions are in `script/lint`, and uv's in `.github/workflows/ruby.yml` and `script/agent-env/install.sh`
 - `rake bootstrap:build` runs `npm install` with `--before` set to 7 days ago
 - The root `package.json` is only linters: ESLint, which CI runs as `npx eslint` over `app/assets/javascripts` and the templates in `app/views` (`eslint.config.mjs`), and Stylelint, which it runs over `app/assets/stylesheets` and the templates (`stylelint.config.mjs`, which parses templates with PostCSS, also listed; `npm run lint` runs both), and Herb's linter, which it runs over the templates (`.herb.yml`). It installs from `package-lock.json` (`npm ci`): pin exact versions, and when adding or bumping one run `npm install --before=<the date a week ago>` so its own dependencies are a week old too
 - `ckeditor/` installs from its `yarn.lock`. Yarn 1 has no cooldown, so when refreshing the lockfile (`yarn upgrade`), check the new versions' release dates (`npm view <package> time`) and pin back any that are under a week old

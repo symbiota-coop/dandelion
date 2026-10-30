@@ -34,6 +34,7 @@ $SUDO apt-get install -y --no-install-recommends \
   zlib1g-dev
 
 # Ubuntu's chromium package is a snap stub that doesn't run, so there use a Playwright Chromium the image provides
+# shellcheck source=/dev/null # the image's, so not ours to check
 . /etc/os-release
 if [ "$ID" = "debian" ]; then
   $SUDO apt-get install -y --no-install-recommends chromium

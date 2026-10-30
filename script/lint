@@ -6,7 +6,7 @@
 #   script/lint --staged    the staged version of each staged file (the pre-commit hook in .githooks)
 #   script/lint --all       everything, as CI does
 #
-# Add --only <linter> (rubocop, erb_lint, eslint, stylelint, herb, zizmor or lint_test) to run just one, as CI's separate steps do.
+# Add --only <linter> (rubocop, erb_lint, eslint, stylelint, herb, zizmor, shellcheck or lint_test) to run just one, as CI's separate steps do.
 # A changed linter config (or one of our own cops or linters) runs that linter on everything, as CI would, and
 # test/lint_test.rb when a file it checks changes. A built file (bootstrap5.css, ckeditor.js, the jQuery UI builds) given without its source
 # fails, as it was edited by hand.
@@ -79,6 +79,18 @@ LINTERS = [
     configs: %r{\A(\.github/)?zizmor\.ya?ml\z},
     command: %w[uvx zizmor@1.31.1 --quiet --no-progress],
     all: ['.'],
+    stdin: ->(_file) { ['-'] },
+    uv: true
+  },
+  {
+    # Shell scripts: the setup scripts and the pre-commit hook. shellcheck-py packages ShellCheck's binary, so uvx runs
+    # this exact version too
+    name: 'ShellCheck',
+    files: %r{\A(.+\.sh|\.githooks/.+)\z},
+    configs: /\A\.shellcheckrc\z/,
+    command: %w[uvx --from shellcheck-py==0.11.0.1 shellcheck],
+    # It doesn't search directories, so it's given the scripts git knows
+    all: -> { `git ls-files -z -- '*.sh' .githooks`.split("\0") },
     stdin: ->(_file) { ['-'] },
     uv: true
   },
@@ -171,7 +183,7 @@ jobs = LINTERS.flat_map do |linter|
     templates = Dir[linter[:shards]]
     templates.each_slice(templates.size.fdiv(WORKERS).ceil).map { |share| { name: linter[:name], command: linter[:command] + share, env: env } }
   elsif all
-    [{ name: linter[:name], command: linter[:command] + (linter[:all] || []), env: env }]
+    [{ name: linter[:name], command: linter[:command] + (linter[:all].respond_to?(:call) ? linter[:all].call : linter[:all] || []), env: env }]
   elsif mode == '--staged'
     # One run per file, given the staged version on stdin (or a copy of it), so unstaged edits (yours or another
     # session's) don't count

@@ -223,7 +223,9 @@ class LintTest < Minitest::Test
     /eslint-disable(?:-next-line|-line)?\s/ => /eslint-disable(?:-next-line|-line)? [\w\/@, -]+ -- \S/,
     /stylelint-disable(?:-next-line|-line)?\s/ => /stylelint-disable(?:-next-line|-line)? [\w\/, -]+ -- \S/,
     /erb_?lint:disable\s/ => /erb_?lint:disable \w+: \S/,
-    /zizmor: ?ignore\[/ => /zizmor: ignore\[[\w, -]+\] -- \S/
+    /zizmor: ?ignore\[/ => /zizmor: ignore\[[\w, -]+\] -- \S/,
+    # ShellCheck can't parse anything after a directive but a comment
+    /shellcheck disable=/ => /shellcheck disable=[\w,]+ # \S/
   }.freeze
 
   # Herb's disable comments take no reason, so it goes in an ERB comment on the line above
@@ -232,7 +234,7 @@ class LintTest < Minitest::Test
 
   def test_every_disable_says_why
     output, = Open3.capture2('git', 'ls-files', '-z', chdir: ROOT)
-    paths = output.split("\0").grep(%r{\.(rb|rake|erb|js|mjs|css)\z|\A\.github/.+\.ya?ml\z}).grep_v(%r{\A(app/assets/javascripts/ext/|app/assets/stylesheets/bootstrap5\.css|ckeditor/|test/lint_test\.rb)})
+    paths = output.split("\0").grep(%r{\.(rb|rake|erb|js|mjs|css|sh)\z|\A\.github/.+\.ya?ml\z|\A\.githooks/}).grep_v(%r{\A(app/assets/javascripts/ext/|app/assets/stylesheets/bootstrap5\.css|ckeditor/|test/lint_test\.rb)})
     missing = paths.flat_map do |path|
       lines = File.readlines(File.join(ROOT, path), encoding: 'UTF-8')
       lines.each_with_index.filter_map do |line, index|
@@ -517,6 +519,22 @@ class LintTest < Minitest::Test
       output, status = lint(bad, 'script/lint')
       refute status.success?, output
       assert_match(/Failed: RuboCop/, output)
+    end
+  end
+
+  def test_script_lint_runs_shellcheck
+    skip 'needs uv installed' unless ENV['PATH'].split(File::PATH_SEPARATOR).any? { |dir| File.executable?(File.join(dir, 'uvx')) }
+    Dir.mktmpdir do |dir|
+      bad = File.join(dir, 'bad.sh')
+      File.write(bad, "#!/bin/sh\necho $1\n") # SC2086, unquoted
+      output, status = lint(bad)
+      refute status.success?, output
+      assert_match(/SC2086/, output)
+
+      good = File.join(dir, 'good.sh')
+      File.write(good, "#!/bin/sh\n# shellcheck disable=SC2086 # splits on purpose\necho $1\n")
+      output, status = lint(good)
+      assert status.success?, output
     end
   end
 end
