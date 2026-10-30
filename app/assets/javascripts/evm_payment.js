@@ -38,8 +38,8 @@ function runEvmPaymentFlow (config, data, options) {
         params: [{ chainId: '0x' + Number(config.networkId).toString(16) }]
       })
       ethereum.on('chainChanged', function () {
-        chainId().then(thisNetworkId => {
-          if (thisNetworkId === Number(config.networkId)) { connectWeb3Wallet() }
+        chainId().then(newNetworkId => {
+          if (newNetworkId === Number(config.networkId)) { connectWeb3Wallet() }
         })
       })
     } else {
@@ -54,7 +54,7 @@ function runEvmPaymentFlow (config, data, options) {
       $('#pay-with-evm').find('.card-body p.web3wallet a').click(function () {
         ethereum.request({
           method: 'eth_requestAccounts'
-        }).then(accounts => pay(accounts[0]))
+        }).then(requestedAccounts => pay(requestedAccounts[0]))
       }).click()
     })
   }

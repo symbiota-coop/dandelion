@@ -241,8 +241,8 @@ $.fn.serializeObject = function () {
                 rtype: options.rtype
               }
             },
-            processResults: function (data) {
-              return { results: data.results }
+            processResults: function (response) {
+              return { results: response.results }
             }
           }
         })

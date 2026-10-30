@@ -115,6 +115,9 @@ const rules = {
   // Files that define the shared functions above declare them, which is not a redeclaration
   'no-redeclare': ['error', { builtinGlobals: false }],
   'no-empty': ['error', { allowEmptyCatch: true }],
+  'prefer-const': 'error',
+  // A closure made in a loop over var sees the loop's last value
+  'no-loop-func': 'error',
   // Requests use jQuery, not fetch (templates get the same check from .erb_linters/jquery_requests.rb)
   'no-restricted-globals': ['error', { name: 'fetch', message: 'Use jQuery ($.get, $.getJSON, $.post, $.ajax) for requests, not fetch.' }],
   // Rules from the Design section of AGENTS.md (templates get the same checks from .erb_linters/design_classes.rb)

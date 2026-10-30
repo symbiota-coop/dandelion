@@ -69,9 +69,9 @@
           option.appendTo(select)
         } else { // collection
           $.each(options, function (f2) {
-            var option = $("<option></option>")
-            option.attr("value", fieldname + '.' + f2).text(fieldname + '.' + f2)
-            option.appendTo(select)
+            var nestedOption = $("<option></option>")
+            nestedOption.attr("value", fieldname + '.' + f2).text(fieldname + '.' + f2)
+            nestedOption.appendTo(select)
           })
         }
       })

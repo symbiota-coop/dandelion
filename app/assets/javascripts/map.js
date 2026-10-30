@@ -131,7 +131,7 @@ window.DandelionMap = {
     var markers = [];
 
     for (var i = 0; i < points.length; i++) {
-      var point = points[i];
+      const point = points[i];
       var modelConfig = this.models.find(model => model.name == point.model_name);
 
       var pin = document.createElement('div');

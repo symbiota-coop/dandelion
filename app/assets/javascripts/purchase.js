@@ -171,14 +171,14 @@ $(function () {
   }
 
   function setDonationAmount () {
-    let p = priceWithoutDonation()
+    const p = priceWithoutDonation()
 
     updateDonationPercentButtons()
 
-    let dp = $('#donation-percent-buttons button.selected-percent').data('active-percent')
+    const dp = $('#donation-percent-buttons button.selected-percent').data('active-percent')
 
     if (typeof dp !== 'undefined') {
-      let donationAmount = parseFloat(p * (dp / 100))
+      const donationAmount = parseFloat(p * (dp / 100))
       if (config.minimumApplicationFee && donationAmount < config.minimumApplicationFee) {
         $('#donation-percent-buttons button').removeClass('active')
         setDonationAmountValue(config.minimumApplicationFee)

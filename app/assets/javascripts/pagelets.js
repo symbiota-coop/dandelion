@@ -263,13 +263,14 @@ $(function () {
   // ─────────────────────────────────────────────────────────────
 
   const PAGELET_MAX_CONCURRENT = 4
-  let pageletQueue = []
+  const pageletQueue = []
   let pageletInFlight = 0
 
   function drainPageletQueue () {
     while (pageletInFlight < PAGELET_MAX_CONCURRENT && pageletQueue.length > 0) {
       const pagelet = pageletQueue.shift()
       pageletInFlight++
+      // eslint-disable-next-line no-loop-func -- the callback shares pageletInFlight on purpose: it counts requests across the whole queue
       pagelet.load(pagelet.attr('data-pagelet-url'), function () {
         pageletInFlight--
         drainPageletQueue()
