@@ -39,3 +39,6 @@ linter:
       enabled: true
     erb-no-unused-local-variable:
       enabled: true
+    # An empty if or when branch: write unless, or fold it into the condition
+    erb-no-empty-control-flow:
+      enabled: true

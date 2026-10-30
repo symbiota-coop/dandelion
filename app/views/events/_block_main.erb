@@ -5,8 +5,7 @@
     <a class="text-body" target="_parent" href="<%= "/e/#{event.slug}#{if @organisation && @organisation != event.organisation; "?cohost=#{@organisation.slug}"; end }" %>"><%= event.name %></a>
   </h4>
   <%= partial :'events/event_labels', locals: { event: event } %>
-  <% if defined?(skip_pagelets) %>
-  <% else %>
+  <% unless defined?(skip_pagelets) %>
     <% if current_account %>
       <%# The star, and the edit link for event admins: loaded separately so the admin check stays out of cached blocks %>
       <div data-with-placeholder class="d-inline" data-pagelet-url="/events/<%= event.id %>/block_controls"><i class="bi bi-star opacity-0"></i></div>

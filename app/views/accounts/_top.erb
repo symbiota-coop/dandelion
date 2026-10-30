@@ -3,8 +3,7 @@
     <img alt="<%= account.name %>" class="profile-photo <%= account.avatar_class %>" title="<%= account.name %>" src="<%= u account.image_thumb_or_gravatar_url %>">
   </div>
   <div class="col-12 col-sm profile-details">
-    <% if defined?(modal) %>
-    <% else %>
+    <% unless defined?(modal) %>
       <div class="mb-2 text-center text-lg-start">
         <h1 class="my-0 d-inline">
           <a class="text-body" href="/u/<%= account.username %>"><%= account.name %></a>
@@ -37,8 +36,7 @@ var temp = $('<input>');
     <div class="mt-2">
       <%= partial :'accounts/table', locals: { account: account, modal: defined?(modal) && modal } %>
     </div>
-    <% if defined?(modal) %>
-    <% else %>
+    <% unless defined?(modal) %>
       <% if account.bio %>
         <div class="row justify-content-between g-0">
           <div class="col wysiwyg links-blank readable">

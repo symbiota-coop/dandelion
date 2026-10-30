@@ -16,8 +16,7 @@
   <% end %>
 <% end %>
 <% if !params[:no_events_banner] && @organisation.unsanitized_ok? && @organisation.events_banner %>
-  <% if current_account && (organisationship = @organisation.organisationships.find_by(account: current_account)) && organisationship.monthly_donor? %>
-  <% else %>
+  <% unless current_account && (organisationship = @organisation.organisationships.find_by(account: current_account)) && organisationship.monthly_donor? %>
     <%== @organisation.events_banner %>
   <% end %>
 <% end %>

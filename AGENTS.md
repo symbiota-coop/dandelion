@@ -92,6 +92,7 @@ Herb (https://herb-tools.dev) parses each template's HTML and ERB together, so i
 - `html-no-duplicate-attributes`, `html-no-self-closing` (`<i />` opens an `<i>` that stays open) and `html-require-closing-tags`
 - `html-img-require-alt` (`alt=""` for decorative images and icons beside their text), `html-iframe-has-title`, `html-no-empty-headings` (a loading placeholder is a `div` with the heading's class) and `html-no-aria-hidden-on-focusable`
 - `erb-no-unused-local-variable`
+- `erb-no-empty-control-flow`: no empty branches (`<% if x %><% else %>...` is `<% unless x %>...`)
 
 ### zizmor
 
