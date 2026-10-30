@@ -35,6 +35,10 @@ Security:
 Style/AndOr:
   Enabled: true
   Severity: warning
+# A rescue modifier rescues every StandardError, so a typo's NoMethodError looks like bad input
+Style/RescueModifier:
+  Enabled: true
+  Severity: warning
 # Puma runs threads, so a constant that changes is state shared across requests
 Style/MutableConstant:
   Enabled: true

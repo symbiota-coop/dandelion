@@ -87,7 +87,7 @@
     <td>
 
       <a href="javascript:;" class="copy-link text-body" data-bs-toggle="tooltip" title="Click to copy" data-url="<%= ENV['BASE_URI'] %>/e/<%= @event.slug %>">
-        <span class="d-none d-md-inline"><%= ENV['BASE_URI'].match(%r{(https?://)})[1] rescue '' %></span><%= ENV['BASE_URI'].gsub(%r{https?://}, '') %>/e/<%= @event.slug %>
+        <span class="d-none d-md-inline"><%= ENV['BASE_URI'][%r{https?://}] %></span><%= ENV['BASE_URI'].gsub(%r{https?://}, '') %>/e/<%= @event.slug %>
       </a>
       <script>
         $(function() {
