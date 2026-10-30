@@ -1,0 +1,7 @@
+# actionlint's config (script/lint runs it on the workflows)
+paths:
+  .github/workflows/*.{yml,yaml}:
+    ignore:
+      # Our own actions use GitHub's $/ self-repository syntax (zizmor's self-repository audit), which actionlint doesn't
+      # know yet
+      - 'specifying action "\$/.+" in invalid format because ref is missing'

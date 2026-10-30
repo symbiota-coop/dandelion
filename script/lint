@@ -6,7 +6,7 @@
 #   script/lint --staged    the staged version of each staged file (the pre-commit hook in .githooks)
 #   script/lint --all       everything, as CI does
 #
-# Add --only <linter> (rubocop, erb_lint, eslint, stylelint, herb, zizmor, shellcheck or lint_test) to run just one, as CI's separate steps do.
+# Add --only <linter> (rubocop, erb_lint, eslint, stylelint, herb, zizmor, actionlint, shellcheck or lint_test) to run just one, as CI's separate steps do.
 # A changed linter config (or one of our own cops or linters) runs that linter on everything, as CI would, and
 # test/lint_test.rb when a file it checks changes. A built file (bootstrap5.css, ckeditor.js, the jQuery UI builds) given without its source
 # fails, as it was edited by hand.
@@ -80,6 +80,17 @@ LINTERS = [
     command: %w[uvx zizmor@1.31.1 --quiet --no-progress],
     all: ['.'],
     stdin: ->(_file) { ['-'] },
+    uv: true
+  },
+  {
+    # GitHub Actions workflows: their syntax, expressions and types, with ShellCheck (installed beside it, at the version
+    # below) on their run: scripts. actionlint-py packages actionlint's binary, so uvx runs these exact versions
+    name: 'actionlint',
+    files: %r{\A\.github/workflows/.+\.ya?ml\z},
+    configs: %r{\A\.github/actionlint\.ya?ml\z},
+    command: %w[uvx --from actionlint-py==1.7.12.25 --with shellcheck-py==0.11.0.1 actionlint -no-color],
+    all: [], # it finds the workflows itself
+    stdin: ->(file) { ['-stdin-filename', file, '-'] },
     uv: true
   },
   {

@@ -537,4 +537,31 @@ class LintTest < Minitest::Test
       assert status.success?, output
     end
   end
+
+  def test_script_lint_runs_actionlint
+    skip 'needs uv installed' unless ENV['PATH'].split(File::PATH_SEPARATOR).any? { |dir| File.executable?(File.join(dir, 'uvx')) }
+    Dir.mktmpdir do |dir|
+      # A workflow in a copy of the checkout's script/ and actionlint config, as script/lint runs from its parent, made
+      # a git repository, where actionlint looks for its config
+      Open3.capture2e('git', 'init', '-q', dir)
+      FileUtils.mkdir_p(File.join(dir, '.github/workflows'))
+      FileUtils.cp_r(File.join(ROOT, 'script'), dir)
+      FileUtils.cp(File.join(ROOT, '.github/actionlint.yaml'), File.join(dir, '.github'))
+      bad = File.join(dir, '.github/workflows/bad.yml')
+      File.write(bad, <<~YAML)
+        on: push
+        jobs:
+          x:
+            runs-on: ubuntu-latest
+            steps:
+              - uses: $/.github/actions/ours
+              - run: echo ${{ github.event.nope.x }} >> $GITHUB_ENV
+      YAML
+      output, status = Open3.capture2e('script/lint', '--only', 'actionlint', '.github/workflows/bad.yml', chdir: dir)
+      output = output.force_encoding('UTF-8') # actionlint underlines with ^~~
+      refute status.success?, output
+      assert_match(/SC2086/, output) # ShellCheck, on the run: script
+      refute_match(%r{actions/ours}, output) # the $/ self-repository syntax is fine
+    end
+  end
 end
