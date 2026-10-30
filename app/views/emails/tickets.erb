@@ -78,13 +78,13 @@
 </div>
 <div class="footer">
   <a href="<%= ENV['BASE_URI'] %>">
-    <img class="footer-logo" src="<%= ENV['BASE_URI'] %>/images/logos/logo-text.png">
+    <img alt="Dandelion" class="footer-logo" src="<%= ENV['BASE_URI'] %>/images/logos/logo-text.png">
   </a>
 </div>
 
 <% if !event.no_tickets_pdf && defined?(viewing_on_web) && viewing_on_web %>
   <a href="/orders/<%= order.public_id %>.pdf" class="attachment">
-    <img class="qr-code" src="<%= ENV['BASE_URI'] %>/images/icons/_qr-code.png">
+    <img alt="" class="qr-code" src="<%= ENV['BASE_URI'] %>/images/icons/_qr-code.png">
     Download <%= order.tickets.count == 1 ? 'ticket' : 'tickets' %> PDF
   </a>
 <% end %>

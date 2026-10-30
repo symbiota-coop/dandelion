@@ -5,7 +5,7 @@
   <% via = %w[organisation activity local_group event].any? { |r| instance_variable_get("@#{r}") } %>
   <% if via || @account.sign_ins_count == 1 %>
     <% if via %>
-      <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
+      <% if (r = %w{organisation activity local_group event}.find { |name| instance_variable_get("@#{name}") }) %>
       <div class="onboarding-callout mb-3">
         <i class="bi bi-stars onboarding-callout-icon"></i>
         <div>
@@ -13,7 +13,7 @@
           <p class="text-body-secondary">Complete your profile to get the most out of Dandelion:</p>
         </div>
       </div>
-      <% break; end; } %>
+      <% end %>
     <% elsif @account.sign_ins_count == 1 %>
 
       <div class="onboarding-callout mb-3">

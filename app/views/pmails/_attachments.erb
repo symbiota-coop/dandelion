@@ -6,7 +6,7 @@
   <tr>
     <td>
       <% if %w{png jpg gif jpeg}.any? { |x| attachment.file.name.downcase.ends_with? ".#{x}" } %>
-        <img class="w-100" src="<%= attachment.file.url %>">
+        <img alt="<%= attachment.file.name %>" class="w-100" src="<%= attachment.file.url %>">
       <% else %>
         <a href="<%= attachment.file.url %>"><%= attachment.file.name %></a>
       <% end %>

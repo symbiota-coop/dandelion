@@ -1,4 +1,4 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 <div class="email-preview-iframe-container">
-  <iframe src="/events/<%= @event.id %>/reminder_email_preview"></iframe>
+  <iframe title="Reminder email preview" src="/events/<%= @event.id %>/reminder_email_preview"></iframe>
 </div>

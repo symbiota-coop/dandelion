@@ -1,6 +1,6 @@
 <% if membership.answers %>
   <div class="mb-5">
-    <% membership.answers.each { |q,a| if q && a %>
+    <% membership.answers.each { |q,a| next unless q && a %>
     <p class="fs-5">
       <strong>
         <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
@@ -9,6 +9,6 @@
     <p class="fs-5">
       <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
     </p>
-  <% end } if membership.answers %>
+  <% } %>
 </div>
 <% end %>

@@ -26,7 +26,7 @@
     <div class="header-image-container">
       <% if pmail.organisation.image %>
         <a href="<%= pmail.organisation.website || "#{ENV['BASE_URI']}/o/#{pmail.organisation.slug}" %>">
-          <img src="<%= pmail.organisation.image.thumb('200x200').url %>">
+          <img alt="<%= pmail.organisation.name %>" src="<%= pmail.organisation.image.thumb('200x200').url %>">
         </a>
       <% else %>
         <h1 class="m-0 py-2">

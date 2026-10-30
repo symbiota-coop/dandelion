@@ -1,9 +1,9 @@
-# Tests our own checks (AGENTS.md, Custom checks): the Dandelion cops, the erb_lint linters, the ESLint and Stylelint
-# rules, and script/lint. It doesn't boot the app, so it runs without foreman or Mongo:
+# Tests our own checks (AGENTS.md, Custom checks): the Dandelion cops, the erb_lint linters, the ESLint, Stylelint and
+# Herb rules, and script/lint. It doesn't boot the app, so it runs without foreman or Mongo:
 #
 #   bundle exec ruby -I test test/lint_test.rb
 #
-# The ESLint and Stylelint tests need them installed (npm ci), and skip without them; CI's lint job runs them.
+# The ESLint, Stylelint and Herb tests need them installed (npm ci), and skip without them; CI's lint job runs them.
 require 'json'
 require 'minitest/autorun'
 require 'open3'
@@ -226,15 +226,22 @@ class LintTest < Minitest::Test
     /zizmor: ?ignore\[/ => /zizmor: ignore\[[\w, -]+\] -- \S/
   }.freeze
 
+  # Herb's disable comments take no reason, so it goes in an ERB comment on the line above
+  HERB_DISABLE = /herb:(?:disable|linter ignore)\b/
+  HERB_REASON = /\A\s*<%#(?!.*herb:).*\w.*%>\s*\z/
+
   def test_every_disable_says_why
     output, = Open3.capture2('git', 'ls-files', '-z', chdir: ROOT)
     paths = output.split("\0").grep(%r{\.(rb|rake|erb|js|mjs|css)\z|\A\.github/.+\.ya?ml\z}).grep_v(%r{\A(app/assets/javascripts/ext/|app/assets/stylesheets/bootstrap5\.css|ckeditor/|test/lint_test\.rb)})
     missing = paths.flat_map do |path|
-      File.foreach(File.join(ROOT, path), encoding: 'UTF-8').with_index(1).filter_map do |line, number|
-        DISABLES.any? { |disable, with_reason| line.match?(disable) && !line.match?(with_reason) } && "#{path}:#{number}: #{line.strip}"
+      lines = File.readlines(File.join(ROOT, path), encoding: 'UTF-8')
+      lines.each_with_index.filter_map do |line, index|
+        unexplained = DISABLES.any? { |disable, with_reason| line.match?(disable) && !line.match?(with_reason) } ||
+                      (line.match?(HERB_DISABLE) && !(index.positive? && lines[index - 1].match?(HERB_REASON)))
+        unexplained && "#{path}:#{index + 1}: #{line.strip}"
       end
     end
-    assert_empty missing, "Say why after the rule (-- reason, or Linter: reason for erb_lint)"
+    assert_empty missing, "Say why after the rule (-- reason, or Linter: reason for erb_lint, or in an ERB comment on the line above for Herb)"
   end
 
   # CI lists its test jobs (one per test file) rather than finding them, so each test file needs to be there
@@ -306,7 +313,7 @@ class LintTest < Minitest::Test
   end
 
   def node_modules!
-    skip 'needs ESLint and Stylelint installed (npm ci)' unless %w[eslint stylelint].all? { |tool| File.exist?(File.join(ROOT, 'node_modules/.bin', tool)) }
+    skip 'needs ESLint, Stylelint and Herb installed (npm ci)' unless %w[eslint stylelint herb-lint].all? { |tool| File.exist?(File.join(ROOT, 'node_modules/.bin', tool)) }
   end
 
   # Lints sources with ESLint's or Stylelint's own API, all in one Node process, as starting the linter for each case took
@@ -426,6 +433,44 @@ class LintTest < Minitest::Test
     assert_equal ['2:18 declaration-property-value-disallowed-list'], email_messages
   end
 
+  # The rules .herb.yml turns on, and none of those it leaves off (Rails conventions and style)
+  def test_herb_rules
+    node_modules!
+    bad = {
+      '<h2>x</h1>' => 'parser-no-errors',
+      "<% xs.each { |x| if x %>\n  <p>a</p>\n<% end } %>" => 'parser-no-errors',
+      '<a class="a" class="b">x</a>' => 'html-no-duplicate-attributes',
+      '<i class="bi bi-x" />' => 'html-no-self-closing',
+      '<img src="a.png">' => 'html-img-require-alt',
+      '<iframe src="/x"></iframe>' => 'html-iframe-has-title',
+      '<h3></h3>' => 'html-no-empty-headings',
+      '<input type="text" aria-hidden="true">' => 'html-no-aria-hidden-on-focusable',
+      '<% x = 1 %>' => 'erb-no-unused-local-variable'
+    }
+    good = <<~ERB
+      <% @events.each { |event| %>
+        <img alt="" src="<%= event.image_url %>">
+        <a href="#" data-confirm="Sure?" data-method="post">x</a>
+      <% } %>
+      <script>var a = 1</script>
+      <% case x %>
+      <% when 1 %>
+        <h2 class="h4">y</h2>
+      <% end %>
+      <%# sheets.js fills it in %>
+      <h3></h3> <%# herb:disable html-no-empty-headings %>
+    ERB
+    Dir.mktmpdir do |dir|
+      files = [*bad.keys, good].each_with_index.map { |source, index| File.join(dir, "_#{index}.erb").tap { |f| File.write(f, source) } }
+      output, = Open3.capture2('npx', '--no-install', 'herb-lint', '--config-file', '.herb.yml', '--force', '--json', *files, chdir: ROOT)
+      offenses = JSON.parse(output)['offenses'].group_by { |offense| File.basename(offense['filename']) }
+      bad.each_with_index do |(source, rule), index|
+        assert_equal [rule], offenses.fetch("_#{index}.erb", []).map { |offense| offense['code'] }.uniq, source
+      end
+      assert_nil offenses["_#{bad.size}.erb"], 'Herb flags Rails conventions or a disabled line'
+    end
+  end
+
   def lint(*args)
     Open3.capture2e(File.join(ROOT, 'script/lint'), *args, chdir: ROOT)
   end
@@ -443,7 +488,7 @@ class LintTest < Minitest::Test
     files = %w[script/lint app/views/design.erb app/assets/javascripts/utils.js app/assets/stylesheets/docs.css]
     output, status = lint(*files)
     assert status.success?, output
-    assert_match(/Passed: RuboCop, erb_lint, ESLint, Stylelint/, output)
+    assert_match(/Passed: RuboCop, erb_lint, ESLint, Stylelint, Herb/, output)
   end
 
   def test_script_lint_fails_on_a_built_file_without_its_source

@@ -24,9 +24,9 @@
   <% if env['omniauth.auth'] || (request.post? && session['omniauth.auth']) %>
     <%= hidden_field_tag :omniauth_signup, value: '1' %>
   <% end %>
-  <% %w{organisation activity local_group event}.each { |r| if instance_variable_get("@#{r}") %>
+  <% %w{organisation activity local_group event}.each { |r| next unless instance_variable_get("@#{r}") %>
   <%= hidden_field_tag :"#{r}_id", value: instance_variable_get("@#{r}").id %>
-<% end; } %>
+  <% } %>
 <script>
   $(function () {
 

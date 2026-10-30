@@ -1,0 +1,41 @@
+# Herb (https://herb-tools.dev) parses each template's HTML and ERB together, so it catches broken HTML structure that
+# erb_lint, which looks at the ERB tags, doesn't. script/lint runs it; AGENTS.md (Custom checks, Herb) lists the rules
+version: 0.11.1
+
+framework: sinatra
+template_engine: erubi
+
+files:
+  include:
+    - 'app/views/**/*.erb'
+
+linter:
+  enabled: true
+  failLevel: hint
+
+  rules:
+    # Most of Herb's rules are for Rails (.html.erb names, Turbo, no instance variables in partials, CSP nonces) or style,
+    # so only the ones below are on
+    all:
+      enabled: false
+
+    # Templates parse: tags close in the scope they open in, and each ERB tag holds whole Ruby control flow
+    parser-no-errors:
+      enabled: true
+    html-no-duplicate-attributes:
+      enabled: true
+    # <i /> isn't self-closing in HTML: it opens an <i> that stays open
+    html-no-self-closing:
+      enabled: true
+    html-require-closing-tags:
+      enabled: true
+    html-img-require-alt:
+      enabled: true
+    html-iframe-has-title:
+      enabled: true
+    html-no-empty-headings:
+      enabled: true
+    html-no-aria-hidden-on-focusable:
+      enabled: true
+    erb-no-unused-local-variable:
+      enabled: true

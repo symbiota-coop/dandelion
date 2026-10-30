@@ -30,7 +30,7 @@ if youngest && oldest %>
         <% data[p] = n } %>
         <tr>
           <td>Unknown</td>
-          <td><%= n = accounts.and(date_of_birth: nil).count %></td>
+          <td><%= accounts.and(date_of_birth: nil).count %></td>
           <td></td>
         </tr>
       </table>
@@ -73,7 +73,8 @@ if youngest && oldest %>
        men = accounts.and(:gender.in => ['Man', 'Cis Man']).count
        other = accounts.and(:gender.nin => ['Woman', 'Cis Woman', 'Man', 'Cis Man', nil]).count
        unknown = accounts.and(gender: nil).count
-       sum = [women, men, other].sum %>
+       sum = [women, men, other].sum
+       genders = { 'Women' => women, 'Men' => men, 'Other' => other, 'Unknown' => unknown } %>
     <table class="table">
       <thead>
         <tr>
@@ -82,13 +83,13 @@ if youngest && oldest %>
           <th>%</th>
         </tr>
       </thead>
-      <% %w[women men other unknown].each { |x| %>
+      <% genders.each { |gender, count| %>
       <tr>
-        <td><%= x.titleize %></td>
-        <td><%= binding.local_variable_get(x) %></td>
+        <td><%= gender %></td>
+        <td><%= count %></td>
         <td>
-          <% unless x == 'unknown' %>
-            <%= number_to_percentage 100 * (binding.local_variable_get(x).to_f / sum), precision: 1 %>
+          <% unless gender == 'Unknown' %>
+            <%= number_to_percentage 100 * (count.to_f / sum), precision: 1 %>
           <% end %>
         </td>
       </tr>

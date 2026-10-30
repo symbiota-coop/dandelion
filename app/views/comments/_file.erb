@@ -1,7 +1,7 @@
 <% if comment.file %>
   <div class="mt-2">
     <% if %w[png jpg gif jpeg].any? { |x| comment.file.url.split('/').last.downcase.ends_with? ".#{x}" } %>
-      <img class="mw-100" src="<%= comment.file.url %>">
+      <img alt="Attached image" class="mw-100" src="<%= comment.file.url %>">
     <% else %>
       <i class="bi bi-paperclip"></i> <a href="<%= comment.file.url %>"><%= comment.file.url.split('/').last %></a>
     <% end %>

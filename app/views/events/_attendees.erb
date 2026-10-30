@@ -25,7 +25,7 @@ others_count = no_image_accounts.count + (@event.tickets.complete.and(:email.ne 
       <% end %>
     <% end %>
   </div>
-  <% if current_account && (ticket = @event.tickets.complete.find_by(account: current_account)) %>
+  <% if current_account && @event.tickets.complete.and(account: current_account).exists? %>
     <% if @event.tickets.complete.and(account: current_account).all? { |ticket| ticket.show_attendance? } %>
       <a class="pagelet-trigger mb-1" data-method="post" href="/events/<%= @event.id %>/hide_attendance">Hide attendance</a>
     <% else %>

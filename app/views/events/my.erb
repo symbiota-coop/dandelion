@@ -68,35 +68,35 @@
                     <td class="align-top">
                       <div class="row justify-content-between">
                         <div class="col ms-1 p-lg-3">
-                          <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
+                          <% extra_items = capture_html do %>
+                            <% if event.organisation && event.attendees.include?(current_account) %>
+                              <li>
+                                <% if (event_feedback = event.event_feedbacks.find_by(account: current_account)) %>
+                                  <div class="mt-1">
+                                    <% if event_feedback.rating %>
+                                      <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
+                                    <% end %>
 
-                          <% if event.organisation && event.attendees.include?(current_account) %>
-                            <li>
-                              <% if (event_feedback = event.event_feedbacks.find_by(account: current_account)) %>
-                                <div class="mt-1">
-                                  <% if event_feedback.rating %>
-                                    <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
-                                  <% end %>
-
-                                  <% event_feedback.answers.each_with_index { |qa,i| q = qa[0]; a = qa[1] %>
-                                  <% if a %>
-                                    <p class="mt-1">
-                                      <strong>
-                                        <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
-                                      </strong>
-                                      <br>
-                                      <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
-                                    </p>
-                                  <% end %>
-                                  <% } if event_feedback.answers %>
-                                </div>
-                              <% else %>
-                                <i data-bs-toggle="tooltip" title="Give feedback" class="bi bi-star"></i>
-                                <a href="/events/<%= event.id %>/give_feedback">Give feedback</a>
-                              <% end %>
-                            </li>
+                                    <% event_feedback.answers.each_with_index { |qa,i| q = qa[0]; a = qa[1] %>
+                                    <% if a %>
+                                      <p class="mt-1">
+                                        <strong>
+                                          <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
+                                        </strong>
+                                        <br>
+                                        <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+                                      </p>
+                                    <% end %>
+                                    <% } if event_feedback.answers %>
+                                  </div>
+                                <% else %>
+                                  <i data-bs-toggle="tooltip" title="Give feedback" class="bi bi-star"></i>
+                                  <a href="/events/<%= event.id %>/give_feedback">Give feedback</a>
+                                <% end %>
+                              </li>
+                            <% end %>
                           <% end %>
-                        </ul>
+                          <%= partial :'events/block_main', locals: { event: event, extra_items: extra_items } %>
                       </div>
                     </div>
                   </td>

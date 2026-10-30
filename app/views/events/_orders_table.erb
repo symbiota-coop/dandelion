@@ -128,7 +128,7 @@
       <td class="text-center">
         <% if order.event.organisation %>
           <% if order.event.organisation.image %>
-            <img src="<%= order.event.organisation.image.thumb('500x500#').url %>" style="max-width: 3.125rem;">
+            <img alt="<%= order.event.organisation.name %>" src="<%= order.event.organisation.image.thumb('500x500#').url %>" style="max-width: 3.125rem;">
             <br>
           <% end %>
           <a href="/o/<%= order.event.organisation.slug %>"><%= order.event.organisation.name %></a>
@@ -187,11 +187,11 @@
       <% if order.via %>
         <%= order.via %><br>
       <% end %>
-      <% if order.affiliate; if order.affiliate.is_a?(Account) %>
+      <% if order.affiliate.is_a?(Account) %>
         <a href="/u/<%= order.affiliate.username %>"><%= order.affiliate.name %></a><br>
       <% elsif order.affiliate.is_a?(Organisation) %>
         <a href="/o/<%= order.affiliate.slug %>"><%= order.affiliate.name %></a><br>
-      <% end; end %>
+      <% end %>
       <% referrer = HttpUrl.parse(order.http_referrer); base_host = URI(ENV['BASE_URI']).host %>
       <% if referrer && !"#{referrer.host}#{referrer.path}".in?(["#{base_host}/events/#{order.event_id}", "#{base_host}/e/#{order.event.slug}"]) %>
         <a href="<%= order.http_referrer %>">

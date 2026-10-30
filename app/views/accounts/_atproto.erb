@@ -13,46 +13,42 @@
       <div class="col-12">
         <div class="mb-4">
           <div class="row block g-0 align-items-stretch">
-            <% if og['image'] %>
-              <div class="col-12 col-lg-9">
-              <% else %>
-                <div class="col-12">
-                <% end %>
-                <div class="p-3">
-                  <h4>
-                    <a class="text-body" href="<%= og['url'] %>" target="_blank">
-                      <%= og['title'] %>
-                    </a>
-                  </h4>
-                  <% if og['description'] %>
-                    <p class="mb-2">
-                      <a class="text-body text-decoration-none" href="<%= og['url'] %>" target="_blank">
-                        <%= og['description'].truncate(150) %>
-                      </a>
-                    </p>
-                  <% end %>
-                  <p class="mb-0 text-body-secondary">
-                    <a target="_blank" class="text-body-secondary" href="<%= og['url'] %>">
-                      <%= HttpUrl.host(og['url']) %>
-                    </a>
-                    &middot;
-                    <a target="_blank" class="text-body-secondary" href="https://bsky.app/profile/<%= account.atproto_handle %>/post/<%= og['hash'] %>">
-                      <%= Time.at(og['timestamp']/1e3).to_date.to_s(:post) %>
+            <div class="col-12 <%= 'col-lg-9' if og['image'] %>">
+              <div class="p-3">
+                <h4>
+                  <a class="text-body" href="<%= og['url'] %>" target="_blank">
+                    <%= og['title'] %>
+                  </a>
+                </h4>
+                <% if og['description'] %>
+                  <p class="mb-2">
+                    <a class="text-body text-decoration-none" href="<%= og['url'] %>" target="_blank">
+                      <%= og['description'].truncate(150) %>
                     </a>
                   </p>
-                </div>
-              </div>
-              <% if og['image'] %>
-                <div class="col-3 bg-white d-none d-lg-block">
-                  <a href="<%= og['url'] %>" target="_blank">
-                    <img class="w-100" onerror="this.style.display='none'" src="<%= og['image'] %>">
+                <% end %>
+                <p class="mb-0 text-body-secondary">
+                  <a target="_blank" class="text-body-secondary" href="<%= og['url'] %>">
+                    <%= HttpUrl.host(og['url']) %>
                   </a>
-                </div>
-              <% end %>
+                  &middot;
+                  <a target="_blank" class="text-body-secondary" href="https://bsky.app/profile/<%= account.atproto_handle %>/post/<%= og['hash'] %>">
+                    <%= Time.at(og['timestamp']/1e3).to_date.to_s(:post) %>
+                  </a>
+                </p>
+              </div>
             </div>
+            <% if og['image'] %>
+              <div class="col-3 bg-white d-none d-lg-block">
+                <a href="<%= og['url'] %>" target="_blank">
+                  <img alt="" class="w-100" onerror="this.style.display='none'" src="<%= og['image'] %>">
+                </a>
+              </div>
+            <% end %>
           </div>
         </div>
-        <% } %>
+      </div>
+      <% } %>
       </div>
     </div>
   <% end %>

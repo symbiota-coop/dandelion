@@ -52,9 +52,9 @@
       <a data-bs-toggle="tooltip" title="<% if @event.location == 'Online' %>Online<% else %>Location<% end %>" <% if @event.location != 'Online' %> target="_blank" href="https://www.google.com/maps?q=<%= @event.location %>"<% end %> class="event-detail location">
 
         <% if @event.location == 'Online' %>
-          <img src="<%= ENV['BASE_URI'] %>/images/icons/_camera-video.png">
+          <img alt="" src="<%= ENV['BASE_URI'] %>/images/icons/_camera-video.png">
         <% else %>
-          <img src="<%= ENV['BASE_URI'] %>/images/icons/_geo-alt.png">
+          <img alt="" src="<%= ENV['BASE_URI'] %>/images/icons/_geo-alt.png">
         <% end %>
 
       </a>
@@ -80,7 +80,7 @@
     <td>
 
       <a href="javascript:;" class="event-detail link copy-link-icon" data-bs-toggle="tooltip" title="Event URL (click to copy)">
-        <img src="<%= ENV['BASE_URI'] %>/images/icons/_link.png">
+        <img alt="" src="<%= ENV['BASE_URI'] %>/images/icons/_link.png">
       </a>
 
     </td>

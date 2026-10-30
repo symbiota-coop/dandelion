@@ -109,7 +109,11 @@
         <th data-money>Profit</th>
         <th data-money>Profit less donations, before allocations</th>
         <% Event.profit_share_roles.each do |role| %>
-          <th data-money<% if %w[category_steward social_media].include?(role) %> data-hide-if-zero<% end %>>Allocated to <%= role.gsub('_',' ') %></th>
+          <% if %w[category_steward social_media].include?(role) %>
+            <th data-money data-hide-if-zero>Allocated to <%= role.gsub('_',' ') %></th>
+          <% else %>
+            <th data-money>Allocated to <%= role.gsub('_',' ') %></th>
+          <% end %>
         <% end %>
         <th data-money>Profit less donations, after allocations</th>
         <th data-money>Profit including donations, after allocations</th>

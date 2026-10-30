@@ -14,7 +14,7 @@
       <nav id="header" class="header navbar navbar-expand navbar-dark fixed-top">
         <div class="container-fluid">
           <a href="/" class="navbar-brand">
-            <img class="position-relative" style="max-height: 1.75rem; top: -0.25rem" src="/images/logos/white-on-transparent.png">
+            <img alt="Dandelion" class="position-relative" style="max-height: 1.75rem; top: -0.25rem" src="/images/logos/white-on-transparent.png">
           </a>
           <!-- Opens the sidebar, which is an offcanvas on mobile -->
           <button type="button" class="navbar-toggler d-md-none" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-label="Menu">
@@ -70,7 +70,8 @@
     <!-- On mobile the notifications and messages dropdowns open in this bottom sheet instead -->
     <div class="offcanvas offcanvas-bottom nav-dropdown-sheet" tabindex="-1" id="nav-dropdown-sheet" aria-labelledby="nav-dropdown-sheet-title">
       <div class="offcanvas-header">
-        <h3 class="offcanvas-title" id="nav-dropdown-sheet-title"></h3>
+        <%# sheets.js fills the title in when the sheet opens %>
+        <h3 class="offcanvas-title" id="nav-dropdown-sheet-title"></h3> <%# herb:disable html-no-empty-headings %>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
       <div class="offcanvas-body p-0"></div>

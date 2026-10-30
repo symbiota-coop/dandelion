@@ -17,7 +17,8 @@
       <th>Notes</th>
       <th>Logged</th>
       <th></th>
-    </thead>
+    </tr>
+  </thead>
     <% @rpayments.each { |rpayment| %>
     <tr>
       <td><%= rpayment.role.gsub('_',' ') %></td>

@@ -2,7 +2,7 @@
   <% cells.each do |cell| %>
     <td>
       <% if cell == :check %>
-        <i class="bi bi-check-lg" />
+        <i class="bi bi-check-lg"></i>
       <% elsif cell %>
         <code><%= cell %></code>
       <% end %>
@@ -10,6 +10,6 @@
   <% end %>
 <% else %>
   <% 3.times do %>
-    <td><i class="bi bi-question-lg" /></td>
+    <td><i class="bi bi-question-lg"></i></td>
   <% end %>
 <% end %>

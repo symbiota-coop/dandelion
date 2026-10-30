@@ -72,7 +72,7 @@
         <%# Only an uploaded image: the generated avatar doesn't sit well in the dark header %>
         <% if current_account.image %>
           <span class="navbar-user-img online float-start">
-            <img src="<%= u current_account.image_thumb_or_gravatar_url %>">
+            <img alt="" src="<%= u current_account.image_thumb_or_gravatar_url %>">
           </span>
         <% end %>
         <span class="d-none d-md-inline"><%= current_account.name %> <i class="bi bi-chevron-down caret"></i></span>

@@ -6,12 +6,14 @@
 #   script/lint --staged    the staged version of each staged file (the pre-commit hook in .githooks)
 #   script/lint --all       everything, as CI does
 #
-# Add --only <linter> (rubocop, erb_lint, eslint, stylelint, zizmor or lint_test) to run just one, as CI's separate steps do.
+# Add --only <linter> (rubocop, erb_lint, eslint, stylelint, herb, zizmor or lint_test) to run just one, as CI's separate steps do.
 # A changed linter config (or one of our own cops or linters) runs that linter on everything, as CI would, and
 # test/lint_test.rb when a file it checks changes. A built file (bootstrap5.css, ckeditor.js, the jQuery UI builds) given without its source
 # fails, as it was edited by hand.
 # Exits non-zero if any linter fails.
+require 'fileutils'
 require 'open3'
+require 'tmpdir'
 
 $stdout.sync = true # so the summary on stderr comes after the output
 # Messages go to $stderr.puts rather than warn, which prints nothing under RUBYOPT=-W0
@@ -59,6 +61,17 @@ LINTERS = [
     node: true
   },
   {
+    # The HTML structure of templates, and the rules .herb.yml turns on
+    name: 'Herb',
+    bin: 'herb-lint',
+    files: %r{\Aapp/views/.+\.erb\z},
+    configs: /\A(\.herb\.yml|package(-lock)?\.json)\z/,
+    command: %w[npx --no-install herb-lint --config-file .herb.yml --simple --no-color --no-timing],
+    # It can't read stdin, so --staged lints a copy of the staged file, which --force lints wherever it is
+    copy: ->(file) { ['--force', file] },
+    node: true
+  },
+  {
     # GitHub Actions workflows and actions. uvx runs this exact version, so none arrives unchosen; with GH_TOKEN set (as in
     # CI) it runs its online audits too
     name: 'zizmor',
@@ -76,7 +89,7 @@ LINTERS = [
     name: 'lint_test',
     files: %r{
       \A(
-        \.rubocop\.yml | \.rubocop/.+ | \.erb_lint\.yml | \.erb_linters/.+ | eslint\.config\.mjs | stylelint\.config\.mjs |
+        \.rubocop\.yml | \.rubocop/.+ | \.erb_lint\.yml | \.erb_linters/.+ | eslint\.config\.mjs | stylelint\.config\.mjs | \.herb\.yml |
         package(-lock)?\.json | config/bootstrap4_leftovers\.json | script/lint | test/lint_test\.rb | AGENTS\.md |
         \.github/workflows/ruby\.yml | \.mcp\.json | \.cursor/mcp\.json | \.opencode/opencode\.json | \.codex/config\.toml |
         tasks/.+\.rake | config/frontend_dependencies\.rb | frontend/(package|integrity)\.json | app/views/layouts/_dependencies\.erb | ckeditor/package\.json
@@ -132,6 +145,7 @@ added = mode == '--staged' ? `git diff --cached --name-only --diff-filter=A -z`.
 hand_edited = GENERATED.select { |file, built| files.include?(file) && files.none? { |f| f.match?(built[:sources]) } }
 hand_edited.each { |file, built| $stderr.puts "#{file} #{built[:message]}, rather than editing it" }
 
+copies = nil # where --staged writes the copies of staged files, for linters that can't read stdin
 jobs = LINTERS.flat_map do |linter|
   next [] if only && linter[:name].downcase != only.downcase
   next [] if linter[:whole] && ENV['LINT_TEST']
@@ -141,7 +155,7 @@ jobs = LINTERS.flat_map do |linter|
   next [] unless all || mine.any?
 
   # Only the versions package-lock.json installs: npx would otherwise fetch a missing linter, of any age
-  if linter[:node] && !File.exist?("node_modules/.bin/#{linter[:name].downcase}")
+  if linter[:node] && !File.exist?("node_modules/.bin/#{linter[:bin] || linter[:name].downcase}")
     $stderr.puts "#{linter[:name]} isn't installed, so run npm ci first"
     next [{ name: linter[:name], missing: true }]
   end
@@ -159,9 +173,19 @@ jobs = LINTERS.flat_map do |linter|
   elsif all
     [{ name: linter[:name], command: linter[:command] + (linter[:all] || []), env: env }]
   elsif mode == '--staged'
-    # One run per file, given the staged version on stdin, so unstaged edits (yours or another session's) don't count
+    # One run per file, given the staged version on stdin (or a copy of it), so unstaged edits (yours or another
+    # session's) don't count
     mine.map do |f|
-      { name: linter[:name], command: linter[:command] + linter[:stdin].call(f), env: env, stdin: Open3.capture2('git', 'show', ":#{f}").first }
+      staged = Open3.capture2('git', 'show', ":#{f}").first
+      if linter[:copy]
+        copies ||= Dir.mktmpdir('lint').tap { |dir| at_exit { FileUtils.rm_rf(dir) } }
+        copy = File.join(copies, f)
+        FileUtils.mkdir_p(File.dirname(copy))
+        File.write(copy, staged)
+        { name: linter[:name], command: linter[:command] + linter[:copy].call(copy), env: env }
+      else
+        { name: linter[:name], command: linter[:command] + linter[:stdin].call(f), env: env, stdin: staged }
+      end
     end
   else
     [{ name: linter[:name], command: linter[:command] + mine, env: env }]

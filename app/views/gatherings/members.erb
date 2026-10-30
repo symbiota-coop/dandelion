@@ -63,7 +63,8 @@
   </pre>
 <% end %>
 
-<% case (params[:view] || 'details'); when 'pictures' %>
+<% case (params[:view] || 'details') %>
+<% when 'pictures' %>
   <% member_account_ids = @memberships.pluck(:account_id); all_member_accounts = Account.and(:id.in => member_account_ids) %>
   <div class="row mt-3">
     <% (all_member_accounts.and(:has_image => true).shuffle + all_member_accounts.and(image_uid: nil).shuffle).each { |account| %>
@@ -146,7 +147,7 @@
         <% end %>
       </tr>
     </thead>
-    <% @memberships.each { |membership| account = membership.account %>
+    <% @memberships.each { |membership| %>
     <tr data-pagelet-url="/membership_row/<%= membership.id %>"></tr>
     <% } %>
     <tr>

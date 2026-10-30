@@ -29,13 +29,13 @@
 </script>
 
 <div class="slick-container slick-placeholder mt-5 mb-lg-5" id="<%= slick_id %>">
-  <h2 class="text-center placeholder-glow"><span class="placeholder col-4"></span></h2>
+  <div class="h2 text-center placeholder-glow" aria-hidden="true"><span class="placeholder col-4"></span></div>
   <div class="slick-responsive row">
     <% 3.times do |i| %>
       <div class="col-12 col-sm-6 col-lg-4 slick-item">
         <div class="position-relative">
           <a target="_parent" href="#">
-            <img class="w-100" src="/images/1920x1080.png">
+            <img alt="" class="w-100" src="/images/1920x1080.png">
           </a>
         </div>
       </div>

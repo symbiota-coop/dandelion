@@ -36,8 +36,6 @@
     <i data-bs-toggle="tooltip" title="Location" class="bi bi-geo-alt-fill"></i>
     <%= partial :'events/location', locals: {event: event} %>
   </li>
-  <% if defined?(skip_final_ul) && skip_final_ul %>
-
-  <% else %>
-  </ul>
-<% end %>
+  <%# More items, from the template that renders this one %>
+  <%= extra_items if defined?(extra_items) %>
+</ul>

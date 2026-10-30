@@ -11,7 +11,7 @@
       <% end %>
     </tr>
   </thead>
-  <% Option.types.each { |type| if (options = @gathering.options.includes(optionships: :account).and(type: type)).exists? %>
+  <% Option.types.each { |type| next unless (options = @gathering.options.includes(optionships: :account).and(type: type)).exists? %>
   <tr class="bg-white">
     <td colspan="5">
       <h3 class="mb-0"><i class="bi <%= Option.icon(type) %>"></i> <%= %w[Tier Extra].include?(type) ? type.pluralize : type %></h3>
@@ -95,7 +95,7 @@
           <% else %>
             <% y << capture do %>
               <% if @membership.admin? %>
-                <a class="me-1" href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit"><img data-bs-toggle="tooltip" class="avatar avatar-sm <%= account.avatar_class %>" title="<%= account.name %>" src="<%= u account.image_thumb_or_gravatar_url %>"></a>
+                <a class="me-1" href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit"><img alt="<%= account.name %>" data-bs-toggle="tooltip" class="avatar avatar-sm <%= account.avatar_class %>" title="<%= account.name %>" src="<%= u account.image_thumb_or_gravatar_url %>"></a>
               <% else %>
                 <%= partial :'accounts/square', locals: { account: account } %>
               <% end %>
@@ -114,7 +114,7 @@
     <% end %>
   </tr>
   <% } %>
-<% end } %>
+<% } %>
 </table>
 <% if params[:view] != 'names' %>
   <div class="d-none d-lg-block">

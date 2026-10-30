@@ -75,6 +75,15 @@ Stylelint checks `app/assets/stylesheets` and the CSS in templates: their `<styl
 - `declaration-property-value-disallowed-list`: Motion: transitions animate only colours, shadows, masks, opacity, `translate` and `rotate` (not `all`, `transform`, `scale` or sizes), over `--transition-fast` or `--transition-enter` rather than a duration of their own, and only loading indicators loop (`infinite`). Loading indicators, which may loop on their own timing, disable it where they are, as do the one other loop, the signed-out home's typewriter cursor, which blinks as it pauses, and the guide's two older exceptions (the quick theme colours and feedback stars grow on hover); don't add more
 - `declaration-property-value-disallowed-list` (override for `event_details.css`, `email.css` and the email templates, `emails/` and `layouts/email.erb` and `pmail.erb`): Emails, and the stylesheets inlined into them, can't use CSS custom properties (`var(--x)`). The colour, radius, shadow and spacing checks above don't apply to them
 
+### Herb
+
+Herb (https://herb-tools.dev) parses each template's HTML and ERB together, so it checks the HTML's structure, which erb_lint doesn't. Its config is `.herb.yml`, which turns on only the rules below: most of Herb's others are Rails conventions (`.html.erb` names, Turbo, no `@` variables in partials, CSP nonces) or style. Its disable comment takes no reason, so give it in an ERB comment on the line above: `<%# sheets.js fills it in %>` then `<h3></h3> <%# herb:disable html-no-empty-headings %>` at the end of the line it's on.
+
+- `parser-no-errors`: Each tag closes in the template and the scope (`if` branch, block) it opens in, so a template doesn't leave a tag for another to close: pass it the extra content instead (`events/_block_main.erb`'s `extra_items`, built with `capture_html`). Each ERB tag holds whole control flow: `<% case x %>` and `<% when 1 %>` in tags of their own, and not a block and an `if` in one tag (`<% xs.each { |x| next unless x %>`, not `<% xs.each { |x| if x %>`). It can't be disabled, and a template it fails is checked for nothing else
+- `html-no-duplicate-attributes`, `html-no-self-closing` (`<i />` opens an `<i>` that stays open) and `html-require-closing-tags`
+- `html-img-require-alt` (`alt=""` for decorative images and icons beside their text), `html-iframe-has-title`, `html-no-empty-headings` (a loading placeholder is a `div` with the heading's class) and `html-no-aria-hidden-on-focusable`
+- `erb-no-unused-local-variable`
+
 ### zizmor
 
 zizmor (https://docs.zizmor.sh) audits the GitHub Actions workflows and actions in `.github` for security problems, with its default audits, run by `uvx` (install uv if you don't have it). CI gives it a `GH_TOKEN`, so it also runs its online audits there; without one it runs offline. Ignore a finding on a line with `# zizmor: ignore[<audit>] -- reason`.
@@ -89,7 +98,7 @@ Rules no linter covers, checked by `test/lint_test.rb` or `script/lint` (both ru
 
 - `test_mcp_copies_match_mcp_json`: `.cursor/mcp.json`, `.opencode/opencode.json` and `.codex/config.toml` are copies of `.mcp.json`: only edit `.mcp.json`, then run `rake mcp:sync` (Cloud agents)
 - `test_ci_runs_every_test_file`: CI's test jobs, one per test file, are listed in `.github/workflows/ruby.yml`: add a new test file there (Tests)
-- `test_every_disable_says_why`: every disable comment gives its reason, after `--` (or after `Linter:` for erb_lint), including zizmor's in `.github`, as each linter's section shows
+- `test_every_disable_says_why`: every disable comment gives its reason, after `--` (or after `Linter:` for erb_lint, or in an ERB comment on the line above for Herb), including zizmor's in `.github`, as each linter's section shows
 - `test_dependency_versions_are_exact`: the root `package.json`, `frontend/package.json` (the CDN packages), the CDN files' URLs and the packages rake tasks install name exact versions, so none arrives unchosen (Dependencies)
 - `test_cdn_files_have_integrity`: every CDN file the app loads has a hash in `frontend/integrity.json`, no hash is left over, and `frontend/package.json` lists only packages the app loads (Dependencies)
 - `test_ckeditor_stays_on_37`: CKEditor stays on 37 (Build/vendored code)
@@ -100,13 +109,13 @@ Rules no linter covers, checked by `test/lint_test.rb` or `script/lint` (both ru
 
 Commit only the changes you made: other sessions may be editing the same checkout, so stage your files by name rather than with `git add -A` or `git commit -a`.
 
-`script/lint` runs our linters, RuboCop, erb_lint, ESLint, Stylelint and zizmor, each on the files of its kind. CI's lint job (`.github/workflows/ruby.yml`) runs it too, so it is the one place their commands and flags are set: change a linter's flags or add a linter there, not in the workflow. Run it on the files you added or changed as you go, and fix what it reports:
+`script/lint` runs our linters, RuboCop, erb_lint, ESLint, Stylelint, Herb and zizmor, each on the files of its kind. CI's lint job (`.github/workflows/ruby.yml`) runs it too, so it is the one place their commands and flags are set: change a linter's flags or add a linter there, not in the workflow. Run it on the files you added or changed as you go, and fix what it reports:
 
 ```bash
 script/lint <files>
 ```
 
-If a linter's config is among them (`.rubocop.yml`, `.rubocop/`, `.erb_lint.yml`, `.erb_linters/`, `eslint.config.mjs`, `stylelint.config.mjs`, `package.json`, `zizmor.yml`), it runs that linter on everything, as CI does; `script/lint --all` runs them all, and `--only <linter>` just one. Run `npm ci` first if `node_modules` is missing, and install uv (https://docs.astral.sh/uv/) if `uvx` is.
+If a linter's config is among them (`.rubocop.yml`, `.rubocop/`, `.erb_lint.yml`, `.erb_linters/`, `eslint.config.mjs`, `stylelint.config.mjs`, `.herb.yml`, `package.json`, `zizmor.yml`), it runs that linter on everything, as CI does; `script/lint --all` runs them all, and `--only <linter>` just one. Run `npm ci` first if `node_modules` is missing, and install uv (https://docs.astral.sh/uv/) if `uvx` is.
 
 The pre-commit hook (`.githooks/pre-commit`) runs `script/lint --staged`, which lints the staged version of each staged file, so another session's unstaged edits don't count (`test/lint_test.rb`, which it runs when you commit a file it checks, reads from disk). Git runs it once `core.hooksPath` is `.githooks`, which `script/agent-env/install.sh` sets; in a checkout of your own, run `git config core.hooksPath .githooks` once. If it fails, fix the offenses (or disable a check where its rule genuinely doesn't apply, as above) and commit again. Never skip it with `--no-verify`.
 
@@ -203,7 +212,7 @@ Cooldown: never use a gem or JS package version released less than 7 days ago. T
 - Gems: the Gemfile's source has `cooldown: 7`, so Bundler enforces it
 - GitHub Actions are pinned to a commit of a release at least 7 days old, with the release as a comment (`unpinned-uses`, under zizmor), but for ruby/setup-ruby when the Gemfile's Ruby is newer than that release knows: then it's the first release that knows it. zizmor's own version is in `script/lint`, and uv's in `.github/workflows/ruby.yml` and `script/agent-env/install.sh`
 - `rake bootstrap:build` runs `npm install` with `--before` set to 7 days ago
-- The root `package.json` is only linters: ESLint, which CI runs as `npx eslint` over `app/assets/javascripts` and the templates in `app/views` (`eslint.config.mjs`), and Stylelint, which it runs over `app/assets/stylesheets` and the templates (`stylelint.config.mjs`, which parses templates with PostCSS, also listed; `npm run lint` runs both). It installs from `package-lock.json` (`npm ci`): pin exact versions, and when adding or bumping one run `npm install --before=<the date a week ago>` so its own dependencies are a week old too
+- The root `package.json` is only linters: ESLint, which CI runs as `npx eslint` over `app/assets/javascripts` and the templates in `app/views` (`eslint.config.mjs`), and Stylelint, which it runs over `app/assets/stylesheets` and the templates (`stylelint.config.mjs`, which parses templates with PostCSS, also listed; `npm run lint` runs both), and Herb's linter, which it runs over the templates (`.herb.yml`). It installs from `package-lock.json` (`npm ci`): pin exact versions, and when adding or bumping one run `npm install --before=<the date a week ago>` so its own dependencies are a week old too
 - `ckeditor/` installs from its `yarn.lock`. Yarn 1 has no cooldown, so when refreshing the lockfile (`yarn upgrade`), check the new versions' release dates (`npm view <package> time`) and pin back any that are under a week old
 - The packages the app loads from jsDelivr have their versions in `frontend/package.json`, and only there: nothing installs them, `config/frontend_dependencies.rb` reads them. `FRONTEND_DEPENDENCIES` there lists the packages every page loads and their files; a page that needs one of its own loads it with `cdn_tag`. Like gems, they're bumped by hand (`/stats/packages` lists what's outdated, for both), and GitHub's security alerts read the same file. When adding or bumping a package, or a version in a rake task, pick a version at least 7 days old (`rake frontend:integrity` refuses a newer one)
 - iframe-resizer stays on 4 (4.4.5 is MIT): 5 and later are GPL-3.0, or a paid licence. The embed code in `app/views/docs/md/events.md` loads its parent script at the same version

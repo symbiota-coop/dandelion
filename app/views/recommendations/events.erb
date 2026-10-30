@@ -33,46 +33,46 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_inc
                   <td class="align-top">
                     <div class="row justify-content-between">
                       <div class="col ms-1 p-lg-3">
-                        <%= partial :'events/block_main', locals: { event: event, skip_final_ul: true } %>
+                        <% extra_items = capture_html do %>
+                          <% people_accounts = Account.and(:id.in => people.map(&:first)) %>
+                          <% private_account_ids = people_accounts.select(&:private?).map { |a| a.id.to_s } %>
+                          <% private_count = private_account_ids.count %>
+                          <% private_events_count = people.select { |k, _v| private_account_ids.include?(k.to_s) }.sum { |_k, v| v.count } %>
+                          <% public_count = people_accounts.count - private_count %>
+                          <li><i data-bs-toggle="tooltip" title="People" class="bi bi-person-fill"></i>
+                            <% people.each { |k,v| account = people_accounts.find { |a| a.id.to_s == k.to_s }; next unless account;
+                            next if account.private? %>
+                            <a href="/u/<%= account.username %>"><%= account.name %></a>,
+                            <span data-bs-toggle="tooltip">
+                              <%= pluralize v.count, 'event' %> in common
+                            </span>
+                            <span class="d-none">
+                              <%
+                                event_ids = v.select { |connection| connection['type'] == 'Event' }.map { |connection| connection['id'] }
+                                gathering_ids = v.select { |connection| connection['type'] == 'Gathering' }.map { |connection| connection['id'] }
 
-                        <% people_accounts = Account.and(:id.in => people.map(&:first)) %>
-                        <% private_account_ids = people_accounts.select(&:private?).map { |a| a.id.to_s } %>
-                        <% private_count = private_account_ids.count %>
-                        <% private_events_count = people.select { |k, _v| private_account_ids.include?(k.to_s) }.sum { |_k, v| v.count } %>
-                        <% public_count = people_accounts.count - private_count %>
-                        <li><i data-bs-toggle="tooltip" title="People" class="bi bi-person-fill"></i>
-                          <% people.each { |k,v| account = people_accounts.find { |a| a.id.to_s == k.to_s }; next unless account;
-                          next if account.private? %>
-                          <a href="/u/<%= account.username %>"><%= account.name %></a>,
-                          <span data-bs-toggle="tooltip">
-                            <%= pluralize v.count, 'event' %> in common
-                          </span>
-                          <span class="d-none">
-                            <%
-                              event_ids = v.select { |connection| connection['type'] == 'Event' }.map { |connection| connection['id'] }
-                              gathering_ids = v.select { |connection| connection['type'] == 'Gathering' }.map { |connection| connection['id'] }
-
-                              events = event_ids.any? ? Event.and(:id.in => event_ids).order('start_time desc') : []
-                              gatherings = gathering_ids.any? ? Gathering.and(:id.in => gathering_ids) : []
-                            %>
-                            <% events.each { |event| %>
-                            <%= event.name %><br>
+                                events = event_ids.any? ? Event.and(:id.in => event_ids).order('start_time desc') : []
+                                gatherings = gathering_ids.any? ? Gathering.and(:id.in => gathering_ids) : []
+                              %>
+                              <% events.each { |event| %>
+                              <%= event.name %><br>
+                              <% } %>
+                              <% gatherings.each { |gathering| %>
+                              <%= gathering.name %><br>
+                              <% } %>
+                            </span>
+                            <br>
                             <% } %>
-                            <% gatherings.each { |gathering| %>
-                            <%= gathering.name %><br>
-                            <% } %>
-                          </span>
-                          <br>
-                          <% } %>
-                          <% if private_count > 0 %>
-                            <% if public_count > 0 %>
-                              and <%= pluralize(private_count, 'other person', 'other people') %> with <%= pluralize(private_events_count, 'event') %> in common
-                            <% else %>
-                              <%= pluralize(private_count, 'person', 'people') %> with <%= pluralize(private_events_count, 'event') %> in common
+                            <% if private_count > 0 %>
+                              <% if public_count > 0 %>
+                                and <%= pluralize(private_count, 'other person', 'other people') %> with <%= pluralize(private_events_count, 'event') %> in common
+                              <% else %>
+                                <%= pluralize(private_count, 'person', 'people') %> with <%= pluralize(private_events_count, 'event') %> in common
+                              <% end %>
                             <% end %>
-                          <% end %>
-                        </li>
-                      </ul>
+                          </li>
+                        <% end %>
+                        <%= partial :'events/block_main', locals: { event: event, extra_items: extra_items } %>
 
                     </div>
                   </div>

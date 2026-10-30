@@ -1,5 +1,5 @@
-<% case pmail.recipient_kind
-   when 'everyone' %>
+<% case pmail.recipient_kind %>
+<% when 'everyone' %>
   Everyone in <%= pmail.organisation.name %>
 <% when 'monthly_donors' %>
   Monthly donors
