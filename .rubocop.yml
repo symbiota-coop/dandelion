@@ -1,11 +1,14 @@
 # Only cops that can fail CI (warning or above, as CI runs RuboCop with --fail-level warning): Lint, Security, ours and
-# the three warning-level Layout cops, and the Style cops raised to warning below. Other convention cops (Style, Layout,
-# Naming) are off, so plain `rubocop` reports what CI does.
+# the three warning-level Layout cops, and the Style and Minitest cops raised to warning below. Other convention cops
+# (Style, Layout, Naming, Minitest) are off, so plain `rubocop` reports what CI does.
 # .erb_lint.yml inherits this file for the Ruby in templates.
 
 # Our own cops (.rubocop/dandelion), which check rules from AGENTS.md
 require:
   - ./.rubocop/dandelion.rb
+
+plugins:
+  - rubocop-minitest
 
 AllCops:
   NewCops: enable
@@ -17,6 +20,9 @@ Layout:
 Naming:
   Enabled: false
 Metrics:
+  Enabled: false
+# Only the cops below that catch tests that don't test what they seem to; the rest are assertion style
+Minitest:
   Enabled: false
 Layout/BeginEndAlignment:
   Enabled: true
@@ -49,6 +55,39 @@ Style/MutableConstant:
   Severity: warning
 # ostruct isn't a default gem since Ruby 3.5, and OpenStruct answers nil to anything, so a stub hides what code reads
 Style/OpenStructUse:
+  Enabled: true
+  Severity: warning
+
+# Tests that don't test what they seem to: expected and actual swapped (so a failure reads backwards), a test method
+# Minitest won't run, a duplicate or unreachable assertion, an assertion in setup, return or skip in the wrong place
+Minitest/LiteralAsActualArgument:
+  Enabled: true
+  Severity: warning
+Minitest/NonPublicTestMethod:
+  Enabled: true
+  Severity: warning
+Minitest/DuplicateTestRun:
+  Enabled: true
+  Severity: warning
+Minitest/UnreachableAssertion:
+  Enabled: true
+  Severity: warning
+Minitest/UselessAssertion:
+  Enabled: true
+  Severity: warning
+Minitest/AssertionInLifecycleHook:
+  Enabled: true
+  Severity: warning
+Minitest/ReturnInTestMethod:
+  Enabled: true
+  Severity: warning
+Minitest/SkipEnsure:
+  Enabled: true
+  Severity: warning
+Minitest/AssertRaisesWithRegexpArgument:
+  Enabled: true
+  Severity: warning
+Minitest/AssertRaisesCompoundBody:
   Enabled: true
   Severity: warning
 

@@ -32,6 +32,7 @@ gem 'email_address'
 gem 'erb_lint', require: false
 gem 'factory_bot'
 gem 'rubocop', require: false
+gem 'rubocop-minitest', require: false
 group :test do
   gem 'capybara'
   gem 'cuprite'

@@ -1425,6 +1425,30 @@ class AccountsTest < ActiveSupport::TestCase
     assert_siwe_failure 'invalid_signature'
   end
 
+  test 'signup checks recaptcha when no skip secret is configured' do
+    later = FactoryBot.build_stubbed(:account)
+    verify_calls = with_recaptcha(skip_secret: nil) { post_new_account(later) }
+
+    assert_equal 1, verify_calls.length
+    assert_nil Account.find_by(email: later.email.downcase)
+  end
+
+  test 'signup checks recaptcha when the skip secret is wrong' do
+    later = FactoryBot.build_stubbed(:account)
+    verify_calls = with_recaptcha(skip_secret: 'right-secret') { post_new_account(later, recaptcha_skip_secret: 'wrong-secret') }
+
+    assert_equal 1, verify_calls.length
+    assert_nil Account.find_by(email: later.email.downcase)
+  end
+
+  test 'signup skips recaptcha with the right skip secret' do
+    later = FactoryBot.build_stubbed(:account)
+    verify_calls = with_recaptcha(skip_secret: 'right-secret') { post_new_account(later, recaptcha_skip_secret: 'right-secret') }
+
+    assert_empty verify_calls
+    assert Account.find_by(email: later.email.downcase)
+  end
+
   private
 
   def siwe_template_from(response)
@@ -1480,30 +1504,6 @@ class AccountsTest < ActiveSupport::TestCase
   ensure
     OmniAuth.config.test_mode = false
     OmniAuth.config.mock_auth[:google_oauth2] = nil
-  end
-
-  test 'signup checks recaptcha when no skip secret is configured' do
-    later = FactoryBot.build_stubbed(:account)
-    verify_calls = with_recaptcha(skip_secret: nil) { post_new_account(later) }
-
-    assert_equal 1, verify_calls.length
-    assert_nil Account.find_by(email: later.email.downcase)
-  end
-
-  test 'signup checks recaptcha when the skip secret is wrong' do
-    later = FactoryBot.build_stubbed(:account)
-    verify_calls = with_recaptcha(skip_secret: 'right-secret') { post_new_account(later, recaptcha_skip_secret: 'wrong-secret') }
-
-    assert_equal 1, verify_calls.length
-    assert_nil Account.find_by(email: later.email.downcase)
-  end
-
-  test 'signup skips recaptcha with the right skip secret' do
-    later = FactoryBot.build_stubbed(:account)
-    verify_calls = with_recaptcha(skip_secret: 'right-secret') { post_new_account(later, recaptcha_skip_secret: 'right-secret') }
-
-    assert_empty verify_calls
-    assert Account.find_by(email: later.email.downcase)
   end
 
   # Configures recaptcha with a verifier that always fails, and returns the verify calls made

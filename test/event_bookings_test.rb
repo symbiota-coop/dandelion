@@ -147,12 +147,12 @@ class EventBookingsTest < ActiveSupport::TestCase
     fill_in 'answers[2]', with: 'a2'
     fill_in 'discount_code', with: code
     click_button 'Apply'
-    assert_equal find_field("quantities[#{@event.ticket_types[0].id}]").value, '1'
-    assert_equal find_field("prices[#{@event.ticket_types[1].id}]").value, price1.to_s
-    assert_equal find_field("prices[#{@event.ticket_types[2].id}]").value, price2.to_s
-    assert_equal find_field('donation_amount').value, donation_amount.to_s
-    assert_equal find_field('answers[0]').value, 'a0'
-    assert_equal find_field('answers[2]').value, 'a2'
+    assert_equal '1', find_field("quantities[#{@event.ticket_types[0].id}]").value
+    assert_equal price1.to_s, find_field("prices[#{@event.ticket_types[1].id}]").value
+    assert_equal price2.to_s, find_field("prices[#{@event.ticket_types[2].id}]").value
+    assert_equal donation_amount.to_s, find_field('donation_amount').value
+    assert_equal 'a0', find_field('answers[0]').value
+    assert_equal 'a2', find_field('answers[2]').value
     assert_equal find_field('discount_code_display', disabled: true).value, code
     assert page.has_button? "Pay £#{format('%.2f', ((price0 + price1 + price2) * (100 - percentage_discount).to_f / 100) + donation_amount)}"
   end

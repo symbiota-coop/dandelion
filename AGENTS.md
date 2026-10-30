@@ -50,6 +50,7 @@ CI fails on warnings and above (`--fail-level warning`), so convention cops are 
 - `Style/RescueStandardError`: Name the errors you rescue (`rescue ArgumentError`), so a typo's `NoMethodError` isn't swallowed
 - `Style/MutableConstant`: Freeze constants, as Puma's threads share them. A per-process cache filled as it goes disables it, saying so
 - `Style/OpenStructUse`: No `OpenStruct` (`ostruct` isn't a default gem). A test's stand-in for an API object is `api_object(id: 'cs_test', url: ...)` (`test/test_config.rb`), which answers only what it's given
+- rubocop-minitest's cops that catch tests that don't test what they seem to (`.rubocop.yml` lists them): expected before actual (`assert_equal 'a0', field.value`, `Minitest/LiteralAsActualArgument`), test methods public (above `private`, `Minitest/NonPublicTestMethod`), and no unreachable, duplicate or useless assertions
 
 ### erb_lint
 
