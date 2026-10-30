@@ -336,31 +336,63 @@
   margin-bottom: 0;
 }
 
-/* A location edition's facilitator, on its own: centred, as wide as one of the main Daily's three */
+/* A location edition's facilitator, on its own: a card with the portrait beside the name and details, centred */
 .newspaper-features > :only-child {
-  flex: 0 1 20rem;
+  flex: 0 1 36rem;
   margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 10rem) minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
+  column-gap: var(--space-lg);
+}
+
+.newspaper-features > :only-child > .newspaper-section {
+  grid-column: 1 / -1;
+}
+
+.newspaper-features > :only-child > a {
+  grid-row: 2 / 4;
+}
+
+.newspaper-features > :only-child > .newspaper-byline {
+  margin-top: 0;
+}
+
+@media (max-width: 575.98px) {
+  .newspaper-features > :only-child {
+    grid-template-columns: minmax(0, 6rem) minmax(0, 1fr);
+    column-gap: var(--space-base);
+  }
 }
 
 /* Long stories (_daily.erb's script sets .newspaper-sidebar) run as one column. From lg they take the left two
    thirds, with the features stacked beside them behind a column rule, so the column is a readable width and the
-   space beside it is used */
+   space beside it is used. A location edition's stories always sit beside its facilitator from lg
+   (.newspaper-local), in two columns unless they're long */
 .newspaper-sidebar .newspaper-stories {
   column-count: 1;
 }
 
 @media (min-width: 992px) {
-  .newspaper-sidebar {
+  :is(.newspaper-sidebar, .newspaper-local) {
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
     gap: var(--space-xl);
   }
 
-  .newspaper-sidebar .newspaper-stories {
+  .newspaper-local:not(.newspaper-sidebar) .newspaper-stories {
+    column-count: 2;
+  }
+
+  :is(.newspaper-sidebar, .newspaper-local) .newspaper-stories {
     margin-bottom: 0;
   }
 
-  .newspaper-sidebar .newspaper-features {
+  .newspaper-local .newspaper-features > :only-child {
+    display: block;
+  }
+
+  :is(.newspaper-sidebar, .newspaper-local) .newspaper-features {
     flex-direction: column;
     justify-content: flex-start;
     border-top: 0;
@@ -368,11 +400,11 @@
     padding: 0 0 0 var(--space-xl);
   }
 
-  .newspaper-sidebar .newspaper-features > * {
+  :is(.newspaper-sidebar, .newspaper-local) .newspaper-features > * {
     flex: none;
   }
 
-  .newspaper-sidebar .newspaper-features > * + * {
+  :is(.newspaper-sidebar, .newspaper-local) .newspaper-features > * + * {
     border-left: 0;
     border-top: 1px solid var(--hairline);
     margin: var(--space-lg) 0 0;

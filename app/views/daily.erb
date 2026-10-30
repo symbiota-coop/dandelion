@@ -15,12 +15,13 @@
     <% locations << @location if @location && !locations.include?(@location) %>
     <% if locations.any? %>
       <nav class="newspaper-motto newspaper-editions">
+        Editions:
         <% locations.each_with_index do |location, index| %>
           <%= '·' if index.positive? %>
           <% if location == @location %>
-            <span class="newspaper-edition-current"><%= location.name %> edition</span>
+            <span class="newspaper-edition-current"><%= location.name %></span>
           <% else %>
-            <a href="/locations/<%= location.name %>/daily?date=<%= date %>"><%= location.name %> edition</a>
+            <a href="/locations/<%= location.name %>/daily?date=<%= date %>"><%= location.name %></a>
           <% end %>
         <% end %>
       </nav>
