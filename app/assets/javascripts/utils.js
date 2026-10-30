@@ -213,7 +213,7 @@ $.fn.serializeObject = function () {
         data.rtype = options.rtype
         $.getJSON(options.lookup_url, data, function (response) {
           var result = response.results.filter(function (r) {
-            return r.id == initialId
+            return String(r.id) === String(initialId)
           })[0]
           $option.text(result ? result.text : initialId)
           initSelect2()

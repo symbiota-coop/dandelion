@@ -116,6 +116,8 @@ const rules = {
   'no-redeclare': ['error', { builtinGlobals: false }],
   'no-empty': ['error', { allowEmptyCatch: true }],
   'prefer-const': 'error',
+  // == converts types ('' == 0); smart still allows == null, which matches null and undefined
+  eqeqeq: ['error', 'smart'],
   // A closure made in a loop over var sees the loop's last value
   'no-loop-func': 'error',
   // Requests use jQuery, not fetch (templates get the same check from .erb_linters/jquery_requests.rb)

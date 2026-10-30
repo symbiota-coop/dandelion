@@ -61,9 +61,9 @@ $(function () {
       p += (parseInt($(this).val()) * parseFloat($(this).attr('data-price') || 0))
     })
 
-    if ($('#percentage_discount').length > 0 && $('#percentage_discount').val() != '') { p = (p * (100 - parseInt($('#percentage_discount').val())) / 100) }
+    if ($('#percentage_discount').length > 0 && $('#percentage_discount').val() !== '') { p = (p * (100 - parseInt($('#percentage_discount').val())) / 100) }
 
-    if ($('#discount').length > 0 && $('#discount').val() != '') { p = (p * (100 - parseInt($('#discount').val())) / 100) }
+    if ($('#discount').length > 0 && $('#discount').val() !== '') { p = (p * (100 - parseInt($('#discount').val())) / 100) }
 
     return p
   }
@@ -73,7 +73,7 @@ $(function () {
 
     p += priceWithoutDonation()
 
-    if ($('#donation_amount').length > 0 && $('#donation_amount').val() != '') { p += parseFloat($('#donation_amount').val()) }
+    if ($('#donation_amount').length > 0 && $('#donation_amount').val() !== '') { p += parseFloat($('#donation_amount').val()) }
 
     return p
   }
@@ -81,7 +81,7 @@ $(function () {
   function credit () {
     let c = 0
 
-    if ($('#credit').length > 0 && $('#credit').val() != '') { c += parseFloat($('#credit').val()) }
+    if ($('#credit').length > 0 && $('#credit').val() !== '') { c += parseFloat($('#credit').val()) }
 
     return c
   }
@@ -89,7 +89,7 @@ $(function () {
   function fixedDiscount () {
     let d = 0
 
-    if ($('#fixed-discount').length > 0 && $('#fixed-discount').val() != '') { d += parseFloat($('#fixed-discount').val()) }
+    if ($('#fixed-discount').length > 0 && $('#fixed-discount').val() !== '') { d += parseFloat($('#fixed-discount').val()) }
 
     return d
   }
@@ -204,10 +204,10 @@ $(function () {
       return cardMethods.includes($(this).attr('data-payment-method'))
     })
 
-    if (p == 0) {
+    if (p === 0) {
       $rsvp.show()
       $paid.hide()
-    } else if (b == 0) {
+    } else if (b === 0) {
       $rsvp.show().find('span').text('Use credit')
       $paid.hide()
     } else if (b > 0) {
@@ -384,7 +384,7 @@ $(function () {
     $('[name^=quantities]').not(':disabled').each(function () {
       numberOfTickets += parseInt($(this).val())
     })
-    if (numberOfTickets == 0) {
+    if (numberOfTickets === 0) {
       showPurchaseAlert('Please select at least one ticket')
       return false
     }

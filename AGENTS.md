@@ -71,6 +71,7 @@ ESLint checks `app/assets/javascripts` and the JavaScript in templates: their in
 
 - `no-restricted-syntax`: The `DesignClasses` rules above (showing and hiding; `-success`, `badge-*` and `.label`; Bootstrap 4 leftovers; `form-select`), in the strings and template literals of scripts
 - `no-restricted-globals`: Requests use jQuery (`$.get`, `$.getJSON`, `$.post`, `$.ajax`), not `fetch`. Where an API needs a real Promise (`ClipboardItem`), wrap the request: `Promise.resolve($.get(url))`
+- `eqeqeq` (`smart`): `===` and `!==`, as `==` converts types (`'' == 0`). `== null` is fine, matching null and undefined; compare ids from different sources as strings (`String(a) === String(b)`)
 - `prefer-const` and `no-loop-func` (a closure made in a loop sees a `var`'s last value: declare it with `const` or `let` in the loop)
 
 ### Stylelint

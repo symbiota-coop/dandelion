@@ -61,20 +61,20 @@
     });
 
     $('#gathering_privacy').change(function () {
-      if ($(this).val() == 'closed')
+      if ($(this).val() === 'closed')
         $('#application-options').show()
       else
         $('#application-options').hide()
-      if ($(this).val() == 'open')
+      if ($(this).val() === 'open')
         $('#joining-options').show()
       else
         $('#joining-options').hide()
     })
-    if ($('#gathering_privacy').val() == 'closed')
+    if ($('#gathering_privacy').val() === 'closed')
       $('#application-options').show()
     else
       $('#application-options').hide()
-    if ($('#gathering_privacy').val() == 'open')
+    if ($('#gathering_privacy').val() === 'open')
       $('#joining-options').show()
     else
       $('#joining-options').hide()
@@ -147,7 +147,7 @@
           <script>
             $(function () {
               $('#gathering_privacy').change(function () {
-                if ($(this).val() == 'secret')
+                if ($(this).val() === 'secret')
                   $('#gathering_listed').prop('checked', false).attr('disabled', true);
                 else
                   $('#gathering_listed').removeAttr('disabled');

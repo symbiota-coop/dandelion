@@ -79,7 +79,7 @@ $(function () {
         slug.data('focus', true)
       })
       title.keyup(function () {
-        if (start_length == 0 && slug.data('focus') != true) { slug.val(title.val().toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')) }
+        if (start_length === 0 && slug.data('focus') !== true) { slug.val(title.val().toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')) }
       })
     })
 

@@ -12,7 +12,7 @@
     $(function () {
 
       $('#new-account-form').submit(function () {
-        if ($(this).find('.g-recaptcha').length && (!grecaptcha || grecaptcha.getResponse().length == 0)) {
+        if ($(this).find('.g-recaptcha').length && (!grecaptcha || grecaptcha.getResponse().length === 0)) {
           alert('Please confirm you are not a robot');
           return false
         }
