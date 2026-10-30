@@ -31,6 +31,10 @@ Security:
   Severity: warning
 
 # Convention cops that catch bugs, raised to warning so they fail CI
+# and/or bind more loosely than =, so `ok = a and b` sets ok to a
+Style/AndOr:
+  Enabled: true
+  Severity: warning
 # Puma runs threads, so a constant that changes is state shared across requests
 Style/MutableConstant:
   Enabled: true

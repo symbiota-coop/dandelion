@@ -18,7 +18,7 @@
       <a data-bs-toggle="tooltip" title="<%= pluralize(tactivity.comments.count, 'comment') %>" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>"><i class="bi bi-chat-left-text"></i> <%= tactivity.comments.count %></a>
       &middot;
     <% end %>
-    <% if tactivity.space_id and (@membership.admin? or tactivity.timetable.scheduling_by_all) %>
+    <% if tactivity.space_id && (@membership.admin? || tactivity.timetable.scheduling_by_all) %>
       <a class="pagelet-trigger" data-confirm="Are you sure you want to unschedule this activity?" title="Unschedule" data-method="post" href="/tactivities/<%= tactivity.id %>/unschedule"><i class="bi bi-calendar-minus"></i></a>
       &middot;
     <% end %>

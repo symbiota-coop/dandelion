@@ -27,7 +27,7 @@ module ParamHelpers
 
   def datetime_hashes_to_datetimes!(hash)
     hash.each { |k,v|
-      if v.is_a?(Hash) and [:year, :month, :day, :hour, :min].all? { |x| v.has_key?(x.to_s) }
+      if v.is_a?(Hash) && [:year, :month, :day, :hour, :min].all? { |x| v.has_key?(x.to_s) }
         hash[k] = begin; Time.zone.parse("#{v[:day]}-#{v[:month]}-#{v[:year]} #{v[:hour]}:#{v[:min]}"); rescue; nil; end
       elsif v.is_a?(Hash)
         datetime_hashes_to_datetimes!(v)
@@ -37,7 +37,7 @@ module ParamHelpers
   
   def date_hashes_to_dates!(hash)
     hash.each { |k,v|
-      if v.is_a?(Hash) and [:year, :month, :day].all? { |x| v.has_key?(x.to_s) }
+      if v.is_a?(Hash) && [:year, :month, :day].all? { |x| v.has_key?(x.to_s) }
         hash[k] = begin; Date.parse("#{v[:day]}-#{v[:month]}-#{v[:year]}"); rescue; nil; end
       elsif v.is_a?(Hash)
         date_hashes_to_dates!(v)
@@ -47,7 +47,7 @@ module ParamHelpers
   
   def file_hashes_to_files!(hash)
     hash.each { |k, v|
-      if v.is_a?(Hash) and v[:tempfile]
+      if v.is_a?(Hash) && v[:tempfile]
         tempfile = v[:tempfile]
         tempfile.original_filename = v[:filename]
         hash[k] = tempfile
@@ -59,7 +59,7 @@ module ParamHelpers
   
   def coordinate_hashes_to_coordinates!(hash)
     hash.each { |k,v|
-      if v.is_a?(Hash) and [:lat, :lng].all? { |x| v.has_key?(x.to_s) }
+      if v.is_a?(Hash) && [:lat, :lng].all? { |x| v.has_key?(x.to_s) }
         if [v[:lng].to_f, v[:lat].to_f] == [0.0,0.0]
           hash[k] = nil
         else

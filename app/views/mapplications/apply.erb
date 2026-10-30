@@ -20,7 +20,7 @@
     <% if params[:accepted] %>
       <h2>You've been accepted to <%= @gathering.name %></h2>
       <p>Check your email app for a sign in link.</p>
-    <% elsif params[:applied] or (current_account and @gathering.mapplications.find_by(:status.ne => 'accepted', :account => current_account)) %>
+    <% elsif params[:applied] || (current_account && @gathering.mapplications.find_by(:status.ne => 'accepted', :account => current_account)) %>
       <h2>Thanks for applying</h2>
       <%= partial :'mapplications/threshold_info' %>
     <% else %>

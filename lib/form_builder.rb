@@ -215,7 +215,7 @@ module Padrino
 
         def file_block(fieldname, required: false, disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
           content = ''
-          if !object.persisted? or !object.send(fieldname)
+          if !object.persisted? || !object.send(fieldname)
             content << file_field(fieldname, class: 'form-control')
           else
             content << %(
@@ -237,7 +237,7 @@ module Padrino
 
         def image_block(fieldname, rotate: true, required: false, disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
           content = ''
-          if !object.persisted? or !object.send(fieldname)
+          if !object.persisted? || !object.send(fieldname)
             content << file_field(fieldname, class: 'form-control')
           else
             has_error = !error_message_on(fieldname.to_s.gsub('_id', '')).blank?
@@ -256,7 +256,7 @@ module Padrino
               #{file_field(fieldname, class: 'form-control', required: (r = required || model_required(fieldname)), disabled: disabled)}
             </div>
             )
-            if object.respond_to?(:"rotate_#{fieldname}_by") and rotate
+            if object.respond_to?(:"rotate_#{fieldname}_by") && rotate
               content << %(
                 <div class="input-group" style="width: 13em">
                   <span class="input-group-text">Rotate by</span>
@@ -331,7 +331,7 @@ module Padrino
             <div class="#{container_class}">
               <div class="#{div_class}">
                 <button class="btn btn-primary" type="submit"#{disabled_attr}>#{button_text}</button> )
-          if !object.new_record? and destroy_url
+          if !object.new_record? && destroy_url
             content << %(<a class="btn btn-danger#{disabled_class}" data-method="post" data-confirm="Are you sure you want to delete this #{model.to_s.underscore.humanize.downcase}?" href="#{destroy_url}"#{disabled_attr}>Delete</a>)
           end
           content << %(
@@ -382,9 +382,9 @@ module Padrino
         def block_layout(fieldname, content, tip: nil, hint: nil, container_class: nil, label_class: nil, div_class: nil, required: nil)
           tip = if tip
                   tip
-                elsif object.new_record? and model.respond_to?(:new_tips) and model.new_tips[fieldname]
+                elsif object.new_record? && model.respond_to?(:new_tips) && model.new_tips[fieldname]
                   model.new_tips[fieldname]
-                elsif !object.new_record? and model.respond_to?(:edit_tips) and model.edit_tips[fieldname]
+                elsif !object.new_record? && model.respond_to?(:edit_tips) && model.edit_tips[fieldname]
                   model.edit_tips[fieldname]
                 end
           tip_html = if tip
@@ -400,9 +400,9 @@ module Padrino
 
           hint = if hint
                    hint
-                 elsif object.new_record? and model.respond_to?(:new_hints) and model.new_hints[fieldname]
+                 elsif object.new_record? && model.respond_to?(:new_hints) && model.new_hints[fieldname]
                    model.new_hints[fieldname]
-                 elsif !object.new_record? and model.respond_to?(:edit_hints) and model.edit_hints[fieldname]
+                 elsif !object.new_record? && model.respond_to?(:edit_hints) && model.edit_hints[fieldname]
                    model.edit_hints[fieldname]
                  end
           hint_html = if hint
@@ -418,7 +418,7 @@ module Padrino
           )
                        end
 
-          block = if container_class and container_class.include?('form-check')
+          block = if container_class && container_class.include?('form-check')
                     %(
             <div class="#{container_class}">
               #{content}

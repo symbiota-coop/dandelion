@@ -5,7 +5,7 @@
       <%= check_box_tag :vote, value: true, checked: voption.votes.find_by(account: current_account), onclick: '$(this.form).submit()' %>
       <%= voption.text %>
     </label>
-    <% if admin? or (current_account && comment.account_id == current_account.id) %>
+    <% if admin? || (current_account && comment.account_id == current_account.id) %>
       <a class="subtle pagelet-trigger" data-confirm="Are you sure?" href="/voptions/<%= voption.id %>/destroy"><i class="bi bi-x-lg"></i></a>
     <% end %>
   <% end %>

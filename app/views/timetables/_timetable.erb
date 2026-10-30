@@ -7,7 +7,7 @@
     <% } %>
   </div>
 <% else %>
-  <% if (admin? || @membership.admin?) or timetable.scheduling_by_all %>
+  <% if (admin? || @membership.admin?) || timetable.scheduling_by_all %>
     <script>
       $(function () {
         if ($(window).width() > 992) {

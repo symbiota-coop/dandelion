@@ -1,5 +1,5 @@
 <div class="comment-body compact-urls nl2br"><%= comment.body_html %></div>
-<% if admin? or (current_account && comment.account_id == current_account.id) %>
+<% if admin? || (current_account && comment.account_id == current_account.id) %>
   <div class="comment-edit" style="display: none">
     <% form_tag "/comments/#{comment.id}/edit" do %>
       <%= text_area_tag :body, value: comment.body, onblur: '$(this.form).submit()', class: 'form-control' %>

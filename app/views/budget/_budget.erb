@@ -61,7 +61,7 @@
         <th>Spent</th>
       </tr>
       <% @gathering.teams.order('name asc').each { |team| %>
-      <tr <% if team.budget and team.spent > team.budget %> class="danger"<% end %>>
+      <tr <% if team.budget && team.spent > team.budget %> class="danger"<% end %>>
         <td><a href="/g/<%= @gathering.slug %>/teams/<%= team.id %>"><%= team.name %></a></td>
         <td>
           <% if team.budget %>

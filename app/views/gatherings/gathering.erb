@@ -43,7 +43,7 @@
       <% end %>
       <a class="btn btn-primary mb-1" data-method="post" data-confirm="Are you sure you want to leave the gathering?" href="/g/<%= @gathering.slug %>/leave">Leave gathering</a>
     </div>
-    <% if @membership.admin? or @gathering.photos.exists? %>
+    <% if @membership.admin? || @gathering.photos.exists? %>
       <div class="my-3">
         <%= partial :'photos/photos', locals: { photoable: @gathering, add_photo_if: @membership.admin?, dimensions: '100x100#' } %>
       </div>

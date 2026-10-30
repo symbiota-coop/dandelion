@@ -45,6 +45,7 @@ Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Rub
 
 CI fails on warnings and above (`--fail-level warning`), so convention cops are off, apart from these, which catch bugs and `.rubocop.yml` raises to warning (in templates too):
 
+- `Style/AndOr`: `&&` and `||`, not `and` and `or`, which bind more loosely than `=` (`ok = a and b` sets `ok` to `a`)
 - `Style/MutableConstant`: Freeze constants, as Puma's threads share them. A per-process cache filled as it goes disables it, saying so
 
 ### erb_lint
