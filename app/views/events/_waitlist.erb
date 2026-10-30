@@ -32,7 +32,7 @@
         $(function () {
 
           $('#waitlist-form').submit(function () {
-            if (!grecaptcha || grecaptcha.getResponse().length == 0) {
+            if ($(this).find('.g-recaptcha').length && (!grecaptcha || grecaptcha.getResponse().length == 0)) {
               alert('Please confirm you are not a robot');
               return false
             }
@@ -43,7 +43,9 @@
       <% form_for Waitship.new, "/events/#{@event.id}/waitship/new", id: 'waitlist-form'  do |f| %>
         <%= f.text_block :name %>
         <%= f.text_block :email %>
-        <div class="g-recaptcha mb-2" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+        <% if ENV['RECAPTCHA_SITE_KEY'] %>
+          <div class="g-recaptcha mb-2" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+        <% end %>
         <%= f.submit_block button_text: 'Submit' %>
       <% end %>
     <% end %>

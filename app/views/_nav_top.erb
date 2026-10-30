@@ -1,7 +1,11 @@
 <% if !current_account && @hide_right_nav %>
   <script>
     window.addEventListener('pagereveal', (e) => {
-      if (e.viewTransition) e.viewTransition.skipTransition();
+      if (e.viewTransition) {
+        // Skipping rejects the transition's ready promise with an AbortError, which is expected
+        e.viewTransition.ready.catch(() => {});
+        e.viewTransition.skipTransition();
+      }
     });
   </script>
   <style>

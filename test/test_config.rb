@@ -19,7 +19,7 @@ Capybara.default_max_wait_time = 10
 
 Capybara.register_driver :cuprite do |app|
   options = {}
-  options[:js_errors] = false
+  options[:js_errors] = true # a JavaScript error on the page fails the test
   options[:timeout] = 60
   options[:process_timeout] = 30
   options[:window_size] = ENV['CREATE_VIDEO'] ? [1920, 1080] : [1280, 720]

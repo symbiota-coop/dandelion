@@ -34,7 +34,7 @@
           $(function () {
             <% if !current_account || @membership %>
               $('#apply').submit(function () {
-                if (!grecaptcha || grecaptcha.getResponse().length == 0) {
+                if ($(this).find('.g-recaptcha').length && (!grecaptcha || grecaptcha.getResponse().length == 0)) {
                   alert('Please confirm you are not a robot');
                   return false
                 }
@@ -59,7 +59,9 @@
           </div>
         </div>
         <% } %>
-        <div class="g-recaptcha mb-2" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+        <% if ENV['RECAPTCHA_SITE_KEY'] %>
+          <div class="g-recaptcha mb-2" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+        <% end %>
         <%= f.submit_block button_text: 'Apply' %>
         <% if @gathering.threshold && @gathering.threshold > 0 %>
           <div class="row mt-2">

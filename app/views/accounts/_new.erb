@@ -31,7 +31,7 @@
   $(function () {
 
   $('#new-account-form').submit(function() {
-    if(!grecaptcha || grecaptcha.getResponse().length == 0) {
+    if($(this).find('.g-recaptcha').length && (!grecaptcha || grecaptcha.getResponse().length == 0)) {
         alert('Please confirm you are not a robot');
         return false
     }
@@ -43,6 +43,8 @@
 <%= f.text_block :name %>
 <%= f.email_block :email %>
 <%= f.text_block :location %>
-<div class="g-recaptcha mb-3" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+<% if ENV['RECAPTCHA_SITE_KEY'] %>
+  <div class="g-recaptcha mb-3" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
+<% end %>
 <%= f.submit_block button_text: 'Sign up' %>
 <% end %>
