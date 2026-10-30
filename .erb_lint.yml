@@ -49,6 +49,7 @@ linters:
       - Layout/EndAlignment
       - Style/AndOr
       - Style/RescueModifier
+      - Style/RescueStandardError
       - Style/MutableConstant
     rubocop_config:
       # The Ruby in each tag is checked with .rubocop.yml's settings for those cops, apart from the override below

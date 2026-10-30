@@ -28,7 +28,7 @@ module ParamHelpers
   def datetime_hashes_to_datetimes!(hash)
     hash.each { |k,v|
       if v.is_a?(Hash) && [:year, :month, :day, :hour, :min].all? { |x| v.has_key?(x.to_s) }
-        hash[k] = begin; Time.zone.parse("#{v[:day]}-#{v[:month]}-#{v[:year]} #{v[:hour]}:#{v[:min]}"); rescue; nil; end
+        hash[k] = begin; Time.zone.parse("#{v[:day]}-#{v[:month]}-#{v[:year]} #{v[:hour]}:#{v[:min]}"); rescue ArgumentError; nil; end
       elsif v.is_a?(Hash)
         datetime_hashes_to_datetimes!(v)
       end
@@ -38,7 +38,7 @@ module ParamHelpers
   def date_hashes_to_dates!(hash)
     hash.each { |k,v|
       if v.is_a?(Hash) && [:year, :month, :day].all? { |x| v.has_key?(x.to_s) }
-        hash[k] = begin; Date.parse("#{v[:day]}-#{v[:month]}-#{v[:year]}"); rescue; nil; end
+        hash[k] = begin; Date.parse("#{v[:day]}-#{v[:month]}-#{v[:year]}"); rescue ArgumentError; nil; end
       elsif v.is_a?(Hash)
         date_hashes_to_dates!(v)
       end

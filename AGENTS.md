@@ -47,6 +47,7 @@ CI fails on warnings and above (`--fail-level warning`), so convention cops are 
 
 - `Style/AndOr`: `&&` and `||`, not `and` and `or`, which bind more loosely than `=` (`ok = a and b` sets `ok` to `a`)
 - `Style/RescueModifier`: No `x rescue y`, which rescues every error: rescue the ones you expect in a `begin` block
+- `Style/RescueStandardError`: Name the errors you rescue (`rescue ArgumentError`), so a typo's `NoMethodError` isn't swallowed
 - `Style/MutableConstant`: Freeze constants, as Puma's threads share them. A per-process cache filled as it goes disables it, saying so
 
 ### erb_lint
