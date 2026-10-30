@@ -20,9 +20,14 @@ module SignalMessaging
     recipients = Array(recipient_phones).filter_map { |phone| normalize_phone(phone) }.uniq
     return if recipients.empty?
 
+    # signal-cli sends to each recipient in turn before the API answers, so a pmail's one request to all its
+    # recipients can take minutes: wait in proportion, rather than Net::HTTP's default 60 s, but within
+    # Delayed::Worker.max_run_time
     conn = Faraday.new(url: ENV['SIGNAL_API_URL']) do |f|
       f.request :json
       f.response :json
+      f.options.open_timeout = 10
+      f.options.timeout = signal_send_timeout(recipients.count)
       f.adapter Faraday.default_adapter
     end
 
@@ -35,6 +40,10 @@ module SignalMessaging
       }
     end
   rescue StandardError => e
-    ErrorReporting.capture_exception(e)
+    ErrorReporting.capture_exception(e, context: { recipients: recipients&.count })
+  end
+
+  def signal_send_timeout(recipient_count)
+    (60 + (recipient_count * 5)).clamp(60, 10.minutes.to_i)
   end
 end
