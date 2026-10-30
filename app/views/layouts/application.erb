@@ -45,9 +45,9 @@
             if (sidebarScrollPosition) document.currentScript.previousElementSibling.scrollTop = parseInt(sidebarScrollPosition)
           } catch {}
         </script>
-        <a onclick="$.post('/sidebar', {minified: $('#page-container').hasClass('page-sidebar-minified') ? false : true});
+        <button type="button" aria-label="Collapse or expand the sidebar" onclick="$.post('/sidebar', {minified: $('#page-container').hasClass('page-sidebar-minified') ? false : true});
             $('#sidebar ul.nav li a[data-bs-toggle=tooltip]').tooltip($('#page-container').hasClass('page-sidebar-minified') ? 'disable' : 'enable')
-           " href="#" class="sidebar-minify-btn" data-click="sidebar-minify"><i class="bi bi-arrow-left"></i></a>
+           " class="sidebar-minify-btn" data-click="sidebar-minify"><i class="bi bi-arrow-left"></i></button>
       </div>
       <!-- END #sidebar -->
       <div id="content" class="content">

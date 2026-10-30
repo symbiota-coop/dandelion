@@ -460,7 +460,8 @@ class LintTest < Minitest::Test
       '<iframe src="/x"></iframe>' => 'html-iframe-has-title',
       '<h3></h3>' => 'html-no-empty-headings',
       '<input type="text" aria-hidden="true">' => 'html-no-aria-hidden-on-focusable',
-      '<% x = 1 %>' => 'erb-no-unused-local-variable'
+      '<% x = 1 %>' => 'erb-no-unused-local-variable',
+      "<% if x %>\n<% else %>\n  <p>a</p>\n<% end %>" => 'erb-no-empty-control-flow'
     }
     good = <<~ERB
       <% @events.each { |event| %>
