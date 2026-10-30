@@ -10,9 +10,4 @@ Dandelion::App.controller do
     @daily_path = "/daily/#{@location.name}"
     daily
   end
-
-  # Where location editions were first
-  get '/locations/:name/daily' do
-    redirect "/daily/#{ERB::Util.url_encode(params[:name])}#{"?date=#{ERB::Util.url_encode(params[:date])}" if params[:date]}", 301
-  end
 end
