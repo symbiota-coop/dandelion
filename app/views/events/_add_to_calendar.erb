@@ -15,11 +15,13 @@ end
   end_time = addable.end_time.utc.iso8601.gsub('-', '').gsub(':', '')
   %>
 
-  <a target="_blank" href="https://www.google.com/calendar/render?action=TEMPLATE&text=<%= ERB::Util.url_encode(name) %>&details=<%= ERB::Util.url_encode(details) %>&location=<%= ERB::Util.url_encode(location) %>&dates=<%= ERB::Util.url_encode("#{start_time}/#{end_time}") %>">
-    <%= defined?(add_to) ? 'Add to Google Calendar' : 'Google' %>
+  <%# dropdown: true gives the links as a dropdown menu's items %>
+  <% item_class = 'dropdown-item' if defined?(dropdown) %>
+  <a class="<%= item_class %>" target="_blank" href="https://www.google.com/calendar/render?action=TEMPLATE&text=<%= ERB::Util.url_encode(name) %>&details=<%= ERB::Util.url_encode(details) %>&location=<%= ERB::Util.url_encode(location) %>&dates=<%= ERB::Util.url_encode("#{start_time}/#{end_time}") %>">
+    <%= defined?(add_to) || item_class ? 'Add to Google Calendar' : 'Google' %>
   </a>
-  &middot;
-  <a target="_blank" href="/<%= addable.class.name.underscore.pluralize %>/<%= addable.id %>.ics">
-    <%= defined?(add_to) ? 'Add as ICS' : 'ICS' %>
+  <% unless item_class %>&middot;<% end %>
+  <a class="<%= item_class %>" target="_blank" href="/<%= addable.class.name.underscore.pluralize %>/<%= addable.id %>.ics">
+    <%= defined?(add_to) || item_class ? 'Add as ICS' : 'ICS' %>
   </a>
 <% end %>

@@ -1,28 +1,16 @@
-<script>
-  $(function() {
-    $('#event-sessions').hover(
-      function() {
-        if (!$(this).find('#add-event-session').next('div').is(':visible')) {
-          $(this).find('.add-to-calendar').show();
-        }
-      },
-      function() {
-        if (!$(this).find('#add-event-session').next('div').is(':visible')) {
-          $(this).find('.add-to-calendar').hide();
-        }
-      }
-    );
-  });
-</script>
-
 <ul class="icon-list mb-0" id="event-sessions">
   <% event_sessions.each_with_index { |event_session,i| %>
   <li <% if i > 2 %> style="display:none" <% end %>>
     <i data-bs-toggle="tooltip" title="Session <%= i+1 %>" class="bi bi-clock"></i>
     <%= when_details(event_session, with_zone: false) %>
-    <span class="add-to-calendar small" style="display: none">
-      <%= partial :'events/add_to_calendar', locals: { event_session: event_session } %>
-    </span>
+    <% if event_session.start_time && event_session.end_time %>
+      <span class="dropdown d-inline-block ms-1">
+        <a href="javascript:;" class="subtle" data-bs-toggle="dropdown" aria-label="Add session <%= i + 1 %> to calendar"><i class="bi bi-calendar-plus"></i></a>
+        <div class="dropdown-menu">
+          <%= partial :'events/add_to_calendar', locals: { event_session: event_session, dropdown: true } %>
+        </div>
+      </span>
+    <% end %>
   </li>
   <% if i == 2 && event_sessions.count > 3 %>
     <li>
@@ -34,8 +22,7 @@
   <% if add_and_remove %>
     <li>
       <i class="bi bi-clock"></i>
-      <a data-bs-toggle="tooltip" title="Add a session" id="add-event-session" href="javascript:;" onclick="$(this).hide().next().show();
-        $('#remove-event-session').hide(); $('#event-sessions .add-to-calendar').hide()"><i class="bi bi-plus-square-fill"></i></a>
+      <a data-bs-toggle="tooltip" title="Add a session" id="add-event-session" href="javascript:;" onclick="$(this).hide().next().show(); $('#remove-event-session').hide()"><i class="bi bi-plus-square-fill"></i></a>
       <div style="display: none;">
         <% form_for new_object, new_url, class: 'bg-white shadow-sm p-3 mb-3 rounded', style: 'position: relative; top: 0.5rem' do |f| %>
           <%= f.datetime_block :start_time, data: { 'flatpickr-min-date': @event.start_time.to_fs(:db_local), 'flatpickr-max-date': @event.end_time.to_fs(:db_local), 'flatpickr-linked-end': '#event_session_end_time' } %>
@@ -44,8 +31,7 @@
         <% end %>
       </div>
       <% if event_sessions.exists? %>
-        <a data-bs-toggle="tooltip" title="Remove a session" id="remove-event-session" href="javascript:;" onclick="$(this).hide().next().show();
-        $('#add-event-session').hide(); $('#event-sessions .add-to-calendar').hide()"><i class="bi bi-dash-square-fill"></i></a>
+        <a data-bs-toggle="tooltip" title="Remove a session" id="remove-event-session" href="javascript:;" onclick="$(this).hide().next().show(); $('#add-event-session').hide()"><i class="bi bi-dash-square-fill"></i></a>
         <div style="display: none">
           <% form_tag destroy_url, class: 'bg-white shadow-sm p-3 mb-3 rounded', style: 'position: relative; top: 0.5rem' do |f| %>
             <%= select_tag :event_session_id, options: event_sessions.map { |event_session| [when_details(event_session, with_zone: false), event_session.id] }, class: 'form-select mb-1' %>
