@@ -1,4 +1,4 @@
-STRIPE_CONNECT_OAUTH_STATE_PURPOSE = 'stripe_connect'
+STRIPE_CONNECT_OAUTH_STATE_PURPOSE = 'stripe_connect'.freeze
 STRIPE_CONNECT_OAUTH_STATE_EXPIRES_IN = 15.minutes
 
 Dandelion::App.helpers do

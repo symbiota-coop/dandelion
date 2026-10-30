@@ -8,7 +8,7 @@ module Asn
     { window_length: 3, listed_from: 0.75, threshold: 1.5 }
   ].freeze
   MAX_WINDOW_LENGTH = DETECTION_CONFIGS.map { |c| c[:window_length] }.max
-  TIMEZONE = 'Europe/Stockholm'
+  TIMEZONE = 'Europe/Stockholm'.freeze
 
   # Big residential ISPs run 10-20% bot, so a surge from one never blocks it
   AUTOBLOCK_BOT_PCT_FLOOR = 20

@@ -3,9 +3,9 @@ PADRINO_ROOT = File.expand_path('..', __dir__) unless defined?(PADRINO_ROOT)
 EMAIL_REGEX = /\A[^@\s]+@[^@\s]+\.[^@\s]+\z/
 MAP_POINTS_LIMIT = 1000
 # The default theme colour, Dandelion's green (--color-green-500 in app.css)
-DEFAULT_THEME_COLOR = '#00af5e'
-CACHEBUST_DIGESTS = {}
-LIBRARY_CACHE = {}
+DEFAULT_THEME_COLOR = '#00af5e'.freeze
+CACHEBUST_DIGESTS = {} # rubocop:disable Style/MutableConstant -- a per-process cache, filled as it goes; a race only works a value out twice
+LIBRARY_CACHE = {} # rubocop:disable Style/MutableConstant -- a per-process cache, filled as it goes; a race only works a value out twice
 ADJECTIVES = %w[soulful regenerative metamodern participatory conscious transformative holistic ethical].freeze
 
 # Each test run gets its own database, which test_config.rb drops afterwards, and a free port, so runs at the

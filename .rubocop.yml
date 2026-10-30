@@ -1,5 +1,6 @@
 # Only cops that can fail CI (warning or above, as CI runs RuboCop with --fail-level warning): Lint, Security, ours and
-# the three warning-level Layout cops. Convention cops (Style, Layout, Naming) are off, so plain `rubocop` reports what CI does.
+# the three warning-level Layout cops, and the Style cops raised to warning below. Other convention cops (Style, Layout,
+# Naming) are off, so plain `rubocop` reports what CI does.
 # .erb_lint.yml inherits this file for the Ruby in templates.
 
 # Our own cops (.rubocop/dandelion), which check rules from AGENTS.md
@@ -27,6 +28,12 @@ Layout/EndAlignment:
 
 # Eval, YAML.load, Marshal.load, Kernel#open... are convention-level by default; warning, so they fail CI
 Security:
+  Severity: warning
+
+# Convention cops that catch bugs, raised to warning so they fail CI
+# Puma runs threads, so a constant that changes is state shared across requests
+Style/MutableConstant:
+  Enabled: true
   Severity: warning
 
 # Our tests save screenshots on purpose (each test's last page, in capybara/<pid>/, and the how-to videos' frames), so

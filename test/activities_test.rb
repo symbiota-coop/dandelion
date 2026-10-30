@@ -3,7 +3,7 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 class ActivitiesTest < ActiveSupport::TestCase
   include Capybara::DSL
 
-  APPLICATION_QUESTIONS = "q1\nq2\nq3"
+  APPLICATION_QUESTIONS = "q1\nq2\nq3".freeze
 
   def fill_application_answers
     question_count = APPLICATION_QUESTIONS.split("\n").length

@@ -86,7 +86,7 @@ end
 
 unless defined?(SentryMongoCommandSubscriber)
   class SentryMongoCommandSubscriber
-    SPAN_ORIGIN = 'auto.db.mongo'
+    SPAN_ORIGIN = 'auto.db.mongo'.freeze
 
     def initialize
       @spans = {}

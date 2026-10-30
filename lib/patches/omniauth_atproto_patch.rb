@@ -1,7 +1,7 @@
 # Custom setup proc for omniauth-atproto that supports GET requests
 # The original gem only checks rack.request.form_hash (POST), this adds query string parsing
 module AtprotoSetup
-  SESSION_DID_KEY = 'atproto_did'
+  SESSION_DID_KEY = 'atproto_did'.freeze
 
   def self.setup_proc
     lambda do |env|

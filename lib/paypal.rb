@@ -1,6 +1,6 @@
 class Paypal
-  LIVE_HOST = 'https://api-m.paypal.com'
-  SANDBOX_HOST = 'https://api-m.sandbox.paypal.com'
+  LIVE_HOST = 'https://api-m.paypal.com'.freeze
+  SANDBOX_HOST = 'https://api-m.sandbox.paypal.com'.freeze
   TOKEN_EXPIRY_SKEW = 60
   WEBHOOK_EVENT_TYPES = %w[CHECKOUT.ORDER.APPROVED PAYMENT.CAPTURE.COMPLETED].freeze
 

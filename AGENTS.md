@@ -43,6 +43,10 @@ Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Rub
 - `Dandelion/CapybaraCurrentPath`: Check the page's path with `assert page.has_current_path?(...)` (with `ignore_query: true` to compare the path alone, or `url: true` for the whole URL), which waits for the page: `current_path` and `current_url` don't, so straight after a click they can still be the old page's. It checks `test`
 - `Dandelion/CapybaraRefuteHas`: To check something isn't on the page, use `assert page.has_no_css?` (`has_no_content?`, `has_no_link?`, `has_no_title?`...), never `refute page.has_css?`: the `has_` form waits the full 10 s `default_max_wait_time` for it to appear before passing
 
+CI fails on warnings and above (`--fail-level warning`), so convention cops are off, apart from these, which catch bugs and `.rubocop.yml` raises to warning (in templates too):
+
+- `Style/MutableConstant`: Freeze constants, as Puma's threads share them. A per-process cache filled as it goes disables it, saying so
+
 ### erb_lint
 
 Our linters, `DesignClasses`, `JqueryRequests` and `CdnTags`, are in `.erb_linters/`. Disable one on a line with `<%# erb_lint:disable DesignClasses: reason %>`. Their checks on JavaScript calls (`addClass('d-none')`, `fetch`) cover only the JavaScript in a template's Ruby (`onclick: '...'` options), as ESLint checks the template's own scripts and event attributes. Their checks on class names and attributes run on the whole template, so an HTML string in a script can get the same message from both

@@ -57,7 +57,7 @@ class Trace
     )
   end
 
-  COMMIT_TIMES = {}
+  COMMIT_TIMES = {} # rubocop:disable Style/MutableConstant -- a per-process cache, filled as it goes; a race only works a value out twice
 
   # When a commit was made: from the local git history if the deploy has it, otherwise from GitHub.
   # Looked up once per process, as a commit's time never changes

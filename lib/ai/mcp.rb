@@ -24,7 +24,7 @@ module Dandelion
       }
     }.freeze
 
-    AUTH_REQUIRED_MESSAGE = 'Authentication required. Provide your API key as a Bearer token.'
+    AUTH_REQUIRED_MESSAGE = 'Authentication required. Provide your API key as a Bearer token.'.freeze
     BEARER_PATTERN = /\ABearer\s+(\S+)\z/i
 
     def self.config_for(model_class)

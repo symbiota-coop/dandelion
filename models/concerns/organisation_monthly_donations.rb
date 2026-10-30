@@ -1,7 +1,7 @@
 module OrganisationMonthlyDonations
   extend ActiveSupport::Concern
 
-  PATREON_API = 'https://www.patreon.com/api/oauth2'
+  PATREON_API = 'https://www.patreon.com/api/oauth2'.freeze
   # Pledge events that set what a patron pays. Charges (subscription) and cancellations (pledge_delete) don't
   PATREON_PLEDGE_EVENT_TYPES = %w[pledge_start pledge_upgrade pledge_downgrade].freeze
 
