@@ -279,7 +279,7 @@ You can also email ticket type waitlists via Dandelion by going to Mailer in the
 
 Dandelion does not take any money from ticket sales. Your chosen payment processor, however, likely charges a fee. Read more on:
 
-- [Stripe fees](https://stripe.com/gb/pricing) and [Stripe payout times](https://support.stripe.com/questions/common-questions-about-payout-schedules?locale=en-GB) (You may be able to change from weekly payouts to daily payouts [here](https://dashboard.stripe.com/settings/payouts))
+- [Stripe fees](https://stripe.com/gb/pricing) and [Stripe payout times](https://support.stripe.com/questions/common-questions-about-payout-schedules?locale=en-GB) (You may be able to [change from weekly to daily payouts in your Stripe dashboard](https://dashboard.stripe.com/settings/payouts))
 - [GoCardless fees](https://gocardless.com/pricing/)
 - [Mollie fees](https://www.mollie.com/pricing)
 - [PayPal fees](https://www.paypal.com/uk/business/paypal-business-fees)

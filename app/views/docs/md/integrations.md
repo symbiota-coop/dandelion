@@ -6,7 +6,7 @@ All access is read-only. Email addresses are included only when you are allowed 
 
 The [Dandelion Zapier integration](https://zapier.com/apps/dandelion/) lets you send Dandelion data to thousands of other apps.
 
-<a href="https://zapier.com/apps/dandelion/"><img src="/images/zapier.png" class="w-100"></a>
+<a href="https://zapier.com/apps/dandelion/"><img alt="Dandelion on Zapier" src="/images/zapier.png" class="w-100"></a>
 
 | Trigger | Description | Endpoint |
 |---------|-------------|----------|
