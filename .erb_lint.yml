@@ -51,6 +51,7 @@ linters:
       - Style/RescueModifier
       - Style/RescueStandardError
       - Style/MutableConstant
+      - Style/OpenStructUse
     rubocop_config:
       # The Ruby in each tag is checked with .rubocop.yml's settings for those cops, apart from the override below
       inherit_from:

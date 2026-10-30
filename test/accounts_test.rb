@@ -1,5 +1,4 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
-require 'ostruct'
 
 class AccountsTest < ActiveSupport::TestCase
   include Capybara::DSL
@@ -1516,6 +1515,7 @@ class AccountsTest < ActiveSupport::TestCase
     # Real connections (Mailgun uses Faraday too), with only posts to the verify URL intercepted
     verify_url = env['RECAPTCHA_VERIFY_URL']
     verify_calls = []
+    verify_response = api_object(body: { success: false }.to_json)
     faraday_new = Faraday.method(:new)
     stubbed_new = lambda do |*args, **kwargs, &block|
       connection = faraday_new.call(*args, **kwargs, &block)
@@ -1523,7 +1523,7 @@ class AccountsTest < ActiveSupport::TestCase
         return super(url, body, headers, &post_block) unless url == verify_url
 
         verify_calls << [url, body]
-        OpenStruct.new(body: { success: false }.to_json)
+        verify_response
       end
       connection
     end

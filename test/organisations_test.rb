@@ -1,5 +1,4 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
-require 'ostruct'
 
 class OrganisationsTest < ActiveSupport::TestCase
   include Capybara::DSL
@@ -512,7 +511,7 @@ class OrganisationsTest < ActiveSupport::TestCase
     captured = nil
     Stripe::Checkout::Session.stub :create, proc { |params, _opts|
       captured = params
-      OpenStruct.new(id: 'cs_setup')
+      api_object(id: 'cs_setup')
     } do
       header 'Accept', 'application/json'
       post "/organisations/#{@organisation.id}/stripe_setup"
@@ -527,7 +526,7 @@ class OrganisationsTest < ActiveSupport::TestCase
     other = FactoryBot.create(:organisation, account: @account)
     sign_in_with_rack(@account)
 
-    session = OpenStruct.new(mode: 'setup', client_reference_id: other.id.to_s, customer: 'cus_other')
+    session = api_object(mode: 'setup', client_reference_id: other.id.to_s, customer: 'cus_other')
     Stripe::Checkout::Session.stub :retrieve, session do
       get "/organisations/#{@organisation.id}/stripe_setup_complete", session_id: 'cs_other'
     end

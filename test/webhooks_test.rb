@@ -1,5 +1,4 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
-require 'ostruct'
 
 class WebhooksTest < ActiveSupport::TestCase
   include Rack::Test::Methods
@@ -35,12 +34,13 @@ class WebhooksTest < ActiveSupport::TestCase
       brq_params.merge!(opts[:params])
       billing_request
     end
+    billing_request_flow = api_object(authorisation_url: nil)
     billing_request_flows = Object.new
     billing_request_flows.define_singleton_method(:create) do |opts|
       flow_params.merge!(opts[:params])
-      OpenStruct.new
+      billing_request_flow
     end
-    client = OpenStruct.new(billing_requests: billing_requests, billing_request_flows: billing_request_flows)
+    client = api_object(billing_requests: billing_requests, billing_request_flows: billing_request_flows)
     [client, brq_params, flow_params]
   end
 
@@ -95,7 +95,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   def with_stubbed_stripe_session(session_id: 'cs_test', payment_intent: 'pi_test')
-    session = OpenStruct.new(id: session_id, payment_intent: payment_intent, url: 'https://checkout.stripe.com/test')
+    session = api_object(id: session_id, payment_intent: payment_intent, url: 'https://checkout.stripe.com/test')
     Stripe::Checkout::Session.stub :create, session do
       yield session
     end
@@ -224,7 +224,7 @@ class WebhooksTest < ActiveSupport::TestCase
   test 'instant bank pay checkout stores the payment request id' do
     create_instant_event
     order = create_incomplete_order(@event, value: 10)
-    billing_request = OpenStruct.new(id: 'BRQ123', links: OpenStruct.new(payment_request: 'PRQ123'))
+    billing_request = api_object(id: 'BRQ123', links: api_object(payment_request: 'PRQ123'))
     client, brq_params, flow_params = stub_billing_request_checkout(billing_request)
 
     GoCardlessPro::Client.stub :new, client do
@@ -295,11 +295,11 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   def stub_gocardless_schedule_client(mandate_id: 'MD123')
-    billing_request = OpenStruct.new(
+    billing_request = api_object(
       status: 'fulfilled',
-      links: OpenStruct.new(mandate_request_mandate: mandate_id)
+      links: api_object(mandate_request_mandate: mandate_id)
     )
-    schedule = OpenStruct.new(id: 'IS123')
+    schedule = api_object(id: 'IS123')
     billing_requests = Object.new
     billing_requests.define_singleton_method(:get) { |_id| billing_request }
     instalment_schedules = Object.new
@@ -308,7 +308,7 @@ class WebhooksTest < ActiveSupport::TestCase
       captured[:params] = opts[:params]
       schedule
     end
-    client = OpenStruct.new(
+    client = api_object(
       billing_requests: billing_requests,
       instalment_schedules: instalment_schedules
     )
@@ -316,10 +316,10 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   def billing_request_event(billing_request_id)
-    OpenStruct.new(
+    api_object(
       resource_type: 'billing_requests',
       action: 'fulfilled',
-      links: OpenStruct.new(billing_request: billing_request_id),
+      links: api_object(billing_request: billing_request_id),
       id: 'EV123'
     )
   end
@@ -338,7 +338,7 @@ class WebhooksTest < ActiveSupport::TestCase
   test 'instalment checkout stores the billing request id' do
     create_instalment_event(instalment_count: 4)
     order = create_incomplete_order(@event, value: 40)
-    billing_request = OpenStruct.new(id: 'BRQ123')
+    billing_request = api_object(id: 'BRQ123')
     client, brq_params, flow_params = stub_billing_request_checkout(billing_request)
 
     GoCardlessPro::Client.stub :new, client do

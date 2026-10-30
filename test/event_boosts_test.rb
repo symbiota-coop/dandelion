@@ -1,5 +1,4 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
-require 'ostruct'
 
 class EventBoostsTest < ActiveSupport::TestCase
   include Capybara::DSL
@@ -15,7 +14,7 @@ class EventBoostsTest < ActiveSupport::TestCase
     fill_in 'event_boost_hours', with: 1
     fill_in 'event_boost_hourly_amount', with: 10
 
-    stripe_session = OpenStruct.new(id: 'cs_complete_me', payment_intent: 'pi_test')
+    stripe_session = api_object(id: 'cs_complete_me', payment_intent: 'pi_test')
     Stripe::Checkout::Session.stub :create, stripe_session do
       page.execute_script(<<~JS)
         window.Stripe = function() { return { redirectToCheckout: function() { return Promise.resolve(); } }; };

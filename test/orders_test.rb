@@ -1,5 +1,4 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
-require 'ostruct'
 
 class OrdersTest < ActiveSupport::TestCase
   include Rack::Test::Methods
@@ -55,7 +54,7 @@ class OrdersTest < ActiveSupport::TestCase
 
   def with_stubbed_stripe_refunds
     refunds = []
-    payment_intent = OpenStruct.new(charges: [OpenStruct.new(id: 'ch_test')])
+    payment_intent = api_object(charges: [api_object(id: 'ch_test')])
     Stripe::PaymentIntent.stub :retrieve, payment_intent do
       Stripe::Refund.stub :create, proc { refunds << true } do
         yield refunds
@@ -417,7 +416,7 @@ class OrdersTest < ActiveSupport::TestCase
     @event.organisation.set(stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json)
     order = create_paid_order(@event)
     captured_opts = nil
-    payment_intent = OpenStruct.new(charges: [OpenStruct.new(id: 'ch_test')])
+    payment_intent = api_object(charges: [api_object(id: 'ch_test')])
     Stripe::PaymentIntent.stub :retrieve, payment_intent do
       Stripe::Refund.stub :create, proc { |_params, opts| captured_opts = opts } do
         order.destroy

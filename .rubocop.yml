@@ -47,6 +47,10 @@ Style/RescueStandardError:
 Style/MutableConstant:
   Enabled: true
   Severity: warning
+# ostruct isn't a default gem since Ruby 3.5, and OpenStruct answers nil to anything, so a stub hides what code reads
+Style/OpenStructUse:
+  Enabled: true
+  Severity: warning
 
 # Our tests save screenshots on purpose (each test's last page, in capybara/<pid>/, and the how-to videos' frames), so
 # save_screenshot isn't a debugging leftover; the rest of Capybara's list (save_and_open_page...) still is

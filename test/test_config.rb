@@ -146,5 +146,11 @@ module ActiveSupport
       assert_includes record.errors[:organisation], 'cannot be changed'
       assert_includes record.errors[:account], 'cannot be changed'
     end
+
+    # A stand-in for an API object (a Stripe session, a GoCardless billing request) that answers the attributes it's
+    # given and nothing else, so a test fails loudly if the code reads one it didn't set
+    def api_object(**attributes)
+      Struct.new(*attributes.keys).new(*attributes.values)
+    end
   end
 end

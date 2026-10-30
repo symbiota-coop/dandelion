@@ -49,6 +49,7 @@ CI fails on warnings and above (`--fail-level warning`), so convention cops are 
 - `Style/RescueModifier`: No `x rescue y`, which rescues every error: rescue the ones you expect in a `begin` block
 - `Style/RescueStandardError`: Name the errors you rescue (`rescue ArgumentError`), so a typo's `NoMethodError` isn't swallowed
 - `Style/MutableConstant`: Freeze constants, as Puma's threads share them. A per-process cache filled as it goes disables it, saying so
+- `Style/OpenStructUse`: No `OpenStruct` (`ostruct` isn't a default gem). A test's stand-in for an API object is `api_object(id: 'cs_test', url: ...)` (`test/test_config.rb`), which answers only what it's given
 
 ### erb_lint
 
