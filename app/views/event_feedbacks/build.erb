@@ -15,17 +15,17 @@
           <% elsif params[:token] %>
             <%= hidden_field_tag :token, value: params[:token] %>
           <% end %>
-          <%= f.hidden_field :rating %>
-
-          <div class="feedback-rating-panel text-center py-4 px-3 mb-4">
-            <label class="feedback-question-label d-block mb-1">Your star rating</label>
+          <%# A radio per star, visually hidden, so the rating can be chosen with a click, a tap or the keyboard (Tab, then the arrow keys) %>
+          <fieldset class="feedback-rating-panel text-center py-4 px-3 mb-4">
+            <legend class="feedback-question-label mb-1">Your star rating</legend>
             <p class="small text-body-secondary mb-3">Your star rating is always public and contributes towards the host's average.</p>
-            <div class="feedback-stars rate" role="radiogroup" aria-label="Star rating">
+            <div class="feedback-stars">
               <% 1.upto(5) do |i| %>
-                <i class="bi bi-star-fill" data-rating="<%= i %>" aria-label="<%= i %> out of 5 stars"></i>
+                <input type="radio" class="visually-hidden" name="event_feedback[rating]" id="event_feedback_rating_<%= i %>" value="<%= i %>" <%= "checked" if @event_feedback.rating == i %>>
+                <label for="event_feedback_rating_<%= i %>" class="bi bi-star-fill" data-rating="<%= i %>"><span class="visually-hidden"><%= i %> out of 5 stars</span></label>
               <% end %>
             </div>
-          </div>
+          </fieldset>
 
           <%= partial :'events/feedback_questions' %>
 
@@ -44,27 +44,29 @@
 
 <script>
   $(function() {
-    var $stars = $('.feedback-stars .bi-star-fill');
-    var $rating = $('input[name="event_feedback[rating]"]');
+    var $stars = $('.feedback-stars label');
+    var $radios = $('.feedback-stars input');
 
+    function chosenRating() {
+      return parseInt($radios.filter(':checked').val(), 10) || 0;
+    }
+
+    // Stars up to count are orange
     function paintStars(count) {
       $stars.each(function(i) {
         $(this).toggleClass('chosen', i < count);
       });
     }
 
-    $stars.hover(
-      function() { paintStars($(this).data('rating')); },
-      function() { paintStars(parseInt($rating.val(), 10) || 0); }
-    );
+    // Hovering previews a rating
+    $stars.on('mouseenter', function() { paintStars($(this).data('rating')); });
+    $stars.on('mouseleave', function() { paintStars(chosenRating()); });
 
-    $stars.click(function() {
-      $rating.val($(this).data('rating'));
-      paintStars($(this).data('rating'));
-    });
+    $radios.on('change', function() { paintStars(chosenRating()); });
+    paintStars(chosenRating());
 
-    $($rating[0].form).submit(function() {
-      if (!$rating.val()) {
+    $($radios[0].form).submit(function() {
+      if (!chosenRating()) {
         alert('Please provide a star rating');
         return false;
       }

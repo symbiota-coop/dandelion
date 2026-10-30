@@ -20,6 +20,12 @@
   transform: scale(1.1);
 }
 
+/* Each star is the label of a visually hidden radio, so it shows the radio's keyboard focus */
+.feedback-stars input:focus-visible + .bi-star-fill {
+  border-radius: var(--bs-border-radius);
+  box-shadow: var(--focus-ring);
+}
+
 .feedback-rating-panel {
   background: var(--bs-tertiary-bg);
   border-radius: var(--bs-border-radius-lg);

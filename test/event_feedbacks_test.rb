@@ -164,6 +164,64 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     assert_equal 4, @event.event_feedbacks.first.rating
   end
 
+  def visit_feedback_form
+    create_attended_event
+    sign_in(@attendee)
+    visit "/events/#{@event.id}/give_feedback"
+    assert page.has_css?('.feedback-stars label', count: 5)
+  end
+
+  def assert_rating(rating)
+    assert page.has_css?("#event_feedback_rating_#{rating}:checked", visible: :all)
+    assert page.has_css?('.feedback-stars label.chosen', count: rating)
+  end
+
+  # A tap as a touch screen sends it, through Chrome's touch emulation
+  def tap_on(node)
+    browser_page = page.driver.browser.page
+    page.scroll_to(node, align: :center)
+    rect = evaluate_script('arguments[0].getBoundingClientRect().toJSON()', node)
+    point = { x: rect['x'] + (rect['width'] / 2), y: rect['y'] + (rect['height'] / 2) }
+    browser_page.command('Emulation.setTouchEmulationEnabled', enabled: true, maxTouchPoints: 1)
+    browser_page.command('Input.dispatchTouchEvent', type: 'touchStart', touchPoints: [point])
+    browser_page.command('Input.dispatchTouchEvent', type: 'touchEnd', touchPoints: [])
+  ensure
+    browser_page&.command('Emulation.setTouchEmulationEnabled', enabled: false)
+  end
+
+  test 'an attendee can choose a star rating with the mouse and submit it' do
+    visit_feedback_form
+
+    find('label[for="event_feedback_rating_4"]').hover
+    assert page.has_css?('.feedback-stars label.chosen', count: 4)
+    find('label[for="event_feedback_rating_4"]').click
+    assert_rating(4)
+
+    click_button 'Submit feedback'
+    assert page.has_content?('Thanks for your feedback!')
+    assert_equal 4, @event.event_feedbacks.first.rating
+  end
+
+  test 'an attendee can choose a star rating with a tap' do
+    visit_feedback_form
+
+    tap_on(find('label[for="event_feedback_rating_2"]'))
+    assert_rating(2)
+  end
+
+  test 'an attendee can choose a star rating with the keyboard' do
+    visit_feedback_form
+
+    # Focus lands on the first star as Tab would (send_keys clicks the node first, and the radio is under its star)
+    execute_script("document.getElementById('event_feedback_rating_1').focus()")
+    keyboard = page.driver.browser.keyboard
+    keyboard.type(:space)
+    assert_rating(1)
+    keyboard.type(:right, :right)
+    assert_rating(3)
+    assert page.has_css?('#event_feedback_rating_3:focus', visible: :all)
+  end
+
   test 'a second live submission is rejected and not thanked' do
     create_attended_event
     create_feedback(account: @attendee, rating: 3)
