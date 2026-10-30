@@ -109,6 +109,26 @@
   }
 }
 
+/* A location edition's title, linking to the main Daily */
+.newspaper-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* The location editions out on the date, in place of the motto: this one in bold, the others linked, each kept on
+   one line */
+.newspaper-editions a {
+  color: var(--newspaper-ink);
+}
+
+.newspaper-editions :is(a, .newspaper-edition-current) {
+  white-space: nowrap;
+}
+
+.newspaper-edition-current {
+  font-weight: 700;
+}
+
 .newspaper-dateline-date {
   font-size: var(--font-size-md);
   white-space: nowrap;
@@ -314,6 +334,12 @@
   border-top: double 0.25rem var(--newspaper-ink);
   padding-top: var(--space-base);
   margin-bottom: 0;
+}
+
+/* A location edition's facilitator, on its own: centred, as wide as one of the main Daily's three */
+.newspaper-features > :only-child {
+  flex: 0 1 20rem;
+  margin-inline: auto;
 }
 
 /* Long stories (_daily.erb's script sets .newspaper-sidebar) run as one column. From lg they take the left two

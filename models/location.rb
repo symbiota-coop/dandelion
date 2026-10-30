@@ -20,16 +20,19 @@ class Location
     name == 'Online'
   end
 
-  # Upcoming public events here, as the location's page lists them
-  def events
-    events = Event.live.publicly_visible.browsable.future
+  # Public events here, past and future, or nil if its place can't be found
+  def area_events
+    events = Event.live.publicly_visible.browsable
     if online?
       events.online
     elsif (bounding_box = GeocodeBounds.for(query))
       events.and(coordinates: { '$geoWithin' => { '$box' => bounding_box } })
-    else
-      events
     end
+  end
+
+  # Upcoming public events here, as the location's page lists them
+  def events
+    (area_events || Event.live.publicly_visible.browsable).future
   end
 
   # The AI summary of the vibe of its events (markdown), made daily by late:errands. Keeps the last one if the model doesn't answer

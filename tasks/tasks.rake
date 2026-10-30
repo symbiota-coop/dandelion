@@ -50,6 +50,7 @@ namespace :late do
     Ticket.refresh_home_page_stats!
     puts 'generate Dandelion Daily'
     Daily.publish(Date.today)
+    Daily.locations.each { |location| Daily.publish(Date.today, location: location) }
     puts 'create organisation edges'
     OrganisationEdge.delete_all
     OrganisationEdge.create_all(Organisation.and(:followers_count.gte => 50))

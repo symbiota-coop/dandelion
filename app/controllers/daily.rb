@@ -1,21 +1,13 @@
 Dandelion::App.controller do
   get '/daily' do
-    # A date that won't parse (Date::Error, or ArgumentError when it's too long; TypeError for date[]=) gets the latest
-    @date = begin
-      Date.parse(params[:date]) if params[:date]
-    rescue ArgumentError, TypeError
-      nil
-    end || Daily.latest_date || Date.today
-    @edition = Daily.edition(@date)
-    unless @edition
-      # Past dates with no edition don't exist, so crawlers drop them; future ones will, so just keep them out of search
-      if @date < Date.today
-        status 404
-        @own_not_found_page = true
-      elsif @date > Date.today
-        response.headers['X-Robots-Tag'] = 'noindex'
-      end
-    end
-    erb :daily
+    @daily_path = '/daily'
+    daily
+  end
+
+  get '/locations/:name/daily' do
+    @location = Location.find_by(name: params[:name]) || not_found
+    @title = "#{@location.name} Daily"
+    @daily_path = "/locations/#{@location.name}/daily"
+    daily
   end
 end

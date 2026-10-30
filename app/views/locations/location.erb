@@ -6,6 +6,10 @@
   </div>
 <% end %>
 
+<% if Daily.latest_date(location: @location) %>
+  <a href="/locations/<%= @location.name %>/daily" class="btn btn-outline-primary mb-3"><i class="bi bi-newspaper"></i> Read the <%= @location.name %> Daily</a>
+<% end %>
+
 <% if @location.signal_group_link %>
   <a href="<%= @location.signal_group_link %>" target="_blank" class="btn btn-signal mb-3"><i class="bi bi-signal"></i> Join the Signal group</a>
 <% end %>
