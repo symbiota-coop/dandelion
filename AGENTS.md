@@ -94,7 +94,7 @@ Herb (https://herb-tools.dev) parses each template's HTML and ERB together, so i
 
 ### zizmor
 
-zizmor (https://docs.zizmor.sh) audits the GitHub Actions workflows and actions in `.github` for security problems, with its default audits, run by `uvx` (install uv if you don't have it). CI gives it a `GH_TOKEN`, so it also runs its online audits there; without one it runs offline. Ignore a finding on a line with `# zizmor: ignore[<audit>] -- reason`.
+zizmor (https://docs.zizmor.sh) audits the GitHub Actions workflows and actions in `.github` for security problems, with its default audits, run by `uvx` (install uv if you don't have it). In CI, which gives it a `GH_TOKEN`, it also runs its online audits; elsewhere `script/lint` runs it offline, as a token outside CI (cloud agents have one) may not reach GitHub's API. Ignore a finding on a line with `# zizmor: ignore[<audit>] -- reason`.
 
 - `unpinned-uses`: Actions are pinned to a commit, with its release as a comment: `uses: actions/checkout@<sha> # v4.4.0`, a release at least 7 days old (Dependencies). CI's online audits check the comment matches the commit
 - `artipacked`: Checkouts set `persist-credentials: false`, unless a later step pushes with git

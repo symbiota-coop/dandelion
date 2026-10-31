@@ -72,12 +72,12 @@ LINTERS = [
     node: true
   },
   {
-    # GitHub Actions workflows and actions. uvx runs this exact version, so none arrives unchosen; with GH_TOKEN set (as in
-    # CI) it runs its online audits too
+    # GitHub Actions workflows and actions. uvx runs this exact version, so none arrives unchosen. In CI, with its GH_TOKEN, it
+    # runs its online audits too; elsewhere offline, as a GH_TOKEN outside CI (cloud agents have one) may not reach the API
     name: 'zizmor',
     files: %r{\A\.github/(workflows|actions)/.+\.ya?ml\z},
     configs: %r{\A(\.github/)?zizmor\.ya?ml\z},
-    command: %w[uvx zizmor@1.31.1 --quiet --no-progress],
+    command: %w[uvx zizmor@1.31.1 --quiet --no-progress] + (ENV['GITHUB_ACTIONS'] ? [] : ['--offline']),
     all: ['.'],
     stdin: ->(_file) { ['-'] },
     uv: true
