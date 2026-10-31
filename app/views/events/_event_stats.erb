@@ -55,7 +55,7 @@
                 sum += f
               })
               if ($(this).is('[data-money]'))
-                $('tfoot th').eq(index).html('<%= money_symbol(organisation.currency) %>' + sum.toLocaleString());
+                $('tfoot th').eq(index).html(<%== money_symbol(organisation.currency).to_json %> + sum.toLocaleString());
               else
                 $('tfoot th').eq(index).html(sum);
             });

@@ -191,6 +191,19 @@ class LintTest < Minitest::Test
     ].each { |template| assert_empty erb_offenses(template).select { |linter, _| linter == 'CdnTags' }, template }
   end
 
+  # better_html found each script's content by ==, so a <script> the same as an earlier one went unchecked
+  def test_safe_erb_checks_every_script
+    {
+      "<script>a()</script>\n<script>var x = <%= x %></script>" => /to_json/,
+      "<script>a()</script>\n<script>\n<% if x %>a()<% end %>\n</script>" => /statement not allowed/
+    }.each do |template, message|
+      offenses = erb_offenses(template).select { |linter, _| linter == 'SafeErb' }
+      assert_equal 1, offenses.size, "SafeErb on #{template}: #{offenses.inspect}"
+      assert_match message, offenses.first.last
+    end
+    assert_empty erb_offenses("<script>a()</script>\n<script>var x = <%== x.to_json %></script>"), 'to_json in a second script'
+  end
+
   def test_rubocop_tags_checks_conditions
     {
       '<% if params[:q].present? %>x<% end %>' => ['Dandelion/ParamsBlank'],

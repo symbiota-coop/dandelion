@@ -108,7 +108,7 @@ if youngest && oldest %>
           data: {
             labels: ['Women', 'Men', 'Other'],
             datasets: [{
-            data: <%= [women, men, other] %>,
+            data: <%== [women, men, other].to_json %>,
             backgroundColor: <%== chart_colors(3).to_json %>.map(cssColor)
             }],
           },

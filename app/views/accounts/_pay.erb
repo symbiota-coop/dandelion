@@ -100,7 +100,7 @@
                 $('#pay-form button[data-payment-method-clicked] i').show()
                 $.post('/accounts/pay', $(this).serializeObject(), function (data) {
                   if (data['session_id']) {
-                    var stripe = Stripe('<%= ENV['STRIPE_PK'] %>');
+                    var stripe = Stripe(<%== ENV['STRIPE_PK'].to_json %>);
                     stripe.redirectToCheckout({sessionId: data['session_id']})
                   }
                 }).fail(function () {
