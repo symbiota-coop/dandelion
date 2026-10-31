@@ -11,9 +11,10 @@
                        'not_following'
                      end
      text = state_options[current_state]
+     noun = resource.class.name.underscore.humanize(capitalize: false)
      state_tooltips = {
-       'follow_without_subscribing' => 'You follow this but don\'t get its emails. Click to change',
-       'follow_and_subscribe' => 'You follow this and get its emails. Click to change'
+       'follow_without_subscribing' => "You follow this #{noun} but don't get its emails. Click to change",
+       'follow_and_subscribe' => "You follow this #{noun} and get its emails. Click to change"
      }
      action_options = {
        'not_following' => 'Unfollow',
@@ -24,7 +25,7 @@
      action_options.delete('not_following') if resourceship && resourceship.admin? %>
   <% if resourceship || !resource.respond_to?(:privacy) || resource.privacy == 'open' %>
     <% if current_state == 'not_following' %>
-      <a class="pagelet-trigger btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" data-method="post" href="<%= resource_path %>/<%= resourceship_name %>?f=follow_and_subscribe" data-bs-toggle="tooltip" title="Follow this and get its emails">Follow</a>
+      <a class="pagelet-trigger btn btn-outline-primary <%= btn_class if defined?(btn_class) %>" data-method="post" href="<%= resource_path %>/<%= resourceship_name %>?f=follow_and_subscribe" data-bs-toggle="tooltip" title="Follow this <%= noun %> and get its emails">Follow</a>
     <% else %>
       <div class="dropdown d-inline-block" data-bs-toggle="tooltip" title="<%= state_tooltips[current_state] %>">
         <button class="btn mb-1 <%= btn_class if defined?(btn_class) %> <%= current_state == 'not_following' ? 'btn-outline-primary' : 'btn-primary' %> dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -47,9 +48,9 @@
 
       <% if defined?(membership_toggle) && membership_toggle %>
         <% if !resourceship.hide_membership? %>
-          <a class="btn mb-1 btn-primary" data-method="post" href="<%= resource_path %>/hide_membership" data-bs-toggle="tooltip" title="This shows on your public profile. Click to hide it">Showing on your profile</a>
+          <a class="btn mb-1 btn-primary" data-method="post" href="<%= resource_path %>/hide_membership" data-bs-toggle="tooltip" title="This <%= noun %> shows on your public profile. Click to hide it">Showing on your profile</a>
         <% else %>
-          <a class="btn mb-1 btn-outline-primary" data-method="post" href="<%= resource_path %>/show_membership" data-bs-toggle="tooltip" title="This doesn't show on your public profile. Click to show it">Not showing on your profile</a>
+          <a class="btn mb-1 btn-outline-primary" data-method="post" href="<%= resource_path %>/show_membership" data-bs-toggle="tooltip" title="This <%= noun %> doesn't show on your public profile. Click to show it">Not showing on your profile</a>
         <% end %>
       <% end %>
 

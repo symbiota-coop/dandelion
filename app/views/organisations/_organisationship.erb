@@ -12,8 +12,8 @@
                      end
      text = state_options[current_state]
      state_tooltips = {
-       'follow_without_subscribing' => 'You follow this but don\'t get its emails. Click to change',
-       'follow_and_subscribe' => 'You follow this and get its emails. Click to change'
+       'follow_without_subscribing' => 'You follow this organisation but don\'t get its emails. Click to change',
+       'follow_and_subscribe' => 'You follow this organisation and get its emails. Click to change'
      }
      action_options = {
        'not_following' => 'Unfollow',
@@ -23,7 +23,7 @@
 
      action_options.delete('not_following') if organisationship && (organisationship.admin? || organisationship.monthly_donor?) %>
   <% if current_state == 'not_following' %>
-    <a class="pagelet-trigger btn mb-1 btn-outline-primary <%= btn_class if defined?(btn_class) %>" data-method="post" href="/o/<%= organisation.slug %>/organisationship?f=follow_and_subscribe" data-bs-toggle="tooltip" title="Follow this and get its emails">Follow</a>
+    <a class="pagelet-trigger btn mb-1 btn-outline-primary <%= btn_class if defined?(btn_class) %>" data-method="post" href="/o/<%= organisation.slug %>/organisationship?f=follow_and_subscribe" data-bs-toggle="tooltip" title="Follow this organisation and get its emails">Follow</a>
 
     <% if defined?(create_event) && create_event %>
       <% if @organisation.allow_event_submissions %>
@@ -53,9 +53,9 @@
 
     <% if defined?(membership_toggle) && membership_toggle %>
       <% if !organisationship.hide_membership? %>
-        <a class="btn mb-1 btn-primary" data-method="post" href="/o/<%= organisation.slug %>/show_membership/0" data-bs-toggle="tooltip" title="This shows on your public profile. Click to hide it">Showing on your profile</a>
+        <a class="btn mb-1 btn-primary" data-method="post" href="/o/<%= organisation.slug %>/show_membership/0" data-bs-toggle="tooltip" title="This organisation shows on your public profile. Click to hide it">Showing on your profile</a>
       <% else %>
-        <a class="btn mb-1 btn-outline-primary" data-method="post" href="/o/<%= organisation.slug %>/show_membership/1" data-bs-toggle="tooltip" title="This doesn't show on your public profile. Click to show it">Not showing on your profile</a>
+        <a class="btn mb-1 btn-outline-primary" data-method="post" href="/o/<%= organisation.slug %>/show_membership/1" data-bs-toggle="tooltip" title="This organisation doesn't show on your public profile. Click to show it">Not showing on your profile</a>
       <% end %>
     <% end %>
 
