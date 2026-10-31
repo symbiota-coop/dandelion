@@ -76,7 +76,7 @@ module EventFields
     field :profit_share_to_social_media, type: Integer
     field :stripe_revenue_adjustment, type: Float
 
-    %w[no_discounts hide_deleted_filters hide_attendees hide_discussion monthly_donors_only locked secret show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description trending hide_from_carousels no_tickets_pdf send_ticketholder_confirmation enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets ai_tagged sold_out_cache sold_out_due_to_sales_end_cache has_organisation minimal_only direct_charges no_sales_after_end_time always_show_full_ticket_form show_after_start_time has_recording hide_waitlist allow_ticket_type_waitlists evergreen terms_and_conditions_check_box].each do |b|
+    %w[no_discounts hide_deleted_filters hide_discussion monthly_donors_only locked secret show_emails featured opt_in_organisation opt_in_facilitator hide_few_left hide_organisation_footer ask_hear_about send_order_notifications raw_description trending hide_from_carousels no_tickets_pdf send_ticketholder_confirmation enable_resales donations_to_organisation browsable hide_unavailable_tickets hidden_from_homepage blank_price_for_free_tickets ai_tagged sold_out_cache sold_out_due_to_sales_end_cache has_organisation minimal_only direct_charges no_sales_after_end_time always_show_full_ticket_form show_after_start_time has_recording hide_waitlist allow_ticket_type_waitlists evergreen terms_and_conditions_check_box].each do |b|
       field b.to_sym, type: Mongoid::Boolean
     end
 
@@ -193,7 +193,6 @@ module EventFields
         featured: "Feature the event in a carousel on the organisation's events page",
         secret: 'Hide the event from all public listings',
         locked: 'Make the event visible to admins only',
-        hide_attendees: 'Hide the public list of attendees (in any case, individuals must opt in)',
         hide_discussion: 'Hide the private discussion for attendees and facilitators',
         hide_from_carousels: 'Hide the event from carousels',
         show_emails: 'Allow all event admins to view attendee emails (by default, only organisation admins and event managers see them)',

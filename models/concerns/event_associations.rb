@@ -65,8 +65,6 @@ module EventAssociations
       has_many_through :waiters, through: :waitships
       has_many_through :event_facilitators, through: :event_facilitations
       has_many_through :attendees, through: :tickets, conditions: { payment_completed: true }
-      has_many_through :public_attendees, through: :tickets, conditions: { payment_completed: true, show_attendance: true }
-      has_many_through :private_attendees, through: :tickets, conditions: { payment_completed: true, show_attendance: false }
     end
   end
 

@@ -318,26 +318,6 @@ Dandelion::App.controller do
     end
   end
 
-  get '/events/:id/attendees' do
-    @event = Event.find(params[:id]) || not_found
-    not_found if @event.hide_attendees? && !event_admin?
-    partial :'events/attendees'
-  end
-
-  post '/events/:id/hide_attendance' do
-    sign_in_required!
-    @event = Event.find(params[:id]) || not_found
-    @event.tickets.complete.and(account: current_account).update_all(show_attendance: nil)
-    200
-  end
-
-  post '/events/:id/show_attendance' do
-    sign_in_required!
-    @event = Event.find(params[:id]) || not_found
-    @event.tickets.complete.and(account: current_account).update_all(show_attendance: true)
-    200
-  end
-
   # Email notifications for the discussion, before anyone has written in it: makes its post to subscribe to
   post '/events/:id/subscribe_discussion' do
     sign_in_required!
