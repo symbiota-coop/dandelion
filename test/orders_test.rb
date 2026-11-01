@@ -509,7 +509,8 @@ class OrdersTest < ActiveSupport::TestCase
     # Each table loads its page of records once, not again for each map, each and pagination_details
     assert_operator tickets_before[:tickets], :<=, 2
     orders_before = counts.call("/e/#{@event.slug}/orders")
-    assert_operator orders_before[:orders], :<=, 3
+    # The table's page, its accounts and booking questions, and the stats row's check for incomplete orders
+    assert_operator orders_before[:orders], :<=, 4
     get "/e/#{@event.slug}/tickets"
     attendees.each { |attendee| assert_includes last_response.body, attendee.name }
     assert_includes last_response.body, 'Displaying <b>all 2</b> tickets'
