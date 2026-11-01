@@ -85,6 +85,9 @@ module ImageWithValidation
 
     image_derivative_sizes.each { |size| image.thumb(size).url }
     image.encode('jpg', '-quality 90').thumb('1200x630').url if warm_opengraph_image_derivative?
+  rescue Dragonfly::Job::Fetch::NotFound
+    # The image was replaced or removed after this job was queued, deleting its original; the new image queues its own
+    nil
   rescue StandardError, Dragonfly::Shell::CommandFailed => e
     ErrorReporting.capture_exception(e, context: { model: self.class.name, id: id.to_s })
   end
