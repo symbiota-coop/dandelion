@@ -517,6 +517,21 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 0, @event.tickets.count
   end
 
+  test 'purchase is rejected, without reporting an error, when the ticket type is no longer on sale' do
+    create_event(prices: [0])
+    @event.ticket_types.first.set(sales_end: 1.day.ago)
+    buyer = FactoryBot.create(:account)
+
+    reported = []
+    ErrorReporting.stub(:capture_exception, ->(e, **) { reported << e }) do
+      post_purchase(@event, buyer)
+    end
+
+    assert_equal 400, last_response.status
+    assert_empty reported
+    assert_equal 0, @event.orders.count
+  end
+
   test 'purchase is allowed up to max_quantity_per_transaction' do
     create_event(prices: [0])
     @event.ticket_types.first.set(quantity: 10, max_quantity_per_transaction: 2)

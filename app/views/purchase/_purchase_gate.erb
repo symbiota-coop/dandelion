@@ -1,4 +1,5 @@
-<% if @event.monthly_donors_only && !monthly_donor_for_event? %>
+<% restriction = @event.booking_restriction(current_account) { event_admin? } %>
+<% if restriction == :monthly_donors_only %>
   <div class="card">
     <h3 class="card-header text-bg-primary"><%= @event.select_tickets_title || 'Select tickets' %></h3>
     <div class="card-body">
@@ -16,7 +17,7 @@
       </p>
     </div>
   </div>
-<% elsif @event.activity && @event.activity.privacy != 'open' && !activity_member_for_event? %>
+<% elsif restriction == :members_only %>
   <div class="card">
     <h3 class="card-header text-bg-primary"><%= @event.select_tickets_title || 'Select tickets' %></h3>
     <div class="card-body">

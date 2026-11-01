@@ -2,8 +2,8 @@
 # steps behind the checkout form (POST /e/:slug/purchase), taking plain
 # values so other callers, like agents, can book the same way.
 #
-# The caller decides whether the buyer may book (can_purchase_event_tickets?).
-# Failures raise an OrderBuilder::Error, after destroying any order created.
+# It checks who may book (Event#booking_restriction, for the signed-in account)
+# and that each ticket type is still on sale. Failures raise an OrderBuilder::Error, after destroying any order created.
 class OrderBuilder
   class Error < StandardError
     def status
@@ -28,6 +28,14 @@ class OrderBuilder
   end
 
   class NotEnoughTickets < Error; end
+
+  class SalesEnded < Error; end
+
+  class NotAllowed < Error
+    def status
+      403
+    end
+  end
 
   class Duplicate < Error
     def status
@@ -71,6 +79,9 @@ class OrderBuilder
 
   # Returns what the payment method returns (JSON for the checkout form)
   def call
+    restriction = @event.booking_restriction(@signed_in_account)
+    raise NotAllowed, restriction.to_s if restriction
+
     find_or_create_account
     check_duplicate unless @confirmed_duplicate
     create_order
@@ -179,6 +190,11 @@ class OrderBuilder
       if !ticket_type || (ticket_type.hidden && @secret_ticket_type_id != ticket_type.public_id)
         @order.destroy
         raise TicketTypeNotFound
+      end
+      # Ticket's own validation also refuses these, but as an unexpected error
+      if ticket_type.sales_ended? || @event.sales_closed_due_to_event_end?
+        @order.destroy
+        raise SalesEnded
       end
       purchased[ticket_type.id] += quantity
       available[ticket_type.id] ||= ticket_type.number_of_tickets_available_in_single_purchase
