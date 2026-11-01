@@ -8,8 +8,10 @@ module EventValidation
   end
 
   included do
-    validates_presence_of :name, :currency, :slug
+    validates_presence_of :name, :currency
     validates_presence_of :start_time, :end_time, :location, unless: :evergreen?
+    # Every event has a slug: a blank one is generated before validation. No validates_presence_of, which would make the
+    # form require the field
     validates_uniqueness_of :slug
     validates_uniqueness_of :name, scope: [:start_time, :organisation_id], conditions: -> { self.and(deleted_at: nil) }, message: 'is invalid: an event with this title and start time already exists for this organisation', unless: -> { duplicate || evergreen? }
     validates_uniqueness_of :name, scope: [:organisation_id], conditions: -> { self.and(deleted_at: nil, evergreen: true) }, message: 'is invalid: an on-demand course with this title already exists for this organisation', if: -> { evergreen? && !duplicate }
