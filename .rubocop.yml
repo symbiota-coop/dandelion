@@ -109,6 +109,9 @@ Dandelion:
 Dandelion/RailsController:
   Include:
     - app/controllers/**/*.rb
+Dandelion/SlugLookup:
+  Include:
+    - app/controllers/**/*.rb
 Dandelion/CapybaraHasNoAfterClick:
   Include:
     - test/**/*.rb

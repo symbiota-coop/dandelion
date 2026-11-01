@@ -359,14 +359,14 @@ Dandelion::App.controller do
 
   # Account URLs named accounts by id before they used usernames: /accounts/:id/... is now /u/:username/...
   get '/accounts/:id' do
-    account = Account.find(params[:id]) || not_found
+    account = Account.find(params[:id]) || not_found # rubocop:disable Dandelion/SlugLookup -- redirects the old id URL
     redirect_to_slug_url "/accounts/#{params[:id]}", "/u/#{account.username}"
   end
 
   %i[get post].each do |verb|
     send(verb, '/accounts/:id/*') do
       pass unless BSON::ObjectId.legal?(params[:id]) # /accounts/privacyable/:p and the like
-      account = Account.find(params[:id]) || not_found
+      account = Account.find(params[:id]) || not_found # rubocop:disable Dandelion/SlugLookup -- redirects the old id URL
       redirect_to_slug_url "/accounts/#{params[:id]}", "/u/#{account.username}"
     end
   end

@@ -163,13 +163,13 @@ Dandelion::App.controller do
 
   # Event URLs named events by id before they used slugs: /events/:id/... is now /e/:slug/...
   get '/events/:id', provides: %i[html ics json] do
-    event = Event.without_heavy_fields.find(params[:id]) || not_found
+    event = Event.without_heavy_fields.find(params[:id]) || not_found # rubocop:disable Dandelion/SlugLookup -- redirects the old id URL
     redirect_to_slug_url "/events/#{params[:id]}", "/e/#{event.slug}"
   end
 
   %i[get post].each do |verb|
     send(verb, '/events/:id/*') do
-      event = Event.unscoped.find(params[:id]) || not_found
+      event = Event.unscoped.find(params[:id]) || not_found # rubocop:disable Dandelion/SlugLookup -- redirects the old id URL
       redirect_to_slug_url "/events/#{params[:id]}", "/e/#{event.slug}"
     end
   end

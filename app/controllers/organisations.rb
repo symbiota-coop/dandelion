@@ -27,7 +27,7 @@ Dandelion::App.controller do
   # Organisation URLs that named organisations by id: /organisations/:id/... is now /o/:slug/...
   %i[get post].each do |verb|
     send(verb, '/organisations/:id/*') do
-      organisation = Organisation.find(params[:id]) || not_found
+      organisation = Organisation.find(params[:id]) || not_found # rubocop:disable Dandelion/SlugLookup -- redirects the old id URL
       redirect_to_slug_url "/organisations/#{params[:id]}", "/o/#{organisation.slug}"
     end
   end

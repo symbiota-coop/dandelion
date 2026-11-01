@@ -175,7 +175,7 @@ You can also copy email addresses of attendees into your own email app from the 
 
 You have two options here:
 
-1. **Use a single event with multiple Ticket Groups:** Create a single event with the start date as the start date of the first event in the series and the end date as the end date of the last event in the series; then use Ticket Groups to list the different dates ([example here](/events/630e122b1fb42b0010b5d792)).
+1. **Use a single event with multiple Ticket Groups:** Create a single event with the start date as the start date of the first event in the series and the end date as the end date of the last event in the series; then use Ticket Groups to list the different dates ([example here](/e/spiritofthelibertycap)).
 <br /> 
 <br /> 
 Ticket groups are created on the Tickets tab when editing your event. To assign tickets to new ticket groups, save the event then return to the Tickets tab.

@@ -26,13 +26,13 @@ Dandelion::App.controller do
   # Local group URLs named local groups by id before they used slugs: /local_groups/:id/... is now
   # /o/:organisation_slug/lg/:slug/...
   get '/local_groups/:id' do
-    local_group = LocalGroup.find(params[:id]) || not_found
+    local_group = LocalGroup.find(params[:id]) || not_found # rubocop:disable Dandelion/SlugLookup -- redirects the old id URL
     redirect_to_slug_url "/local_groups/#{params[:id]}", local_group.path
   end
 
   %i[get post].each do |verb|
     send(verb, '/local_groups/:id/*') do
-      local_group = LocalGroup.find(params[:id]) || not_found
+      local_group = LocalGroup.find(params[:id]) || not_found # rubocop:disable Dandelion/SlugLookup -- redirects the old id URL
       redirect_to_slug_url "/local_groups/#{params[:id]}", local_group.path
     end
   end
