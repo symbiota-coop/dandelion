@@ -108,7 +108,8 @@
 
 <div class="row justify-content-between">
   <div class="col">
-    <span class="badge text-bg-primary"><%= pluralize @events.count, 'event' %></span>
+    <% events_count = @events.count %>
+    <span class="badge text-bg-primary"><%= pluralize events_count, 'event' %></span>
   </div>
   <div class="col-auto">
     <% if @organisation %>
@@ -117,4 +118,6 @@
   </div>
 </div>
 <%# The table loads in a request of its own (this page with table=1), so the page shows before its rows are worked out %>
-<div data-pagelet-url="<%= request.path %>?<%= request.query_string.empty? ? 'table=1' : "#{request.query_string}&table=1" %>"></div>
+<div data-with-placeholder data-pagelet-url="<%= request.path %>?<%= request.query_string.empty? ? 'table=1' : "#{request.query_string}&table=1" %>">
+  <%= partial :'events/event_stats_placeholder', locals: { rows: [events_count, 10].min } %>
+</div>
