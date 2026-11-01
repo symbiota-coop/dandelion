@@ -318,7 +318,7 @@ Dandelion::App.controller do
                elsif @activity
                  @activity.path
                elsif @local_group
-                 "/local_groups/#{@local_group.id}"
+                 @local_group.path
                elsif @event
                  "/e/#{@event.slug}"
                elsif @account.sign_ins_count == 1

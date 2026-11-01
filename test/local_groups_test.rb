@@ -19,7 +19,7 @@ class LocalGroupsTest < ActiveSupport::TestCase
     create_organisation
     local_group = FactoryBot.create(:local_group, organisation: @organisation)
     sign_in(@account)
-    visit "/local_groups/#{local_group.id}/edit"
+    visit "#{local_group.path}/edit"
     fill_in 'Name', with: (name = FactoryBot.build_stubbed(:local_group).name)
     click_button 'Update local group'
     assert page.has_content? 'The local group was saved'

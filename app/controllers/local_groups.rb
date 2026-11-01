@@ -16,27 +16,35 @@ Dandelion::App.controller do
     @local_group.account = current_account
     if @local_group.save
       flash[:notice] = 'The local group was created.'
-      redirect "/local_groups/#{@local_group.id}"
+      redirect @local_group.path
     else
       flash.now[:error] = 'There was an error saving the local group'
       erb :'local_groups/build'
     end
   end
 
+  # Local group URLs named local groups by id before they used slugs: /local_groups/:id/... is now
+  # /o/:organisation_slug/lg/:slug/...
   get '/local_groups/:id' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
-    redirect "/o/#{@local_group.organisation.slug}/lg/#{@local_group.slug}"
+    local_group = LocalGroup.find(params[:id]) || not_found
+    redirect_to_slug_url "/local_groups/#{params[:id]}", local_group.path
+  end
+
+  %i[get post].each do |verb|
+    send(verb, '/local_groups/:id/*') do
+      local_group = LocalGroup.find(params[:id]) || not_found
+      redirect_to_slug_url "/local_groups/#{params[:id]}", local_group.path
+    end
   end
 
   get '/o/:organisation_slug/lg/:slug', prerender: true do
-    organisation = Organisation.find_by_slug_or_id(slug: params[:organisation_slug]) || not_found
-    @local_group = organisation.local_groups.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @local_group = local_group_from_params || not_found
     @title = @local_group.name
     erb :'local_groups/local_group'
   end
 
-  get '/local_groups/:id/events/stats' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  get '/o/:organisation_slug/lg/:slug/events/stats' do
+    @local_group = local_group_from_params || not_found
     local_group_admins_only!
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
@@ -55,32 +63,32 @@ Dandelion::App.controller do
     event_stats_page(@local_group.organisation)
   end
 
-  get '/local_groups/:id/edit' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  get '/o/:organisation_slug/lg/:slug/edit' do
+    @local_group = local_group_from_params || not_found
     local_group_admins_only!
     erb :'local_groups/build'
   end
 
-  post '/local_groups/:id/edit' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  post '/o/:organisation_slug/lg/:slug/edit' do
+    @local_group = local_group_from_params || not_found
     local_group_admins_only!
     if @local_group.update_attributes(mass_assigning(params[:local_group], LocalGroup))
       flash[:notice] = 'The local group was saved.'
-      redirect "/local_groups/#{@local_group.id}"
+      redirect @local_group.path
     else
       flash.now[:error] = 'There was an error saving the local group'
       erb :'local_groups/build'
     end
   end
 
-  get '/local_groups/:id/stats' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  get '/o/:organisation_slug/lg/:slug/stats' do
+    @local_group = local_group_from_params || not_found
     local_group_admins_only!
     erb :'local_groups/stats'
   end
 
-  post '/local_groups/:id/add_follower' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  post '/o/:organisation_slug/lg/:slug/add_follower' do
+    @local_group = local_group_from_params || not_found
     local_group_admins_only!
 
     unless params[:email]
@@ -105,61 +113,61 @@ Dandelion::App.controller do
     redirect back
   end
 
-  post '/local_groups/:id/receive_feedback/:f' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  post '/o/:organisation_slug/lg/:slug/receive_feedback/:f' do
+    @local_group = local_group_from_params || not_found
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found
     @local_groupship.set(receive_feedback: params[:f].to_i == 1)
     redirect back
   end
 
-  post '/local_groups/:id/local_groupships/admin' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  post '/o/:organisation_slug/lg/:slug/local_groupships/admin' do
+    @local_group = local_group_from_params || not_found
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find_by(account_id: params[:local_groupship][:account_id]) || @local_group.local_groupships.create(account_id: params[:local_groupship][:account_id])
     @local_groupship.set(admin: true)
     redirect back
   end
 
-  post '/local_groups/:id/local_groupships/unadmin' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  post '/o/:organisation_slug/lg/:slug/local_groupships/unadmin' do
+    @local_group = local_group_from_params || not_found
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find_by(account_id: params[:account_id]) || not_found
     @local_groupship.set(admin: false)
     redirect back
   end
 
-  post '/local_groups/:id/destroy' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  post '/o/:organisation_slug/lg/:slug/destroy' do
+    @local_group = local_group_from_params || not_found
     local_group_admins_only!
     @local_group.destroy
     redirect "/o/#{@local_group.organisation.slug}/local_groups"
   end
 
-  get '/local_groups/:id/unsubscribe' do
+  get '/o/:organisation_slug/lg/:slug/unsubscribe' do
     sign_in_required!
-    @local_group = LocalGroup.find(params[:id]) || not_found
+    @local_group = local_group_from_params || not_found
     erb :'local_groups/unsubscribe'
   end
 
-  post '/local_groups/:id/unsubscribe' do
+  post '/o/:organisation_slug/lg/:slug/unsubscribe' do
     sign_in_required!
-    @local_group = LocalGroup.find(params[:id]) || not_found
+    @local_group = local_group_from_params || not_found
     @local_groupship = current_account.local_groupships.find_by(local_group: @local_group) || current_account.local_groupships.create(local_group: @local_group)
     @local_groupship.set(unsubscribed: true)
     flash[:notice] = "You were unsubscribed from #{@local_group.name}."
     redirect '/accounts/subscriptions'
   end
 
-  get '/local_groups/:id/local_groupship' do
+  get '/o/:organisation_slug/lg/:slug/local_groupship' do
     sign_in_required!
-    @local_group = LocalGroup.find(params[:id]) || not_found
-    request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @local_group, resourceship_name: 'local_groupship', resource_path: "/local_groups/#{@local_group.id}", membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }) : redirect("/local_groups/#{@local_group.id}")
+    @local_group = local_group_from_params || not_found
+    request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @local_group, resourceship_name: 'local_groupship', resource_path: @local_group.path, membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }) : redirect(@local_group.path)
   end
 
-  post '/local_groups/:id/local_groupship' do
+  post '/o/:organisation_slug/lg/:slug/local_groupship' do
     sign_in_required!
-    @local_group = LocalGroup.find(params[:id]) || not_found
+    @local_group = local_group_from_params || not_found
     case params[:f]
     when 'not_following'
       local_groupship = current_account.local_groupships.find_by(local_group: @local_group)
@@ -171,27 +179,27 @@ Dandelion::App.controller do
       local_groupship = current_account.local_groupships.find_by(local_group: @local_group) || current_account.local_groupships.create(local_group: @local_group)
       local_groupship.set(unsubscribed: false)
     end
-    request.xhr? ? 200 : redirect("/local_groups/#{@local_group.id}")
+    request.xhr? ? 200 : redirect(@local_group.path)
   end
 
-  post '/local_groups/:id/hide_membership' do
+  post '/o/:organisation_slug/lg/:slug/hide_membership' do
     sign_in_required!
-    @local_group = LocalGroup.find(params[:id]) || not_found
+    @local_group = local_group_from_params || not_found
     @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found
     @local_groupship.set(hide_membership: true)
     redirect back
   end
 
-  post '/local_groups/:id/show_membership' do
+  post '/o/:organisation_slug/lg/:slug/show_membership' do
     sign_in_required!
-    @local_group = LocalGroup.find(params[:id]) || not_found
+    @local_group = local_group_from_params || not_found
     @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found
     @local_groupship.set(hide_membership: false)
     redirect back
   end
 
-  get '/local_groups/:id/followers', provides: %i[html csv] do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  get '/o/:organisation_slug/lg/:slug/followers', provides: %i[html csv] do
+    @local_group = local_group_from_params || not_found
     local_group_admins_only!
     @local_groupships = @local_group.local_groupships.includes(:account).order('created_at desc')
     @local_groupships = @local_groupships.and(:account_id.in => Account.search(params[:q], child_scope: @local_groupships).pluck(:id)) if params[:q]
@@ -214,8 +222,8 @@ Dandelion::App.controller do
     end
   end
 
-  post '/local_groups/:id/followers' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  post '/o/:organisation_slug/lg/:slug/followers' do
+    @local_group = local_group_from_params || not_found
     local_group_admins_only!
     halt 400 unless params[:csv].is_a?(Tempfile)
     csv = ImportFromCsv.read(params[:csv])
@@ -225,7 +233,7 @@ Dandelion::App.controller do
       @local_group.import_from_csv(csv, :local_groupships)
       flash[:notice] = 'The followers will be added shortly. Refresh the page to check progress.'
     end
-    redirect "/local_groups/#{@local_group.id}/followers"
+    redirect "#{@local_group.path}/followers"
   end
 
   post '/local_groupships/:id/destroy' do
@@ -236,8 +244,8 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/local_groups/:id/pmails' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  get '/o/:organisation_slug/lg/:slug/pmails' do
+    @local_group = local_group_from_params || not_found
     @_organisation = @local_group.organisation
     local_group_admins_only!
     @pmails = @local_group.pmails_including_events.order('created_at desc').paginate(page: params[:page])
@@ -245,23 +253,23 @@ Dandelion::App.controller do
     erb :'pmails/pmails'
   end
 
-  get '/local_groups/:id/subscribed/:local_groupship_id' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  get '/o/:organisation_slug/lg/:slug/subscribed/:local_groupship_id' do
+    @local_group = local_group_from_params || not_found
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find(params[:local_groupship_id]) || not_found
     partial :'local_groups/subscribed', locals: { local_groupship: @local_groupship }
   end
 
-  post '/local_groups/:id/subscribed/:local_groupship_id' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  post '/o/:organisation_slug/lg/:slug/subscribed/:local_groupship_id' do
+    @local_group = local_group_from_params || not_found
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find(params[:local_groupship_id]) || not_found
     @local_groupship.set(unsubscribed: !params[:subscribed])
     200
   end
 
-  get '/local_groups/:id/discount_codes' do
-    @local_group = LocalGroup.find(params[:id]) || not_found
+  get '/o/:organisation_slug/lg/:slug/discount_codes' do
+    @local_group = local_group_from_params || not_found
     local_group_admins_only!
     @discount_codes = @local_group.discount_codes
     @scope = "local_group_id=#{@local_group.id}"

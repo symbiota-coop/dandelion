@@ -40,7 +40,7 @@
     <tr>
       <td>Local group</td>
       <td>
-        <a href="/o/<%= @event.local_group.organisation.slug %>/lg/<%= @event.local_group.slug %>"><%= @event.local_group.name %></a>
+        <a href="<%= @event.local_group.path %>"><%= @event.local_group.name %></a>
       </td>
     </tr>
   <% end %>

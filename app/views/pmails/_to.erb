@@ -13,7 +13,7 @@
   Activity tag:
   <span class="badge text-bg-primary mb-1"><%= pmail.mailable.name %></span>
 <% when 'local_group' %>
-  Local group: <a href="/o/<%= pmail.mailable.organisation.slug %>/lg/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
+  Local group: <a href="<%= pmail.mailable.path %>"><%= pmail.mailable.name %></a>
 <% when 'ticket_group' %>
   Ticket group <%= pmail.ticket_group ? pmail.ticket_group.name : '[deleted group]' %> for <a href="/e/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
 <% when 'ticket_type_waitlist' %>

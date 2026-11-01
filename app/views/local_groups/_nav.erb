@@ -6,14 +6,14 @@
     <%= partial :'organisations/nav', locals: { organisation: local_group.organisation, inline: true } %>
   <% end %>
   <%= dropdown_nav [
-        ['View local group', "/o/#{local_group.organisation.slug}/lg/#{local_group.slug}"],
-        ['Settings', "/local_groups/#{local_group.id}/edit"],
-        [%(Followers <span class="badge text-bg-primary">#{local_group.local_groupships.count}</span>), "/local_groups/#{local_group.id}/followers"],
-        ['Discount codes' + (local_group.discount_codes.count.positive? ? " <span class='badge text-bg-primary'>#{local_group.discount_codes.count}</span>" : ''), "/local_groups/#{local_group.id}/discount_codes"],
-        ['Event stats', "/local_groups/#{local_group.id}/events/stats"],
-        ['Audience stats', "/local_groups/#{local_group.id}/stats"],
-        ['Feedback', "/local_groups/#{local_group.id}/feedback"],
-        ['Mailer', "/local_groups/#{local_group.id}/pmails"]
+        ['View local group', local_group.path],
+        ['Settings', "#{local_group.path}/edit"],
+        [%(Followers <span class="badge text-bg-primary">#{local_group.local_groupships.count}</span>), "#{local_group.path}/followers"],
+        ['Discount codes' + (local_group.discount_codes.count.positive? ? " <span class='badge text-bg-primary'>#{local_group.discount_codes.count}</span>" : ''), "#{local_group.path}/discount_codes"],
+        ['Event stats', "#{local_group.path}/events/stats"],
+        ['Audience stats', "#{local_group.path}/stats"],
+        ['Feedback', "#{local_group.path}/feedback"],
+        ['Mailer', "#{local_group.path}/pmails"]
       ].compact, button_text: %(#{local_group.name}), container_class: "btn-group mb-1#{' nav-crumbs-sibling' if defined?(beside_activity) && beside_activity}" %>
   <% unless defined?(inline) %>
     <%== '</div>' %>

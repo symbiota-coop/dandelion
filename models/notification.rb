@@ -22,10 +22,8 @@ class Notification
       "#{ENV['BASE_URI']}/g/#{circle.slug}"
     when Account
       "#{ENV['BASE_URI']}/accounts/#{circle.id}"
-    when Activity
+    when Activity, LocalGroup
       "#{ENV['BASE_URI']}#{circle.path}"
-    when LocalGroup
-      "#{ENV['BASE_URI']}/local_groups/#{circle.id}"
     when Organisation
       "#{ENV['BASE_URI']}/o/#{circle.slug}"
     end

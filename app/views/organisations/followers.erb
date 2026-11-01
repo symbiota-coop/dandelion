@@ -85,7 +85,7 @@
       </td>
       <td>
         <% (local_groupships_by_account[account.id] || []).each { |local_groupship| %>
-        <a href="/o/<%= local_groupship.local_group.organisation.slug %>/lg/<%= local_groupship.local_group.slug %>" class="badge text-bg-primary"><%= local_groupship.local_group.name %></a>
+        <a href="<%= local_groupship.local_group.path %>" class="badge text-bg-primary"><%= local_groupship.local_group.name %></a>
         <% } %>
       </td>
       <td>

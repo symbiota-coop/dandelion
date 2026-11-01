@@ -102,7 +102,7 @@ Dandelion::App.helpers do
   end
 
   def local_group_admins_only!
-    kick!(redirect_url: "/local_groups/#{@local_group.id}") unless local_group_admin?
+    kick!(redirect_url: @local_group.path) unless local_group_admin?
   end
 
   def event_admin?(event = nil, account = current_account)

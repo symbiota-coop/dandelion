@@ -1,4 +1,4 @@
-<% form_tag "/local_groups/#{@local_group.id}/subscribed/#{local_groupship.id}" do %>
+<% form_tag "#{@local_group.path}/subscribed/#{local_groupship.id}" do %>
   <div class="form-check form-switch">
     <%= check_box_tag :subscribed, id: "local_groupship-subscribed-#{local_groupship.id}", class: 'form-check-input', 'aria-label': 'Subscribed', checked: !local_groupship.unsubscribed, onclick: '$(this.form).submit()' %>
   </div>

@@ -58,7 +58,7 @@ Dandelion::App.controller do
       elsif @activity
         redirect "#{@activity.path}/discount_codes"
       elsif @local_group
-        redirect "/local_groups/#{@local_group.id}/discount_codes"
+        redirect "#{@local_group.path}/discount_codes"
       elsif @event
         redirect "/e/#{@event.slug}/discount_codes"
       end
@@ -81,7 +81,7 @@ Dandelion::App.controller do
       elsif @activity
         redirect "#{@activity.path}/discount_codes"
       elsif @local_group
-        redirect "/local_groups/#{@local_group.id}/discount_codes"
+        redirect "#{@local_group.path}/discount_codes"
       elsif @event
         redirect "/e/#{@event.slug}/discount_codes"
       end
@@ -98,7 +98,7 @@ Dandelion::App.controller do
     elsif @activity
       redirect "#{@activity.path}/discount_codes"
     elsif @local_group
-      redirect "/local_groups/#{@local_group.id}/discount_codes"
+      redirect "#{@local_group.path}/discount_codes"
     elsif @event
       redirect "/e/#{@event.slug}/discount_codes"
     end
