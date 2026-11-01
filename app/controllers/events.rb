@@ -163,11 +163,7 @@ Dandelion::App.controller do
 
   get '/events/:id', provides: %i[html ics json] do
     @event = Event.without_heavy_fields.find(params[:id]) || not_found
-    if @event.slug
-      redirect request.url.gsub('/events/', '/e/').gsub(params[:id], @event.slug)
-    else
-      redirect request.url.gsub('/events/', '/e/')
-    end
+    redirect request.url.gsub('/events/', '/e/').gsub(params[:id], @event.slug)
   end
 
   get '/e/:slug', provides: %i[html ics json jpg], prerender: true do
@@ -180,7 +176,7 @@ Dandelion::App.controller do
     unless @event
       id = params[:slug]
       @event = Event.with_key_includes.without(:voyage_embedding).find(id) || not_found
-      redirect request.url.gsub(id, @event.slug) if @event.slug
+      redirect request.url.gsub(id, @event.slug)
     end
 
     redirect @event.purchase_url if @event.minimal_only? && @event.purchase_url
