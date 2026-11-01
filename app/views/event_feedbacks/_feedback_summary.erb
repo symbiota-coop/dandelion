@@ -4,7 +4,7 @@
                                 elsif @account
                                   [@account, "/accounts/#{@account.id}/feedback_summary", admin? || (current_account && @account == current_account)]
                                 elsif @organisation
-                                  [@organisation, "/organisations/#{@organisation.id}/feedback_summary", organisation_admin?]
+                                  [@organisation, "/o/#{@organisation.slug}/feedback_summary", organisation_admin?]
                                 end
 %>
 <% generating = summarisable.feedback_summary_generating? %>

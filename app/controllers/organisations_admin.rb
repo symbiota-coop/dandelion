@@ -390,8 +390,8 @@ Dandelion::App.controller do
     200
   end
 
-  post '/organisations/:id/feedback_summary' do
-    @organisation = Organisation.find(params[:id]) || not_found
+  post '/o/:slug/feedback_summary' do
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     if !admin? && @organisation.feedback_summary_last_refreshed_at && @organisation.feedback_summary_last_refreshed_at > 24.hours.ago
       flash[:error] = 'Feedback summary can only be refreshed once per day'
@@ -401,13 +401,13 @@ Dandelion::App.controller do
     request.xhr? ? 200 : redirect(back('#feedback'))
   end
 
-  get '/organisations/:id/feedback_summary' do
-    @organisation = Organisation.find(params[:id]) || not_found
+  get '/o/:slug/feedback_summary' do
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     partial :'event_feedbacks/feedback_summary', locals: { contents_only: true }
   end
 
-  post '/organisations/:id/feedback_summary/delete' do
-    @organisation = Organisation.find(params[:id]) || not_found
+  post '/o/:slug/feedback_summary/delete' do
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisation.set(feedback_summary: nil)
     @organisation.set(feedback_summary_last_refreshed_at: Time.now)

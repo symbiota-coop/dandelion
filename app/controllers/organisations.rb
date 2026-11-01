@@ -24,8 +24,16 @@ Dandelion::App.controller do
     }.to_json
   end
 
+  # Organisation URLs that named organisations by id: /organisations/:id/... is now /o/:slug/...
+  %i[get post].each do |verb|
+    send(verb, '/organisations/:id/*') do
+      organisation = Organisation.find(params[:id]) || not_found
+      redirect_to_slug_url "/organisations/#{params[:id]}", "/o/#{organisation.slug}"
+    end
+  end
+
   get '/o/:slug/activities', provides: %i[html json] do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     @activities = @organisation.activities.order('name asc')
     @activities = @activities.and(:id.in => Activity.search(params[:q], @activities).pluck(:id)) if params[:q]
     @activities = @activities.and(id: params[:id]) if params[:id]
@@ -47,7 +55,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/local_groups', provides: %i[html json] do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     @local_groups = @organisation.local_groups.order('name asc')
     @local_groups = @local_groups.and(:id.in => LocalGroup.search(params[:q], @local_groups).pluck(:id)) if params[:q]
     @local_groups = @local_groups.and(id: params[:id]) if params[:id]
@@ -66,7 +74,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/news' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     @pmails = @organisation.news
     if request.xhr?
       partial :'organisations/news'
@@ -76,13 +84,13 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/news/latest' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     @pmails = @organisation.news
     redirect "/pmails/#{@pmails.first.public_id}"
   end
 
   get '/o/:slug/subscribe' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     @skip_minimal_head = true
     partial :'accounts/minimal_subscribe', layout: 'minimal'
   end

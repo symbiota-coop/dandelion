@@ -22,8 +22,8 @@ Dandelion::App.controller do
     halt 200
   end
 
-  post '/organisations/:id/stripe_setup', provides: :json do
-    @organisation = Organisation.find(params[:id])
+  post '/o/:slug/stripe_setup', provides: :json do
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug])
     organisation_admins_only!
 
     session = Stripe::Checkout::Session.create({
@@ -31,15 +31,15 @@ Dandelion::App.controller do
                                                  currency: @organisation.currency,
                                                  customer_creation: 'always',
                                                  client_reference_id: @organisation.id.to_s,
-                                                 success_url: "#{ENV['BASE_URI']}/organisations/#{@organisation.id}/stripe_setup_complete?session_id={CHECKOUT_SESSION_ID}",
+                                                 success_url: "#{ENV['BASE_URI']}/o/#{@organisation.slug}/stripe_setup_complete?session_id={CHECKOUT_SESSION_ID}",
                                                  cancel_url: "#{ENV['BASE_URI']}/events/new?organisation_id=#{@organisation.id}"
                                                }, StripeOpts.call)
 
     { session_id: session.id }.to_json
   end
 
-  get '/organisations/:id/stripe_setup_complete' do
-    @organisation = Organisation.find(params[:id])
+  get '/o/:slug/stripe_setup_complete' do
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug])
     organisation_admins_only!
 
     opts = StripeOpts.call
@@ -62,16 +62,16 @@ Dandelion::App.controller do
     redirect "/o/#{@organisation.slug}/contribute"
   end
 
-  post '/organisations/:id/clear_stripe_customer_id' do
-    @organisation = Organisation.find(params[:id])
+  post '/o/:slug/clear_stripe_customer_id' do
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug])
     organisation_admins_only!
 
     @organisation.set(stripe_customer_id: nil)
     redirect "/o/#{@organisation.slug}/contribute"
   end
 
-  post '/organisations/:id/pay', provides: :json do
-    @organisation = Organisation.find(params[:id])
+  post '/o/:slug/pay', provides: :json do
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug])
     organisation_admins_only!
 
     halt 400 unless params[:amount] && params[:amount].to_f > 0

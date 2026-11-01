@@ -514,7 +514,7 @@ class OrganisationsTest < ActiveSupport::TestCase
       api_object(id: 'cs_setup')
     } do
       header 'Accept', 'application/json'
-      post "/organisations/#{@organisation.id}/stripe_setup"
+      post "/o/#{@organisation.slug}/stripe_setup"
     end
 
     assert_equal 200, last_response.status
@@ -528,7 +528,7 @@ class OrganisationsTest < ActiveSupport::TestCase
 
     session = api_object(mode: 'setup', client_reference_id: other.id.to_s, customer: 'cus_other')
     Stripe::Checkout::Session.stub :retrieve, session do
-      get "/organisations/#{@organisation.id}/stripe_setup_complete", session_id: 'cs_other'
+      get "/o/#{@organisation.slug}/stripe_setup_complete", session_id: 'cs_other'
     end
 
     assert_equal 400, last_response.status

@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/o/:slug/events/lookup', provides: :json do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || Organisation.find(params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @events = @organisation.events_including_cohosted.order('start_time desc')
     @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]

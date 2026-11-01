@@ -69,10 +69,10 @@
 
         <p class="mb-0">
           <% if organisation.stripe_customer_id %>
-            Auto top-up enabled<% if organisation.card_last4 %> using card ending in <%= organisation.card_last4 %><% end %>. <a data-method="post" href="/organisations/<%= organisation.id %>/clear_stripe_customer_id">Click to disable</a>
+            Auto top-up enabled<% if organisation.card_last4 %> using card ending in <%= organisation.card_last4 %><% end %>. <a data-method="post" href="/o/<%= organisation.slug %>/clear_stripe_customer_id">Click to disable</a>
           <% else %>
             <a href="javascript:;" onclick="
-               $.post(<%= "/organisations/#{organisation.id}/stripe_setup".to_json %>, $(this).serializeObject(), function (data) {
+               $.post(<%= "/o/#{organisation.slug}/stripe_setup".to_json %>, $(this).serializeObject(), function (data) {
                   var stripe = Stripe(<%= ENV['STRIPE_PK'].to_json %>);
                   stripe.redirectToCheckout({sessionId: data['session_id']})
                 })
@@ -97,7 +97,7 @@
 
             $('#pay-form').submit(function () {
               $('#pay-form button[data-payment-method-clicked] i').show()
-              $.post(<%== "/organisations/#{organisation.id}/pay".to_json %>, $(this).serializeObject(), function (data) {
+              $.post(<%== "/o/#{organisation.slug}/pay".to_json %>, $(this).serializeObject(), function (data) {
                 if (data['session_id']) {
                   var stripe = Stripe(<%== ENV['STRIPE_PK'].to_json %>);
                   stripe.redirectToCheckout({sessionId: data['session_id']})
