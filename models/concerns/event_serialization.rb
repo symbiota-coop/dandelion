@@ -81,15 +81,17 @@ module EventSerialization
     end
   end
 
-  # The opt-ins the checkout form offers
+  # The opt-ins the checkout form offers, with their labels
   def checkout_opt_ins
     opt_ins = []
-    opt_ins << { name: 'opt_in_organisation', label: "Get email updates from #{organisation_and_cohosts.map(&:name).to_sentence}" } if opt_in_organisation
-    opt_ins << { name: 'opt_in_facilitator', label: "Get email updates from #{event_facilitators.map(&:firstname).to_sentence}" } if opt_in_facilitator && event_facilitators.exists?
+    opt_ins << { name: 'opt_in_organisation', label: "Get email updates from #{organisation_and_cohosts.map(&:name).to_sentence(last_word_connector: ' and ')}" } if opt_in_organisation
+    if opt_in_facilitator && event_facilitators.exists?
+      opt_ins << { name: 'opt_in_facilitator', label: "Get email updates from #{event_facilitators.map(&:firstname).to_sentence(last_word_connector: ' and ')}" }
+    end
     opt_ins
   end
 
-  # The details about the buyer the checkout form asks for
+  # The details about the buyer the checkout form asks for, in the order it asks for them
   def checkout_buyer_fields
     buyer_fields = [
       { name: 'name', required: true },
@@ -105,9 +107,9 @@ module EventSerialization
   # suggests, and any minimum it requires)
   def checkout_donation
     if donations_to_dandelion?
-      { to: 'Dandelion', suggested: nil, minimum: nil }
+      { to: 'dandelion', name: 'Dandelion', suggested: nil, minimum: nil }
     elsif suggested_donation
-      { to: organisation.name, suggested: suggested_donation, minimum: (minimum_donation if minimum_donation&.positive?) }
+      { to: 'organisation', name: organisation.name, suggested: suggested_donation, minimum: (minimum_donation if minimum_donation&.positive?) }
     end
   end
 
@@ -128,7 +130,7 @@ module EventSerialization
       currency: currency,
       ticket_types: public_ticket_types(secret_ticket_type: secret_ticket_type),
       # The event's own waitlist, which the event page offers once it's sold out, unless its ticket types have their own
-      event_waitlist: sold_out? && !hide_waitlist && !ticket_type_waitlists_available?,
+      event_waitlist: event_waitlist_open?,
       buyer_fields: checkout_buyer_fields,
       questions: Questions.parse(questions),
       opt_ins: checkout_opt_ins,

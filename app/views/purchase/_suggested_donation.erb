@@ -1,4 +1,6 @@
-<% if @event.donations_to_dandelion? %>
+<%# Event#checkout_donation, which agents read too %>
+<% donation = @event.checkout_donation %>
+<% if donation && donation[:to] == 'dandelion' %>
   <% dandelion_suggested_min = FiatCurrency.minimum_unit_amount(@event.currency) %>
   <tr>
     <td></td>
@@ -52,36 +54,36 @@
       </div>
     </td>
   </tr>
-<% elsif @event.suggested_donation %>
+<% elsif donation %>
   <tr>
     <td colspan="2">
       <% if @event.add_a_donation_to || @event.organisation.add_a_donation_to %>
         <%== Sanitize.fragment(@event.add_a_donation_to || @event.organisation.add_a_donation_to || "Add a donation to #{@event.organisation.name}", Sanitize::Config::DANDELION) %>
-        <%= "(minimum #{m @event.minimum_donation, @event.currency})" if @event.minimum_donation && @event.minimum_donation > 0 %>
+        <%= "(minimum #{m donation[:minimum], @event.currency})" if donation[:minimum] %>
       <% end %>
     </td>
     <td>
       <% if !@event.add_a_donation_to && !@event.organisation.add_a_donation_to %>
         <strong>
-          Add a donation to <%= @event.organisation.name %>
-          <%= "(minimum #{m @event.minimum_donation, @event.currency})" if @event.minimum_donation && @event.minimum_donation > 0 %>
+          Add a donation to <%= donation[:name] %>
+          <%= "(minimum #{m donation[:minimum], @event.currency})" if donation[:minimum] %>
         </strong>
       <% end %>
       <div class="input-group my-1">
         <span class="input-group-text"><%= money_symbol(@event.currency) %></span>
-        <% if @event.minimum_donation %>
+        <% if donation[:minimum] %>
           <script>
             $(function() {
               $('#donation_amount').change(function() {
-                if ($(this).val() < <%== @event.minimum_donation.to_json %>)
-                  $(this).val(<%== @event.minimum_donation.to_s.to_json %>)
+                if ($(this).val() < <%== donation[:minimum].to_json %>)
+                  $(this).val(<%== donation[:minimum].to_s.to_json %>)
               })
             })
           </script>
         <% end %>
-        <% donation_value = params[:donation_amount] || @event.suggested_donation %>
+        <% donation_value = params[:donation_amount] || donation[:suggested] %>
         <% donation_value = (donation_value.to_f % 1).zero? ? donation_value.to_i : donation_value %>
-        <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: donation_value, min: (@event.minimum_donation || 0) %>
+        <%= number_field_tag :donation_amount, id: 'donation_amount', class: 'form-control', style: 'width: 5em', value: donation_value, min: (donation[:minimum] || 0) %>
       </div>
       <% donation_text = @event.donation_text || @event.organisation.donation_text %>
       <% donation_text_unsanitized_ok = Padrino.env == :development || (!@event.donation_text && @event.organisation.unsanitized_ok?) %>

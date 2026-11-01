@@ -70,7 +70,7 @@
     <style>
       @media (max-width: 767.98px) { #content { padding-bottom: 5.5rem } }
     </style>
-  <% elsif (params[:ticket_type_id] || !@event.sold_out? || @event.ticket_type_waitlists_available?) && @event.ticket_types.exists? %>
+  <% elsif (params[:ticket_type_id] || !@event.shows_event_waitlist?) && @event.ticket_types.exists? %>
     <% sidebar = true %>
     <div id="get-tickets-fixed-bottom" <%== get_tickets_fixed_bottom_style %>>
       <a href="javascript:;" onclick="$(this).parent().hide();

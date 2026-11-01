@@ -295,6 +295,8 @@ module Dandelion
     # Why the event's own waitlist can't be joined, if it can't. The event page offers it once the event is sold out,
     # unless the event has turned it off or its ticket types have waitlists of their own
     def self.event_waitlist_error(event)
+      return if event.event_waitlist_open?
+
       if event.ticket_type_waitlists_available?
         'This event has a waitlist for each sold-out ticket type: pass the ticket_type_id of one.'
       elsif !event.sold_out?

@@ -681,7 +681,7 @@ class McpTest < ActiveSupport::TestCase
     assert_equal 5, @event.minimum_donation
     requirements = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))
     assert_empty requirements['restrictions']
-    assert_equal({ 'to' => @organisation.name, 'suggested' => 10.0, 'minimum' => 5.0 }, requirements['donation'])
+    assert_equal({ 'to' => 'organisation', 'name' => @organisation.name, 'suggested' => 10.0, 'minimum' => 5.0 }, requirements['donation'])
     quantities = { @event.ticket_types.first.id.to_s => 1 }
 
     rpc, = create_checkout(quantities: quantities)

@@ -126,49 +126,45 @@ discount_code_used_up = discount_code_problem == :used_up
     <% form_for (@account = current_account || Account.new(country: visitor_country_name)), '' do |f| %>
       <% if current_account %>
         <p class="lead">Signed in as <%= current_account.name %> (<%= current_account.email %>)</p>
-        <%= f.hidden_field :name %>
-        <%= f.hidden_field :email %>
-        <% if @event.organisation.collect_phone? && (!current_account.phone || !current_account.phone.starts_with?('+')) %>
-          <%= f.text_block :phone %>
-        <% end %>
-      <% else %>
-        <%= f.text_block :name %>
-        <%= f.email_block :email %>
-        <% if @event.organisation.collect_phone? %>
-          <%= f.text_block :phone %>
-        <% end %>
-        <% if @event.organisation.collect_location %>
-          <%= f.text_block :postcode %>
-          <%= f.select_block :country %>
-        <% end %>
       <% end %>
-      <% if @event.ask_hear_about %>
-        <%= f.text_block :hear_about %>
+      <%# Event#checkout_buyer_fields, which agents read too. Signed in, the account has its name, email and location, and
+          a phone number unless it lacks its country code %>
+      <% @event.checkout_buyer_fields.each do |field| %>
+        <% case field[:name] %>
+        <% when 'name' %>
+          <%= current_account ? f.hidden_field(:name) : f.text_block(:name) %>
+        <% when 'email' %>
+          <%= current_account ? f.hidden_field(:email) : f.email_block(:email) %>
+        <% when 'phone' %>
+          <% if !current_account || !current_account.phone || !current_account.phone.starts_with?('+') %>
+            <%= f.text_block :phone %>
+          <% end %>
+        <% when 'postcode' %>
+          <%= f.text_block :postcode unless current_account %>
+        <% when 'country' %>
+          <%= f.select_block :country unless current_account %>
+        <% when 'hear_about' %>
+          <%= f.text_block :hear_about %>
+        <% end %>
       <% end %>
       <%= f.hidden_field :http_referrer, value: request.referrer %>
       <%= f.hidden_field :via, value: params[:via] %>
 
       <%= partial :'questions/questions', locals: { questions: @event.questions } %>
 
-      <% if @event.opt_in_organisation %>
-        <% if current_account && @event.organisation_and_cohosts.all? { |organisation| current_account.organisationships.find_by(organisation: organisation) } %>
+      <%# Event#checkout_opt_ins, which agents read too %>
+      <% @event.checkout_opt_ins.each do |opt_in| %>
+        <%# Signed in and already getting updates from all of them, they keep getting them %>
+        <% if opt_in[:name] == 'opt_in_organisation' && current_account && @event.organisation_and_cohosts.all? { |organisation| current_account.organisationships.find_by(organisation: organisation) } %>
           <%= f.hidden_field :opt_in_organisation, value: 1 %>
         <% else %>
-          <div id="opt-in-organisation">
+          <div id="<%= opt_in[:name].tr('_', '-') %>">
             <div class="form-check">
-              <%= f.check_box :opt_in_organisation, class: 'form-check-input' %>
-              <label for="account_opt_in_organisation" class="form-check-label">Get email updates from <%== @event.organisation_and_cohosts.map { |organisation| Sanitize.fragment(organisation.name) }.to_sentence(last_word_connector: ' and ') %></label>
+              <%= f.check_box opt_in[:name].to_sym, class: 'form-check-input' %>
+              <label for="account_<%= opt_in[:name] %>" class="form-check-label"><%= opt_in[:label] %></label>
             </div>
           </div>
         <% end %>
-      <% end %>
-      <% if @event.opt_in_facilitator && @event.event_facilitators.exists? %>
-        <div id="opt-in-facilitator">
-          <div class="form-check">
-            <%= f.check_box :opt_in_facilitator, class: 'form-check-input' %>
-            <label for="account_opt_in_facilitator" class="form-check-label">Get email updates from <%= @event.event_facilitators.map(&:firstname).to_sentence(last_word_connector: ' and ') %></label>
-          </div>
-        </div>
       <% end %>
 
       <%= partial :'purchase/terms_and_conditions' %>

@@ -284,6 +284,17 @@ class Event
     end
   end
 
+  # The event page shows the event as sold out, with its own waitlist, rather than the checkout form: it's sold out,
+  # and its ticket types have no waitlists of their own to join
+  def shows_event_waitlist?
+    sold_out? && !ticket_type_waitlists_available?
+  end
+
+  # The event's own waitlist can be joined, unless the event has turned it off
+  def event_waitlist_open?
+    shows_event_waitlist? && !hide_waitlist
+  end
+
   def ticket_type_waitlists_available?
     allow_ticket_type_waitlists? &&
       !sales_closed_due_to_event_end? &&
