@@ -32,6 +32,16 @@ $(function () {
     if (window.matchMedia('(min-width: 992px)').matches) e.preventDefault()
   })
 
+  // A tooltip on a dropdown (_organisationship.erb) hides when its menu opens, and stays hidden while it's open
+  $(document).on('show.bs.dropdown', function (e) {
+    const tooltipEl = $(e.target).closest('[data-bs-toggle="tooltip"]')[0]
+    const tooltip = tooltipEl && bootstrap.Tooltip.getInstance(tooltipEl)
+    if (tooltip) tooltip.hide()
+  })
+  $(document).on('show.bs.tooltip', '[data-bs-toggle="tooltip"]', function (e) {
+    if ($(this).find('[data-bs-toggle="dropdown"].show').length) e.preventDefault()
+  })
+
   // The fixed header's height and #content's padding as custom properties, for layouts that fill the rest of
   // the screen (messages.css), updated on resize
   function syncFixedHeaderHeight () {
