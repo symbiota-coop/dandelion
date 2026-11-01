@@ -2,18 +2,19 @@ module Dandelion
   module MCP
     # With an API key, books as that account. Without one, books as the buyer given, as the checkout form does for
     # someone signed out: finding the account with their email, or creating one
-    def self.perform_create_checkout(server_context: nil, slug: nil, id: nil, quantities: nil, answers: nil, accept_terms: false, idempotency_key: nil, buyer: nil)
+    def self.perform_create_checkout(server_context: nil, slug: nil, id: nil, quantities: nil, answers: nil, accept_terms: false, idempotency_key: nil, buyer: nil,
+                                     opt_ins: nil)
       return tool_error('Provide event slug or id') if slug.blank? && id.blank?
 
       event = Event.live.publicly_visible.find_by_slug_or_id(slug: slug, id: id)
       return tool_error('Event not found') unless event
 
       signed_in_account = current_account_from(server_context)
-      buyer = if signed_in_account
-                { name: signed_in_account.name, email: signed_in_account.email }
-              else
-                (buyer.is_a?(Hash) ? buyer : {}).transform_keys(&:to_sym).slice(:name, :email, :phone, :postcode, :country).transform_values(&:to_s)
-              end
+      buyer = (buyer.is_a?(Hash) ? buyer : {}).transform_keys(&:to_sym).slice(:name, :email, :phone, :postcode, :country, :hear_about).transform_values(&:to_s)
+      # How they heard about the event is the order's, so it's taken whoever the booking is for
+      hear_about = buyer.delete(:hear_about)
+      hear_about = nil if hear_about.blank? || !event.ask_hear_about
+      buyer = { name: signed_in_account.name, email: signed_in_account.email } if signed_in_account
       return tool_error('Provide buyer: an object with the name and email of who the tickets are for, or authenticate with an API key to book as that account.') if buyer[:name].blank? || buyer[:email].blank?
 
       idempotency_key = (idempotency_key.to_s if idempotency_key.present?)
@@ -28,6 +29,9 @@ module Dandelion
       question_answers, error = checkout_answers(event, answers)
       return tool_error(error) if error
 
+      opt_ins, error = checkout_opt_ins(event, opt_ins)
+      return tool_error(error) if error
+
       builder = OrderBuilder.new(
         event: event,
         buyer: buyer,
@@ -36,6 +40,9 @@ module Dandelion
         # OrderBuilder pays with RSVP whenever nothing is left to pay
         payment_method: payment_method&.name || 'rsvp',
         answers: question_answers,
+        opt_in_organisation: opt_ins.include?('opt_in_organisation'),
+        opt_in_facilitator: opt_ins.include?('opt_in_facilitator'),
+        hear_about: hear_about,
         via: 'mcp',
         idempotency_key: idempotency_key
       )
@@ -121,6 +128,16 @@ module Dandelion
       return [nil, "Answer the required questions: #{missing.join('; ')}"] if missing.any?
 
       [fields.zip(pairs).reject { |field, (_question, value)| field[:type] == 'checkbox' && value.nil? }.map(&:last), nil]
+    end
+
+    # opt_ins: the names of the opt-ins get_event_checkout_requirements_tool lists that the buyer chose
+    def self.checkout_opt_ins(event, opt_ins)
+      opt_ins = Array(opt_ins).map(&:to_s)
+      offered = event.checkout_opt_ins.map { |opt_in| opt_in[:name] }
+      unknown = opt_ins - offered
+      return [nil, "This event doesn't offer these opt-ins: #{unknown.join(', ')}"] if unknown.any?
+
+      [opt_ins, nil]
     end
 
     # OrderBuilder's errors say what went wrong; this only adds what an agent can do about it. Whether there's anything

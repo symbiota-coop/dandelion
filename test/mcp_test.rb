@@ -407,6 +407,23 @@ class McpTest < ActiveSupport::TestCase
     end
   end
 
+  test 'create_checkout_tool takes the opt-ins and hear_about the event asks for' do
+    create_event(prices: [0], ask_hear_about: true, opt_in_organisation: true)
+    quantities = { @event.ticket_types.first.id.to_s => 1 }
+
+    rpc, = create_checkout(quantities: quantities, opt_ins: ['opt_in_facilitator'])
+    assert rpc.dig('result', 'isError')
+    assert_includes tool_text(rpc), "doesn't offer these opt-ins: opt_in_facilitator"
+
+    # With an API key, buyer is only read for hear_about
+    _rpc, order = create_checkout(quantities: quantities, opt_ins: ['opt_in_organisation'], buyer: { name: 'Ignored', hear_about: 'A friend' })
+    record = Order.find(order['order_id'])
+    assert_equal @buyer, record.account
+    assert record.opt_in_organisation
+    assert_equal 'A friend', record.hear_about
+    assert @organisation.organisationships.find_by(account: @buyer)
+  end
+
   test 'create_checkout_tool books an existing account without changing it, when given its email without an API key' do
     create_event(prices: [0])
     existing = FactoryBot.create(:account, name: 'Original Name')

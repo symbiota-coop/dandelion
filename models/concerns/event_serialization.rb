@@ -75,6 +75,14 @@ module EventSerialization
     end
   end
 
+  # The opt-ins the checkout form offers
+  def checkout_opt_ins
+    opt_ins = []
+    opt_ins << { name: 'opt_in_organisation', label: "Get email updates from #{organisation_and_cohosts.map(&:name).to_sentence}" } if opt_in_organisation
+    opt_ins << { name: 'opt_in_facilitator', label: "Get email updates from #{event_facilitators.map(&:firstname).to_sentence}" } if opt_in_facilitator && event_facilitators.exists?
+    opt_ins
+  end
+
   # What the checkout form on the event page asks for, so an agent can prepare a booking
   def checkout_requirements
     restrictions = []
@@ -94,10 +102,6 @@ module EventSerialization
     buyer_fields += [{ name: 'postcode', required: false }, { name: 'country', required: false }] if organisation&.collect_location
     buyer_fields << { name: 'hear_about', required: false } if ask_hear_about
 
-    opt_ins = []
-    opt_ins << { name: 'opt_in_organisation', label: "Get email updates from #{organisation_and_cohosts.map(&:name).to_sentence}" } if opt_in_organisation
-    opt_ins << { name: 'opt_in_facilitator', label: "Get email updates from #{event_facilitators.map(&:firstname).to_sentence}" } if opt_in_facilitator && event_facilitators.exists?
-
     {
       event: { id: id.to_s, slug: slug, name: name, url: "#{ENV['BASE_URI']}/e/#{slug}", start_time: start_time, end_time: end_time, time_zone: time_zone },
       purchasable: restrictions.empty? && !sold_out?,
@@ -106,7 +110,7 @@ module EventSerialization
       ticket_types: public_ticket_types,
       buyer_fields: buyer_fields,
       questions: Questions.parse(questions),
-      opt_ins: opt_ins,
+      opt_ins: checkout_opt_ins,
       terms: {
         text: terms_and_conditions_for_purchase,
         url: terms_and_conditions_url_for_purchase,

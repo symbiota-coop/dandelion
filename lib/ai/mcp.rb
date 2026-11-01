@@ -305,17 +305,19 @@ module Dandelion
                          idempotency_key: { type: 'string', description: 'A unique key for this booking. Retrying with the same key returns the first order instead of booking again (status processing while it is still being set up)' },
                          buyer: {
                            type: 'object',
-                           description: 'Who the tickets are for, with the fields buyer_fields lists. Required without an API key; with one, the booking is for that account and this is ignored',
-                           properties: { name: { type: 'string' }, email: { type: 'string' }, phone: { type: 'string' }, postcode: { type: 'string' }, country: { type: 'string' } },
-                           required: %w[name email]
-                         }
+                           description: 'Who the tickets are for, with the fields buyer_fields lists. Required without an API key; with one, the booking is for that account and only hear_about is used',
+                           properties: { name: { type: 'string' }, email: { type: 'string' }, phone: { type: 'string' }, postcode: { type: 'string' }, country: { type: 'string' },
+                                         hear_about: { type: 'string' } }
+                         },
+                         opt_ins: { type: 'array', items: { type: 'string' }, description: 'The names of the opt_ins the buyer chose, from get_event_checkout_requirements_tool' }
                        }, required: [:quantities])
           annotations(read_only_hint: false, destructive_hint: false, idempotent_hint: false, open_world_hint: true)
 
           # **_rest ignores arguments the tool doesn't take, rather than failing the call
-          define_singleton_method(:call) do |slug: nil, id: nil, quantities: nil, answers: nil, accept_terms: false, idempotency_key: nil, buyer: nil, server_context: {}, **_rest|
+          define_singleton_method(:call) do |slug: nil, id: nil, quantities: nil, answers: nil, accept_terms: false, idempotency_key: nil, buyer: nil, opt_ins: nil,
+                                             server_context: {}, **_rest|
             Dandelion::MCP.perform_create_checkout(server_context: server_context, slug: slug, id: id, quantities: quantities, answers: answers,
-                                                   accept_terms: accept_terms, idempotency_key: idempotency_key, buyer: buyer)
+                                                   accept_terms: accept_terms, idempotency_key: idempotency_key, buyer: buyer, opt_ins: opt_ins)
           end
         end,
         Class.new(::MCP::Tool) do
