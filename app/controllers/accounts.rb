@@ -183,8 +183,8 @@ Dandelion::App.controller do
     sign_in_code_required!
     @account = current_account
     @organisationships = @account.organisationships.includes(:organisation).select(&:organisation).sort_by { |organisationship| organisationship.organisation.name.to_s.downcase }
-    @activityships_by_organisation_id = @account.activityships.includes(:activity).select(&:activity).sort_by { |activityship| activityship.activity.name.downcase }.group_by { |activityship| activityship.activity.organisation_id }
-    @local_groupships_by_organisation_id = @account.local_groupships.includes(:local_group).select(&:local_group).sort_by { |local_groupship| local_groupship.local_group.name.downcase }.group_by { |local_groupship| local_groupship.local_group.organisation_id }
+    @activityships_by_organisation_id = @account.activityships.includes(activity: :organisation).select(&:activity).sort_by { |activityship| activityship.activity.name.downcase }.group_by { |activityship| activityship.activity.organisation_id }
+    @local_groupships_by_organisation_id = @account.local_groupships.includes(local_group: :organisation).select(&:local_group).sort_by { |local_groupship| local_groupship.local_group.name.downcase }.group_by { |local_groupship| local_groupship.local_group.organisation_id }
     @memberships = @account.memberships.includes(:gathering).select(&:gathering).sort_by { |membership| membership.gathering.name.downcase }
     @teamships_by_gathering_id = @account.teamships.includes(:team).select(&:team).sort_by { |teamship| teamship.team.name.downcase }.group_by(&:gathering_id)
     erb :'accounts/subscriptions'

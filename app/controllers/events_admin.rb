@@ -168,7 +168,7 @@ Dandelion::App.controller do
   get '/e/:slug/stripe_charges' do
     @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
-    @stripe_charges = @event.stripe_charges.includes(:account, order: :account).and(:balance_transaction.ne => nil)
+    @stripe_charges = @event.stripe_charges.includes(:account, order: %i[account event]).and(:balance_transaction.ne => nil)
     @stripe_charges = @stripe_charges.and(:account_id.in => Account.search(params[:q], child_scope: @stripe_charges).pluck(:id)) if params[:q]
 
     if request.xhr?
