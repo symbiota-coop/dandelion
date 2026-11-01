@@ -44,3 +44,6 @@ GeoLite2-City.mmdb
 iframe-test.html
 .ruby-version
 ckeditor/build
+
+# The Claude desktop app's dev-server config for its browser pane; Claude-only, so kept local (AGENTS.md: Many agents)
+.claude/launch.json
