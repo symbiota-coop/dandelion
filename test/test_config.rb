@@ -20,6 +20,10 @@ Capybara.default_max_wait_time = 10
 Capybara.register_driver :cuprite do |app|
   options = {}
   options[:js_errors] = true # a JavaScript error on the page fails the test
+  # Tests have no Maps key, so the Maps API is blocked: otherwise Google's own scripts, which change weekly, can throw
+  # on the page and fail tests that aren't about maps. Maps show their could-not-load message, and tests of places.js
+  # fake the Places library (FAKE_PLACES_JS in accounts_test.rb)
+  options[:url_blacklist] = [%r{\Ahttps://maps\.googleapis\.com/}]
   options[:timeout] = 60
   options[:process_timeout] = 30
   options[:window_size] = ENV['CREATE_VIDEO'] ? [1920, 1080] : [1280, 720]
