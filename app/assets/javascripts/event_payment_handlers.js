@@ -1,14 +1,22 @@
 /* global Stripe, runEvmPaymentFlow */
 
-function redirectToCheckout (config, url) {
+// Embedded, the provider's page opens in a new tab: the one opened as the button was pressed (paymentWindow), as
+// browsers block a tab opened only once the order comes back (Safari always). In case that tab was blocked too, or opened
+// out of sight, the form shows a link to the page
+function redirectToCheckout (config, url, options) {
   if (config.embedded && url) {
-    window.open(url, '_blank')
+    const paymentWindow = options.paymentWindow
+    if (paymentWindow && !paymentWindow.closed) {
+      paymentWindow.location = url
+    }
+    options.showPaymentLink(url)
     return
   }
   window.location = url
 }
 
-function eventPaymentHandlers (config) {
+function eventPaymentHandlers (config, options) {
+  options = options || {}
   return {
     rsvp: function (data) {
       window.location = '?success=true&order_id=' + data.order_id
@@ -16,7 +24,7 @@ function eventPaymentHandlers (config) {
 
     stripe: function (data) {
       if (config.embedded && data.session_url) {
-        window.open(data.session_url, '_blank')
+        redirectToCheckout(config, data.session_url, options)
         return
       }
       const stripe = config.stripeAccount ? Stripe(config.stripePk, { stripeAccount: config.stripeAccount }) : Stripe(config.stripePk)
@@ -35,7 +43,7 @@ function eventPaymentHandlers (config) {
     },
 
     default: function (data) {
-      redirectToCheckout(config, data.redirect_url)
+      redirectToCheckout(config, data.redirect_url, options)
     }
   }
 }

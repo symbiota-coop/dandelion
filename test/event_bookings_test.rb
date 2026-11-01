@@ -95,6 +95,25 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert page.has_button? "Pay £#{format('%.2f', ticket_price + donation_amount)}"
   end
 
+  test 'embedded, paying opens the payment page in a tab opened as Pay is pressed' do
+    create_event(prices: [10], suggested_donation: 0)
+    sign_in(@account)
+    visit "/e/#{@event.slug}?ticket_form_only=1"
+    select 1, from: "quantities[#{@event.ticket_types.first.id}]"
+    assert page.has_button? 'Pay £10.00'
+
+    payment_url = "#{ENV['BASE_URI']}/e/#{@event.slug}?cancelled=true"
+    stripe_session = api_object(id: 'cs_embedded', payment_intent: 'pi_embedded', url: payment_url)
+    payment_window = nil
+    Stripe::Checkout::Session.stub :create, stripe_session do
+      payment_window = window_opened_by { click_button 'Pay £10.00' }
+      assert page.has_link?('continue to payment', href: payment_url)
+    end
+    within_window(payment_window) do
+      assert page.has_current_path?(payment_url, url: true)
+    end
+  end
+
   test 'booking onto a paid event with a range' do
     create_event(prices: ['10-100'], suggested_donation: 0)
     sign_in(@account)

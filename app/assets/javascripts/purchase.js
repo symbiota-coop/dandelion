@@ -457,7 +457,6 @@ $(function () {
     $('#total').val($('#totalDisplay').val())
     $('#details form button[data-payment-method-clicked] i').show()
 
-    const handlers = eventPaymentHandlers(config)
     let method = $('input[type=hidden][name=payment_method]:not(:disabled)').val()
     const ticketForm = $('#ticket-types form').serializeObject()
     if (config.donationsToDandelion && !(config.platformDonationMethods || []).includes(method)) {
@@ -470,6 +469,30 @@ $(function () {
       }
     }
 
+    // Embedded, the provider's page opens in a new tab, which has to be opened now, while the button is being pressed:
+    // browsers block one opened when the order comes back. It shows a blank page until then, and closes if the order fails
+    let paymentWindow = null
+    if (config.embedded && !['rsvp', 'evm', 'opencollective'].includes(method)) {
+      paymentWindow = window.open('', '_blank')
+      if (paymentWindow) {
+        paymentWindow.opener = null
+      }
+    }
+    const closePaymentWindow = function () {
+      if (paymentWindow) {
+        paymentWindow.close()
+      }
+    }
+    const handlers = eventPaymentHandlers(config, {
+      paymentWindow: paymentWindow,
+      showPaymentLink: function (url) {
+        $('#details form button[data-payment-method-clicked] i').hide()
+        $('#payment-link a').attr('href', url)
+        $('#payment-link').show()
+        $('#payment-link')[0].scrollIntoView({ block: 'nearest' })
+      }
+    })
+
     const postPurchase = function (confirmedDuplicate) {
       $.post('/e/' + config.eventSlug + '/purchase', {
         ticketForm: ticketForm,
@@ -480,6 +503,7 @@ $(function () {
       }).fail(function (xhr) {
         let json = {}
         try { json = xhr.responseJSON || JSON.parse(xhr.responseText || '{}') || {} } catch { }
+        closePaymentWindow()
         if (json.duplicate && !confirmedDuplicate) {
           purchaseSubmitting = false
           $('#details form button[data-payment-method]').prop('disabled', false)

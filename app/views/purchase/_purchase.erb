@@ -184,6 +184,9 @@ end
       <%= partial :'purchase/terms_and_conditions' %>
 
       <div id="purchase-alert" class="alert alert-danger mb-3" style="display: none" role="alert"></div>
+      <div id="payment-link" class="alert alert-primary mb-3" style="display: none" role="status">
+        Payment continues in a new tab. If it didn't open, <a target="_blank" rel="noopener">continue to payment</a>.
+      </div>
 
       <% EventPaymentMethod.all.each do |pm| %>
         <%== payment_button(method: pm.name, label: pm.button_label(@event), outline: pm.outline, visible: pm.visible, condition: pm.available?(@event)) %>
