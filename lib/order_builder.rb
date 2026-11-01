@@ -2,8 +2,10 @@
 # steps behind the checkout form (POST /e/:slug/purchase), taking plain
 # values so other callers, like agents, can book the same way.
 #
-# It checks who may book (Event#booking_restriction, for the signed-in account)
-# and that each ticket type is still on sale. Failures raise an OrderBuilder::Error, after destroying any order created.
+# It checks everything the checkout form asks for, as a request needn't come from the form: who may book
+# (Event#booking_restriction, for the signed-in account), that each ticket type is still on sale, the terms, answers
+# to the event's questions, prices for range and pay-what-you-want tickets, the discount code and any donation.
+# Failures raise an OrderBuilder::Error, after destroying any order created.
 class OrderBuilder
   # Each error's message says what went wrong, for whoever is booking. The details of an unexpected error or a payment
   # provider's go to Sentry or the failed purchase email instead
@@ -59,6 +61,23 @@ class OrderBuilder
     MESSAGE = 'Choose at least one ticket.'.freeze
   end
 
+  class TermsNotAccepted < Error
+    MESSAGE = 'You must agree to the terms and conditions.'.freeze
+  end
+
+  # Says which questions: an unknown one, an option that isn't offered or a required one left unanswered
+  class AnswersInvalid < Error; end
+
+  # A range or pay-what-you-want ticket without a price, or with one outside its range. Says which, and what's allowed
+  class PriceInvalid < Error; end
+
+  # Not one of the event's, used up, or not for every ticket chosen. Says which
+  class DiscountCodeInvalid < Error; end
+
+  class DonationInvalid < Error
+    MESSAGE = "This event doesn't take donations at checkout.".freeze
+  end
+
   # The event asks for a donation to the organisation of at least its minimum_donation
   class DonationRequired < Error
     def initialize(minimum, currency)
@@ -102,12 +121,16 @@ class OrderBuilder
 
   attr_reader :order, :account
 
-  # buyer: name, email, and optionally phone, postcode and country
+  # buyer: name, email, and optionally phone, postcode and country, of which only those the event asks for
+  # (Event#checkout_buyer_fields) are used
   # quantities and prices: keyed by ticket type id
+  # answers: keyed by question index (Questions.parse), as the checkout form sends them or as booleans and arrays
+  # (Questions.answer_pairs)
+  # discount_code: the code the buyer applied
   # signed_in_account: whoever is signed in, if anyone; only they can update their profile or spend their credit
   def initialize(event:, buyer:, quantities:, payment_method:, prices: {}, signed_in_account: nil, new_account_currency: nil,
-                 secret_ticket_type_id: nil, answers: nil, donation_amount: nil, donation_via_modal: false,
-                 discount_code_id: nil, cohost: nil, affiliate_type: nil, affiliate_id: nil,
+                 secret_ticket_type_id: nil, answers: nil, accepted_terms: false, donation_amount: nil, donation_via_modal: false,
+                 discount_code: nil, cohost: nil, affiliate_type: nil, affiliate_id: nil,
                  opt_in_organisation: false, opt_in_facilitator: false, hear_about: nil, via: nil, http_referrer: nil,
                  confirmed_duplicate: false, utm: {}, idempotency_key: nil)
     @event = event
@@ -119,15 +142,18 @@ class OrderBuilder
     @new_account_currency = new_account_currency
     @secret_ticket_type_id = secret_ticket_type_id
     @answers = answers
+    @accepted_terms = accepted_terms
     @donation_amount = donation_amount
     @donation_via_modal = donation_via_modal
-    @discount_code_id = discount_code_id
+    @discount_code = discount_code
     @cohost = cohost
     @affiliate_type = affiliate_type
     @affiliate_id = affiliate_id
-    @opt_in_organisation = opt_in_organisation
-    @opt_in_facilitator = opt_in_facilitator
-    @hear_about = hear_about
+    # Only the opt-ins and question the event offers
+    offered = @event.checkout_opt_ins.map { |opt_in| opt_in[:name] }
+    @opt_in_organisation = opt_in_organisation && offered.include?('opt_in_organisation')
+    @opt_in_facilitator = opt_in_facilitator && offered.include?('opt_in_facilitator')
+    @hear_about = (hear_about if @event.ask_hear_about)
     @via = via
     @http_referrer = http_referrer
     @confirmed_duplicate = confirmed_duplicate
@@ -139,9 +165,8 @@ class OrderBuilder
   def call
     restriction = @event.booking_restriction(@signed_in_account)
     raise NotAllowed.new(restriction) if restriction
-    # Donation's own validation only sees a donation that's made
-    raise DonationRequired.new(@event.minimum_donation, @event.currency) if donation_below_minimum?
 
+    check_choices
     find_or_create_account
     check_duplicate unless @confirmed_duplicate
     create_order
@@ -170,9 +195,75 @@ class OrderBuilder
 
   private
 
+  # What the checkout form asks the buyer to choose, before anything is made
+  def check_choices
+    raise TermsNotAccepted if @event.terms_acceptance_required? && !@accepted_terms
+
+    @answer_pairs, error = Questions.answer_pairs(@event.questions, @answers)
+    raise AnswersInvalid, error if error
+
+    # Keyed as quantities are. create_tickets refuses ids that aren't the event's
+    ticket_types = @quantities.select { |_ticket_type_id, quantity| quantity.to_i.positive? }.keys.filter_map do |ticket_type_id|
+      ticket_type = @event.ticket_types.find(ticket_type_id)
+      [ticket_type_id, ticket_type] if ticket_type
+    end
+    check_prices(ticket_types)
+    check_discount_code(ticket_types.map(&:last))
+    check_donation
+  end
+
+  # Each range or pay-what-you-want ticket type needs a price, within its range: the checkout form only lets the buyer
+  # choose one once they've set it
+  def check_prices(ticket_types)
+    @ticket_prices = {}
+    problems = ticket_types.filter_map do |ticket_type_id, ticket_type|
+      next unless ticket_type.range || ticket_type.price.nil?
+
+      price = Float(@prices[ticket_type_id], exception: false)
+      if price.nil? || (ticket_type.range ? !price.between?(*ticket_type.range) : price.negative?)
+        bounds = if ticket_type.range
+                   "from #{format_money(ticket_type.range_min)} to #{format_money(ticket_type.range_max)}"
+                 else
+                   "#{format_money(0)} or more"
+                 end
+        "#{ticket_type.name} (#{bounds})"
+      else
+        @ticket_prices[ticket_type_id] = price
+        nil
+      end
+    end.uniq
+    raise PriceInvalid, "Choose a price per ticket for #{problems.join('; ')}." if problems.any?
+  end
+
+  # The code must be the event's and not used up, and apply to each ticket chosen: the checkout form only shows the
+  # ticket types it applies to once it's applied
+  def check_discount_code(ticket_types)
+    return if @discount_code.to_s.strip.empty?
+
+    discount_code, problem = @event.checkout_discount_code(@discount_code)
+    code = @discount_code.to_s.strip.upcase
+    raise DiscountCodeInvalid, "The discount code #{code} has been used up." if problem == :used_up
+    raise DiscountCodeInvalid, "The discount code #{code} is not valid for this event." unless discount_code
+    unless ticket_types.all? { |ticket_type| discount_code.applies_to_ticket_type?(ticket_type) }
+      raise DiscountCodeInvalid, "The discount code #{code} only applies to ticket types whose names include #{discount_code.filters.join(' or ')}."
+    end
+
+    @discount_code_id = discount_code.id
+  end
+
+  def check_donation
+    raise DonationInvalid if @donation_amount.to_f.negative? || (@donation_amount.to_f.positive? && !@event.checkout_donation)
+    # Donation's own validation only sees a donation that's made
+    raise DonationRequired.new(@event.minimum_donation, @event.currency) if donation_below_minimum?
+  end
+
+  def format_money(amount)
+    Money.new((amount * 100).round, @event.currency).format(no_cents_if_whole: true)
+  end
+
   def find_or_create_account
-    account_hash = @buyer.slice(:name, :email, :postcode, :country)
-    account_hash[:phone] = @buyer[:phone] if @event.organisation.collect_phone?
+    fields = @event.checkout_buyer_fields.map { |field| field[:name].to_sym } - [:hear_about]
+    account_hash = @buyer.slice(*fields)
 
     @account = Account.find_by(email: @buyer[:email].downcase.strip)
     @account ||= Account.new(account_hash.merge(skip_confirmation_email: true, default_currency: @new_account_currency, skip_geocoding: true))
@@ -232,7 +323,7 @@ class OrderBuilder
       revenue_sharer: (@event.revenue_sharer_organisationship.account if @event.revenue_sharer_organisationship),
       opt_in_organisation: @opt_in_organisation,
       opt_in_facilitator: @opt_in_facilitator,
-      answers: @answers,
+      answers: @answer_pairs,
       application_fee_paid_to_dandelion: !ignore_dandelion_donation? && !@event.revenue_sharer_organisationship && @event.donations_to_dandelion?,
       donation_via_modal: !ignore_dandelion_donation? && @donation_via_modal,
       cohost: @cohost,
@@ -281,10 +372,8 @@ class OrderBuilder
         @order.destroy
         raise NotEnoughTickets
       end
-      price = if ticket_type.range || ticket_type.price.nil?
-                submitted_price = Float(@prices[ticket_type_id], exception: false) || 0
-                ticket_type.range ? submitted_price.clamp(*ticket_type.range) : submitted_price
-              end
+      # check_prices has checked it
+      price = @ticket_prices[ticket_type_id] if ticket_type.range || ticket_type.price.nil?
       quantity.times do
         @order.tickets.create!(
           event: @event,
@@ -306,7 +395,6 @@ class OrderBuilder
   def apply_donation_and_discounts
     @order.donations.create!(event: @event, account: @account, amount: @donation_amount) if @donation_amount.to_f > 0 && !ignore_dandelion_donation?
 
-    @order.filter_discounts if @order.discount_code && @order.discount_code.filter
     # Credit belongs to the order account; only apply it if that account is signed in.
     @order.apply_credit if signed_in_as_buyer?
     @order.apply_fixed_discount

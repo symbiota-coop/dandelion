@@ -68,7 +68,7 @@
       <% if discount_code %>
         <div class="input-group my-1">
           <%= text_field_tag :discount_code_display, id: 'discount_code_display', class: 'form-control', style: 'width: 5em', disabled: true, value: params[:discount_code].upcase %>
-          <%= hidden_field_tag :discount_code_id, id: 'discount_code_id', value: discount_code.id %>
+          <%= hidden_field_tag :applied_discount_code, id: 'applied_discount_code', value: discount_code.code %>
           <button class="btn btn-outline-secondary" type="button" onclick="applyDiscountCode(null)">Remove</button>
         </div>
         <% if discount_code.percentage_discount %>

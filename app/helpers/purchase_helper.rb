@@ -53,14 +53,18 @@ Dandelion::App.helpers do
       new_account_currency: visitor_currency,
       secret_ticket_type_id: ticket_form[:ticket_type_id],
       payment_method: details_form[:payment_method],
-      answers: question_answer_pairs(details_form),
+      # By question index: OrderBuilder pairs them with the event's questions
+      answers: details_form[:answers],
+      accepted_terms: checked.(details_form[:accepted_terms]),
+      # The code applied, rather than one typed into the box but not applied
+      discount_code: ticket_form[:applied_discount_code],
       donation_via_modal: checked.(ticket_form[:donation_via_modal]),
       opt_in_organisation: checked.(account_data[:opt_in_organisation]),
       opt_in_facilitator: checked.(account_data[:opt_in_facilitator]),
       confirmed_duplicate: checked.(params[:confirmed_duplicate]),
       utm: %i[source medium campaign].index_with { |field| details_form[:"utm_#{field}"] }
     }.merge(
-      %i[quantities prices donation_amount discount_code_id cohost affiliate_type affiliate_id].index_with { |field| ticket_form[field] },
+      %i[quantities prices donation_amount cohost affiliate_type affiliate_id].index_with { |field| ticket_form[field] },
       %i[hear_about via http_referrer].index_with { |field| account_data[field] }
     )
   rescue StandardError => e

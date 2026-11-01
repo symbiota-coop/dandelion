@@ -35,24 +35,8 @@ module Dandelion
         return tool_error("That secret link doesn't unlock a ticket type of this event. Check the link with the buyer.")
       end
 
-      ticket_types = quantities.select { |_ticket_type_id, quantity| quantity.to_i.positive? }.keys.filter_map { |ticket_type_id| event.ticket_types.find(ticket_type_id) }
-
-      discount_code, error = checkout_discount_code(event, discount_code, ticket_types)
-      return tool_error(error) if error
-
-      prices, error = checkout_prices(event, ticket_types, prices)
-      return tool_error(error) if error
-
-      donation_amount, error = checkout_donation_amount(event, donation_amount)
-      return tool_error(error) if error
-
-      if event.terms_acceptance_required? && accept_terms != true
-        return tool_error('The buyer must accept the terms and conditions: show them the terms, then set accept_terms to true.')
-      end
-
-      question_answers, error = checkout_answers(event, answers)
-      return tool_error(error) if error
-
+      prices = prices.is_a?(Hash) ? prices.transform_keys(&:to_s) : {}
+      discount_code = (discount_code.to_s.strip.upcase unless discount_code.to_s.strip.empty?)
       opt_ins, error = checkout_opt_ins(event, opt_ins)
       return tool_error(error) if error
 
@@ -73,9 +57,10 @@ module Dandelion
         secret_ticket_type_id: secret_ticket_type_id,
         # OrderBuilder pays with RSVP whenever nothing is left to pay
         payment_method: payment_method&.name || 'rsvp',
-        answers: question_answers,
+        answers: answers,
+        accepted_terms: accept_terms == true,
         donation_amount: donation_amount,
-        discount_code_id: discount_code&.id,
+        discount_code: discount_code,
         cohost: attribution['cohost'],
         affiliate_type: attribution['affiliate_type'],
         affiliate_id: attribution['affiliate_id'],
@@ -154,96 +139,6 @@ module Dandelion
       [nil, "Choose one of the payment methods agents can use for this event: #{choices.map(&:name).join(', ')}."]
     end
 
-    # The discount code the buyer entered, which must apply to each ticket they chose, as the checkout form only shows
-    # those ticket types once the code is applied
-    def self.checkout_discount_code(event, code, ticket_types)
-      return [nil, nil] if code.to_s.strip.empty?
-
-      discount_code, problem = event.checkout_discount_code(code)
-      return [nil, "The discount code #{code} has been used up."] if problem == :used_up
-      return [nil, "The discount code #{code} is not valid for this event."] unless discount_code
-
-      unless ticket_types.all? { |ticket_type| discount_code.applies_to_ticket_type?(ticket_type) }
-        return [nil, "The discount code #{code} only applies to ticket types whose names include #{discount_code.filters.join(' or ')}."]
-      end
-
-      [discount_code, nil]
-    end
-
-    # prices: the price per ticket the buyer chose for each range or pay-what-you-want ticket type, keyed by ticket type
-    # id. Agents don't choose an amount on the buyer's behalf, so each needs one, within the ticket type's range
-    def self.checkout_prices(event, ticket_types, prices)
-      prices = prices.is_a?(Hash) ? prices.transform_keys(&:to_s) : {}
-      chosen = {}
-      problems = ticket_types.uniq.filter_map do |ticket_type|
-        next unless ticket_type.range || ticket_type.price.nil?
-
-        price = Float(prices[ticket_type.id.to_s], exception: false)
-        bounds = if ticket_type.range
-                   "from #{format_money(ticket_type.range_min, event.currency)} to #{format_money(ticket_type.range_max, event.currency)}"
-                 else
-                   "#{format_money(0, event.currency)} or more"
-                 end
-        if price.nil? || (ticket_type.range ? !price.between?(*ticket_type.range) : price.negative?)
-          "#{ticket_type.name} (#{bounds})"
-        else
-          chosen[ticket_type.id.to_s] = price
-          nil
-        end
-      end
-      if problems.any?
-        return [nil, "Ask the buyer how much they want to pay per ticket, and pass it in prices, keyed by ticket type id: #{problems.join('; ')}"]
-      end
-
-      [chosen, nil]
-    end
-
-    # A donation the buyer chose to add, where the checkout form offers one. OrderBuilder checks any minimum
-    def self.checkout_donation_amount(event, amount)
-      return [nil, nil] if amount.to_s.strip.empty?
-
-      amount = Float(amount, exception: false)
-      return [nil, 'donation_amount must be a number, 0 or more.'] if amount.nil? || amount.negative?
-      return [nil, "This event doesn't take donations at checkout."] if amount.positive? && !event.checkout_donation
-
-      [amount, nil]
-    end
-
-    # answers: an object mapping question indexes (from get_event_checkout_requirements_tool)
-    # to strings, true/false for a checkbox, or an array of options for checkboxes.
-    # Returns the [question, answer] pairs the checkout form would, or an error.
-    def self.checkout_answers(event, answers)
-      answers = (answers || {}).to_h.transform_keys(&:to_s)
-      fields = Questions.parse(event.questions).reject { |field| %w[heading info].include?(field[:type]) }
-      unknown = answers.keys - fields.map { |field| field[:index].to_s }
-      return [nil, "Unknown question indexes: #{unknown.join(', ')}"] if unknown.any?
-
-      invalid = fields.select do |field|
-        answer = answers[field[:index].to_s].to_s.strip
-        field[:type] == 'select' && !answer.empty? && !field[:options].include?(answer)
-      end
-      return [nil, "Choose one of the options: #{invalid.map { |field| "#{field[:text]} (#{field[:options].join(', ')})" }.join('; ')}"] if invalid.any?
-
-      # Stored as the checkout form sends them: a ticked checkbox as '1', and an unticked one not at all
-      pairs = fields.map do |field|
-        value = answers[field[:index].to_s]
-        value = case field[:type]
-                when 'checkbox' then ('1' if value == true || value.to_s == 'true')
-                when 'checkboxes'
-                  selected = Array(value).map(&:to_s) & field[:options]
-                  selected unless selected.empty?
-                else
-                  value.to_s.strip unless value.to_s.strip.empty?
-                end
-        [field[:question], value]
-      end
-
-      missing = fields.zip(pairs).select { |field, (_question, value)| field[:required] && value.nil? }.map { |field, _pair| field[:text] }
-      return [nil, "Answer the required questions: #{missing.join('; ')}"] if missing.any?
-
-      [fields.zip(pairs).reject { |field, (_question, value)| field[:type] == 'checkbox' && value.nil? }.map(&:last), nil]
-    end
-
     # opt_ins: the names of the opt-ins get_event_checkout_requirements_tool lists that the buyer chose
     def self.checkout_opt_ins(event, opt_ins)
       opt_ins = Array(opt_ins).map(&:to_s)
@@ -264,16 +159,12 @@ module Dandelion
     def self.checkout_page_url(event, quantities:, prices:, discount_code:, secret_ticket_type_id:, donation_amount:, attribution:)
       query = {
         'ticket_type_id' => secret_ticket_type_id,
-        'discount_code' => discount_code&.code,
+        'discount_code' => discount_code,
         'quantities' => quantities.select { |_ticket_type_id, quantity| quantity.to_i.positive? }.transform_values(&:to_i),
         'prices' => prices,
         'donation_amount' => donation_amount
       }.merge(attribution).reject { |_key, value| value.nil? || (value.respond_to?(:empty?) && value.empty?) }
       "#{ENV['BASE_URI']}/e/#{event.slug}#{"?#{Rack::Utils.build_nested_query(query)}" unless query.empty?}#select-tickets"
-    end
-
-    def self.format_money(amount, currency)
-      Money.new((amount * 100).round, currency).format(no_cents_if_whole: true)
     end
 
     # OrderBuilder's errors say what went wrong; this only adds what an agent can do about it. Whether there's anything
@@ -291,6 +182,11 @@ module Dandelion
         else
           error.message
         end
+      when OrderBuilder::TermsNotAccepted
+        'The buyer must accept the terms and conditions: show them the terms, then set accept_terms to true.'
+      when OrderBuilder::PriceInvalid
+        # Agents don't choose a price on the buyer's behalf
+        "#{error.message} Ask the buyer how much they want to pay per ticket, and pass it in prices, keyed by ticket type id."
       when OrderBuilder::DonationRequired
         # Agents don't choose an amount to give on the buyer's behalf
         "#{error.message} Ask the buyer how much they want to give, and pass it as donation_amount."

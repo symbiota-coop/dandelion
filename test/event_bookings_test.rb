@@ -588,6 +588,89 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 5, @event.orders.first.donations.first.amount
   end
 
+  # The checkout form checks these in the browser, so these post without it, as a request needn't come from the form
+
+  def post_checkout(ticket_form: {}, details_form: {})
+    @buyer ||= FactoryBot.create(:account)
+    header 'Accept', 'application/json'
+    post "/e/#{@event.slug}/purchase",
+         ticketForm: { quantities: { @event.ticket_types.first.id.to_s => '1' } }.merge(ticket_form),
+         detailsForm: { payment_method: 'stripe', account: { name: @buyer.name, email: @buyer.email } }.merge(details_form)
+  end
+
+  def with_stubbed_stripe_session(&)
+    Stripe::Checkout::Session.stub(:create, api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test'), &)
+  end
+
+  test 'purchase needs the terms accepted when the event asks' do
+    create_event(prices: [0], terms_and_conditions: 'Be kind', terms_and_conditions_check_box: true)
+
+    post_checkout(details_form: { payment_method: 'rsvp' })
+    assert_equal 400, last_response.status
+    assert_equal 0, @event.orders.count
+
+    post_checkout(details_form: { payment_method: 'rsvp', accepted_terms: '1' })
+    assert_equal 200, last_response.status
+  end
+
+  test "purchase checks answers and stores them with the event's own questions" do
+    create_event(prices: [0], questions: "T-shirt size <S, M, L>*\nDietary requirements")
+
+    post_checkout(details_form: { payment_method: 'rsvp', answers: { '1' => 'None' } })
+    assert_equal 400, last_response.status
+
+    post_checkout(details_form: { payment_method: 'rsvp', answers: { '0' => 'XL' } })
+    assert_equal 400, last_response.status
+    assert_equal 0, @event.orders.count
+
+    post_checkout(details_form: { payment_method: 'rsvp', answers: { '0' => 'M', '1' => 'None' }, questions: { '0' => 'Forged question', '1' => 'Another' } })
+    assert_equal 200, last_response.status
+    assert_equal [['T-shirt size <S, M, L>*', 'M'], ['Dietary requirements', 'None']], @event.orders.last.answers
+  end
+
+  test 'purchase needs a price within range for range and pay-what-you-want tickets' do
+    create_event(prices: ['10-100'], suggested_donation: 0)
+    ticket_type_id = @event.ticket_types.first.id.to_s
+
+    # Rather than booking at £0, or at the nearest end of the range
+    post_checkout
+    assert_equal 400, last_response.status
+    post_checkout(ticket_form: { prices: { ticket_type_id => '150' } })
+    assert_equal 400, last_response.status
+    assert_equal 0, @event.orders.count
+
+    with_stubbed_stripe_session do
+      post_checkout(ticket_form: { prices: { ticket_type_id => '25' } })
+    end
+    assert_equal 200, last_response.status
+    assert_equal 25, @event.tickets.first.price
+  end
+
+  test 'purchase refuses a discount code that is not valid, rather than charging the full price' do
+    create_event(prices: [10], suggested_donation: 0)
+    FactoryBot.create(:discount_code, codeable: @event, code: 'HALF', percentage_discount: 50)
+
+    post_checkout(ticket_form: { applied_discount_code: 'NOPE' })
+    assert_equal 400, last_response.status
+    assert_equal 0, @event.orders.count
+
+    with_stubbed_stripe_session do
+      post_checkout(ticket_form: { applied_discount_code: 'HALF' })
+    end
+    assert_equal 200, last_response.status
+    assert_equal 5, @event.orders.last.total
+  end
+
+  test "purchase refuses a donation the event doesn't take" do
+    create_event(prices: [10])
+    @event.set(suggested_donation: nil)
+
+    post_checkout(ticket_form: { donation_amount: '5' })
+
+    assert_equal 400, last_response.status
+    assert_equal 0, @event.orders.count
+  end
+
   test 'purchase is allowed up to max_quantity_per_transaction' do
     create_event(prices: [0])
     @event.ticket_types.first.set(quantity: 10, max_quantity_per_transaction: 2)

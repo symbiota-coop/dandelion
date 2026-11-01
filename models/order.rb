@@ -228,22 +228,6 @@ class Order
     text + "#{event.when_details(account.try(:time_zone))}#{" at #{event.location}" if event.location != 'Online'}#{": #{d.join(', ')}" unless d.empty?}"
   end
 
-  def filter_discounts
-    # return == leave existing discounts
-    return unless discount_code&.filter
-
-    return if tickets.all? { |ticket| discount_code.applies_to_ticket_type?(ticket.ticket_type) }
-
-    # otherwise, remove discounts
-    self.discount_code = nil
-    self.percentage_discount = nil
-    save
-    tickets.each do |ticket|
-      ticket.percentage_discount = nil
-      ticket.save
-    end
-  end
-
   def apply_credit
     return unless (organisationship = event.organisation.organisationships.find_by(account: account))
 
