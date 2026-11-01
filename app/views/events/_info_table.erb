@@ -32,7 +32,7 @@
     <tr>
       <td>Activity</td>
       <td>
-        <a href="/o/<%= @event.activity.organisation.slug %>/a/<%= @event.activity.slug %>"><%= @event.activity.name %></a>
+        <a href="<%= @event.activity.path %>"><%= @event.activity.name %></a>
       </td>
     </tr>
   <% end %>

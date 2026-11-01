@@ -32,7 +32,7 @@ class ActivitiesTest < ActiveSupport::TestCase
     create_organisation
     activity = FactoryBot.create(:activity, organisation: @organisation)
     sign_in(@account)
-    visit "/activities/#{activity.id}/edit"
+    visit "#{activity.path}/edit"
     fill_in 'Name', with: (name = FactoryBot.build_stubbed(:activity).name)
     click_button 'Update activity'
     assert page.has_content? 'The activity was saved'
@@ -51,7 +51,7 @@ class ActivitiesTest < ActiveSupport::TestCase
   test 'applying to an activity when not logged in' do
     create_activity_with_questions
     applicant = FactoryBot.build_stubbed(:account)
-    visit "/activities/#{@activity.id}/apply"
+    visit "#{@activity.path}/apply"
     fill_in 'Full name', with: applicant.name
     fill_in 'Email', with: applicant.email
     fill_application_answers
@@ -63,7 +63,7 @@ class ActivitiesTest < ActiveSupport::TestCase
     create_organisation
     activity = FactoryBot.create(:activity, organisation: @organisation)
     sign_in(@account)
-    visit "/activities/#{activity.id}/apply"
+    visit "#{activity.path}/apply"
     assert page.has_content? 'Preview of application form'
   end
 
@@ -83,7 +83,7 @@ class ActivitiesTest < ActiveSupport::TestCase
                                  application_questions: questions)
     applicant = FactoryBot.create(:account)
     sign_in(applicant)
-    visit "/activities/#{activity.id}/apply"
+    visit "#{activity.path}/apply"
 
     assert page.has_content?('Application Form')
     assert page.has_content?('Please fill out all fields')

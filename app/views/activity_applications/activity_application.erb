@@ -1,4 +1,4 @@
-<a class="d-inline-block mb-3" href="/activities/<%= @activity.id %>/applications"><i class="bi bi-arrow-left"></i> Return to <%= @activity.name %> applications</a>
+<a class="d-inline-block mb-3" href="<%= @activity.path %>/applications"><i class="bi bi-arrow-left"></i> Return to <%= @activity.name %> applications</a>
 <div class="row">
   <div class="col-12 col-lg-auto text-center">
     <img alt="<%= @account.name %>" class="profile-photo <%= @account.avatar_class %>" title="<%= @account.name %>" src="<%= u @account.image_thumb_or_gravatar_url %>">
@@ -7,9 +7,9 @@
     <div class="mb-3">
       <h1 class="my-0">
         <a class="text-body" href="/u/<%= @account.username %>"><%= @account.name %></a>'s application to
-        <a class="text-body" href="/o/<%= @activity.organisation.slug %>/a/<%= @activity.slug %>"><%= @activity.name %></a>
+        <a class="text-body" href="<%= @activity.path %>"><%= @activity.name %></a>
       </h1>
-      <div data-pagelet-url="/activities/<%= @activity.id %>/activity_applications/<%= @activity_application.id %>/set_status">
+      <div data-pagelet-url="<%= @activity.path %>/activity_applications/<%= @activity_application.id %>/set_status">
         <%= partial :'activity_applications/set_status' %>
       </div>
     </div>

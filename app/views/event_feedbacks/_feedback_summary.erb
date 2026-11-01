@@ -1,6 +1,6 @@
 <%
   summarisable, path, manager = if @activity
-                                  [@activity, "/activities/#{@activity.id}/feedback_summary", activity_admin?]
+                                  [@activity, "#{@activity.path}/feedback_summary", activity_admin?]
                                 elsif @account
                                   [@account, "/accounts/#{@account.id}/feedback_summary", admin? || (current_account && @account == current_account)]
                                 elsif @organisation

@@ -8,7 +8,7 @@
 <% when 'facilitators' %>
   Facilitators
 <% when 'activity' %>
-  Activity: <a href="/o/<%= pmail.mailable.organisation.slug %>/a/<%= pmail.mailable.slug %>"><%= pmail.mailable.name %></a>
+  Activity: <a href="<%= pmail.mailable.path %>"><%= pmail.mailable.name %></a>
 <% when 'activity_tag' %>
   Activity tag:
   <span class="badge text-bg-primary mb-1"><%= pmail.mailable.name %></span>

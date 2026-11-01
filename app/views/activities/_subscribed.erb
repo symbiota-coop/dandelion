@@ -1,4 +1,4 @@
-<% form_tag "/activities/#{@activity.id}/subscribed/#{activityship.id}" do %>
+<% form_tag "#{@activity.path}/subscribed/#{activityship.id}" do %>
   <div class="form-check form-switch">
     <%= check_box_tag :subscribed, id: "activityship-subscribed-#{activityship.id}", class: 'form-check-input', 'aria-label': 'Subscribed', checked: !activityship.unsubscribed, onclick: '$(this.form).submit()' %>
   </div>

@@ -1,14 +1,14 @@
 Dandelion::App.controller do
-  get '/activities/:id/apply' do
-    @activity = Activity.find(params[:id]) || not_found
+  get '/o/:organisation_slug/a/:slug/apply' do
+    @activity = activity_from_params || not_found
     @activityship = @activity.activityships.find_by(account: current_account)
-    #  redirect "/activities/#{@activity.id}/join" if @activity.privacy == 'open'
+    #  redirect "#{@activity.path}/join" if @activity.privacy == 'open'
     @account = current_account || Account.new
     erb :'activity_applications/apply'
   end
 
-  post '/activities/:id/apply' do
-    @activity = Activity.find(params[:id]) || not_found
+  post '/o/:organisation_slug/a/:slug/apply' do
+    @activity = activity_from_params || not_found
 
     if (account = Account.find_by(email: params[:account][:email].downcase.strip))
       @account = account
@@ -30,7 +30,7 @@ Dandelion::App.controller do
     else
       @activity_application = @activity.activity_applications.build(account: @account, via: params[:via], status: 'Pending', answers: question_answer_pairs(params))
       if @activity_application.save
-        redirect "/activities/#{@activity.id}/apply?applied=true"
+        redirect "#{@activity.path}/apply?applied=true"
       else
         flash.now[:error] = 'There was a problem saving the application'
         halt 400, erb(:'activity_applications/apply')
@@ -38,8 +38,8 @@ Dandelion::App.controller do
     end
   end
 
-  get '/activities/:id/applications', provides: %i[html csv] do
-    @activity = Activity.find(params[:id]) || not_found
+  get '/o/:organisation_slug/a/:slug/applications', provides: %i[html csv] do
+    @activity = activity_from_params || not_found
     activity_admins_only!
     @from = parse_date(params[:from]) if params[:from]
     @to = parse_date(params[:to]) if params[:to]
@@ -78,31 +78,31 @@ Dandelion::App.controller do
     end
   end
 
-  get '/activities/:id/activity_applications/latest' do
+  get '/o/:organisation_slug/a/:slug/activity_applications/latest' do
     sign_in_required!
-    @activity = Activity.find(params[:id]) || not_found
+    @activity = activity_from_params || not_found
     @activity_application = @activity.activity_applications.order('created_at desc').and(account_id: current_account.id).first || not_found
     @account = @activity_application.account
     erb :'activity_applications/view'
   end
 
-  get '/activities/:id/activity_applications/:activity_application_id' do
-    @activity = Activity.find(params[:id]) || not_found
+  get '/o/:organisation_slug/a/:slug/activity_applications/:activity_application_id' do
+    @activity = activity_from_params || not_found
     activity_admins_only!
     @activity_application = @activity.activity_applications.find(params[:activity_application_id]) || not_found
     @account = @activity_application.account
     erb :'activity_applications/activity_application'
   end
 
-  get '/activities/:id/activity_applications/:activity_application_id/set_status' do
-    @activity = Activity.find(params[:id]) || not_found
+  get '/o/:organisation_slug/a/:slug/activity_applications/:activity_application_id/set_status' do
+    @activity = activity_from_params || not_found
     activity_admins_only!
     @activity_application = @activity.activity_applications.find(params[:activity_application_id]) || not_found
     partial :'activity_applications/set_status'
   end
 
-  post '/activities/:id/activity_applications/:activity_application_id/set_status' do
-    @activity = Activity.find(params[:id]) || not_found
+  post '/o/:organisation_slug/a/:slug/activity_applications/:activity_application_id/set_status' do
+    @activity = activity_from_params || not_found
     activity_admins_only!
     @activity_application = @activity.activity_applications.find(params[:activity_application_id]) || not_found
     @activity_application.status = params[:status]
@@ -113,8 +113,8 @@ Dandelion::App.controller do
     200
   end
 
-  post '/activities/:id/activity_applications/:activity_application_id/destroy' do
-    @activity = Activity.find(params[:id]) || not_found
+  post '/o/:organisation_slug/a/:slug/activity_applications/:activity_application_id/destroy' do
+    @activity = activity_from_params || not_found
     activity_admins_only!
     @activity_application = @activity.activity_applications.find(params[:activity_application_id]) || not_found
     @activity_application.destroy

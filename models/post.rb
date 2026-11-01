@@ -59,7 +59,7 @@ class Post
       "#{ENV['BASE_URI']}/e/#{event.slug}"
     when ActivityApplication
       activity_application = commentable
-      "#{ENV['BASE_URI']}/activities/#{activity_application.activity_id}/activity_applications/#{activity_application.id}"
+      "#{ENV['BASE_URI']}#{activity_application.activity.path}/activity_applications/#{activity_application.id}"
     end
   end
 

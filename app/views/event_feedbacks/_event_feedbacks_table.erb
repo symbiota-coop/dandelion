@@ -124,7 +124,7 @@
     <% if defined?(activity_name) %>
       <td class="desktop">
         <% if event_feedback.event && event_feedback.event.activity %>
-          <a href="/o/<%= event_feedback.event.activity.organisation.slug %>/a/<%= event_feedback.event.activity.slug %>"><%= event_feedback.event.activity.name %></a>
+          <a href="<%= event_feedback.event.activity.path %>"><%= event_feedback.event.activity.name %></a>
         <% end %>
       </td>
     <% end %>

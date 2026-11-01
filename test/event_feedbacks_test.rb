@@ -40,7 +40,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     deleted.destroy
     create_feedback(account: live_reviewer, rating: 5)
 
-    get "/activities/#{@activity.id}/show_feedback", minimal: 1
+    get "#{@activity.path}/show_feedback", minimal: 1
     assert_equal 200, last_response.status
     assert_includes last_response.body, '<em>Removed</em>'
     assert_includes last_response.body, @event.name
@@ -60,7 +60,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     event_feedback = create_feedback(account: reviewer, event: @secret_event, rating: 5)
 
     assert_equal 0, event_feedback.notifications.count
-    ["/activities/#{@activity.id}/show_feedback", "/o/#{@organisation.slug}/show_feedback", "/accounts/#{facilitator.id}/show_feedback"].each do |path|
+    ["#{@activity.path}/show_feedback", "/o/#{@organisation.slug}/show_feedback", "/accounts/#{facilitator.id}/show_feedback"].each do |path|
       get path, minimal: 1
       assert_equal 200, last_response.status
       refute_includes last_response.body, reviewer.name, path
@@ -145,7 +145,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     get "/e/#{@event.slug}"
     assert_equal 200, last_response.status
     assert_includes last_response.body, "Feedback on #{@activity.name} events"
-    assert_includes last_response.body, "/activities/#{@activity.id}/show_feedback"
+    assert_includes last_response.body, "#{@activity.path}/show_feedback"
   end
 
   # ═══════════════════════════════════════════════════════════════════════════

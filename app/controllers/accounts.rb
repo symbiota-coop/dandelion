@@ -316,7 +316,7 @@ Dandelion::App.controller do
                elsif @organisation
                  "/o/#{@organisation.slug}"
                elsif @activity
-                 "/activities/#{@activity.id}"
+                 @activity.path
                elsif @local_group
                  "/local_groups/#{@local_group.id}"
                elsif @event

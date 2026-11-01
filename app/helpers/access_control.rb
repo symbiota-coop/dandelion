@@ -91,7 +91,7 @@ Dandelion::App.helpers do
   end
 
   def activity_admins_only!
-    kick!(redirect_url: "/activities/#{@activity.id}") unless activity_admin?
+    kick!(redirect_url: @activity.path) unless activity_admin?
   end
 
   def local_group_admin?(local_group = nil, account = current_account)

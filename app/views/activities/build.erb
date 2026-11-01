@@ -16,7 +16,7 @@
     autosize($('#activity_application_questions')[0])
 
     if (<%== @activity.persisted?.to_json %>) {
-      initQuestionsPreview('#activity_application_questions', <%== "/activities/#{@activity.id}/application_questions".to_json %>, {
+      initQuestionsPreview('#activity_application_questions', <%== "#{@activity.path}/application_questions".to_json %>, {
         extraParams: function () {
           return {
             hide_image: $('#activity_hide_image').is(':checked') ? '1' : '0',
@@ -30,7 +30,7 @@
     }
   })
 </script>
-<% form_for @activity, @activity.new_record ? '/activities/new' : "/activities/#{@activity.id}/edit" do |f| %>
+<% form_for @activity, @activity.new_record ? '/activities/new' : "#{@activity.path}/edit" do |f| %>
   <%= hidden_field_tag :'activity[organisation_id]', value: @activity.organisation_id %>
   <%= f.text_block :name %>
   <div class="slugify">
@@ -55,5 +55,5 @@
     <%= f.wysiwyg_block :thank_you_message %>
     <%= f.wysiwyg_block :extra_info_for_acceptance_email %>
   </div>
-  <%= f.submit_block destroy_url: "/activities/#{@activity.id}/destroy" %>
+  <%= f.submit_block destroy_url: "#{@activity.path}/destroy" %>
 <% end %>

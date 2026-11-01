@@ -6,8 +6,8 @@ Dandelion::App.controller do
     erb :'organisations/event_feedbacks'
   end
 
-  get '/activities/:id/feedback' do
-    @activity = Activity.find(params[:id]) || not_found
+  get '/o/:organisation_slug/a/:slug/feedback' do
+    @activity = activity_from_params || not_found
     activity_admins_only!
     @event_feedbacks = @activity.event_feedbacks.includes(:account, event: :organisation)
     erb :'activities/event_feedbacks'

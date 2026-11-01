@@ -89,6 +89,11 @@ class Activity
 
   has_many :pmails_as_mailable, class_name: 'Pmail', as: :mailable, dependent: :destroy
   has_many :pmails_as_exclusion, class_name: 'Pmail', inverse_of: :activity, dependent: :nullify
+  # Its URLs are under its organisation's, as its slug is unique only within the organisation
+  def path
+    "/o/#{organisation.slug}/a/#{slug}"
+  end
+
   def pmails_including_events
     Pmail.and(:id.in => pmails_as_mailable.pluck(:id) + Pmail.and(:mailable_type => 'Event', :mailable_id.in => events.pluck(:id)).pluck(:id))
   end

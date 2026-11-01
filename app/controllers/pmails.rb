@@ -109,7 +109,7 @@ Dandelion::App.controller do
         if @organisation
           redirect "/o/#{@organisation.slug}/pmails"
         elsif @activity
-          redirect "/activities/#{@activity.id}/pmails"
+          redirect "#{@activity.path}/pmails"
         elsif @local_group
           redirect "/local_groups/#{@local_group.id}/pmails"
         elsif @event
@@ -140,7 +140,7 @@ Dandelion::App.controller do
     if @organisation
       redirect "/o/#{@organisation.slug}/pmails"
     elsif @activity
-      redirect "/activities/#{@activity.id}/pmails"
+      redirect "#{@activity.path}/pmails"
     elsif @local_group
       redirect "/local_groups/#{@local_group.id}/pmails"
     elsif @event

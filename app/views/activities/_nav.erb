@@ -6,16 +6,16 @@
     <%= partial :'organisations/nav', locals: { organisation: activity.organisation, inline: true } %>
   <% end %>
   <%= dropdown_nav [
-        ['View activity', "/o/#{activity.organisation.slug}/a/#{activity.slug}"],
-        ['Settings', "/activities/#{activity.id}/edit"],
-        (['Preview application form', "/activities/#{activity.id}/apply"] if activity.privacy == 'closed'),
-        ([%(Applications <span class="badge text-bg-primary">#{activity.activity_applications.outstanding.count}</span>), "/activities/#{activity.id}/applications"] if activity.privacy == 'closed'),
-        [%(Followers <span class="badge text-bg-primary">#{activity.activityships.count}</span>), "/activities/#{activity.id}/followers"],
-        ['Discount codes' + (activity.discount_codes.count.positive? ? " <span class='badge text-bg-primary'>#{activity.discount_codes.count}</span>" : ''), "/activities/#{activity.id}/discount_codes"],
-        ['Event stats', "/activities/#{activity.id}/events/stats"],
-        ['Audience stats', "/activities/#{activity.id}/stats"],
-        ['Feedback', "/activities/#{activity.id}/feedback"],
-        ['Mailer', "/activities/#{activity.id}/pmails"]
+        ['View activity', activity.path],
+        ['Settings', "#{activity.path}/edit"],
+        (['Preview application form', "#{activity.path}/apply"] if activity.privacy == 'closed'),
+        ([%(Applications <span class="badge text-bg-primary">#{activity.activity_applications.outstanding.count}</span>), "#{activity.path}/applications"] if activity.privacy == 'closed'),
+        [%(Followers <span class="badge text-bg-primary">#{activity.activityships.count}</span>), "#{activity.path}/followers"],
+        ['Discount codes' + (activity.discount_codes.count.positive? ? " <span class='badge text-bg-primary'>#{activity.discount_codes.count}</span>" : ''), "#{activity.path}/discount_codes"],
+        ['Event stats', "#{activity.path}/events/stats"],
+        ['Audience stats', "#{activity.path}/stats"],
+        ['Feedback', "#{activity.path}/feedback"],
+        ['Mailer', "#{activity.path}/pmails"]
       ].compact, button_text: %(#{activity.name}), container_class: 'btn-group mb-1' %>
   <% unless defined?(inline) %>
     <%== '</div>' %>

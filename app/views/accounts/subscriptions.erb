@@ -84,8 +84,8 @@
               <% activityships.each { |activityship| activity = activityship.activity %>
               <li class="list-group-item subscription-row subscription-child" style="display: none">
                 <a href="/o/<%= organisation.slug %>/a/<%= activity.slug %>"><%= activity.name %></a>
-                <div data-pagelet-url="/activities/<%= activity.id %>/activityship">
-                  <%= partial :'activities_and_local_groups/resourceship', locals: { resource: activity, resourceship: activityship, resourceship_name: 'activityship', resource_path: "/activities/#{activity.id}" } %>
+                <div data-pagelet-url="<%= activity.path %>/activityship">
+                  <%= partial :'activities_and_local_groups/resourceship', locals: { resource: activity, resourceship: activityship, resourceship_name: 'activityship', resource_path: activity.path } %>
                 </div>
               </li>
               <% } %>

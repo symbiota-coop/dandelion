@@ -23,7 +23,7 @@ class Notification
     when Account
       "#{ENV['BASE_URI']}/accounts/#{circle.id}"
     when Activity
-      "#{ENV['BASE_URI']}/activities/#{circle.id}"
+      "#{ENV['BASE_URI']}#{circle.path}"
     when LocalGroup
       "#{ENV['BASE_URI']}/local_groups/#{circle.id}"
     when Organisation

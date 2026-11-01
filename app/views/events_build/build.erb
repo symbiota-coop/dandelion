@@ -123,7 +123,7 @@
         <% end %>
 
         <% if @event.organisation.activities.exists? %>
-          <%= f.lookup_block :activity_id, lookup_url: "/o/#{@event.organisation_id}/activities.json", placeholder: 'Search activities', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="/o/#{@event.activity.organisation.slug}/a/#{@event.activity.slug}">View activity</a>) if @event.activity) %>
+          <%= f.lookup_block :activity_id, lookup_url: "/o/#{@event.organisation_id}/activities.json", placeholder: 'Search activities', selected_link: (%(<a class="d-inline-block mt-1" target="_blank" href="#{@event.activity.path}">View activity</a>) if @event.activity) %>
         <% end %>
 
         <% if @event.organisation.local_groups.exists? %>
