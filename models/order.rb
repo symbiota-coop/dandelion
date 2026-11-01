@@ -5,9 +5,12 @@ class Order
 
   include Mongoid::Paranoia
 
-  %w[OrderNotFound Restored PaymentMethodNotFound NoTickets].each do |error_class|
+  %w[OrderNotFound Restored].each do |error_class|
     const_set(error_class, Class.new(StandardError))
   end
+
+  # How long an unpaid order holds its tickets before the hourly cleanup deletes it (tasks/tasks.rake)
+  UNPAID_HOLD = 1.hour
 
   include OrderFields
   include PublicToken

@@ -109,6 +109,15 @@ class TicketType
     range_min && range_max ? [range_min, range_max] : nil
   end
 
+  # Whether account gives less each month than this ticket type asks of its buyers (minimum_monthly_donation)
+  def monthly_donation_too_low?(account)
+    return false unless minimum_monthly_donation
+    return true unless account && (organisationship = event.organisation.organisationships.find_by(account: account))
+    return true unless organisationship.monthly_donation_amount
+
+    Money.new(organisationship.monthly_donation_amount * 100, organisationship.monthly_donation_currency) < Money.new(minimum_monthly_donation * 100, event.currency)
+  end
+
   def sales_ended?
     sales_end.present? && Time.now > sales_end
   end

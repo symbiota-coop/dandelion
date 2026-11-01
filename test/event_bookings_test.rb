@@ -551,6 +551,43 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 0, @event.orders.count
   end
 
+  test 'purchase is rejected, without reporting an error, when no tickets are chosen' do
+    create_event(prices: [0])
+    buyer = FactoryBot.create(:account)
+
+    reported = []
+    ErrorReporting.stub(:capture_exception, ->(e, **) { reported << e }) do
+      post_purchase(@event, buyer, quantity: 0)
+    end
+
+    assert_equal 400, last_response.status
+    assert_empty reported
+    assert_equal 0, @event.orders.count
+  end
+
+  test 'purchase needs at least the minimum donation' do
+    create_event(prices: [0], suggested_donation: 10, minimum_donation: 5)
+    assert_equal 5, @event.minimum_donation
+    refute @event.donations_to_dandelion?
+    buyer = FactoryBot.create(:account)
+    purchase = lambda do |donation_amount|
+      header 'Accept', 'application/json'
+      post "/e/#{@event.slug}/purchase",
+           ticketForm: { quantities: { @event.ticket_types.first.id.to_s => '1' }, donation_amount: donation_amount },
+           detailsForm: { payment_method: 'stripe', account: { name: buyer.name, email: buyer.email } }
+    end
+
+    purchase.call('')
+    assert_equal 400, last_response.status
+    assert_equal 0, @event.orders.count
+
+    Stripe::Checkout::Session.stub(:create, api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test')) do
+      purchase.call('5')
+    end
+    assert_equal 200, last_response.status
+    assert_equal 5, @event.orders.first.donations.first.amount
+  end
+
   test 'purchase is allowed up to max_quantity_per_transaction' do
     create_event(prices: [0])
     @event.ticket_types.first.set(quantity: 10, max_quantity_per_transaction: 2)

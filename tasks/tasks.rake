@@ -14,7 +14,7 @@ namespace :hourly do
     puts 'clean up old temp files'
     system('find /tmp -maxdepth 1 -type f -mmin +60 -delete 2>/dev/null')
     puts 'delete stale uncompleted orders'
-    Order.incomplete.and(:created_at.lt => 1.hour.ago).destroy_all
+    Order.incomplete.and(:created_at.lt => Order::UNPAID_HOLD.ago).destroy_all
     puts 'update paid up status for organisations with orders in the last hour'
     Organisation.and(:id.in => Event.and(:id.in => Order.complete.and(:created_at.gt => 1.hour.ago).pluck(:event_id)).pluck(:organisation_id)).each(&:update_paid_up_without_delay)
     puts 'update monthly contributions current month'

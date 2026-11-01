@@ -5,33 +5,86 @@
 # It checks who may book (Event#booking_restriction, for the signed-in account)
 # and that each ticket type is still on sale. Failures raise an OrderBuilder::Error, after destroying any order created.
 class OrderBuilder
+  # Each error's message says what went wrong, for whoever is booking. The details of an unexpected error or a payment
+  # provider's go to Sentry or the failed purchase email instead
   class Error < StandardError
+    MESSAGE = 'Booking failed. Please try again.'.freeze
+
+    def initialize(message = self.class::MESSAGE)
+      super
+    end
+
     def status
       400
     end
   end
 
-  class AccountInvalid < Error; end
+  class AccountInvalid < Error
+    MESSAGE = 'The name or email address is not valid.'.freeze
+  end
 
-  class PaymentFailed < Error; end
+  class PaymentFailed < Error
+    MESSAGE = "The payment provider couldn't set up this payment. Please try again later.".freeze
+  end
 
   class BannedEmail < Error
+    MESSAGE = 'This account cannot book this event.'.freeze
+
     def status
       403
     end
   end
 
   class TicketTypeNotFound < Error
+    MESSAGE = 'Ticket type not found.'.freeze
+
     def status
       404
     end
   end
 
-  class NotEnoughTickets < Error; end
+  class NotEnoughTickets < Error
+    MESSAGE = 'Not enough tickets left of that type.'.freeze
+  end
 
-  class SalesEnded < Error; end
+  class SalesEnded < Error
+    MESSAGE = 'Sales of that ticket type have ended.'.freeze
+  end
+
+  class MonthlyDonationRequired < Error
+    MESSAGE = 'That ticket type is only for monthly donors giving at least its minimum.'.freeze
+  end
+
+  class NoTickets < Error
+    MESSAGE = 'Choose at least one ticket.'.freeze
+  end
+
+  # The event asks for a donation to the organisation of at least its minimum_donation
+  class DonationRequired < Error
+    def initialize(minimum, currency)
+      super("A donation of at least #{Money.new((minimum * 100).round, currency).format(no_cents_if_whole: true)} is required.")
+    end
+  end
+
+  class PaymentMethodUnavailable < Error
+    MESSAGE = "That payment method isn't available for this event.".freeze
+  end
 
   class NotAllowed < Error
+    MESSAGES = {
+      locked: 'This event is not taking bookings right now.',
+      monthly_donors_only: 'Only monthly donors to this organisation can book this event.',
+      members_only: 'Only members can book this event.'
+    }.freeze
+
+    # What Event#booking_restriction gave: :locked, :monthly_donors_only or :members_only
+    attr_reader :restriction
+
+    def initialize(restriction)
+      @restriction = restriction
+      super(MESSAGES.fetch(restriction))
+    end
+
     def status
       403
     end
@@ -80,7 +133,9 @@ class OrderBuilder
   # Returns what the payment method returns (JSON for the checkout form)
   def call
     restriction = @event.booking_restriction(@signed_in_account)
-    raise NotAllowed, restriction.to_s if restriction
+    raise NotAllowed.new(restriction) if restriction
+    # Donation's own validation only sees a donation that's made
+    raise DonationRequired.new(@event.minimum_donation, @event.currency) if donation_below_minimum?
 
     find_or_create_account
     check_duplicate unless @confirmed_duplicate
@@ -100,12 +155,12 @@ class OrderBuilder
       end
       @order.notify_of_failed_purchase(e, provider: info[:provider], help: info[:help])
       @order.destroy
-      raise PaymentFailed, e.message
+      raise PaymentFailed
     end
 
     ErrorReporting.capture_exception(e, context: ({ order_id: @order.id.to_s } if @order))
     @order.try(:destroy)
-    raise Error, e.message
+    raise Error
   end
 
   private
@@ -128,6 +183,10 @@ class OrderBuilder
       end
     end
     raise BannedEmail if @event.organisation.banned_emails_a.include?(@account.email)
+  end
+
+  def donation_below_minimum?
+    @event.minimum_donation&.positive? && !@event.donations_to_dandelion? && @donation_amount.to_f < @event.minimum_donation
   end
 
   def signed_in_as_buyer?
@@ -196,6 +255,10 @@ class OrderBuilder
         @order.destroy
         raise SalesEnded
       end
+      if ticket_type.monthly_donation_too_low?(@account)
+        @order.destroy
+        raise MonthlyDonationRequired
+      end
       purchased[ticket_type.id] += quantity
       available[ticket_type.id] ||= ticket_type.number_of_tickets_available_in_single_purchase
       if purchased[ticket_type.id] > available[ticket_type.id]
@@ -218,7 +281,10 @@ class OrderBuilder
       # Count these tickets when checking availability for the next ticket type
       @event.reset_ticket_counts
     end
-    raise Order::NoTickets if @order.tickets.empty?
+    return unless @order.tickets.empty?
+
+    @order.destroy
+    raise NoTickets
   end
 
   def apply_donation_and_discounts
@@ -237,9 +303,10 @@ class OrderBuilder
          else
            EventPaymentMethod.object('rsvp')
          end
-    raise Order::PaymentMethodNotFound if @order.total.positive? && pm&.name == 'rsvp'
-    raise Order::PaymentMethodNotFound unless pm&.process
-    raise Order::PaymentMethodNotFound unless pm&.available?(@event)
+    if (@order.total.positive? && pm&.name == 'rsvp') || !pm&.process || !pm.available?(@event)
+      @order.destroy
+      raise PaymentMethodUnavailable
+    end
 
     pm.process_payment(order: @order, event: @event, account: @account, cohost: @cohost, utm: @utm)
   end
