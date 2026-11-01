@@ -2,18 +2,8 @@
   <%= partial :'purchase/purchase_gate' %>
 <% else %>
 <%
-discount_code = nil
-discount_code_used_up = false
-if params[:discount_code]
-  discount_code = @event.all_discount_codes.find_by(code: params[:discount_code].upcase)
-  if discount_code
-    discount_code = nil if !discount_code.applies_to?(@event)
-    if discount_code&.exhausted?
-      discount_code = nil
-      discount_code_used_up = true
-    end
-  end
-end
+discount_code, discount_code_problem = (@event.checkout_discount_code(params[:discount_code]) if params[:discount_code])
+discount_code_used_up = discount_code_problem == :used_up
 
 @concise_ticket_form = !@event.always_show_full_ticket_form? &&
   @event.ticket_types.count == 1 &&
@@ -63,7 +53,7 @@ end
 
             <% @event.ticket_types.order('order asc, price desc').each { |ticket_type| %>
             <% next if ticket_type.hidden && params[:ticket_type_id] != ticket_type.public_id; %>
-            <% next if discount_code && discount_code.filter && !discount_code.filter.downcase.split(',').map(&:strip).any? { |filter| ticket_type.name.downcase.include?(filter) } %>
+            <% next if discount_code && !discount_code.applies_to_ticket_type?(ticket_type) %>
             <% ticket_type_availability = ticket_type.number_of_tickets_available_in_single_purchase %>
             <% ticket_type_sales_closed = ticket_type.sales_ended? || @event.sales_closed_due_to_event_end? %>
             <% ticket_type_waitlistable = @event.allow_ticket_type_waitlists? && ticket_type_availability <= 0 && !ticket_type_sales_closed %>

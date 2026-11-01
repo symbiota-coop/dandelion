@@ -632,7 +632,13 @@ class McpTest < ActiveSupport::TestCase
 
     rpc, = create_checkout(quantities: quantities, answers: { '0' => 'M' }, accept_terms: true)
     assert_includes tool_text(rpc), 'already has a ticket to this event'
+    assert_includes tool_text(rpc), 'confirm_duplicate'
     assert_equal 1, @event.orders.count
+
+    # As the checkout form books again once the buyer confirms
+    _rpc, order = create_checkout(quantities: quantities, answers: { '0' => 'M' }, accept_terms: true, confirm_duplicate: true)
+    assert_equal 'complete', order['status']
+    assert_equal 2, @event.orders.count
   end
 
   test 'create_checkout_tool refuses what agents cannot book' do
@@ -644,16 +650,20 @@ class McpTest < ActiveSupport::TestCase
     rpc, = create_checkout(quantities: { fixed.id.to_s => 0 })
     assert_includes tool_text(rpc), 'Choose at least one ticket.'
 
+    # Agents don't choose a price for the buyer
     rpc, = create_checkout(quantities: { range.id.to_s => 1 })
-    assert_includes tool_text(rpc), 'only book fixed-price tickets'
+    assert_includes tool_text(rpc), 'Ask the buyer how much they want to pay'
+    assert_includes tool_text(rpc), "#{range.name} (from £10 to £100)"
 
-    rpc, = create_checkout(quantities: { pay_what_you_want.id.to_s => 1 })
-    assert_includes tool_text(rpc), 'only book fixed-price tickets'
+    rpc, = create_checkout(quantities: { pay_what_you_want.id.to_s => 1 }, prices: { pay_what_you_want.id.to_s => -1 })
+    assert_includes tool_text(rpc), "#{pay_what_you_want.name} (£0 or more)"
 
+    # Sends the buyer to the event page with their choices filled in
     Dandelion::MCP.stub(:event_agent_payment_methods, []) do
       rpc, = create_checkout(quantities: { fixed.id.to_s => 1 })
     end
     assert_includes tool_text(rpc), 'no payment methods agents can use'
+    assert_includes tool_text(rpc), "#{ENV['BASE_URI']}/e/#{@event.slug}?quantities%5B#{fixed.id}%5D=1#select-tickets"
 
     fixed.update_attributes!(sales_end: 1.day.ago)
     rpc, = create_checkout(quantities: { fixed.id.to_s => 1 })
@@ -666,16 +676,37 @@ class McpTest < ActiveSupport::TestCase
     assert_equal 0, @event.orders.count
   end
 
-  test 'create_checkout_tool sends the buyer to the event page when the event needs a donation' do
+  test 'create_checkout_tool adds the donation the buyer chose' do
     create_event(prices: [0], suggested_donation: 10, minimum_donation: 5)
     assert_equal 5, @event.minimum_donation
     requirements = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))
-    assert_includes requirements['restrictions'], 'donation_required'
+    assert_empty requirements['restrictions']
+    assert_equal({ 'to' => @organisation.name, 'suggested' => 10.0, 'minimum' => 5.0 }, requirements['donation'])
+    quantities = { @event.ticket_types.first.id.to_s => 1 }
 
-    rpc, = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 })
-
+    rpc, = create_checkout(quantities: quantities)
     assert_includes tool_text(rpc), 'A donation of at least £5 is required.'
-    assert_includes tool_text(rpc), 'send the buyer to the event page'
+    assert_includes tool_text(rpc), 'pass it as donation_amount'
+
+    rpc, = create_checkout(quantities: quantities, donation_amount: 4)
+    assert_includes tool_text(rpc), 'A donation of at least £5 is required.'
+    assert_equal 0, @event.orders.count
+
+    order = nil
+    with_stubbed_stripe_session do
+      _rpc, order = create_checkout(quantities: quantities, donation_amount: 7)
+    end
+    assert_equal 'awaiting_payment', order['status']
+    assert_equal 7.0, order['donation']
+    assert_equal 7.0, order['total']
+  end
+
+  test 'create_checkout_tool refuses a donation the event does not take' do
+    create_event(prices: [0])
+
+    rpc, = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 }, donation_amount: 5)
+
+    assert_includes tool_text(rpc), "doesn't take donations"
     assert_equal 0, @event.orders.count
   end
 
@@ -698,13 +729,157 @@ class McpTest < ActiveSupport::TestCase
     assert_equal 0, @event.orders.count
   end
 
-  test 'create_checkout_tool does not sell hidden ticket types' do
+  test 'create_checkout_tool sells hidden ticket types only with their secret link' do
     create_event(prices: [0])
     hidden = @event.ticket_types.create!(name: 'Secret', price: 0, quantity: 5, hidden: true)
 
     rpc, = create_checkout(quantities: { hidden.id.to_s => 1 })
-
     assert_includes tool_text(rpc), 'Ticket type not found'
+
+    rpc, = create_checkout(quantities: { hidden.id.to_s => 1 }, secret_ticket_type_id: 'not-the-link')
+    assert_includes tool_text(rpc), "doesn't unlock a ticket type"
     assert_equal 0, @event.orders.count
+
+    link = "#{ENV['BASE_URI']}/e/#{@event.slug}?ticket_type_id=#{hidden.public_id}"
+    requirements = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug, secret_ticket_type_id: link })))
+    listed = requirements['ticket_types'].find { |ticket_type| ticket_type['id'] == hidden.id.to_s }
+    assert listed['hidden']
+
+    _rpc, order = create_checkout(quantities: { hidden.id.to_s => 1 }, secret_ticket_type_id: link)
+    assert_equal 'complete', order['status']
+    assert_equal ['Secret'], order['tickets'].pluck('ticket_type')
+  end
+
+  test 'create_checkout_tool books range and pay-what-you-want tickets at the price the buyer chose' do
+    create_event(prices: ['10-100', nil])
+    range = @event.ticket_types.detect(&:range)
+    pay_what_you_want = @event.ticket_types.detect { |ticket_type| !ticket_type.range }
+
+    rpc, = create_checkout(quantities: { range.id.to_s => 1 }, prices: { range.id.to_s => 150 })
+    assert_includes tool_text(rpc), "#{range.name} (from £10 to £100)"
+    assert_equal 0, @event.orders.count
+
+    order = nil
+    with_stubbed_stripe_session do
+      _rpc, order = create_checkout(quantities: { range.id.to_s => 2, pay_what_you_want.id.to_s => 1 },
+                                    prices: { range.id.to_s => 25, pay_what_you_want.id.to_s => 7.5 })
+    end
+    assert_equal 'awaiting_payment', order['status']
+    assert_equal [25.0, 25.0, 7.5], order['tickets'].pluck('price').sort.reverse
+    assert_equal 57.5, order['total']
+  end
+
+  test 'create_checkout_tool applies a discount code' do
+    create_event(prices: [10, 20])
+    early, late = @event.ticket_types.sort_by(&:price)
+    early.set(name: 'Early bird')
+    @event.discount_codes.create!(code: 'HALF', percentage_discount: 50, maximum_uses: 1)
+    @event.discount_codes.create!(code: 'EARLY', percentage_discount: 10, filter: 'early')
+
+    requirements = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug, discount_code: 'early' })))
+    assert requirements['discount_codes']
+    assert_equal({ 'code' => 'EARLY', 'valid' => true, 'percentage_discount' => 10, 'fixed_discount' => nil, 'fixed_discount_currency' => nil, 'ticket_type_ids' => [early.id.to_s] },
+                 requirements['discount_code'])
+
+    rpc, = create_checkout(quantities: { early.id.to_s => 1 }, discount_code: 'NOPE')
+    assert_includes tool_text(rpc), 'The discount code NOPE is not valid for this event.'
+
+    rpc, = create_checkout(quantities: { late.id.to_s => 1 }, discount_code: 'early')
+    assert_includes tool_text(rpc), 'only applies to ticket types whose names include early'
+    assert_equal 0, @event.orders.count
+
+    order = nil
+    with_stubbed_stripe_session do
+      _rpc, order = create_checkout(quantities: { early.id.to_s => 1, late.id.to_s => 1 }, discount_code: 'half')
+    end
+    assert_equal 15.0, order['total']
+    assert_equal({ 'discount_code' => 'HALF', 'percentage_discount' => 50 }, order['discounts'])
+
+    rpc, = create_checkout(quantities: { early.id.to_s => 1 }, discount_code: 'HALF')
+    assert_includes tool_text(rpc), 'The discount code HALF has been used up.'
+  end
+
+  test 'create_checkout_tool pays with the payment method the buyer chose' do
+    create_event(prices: [10])
+    @organisation.set(paypal_client_id: 'client', paypal_secret: 'secret')
+    quantities = { @event.ticket_types.first.id.to_s => 1 }
+
+    rpc, = create_checkout(quantities: quantities, payment_method: 'evm')
+    assert_includes tool_text(rpc), 'Choose one of the payment methods agents can use for this event: stripe, paypal.'
+
+    rpc, = create_checkout(quantities: quantities, payment_method: 'rsvp')
+    assert_includes tool_text(rpc), 'rsvp is only for bookings with nothing left to pay'
+    assert_equal 0, @event.orders.count
+
+    order = nil
+    EventPaymentMethod::Paypal.stub(:call, ->(**) { { redirect_url: 'https://www.paypal.com/checkoutnow?token=test' }.to_json }) do
+      _rpc, order = create_checkout(quantities: quantities, payment_method: 'paypal')
+    end
+    assert_equal 'awaiting_payment', order['status']
+    assert_equal 'https://www.paypal.com/checkoutnow?token=test', order['checkout_url']
+  end
+
+  test 'create_checkout_tool updates the profile of the account it books for with an API key' do
+    create_event(prices: [0])
+    @organisation.update_attributes!(collect_phone: true)
+    buyer_headers
+    name = @buyer.name
+
+    _rpc, order = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 }, buyer: { name: 'Ignored', phone: '+447700900000' })
+    assert_equal 'complete', order['status']
+    @buyer.reload
+    assert_equal '+447700900000', @buyer.phone
+    assert_equal name, @buyer.name
+  end
+
+  test 'create_checkout_tool records the cohost and affiliate the buyer came through' do
+    create_event(prices: [0])
+    affiliate = FactoryBot.create(:account)
+
+    _rpc, order = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 },
+                                  attribution: { affiliate_type: 'Account', affiliate_id: affiliate.id.to_s, utm_source: 'newsletter', unknown: 'ignored' })
+
+    record = Order.find(order['order_id'])
+    assert_equal affiliate, record.affiliate
+  end
+
+  test 'join_waitlist_tool joins a sold-out ticket type waitlist' do
+    create_event(prices: [10, 20], allow_ticket_type_waitlists: true)
+    sold_out, on_sale = @event.ticket_types.sort_by(&:price)
+    sold_out.set(quantity: 0)
+
+    requirements = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))
+    assert_equal({ sold_out.id.to_s => true, on_sale.id.to_s => false }, requirements['ticket_types'].to_h { |ticket_type| [ticket_type['id'], ticket_type['waitlist']] })
+    refute requirements['event_waitlist']
+
+    rpc = mcp_tool_call('join_waitlist_tool', arguments: { slug: @event.slug, ticket_type_id: on_sale.id.to_s, buyer: { name: 'Wait Er', email: 'waiter@example.com' } })
+    assert_includes tool_text(rpc), 'not sold out'
+    assert_nil Account.find_by(email: 'waiter@example.com')
+
+    rpc = mcp_tool_call('join_waitlist_tool', arguments: { slug: @event.slug, ticket_type_id: sold_out.id.to_s })
+    assert_includes tool_text(rpc), 'Provide buyer'
+
+    2.times do
+      rpc = mcp_tool_call('join_waitlist_tool', arguments: { slug: @event.slug, ticket_type_id: sold_out.id.to_s, buyer: { name: 'Wait Er', email: 'Waiter@example.com' } })
+      assert_equal 'joined', JSON.parse(tool_text(rpc))['status']
+    end
+    assert_equal [Account.find_by(email: 'waiter@example.com')], sold_out.ticket_type_waitships.map(&:account)
+
+    rpc = mcp_tool_call('join_waitlist_tool', arguments: { slug: @event.slug })
+    assert_includes tool_text(rpc), 'pass the ticket_type_id of one'
+  end
+
+  test "join_waitlist_tool joins a sold-out event's waitlist as the authenticated account" do
+    create_event(prices: [10])
+    rpc = mcp_tool_call('join_waitlist_tool', arguments: { slug: @event.slug }, headers: buyer_headers)
+    assert_includes tool_text(rpc), "isn't sold out"
+
+    @event.ticket_types.first.set(quantity: 0)
+    @event.refresh_sold_out_cache_and_notify_waitlist
+    assert JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))['event_waitlist']
+
+    rpc = mcp_tool_call('join_waitlist_tool', arguments: { slug: @event.slug }, headers: buyer_headers)
+    assert_equal 'joined', JSON.parse(tool_text(rpc))['status']
+    assert @event.waitships.find_by(account: @buyer)
   end
 end

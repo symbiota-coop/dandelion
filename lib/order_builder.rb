@@ -179,15 +179,21 @@ class OrderBuilder
 
     if @account.persisted?
       # Only the account owner may merge checkout fields into an existing profile.
-      @account.update_attributes!(account_hash.compact) if signed_in_as_buyer?
+      raise account_invalid if signed_in_as_buyer? && !@account.update_attributes(account_hash.compact)
     else
       begin
         @account.save!
       rescue StandardError
-        raise AccountInvalid
+        raise account_invalid
       end
     end
     raise BannedEmail if @event.organisation.banned_emails_a.include?(@account.email)
+  end
+
+  # Says which details are invalid, like a phone number without its country code
+  def account_invalid
+    messages = @account.errors.full_messages
+    messages.empty? ? AccountInvalid.new : AccountInvalid.new("#{messages.to_sentence}.")
   end
 
   def donation_below_minimum?

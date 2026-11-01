@@ -46,6 +46,15 @@ class DiscountCode
     event.all_discount_codes.include?(self)
   end
 
+  # The terms in filter: the code only applies to ticket types whose names contain one
+  def filters
+    filter ? filter.downcase.split(',').map(&:strip) : []
+  end
+
+  def applies_to_ticket_type?(ticket_type)
+    !filter || filters.any? { |term| ticket_type.name.to_s.downcase.include?(term) }
+  end
+
   def exhausted?(excluding: nil)
     return false unless maximum_uses
 

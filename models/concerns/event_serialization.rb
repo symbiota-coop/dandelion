@@ -48,9 +48,12 @@ module EventSerialization
     }
   end
 
-  # Ticket types anyone can buy (hidden ones need their secret link), as listed on the event page
-  def public_ticket_types
-    ticket_types.and(hidden: false).order('order asc, price desc').map do |ticket_type|
+  # Ticket types anyone can buy (hidden ones need their secret link), as listed on the event page, and the hidden one
+  # a secret link unlocks
+  def public_ticket_types(secret_ticket_type: nil)
+    listed = secret_ticket_type ? ticket_types.and('$or' => [{ hidden: false }, { _id: secret_ticket_type.id }]) : ticket_types.and(hidden: false)
+    listed.order('order asc, price desc').map do |ticket_type|
+      available = [ticket_type.number_of_tickets_available_in_single_purchase, 0].max
       {
         id: ticket_type.id.to_s,
         name: ticket_type.name,
@@ -66,11 +69,14 @@ module EventSerialization
         price_min: ticket_type.range_min,
         price_max: ticket_type.range_max,
         currency: currency,
-        available: [ticket_type.number_of_tickets_available_in_single_purchase, 0].max,
+        available: available,
         sold_out: ticket_type.sold_out?,
+        # As the checkout form offers it: once a ticket type is sold out, while sales are open
+        waitlist: allow_ticket_type_waitlists? && available.zero? && !ticket_type.sales_ended? && !sales_closed_due_to_event_end?,
         sales_end: ticket_type.sales_end,
         ticket_group: ticket_type.ticket_group&.name,
-        minimum_monthly_donation: ticket_type.minimum_monthly_donation
+        minimum_monthly_donation: ticket_type.minimum_monthly_donation,
+        hidden: ticket_type.hidden
       }
     end
   end
@@ -83,17 +89,8 @@ module EventSerialization
     opt_ins
   end
 
-  # What the checkout form on the event page asks for, so an agent can prepare a booking
-  def checkout_requirements
-    restrictions = []
-    restrictions << 'sales_closed' if sales_closed_due_to_event_end?
-    restrictions << 'monthly_donors_only' if monthly_donors_only
-    restrictions << 'members_only' if activity && activity.privacy != 'open'
-    # The event page asks for a donation to the organisation that agents can't add
-    restrictions << 'donation_required' if minimum_donation&.positive? && !donations_to_dandelion?
-    # Nothing to book without a public ticket type (hidden ones need their secret link)
-    restrictions << 'no_tickets' unless ticket_types.and(hidden: false).exists?
-
+  # The details about the buyer the checkout form asks for
+  def checkout_buyer_fields
     buyer_fields = [
       { name: 'name', required: true },
       { name: 'email', required: true }
@@ -101,16 +98,42 @@ module EventSerialization
     buyer_fields << { name: 'phone', required: false, format: 'international, starting with +' } if organisation&.collect_phone?
     buyer_fields += [{ name: 'postcode', required: false }, { name: 'country', required: false }] if organisation&.collect_location
     buyer_fields << { name: 'hear_about', required: false } if ask_hear_about
+    buyer_fields
+  end
+
+  # The donation the checkout form offers to add, if any: to Dandelion, or to the organisation (with the amount it
+  # suggests, and any minimum it requires)
+  def checkout_donation
+    if donations_to_dandelion?
+      { to: 'Dandelion', suggested: nil, minimum: nil }
+    elsif suggested_donation
+      { to: organisation.name, suggested: suggested_donation, minimum: (minimum_donation if minimum_donation&.positive?) }
+    end
+  end
+
+  # What the checkout form on the event page asks for, so an agent can prepare a booking. secret_ticket_type: the
+  # hidden ticket type a secret link unlocks, listed with the others
+  def checkout_requirements(secret_ticket_type: nil)
+    restrictions = []
+    restrictions << 'sales_closed' if sales_closed_due_to_event_end?
+    restrictions << 'monthly_donors_only' if monthly_donors_only
+    restrictions << 'members_only' if activity && activity.privacy != 'open'
+    # Nothing to book without a public ticket type (hidden ones need their secret link)
+    restrictions << 'no_tickets' unless secret_ticket_type || ticket_types.and(hidden: false).exists?
 
     {
       event: { id: id.to_s, slug: slug, name: name, url: "#{ENV['BASE_URI']}/e/#{slug}", start_time: start_time, end_time: end_time, time_zone: time_zone },
-      purchasable: restrictions.empty? && !sold_out?,
+      purchasable: restrictions.empty? && (!sold_out? || secret_ticket_type&.sold_out? == false),
       restrictions: restrictions,
       currency: currency,
-      ticket_types: public_ticket_types,
-      buyer_fields: buyer_fields,
+      ticket_types: public_ticket_types(secret_ticket_type: secret_ticket_type),
+      # The event's own waitlist, which the event page offers once it's sold out, unless its ticket types have their own
+      event_waitlist: sold_out? && !hide_waitlist && !ticket_type_waitlists_available?,
+      buyer_fields: checkout_buyer_fields,
       questions: Questions.parse(questions),
       opt_ins: checkout_opt_ins,
+      donation: checkout_donation,
+      discount_codes: all_discount_codes.exists?,
       terms: {
         text: terms_and_conditions_for_purchase,
         url: terms_and_conditions_url_for_purchase,

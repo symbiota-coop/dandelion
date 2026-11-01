@@ -65,13 +65,36 @@ module Dandelion
       nil
     end
 
-    def self.perform_get_event_checkout_requirements(slug: nil, id: nil)
+    # secret_ticket_type_id lists the hidden ticket type its secret link unlocks, and discount_code says what the code
+    # takes off, as the checkout form shows once a code is applied
+    def self.perform_get_event_checkout_requirements(slug: nil, id: nil, secret_ticket_type_id: nil, discount_code: nil)
       return tool_error('Provide event slug or id') if slug.blank? && id.blank?
 
       event = Event.live.publicly_visible.find_by_slug_or_id(slug: slug, id: id)
       return tool_error('Event not found') unless event
 
-      tool_json(event.checkout_requirements)
+      secret_ticket_type_id = secret_ticket_type_id_from(secret_ticket_type_id)
+      secret_ticket_type = event.secret_ticket_type(secret_ticket_type_id)
+      return tool_error("That secret link doesn't unlock a ticket type of this event. Check the link with the buyer.") if secret_ticket_type_id && !secret_ticket_type
+
+      requirements = event.checkout_requirements(secret_ticket_type: secret_ticket_type)
+      requirements[:discount_code] = checkout_discount_code_details(event, discount_code, requirements[:ticket_types]) unless discount_code.to_s.strip.empty?
+      tool_json(requirements)
+    end
+
+    def self.checkout_discount_code_details(event, code, ticket_types)
+      discount_code, problem = event.checkout_discount_code(code)
+      return { code: code.to_s.strip.upcase, valid: false, problem: problem.to_s } unless discount_code
+
+      {
+        code: discount_code.code,
+        valid: true,
+        percentage_discount: discount_code.percentage_discount,
+        fixed_discount: discount_code.fixed_discount_amount,
+        fixed_discount_currency: discount_code.fixed_discount_currency,
+        # The fixed discount comes off the order's total, and the percentage off each ticket, of these ticket types only
+        ticket_type_ids: ticket_types.pluck(:id).select { |ticket_type_id| discount_code.applies_to_ticket_type?(event.ticket_types.find(ticket_type_id)) }
+      }
     end
 
     def self.perform_get_trending_events(limit: nil)
@@ -281,43 +304,79 @@ module Dandelion
         Class.new(::MCP::Tool) do
           tool_name 'get_event_checkout_requirements_tool'
           title 'Get Event Checkout Requirements'
-          description 'Get what booking a Dandelion event involves, by slug or ID: whether it can be booked, its ticket types with prices and availability, the buyer details and questions the checkout form asks for, opt-ins, terms and the payment methods on offer. Call this before create_checkout_tool.'
+          description 'Get what booking a Dandelion event involves, by slug or ID: whether it can be booked, its ticket types with prices, availability and waitlists, the buyer details and questions the checkout form asks for, opt-ins, any donation it offers, whether it takes discount codes, terms and the payment methods on offer. Pass a secret_ticket_type_id to list the hidden ticket type its link unlocks, and a discount_code to see what it takes off. Call this before create_checkout_tool or join_waitlist_tool.'
           input_schema(properties: {
                          slug: { type: 'string', description: 'Event slug' },
-                         id: { type: 'string', description: 'Event ID' }
+                         id: { type: 'string', description: 'Event ID' },
+                         secret_ticket_type_id: { type: 'string', description: "A hidden ticket type's secret link, or the ticket_type_id in its query string" },
+                         discount_code: { type: 'string', description: 'A discount code the buyer has' }
                        })
           annotations(read_only_hint: true, destructive_hint: false)
 
-          define_singleton_method(:call) do |slug: nil, id: nil, _server_context: {}|
-            Dandelion::MCP.perform_get_event_checkout_requirements(slug: slug, id: id)
+          define_singleton_method(:call) do |slug: nil, id: nil, secret_ticket_type_id: nil, discount_code: nil, _server_context: {}, **_rest|
+            Dandelion::MCP.perform_get_event_checkout_requirements(slug: slug, id: id, secret_ticket_type_id: secret_ticket_type_id, discount_code: discount_code)
           end
         end,
         Class.new(::MCP::Tool) do
           tool_name 'create_checkout_tool'
           title 'Create Checkout'
-          description 'Book fixed-price tickets to a Dandelion event: for the authenticated account with a Bearer API key, or without one for the buyer given. Range and pay-what-you-want tickets are booked on the event page. Free bookings are confirmed straight away; paid ones return a checkout_url where the buyer pays, which they must open themselves before pay_by, when unpaid orders are released. Call get_event_checkout_requirements_tool first, and confirm the tickets, total and any terms with the buyer before calling this.'
+          description 'Book tickets to a Dandelion event: for the authenticated account with a Bearer API key, or without one for the buyer given. Free bookings are confirmed straight away; paid ones return a checkout_url where the buyer pays, which they must open themselves before pay_by, when unpaid orders are released. Call get_event_checkout_requirements_tool first, and confirm the tickets, prices, any donation and discount, the total and any terms with the buyer before calling this. Range and pay-what-you-want tickets need the price the buyer chose, in prices: never choose one for them. When the buyer has to finish on the event page, the error links to it with their choices filled in.'
           input_schema(properties: {
                          slug: { type: 'string', description: 'Event slug' },
                          id: { type: 'string', description: 'Event ID' },
                          quantities: { type: 'object', description: 'Ticket type id => number of tickets', additionalProperties: { type: 'integer' } },
+                         prices: { type: 'object', description: 'Ticket type id => the price per ticket the buyer chose, for range (within price_min and price_max) and pay_what_you_want ticket types', additionalProperties: { type: 'number' } },
                          answers: { type: 'object', description: 'Question index => answer: a string, true/false for a checkbox, or an array of options for checkboxes' },
                          accept_terms: { type: 'boolean', description: 'The buyer has accepted the terms and conditions (required when terms.must_accept)' },
                          idempotency_key: { type: 'string', description: 'A unique key for this booking. Retrying with the same key returns the first order instead of booking again (status processing while it is still being set up)' },
                          buyer: {
                            type: 'object',
-                           description: 'Who the tickets are for, with the fields buyer_fields lists. Required without an API key; with one, the booking is for that account and only hear_about is used',
+                           description: 'Who the tickets are for, with the fields buyer_fields lists. Required without an API key; with one, the booking is for that account, whose phone, postcode and country the details given update',
                            properties: { name: { type: 'string' }, email: { type: 'string' }, phone: { type: 'string' }, postcode: { type: 'string' }, country: { type: 'string' },
                                          hear_about: { type: 'string' } }
                          },
-                         opt_ins: { type: 'array', items: { type: 'string' }, description: 'The names of the opt_ins the buyer chose, from get_event_checkout_requirements_tool' }
+                         opt_ins: { type: 'array', items: { type: 'string' }, description: 'The names of the opt_ins the buyer chose, from get_event_checkout_requirements_tool' },
+                         discount_code: { type: 'string', description: 'A discount code the buyer has' },
+                         payment_method: { type: 'string', description: 'The payment method the buyer chose, from the payment_methods with agent_checkout. Defaults to the first one that pays by link' },
+                         secret_ticket_type_id: { type: 'string', description: "A hidden ticket type's secret link, or the ticket_type_id in its query string, to book that ticket type" },
+                         donation_amount: { type: 'number', description: 'A donation the buyer chose to add, where the requirements list a donation (at least its minimum, if it has one)' },
+                         confirm_duplicate: { type: 'boolean', description: 'The buyer confirmed they want to book again, though this account already has a ticket' },
+                         attribution: {
+                           type: 'object',
+                           description: 'From the query string of the event link the buyer followed, if it has them',
+                           properties: CHECKOUT_ATTRIBUTION_FIELDS.index_with { { type: 'string' } }
+                         }
                        }, required: [:quantities])
           annotations(read_only_hint: false, destructive_hint: false, idempotent_hint: false, open_world_hint: true)
 
           # **_rest ignores arguments the tool doesn't take, rather than failing the call
-          define_singleton_method(:call) do |slug: nil, id: nil, quantities: nil, answers: nil, accept_terms: false, idempotency_key: nil, buyer: nil, opt_ins: nil,
-                                             server_context: {}, **_rest|
-            Dandelion::MCP.perform_create_checkout(server_context: server_context, slug: slug, id: id, quantities: quantities, answers: answers,
-                                                   accept_terms: accept_terms, idempotency_key: idempotency_key, buyer: buyer, opt_ins: opt_ins)
+          define_singleton_method(:call) do |slug: nil, id: nil, quantities: nil, prices: nil, answers: nil, accept_terms: false, idempotency_key: nil, buyer: nil, opt_ins: nil,
+                                             discount_code: nil, payment_method: nil, secret_ticket_type_id: nil, donation_amount: nil, confirm_duplicate: false,
+                                             attribution: nil, server_context: {}, **_rest|
+            Dandelion::MCP.perform_create_checkout(server_context: server_context, slug: slug, id: id, quantities: quantities, prices: prices, answers: answers,
+                                                   accept_terms: accept_terms, idempotency_key: idempotency_key, buyer: buyer, opt_ins: opt_ins,
+                                                   discount_code: discount_code, payment_method: payment_method, secret_ticket_type_id: secret_ticket_type_id,
+                                                   donation_amount: donation_amount, confirm_duplicate: confirm_duplicate, attribution: attribution)
+          end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'join_waitlist_tool'
+          title 'Join Waitlist'
+          description "Join the waitlist for a sold-out ticket type of a Dandelion event (one get_event_checkout_requirements_tool lists with waitlist true), or for the event itself when event_waitlist is true: for the authenticated account with a Bearer API key, or without one for the buyer given. They're emailed when tickets become available. Check with the buyer before calling this."
+          input_schema(properties: {
+                         slug: { type: 'string', description: 'Event slug' },
+                         id: { type: 'string', description: 'Event ID' },
+                         ticket_type_id: { type: 'string', description: "The sold-out ticket type's id. Leave it out to join the event's waitlist" },
+                         buyer: {
+                           type: 'object',
+                           description: 'Who is joining the waitlist. Required without an API key',
+                           properties: { name: { type: 'string' }, email: { type: 'string' } }
+                         }
+                       })
+          annotations(read_only_hint: false, destructive_hint: false, idempotent_hint: true, open_world_hint: true)
+
+          define_singleton_method(:call) do |slug: nil, id: nil, ticket_type_id: nil, buyer: nil, server_context: {}, **_rest|
+            Dandelion::MCP.perform_join_waitlist(server_context: server_context, slug: slug, id: id, ticket_type_id: ticket_type_id, buyer: buyer)
           end
         end,
         Class.new(::MCP::Tool) do
@@ -422,7 +481,7 @@ module Dandelion
           name: 'dandelion',
           title: 'Dandelion',
           version: '1.0.0',
-          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings, and for booking events. To book: get_event_checkout_requirements_tool, confirm the details with the buyer, create_checkout_tool (as the authenticated account, or for the buyer given without an API key), then send the buyer to the checkout_url to pay. Authenticated tools such as get_me_tool, get_organisation_events_tool, get_organisation_followers_tool, get_organisation_orders_tool, get_event_orders_tool and get_event_tickets_tool require a Bearer API key.',
+          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings, and for booking events. To book: get_event_checkout_requirements_tool, confirm the details with the buyer, create_checkout_tool (as the authenticated account, or for the buyer given without an API key), then send the buyer to the checkout_url to pay. For a sold-out event or ticket type, join_waitlist_tool. Authenticated tools such as get_me_tool, get_organisation_events_tool, get_organisation_followers_tool, get_organisation_orders_tool, get_event_orders_tool and get_event_tickets_tool require a Bearer API key.',
           tools: tools
         )
         def s.server_context

@@ -232,10 +232,7 @@ class Order
     # return == leave existing discounts
     return unless discount_code&.filter
 
-    filters = discount_code.filter.downcase.split(',').map(&:strip)
-    return if tickets.all? do |ticket|
-      filters.any? { |filter| ticket.ticket_type.name.downcase.include?(filter) }
-    end
+    return if tickets.all? { |ticket| discount_code.applies_to_ticket_type?(ticket.ticket_type) }
 
     # otherwise, remove discounts
     self.discount_code = nil

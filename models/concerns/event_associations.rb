@@ -112,6 +112,24 @@ module EventAssociations
       (local_group ? local_group.discount_codes.pluck(:id) : []))
   end
 
+  # The discount code a buyer entered, as the checkout form applies it: [discount_code, nil], or [nil, :invalid] or
+  # [nil, :used_up]
+  def checkout_discount_code(code)
+    discount_code = all_discount_codes.find_by(code: code.to_s.strip.upcase)
+    return [nil, :invalid] unless discount_code
+    return [nil, :used_up] if discount_code.exhausted?
+
+    [discount_code, nil]
+  end
+
+  # A hidden ticket type, from the ticket_type_id in its secret link (its public_id)
+  def secret_ticket_type(public_id)
+    return unless public_id
+
+    ticket_type = ticket_types.find_by(token: public_id.to_s) || ticket_types.find(public_id.to_s)
+    ticket_type if ticket_type&.hidden && ticket_type.public_id == public_id.to_s
+  end
+
   def organisation_and_cohosts
     [organisation] + cohosts
   end
