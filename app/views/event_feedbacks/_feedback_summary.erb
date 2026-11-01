@@ -2,7 +2,7 @@
   summarisable, path, manager = if @activity
                                   [@activity, "#{@activity.path}/feedback_summary", activity_admin?]
                                 elsif @account
-                                  [@account, "/accounts/#{@account.id}/feedback_summary", admin? || (current_account && @account == current_account)]
+                                  [@account, "/u/#{@account.username}/feedback_summary", admin? || (current_account && @account == current_account)]
                                 elsif @organisation
                                   [@organisation, "/o/#{@organisation.slug}/feedback_summary", organisation_admin?]
                                 end

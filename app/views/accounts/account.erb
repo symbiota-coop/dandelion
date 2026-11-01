@@ -1,7 +1,7 @@
 <% viewer_in_network = current_account && @account.network.find(current_account.id) %>
 <%= partial :'accounts/top', locals: { account: @account } %>
 
-<%= cp(:'accounts/atproto', key: "/accounts/#{@account.id}/atproto", locals: { account: @account }) %>
+<%= cp(:'accounts/atproto', key: "/u/#{@account.username}/atproto", locals: { account: @account }) %>
 
 <% if (events = Event.and(:id.in => EventFacilitation.and(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.publicly_visible.future.with_key_includes.to_a).any? %>
   <h2 class="mt-5">Upcoming events <% if @account.following_starred.exists? %>featuring <%= @account.firstname %> and <%= @account.pronoun %> stars<% end %></h2>
@@ -9,7 +9,7 @@
 <% end %>
 <% if @account.public_event_feedbacks_as_facilitator.exists? %>
   <h2 id="feedback" class="mt-5">Feedback on <%= @account.firstname %>'s events</h2>
-  <div class="mt-3" data-pagelet-url="/accounts/<%= @account.id %>/show_feedback"></div>
+  <div class="mt-3" data-pagelet-url="/u/<%= @account.username %>/show_feedback"></div>
 <% end %>
 
 <% if Organisation.and(:id.in => @account.organisationships.and(:hide_membership => false).pluck(:organisation_id)).exists? %>
@@ -24,7 +24,7 @@
         </div>
       <% end %>
     </div>
-    <div data-pagelet-url="/accounts/<%= @account.id %>/organisations"></div>
+    <div data-pagelet-url="/u/<%= @account.username %>/organisations"></div>
   <% end %>
 <% end %>
 
@@ -40,7 +40,7 @@
         </div>
       <% end %>
     </div>
-    <div data-pagelet-url="/accounts/<%= @account.id %>/local_groups"></div>
+    <div data-pagelet-url="/u/<%= @account.username %>/local_groups"></div>
   <% end %>
 <% end %>
 
@@ -56,7 +56,7 @@
         </div>
       <% end %>
     </div>
-    <div data-pagelet-url="/accounts/<%= @account.id %>/activities"></div>
+    <div data-pagelet-url="/u/<%= @account.username %>/activities"></div>
   <% end %>
 <% end %>
 
@@ -72,7 +72,7 @@
         </div>
       <% end %>
     </div>
-    <div data-pagelet-url="/accounts/<%= @account.id %>/gatherings"></div>
+    <div data-pagelet-url="/u/<%= @account.username %>/gatherings"></div>
   <% end %>
 <% end %>
 
@@ -88,7 +88,7 @@
         </div>
       <% end %>
     </div>
-    <div data-pagelet-url="/accounts/<%= @account.id %>/following"></div>
+    <div data-pagelet-url="/u/<%= @account.username %>/following"></div>
   <% end %>
 <% end %>
 
@@ -104,6 +104,6 @@
         </div>
       <% end %>
     </div>
-    <div data-pagelet-url="/accounts/<%= @account.id %>/followers"></div>
+    <div data-pagelet-url="/u/<%= @account.username %>/followers"></div>
   <% end %>
 <% end %>

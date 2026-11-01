@@ -11,7 +11,7 @@
 <% elsif @event.event_facilitations.count == 1 && (account = @event.event_facilitators.first).public_event_feedbacks_as_facilitator.exists? %>
   <div class="card mt-3" id="feedback">
     <h3 class="card-header chill">Feedback on <%= account.name %>'s events</h3>
-    <div class="card-body pt-2" data-pagelet-url="/accounts/<%= account.id %>/show_feedback"></div>
+    <div class="card-body pt-2" data-pagelet-url="/u/<%= account.username %>/show_feedback"></div>
   </div>
 <% elsif @event.organisation.public_event_feedbacks.exists? %>
   <div class="card mt-3" id="feedback">

@@ -21,7 +21,7 @@ class Notification
     when Gathering
       "#{ENV['BASE_URI']}/g/#{circle.slug}"
     when Account
-      "#{ENV['BASE_URI']}/accounts/#{circle.id}"
+      "#{ENV['BASE_URI']}/u/#{circle.username}"
     when Activity, LocalGroup
       "#{ENV['BASE_URI']}#{circle.path}"
     when Organisation

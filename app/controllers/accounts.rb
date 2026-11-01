@@ -357,13 +357,22 @@ Dandelion::App.controller do
     redirect back
   end
 
+  # Account URLs named accounts by id before they used usernames: /accounts/:id/... is now /u/:username/...
   get '/accounts/:id' do
-    @account = Account.find(params[:id]) || not_found
-    redirect "/u/#{@account.username}"
+    account = Account.find(params[:id]) || not_found
+    redirect_to_slug_url "/accounts/#{params[:id]}", "/u/#{account.username}"
   end
 
-  post '/accounts/:id/feedback_summary' do
-    @account = Account.find(params[:id]) || not_found
+  %i[get post].each do |verb|
+    send(verb, '/accounts/:id/*') do
+      pass unless BSON::ObjectId.legal?(params[:id]) # /accounts/privacyable/:p and the like
+      account = Account.find(params[:id]) || not_found
+      redirect_to_slug_url "/accounts/#{params[:id]}", "/u/#{account.username}"
+    end
+  end
+
+  post '/u/:username/feedback_summary' do
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     kick! unless admin? || (current_account && @account == current_account)
     if !admin? && @account.feedback_summary_last_refreshed_at && @account.feedback_summary_last_refreshed_at > 24.hours.ago
       flash[:error] = 'Feedback summary can only be refreshed once per day'
@@ -373,13 +382,13 @@ Dandelion::App.controller do
     request.xhr? ? 200 : redirect(back('#feedback'))
   end
 
-  get '/accounts/:id/feedback_summary' do
-    @account = Account.find(params[:id]) || not_found
+  get '/u/:username/feedback_summary' do
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     partial :'event_feedbacks/feedback_summary', locals: { contents_only: true }
   end
 
-  post '/accounts/:id/feedback_summary/delete' do
-    @account = Account.find(params[:id]) || not_found
+  post '/u/:username/feedback_summary/delete' do
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     kick! unless admin? || (current_account && @account == current_account)
     @account.set(feedback_summary: nil)
     @account.set(feedback_summary_last_refreshed_at: Time.now)
@@ -387,9 +396,9 @@ Dandelion::App.controller do
     redirect back('#feedback')
   end
 
-  post '/accounts/:id/reset_password', provides: :json do
+  post '/u/:username/reset_password', provides: :json do
     halt unless current_account && (current_account.admin? || current_account.can_reset_passwords?)
-    @account = Account.find(params[:id]) || not_found
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     halt 403 if @account.admin? && !current_account.admin?
     @account.password = Account.generate_password
     @account.failed_sign_in_attempts = nil
@@ -413,50 +422,50 @@ Dandelion::App.controller do
     end
   end
 
-  get '/accounts/:id/feedback_summary_email_preview' do
+  get '/u/:username/feedback_summary_email_preview' do
     sign_in_required!
-    account = Account.find(params[:id]) || not_found
+    account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     kick! unless admin? || account == current_account
     email_html_csp!
     EmailHelper.html(:feedback_summary, account: account)
   end
 
-  get '/accounts/:id/following' do
-    @account = Account.find(params[:id]) || not_found
+  get '/u/:username/following' do
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     kick! unless viewable?(@account, :following)
     partial :'accounts/following', locals: { accounts: @account.following, starred: @account.following_starred }
   end
 
-  get '/accounts/:id/organisations' do
-    @account = Account.find(params[:id]) || not_found
+  get '/u/:username/organisations' do
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     kick! unless viewable?(@account, :organisations)
     organisations = Organisation.and(:id.in => @account.organisationships.and(hide_membership: false).pluck(:organisation_id))
     partial :'organisations/blocks', locals: { organisations: organisations }
   end
 
-  get '/accounts/:id/local_groups' do
-    @account = Account.find(params[:id]) || not_found
+  get '/u/:username/local_groups' do
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     kick! unless viewable?(@account, :local_groups)
     local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(hide_membership: false).pluck(:local_group_id))
     partial :'local_groups/blocks', locals: { local_groups: local_groups }
   end
 
-  get '/accounts/:id/activities' do
-    @account = Account.find(params[:id]) || not_found
+  get '/u/:username/activities' do
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     kick! unless viewable?(@account, :activities)
     activities = Activity.and(:id.in => @account.activityships.and(hide_membership: false).pluck(:activity_id))
     partial :'activities/blocks', locals: { activities: activities }
   end
 
-  get '/accounts/:id/gatherings' do
-    @account = Account.find(params[:id]) || not_found
+  get '/u/:username/gatherings' do
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     kick! unless viewable?(@account, :gatherings)
     gatherings = Gathering.and(:id.in => @account.memberships.pluck(:gathering_id)).and(listed: true).and(:privacy.ne => 'secret')
     partial :'gatherings/blocks', locals: { gatherings: gatherings }
   end
 
-  get '/accounts/:id/followers' do
-    @account = Account.find(params[:id]) || not_found
+  get '/u/:username/followers' do
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     kick! unless viewable?(@account, :followers)
     partial :'accounts/following', locals: { accounts: @account.followers }
   end
@@ -495,15 +504,15 @@ Dandelion::App.controller do
     end
   end
 
-  post '/accounts/:id/image' do
+  post '/u/:username/image' do
     admins_only!
-    @account = Account.find(params[:id]) || not_found
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     @account.set(image: params[:image])
     redirect back
   end
 
-  get '/accounts/:id/show_feedback' do
-    @account = Account.find(params[:id]) || not_found
+  get '/u/:username/show_feedback' do
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     partial :'event_feedbacks/event_feedbacks', locals: { event_feedbacks: @account.public_event_feedbacks_as_facilitator }
   end
 
@@ -514,8 +523,8 @@ Dandelion::App.controller do
     erb :'accounts/feedback', layout: (params[:minimal] ? 'minimal' : nil)
   end
 
-  get '/accounts/:id/events' do
-    @account = Account.find(params[:id]) || not_found
+  get '/u/:username/events' do
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     events = Event.and(:id.in => EventFacilitation.and(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.publicly_visible.future.and(hidden_from_homepage: false).with_key_includes
     partial :'events/blocks', locals: { events: events }, layout: 'minimal'
   end

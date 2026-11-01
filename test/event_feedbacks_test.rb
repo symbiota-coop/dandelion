@@ -60,7 +60,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     event_feedback = create_feedback(account: reviewer, event: @secret_event, rating: 5)
 
     assert_equal 0, event_feedback.notifications.count
-    ["#{@activity.path}/show_feedback", "/o/#{@organisation.slug}/show_feedback", "/accounts/#{facilitator.id}/show_feedback"].each do |path|
+    ["#{@activity.path}/show_feedback", "/o/#{@organisation.slug}/show_feedback", "/u/#{facilitator.username}/show_feedback"].each do |path|
       get path, minimal: 1
       assert_equal 200, last_response.status
       refute_includes last_response.body, reviewer.name, path
