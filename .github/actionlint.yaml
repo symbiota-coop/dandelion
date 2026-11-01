@@ -1,4 +1,8 @@
 # actionlint's config (script/lint runs it on the workflows)
+self-hosted-runner:
+  # GitHub's Ubuntu 26.04 runner, which actionlint (1.7.12) doesn't know yet. Drop this once it does
+  labels:
+    - ubuntu-26.04
 paths:
   .github/workflows/*.{yml,yaml}:
     ignore:
