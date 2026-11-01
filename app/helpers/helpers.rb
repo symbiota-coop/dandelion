@@ -182,6 +182,12 @@ Dandelion::App.helpers do
     end
   end
 
+  # Redirects a URL that names a record by id to the one that names it by slug, keeping the rest of the URL and, with
+  # a 307, the method and body, so forms and requests still made to the old URL reach the new one
+  def redirect_to_slug_url(id_path, slug_path)
+    redirect request.url.sub(id_path, slug_path), 307
+  end
+
   def organisation_from_params
     Organisation.find_by_slug_or_id(
       slug: params[:organisation_slug] || params[:slug],

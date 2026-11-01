@@ -91,7 +91,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     create_feedback(account: live_reviewer, rating: 5)
 
     sign_in_with_rack(@account)
-    get "/events/#{@event.id}/feedback"
+    get "/e/#{@event.slug}/feedback"
     assert_equal 200, last_response.status
     refute_includes last_response.body, '<em>Removed</em>'
     refute_includes last_response.body, reviewer.name
@@ -123,7 +123,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
 
     sign_in(@account)
     page.current_window.resize_to(375, 812)
-    visit "/events/#{@event.id}/feedback"
+    visit "/e/#{@event.slug}/feedback"
     assert page.has_css?('#event_feedbacks .feedback-toggle')
     assert page.has_no_content?('Lovely day')
 
@@ -156,7 +156,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     create_attended_event
     sign_in_with_rack(@attendee)
 
-    post "/events/#{@event.id}/give_feedback", event_feedback: { rating: 4 }
+    post "/e/#{@event.slug}/give_feedback", event_feedback: { rating: 4 }
     follow_redirects
 
     assert_includes last_response.body, 'Thanks for your feedback!'
@@ -167,7 +167,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
   def visit_feedback_form
     create_attended_event
     sign_in(@attendee)
-    visit "/events/#{@event.id}/give_feedback"
+    visit "/e/#{@event.slug}/give_feedback"
     assert page.has_css?('.feedback-stars label', count: 5)
   end
 
@@ -227,7 +227,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     create_feedback(account: @attendee, rating: 3)
     sign_in_with_rack(@attendee)
 
-    post "/events/#{@event.id}/give_feedback", event_feedback: { rating: 1 }
+    post "/e/#{@event.slug}/give_feedback", event_feedback: { rating: 1 }
     follow_redirects
 
     refute_includes last_response.body, 'Thanks for your feedback!'
@@ -241,7 +241,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     create_feedback(account: @attendee, rating: 3).destroy
     sign_in_with_rack(@attendee)
 
-    post "/events/#{@event.id}/give_feedback", event_feedback: { rating: 5 }
+    post "/e/#{@event.slug}/give_feedback", event_feedback: { rating: 5 }
     follow_redirects
 
     assert_includes last_response.body, 'Thanks for your feedback!'
@@ -262,7 +262,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
   test 'a failed save surfaces the error instead of thanking the attendee' do
     create_attended_event
     sign_in_with_rack(@attendee)
-    header 'HTTP_REFERER', "/events/#{@event.id}/give_feedback"
+    header 'HTTP_REFERER', "/e/#{@event.slug}/give_feedback"
 
     original = EventFeedback.instance_method(:save)
     EventFeedback.define_method(:save) do |*_args|
@@ -270,7 +270,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
       false
     end
     begin
-      post "/events/#{@event.id}/give_feedback", event_feedback: { rating: 2 }
+      post "/e/#{@event.slug}/give_feedback", event_feedback: { rating: 2 }
       follow_redirects
       refute_includes last_response.body, 'Thanks for your feedback!'
       assert_includes last_response.body, 'could not be saved'

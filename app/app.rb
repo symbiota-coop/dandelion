@@ -102,7 +102,7 @@ module Dandelion
       route_path = '/' if route_path.empty?
       name = "#{request.request_method} #{route_path}"
 
-      # The format the route parsed (/events/:id.ics), not the path's extension, which can be part of a param
+      # The format the route parsed (/e/:slug.ics), not the path's extension, which can be part of a param
       # (/u/nika.shoot is GET /u/:username)
       ext = ".#{params[:format]}" if params[:format]
       name = "#{name}#{ext}" if ext && !name.end_with?(ext)

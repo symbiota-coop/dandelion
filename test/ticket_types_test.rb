@@ -72,7 +72,7 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert_includes ticket.errors[:ticket_type], 'must belong to the same event'
 
     sign_in_with_rack(@account)
-    post "/events/#{@event.id}/create_ticket", ticket: { name: 'Guest', email: 'guest@example.com', ticket_type_id: other_ticket_type.id.to_s, price: '0' }
+    post "/e/#{@event.slug}/create_ticket", ticket: { name: 'Guest', email: 'guest@example.com', ticket_type_id: other_ticket_type.id.to_s, price: '0' }
 
     assert last_response.redirect?
     assert_equal 0, other_ticket_type.tickets.count

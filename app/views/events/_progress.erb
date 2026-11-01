@@ -6,7 +6,7 @@
     <span class="badge text-bg-primary"><%= HttpUrl.host(event.purchase_url) %></span>
   </a>
 <% elsif (event.live? || tc > 0) %>
-  <a href="/events/<%= event.id %>/tickets">
+  <a href="/e/<%= event.slug %>/tickets">
     <% if defined?(full_width) && !event.capacity %>
       <%= pluralize(tc, 'ticket') %>
     <% elsif !defined?(full_width) %>
@@ -14,7 +14,7 @@
     <% end %>
   </a>
   <% if event.capacity && event.capacity > 0; w = ((slots_taken/event.capacity.to_f)*100).round %>
-    <a class="d-block text-decoration-none" href="/events/<%= event.id %>/tickets">
+    <a class="d-block text-decoration-none" href="/e/<%= event.slug %>/tickets">
       <div class="progress" data-bs-toggle="tooltip" title="<%= slots_taken %>/<%= event.capacity %> places filled">
         <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
           <% if defined?(full_width) %>

@@ -161,9 +161,17 @@ Dandelion::App.controller do
     200
   end
 
+  # Event URLs named events by id before they used slugs: /events/:id/... is now /e/:slug/...
   get '/events/:id', provides: %i[html ics json] do
-    @event = Event.without_heavy_fields.find(params[:id]) || not_found
-    redirect request.url.gsub('/events/', '/e/').gsub(params[:id], @event.slug)
+    event = Event.without_heavy_fields.find(params[:id]) || not_found
+    redirect_to_slug_url "/events/#{params[:id]}", "/e/#{event.slug}"
+  end
+
+  %i[get post].each do |verb|
+    send(verb, '/events/:id/*') do
+      event = Event.unscoped.find(params[:id]) || not_found
+      redirect_to_slug_url "/events/#{params[:id]}", "/e/#{event.slug}"
+    end
   end
 
   get '/e/:slug', provides: %i[html ics json jpg], prerender: true do
@@ -249,13 +257,8 @@ Dandelion::App.controller do
     @event_session.ical.to_ical
   end
 
-  get '/events/:id/edit' do
-    @event = Event.unscoped.find(params[:id]) || not_found
-    redirect "/e/#{@event.slug}/edit"
-  end
-
-  post '/events/:id/ticket_type_waitships', provides: :json do
-    @event = Event.find(params[:id]) || not_found
+  post '/e/:slug/ticket_type_waitships', provides: :json do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
 
     validate_recaptcha(json: true)
 
@@ -279,8 +282,8 @@ Dandelion::App.controller do
     { ok: true }.to_json
   end
 
-  post '/events/:id/waitship/new' do
-    @event = Event.find(params[:id]) || not_found
+  post '/e/:slug/waitship/new' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
 
     validate_recaptcha
 
@@ -308,9 +311,9 @@ Dandelion::App.controller do
   end
 
   # Email notifications for the discussion, before anyone has written in it: makes its post to subscribe to
-  post '/events/:id/subscribe_discussion' do
+  post '/e/:slug/subscribe_discussion' do
     sign_in_required!
-    @event = Event.find(params[:id]) || not_found
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     @commentable = @event
     commentable_viewers_only!
     @event.discussion_post!(current_account).subscriptions.find_or_create_by(account: current_account)
@@ -318,47 +321,47 @@ Dandelion::App.controller do
   end
 
   # Discussion emails sent before 2026-10-15 link here to unsubscribe
-  get '/events/:id/unsubscribe_discussion' do
+  get '/e/:slug/unsubscribe_discussion' do
     sign_in_required!
-    @event = Event.find(params[:id]) || not_found
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     @event.discussion_post&.subscriptions&.and(account: current_account)&.destroy_all
     flash[:notice] = "You unsubscribed from the discussion of #{@event.name}"
     redirect "/e/#{@event.slug}"
   end
 
-  get '/events/:id/star' do
+  get '/e/:slug/star' do
     sign_in_required!
-    @event = Event.find(params[:id]) || not_found
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     @event_star = @event.event_stars.find_by(account: current_account)
     partial :'events/star', locals: { event: @event, event_star: @event_star, block_edit: params[:block_edit] }
   end
 
-  get '/events/:id/block_controls' do
+  get '/e/:slug/block_controls' do
     sign_in_required!
-    @event = Event.find(params[:id]) || not_found
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     partial :'events/block_controls', locals: { event: @event, event_star: @event.event_stars.find_by(account: current_account) }
   end
 
-  post '/events/:id/do_star' do
+  post '/e/:slug/do_star' do
     sign_in_required!
-    @event = Event.find(params[:id]) || not_found
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     @event.event_stars.create(account: current_account)
     200
   end
 
-  post '/events/:id/unstar' do
+  post '/e/:slug/unstar' do
     sign_in_required!
-    @event = Event.find(params[:id]) || not_found
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     @event_star = @event.event_stars.find_by(account: current_account)
     @event_star.try(:destroy)
     200
   end
 
-  get '/events/:id/questions' do
+  get '/e/:slug/questions' do
     partial :'questions/questions', locals: { questions: params[:questions], preview: true }
   end
 
-  get '/events/:id/feedback_questions' do
+  get '/e/:slug/feedback_questions' do
     partial :'events/feedback_questions', locals: { questions: params[:questions] }
   end
 end

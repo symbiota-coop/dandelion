@@ -213,7 +213,7 @@ end
 
 <%
   config = {
-    eventId: @event.id,
+    eventSlug: @event.slug,
     eventUrl: "#{ENV['BASE_URI']}/e/#{@event.slug}",
     placesRemaining: @event.places_remaining,
     ticketGroupPlacesRemaining: @event.ticket_groups.each_with_object({}) { |ticket_group, hash| hash[ticket_group.id.to_s] = ticket_group.places_remaining },

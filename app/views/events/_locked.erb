@@ -13,7 +13,7 @@
           <% if request.path.include?('/edit') %>
             This is a duplicate of <%== original.strip %>, currently visible to event admins only: make your edits, then uncheck the Locked checkbox and save to unlock it.
           <% else %>
-            This is a duplicate of <%== original.strip %>, currently visible to event admins only: <a href="/events/<%= @event.id %>/edit">make your edits</a>, then uncheck the Locked checkbox and save to unlock it.
+            This is a duplicate of <%== original.strip %>, currently visible to event admins only: <a href="/e/<%= @event.slug %>/edit">make your edits</a>, then uncheck the Locked checkbox and save to unlock it.
           <% end %>
         </p>
         <% warning = false %>
@@ -45,7 +45,7 @@
               <% if request.path.include?('/edit') %>
                 Uncheck the Locked checkbox and save to unlock it.
               <% else %>
-                <a href="/events/<%= @event.id %>/edit">Edit the event</a>, uncheck the Locked checkbox and save to unlock it.
+                <a href="/e/<%= @event.slug %>/edit">Edit the event</a>, uncheck the Locked checkbox and save to unlock it.
               <% end %>
             <% else %>
               The event has been submitted for review. It's currently locked and visible to event admins only.

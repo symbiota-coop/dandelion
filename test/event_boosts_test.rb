@@ -7,7 +7,7 @@ class EventBoostsTest < ActiveSupport::TestCase
     create_event(prices: [0])
 
     sign_in(@account)
-    visit "/events/#{@event.id}/boosts"
+    visit "/e/#{@event.slug}/boosts"
 
     start_time = (Time.zone.now.beginning_of_hour + 2.hours).strftime('%Y-%m-%d %H:%M')
     execute_script %(document.getElementById('event_boost_start_time').value = #{start_time.to_json})
@@ -30,7 +30,7 @@ class EventBoostsTest < ActiveSupport::TestCase
 
     assert event_boost.reload.payment_completed?
 
-    visit "/events/#{@event.id}/boosts"
+    visit "/e/#{@event.slug}/boosts"
 
     assert page.has_content?('Upcoming')
   end

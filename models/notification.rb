@@ -235,14 +235,12 @@ class Notification
       ['View post', notifiable.post.url]
     when :created_inventory_item
       ['View inventory', "#{ENV['BASE_URI']}/g/#{circle.slug}/inventory"]
-    when :created_event, :updated_event
+    when :created_event, :updated_event, :starred_event
       ['View event', "#{ENV['BASE_URI']}/e/#{notifiable.slug}"]
     when :created_organisation
       ['View organisation', "#{ENV['BASE_URI']}/o/#{notifiable.slug}"]
     when :created_order, :left_feedback
-      ['View event', "#{ENV['BASE_URI']}/events/#{notifiable.event_id}"]
-    when :starred_event
-      ['View event', "#{ENV['BASE_URI']}/events/#{notifiable.id}"]
+      ['View event', "#{ENV['BASE_URI']}/e/#{notifiable.event.slug}"]
     end
   end
 

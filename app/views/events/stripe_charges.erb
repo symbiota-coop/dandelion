@@ -13,6 +13,6 @@
   <%= submit_tag 'Search', class: 'btn btn-primary' %>
 <% end %>
 
-<div id="stripe-charges-table" data-pagelet-url="/events/<%= @event.id %>/stripe_charges">
+<div id="stripe-charges-table" data-pagelet-url="/e/<%= @event.slug %>/stripe_charges">
   <%= partial :'events/stripe_charges_table', locals: { stripe_charges: @stripe_charges, show_emails: event_email_viewer? } %>
 </div>

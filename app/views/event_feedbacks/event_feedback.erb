@@ -5,7 +5,7 @@
       Event
     </th>
     <td>
-      <a href="/events/<%= @event_feedback.event_id %>/feedback"><%= @event_feedback.event.name %> (<%= when_details(@event_feedback.event) %>)</a>
+      <a href="/e/<%= @event_feedback.event.slug %>/feedback"><%= @event_feedback.event.name %> (<%= when_details(@event_feedback.event) %>)</a>
     </td>
   </tr>
   <tr>

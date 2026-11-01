@@ -172,7 +172,7 @@ class PmailsTest < ActiveSupport::TestCase
     FactoryBot.create(:pmail, organisation: @organisation, to_option: "ticket_group:#{ticket_group.id}")
 
     sign_in(@account)
-    visit "/events/#{@event.id}/pmails"
+    visit "/e/#{@event.slug}/pmails"
 
     assert page.has_content? 'Ticket group Backstage'
   end
@@ -258,7 +258,7 @@ class PmailsTest < ActiveSupport::TestCase
     FactoryBot.create(:pmail, organisation: @organisation, to_option: "all_ticket_type_waitlists:#{@event.id}")
 
     sign_in(@account)
-    visit "/events/#{@event.id}/pmails"
+    visit "/e/#{@event.slug}/pmails"
 
     assert page.has_content? 'Ticket type waitlist Weekend'
     assert page.has_content? 'Ticket type waitlists:'

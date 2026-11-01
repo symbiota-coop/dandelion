@@ -29,7 +29,7 @@ function eventPaymentHandlers (config) {
 
     evm: function (data) {
       runEvmPaymentFlow(config, data, {
-        pollUrl: '/events/' + config.eventId + '/orders/' + data.order_id + '/payment_completed',
+        pollUrl: '/e/' + config.eventSlug + '/orders/' + data.order_id + '/payment_completed',
         onComplete: function () { window.location = '?success=true&order_id=' + data.order_id }
       })
     },

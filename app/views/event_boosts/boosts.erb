@@ -49,7 +49,7 @@
       $button.find('i').show();
       $form.css('opacity', 0.5);
 
-      $.post(<%== "/events/#{@event.id}/boosts".to_json %>, $form.serializeObject(), function (data) {
+      $.post(<%== "/e/#{@event.slug}/boosts".to_json %>, $form.serializeObject(), function (data) {
         if (data.session_id) {
           var stripe = Stripe(<%== ENV['STRIPE_PK'].to_json %>);
           stripe.redirectToCheckout({sessionId: data.session_id});

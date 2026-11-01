@@ -1,5 +1,5 @@
 /*
- * Event feedback form (/events/:id/feedback): the star rating and its questions.
+ * Event feedback form (/e/:slug/feedback): the star rating and its questions.
  * Loaded only by event_feedbacks/build.erb, after app.css.
  */
 

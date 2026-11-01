@@ -9,7 +9,7 @@
           <div class="alert alert-warning">This is a preview of the feedback form. Submission is disabled.</div>
         <% end %>
 
-        <% form_for @event_feedback, "/events/#{@event.id}/give_feedback" do |f| %>
+        <% form_for @event_feedback, "/e/#{@event.slug}/give_feedback" do |f| %>
           <% if params[:email] %>
             <%= hidden_field_tag :email, value: params[:email] %>
           <% elsif params[:token] %>

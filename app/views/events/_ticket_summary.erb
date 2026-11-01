@@ -1,7 +1,7 @@
 <ul class="icon-list">
   <% tickets.order('created_at desc').each { |ticket| %>
   <li><i class="bi bi-ticket-detailed-fill"></i>
-    <a href="/events/<%= ticket.event_id %>/tickets">
+    <a href="/e/<%= ticket.event.slug %>/tickets">
       <%= ticket.event.summary %>
       <% if ticket.discounted_price %>
         (<%= m ticket.discounted_price, ticket.currency %>)

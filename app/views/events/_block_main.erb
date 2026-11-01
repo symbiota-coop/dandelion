@@ -8,10 +8,10 @@
   <% unless defined?(skip_pagelets) %>
     <% if current_account %>
       <%# The star, and the edit link for event admins: loaded separately so the admin check stays out of cached blocks %>
-      <div data-with-placeholder class="d-inline" data-pagelet-url="/events/<%= event.id %>/block_controls"><i class="bi bi-star opacity-0"></i></div>
+      <div data-with-placeholder class="d-inline" data-pagelet-url="/e/<%= event.slug %>/block_controls"><i class="bi bi-star opacity-0"></i></div>
     <% end %>
     <% if admin? %>
-      <div data-with-placeholder class="d-inline" data-pagelet-url="/events/<%= event.id %>/hide_from_homepage?block_edit=1"><i class="bi bi-eye-slash-fill opacity-0"></i></div>
+      <div data-with-placeholder class="d-inline" data-pagelet-url="/e/<%= event.slug %>/hide_from_homepage?block_edit=1"><i class="bi bi-eye-slash-fill opacity-0"></i></div>
     <% end %>
   <% end %>
 </div>

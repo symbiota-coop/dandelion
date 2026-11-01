@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   before do
-    @event = (params[:slug] ? Event.find_by_slug_or_id(slug: params[:slug]) : Event.find(params[:id])) || not_found
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     @check_in_secret = OpenSSL::HMAC.hexdigest('SHA256', ENV['CHECK_IN_SECRET'], "check_in:#{@event.id}")[0, 32]
     @check_in_url = "#{ENV['BASE_URI']}/e/#{@event.slug}/check_in?secret=#{@check_in_secret}"
     unless event_admin?
@@ -21,12 +21,12 @@ Dandelion::App.controller do
     erb :'events/check_in'
   end
 
-  get '/events/:id/check_in_toggle/:ticket_id' do
+  get '/e/:slug/check_in_toggle/:ticket_id' do
     ticket = @event.tickets.complete.find_by_id_or_token(params[:ticket_id])
     partial :'events/check_in_toggle', locals: { ticket: ticket }
   end
 
-  post '/events/:id/check_in/:ticket_id' do
+  post '/e/:slug/check_in/:ticket_id' do
     ticket = @event.tickets.complete.find_by_id_or_token(params[:ticket_id])
     if !ticket
       403

@@ -218,7 +218,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   def ticketholder_path(order_ref, action, ticket_ref: @ticket.public_id)
-    "/events/#{@event.id}/orders/#{order_ref}/ticketholders/#{ticket_ref}/#{action}"
+    "/e/#{@event.slug}/orders/#{order_ref}/ticketholders/#{ticket_ref}/#{action}"
   end
 
   test 'creating a ticket generates a secret token' do
@@ -297,30 +297,30 @@ class OrdersTest < ActiveSupport::TestCase
     create_complete_order_with_ticket
     secret = OpenSSL::HMAC.hexdigest('SHA256', ENV['CHECK_IN_SECRET'], "check_in:#{@event.id}")[0, 32]
 
-    post "/events/#{@event.id}/check_in/#{@ticket.token}", checked_in: true, secret: secret
+    post "/e/#{@event.slug}/check_in/#{@ticket.token}", checked_in: true, secret: secret
     assert_equal 200, last_response.status
     assert @ticket.reload.checked_in
 
-    post "/events/#{@event.id}/check_in/#{@ticket.token}", checked_in: true, secret: secret
+    post "/e/#{@event.slug}/check_in/#{@ticket.token}", checked_in: true, secret: secret
     assert_equal 409, last_response.status # already checked in
 
-    post "/events/#{@event.id}/check_in/#{@ticket.id}", secret: secret
+    post "/e/#{@event.slug}/check_in/#{@ticket.id}", secret: secret
     assert_equal 403, last_response.status
     assert @ticket.reload.checked_in
 
     @ticket.unset(:token)
-    post "/events/#{@event.id}/check_in/#{@ticket.id}", secret: secret
+    post "/e/#{@event.slug}/check_in/#{@ticket.id}", secret: secret
     assert_equal 200, last_response.status
     refute @ticket.reload.checked_in
 
-    post "/events/#{@event.id}/check_in/#{@ticket.id}", secret: secret
+    post "/e/#{@event.slug}/check_in/#{@ticket.id}", secret: secret
     assert_equal 409, last_response.status # already not checked in
   end
 
   test 'ticketholder routes return 404 for an unknown ticket' do
     create_complete_order_with_ticket
 
-    get "/events/#{@event.id}/orders/#{@order.token}/ticketholders/#{BSON::ObjectId.new}/name"
+    get "/e/#{@event.slug}/orders/#{@order.token}/ticketholders/#{BSON::ObjectId.new}/name"
     assert_equal 404, last_response.status
   end
 
@@ -505,20 +505,20 @@ class OrdersTest < ActiveSupport::TestCase
       { events: queries.count(%w[find events]), tickets: queries.count(%w[find tickets]), orders: queries.count(%w[find orders]) }
     end
 
-    tickets_before = counts.call("/events/#{@event.id}/tickets")
+    tickets_before = counts.call("/e/#{@event.slug}/tickets")
     # Each table loads its page of records once, not again for each map, each and pagination_details
     assert_operator tickets_before[:tickets], :<=, 2
-    orders_before = counts.call("/events/#{@event.id}/orders")
+    orders_before = counts.call("/e/#{@event.slug}/orders")
     assert_operator orders_before[:orders], :<=, 3
-    get "/events/#{@event.id}/tickets"
+    get "/e/#{@event.slug}/tickets"
     attendees.each { |attendee| assert_includes last_response.body, attendee.name }
     assert_includes last_response.body, 'Displaying <b>all 2</b> tickets'
 
     3.times { add_order_with_ticket(@event) }
 
-    assert_equal tickets_before, counts.call("/events/#{@event.id}/tickets")
+    assert_equal tickets_before, counts.call("/e/#{@event.slug}/tickets")
     assert_includes last_response.body, 'Displaying <b>all 5</b> tickets'
-    assert_equal orders_before, counts.call("/events/#{@event.id}/orders")
+    assert_equal orders_before, counts.call("/e/#{@event.slug}/orders")
     assert_includes last_response.body, 'Displaying <b>all 5</b> orders'
   end
 

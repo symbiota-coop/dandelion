@@ -21,7 +21,7 @@ end
     <%= defined?(add_to) || item_class ? 'Add to Google Calendar' : 'Google' %>
   </a>
   <% unless item_class %>&middot;<% end %>
-  <a class="<%= item_class %>" target="_blank" href="/<%= addable.class.name.underscore.pluralize %>/<%= addable.id %>.ics">
+  <a class="<%= item_class %>" target="_blank" href="<%= addable.is_a?(Event) ? "/e/#{addable.slug}" : "/event_sessions/#{addable.id}" %>.ics">
     <%= defined?(add_to) || item_class ? 'Add as ICS' : 'ICS' %>
   </a>
 <% end %>

@@ -176,7 +176,7 @@ class EventBoost
       "Hours: #{event_boost.hours}",
       "Hourly amount: #{event_boost.hourly_amount} #{event_boost.currency}",
       "Total amount: #{event_boost.total_amount} #{event_boost.currency}",
-      "Boosts URL: #{ENV['BASE_URI']}/events/#{event.id}/boosts"
+      "Boosts URL: #{ENV['BASE_URI']}/e/#{event.slug}/boosts"
     ].join("\n")
 
     Account.and(admin: true).each do |admin_account|

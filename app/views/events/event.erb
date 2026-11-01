@@ -46,7 +46,7 @@
       <script>
         $(function () {
           setInterval(function () {
-            $.getJSON(<%== "/events/#{@event.id}/orders/#{@pending_order.public_id}/payment_completed".to_json %>, function (data) {
+            $.getJSON(<%== "/e/#{@event.slug}/orders/#{@pending_order.public_id}/payment_completed".to_json %>, function (data) {
               if (data.payment_completed) { window.location.reload() }
             })
           }, 3 * 1000)
@@ -112,7 +112,7 @@
           </h1>
         </div>
         <div class="col-auto">
-          <div class="d-inline ms-3 me-2 fs-4" data-pagelet-url="/events/<%= @event.id %>/star">
+          <div class="d-inline ms-3 me-2 fs-4" data-pagelet-url="/e/<%= @event.slug %>/star">
             <%= partial :'events/star', locals: {event: @event} %>
           </div>
         </div>

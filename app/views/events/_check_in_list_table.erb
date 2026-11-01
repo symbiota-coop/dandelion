@@ -58,7 +58,7 @@
       <%= ticket.created_at %>
     </td>
     <td>
-      <div data-pagelet-url="/events/<%= @event.id %>/check_in_toggle/<%= ticket.public_id %>">
+      <div data-pagelet-url="/e/<%= @event.slug %>/check_in_toggle/<%= ticket.public_id %>">
         <%= partial :'events/check_in_toggle', locals: { ticket: ticket } %>
       </div>
     </td>

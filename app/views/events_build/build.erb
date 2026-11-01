@@ -44,7 +44,7 @@
     imageRequiredHeight: @event.organisation.try(:event_image_required_height),
     isOrgAdmin: !!organisation_admins_or_event_managers?(@event.organisation),
     revenueSharingEnabled: !!@event.organisation.try(:stripe_client_id),
-    eventId: @event.id
+    eventSlug: (@event.slug unless @event.new_record?)
   }
 %>
 <script type="application/json" id="events-build-config">
@@ -142,7 +142,7 @@
         <%= f.wysiwyg_block :description %>
         <%= f.wysiwyg_block :extra_info_for_ticket_email %>
         <% if @event.persisted? %>
-          <p class="field-note"><a target="_blank" href="/events/<%= @event.id %>/ticket_email">Preview order confirmation email &rarr;</a></p>
+          <p class="field-note"><a target="_blank" href="/e/<%= @event.slug %>/ticket_email">Preview order confirmation email &rarr;</a></p>
         <% end %>
       </div>
       <div role="tabpanel" class="tab-pane" id="tab-tickets">
@@ -154,7 +154,7 @@
       <div role="tabpanel" class="tab-pane" id="tab-questions">
         <%= f.check_box_block :ask_hear_about %>
 
-        <%= partial :'questions/questions_with_preview', locals: { f: f, field_name: :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]", help_text: 'Questions to ask participants upon booking.', questions_help_locals: { answers_url: "/events/#{@event.id}/orders" } } %>
+        <%= partial :'questions/questions_with_preview', locals: { f: f, field_name: :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]", help_text: 'Questions to ask participants upon booking.', questions_help_locals: { answers_url: "/e/#{@event.slug}/orders" } } %>
         <div class="row">
           <div class="col-lg-6">
             <%= f.text_area_block :feedback_questions %>
@@ -164,7 +164,7 @@
                 <li>One question per line</li>
                 <li>Text fields only, like: question?</li>
                 <li>Leave blank to disable feedback</li>
-                <li>View answers on the <a target="_blank" href="/events/<%= @event.id %>/feedback">Feedback</a> page</li>
+                <li>View answers on the <a target="_blank" href="/e/<%= @event.slug %>/feedback">Feedback</a> page</li>
               </ul>
             </div>
           </div>
@@ -237,14 +237,14 @@
             <p class="field-note text-body-secondary">
               No need to repeat information you already entered on the <code>Description and confirmation</code> tab; it will be included below this greeting.
               <br>
-              <a target="_blank" href="/events/<%= @event.id %>/ticket_email">Preview order confirmation email &rarr;</a></p>
+              <a target="_blank" href="/e/<%= @event.slug %>/ticket_email">Preview order confirmation email &rarr;</a></p>
           <% end %>
         </div>
         <div class="mt-5">
           <%= f.text_block :reminder_email_title %>
           <%= f.wysiwyg_block :reminder_email_body %>
           <% if @event.persisted? %>
-            <p class="field-note"><a target="_blank" href="/events/<%= @event.id %>/reminder_email">Preview reminder email &rarr;</a></p>
+            <p class="field-note"><a target="_blank" href="/e/<%= @event.slug %>/reminder_email">Preview reminder email &rarr;</a></p>
           <% end %>
           <div class="evergreen-hide" style="<%= 'display:none' if @event.evergreen? %>">
             <% if @event.sent_reminders_at %>
@@ -261,7 +261,7 @@
           <%= f.text_block :feedback_email_title %>
           <%= f.wysiwyg_block :feedback_email_body %>
           <% if @event.persisted? %>
-            <p class="field-note"><a target="_blank" href="/events/<%= @event.id %>/feedback_request_email">Preview feedback request email &rarr;</a></p>
+            <p class="field-note"><a target="_blank" href="/e/<%= @event.slug %>/feedback_request_email">Preview feedback request email &rarr;</a></p>
           <% end %>
           <div class="evergreen-hide" style="<%= 'display:none' if @event.evergreen? %>">
             <% if @event.sent_feedback_requests_at %>
@@ -279,7 +279,7 @@
             <%= f.text_block :recording_email_title %>
             <%= f.wysiwyg_block :recording_email_greeting %>
             <% if @event.persisted? %>
-              <p class="field-note"><a target="_blank" href="/events/<%= @event.id %>/ticket_email">Preview order confirmation email &rarr;</a></p>
+              <p class="field-note"><a target="_blank" href="/e/<%= @event.slug %>/ticket_email">Preview order confirmation email &rarr;</a></p>
             <% end %>
           </div>
         <% end %>
@@ -338,7 +338,7 @@
         <div role="tabpanel" class="tab-pane" id="tab-recording">
           <%= f.wysiwyg_block :extra_info_for_recording_email %>
           <% if @event.persisted? %>
-            <p class="field-note"><a target="_blank" href="/events/<%= @event.id %>/ticket_email">Preview order confirmation email &rarr;</a></p>
+            <p class="field-note"><a target="_blank" href="/e/<%= @event.slug %>/ticket_email">Preview order confirmation email &rarr;</a></p>
           <% end %>
         </div>
       <% end %>

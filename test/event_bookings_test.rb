@@ -8,7 +8,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     ticket_type = event.ticket_types.first
     quantities ||= { ticket_type.id.to_s => quantity.to_s }
     header 'Accept', 'application/json'
-    post "/events/#{event.id}/purchase",
+    post "/e/#{event.slug}/purchase",
          confirmed_duplicate: (confirmed_duplicate ? '1' : ''),
          ticketForm: { quantities: quantities },
          detailsForm: {
@@ -23,7 +23,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     buyer = FactoryBot.create(:account)
     purchase = lambda do |ticket_type_id|
       header 'Accept', 'application/json'
-      post "/events/#{@event.id}/purchase",
+      post "/e/#{@event.slug}/purchase",
            ticketForm: { quantities: { hidden.id.to_s => '1' }, ticket_type_id: ticket_type_id },
            detailsForm: { payment_method: 'rsvp', account: { name: buyer.name, email: buyer.email } }
     end
@@ -41,7 +41,7 @@ class EventBookingsTest < ActiveSupport::TestCase
 
     hidden.unset(:token)
     header 'Accept', 'application/json'
-    post "/events/#{@event.id}/purchase",
+    post "/e/#{@event.slug}/purchase",
          confirmed_duplicate: '1',
          ticketForm: { quantities: { hidden.id.to_s => '1' }, ticket_type_id: hidden.id.to_s },
          detailsForm: { payment_method: 'rsvp', account: { name: buyer.name, email: buyer.email } }
@@ -59,7 +59,7 @@ class EventBookingsTest < ActiveSupport::TestCase
       EventPaymentMethod::GoCardlessInstantBankPay.stub :call, proc { raise error } do
         EmailHelper.stub :html, proc { |*args, **kwargs| html.call(*args, **kwargs).tap { |h| emails << h if args.first == :purchase_failed } } do
           header 'Accept', 'application/json'
-          post "/events/#{@event.id}/purchase",
+          post "/e/#{@event.slug}/purchase",
                ticketForm: { quantities: { @event.ticket_types.first.id.to_s => '1' } },
                detailsForm: { payment_method: 'gocardless_instant', account: { name: buyer.name, email: buyer.email } }
         end
@@ -176,7 +176,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     fill_in 'discount_code', with: code
     click_button 'Apply'
     assert page.has_content? 'The code you entered has been used up'
-    visit "/events/#{@event.id}/discount_codes"
+    visit "/e/#{@event.slug}/discount_codes"
     assert page.has_css? '.badge', text: 'Used up'
   end
 

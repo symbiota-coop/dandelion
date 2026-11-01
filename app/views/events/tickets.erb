@@ -1,6 +1,6 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 <% if @event.questions_a.any? %>
-  <div class="alert alert-primary">View answers to booking questions on the <a href="/events/<%= @event.id %>/orders">Orders</a> page</div>
+  <div class="alert alert-primary">View answers to booking questions on the <a href="/e/<%= @event.slug %>/orders">Orders</a> page</div>
 <% end %>
 <div class="row">
   <div class="col">
@@ -32,13 +32,13 @@
     $(function() { $('#create-ticket-button').click() })
   </script>
 <% end %>
-<% form_for @event.tickets.new, "/events/#{@event.id}/create_ticket", id: 'create-ticket', style: 'display: none', class: 'mb-5' do |f| %>
+<% form_for @event.tickets.new, "/e/#{@event.slug}/create_ticket", id: 'create-ticket', style: 'display: none', class: 'mb-5' do |f| %>
   <%= f.text_block :name %>
   <%= f.text_block :email %>
   <%= f.select_block :ticket_type_id, options: @event.ticket_types.map { |ticket_type| [ticket_type.name, ticket_type.id] } %>
   <%= f.number_block :price %>
   <%= f.submit_block %>
 <% end %>
-<div id="tickets-table" data-pagelet-url="/events/<%= @event.id %>/tickets">
+<div id="tickets-table" data-pagelet-url="/e/<%= @event.slug %>/tickets">
   <%= partial :'events/tickets_table', locals: { tickets: @tickets } %>
 </div>

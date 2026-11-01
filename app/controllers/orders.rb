@@ -23,8 +23,8 @@ Dandelion::App.controller do
     end
   end
 
-  get '/events/:id/orders/:order_id/payment_completed', provides: :json do
-    @event = Event.find(params[:id]) || not_found
+  get '/e/:slug/orders/:order_id/payment_completed', provides: :json do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     @order = @event.orders.find_by_id_or_token(params[:order_id]) || not_found
     @event.organisation.check_evm_account if @order.evm_secret && @event.organisation.evm_address
     @event.check_oc_event if @order.oc_secret && @event.oc_slug
@@ -39,16 +39,16 @@ Dandelion::App.controller do
     { payment_completed: @order.payment_completed }.to_json
   end
 
-  get '/events/:id/orders/:order_id/ticketholders/:ticket_id/name' do
-    @event = Event.find(params[:id]) || not_found
+  get '/e/:slug/orders/:order_id/ticketholders/:ticket_id/name' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
     headers['Referrer-Policy'] = 'no-referrer'
     partial :'events/ticketholder_name', locals: { ticket: @ticket }
   end
 
-  post '/events/:id/orders/:order_id/ticketholders/:ticket_id/name' do
-    @event = Event.find(params[:id]) || not_found
+  post '/e/:slug/orders/:order_id/ticketholders/:ticket_id/name' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
     headers['Referrer-Policy'] = 'no-referrer'
@@ -56,16 +56,16 @@ Dandelion::App.controller do
     200
   end
 
-  get '/events/:id/orders/:order_id/ticketholders/:ticket_id/email' do
-    @event = Event.find(params[:id]) || not_found
+  get '/e/:slug/orders/:order_id/ticketholders/:ticket_id/email' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
     headers['Referrer-Policy'] = 'no-referrer'
     partial :'events/ticketholder_email', locals: { ticket: @ticket, success: params[:success] }
   end
 
-  post '/events/:id/orders/:order_id/ticketholders/:ticket_id/email' do
-    @event = Event.find(params[:id]) || not_found
+  post '/e/:slug/orders/:order_id/ticketholders/:ticket_id/email' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
     headers['Referrer-Policy'] = 'no-referrer'

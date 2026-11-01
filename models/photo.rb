@@ -30,7 +30,7 @@ class Photo
       comment.post.url
     when TicketType
       ticket_type = photoable
-      "#{ENV['BASE_URI']}/events/#{ticket_type.event_id}/ticket_types"
+      "#{ENV['BASE_URI']}/e/#{ticket_type.event.slug}/ticket_types"
     end
   end
 

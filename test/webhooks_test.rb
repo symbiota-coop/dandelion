@@ -86,7 +86,7 @@ class WebhooksTest < ActiveSupport::TestCase
   def post_stripe_purchase(event, account)
     ticket_type = event.ticket_types.first
     header 'Accept', 'application/json'
-    post "/events/#{event.id}/purchase",
+    post "/e/#{event.slug}/purchase",
          ticketForm: { quantities: { ticket_type.id.to_s => '1' } },
          detailsForm: {
            payment_method: 'stripe',
@@ -409,7 +409,7 @@ class WebhooksTest < ActiveSupport::TestCase
   def post_mollie_purchase(event, account)
     ticket_type = event.ticket_types.first
     header 'Accept', 'application/json'
-    post "/events/#{event.id}/purchase",
+    post "/e/#{event.slug}/purchase",
          ticketForm: { quantities: { ticket_type.id.to_s => '1' } },
          detailsForm: {
            payment_method: 'mollie',
@@ -570,7 +570,7 @@ class WebhooksTest < ActiveSupport::TestCase
   def post_paypal_purchase(event, account)
     ticket_type = event.ticket_types.first
     header 'Accept', 'application/json'
-    post "/events/#{event.id}/purchase",
+    post "/e/#{event.slug}/purchase",
          ticketForm: { quantities: { ticket_type.id.to_s => '1' } },
          detailsForm: {
            payment_method: 'paypal',
@@ -756,7 +756,7 @@ class WebhooksTest < ActiveSupport::TestCase
     client = stub_paypal_client(get: approved, capture: captured)
 
     Paypal.stub :new, client do
-      get "/events/#{@event.id}/orders/#{order.public_id}/payment_completed"
+      get "/e/#{@event.slug}/orders/#{order.public_id}/payment_completed"
     end
 
     assert_equal 200, last_response.status

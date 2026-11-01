@@ -113,7 +113,7 @@ Dandelion::App.controller do
         elsif @local_group
           redirect "/local_groups/#{@local_group.id}/pmails"
         elsif @event
-          redirect "/events/#{@event.id}/pmails"
+          redirect "/e/#{@event.slug}/pmails"
         end
       elsif params[:preview]
         redirect "/pmails/#{@pmail.id}/edit?#{@scope}&preview=1"
@@ -144,7 +144,7 @@ Dandelion::App.controller do
     elsif @local_group
       redirect "/local_groups/#{@local_group.id}/pmails"
     elsif @event
-      redirect "/events/#{@event.id}/pmails"
+      redirect "/e/#{@event.slug}/pmails"
     end
   end
 

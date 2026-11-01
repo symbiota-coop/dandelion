@@ -40,7 +40,7 @@
 
         })
       </script>
-      <% form_for Waitship.new, "/events/#{@event.id}/waitship/new", id: 'waitlist-form'  do |f| %>
+      <% form_for Waitship.new, "/e/#{@event.slug}/waitship/new", id: 'waitlist-form'  do |f| %>
         <%= f.text_block :name %>
         <%= f.text_block :email %>
         <% if ENV['RECAPTCHA_SITE_KEY'] %>

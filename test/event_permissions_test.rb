@@ -86,7 +86,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     attacker = attacker_org.account
 
     sign_in_with_rack(attacker)
-    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: attacker_org.id }
+    post "/e/#{@event.slug}/cohostships/new", cohostship: { organisation_id: attacker_org.id }
 
     assert last_response.redirect?
     assert_includes last_response.location, "/e/#{@event.slug}"
@@ -99,7 +99,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     cohost = FactoryBot.create(:organisation)
 
     sign_in_with_rack(@account)
-    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: cohost.id }
+    post "/e/#{@event.slug}/cohostships/new", cohostship: { organisation_id: cohost.id }
 
     assert last_response.redirect?
     assert @event.cohostships.find_by(organisation: cohost)
@@ -110,7 +110,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     restricted = FactoryBot.create(:organisation, restrict_cohosting: true)
 
     sign_in_with_rack(@account)
-    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: restricted.id }
+    post "/e/#{@event.slug}/cohostships/new", cohostship: { organisation_id: restricted.id }
 
     assert last_response.redirect?
     assert_includes last_response.location, "/o/#{restricted.slug}"
@@ -123,7 +123,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     restricted.organisationships.create!(account: @account, admin: true)
 
     sign_in_with_rack(@account)
-    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: restricted.id }
+    post "/e/#{@event.slug}/cohostships/new", cohostship: { organisation_id: restricted.id }
 
     assert last_response.redirect?
     assert @event.cohostships.find_by(organisation: restricted)
@@ -136,7 +136,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     attacker_org = FactoryBot.create(:organisation, account: activity_admin)
 
     sign_in_with_rack(activity_admin)
-    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: attacker_org.id }
+    post "/e/#{@event.slug}/cohostships/new", cohostship: { organisation_id: attacker_org.id }
 
     assert last_response.redirect?
     assert_includes last_response.location, "/e/#{@event.slug}"
@@ -151,7 +151,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     attacker_org = FactoryBot.create(:organisation, account: local_group_admin)
 
     sign_in_with_rack(local_group_admin)
-    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: attacker_org.id }
+    post "/e/#{@event.slug}/cohostships/new", cohostship: { organisation_id: attacker_org.id }
 
     assert last_response.redirect?
     assert_includes last_response.location, "/e/#{@event.slug}"
@@ -209,7 +209,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
 
     assert last_response.ok?
     [@event, cohosted_event].each do |event|
-      assert_includes last_response.body, "/events/#{event.id}/rpayments"
+      assert_includes last_response.body, "/e/#{event.slug}/rpayments"
     end
   end
 
@@ -219,7 +219,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     cohost = FactoryBot.create(:organisation)
 
     sign_in_with_rack(manager)
-    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: cohost.id }
+    post "/e/#{@event.slug}/cohostships/new", cohostship: { organisation_id: cohost.id }
 
     assert last_response.redirect?
     assert @event.cohostships.find_by(organisation: cohost)
@@ -233,7 +233,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     @event.cohostships.create!(organisation: cohost)
 
     sign_in_with_rack(activity_admin)
-    post "/events/#{@event.id}/cohostships/destroy", organisation_id: cohost.id
+    post "/e/#{@event.slug}/cohostships/destroy", organisation_id: cohost.id
 
     assert last_response.redirect?
     refute @event.cohostships.find_by(organisation: cohost)
@@ -285,7 +285,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     manager = add_event_manager(org)
     event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
     sign_in(manager)
-    visit "/events/#{event.id}/delete"
+    visit "/e/#{event.slug}/delete"
     click_link 'Delete event and attempt to refund all orders'
     click_button 'Delete event'
     assert page.has_current_path?("/o/#{org.slug}/events", ignore_query: true)
@@ -298,7 +298,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     manager = add_event_manager(org)
     event = FactoryBot.create(:event, organisation: org)
     sign_in(manager)
-    visit "/events/#{event.id}/delete"
+    visit "/e/#{event.slug}/delete"
     assert page.has_content?("Please ask an admin of #{org.name} to delete the event")
     assert page.has_no_link?('Delete event and attempt to refund all orders')
     refute event.reload.deleted?
@@ -309,7 +309,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     manager = add_event_manager(org)
     event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
     sign_in(org.account)
-    visit "/events/#{event.id}/delete"
+    visit "/e/#{event.slug}/delete"
     click_link 'Delete event and attempt to refund all orders'
     click_button 'Delete event'
     assert page.has_current_path?("/o/#{org.slug}/events", ignore_query: true)
@@ -439,7 +439,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     attacker_organisation = FactoryBot.create(:organisation, account: facilitator)
 
     sign_in_with_rack(facilitator)
-    post "/events/#{@event.id}/cohostships/new", cohostship: { organisation_id: attacker_organisation.id.to_s }
+    post "/e/#{@event.slug}/cohostships/new", cohostship: { organisation_id: attacker_organisation.id.to_s }
 
     assert last_response.redirect?
     refute @event.cohostships.find_by(organisation: attacker_organisation)
@@ -455,7 +455,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     @event.event_facilitations.create!(account: facilitator)
 
     sign_in_with_rack(facilitator)
-    post "/events/#{@event.id}/cohostships/destroy", organisation_id: cohost.id.to_s
+    post "/e/#{@event.slug}/cohostships/destroy", organisation_id: cohost.id.to_s
 
     assert last_response.redirect?
     assert @event.cohostships.find_by(organisation: cohost)
@@ -469,11 +469,11 @@ class EventPermissionsTest < ActiveSupport::TestCase
     @event.event_facilitations.create!(account: facilitator)
 
     sign_in_with_rack(facilitator)
-    post "/events/#{@event.id}/cohostships/#{cohostship.id}", cohostship: { featured: '1' }
+    post "/e/#{@event.slug}/cohostships/#{cohostship.id}", cohostship: { featured: '1' }
     refute cohostship.reload.featured
 
     sign_in_with_rack(cohost.account)
-    post "/events/#{@event.id}/cohostships/#{cohostship.id}", cohostship: { featured: '1' }
+    post "/e/#{@event.slug}/cohostships/#{cohostship.id}", cohostship: { featured: '1' }
     assert cohostship.reload.featured
   end
 

@@ -157,7 +157,7 @@ class EventFeedback
   def clear_event_feedback_report_stash
     return unless event
 
-    Stash.find_by(key: "/events/#{event.id}/feedback_report")&.destroy
+    Stash.find_by(key: "/e/#{event.slug}/feedback_report")&.destroy
   end
 
   def generate_public_answers

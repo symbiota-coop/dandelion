@@ -18,8 +18,8 @@ Dandelion::App.controller do
     end
   end
 
-  get '/events/:id/orders', provides: %i[html csv pdf] do
-    @event = Event.unscoped.find(params[:id]) || not_found
+  get '/e/:slug/orders', provides: %i[html csv pdf] do
+    @event = Event.unscoped.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     @orders = @event.orders.includes(:account, :revenue_sharer, :discount_code)
     @orders =  @orders.discounted if params[:discounted]
@@ -60,8 +60,8 @@ Dandelion::App.controller do
     end
   end
 
-  get '/events/:id/tickets', provides: %i[html csv pdf] do
-    @event = Event.unscoped.find(params[:id]) || not_found
+  get '/e/:slug/tickets', provides: %i[html csv pdf] do
+    @event = Event.unscoped.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     @tickets = if params[:ticket_type_id]
                  tt = @event.ticket_types.find(params[:ticket_type_id]) || not_found
@@ -153,7 +153,6 @@ Dandelion::App.controller do
     @order = Order.find(params[:id]) || not_found
     @event = @order.event
     @organisation = @event.organisation
-    original_event_id = @order.event_id
     event_admins_only!
     new_event = @event.organisation.events.find(params[:order][:event_id]) || not_found
     halt 403 unless event_admin?(new_event)
@@ -173,26 +172,26 @@ Dandelion::App.controller do
     @event.refresh_sold_out_cache_and_notify_waitlist
     new_event.refresh_sold_out_cache_and_notify_waitlist
     flash[:notice] = 'The order was transferred.'
-    redirect "/events/#{original_event_id}/orders"
+    redirect "/e/#{@event.slug}/orders"
   end
 
-  post '/events/:id/orders/clear_answers' do
-    @event = Event.find(params[:id]) || not_found
+  post '/e/:slug/orders/clear_answers' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     @event.orders.unscoped.update_all(answers: nil)
     redirect back
   end
 
-  post '/events/:id/orders/:order_id/refund_and_destroy' do
-    @event = Event.find(params[:id]) || not_found
+  post '/e/:slug/orders/:order_id/refund_and_destroy' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     order = @event.orders.find(params[:order_id]) || not_found
     order.destroy # calls order.refund
     redirect back
   end
 
-  post '/events/:id/orders/:order_id/destroy' do
-    @event = Event.find(params[:id]) || not_found
+  post '/e/:slug/orders/:order_id/destroy' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     order = @event.orders.find(params[:order_id]) || not_found
     order.prevent_refund = true
@@ -200,15 +199,15 @@ Dandelion::App.controller do
     redirect back
   end
 
-  post '/events/:id/orders/:order_id/restore_and_complete' do
-    @event = Event.find(params[:id]) || not_found
+  post '/e/:slug/orders/:order_id/restore_and_complete' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     @event.orders.deleted.find(params[:order_id]).restore_and_complete
     redirect back
   end
 
-  post '/events/:id/tickets/:ticket_id/restore' do
-    @event = Event.find(params[:id]) || not_found
+  post '/e/:slug/tickets/:ticket_id/restore' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     @event.tickets.deleted.find(params[:ticket_id]).restore
     redirect back
@@ -236,7 +235,7 @@ Dandelion::App.controller do
     event_admins_only!
     if @ticket.update_attributes(name: params[:ticket][:name], email: params[:ticket][:email])
       flash[:notice] = 'The ticket was updated.'
-      redirect "/events/#{@event.id}/tickets"
+      redirect "/e/#{@event.slug}/tickets"
     else
       flash.now[:error] = 'There was an error updating the ticket.'
       erb :'events/ticket'
@@ -277,8 +276,8 @@ Dandelion::App.controller do
     200
   end
 
-  post '/events/:id/tickets/:ticket_id/refund_and_destroy' do
-    @event = Event.find(params[:id]) || not_found
+  post '/e/:slug/tickets/:ticket_id/refund_and_destroy' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     ticket = @event.tickets.find(params[:ticket_id]) || not_found
     ticket.refund
@@ -286,8 +285,8 @@ Dandelion::App.controller do
     redirect back
   end
 
-  post '/events/:id/tickets/:ticket_id/destroy' do
-    @event = Event.find(params[:id]) || not_found
+  post '/e/:slug/tickets/:ticket_id/destroy' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     ticket = @event.tickets.find(params[:ticket_id]) || not_found
     ticket.destroy

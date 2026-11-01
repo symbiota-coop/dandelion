@@ -248,7 +248,7 @@ $(function () {
   $(document).on('click', '.join-ticket-type-waitlist', function (e) {
     e.preventDefault()
     e.stopPropagation()
-    if (!config.eventId) { return }
+    if (!config.eventSlug) { return }
 
     $ticketTypeWaitlistButton = $(this)
     $('#ticket-type-waitlist-ticket-type-id').val($ticketTypeWaitlistButton.data('ticket-type-id'))
@@ -262,7 +262,7 @@ $(function () {
 
   $('#ticket-type-waitlist-form').on('submit', function (e) {
     e.preventDefault()
-    if (!config.eventId) { return }
+    if (!config.eventSlug) { return }
 
     const name = ($('#ticket-type-waitlist-name').val() || '').trim()
     const email = ($('#ticket-type-waitlist-email').val() || '').trim()
@@ -279,7 +279,7 @@ $(function () {
     $('#ticket-type-waitlist-error').hide().text('')
     $('#ticket-type-waitlist-submit').prop('disabled', true)
     $ticketTypeWaitlistButton.prop('disabled', true)
-    $.post('/events/' + config.eventId + '/ticket_type_waitships', {
+    $.post('/e/' + config.eventSlug + '/ticket_type_waitships', {
       ticket_type_id: $('#ticket-type-waitlist-ticket-type-id').val(),
       name: name,
       email: email,
@@ -471,7 +471,7 @@ $(function () {
     }
 
     const postPurchase = function (confirmedDuplicate) {
-      $.post('/events/' + config.eventId + '/purchase', {
+      $.post('/e/' + config.eventSlug + '/purchase', {
         ticketForm: ticketForm,
         detailsForm: $('#details form').serializeObject(),
         confirmed_duplicate: confirmedDuplicate ? '1' : ''

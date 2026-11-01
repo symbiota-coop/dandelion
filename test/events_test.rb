@@ -331,11 +331,11 @@ class EventsTest < ActiveSupport::TestCase
     get "/e/#{@event.slug}", link_token: attendee.link_token
     assert_nil @event.discussion_post
 
-    post "/events/#{@event.id}/subscribe_discussion"
+    post "/e/#{@event.slug}/subscribe_discussion"
     assert last_response.ok?
     assert @event.discussion_post.subscriptions.and(account: attendee).exists?
 
-    get "/events/#{@event.id}/unsubscribe_discussion"
+    get "/e/#{@event.slug}/unsubscribe_discussion"
     assert last_response.redirect?
     assert_not @event.discussion_post.subscriptions.and(account: attendee).exists?
   end
@@ -345,7 +345,7 @@ class EventsTest < ActiveSupport::TestCase
     outsider = FactoryBot.create(:account)
 
     get "/e/#{@event.slug}", link_token: outsider.link_token
-    post "/events/#{@event.id}/subscribe_discussion"
+    post "/e/#{@event.slug}/subscribe_discussion"
     assert_not last_response.ok?
     assert_nil @event.discussion_post
   end
@@ -729,7 +729,7 @@ class EventsTest < ActiveSupport::TestCase
     other_event = FactoryBot.create(:event)
 
     sign_in_with_rack(@account)
-    post "/events/#{@event.id}/event_sessions/new", event_session: {
+    post "/e/#{@event.slug}/event_sessions/new", event_session: {
       start_time: (@event.start_time + 1.hour).iso8601,
       end_time: (@event.end_time - 1.hour).iso8601,
       event_id: other_event.id
@@ -758,7 +758,7 @@ class EventsTest < ActiveSupport::TestCase
     rpayment = @event.rpayments.create!(account: @account, amount: 10, currency: @event.currency, role: Rpayment.roles.first)
 
     sign_in_with_rack(@account)
-    post "/events/#{@event.id}/rpayments/#{rpayment.id}/edit", rpayment: {
+    post "/e/#{@event.slug}/rpayments/#{rpayment.id}/edit", rpayment: {
       amount: 10,
       currency: @event.currency,
       role: rpayment.role,

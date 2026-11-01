@@ -1,6 +1,6 @@
 <td>
   <% if (feedback_count = event.feedback_count) > 0 %>
-    <a href="/events/<%= event.id %>/feedback"><%= pluralize(feedback_count, 'response') %></a>
+    <a href="/e/<%= event.slug %>/feedback"><%= pluralize(feedback_count, 'response') %></a>
     <% if (attendees_count = event.attendees_count) > 0 %>
       (<%= "#{(100 * (feedback_count.to_f / attendees_count)).round}%" %>)
     <% end %>

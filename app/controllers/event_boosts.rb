@@ -1,6 +1,6 @@
 Dandelion::App.controller do
-  get '/events/:id/boosts' do
-    @event = Event.find(params[:id]) || not_found
+  get '/e/:slug/boosts' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
 
     @event_boosts = @event.event_boosts.and(:payment_completed => true).order('created_at desc')
@@ -30,8 +30,8 @@ Dandelion::App.controller do
     erb :'event_boosts/boosts'
   end
 
-  post '/events/:id/boosts', provides: :json do
-    @event = Event.find(params[:id]) || not_found
+  post '/e/:slug/boosts', provides: :json do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
 
     @event_boost = @event.event_boosts.new(
@@ -42,8 +42,8 @@ Dandelion::App.controller do
 
     session = Stripe::Checkout::Session.create({
                                                  customer_email: current_account.email,
-                                                 success_url: "#{ENV['BASE_URI']}/events/#{@event.id}/boosts?thanks=1",
-                                                 cancel_url: "#{ENV['BASE_URI']}/events/#{@event.id}/boosts?cancelled=1",
+                                                 success_url: "#{ENV['BASE_URI']}/e/#{@event.slug}/boosts?thanks=1",
+                                                 cancel_url: "#{ENV['BASE_URI']}/e/#{@event.slug}/boosts?cancelled=1",
                                                  line_items: [{
                                                    name: "Event boost for #{@event.name}",
                                                    description: "#{@event_boost.hours}h at #{Money.new((@event_boost.hourly_amount * 100).round, @event_boost.currency).format(no_cents_if_whole: true)}/h, starting #{@event_boost.start_time}",

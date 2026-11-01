@@ -412,8 +412,8 @@ $(function () {
     $(this).find('button[type=submit]').prop('disabled', true)
   })
 
-  if (config.eventId) {
-    initQuestionsPreview('#event_questions', '/events/' + config.eventId + '/questions')
-    initQuestionsPreview('#event_feedback_questions', '/events/' + config.eventId + '/feedback_questions')
+  if (config.eventSlug) {
+    initQuestionsPreview('#event_questions', '/e/' + config.eventSlug + '/questions')
+    initQuestionsPreview('#event_feedback_questions', '/e/' + config.eventSlug + '/feedback_questions')
   }
 })

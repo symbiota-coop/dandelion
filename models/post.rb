@@ -56,7 +56,7 @@ class Post
       "#{ENV['BASE_URI']}/g/#{mapplication.gathering.slug}/mapplications/#{mapplication.id}#post-#{id}"
     when Event
       event = commentable
-      "#{ENV['BASE_URI']}/events/#{event.id}"
+      "#{ENV['BASE_URI']}/e/#{event.slug}"
     when ActivityApplication
       activity_application = commentable
       "#{ENV['BASE_URI']}/activities/#{activity_application.activity_id}/activity_applications/#{activity_application.id}"

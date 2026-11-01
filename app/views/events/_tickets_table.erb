@@ -27,8 +27,8 @@
       <p><%== pagination_details @tickets, model: 'Ticket' %></p>
     </div>
     <div class="col-auto">
-      <a class="btn btn-primary" href="/events/<%= @event.id %>/tickets.csv?<%= request.query_string %>"><i class="bi bi-download"></i> CSV</a>
-      <a class="btn btn-primary" href="/events/<%= @event.id %>/tickets.pdf?<%= request.query_string %>"><i class="bi bi-download"></i> PDF</a>
+      <a class="btn btn-primary" href="/e/<%= @event.slug %>/tickets.csv?<%= request.query_string %>"><i class="bi bi-download"></i> CSV</a>
+      <a class="btn btn-primary" href="/e/<%= @event.slug %>/tickets.pdf?<%= request.query_string %>"><i class="bi bi-download"></i> PDF</a>
     </div>
   </div>
 <% else %>
@@ -58,7 +58,7 @@
       <th>
         Feedback
         <% if @event && @event.started? && @event.organisation && !@event.evergreen? && @event.feedback_questions.present? %>
-          <a data-method="post" data-confirm="<% if @event.finished? %>Resend<% else %>Send<% end %> the feedback email to all eligible attendees?" href="/events/<%= @event.id %>/resend_all_feedback_emails"><i class="bi bi-send"></i></a>
+          <a data-method="post" data-confirm="<% if @event.finished? %>Resend<% else %>Send<% end %> the feedback email to all eligible attendees?" href="/e/<%= @event.slug %>/resend_all_feedback_emails"><i class="bi bi-send"></i></a>
         <% end %>
       </th>
       <th>Actions</th>
@@ -101,7 +101,7 @@
       <%= ticket.created_at %>
     </td>
     <td>
-      <div data-pagelet-url="/events/<%= @event.id %>/check_in_toggle/<%= ticket.public_id %>">
+      <div data-pagelet-url="/e/<%= @event.slug %>/check_in_toggle/<%= ticket.public_id %>">
         <%= partial :'events/check_in_toggle', locals: { ticket: ticket } %>
       </div>
     </td>
@@ -118,7 +118,7 @@
         <% if ticket.account.unsubscribed || ticket.account.unsubscribed_feedback %>
           <span class="text-body-secondary">Unsubscribed from feedback emails</span>
         <% else %>
-          <a data-method="post" href="/events/<%= ticket.event_id %>/resend_feedback_email/<%= ticket.account_id %>">
+          <a data-method="post" href="/e/<%= ticket.event.slug %>/resend_feedback_email/<%= ticket.account_id %>">
             <% if ticket.event.finished? %>
               Resend feedback email
             <% elsif ticket.event.started? %>
@@ -131,7 +131,7 @@
     <td>
       <% if ticket.deleted? %>
         <%= dropdown_nav [
-        ['Restore', "/events/#{@event.id}/tickets/#{ticket.id}/restore", { 'data-method' => 'post' }],
+        ['Restore', "/e/#{@event.slug}/tickets/#{ticket.id}/restore", { 'data-method' => 'post' }],
       ].compact, button_text: %(Actions), container_class: 'btn-group mb-1' %>
       <% else %>
         <%= dropdown_nav [
@@ -139,10 +139,10 @@
         (['Resend order confirmation', "/orders/#{ticket.order_id}/send_tickets", { 'data-method' => 'post' }] if ticket.order),
         ['Resend single ticket', "/tickets/#{ticket.id}/send_ticket", { 'data-method' => 'post' }],
         ['Change name or email', "/tickets/#{ticket.id}/edit"],
-        (['Remove and refund ticket', "/events/#{@event.id}/tickets/#{ticket.id}/refund_and_destroy"] if ticket.refundable?),
-        ['Remove ticket', "/events/#{@event.id}/tickets/#{ticket.id}/destroy"],
-        (['Remove and refund order', "/events/#{@event.id}/orders/#{ticket.order_id}/refund_and_destroy"] if ticket.order && ticket.order.refundable?),
-        (['Remove order', "/events/#{@event.id}/orders/#{ticket.order_id}/destroy"] if ticket.order),
+        (['Remove and refund ticket', "/e/#{@event.slug}/tickets/#{ticket.id}/refund_and_destroy"] if ticket.refundable?),
+        ['Remove ticket', "/e/#{@event.slug}/tickets/#{ticket.id}/destroy"],
+        (['Remove and refund order', "/e/#{@event.slug}/orders/#{ticket.order_id}/refund_and_destroy"] if ticket.order && ticket.order.refundable?),
+        (['Remove order', "/e/#{@event.slug}/orders/#{ticket.order_id}/destroy"] if ticket.order),
       ].compact, button_text: %(Actions), container_class: 'btn-group mb-1' %>
       <% end %>
     </td>

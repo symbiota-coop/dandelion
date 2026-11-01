@@ -38,14 +38,14 @@
       <a href="/o/<%= organisation.slug %>/events"><%= organisation.name %></a>
     </td>
     <td class="no-labels no-buttons">
-      <% form_for cohostship, "/events/#{@event.id}/cohostships/#{cohostship.id}" do |f| %>
+      <% form_for cohostship, "/e/#{@event.slug}/cohostships/#{cohostship.id}" do |f| %>
         <%= f.image_block :image %>
         <%= f.submit_block %>
       <% end %>
     </td>
     <td class="no-buttons">
       <% if organisation_admins_or_event_managers?(organisation) %>
-      <% form_for cohostship, "/events/#{@event.id}/cohostships/#{cohostship.id}" do |f| %>
+      <% form_for cohostship, "/e/#{@event.slug}/cohostships/#{cohostship.id}" do |f| %>
         <%= f.check_box_block :featured %>
         <%= f.submit_block %>
       <% end %>

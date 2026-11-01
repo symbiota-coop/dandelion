@@ -23,8 +23,8 @@
           add: event_cohost_adder?,
           remove: event_cohost_remover?,
           new_object: Cohostship.new,
-          new_url: "/events/#{@event.id}/cohostships/new",
-          destroy_url: "/events/#{@event.id}/cohostships/destroy"
+          new_url: "/e/#{@event.slug}/cohostships/new",
+          destroy_url: "/e/#{@event.slug}/cohostships/destroy"
         } %>
     </td>
   </tr>
@@ -53,8 +53,8 @@
             accounts: @event.event_facilitators.order('name asc'),
             add_and_remove: event_admin?,
             new_object: EventFacilitation.new,
-            new_url: "/events/#{@event.id}/event_facilitations/new",
-            destroy_url: "/events/#{@event.id}/event_facilitations/destroy"
+            new_url: "/e/#{@event.slug}/event_facilitations/new",
+            destroy_url: "/e/#{@event.slug}/event_facilitations/destroy"
           } %>
       </td>
     </tr>

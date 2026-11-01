@@ -21,8 +21,8 @@
       <p><%== pagination_details orders, model: 'Order' %></p>
     </div>
     <div class="col-auto">
-      <a class="btn btn-primary" href="/events/<%= @event.id %>/orders.csv?<%= request.query_string %>"><i class="bi bi-download"></i> CSV</a>
-      <a class="btn btn-primary" href="/events/<%= @event.id %>/orders.pdf?<%= request.query_string %>"><i class="bi bi-download"></i> PDF</a>
+      <a class="btn btn-primary" href="/e/<%= @event.slug %>/orders.csv?<%= request.query_string %>"><i class="bi bi-download"></i> CSV</a>
+      <a class="btn btn-primary" href="/e/<%= @event.slug %>/orders.pdf?<%= request.query_string %>"><i class="bi bi-download"></i> PDF</a>
     </div>
   </div>
 <% elsif @organisation %>
@@ -73,7 +73,7 @@
         <th class="answers-col">
           Answers
           <% if orders.unscoped.and(:answers.ne => nil).exists? %>
-            <a data-method="post" data-confirm="Clear the answers for all orders for this event, for data privacy reasons? This cannot be undone." href="/events/<%= @event.id %>/orders/clear_answers"><i class="bi bi-x-lg"></i></a>
+            <a data-method="post" data-confirm="Clear the answers for all orders for this event, for data privacy reasons? This cannot be undone." href="/e/<%= @event.slug %>/orders/clear_answers"><i class="bi bi-x-lg"></i></a>
           <% end %>
         </th>
         <th>Updates from organisation?</th>
@@ -84,7 +84,7 @@
         <th>
           Feedback
           <% if @event.started? && @event.organisation && !@event.evergreen? && @event.feedback_questions.present? %>
-            <a data-method="post" data-confirm="<% if @event.finished? %>Resend<% else %>Send<% end %> the feedback email to all eligible attendees?" href="/events/<%= @event.id %>/resend_all_feedback_emails"><i class="bi bi-send"></i></a>
+            <a data-method="post" data-confirm="<% if @event.finished? %>Resend<% else %>Send<% end %> the feedback email to all eligible attendees?" href="/e/<%= @event.slug %>/resend_all_feedback_emails"><i class="bi bi-send"></i></a>
           <% end %>
         </th>
       <% end %>
@@ -118,7 +118,7 @@
             </span>
           <% end %>
         </div>
-        <div data-pagelet-url="/events/<%= order.event.id %>/progress?full_width=true" class="my-1"></div>
+        <div data-pagelet-url="/e/<%= order.event.slug %>/progress?full_width=true" class="my-1"></div>
         <% if order.event.discounted_ticket_revenue > 0 %>
           <%= m order.event.discounted_ticket_revenue, order.event.currency %>
         <% end %>
@@ -237,7 +237,7 @@
             <% if order.account.unsubscribed || order.account.unsubscribed_feedback %>
               <span class="text-body-secondary">Unsubscribed from feedback emails</span>
             <% else %>
-              <a data-method="post" href="/events/<%= order.event_id %>/resend_feedback_email/<%= order.account_id %>">
+              <a data-method="post" href="/e/<%= order.event.slug %>/resend_feedback_email/<%= order.account_id %>">
                 <% if order.event.finished? %>
                   Resend feedback email
                 <% elsif order.event.started? %>
@@ -252,15 +252,15 @@
     <td nowrap>
       <% if order.deleted? %>
         <%= dropdown_nav [
-        ['Restore and complete', "/events/#{order.event_id}/orders/#{order.id}/restore_and_complete", { 'data-method' => 'post' }],
+        ['Restore and complete', "/e/#{order.event.slug}/orders/#{order.id}/restore_and_complete", { 'data-method' => 'post' }],
       ].compact, button_text: %(Actions), container_class: 'btn-group mb-1' %>
       <% else %>
         <%= dropdown_nav [
         ['Link to order confirmation', "/orders/#{order.public_id}"],
         ['Resend order confirmation', "/orders/#{order.id}/send_tickets", { 'data-method' => 'post' }],
         ['Transfer to another event', "/orders/#{order.id}/transfer"],
-        (['Remove and refund order', "/events/#{order.event.id}/orders/#{order.id}/refund_and_destroy"] if order.refundable?),
-        ['Remove order', "/events/#{order.event.id}/orders/#{order.id}/destroy"],
+        (['Remove and refund order', "/e/#{order.event.slug}/orders/#{order.id}/refund_and_destroy"] if order.refundable?),
+        ['Remove order', "/e/#{order.event.slug}/orders/#{order.id}/destroy"],
       ].compact, button_text: %(Actions), container_class: 'btn-group mb-1' %>
       <% end %>
     </td>

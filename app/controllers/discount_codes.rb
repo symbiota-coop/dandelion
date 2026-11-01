@@ -60,7 +60,7 @@ Dandelion::App.controller do
       elsif @local_group
         redirect "/local_groups/#{@local_group.id}/discount_codes"
       elsif @event
-        redirect "/events/#{@event.id}/discount_codes"
+        redirect "/e/#{@event.slug}/discount_codes"
       end
     else
       erb :'discount_codes/build'
@@ -83,7 +83,7 @@ Dandelion::App.controller do
       elsif @local_group
         redirect "/local_groups/#{@local_group.id}/discount_codes"
       elsif @event
-        redirect "/events/#{@event.id}/discount_codes"
+        redirect "/e/#{@event.slug}/discount_codes"
       end
     else
       erb :'discount_codes/build'
@@ -100,7 +100,7 @@ Dandelion::App.controller do
     elsif @local_group
       redirect "/local_groups/#{@local_group.id}/discount_codes"
     elsif @event
-      redirect "/events/#{@event.id}/discount_codes"
+      redirect "/e/#{@event.slug}/discount_codes"
     end
   end
 end

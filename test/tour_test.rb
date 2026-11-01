@@ -30,7 +30,7 @@ class TourTest < ActiveSupport::TestCase
   test 'event tour' do
     create_event
     sign_in(@account)
-    visit "/events/#{@event.id}?tour=1"
+    visit "/e/#{@event.slug}?tour=1"
     assert page.has_content? "You've created your first event"
     execute_script %{document.querySelector('.introjs-nextbutton').click()}
     assert page.has_content? "Here's the admin dropdown for the event"

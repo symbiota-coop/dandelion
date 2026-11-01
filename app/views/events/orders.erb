@@ -22,10 +22,10 @@
     <% end %>
   </div>
   <div class="col-12 mb-3 col-lg-auto mb-lg-0">
-    <a class="btn btn-primary show mb-1" href="/events/<%= @event.id %>/tickets?create_ticket=1"><i class="bi bi-plus-lg"></i> Create a ticket</a>
+    <a class="btn btn-primary show mb-1" href="/e/<%= @event.slug %>/tickets?create_ticket=1"><i class="bi bi-plus-lg"></i> Create a ticket</a>
   </div>
 </div>
 
-<div id="orders-table" data-pagelet-url="/events/<%= @event.id %>/orders">
+<div id="orders-table" data-pagelet-url="/e/<%= @event.slug %>/orders">
   <%= partial :'events/orders_table', locals: { orders: @orders, show_emails: event_email_viewer? } %>
 </div>

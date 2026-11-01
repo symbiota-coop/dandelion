@@ -52,7 +52,7 @@
         if (!code)
           return
         checkingIn = true
-        $.post(<%== "/events/#{@event.id}/check_in/".to_json %> + code, {checked_in: true}, function(accountName) {
+        $.post(<%== "/e/#{@event.slug}/check_in/".to_json %> + code, {checked_in: true}, function(accountName) {
           alert('Checked in ' + accountName + ' ' + code + ' ✅')
         }).fail(function(data) {
           switch (data.status) {

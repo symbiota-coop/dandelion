@@ -14,7 +14,7 @@
   <% if post && (subscription = post.subscriptions.find_by(account: current_account)) %>
     <a class="pagelet-trigger" href="/subscriptions/<%= subscription.id %>/unsubscribe">Email notifications on</a>
   <% else %>
-    <a class="text-body-secondary pagelet-trigger" data-method="post" href="/events/<%= commentable.id %>/subscribe_discussion">Email notifications off</a>
+    <a class="text-body-secondary pagelet-trigger" data-method="post" href="/e/<%= commentable.slug %>/subscribe_discussion">Email notifications off</a>
   <% end %>
   <% if post %>
     <span class="text-body-secondary">&middot; <%= pluralize(post.subscriptions.count, 'person') %> subscribed</span>

@@ -1,6 +1,6 @@
 Dandelion::App.controller do
-  post '/events/:id/purchase', provides: :json do
-    @event = Event.find(params[:id]) || not_found
+  post '/e/:slug/purchase', provides: :json do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     halt 403 unless can_purchase_event_tickets?
     ticket_form = params[:ticketForm]
     details_form = params[:detailsForm]

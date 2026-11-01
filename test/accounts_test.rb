@@ -1203,7 +1203,7 @@ class AccountsTest < ActiveSupport::TestCase
     @account.generate_link_token!
 
     %w[ticket_email_preview reminder_email_preview feedback_request_email_preview].each do |preview|
-      get "/events/#{@event.id}/#{preview}"
+      get "/e/#{@event.slug}/#{preview}"
       assert last_response.ok?, preview
       refute_includes last_response.body, @account.reload.link_token, preview
     end
