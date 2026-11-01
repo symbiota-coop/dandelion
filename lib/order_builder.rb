@@ -70,6 +70,10 @@ class OrderBuilder
     MESSAGE = "That payment method isn't available for this event.".freeze
   end
 
+  # Another request with the same idempotency key created its order first
+  # (orders' unique index on event_id, account_id and idempotency_key)
+  class IdempotencyKeyTaken < Error; end
+
   class NotAllowed < Error
     MESSAGES = {
       locked: 'This event is not taking bookings right now.',
@@ -105,7 +109,7 @@ class OrderBuilder
                  secret_ticket_type_id: nil, answers: nil, donation_amount: nil, donation_via_modal: false,
                  discount_code_id: nil, cohost: nil, affiliate_type: nil, affiliate_id: nil,
                  opt_in_organisation: false, opt_in_facilitator: false, hear_about: nil, via: nil, http_referrer: nil,
-                 confirmed_duplicate: false, utm: {})
+                 confirmed_duplicate: false, utm: {}, idempotency_key: nil)
     @event = event
     @buyer = buyer
     @quantities = quantities
@@ -128,6 +132,7 @@ class OrderBuilder
     @http_referrer = http_referrer
     @confirmed_duplicate = confirmed_duplicate
     @utm = utm || {}
+    @idempotency_key = idempotency_key
   end
 
   # Returns what the payment method returns (JSON for the checkout form)
@@ -230,11 +235,16 @@ class OrderBuilder
       discount_code_id: @discount_code_id,
       hear_about: @hear_about,
       via: @via,
-      http_referrer: @http_referrer
+      http_referrer: @http_referrer,
+      idempotency_key: @idempotency_key
     )
     # Not needed for the purchase, so looked up in the background, once the order has joined the account to its
     # organisations (whose local groups need the coordinates)
     @account.delay.geocode_location! if @account.skip_geocoding && @account.location
+  rescue Mongo::Error::OperationFailure => e
+    raise IdempotencyKeyTaken if @idempotency_key && e.code == 11_000
+
+    raise
   end
 
   def create_tickets

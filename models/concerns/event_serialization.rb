@@ -81,6 +81,8 @@ module EventSerialization
     restrictions << 'sales_closed' if sales_closed_due_to_event_end?
     restrictions << 'monthly_donors_only' if monthly_donors_only
     restrictions << 'members_only' if activity && activity.privacy != 'open'
+    # The event page asks for a donation to the organisation that agents can't add
+    restrictions << 'donation_required' if minimum_donation&.positive? && !donations_to_dandelion?
     # Nothing to book without a public ticket type (hidden ones need their secret link)
     restrictions << 'no_tickets' unless ticket_types.and(hidden: false).exists?
 
@@ -108,11 +110,11 @@ module EventSerialization
       terms: {
         text: terms_and_conditions_for_purchase,
         url: terms_and_conditions_url_for_purchase,
-        must_accept: terms_and_conditions_check_box_for_purchase && (terms_and_conditions_for_purchase || terms_and_conditions_url_for_purchase).present?,
+        must_accept: terms_acceptance_required?,
         platform_terms_url: "#{ENV['BASE_URI']}/terms",
         organiser: responsible_name
       },
-      payment_methods: EventPaymentMethod.all.select { |pm| pm.process && pm.available?(self) }.map { |pm| { name: pm.name, label: pm.button_label(self), free_only: pm.complimentary } }
+      payment_methods: EventPaymentMethod.all.select { |pm| pm.process && pm.available?(self) }.map { |pm| { name: pm.name, label: pm.button_label(self), free_only: pm.complimentary, agent_checkout: pm.redirect || pm.complimentary } }
     }
   end
 end

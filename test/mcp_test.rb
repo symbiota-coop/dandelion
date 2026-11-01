@@ -326,7 +326,9 @@ class McpTest < ActiveSupport::TestCase
     assert payload['questions'][3]['required']
     refute payload['questions'][1]['required']
     assert_equal ['opt_in_organisation'], payload['opt_ins'].pluck('name')
-    assert(payload['payment_methods'].find { |payment_method| payment_method['name'] == 'rsvp' }['free_only'])
+    rsvp = payload['payment_methods'].find { |payment_method| payment_method['name'] == 'rsvp' }
+    assert rsvp['free_only']
+    assert rsvp['agent_checkout']
   end
 
   test 'get_event_checkout_requirements_tool reports restrictions and hides secret events' do
@@ -347,5 +349,301 @@ class McpTest < ActiveSupport::TestCase
 
     assert rpc.dig('result', 'isError')
     assert_includes tool_text(rpc), 'Event not found'
+  end
+
+  def buyer_headers
+    @buyer ||= FactoryBot.create(:account)
+    { 'Authorization' => "Bearer #{@buyer.api_key}" }
+  end
+
+  def create_checkout(arguments)
+    rpc = mcp_tool_call('create_checkout_tool', arguments: { slug: @event.slug }.merge(arguments), headers: buyer_headers)
+    [rpc, (JSON.parse(tool_text(rpc)) unless rpc.dig('result', 'isError'))]
+  end
+
+  def with_stubbed_stripe_session(&)
+    session = api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test')
+    Stripe::Checkout::Session.stub(:create, session, &)
+  end
+
+  test 'create_checkout_tool requires authentication' do
+    create_event(prices: [0])
+    rpc = mcp_tool_call('create_checkout_tool', arguments: { slug: @event.slug, quantities: { @event.ticket_types.first.id.to_s => 1 } })
+
+    assert rpc.dig('result', 'isError')
+    assert_includes tool_text(rpc), 'Authentication required'
+  end
+
+  test 'create_checkout_tool books a free event for the authenticated account' do
+    create_event(prices: [0], questions: "Dietary requirements\nT-shirt size <S, M, L>*\n[Photos are fine]\n[Add me to the list]")
+    ticket_type = @event.ticket_types.first
+
+    # phone isn't an argument the tool takes, and is ignored
+    _rpc, order = create_checkout(quantities: { ticket_type.id.to_s => 2 }, answers: { '1' => 'M', '2' => true, '3' => false }, phone: '+447700900000')
+
+    assert_equal 'complete', order['status']
+    assert_nil order['checkout_url']
+    assert_equal 2, order['tickets'].length
+    record = Order.find(order['order_id'])
+    assert_equal @buyer, record.account
+    assert_equal 'mcp', record.via
+    # As the checkout form stores them: a ticked checkbox as '1', and an unticked one not at all
+    assert_equal [['Dietary requirements', nil], ['T-shirt size <S, M, L>*', 'M'], ['[Photos are fine]', '1']], record.answers
+    assert_equal 2, @event.tickets.complete.and(account_id: @buyer.id).count
+  end
+
+  test 'create_checkout_tool returns a payment link for a paid event' do
+    create_event(prices: [10])
+    ticket_type = @event.ticket_types.first
+
+    order = nil
+    with_stubbed_stripe_session do
+      _rpc, order = create_checkout(quantities: { ticket_type.id.to_s => 1 })
+    end
+
+    assert_equal 'awaiting_payment', order['status']
+    assert_equal 'https://checkout.stripe.com/test', order['checkout_url']
+    assert_equal 10.0, order['total']
+    assert order['pay_by']
+    assert_equal 'https://checkout.stripe.com/test', Order.find(order['order_id']).checkout_url
+  end
+
+  test 'create_checkout_tool returns the first order when retried with the same idempotency key' do
+    create_event(prices: [10])
+    ticket_type = @event.ticket_types.first
+
+    first = second = nil
+    with_stubbed_stripe_session do
+      _rpc, first = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+      _rpc, second = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+    end
+
+    assert_equal first['order_id'], second['order_id']
+    assert_equal 1, @event.orders.count
+
+    Order.find(first['order_id']).destroy
+    _rpc, third = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+
+    assert_equal first['order_id'], third['order_id']
+    assert_equal 'expired', third['status']
+    assert_includes third['message'], 'new idempotency_key'
+    assert_nil third['total']
+    assert_equal 1, Order.unscoped.and(event_id: @event.id).count
+  end
+
+  test 'create_checkout_tool says a retry is still processing while the first call sets up payment' do
+    create_event(prices: [10])
+    ticket_type = @event.ticket_types.first
+
+    first = nil
+    with_stubbed_stripe_session do
+      _rpc, first = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+    end
+    # As the order is while the first call waits for the payment provider
+    Order.find(first['order_id']).unset(:checkout_url)
+
+    _rpc, second = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+
+    assert_equal first['order_id'], second['order_id']
+    assert_equal 'processing', second['status']
+    assert_includes second['message'], 'in a few seconds'
+    assert_nil second['checkout_url']
+  end
+
+  test 'create_checkout_tool books again when retried after the first attempt failed' do
+    create_event(prices: [10])
+    ticket_type = @event.ticket_types.first
+
+    Stripe::Checkout::Session.stub(:create, ->(*) { raise 'Stripe is down' }) do
+      rpc, = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+      assert_includes tool_text(rpc), 'Booking failed. Please try again.'
+      refute_includes tool_text(rpc), 'Stripe is down'
+    end
+
+    order = nil
+    with_stubbed_stripe_session do
+      _rpc, order = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+    end
+
+    assert_equal 'awaiting_payment', order['status']
+    assert_equal 'https://checkout.stripe.com/test', order['checkout_url']
+    assert_equal 1, @event.orders.count
+    assert_equal 1, Order.unscoped.and(event_id: @event.id, idempotency_key: 'retry-1').count
+  end
+
+  test 'create_checkout_tool returns the first order when a retry of a free booking arrives at the same time' do
+    create_event(prices: [0])
+    ticket_type = @event.ticket_types.first
+    _rpc, first = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+
+    # The retry's lookup runs before the first order exists, and it then finds the first order's ticket
+    idempotent_order = Dandelion::MCP.method(:idempotent_order)
+    lookups = 0
+    second = nil
+    Dandelion::MCP.stub(:idempotent_order, ->(*args) { (lookups += 1) == 1 ? nil : idempotent_order.call(*args) }) do
+      _rpc, second = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+    end
+
+    assert_equal first['order_id'], second['order_id']
+    assert_equal 'complete', second['status']
+    assert_equal 1, @event.orders.count
+  end
+
+  test 'create_checkout_tool books paid tickets that credit covers, with no payment method agents can use' do
+    create_event(prices: [10], suggested_donation: 0)
+    buyer_headers
+    @organisation.organisationships.find_or_create_by(account: @buyer).creditings.create!(account: @account, amount: 10, currency: @event.currency)
+
+    order = nil
+    Dandelion::MCP.stub(:event_agent_payment_methods, []) do
+      _rpc, order = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 })
+    end
+
+    assert_equal 'complete', order['status']
+    assert_equal 10, Order.find(order['order_id']).credit_applied
+  end
+
+  test 'create_checkout_tool says to try again when the order it clashed with has already failed' do
+    create_event(prices: [10])
+    ticket_type = @event.ticket_types.first
+    index = 'event_id_1_account_id_1_idempotency_key_1_unique'
+    Order.collection.indexes.create_one({ event_id: 1, account_id: 1, idempotency_key: 1 },
+                                        name: index, unique: true, partial_filter_expression: { idempotency_key: { '$type' => 'string' } })
+
+    rpc = nil
+    with_stubbed_stripe_session do
+      create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+      # Neither lookup finds the first order, as if it failed and freed its key just after the clash
+      Dandelion::MCP.stub(:idempotent_order, nil) do
+        rpc, = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+      end
+    end
+
+    assert rpc.dig('result', 'isError')
+    assert_includes tool_text(rpc), 'Booking failed. Please try again.'
+  ensure
+    Order.collection.indexes.drop_one(index)
+  end
+
+  test 'create_checkout_tool returns the first order when a retry arrives at the same time' do
+    create_event(prices: [10])
+    ticket_type = @event.ticket_types.first
+    index = 'event_id_1_account_id_1_idempotency_key_1_unique'
+    Order.collection.indexes.create_one({ event_id: 1, account_id: 1, idempotency_key: 1 },
+                                        name: index, unique: true, partial_filter_expression: { idempotency_key: { '$type' => 'string' } })
+
+    first = second = nil
+    with_stubbed_stripe_session do
+      _rpc, first = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+
+      # The retry's lookup runs before the first order exists
+      idempotent_order = Dandelion::MCP.method(:idempotent_order)
+      lookups = 0
+      Dandelion::MCP.stub(:idempotent_order, ->(*args) { (lookups += 1) == 1 ? nil : idempotent_order.call(*args) }) do
+        _rpc, second = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
+      end
+    end
+
+    assert_equal first['order_id'], second['order_id']
+    assert_equal 1, Order.unscoped.and(event_id: @event.id).count
+  ensure
+    Order.collection.indexes.drop_one(index)
+  end
+
+  test 'create_checkout_tool checks questions, terms and duplicates' do
+    create_event(prices: [0], questions: 'T-shirt size <S, M, L>*', terms_and_conditions: 'Be kind', terms_and_conditions_check_box: true)
+    quantities = { @event.ticket_types.first.id.to_s => 1 }
+
+    rpc, = create_checkout(quantities: quantities, accept_terms: true)
+    assert_includes tool_text(rpc), 'Answer the required questions: T-shirt size'
+
+    rpc, = create_checkout(quantities: quantities, answers: { '1' => 'M' }, accept_terms: true)
+    assert_includes tool_text(rpc), 'Unknown question indexes: 1'
+
+    rpc, = create_checkout(quantities: quantities, answers: { '0' => 'XL' }, accept_terms: true)
+    assert_includes tool_text(rpc), 'Choose one of the options: T-shirt size (S, M, L)'
+
+    rpc, = create_checkout(quantities: quantities, answers: { '0' => 'M' })
+    assert_includes tool_text(rpc), 'accept the terms and conditions'
+
+    _rpc, order = create_checkout(quantities: quantities, answers: { '0' => 'M' }, accept_terms: true)
+    assert_equal 'complete', order['status']
+
+    rpc, = create_checkout(quantities: quantities, answers: { '0' => 'M' }, accept_terms: true)
+    assert_includes tool_text(rpc), 'already has a ticket to this event'
+    assert_equal 1, @event.orders.count
+  end
+
+  test 'create_checkout_tool refuses what agents cannot book' do
+    create_event(prices: [10, '10-100', nil])
+    fixed = @event.ticket_types.detect(&:price)
+    range = @event.ticket_types.detect(&:range)
+    pay_what_you_want = @event.ticket_types.detect { |ticket_type| !ticket_type.price && !ticket_type.range }
+
+    rpc, = create_checkout(quantities: { fixed.id.to_s => 0 })
+    assert_includes tool_text(rpc), 'Choose at least one ticket.'
+
+    rpc, = create_checkout(quantities: { range.id.to_s => 1 })
+    assert_includes tool_text(rpc), 'only book fixed-price tickets'
+
+    rpc, = create_checkout(quantities: { pay_what_you_want.id.to_s => 1 })
+    assert_includes tool_text(rpc), 'only book fixed-price tickets'
+
+    Dandelion::MCP.stub(:event_agent_payment_methods, []) do
+      rpc, = create_checkout(quantities: { fixed.id.to_s => 1 })
+    end
+    assert_includes tool_text(rpc), 'no payment methods agents can use'
+
+    fixed.update_attributes!(sales_end: 1.day.ago)
+    rpc, = create_checkout(quantities: { fixed.id.to_s => 1 })
+    assert_includes tool_text(rpc), 'Sales of that ticket type have ended'
+
+    # Event.live leaves out locked events
+    @event.set(locked: true)
+    rpc, = create_checkout(quantities: { fixed.id.to_s => 1 })
+    assert_includes tool_text(rpc), 'Event not found'
+    assert_equal 0, @event.orders.count
+  end
+
+  test 'create_checkout_tool sends the buyer to the event page when the event needs a donation' do
+    create_event(prices: [0], suggested_donation: 10, minimum_donation: 5)
+    assert_equal 5, @event.minimum_donation
+    requirements = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))
+    assert_includes requirements['restrictions'], 'donation_required'
+
+    rpc, = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 })
+
+    assert_includes tool_text(rpc), 'A donation of at least £5 is required.'
+    assert_includes tool_text(rpc), 'send the buyer to the event page'
+    assert_equal 0, @event.orders.count
+  end
+
+  test 'create_checkout_tool says when a ticket type is only for monthly donors' do
+    create_event(prices: [0])
+    @event.ticket_types.first.set(minimum_monthly_donation: 10)
+
+    rpc, = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 })
+
+    assert_includes tool_text(rpc), 'only for monthly donors'
+    assert_equal 0, @event.orders.count
+  end
+
+  test 'create_checkout_tool keeps to who may book the event' do
+    create_event(prices: [0], monthly_donors_only: true)
+
+    rpc, = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 })
+
+    assert_includes tool_text(rpc), 'Only monthly donors to this organisation can book this event'
+    assert_equal 0, @event.orders.count
+  end
+
+  test 'create_checkout_tool does not sell hidden ticket types' do
+    create_event(prices: [0])
+    hidden = @event.ticket_types.create!(name: 'Secret', price: 0, quantity: 5, hidden: true)
+
+    rpc, = create_checkout(quantities: { hidden.id.to_s => 1 })
+
+    assert_includes tool_text(rpc), 'Ticket type not found'
+    assert_equal 0, @event.orders.count
   end
 end

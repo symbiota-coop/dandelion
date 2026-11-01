@@ -68,7 +68,7 @@ module Dandelion
     def self.perform_get_event_checkout_requirements(slug: nil, id: nil)
       return tool_error('Provide event slug or id') if slug.blank? && id.blank?
 
-      event = Event.search_scope.find_by_slug_or_id(slug: slug, id: id)
+      event = Event.live.publicly_visible.find_by_slug_or_id(slug: slug, id: id)
       return tool_error('Event not found') unless event
 
       tool_json(event.checkout_requirements)
@@ -281,7 +281,7 @@ module Dandelion
         Class.new(::MCP::Tool) do
           tool_name 'get_event_checkout_requirements_tool'
           title 'Get Event Checkout Requirements'
-          description 'Get what booking a Dandelion event involves, by slug or ID: whether it can be booked, its ticket types with prices and availability, the buyer details and questions the checkout form asks for, opt-ins, terms and the payment methods on offer. Booking itself happens on the event page.'
+          description 'Get what booking a Dandelion event involves, by slug or ID: whether it can be booked, its ticket types with prices and availability, the buyer details and questions the checkout form asks for, opt-ins, terms and the payment methods on offer. Call this before create_checkout_tool.'
           input_schema(properties: {
                          slug: { type: 'string', description: 'Event slug' },
                          id: { type: 'string', description: 'Event ID' }
@@ -290,6 +290,26 @@ module Dandelion
 
           define_singleton_method(:call) do |slug: nil, id: nil, _server_context: {}|
             Dandelion::MCP.perform_get_event_checkout_requirements(slug: slug, id: id)
+          end
+        end,
+        Class.new(::MCP::Tool) do
+          tool_name 'create_checkout_tool'
+          title 'Create Checkout'
+          description 'Book fixed-price tickets to a Dandelion event for the authenticated account. Range and pay-what-you-want tickets are booked on the event page. Free bookings are confirmed straight away; paid ones return a checkout_url where the buyer pays, which they must open themselves before pay_by, when unpaid orders are released. Call get_event_checkout_requirements_tool first, and confirm the tickets, total and any terms with the buyer before calling this. Requires a Bearer API key.'
+          input_schema(properties: {
+                         slug: { type: 'string', description: 'Event slug' },
+                         id: { type: 'string', description: 'Event ID' },
+                         quantities: { type: 'object', description: 'Ticket type id => number of tickets', additionalProperties: { type: 'integer' } },
+                         answers: { type: 'object', description: 'Question index => answer: a string, true/false for a checkbox, or an array of options for checkboxes' },
+                         accept_terms: { type: 'boolean', description: 'The buyer has accepted the terms and conditions (required when terms.must_accept)' },
+                         idempotency_key: { type: 'string', description: 'A unique key for this booking. Retrying with the same key returns the first order instead of booking again (status processing while it is still being set up)' }
+                       }, required: [:quantities])
+          annotations(read_only_hint: false, destructive_hint: false, idempotent_hint: false, open_world_hint: true)
+
+          # **_rest ignores arguments the tool doesn't take, rather than failing the call
+          define_singleton_method(:call) do |slug: nil, id: nil, quantities: nil, answers: nil, accept_terms: false, idempotency_key: nil, server_context: {}, **_rest|
+            Dandelion::MCP.perform_create_checkout(server_context: server_context, slug: slug, id: id, quantities: quantities, answers: answers,
+                                                   accept_terms: accept_terms, idempotency_key: idempotency_key)
           end
         end,
         Class.new(::MCP::Tool) do
@@ -394,7 +414,7 @@ module Dandelion
           name: 'dandelion',
           title: 'Dandelion',
           version: '1.0.0',
-          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings. Authenticated tools such as get_me_tool, get_organisation_events_tool, get_organisation_followers_tool, get_organisation_orders_tool, get_event_orders_tool and get_event_tickets_tool require a Bearer API key.',
+          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings, and for booking events. To book: get_event_checkout_requirements_tool, confirm the details with the buyer, create_checkout_tool, then send the buyer to the checkout_url to pay. Authenticated tools such as get_me_tool, create_checkout_tool, get_organisation_events_tool, get_organisation_followers_tool, get_organisation_orders_tool, get_event_orders_tool and get_event_tickets_tool require a Bearer API key.',
           tools: tools
         )
         def s.server_context
