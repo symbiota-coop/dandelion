@@ -95,7 +95,7 @@ class EventFeedback
   end
 
   after_create :send_feedback
-  after_create :generate_public_answers, if: -> { publicly_visible? && answers&.length == 1 }
+  after_create :generate_public_answers, if: -> { rating == 5 && publicly_visible? && answers&.length == 1 }
   def send_feedback
     return unless event
 
@@ -161,6 +161,7 @@ class EventFeedback
   end
 
   def generate_public_answers
+    return unless rating == 5
     return unless publicly_visible?
     return if public_answers.present?
     return unless answers&.length == 1
