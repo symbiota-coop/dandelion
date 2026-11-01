@@ -80,7 +80,7 @@ Dandelion::App.controller do
       @events = @events.in_person if params[:in_person]
     end
     @events = filter_events_by_search_and_tags(@events)
-    erb :'events/event_stats'
+    event_stats_page(@activity.organisation)
   end
 
   get '/activities/:id/edit' do

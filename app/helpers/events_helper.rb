@@ -167,6 +167,12 @@ Dandelion::App.helpers do
     DragonflyJob.with_prefetched(images) { yield events }
   end
 
+  # The stats page, or with table=1 just its table, which the page loads in a request of its own so it shows before the
+  # rows are worked out
+  def event_stats_page(organisation)
+    params[:table] ? partial(:'events/event_stats', locals: { events: @events, organisation: organisation }) : erb(:'events/event_stats')
+  end
+
   # The stats table's rows (events/event_stats_row)
   def event_stats_rows(events, organisation)
     with_stats_events(events) do |stats_events|

@@ -14,6 +14,15 @@
   <% coordinators = Account.and(:id.in => @local_group.events.pluck(:coordinator_id)) %>
   <% organisation = @local_group.organisation %>
 <% end %>
+<%# The dropdowns' names and ids, plucked, as loading whole documents (local groups' polygons) is slow %>
+<% event_tag_options = event_tags.order('name asc').pluck(:name, :id) %>
+<% coordinator_options = coordinators.order('name asc').pluck(:name, :id) %>
+<% if @organisation %>
+  <% local_group_options = @organisation.local_groups.order('name asc').pluck(:name, :id) %>
+  <% activity_options = @organisation.activities.order('name asc').pluck(:name, :id) %>
+  <% carousel_options = params[:deleted] ? [] : @organisation.carousels.order('o asc').pluck(:name, :id) %>
+  <% cohost_options = @organisation.cohosts.order('name asc').pluck(:name, :id) %>
+<% end %>
 
 <div class="search border rounded p-3 pb-lg-0 mb-3">
 
@@ -35,40 +44,40 @@
         <label>containing the word</label>
         <%= text_field_tag :q, class: 'form-control mx-1', value: params[:q] %>
       </div>
-      <% if event_tags.exists? %>
+      <% if event_tag_options.any? %>
         <div class="form-group col-12 col-sm-auto">
           <label>tagged</label>
-          <%= select_tag :event_tag_id, options: [''] + event_tags.order('name asc').map { |event_tag| [event_tag.name, event_tag.id] }, selected: params[:event_tag_id], class: 'form-select' %>
+          <%= select_tag :event_tag_id, options: [''] + event_tag_options, selected: params[:event_tag_id], class: 'form-select' %>
         </div>
       <% end %>
       <div class="form-group col-12 col-sm-auto">
         <label>Coordinator</label>
-        <%= select_tag :coordinator_id, options: [''] + coordinators.order('name asc').map { |account| [account.name, account.id] }, selected: params[:coordinator_id], class: 'form-select mx-1' %>
+        <%= select_tag :coordinator_id, options: [''] + coordinator_options, selected: params[:coordinator_id], class: 'form-select mx-1' %>
       </div>
 
       <% if @organisation %>
-        <% if @organisation.local_groups.exists? %>
+        <% if local_group_options.any? %>
           <div class="form-group col-12 col-sm-auto">
             <label>Local group</label>
-            <%= select_tag :local_group_id, options: [''] + @organisation.local_groups.order('name asc').map { |local_group| [local_group.name, local_group.id] }, selected: params[:local_group_id], class: 'form-select mx-1' %>
+            <%= select_tag :local_group_id, options: [''] + local_group_options, selected: params[:local_group_id], class: 'form-select mx-1' %>
           </div>
         <% end %>
-        <% if @organisation.activities.exists? %>
+        <% if activity_options.any? %>
           <div class="form-group col-12 col-sm-auto">
             <label>Activity</label>
-            <%= select_tag :activity_id, options: [''] + @organisation.activities.order('name asc').map { |activity| [activity.name, activity.id] }, selected: params[:activity_id], class: 'form-select mx-1' %>
+            <%= select_tag :activity_id, options: [''] + activity_options, selected: params[:activity_id], class: 'form-select mx-1' %>
           </div>
         <% end %>
-        <% if !params[:deleted] && @organisation.carousels.exists? %>
+        <% if carousel_options.any? %>
           <div class="form-group col-12 col-sm-auto">
             <label>Carousel</label>
-            <%= select_tag :carousel_id, options: ['', ['Featured', 'featured']] + @organisation.carousels.order('o asc').map { |carousel| [carousel.name, carousel.id] }, selected: params[:carousel_id], class: 'form-select mx-1' %>
+            <%= select_tag :carousel_id, options: ['', ['Featured', 'featured']] + carousel_options, selected: params[:carousel_id], class: 'form-select mx-1' %>
           </div>
         <% end %>
-        <% if @organisation.cohosts.exists? %>
+        <% if cohost_options.any? %>
           <div class="form-group col-12 col-sm-auto">
             <label>Co-host</label>
-            <%= select_tag :cohost_id, options: [''] + @organisation.cohosts.order('name asc').map { |organisation| [organisation.name, organisation.id] }, selected: params[:cohost_id], class: 'form-select mx-1' %>
+            <%= select_tag :cohost_id, options: [''] + cohost_options, selected: params[:cohost_id], class: 'form-select mx-1' %>
           </div>
         <% end %>
       <% end %>
@@ -107,4 +116,5 @@
     <% end %>
   </div>
 </div>
-<%= partial :'events/event_stats', locals: { events: @events, organisation: organisation } %>
+<%# The table loads in a request of its own (this page with table=1), so the page shows before its rows are worked out %>
+<div data-pagelet-url="<%= request.path %>?<%= request.query_string.empty? ? 'table=1' : "#{request.query_string}&table=1" %>"></div>

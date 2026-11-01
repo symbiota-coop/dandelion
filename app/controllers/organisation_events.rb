@@ -155,7 +155,7 @@ Dandelion::App.controller do
     @events = filter_events_by_search_and_tags(@events)
     case content_type
     when :html
-      erb :'events/event_stats'
+      event_stats_page(@organisation)
     when :csv
       build_events_stats_csv(@events, @organisation)
     end

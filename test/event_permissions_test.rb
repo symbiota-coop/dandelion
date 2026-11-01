@@ -205,7 +205,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     cohosted_event.cohostships.create!(organisation: @organisation)
 
     sign_in_with_rack(manager)
-    get "/o/#{@organisation.slug}/events/stats"
+    get "/o/#{@organisation.slug}/events/stats", table: 1
 
     assert last_response.ok?
     [@event, cohosted_event].each do |event|

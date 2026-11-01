@@ -944,25 +944,30 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal one_event_commands, three_event_commands
   end
 
-  test 'events stats page renders every row itself, with the same queries however many events there are' do
+  test 'events stats page loads its table in a request of its own, which renders every row with the same queries however many events there are' do
     create_stats_event(:event1)
-    # Every row shows the coordinator's avatar, whose url's Dragonfly job is found once for the page
+    # Every row shows the coordinator's avatar, whose url's Dragonfly job is found once for the table
     coordinator = @event1.coordinator
     coordinator.update!(image: File.open('app/assets/images/test-event.jpg'))
     coordinator.image_thumb_or_gravatar_url
     sign_in_with_rack(@account)
-    body, one_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s }
+    page, one_event_page_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s }
+    assert_includes page, %(data-pagelet-url="/o/#{@organisation.slug}/events/stats?from=#{Rack::Utils.escape(Date.today.to_s)}&amp;table=1")
+    refute_includes page, '1/1 tickets sold'
+    body, one_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s, table: 1 }
     assert_includes body, 'Coco Ordinator'
     assert_includes body, 'Fay Cilitator'
     assert_includes body, 'wellbeing'
     assert_includes body, '1/1 tickets sold'
     assert_includes body, '1 order</a>'
     assert_includes body, '1 response'
-    refute_includes body, 'data-pagelet-url="/events/'
+    refute_includes body, 'data-pagelet-url'
 
     create_stats_event(:event2)
     create_stats_event(:event3)
-    body, three_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s }
+    _, three_event_page_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s }
+    assert_equal one_event_page_commands, three_event_page_commands
+    body, three_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s, table: 1 }
     assert_equal 3, body.scan('1 response').size
     assert_equal one_event_commands, three_event_commands
   end
