@@ -1,8 +1,10 @@
 name: Ruby
 
 on:
+  # Claude Code's branches too, so its work is tested before it reaches master
   push:
-    branches: [ master ]
+    branches: [ master, 'claude/**' ]
+  workflow_dispatch:
   pull_request:
     branches: [ master ]
 
