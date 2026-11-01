@@ -76,6 +76,7 @@ Dandelion::App.controller do
       flash[:notice] = 'The local group was saved.'
       redirect @local_group.path
     else
+      @edit_path = "/o/#{params[:organisation_slug]}/lg/#{params[:slug]}/edit" # Use the original slugs for the form action, not the (possibly invalid) in-memory ones
       flash.now[:error] = 'There was an error saving the local group'
       erb :'local_groups/build'
     end

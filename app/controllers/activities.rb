@@ -104,6 +104,7 @@ Dandelion::App.controller do
       flash[:notice] = 'The activity was saved.'
       redirect @activity.path
     else
+      @edit_path = "/o/#{params[:organisation_slug]}/a/#{params[:slug]}/edit" # Use the original slugs for the form action, not the (possibly invalid) in-memory ones
       flash.now[:error] = 'There was an error saving the activity.'
       erb :'activities/build'
     end

@@ -30,7 +30,7 @@
     }
   })
 </script>
-<% form_for @activity, @activity.new_record ? '/activities/new' : "#{@activity.path}/edit" do |f| %>
+<% form_for @activity, @activity.new_record ? '/activities/new' : (@edit_path || "#{@activity.path}/edit") do |f| %>
   <%= hidden_field_tag :'activity[organisation_id]', value: @activity.organisation_id %>
   <%= f.text_block :name %>
   <div class="slugify">
