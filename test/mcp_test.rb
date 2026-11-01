@@ -866,7 +866,7 @@ class McpTest < ActiveSupport::TestCase
     assert_equal [Account.find_by(email: 'waiter@example.com')], sold_out.ticket_type_waitships.map(&:account)
 
     rpc = mcp_tool_call('join_waitlist_tool', arguments: { slug: @event.slug })
-    assert_includes tool_text(rpc), 'pass the ticket_type_id of one'
+    assert_includes tool_text(rpc), 'Pass the ticket_type_id of one'
   end
 
   test "join_waitlist_tool joins a sold-out event's waitlist as the authenticated account" do

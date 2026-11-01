@@ -247,8 +247,8 @@ module Dandelion
       }
     end
 
-    # Joins a sold-out ticket type's waitlist, or the event's own once it's sold out, as the event page does: as the API
-    # key's account, or without one as the buyer given, finding the account with their email or creating one
+    # Joins a sold-out ticket type's waitlist, or the event's own once it's sold out, with WaitlistJoiner, as the event
+    # page's forms do: as the API key's account, or without one as the buyer given
     def self.perform_join_waitlist(server_context: nil, slug: nil, id: nil, ticket_type_id: nil, buyer: nil)
       return tool_error('Provide event slug or id') if slug.blank? && id.blank?
 
@@ -258,52 +258,26 @@ module Dandelion
       if ticket_type_id.present?
         ticket_type = event.ticket_types.find(ticket_type_id.to_s)
         return tool_error('Ticket type not found. Use the ticket type ids from get_event_checkout_requirements_tool.') unless ticket_type
-
-        # Whether the waitlist is open doesn't depend on who joins it, so it's checked before finding or creating an account
-        eligibility = TicketTypeWaitship.new(ticket_type: ticket_type)
-        eligibility.valid?
-        return tool_error(eligibility.errors[:base].first) if eligibility.errors[:base].any?
-      else
-        error = event_waitlist_error(event)
-        return tool_error(error) if error
       end
 
+      # With an API key, joins as that account; without one, as the buyer given
       account = current_account_from(server_context)
-      unless account
-        buyer = (buyer.is_a?(Hash) ? buyer : {}).transform_keys(&:to_sym).slice(:name, :email).transform_values { |value| value.to_s.strip }
-        return tool_error('Provide buyer: an object with the name and email of who is joining the waitlist, or authenticate with an API key to join as that account.') if buyer[:name].blank? || buyer[:email].blank?
-
-        account = Account.find_by(email: buyer[:email].downcase) || Account.new(name: buyer[:name], email: buyer[:email], password: Account.generate_password)
-        return tool_error("#{account.errors.full_messages.to_sentence}.") unless account.persisted? || account.save
-      end
-
-      waitship = if ticket_type
-                   ticket_type.ticket_type_waitships.find_by(account: account) || TicketTypeWaitship.create(ticket_type: ticket_type, account: account)
-                 else
-                   event.waitships.find_by(account: account) || event.waitships.create(account: account)
-                 end
-      return tool_error("#{waitship.errors.full_messages.to_sentence}.") unless waitship.persisted?
-
+      buyer = account ? {} : (buyer.is_a?(Hash) ? buyer : {}).transform_keys(&:to_sym)
+      WaitlistJoiner.new(event: event, ticket_type: ticket_type, account: account, name: buyer[:name], email: buyer[:email]).call
       tool_json(
         status: 'joined',
         event: { name: event.name, slug: event.slug, url: "#{ENV['BASE_URI']}/e/#{event.slug}" },
         ticket_type: ticket_type&.name,
         message: "They'll get an email when tickets become available#{" to #{event.name} or the organiser's future events" unless ticket_type}."
       )
-    end
-
-    # Why the event's own waitlist can't be joined, if it can't. The event page offers it once the event is sold out,
-    # unless the event has turned it off or its ticket types have waitlists of their own
-    def self.event_waitlist_error(event)
-      return if event.event_waitlist_open?
-
-      if event.ticket_type_waitlists_available?
-        'This event has a waitlist for each sold-out ticket type: pass the ticket_type_id of one.'
-      elsif !event.sold_out?
-        "This event isn't sold out: book with create_checkout_tool."
-      elsif event.hide_waitlist
-        "This event doesn't have a waitlist."
+    rescue WaitlistJoiner::Error => e
+      # What an agent can do instead
+      if e.reason == :no_name_or_email
+        return tool_error('Provide buyer: an object with the name and email of who is joining the waitlist, or authenticate with an API key to join as that account.')
       end
+
+      hint = { ticket_type_waitlists: ' Pass the ticket_type_id of one.', not_sold_out: ' Book with create_checkout_tool.' }[e.reason]
+      tool_error("#{e.message}#{hint}")
     end
   end
 end

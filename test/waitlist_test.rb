@@ -2,6 +2,7 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class WaitlistTest < ActiveSupport::TestCase
   include Capybara::DSL
+  include Rack::Test::Methods
 
   def create_ticket_type_waitlist_event
     create_full_event_hierarchy(
@@ -183,5 +184,26 @@ class WaitlistTest < ActiveSupport::TestCase
     assert_equal 1, Delayed::Job.and(handler: /send_ticket_type_waitlist_tickets_available/).count,
                  'Ticket type waitlist notification should be queued'
   end
+
+  test "the waitlist forms refuse a waitlist that isn't open, without making an account" do
+    create_ticket_type_waitlist_event
+
+    header 'Accept', 'application/json'
+    post "/e/#{@event.slug}/ticket_type_waitships", ticket_type_id: @ticket_type.id.to_s, name: 'Early Bird', email: 'early@example.com'
+    assert_equal 400, last_response.status
+    assert_equal 'This ticket type is not sold out.', JSON.parse(last_response.body)['error']
+
+    post "/e/#{@event.slug}/waitship/new", waitship: { name: 'Early Bird', email: 'early@example.com' }
+    assert_equal 302, last_response.status
+    assert_equal 0, @event.waitships.count
+    assert_nil Account.find_by(email: 'early@example.com')
+
+    sell_out_ticket_type
+    header 'Accept', 'application/json'
+    post "/e/#{@event.slug}/ticket_type_waitships", ticket_type_id: @ticket_type.id.to_s, name: 'Early Bird', email: 'early@example.com'
+    assert_equal 200, last_response.status
+    assert @ticket_type.ticket_type_waitships.find_by(account: Account.find_by(email: 'early@example.com'))
+  end
+
 end
 

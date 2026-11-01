@@ -263,23 +263,10 @@ Dandelion::App.controller do
     validate_recaptcha(json: true)
 
     ticket_type = @event.ticket_types.find(params[:ticket_type_id]) || not_found
-
-    email = params[:email]
-    account_hash = { name: params[:name], email: params[:email] }
-    account = if (existing = Account.find_by(email: email&.downcase&.strip))
-                existing
-              else
-                Account.new(account_hash)
-              end
-    account.password = Account.generate_password unless account.persisted?
-    successful_update_or_save = save_or_update_account_from_email_form(account, account_hash)
-    halt 400, { error: account.errors.full_messages.join('; ') }.to_json unless successful_update_or_save
-
-    unless ticket_type.ticket_type_waitships.find_by(account: account)
-      waitship = TicketTypeWaitship.create(ticket_type: ticket_type, account: account)
-      halt 400, { error: waitship.errors.full_messages.join('; ') }.to_json unless waitship.persisted?
-    end
+    WaitlistJoiner.new(event: @event, ticket_type: ticket_type, name: params[:name], email: params[:email], signed_in_account: current_account).call
     { ok: true }.to_json
+  rescue WaitlistJoiner::Error => e
+    halt 400, { error: e.message }.to_json
   end
 
   post '/e/:slug/waitship/new' do
@@ -287,27 +274,11 @@ Dandelion::App.controller do
 
     validate_recaptcha
 
-    email = params[:waitship][:email]
-    account_hash = { name: params[:waitship][:name], email: params[:waitship][:email] }
-    @account = if (account = Account.find_by(email: email&.downcase&.strip))
-                 account
-               else
-                 Account.new(account_hash)
-               end
-    @account.password = Account.generate_password unless @account.persisted?
-    successful_update_or_save = save_or_update_account_from_email_form(@account, account_hash)
-    if successful_update_or_save
-      waitship = @event.waitships.create(account: @account)
-      if @event.waitships.find_by(account: @account)
-        redirect "/e/#{@event.slug}?added_to_waitlist=true"
-      else
-        flash[:error] = waitship.errors.full_messages.join('; ')
-        redirect "/e/#{@event.slug}"
-      end
-    else
-      flash[:error] = @account.errors.full_messages.join('; ')
-      redirect "/e/#{@event.slug}"
-    end
+    WaitlistJoiner.new(event: @event, name: params[:waitship][:name], email: params[:waitship][:email], signed_in_account: current_account).call
+    redirect "/e/#{@event.slug}?added_to_waitlist=true"
+  rescue WaitlistJoiner::Error => e
+    flash[:error] = e.message
+    redirect "/e/#{@event.slug}"
   end
 
   # Email notifications for the discussion, before anyone has written in it: makes its post to subscribe to
