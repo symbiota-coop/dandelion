@@ -62,11 +62,12 @@ jobs:
     - name: Run Herb
       run: script/lint --all --only herb
 
-    # uvx runs the zizmor, actionlint and ShellCheck versions script/lint names
+    # uvx runs the zizmor, actionlint and ShellCheck versions script/lint names, so its cache is keyed on that file
     - name: Install uv
       uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
       with:
         version: 0.13.1
+        cache-dependency-glob: script/lint
 
     # With GH_TOKEN, zizmor runs its online audits too (impostor commits, known-vulnerable actions, tag comments that
     # don't match their commits)
