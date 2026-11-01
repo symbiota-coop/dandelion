@@ -14,7 +14,7 @@ namespace :bootstrap do
     Dir.mktmpdir do |dir|
       # --before keeps to package versions published at least 7 days ago, like the Gemfile's cooldown
       puts 'Installing Bootstrap 5.3.8 and Dart Sass...'
-      system('npm', 'install', '--prefix', dir, '--no-save', '--silent', "--before=#{(Date.today - 7).iso8601}", 'bootstrap@5.3.8', 'sass@1.105.0', exception: true)
+      system('npm', 'install', '--prefix', dir, '--no-save', '--silent', "--before=#{(Date.today - 7).iso8601}", 'bootstrap@5.3.8', 'sass@1.106.1', exception: true)
 
       puts 'Compiling bootstrap5.scss...'
       css_file = File.join(dir, 'bootstrap5.css')

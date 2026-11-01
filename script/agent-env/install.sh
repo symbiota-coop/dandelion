@@ -50,7 +50,7 @@ fi
 if ! command -v uvx >/dev/null; then
   SUDO=""
   [ "$(id -u)" -ne 0 ] && SUDO="sudo"
-  if ! curl -LsSf https://astral.sh/uv/0.13.1/install.sh | $SUDO env UV_INSTALL_DIR=/usr/local/bin UV_NO_MODIFY_PATH=1 sh; then
+  if ! curl -LsSf https://astral.sh/uv/0.13.5/install.sh | $SUDO env UV_INSTALL_DIR=/usr/local/bin UV_NO_MODIFY_PATH=1 sh; then
     echo "WARNING: uv failed to install, so zizmor, actionlint and ShellCheck can't run: install uv (https://docs.astral.sh/uv/)" >&2
   fi
 fi
