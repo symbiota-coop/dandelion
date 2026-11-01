@@ -59,7 +59,7 @@ GEM
     connection_pool (3.0.2)
     countries (8.1.0)
       unaccent (~> 0.3)
-    crass (1.0.7)
+    crass (1.0.8)
     crawler_detect (1.2.19)
       qonfig (>= 0.24)
     css_parser (3.3.0)
