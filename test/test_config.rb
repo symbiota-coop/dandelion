@@ -62,6 +62,8 @@ Minitest.after_run { Mongoid.default_client.database.drop }
 Dir.glob('capybara/*/').each do |dir|
   pid = File.basename(dir)
   FileUtils.rm_rf(dir) if pid.match?(/\A\d+\z/) && !test_run_running.call(pid.to_i) && File.mtime(dir) < 1.hour.ago
+rescue Errno::ENOENT
+  # Another run starting at the same time removed it first
 end
 
 module ActiveSupport
