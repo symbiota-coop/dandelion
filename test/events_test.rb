@@ -946,10 +946,12 @@ class EventsTest < ActiveSupport::TestCase
 
   test 'events stats page loads its table in a request of its own, which renders every row with the same queries however many events there are' do
     create_stats_event(:event1)
-    # Every row shows the coordinator's avatar, whose url's Dragonfly job is found once for the table
+    # Every row shows the coordinator's avatar, whose url's Dragonfly job is found once for the table. Stored, and its
+    # thumbnail's job recorded, directly, as an earlier upload and page view would have left them, so the test doesn't
+    # need ImageMagick
     coordinator = @event1.coordinator
-    coordinator.update!(image: File.open('app/assets/images/test-event.jpg'))
-    coordinator.image_thumb_or_gravatar_url
+    coordinator.set(image_uid: Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg')))
+    DragonflyJob.create!(signature: coordinator.image.thumb('400x400#').signature, uid: Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg')))
     sign_in_with_rack(@account)
     page, one_event_page_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s }
     assert_includes page, %(data-pagelet-url="/o/#{@organisation.slug}/events/stats?from=#{Rack::Utils.escape(Date.today.to_s)}&amp;table=1")

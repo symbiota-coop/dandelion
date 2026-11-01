@@ -58,7 +58,10 @@ module EventAccounting
 
   # The ids of the orders of the event's charges that were transferred to another event (a superset when preloaded)
   def transferred_order_ids
-    @transferred_order_ids ||= Order.and(:id.in => stripe_charges_for_accounting.filter_map(&:order_id), transferred: true).pluck(:id).to_set
+    @transferred_order_ids ||= begin
+      order_ids = stripe_charges_for_accounting.filter_map(&:order_id)
+      order_ids.empty? ? Set.new : Order.and(:id.in => order_ids, transferred: true).pluck(:id).to_set
+    end
   end
 
   # The charges with a balance, split into those whose orders weren't transferred to another event and those whose were

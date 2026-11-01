@@ -158,9 +158,10 @@ Dandelion::App.helpers do
   end
 
   # Loads events for the stats table or CSV (Event.preload_stats) and yields them, with the urls of the images their
-  # rows show (avatars and activity images) found in one query
+  # rows show (avatars and activity images) found in one query. An event's own pages pass an array of just it, which
+  # preloading would only add queries for
   def with_stats_events(events)
-    events = Event.preload_stats(events)
+    events = Event.preload_stats(events) unless events.is_a?(Array)
     accounts = events.flat_map { |event| [event.coordinator, event.organiser, event.revenue_sharer] }.compact.uniq
     images = accounts.filter_map { |account| account.image&.thumb('400x400#') } +
              events.filter_map(&:activity).uniq.filter_map { |activity| activity.image&.thumb('500x500#') }

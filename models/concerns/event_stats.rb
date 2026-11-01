@@ -24,7 +24,8 @@ module EventStats
       end
       ticket_rows = rows.call(Ticket, EventAccounting::TICKET_ACCOUNTING_FIELDS, EventAccounting::TicketAccountingRow)
       donation_rows = rows.call(Donation, EventAccounting::DONATION_ACCOUNTING_FIELDS, EventAccounting::DonationAccountingRow)
-      transferred_order_ids = Order.and(:id.in => events.flat_map { |event| event.stripe_charges.filter_map(&:order_id) }.uniq, transferred: true).pluck(:id).to_set
+      charged_order_ids = events.flat_map { |event| event.stripe_charges.filter_map(&:order_id) }.uniq
+      transferred_order_ids = charged_order_ids.empty? ? Set.new : Order.and(:id.in => charged_order_ids, transferred: true).pluck(:id).to_set
       events.each do |event|
         event.assign_preloaded_stats(
           ticket_rows: ticket_rows[event.id],
