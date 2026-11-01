@@ -11,7 +11,8 @@ Dandelion::App.controller do
     end
   end
 
-  get '/messages/index' do
+  # Not under /messages/, where a username is a conversation
+  get '/messages_index' do
     partial :'messages/index'
   end
 

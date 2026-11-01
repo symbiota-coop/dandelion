@@ -32,7 +32,7 @@
       <%= text_field_tag :q, placeholder: 'Search for someone', id: 'messages-search', class: 'form-control' %>
     <% end %>
 
-    <div data-pagelet-scroll="false" data-pagelet-url="/messages/index" data-pagelet-refresh="10">
+    <div data-pagelet-scroll="false" data-pagelet-url="/messages_index" data-pagelet-refresh="10">
       <%= partial :'messages/index' %>
     </div>
   </div>
@@ -45,10 +45,10 @@
             <li class="breadcrumb-item active"><%= @account.name %></li>
           </ul>
         </div>
-        <div class="message-thread" data-pagelet-url="/messages/<%= @account.username %>" data-pagelet-refresh="10" data-pagelet-also="/messages/index">
+        <div class="message-thread" data-pagelet-url="/messages/<%= @account.username %>" data-pagelet-refresh="10" data-pagelet-also="/messages_index">
           <%= partial :'messages/thread' %>
         </div>
-        <div id="message-send" data-pagelet-url="/messages/<%= @account.username %>/send" data-pagelet-also="/messages/<%= @account.username %>,/messages/index">
+        <div id="message-send" data-pagelet-url="/messages/<%= @account.username %>/send" data-pagelet-also="/messages/<%= @account.username %>,/messages_index">
           <%= partial :'messages/send' %>
         </div>
       <% elsif current_account.messages.empty? %>
