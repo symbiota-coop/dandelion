@@ -1,61 +1,72 @@
 module Dandelion
   module MCP
-    def self.perform_create_checkout(server_context: nil, slug: nil, id: nil, quantities: nil, answers: nil, accept_terms: false, idempotency_key: nil)
-      with_account(server_context) do |account|
-        next tool_error('Provide event slug or id') if slug.blank? && id.blank?
+    # With an API key, books as that account. Without one, books as the buyer given, as the checkout form does for
+    # someone signed out: finding the account with their email, or creating one
+    def self.perform_create_checkout(server_context: nil, slug: nil, id: nil, quantities: nil, answers: nil, accept_terms: false, idempotency_key: nil, buyer: nil)
+      return tool_error('Provide event slug or id') if slug.blank? && id.blank?
 
-        event = Event.live.publicly_visible.find_by_slug_or_id(slug: slug, id: id)
-        next tool_error('Event not found') unless event
+      event = Event.live.publicly_visible.find_by_slug_or_id(slug: slug, id: id)
+      return tool_error('Event not found') unless event
 
-        idempotency_key = (idempotency_key.to_s if idempotency_key.present?)
-        if idempotency_key && (order = idempotent_order(event, account, idempotency_key))
-          next tool_json(order_status(order))
-        end
+      signed_in_account = current_account_from(server_context)
+      buyer = if signed_in_account
+                { name: signed_in_account.name, email: signed_in_account.email }
+              else
+                (buyer.is_a?(Hash) ? buyer : {}).transform_keys(&:to_sym).slice(:name, :email, :phone, :postcode, :country).transform_values(&:to_s)
+              end
+      return tool_error('Provide buyer: an object with the name and email of who the tickets are for, or authenticate with an API key to book as that account.') if buyer[:name].blank? || buyer[:email].blank?
 
-        payment_method = event_agent_payment_methods(event).first
-        error = checkout_error(event, quantities: quantities, accept_terms: accept_terms)
-        next tool_error(error) if error
-
-        question_answers, error = checkout_answers(event, answers)
-        next tool_error(error) if error
-
-        builder = OrderBuilder.new(
-          event: event,
-          buyer: { name: account.name, email: account.email },
-          signed_in_account: account,
-          quantities: quantities.to_h.transform_keys(&:to_s),
-          # OrderBuilder pays with RSVP whenever nothing is left to pay
-          payment_method: payment_method&.name || 'rsvp',
-          answers: question_answers,
-          via: 'mcp',
-          idempotency_key: idempotency_key
-        )
-        response = JSON.parse(builder.call)
-        builder.order.set(checkout_url: response['session_url'] || response['redirect_url'])
-        tool_json(order_status(builder.order.reload))
-      rescue OrderBuilder::IdempotencyKeyTaken
-        # The other request's order can be gone already, if it failed and freed the key
-        order = idempotent_order(event, account, idempotency_key)
-        next tool_json(order_status(order)) if order
-
-        tool_error(OrderBuilder::Error.new.message)
-      rescue OrderBuilder::Duplicate
-        # A retry at the same time as a free booking finds its ticket before its order
-        if idempotency_key && (order = idempotent_order(event, account, idempotency_key))
-          next tool_json(order_status(order))
-        end
-
-        tool_error('This account already has a ticket to this event. To book again, the buyer can use the event page.')
-      rescue OrderBuilder::Error => e
-        # OrderBuilder deletes a failed attempt's order: free its key, so that a retry books rather than finding it expired
-        Order.unscoped.and(_id: builder.order.id).update_all('$unset' => { idempotency_key: 1 }) if builder&.order
-        tool_error(checkout_error_message(e, payment_method: payment_method))
+      idempotency_key = (idempotency_key.to_s if idempotency_key.present?)
+      if idempotency_key && (order = idempotent_order(event, signed_in_account, buyer, idempotency_key))
+        return tool_json(order_status(order, details: signed_in_account.present?))
       end
+
+      payment_method = event_agent_payment_methods(event).first
+      error = checkout_error(event, quantities: quantities, accept_terms: accept_terms)
+      return tool_error(error) if error
+
+      question_answers, error = checkout_answers(event, answers)
+      return tool_error(error) if error
+
+      builder = OrderBuilder.new(
+        event: event,
+        buyer: buyer,
+        signed_in_account: signed_in_account,
+        quantities: quantities.to_h.transform_keys(&:to_s),
+        # OrderBuilder pays with RSVP whenever nothing is left to pay
+        payment_method: payment_method&.name || 'rsvp',
+        answers: question_answers,
+        via: 'mcp',
+        idempotency_key: idempotency_key
+      )
+      response = JSON.parse(builder.call)
+      builder.order.set(checkout_url: response['session_url'] || response['redirect_url'])
+      tool_json(order_status(builder.order.reload))
+    rescue OrderBuilder::IdempotencyKeyTaken
+      # The other request's order can be gone already, if it failed and freed the key
+      order = idempotent_order(event, signed_in_account, buyer, idempotency_key)
+      return tool_json(order_status(order, details: signed_in_account.present?)) if order
+
+      tool_error(OrderBuilder::Error.new.message)
+    rescue OrderBuilder::Duplicate
+      # A retry at the same time as a free booking finds its ticket before its order
+      if idempotency_key && (order = idempotent_order(event, signed_in_account, buyer, idempotency_key))
+        return tool_json(order_status(order, details: signed_in_account.present?))
+      end
+
+      tool_error('This account already has a ticket to this event. To book again, the buyer can use the event page.')
+    rescue OrderBuilder::Error => e
+      # OrderBuilder deletes a failed attempt's order: free its key, so that a retry books rather than finding it expired
+      Order.unscoped.and(_id: builder.order.id).update_all('$unset' => { idempotency_key: 1 }) if builder&.order
+      tool_error(checkout_error_message(e, payment_method: payment_method))
     end
 
     # The order an earlier call with this key made, including one deleted once it went unpaid (which a late payment
     # can still restore), so a retry reports it rather than booking again
-    def self.idempotent_order(event, account, idempotency_key)
+    def self.idempotent_order(event, signed_in_account, buyer, idempotency_key)
+      account = signed_in_account || Account.find_by(email: buyer[:email].downcase.strip)
+      return unless account
+
       Order.unscoped.find_by(event_id: event.id, account_id: account.id, idempotency_key: idempotency_key)
     end
 
@@ -125,7 +136,9 @@ module Dandelion
       error.message
     end
 
-    def self.order_status(order)
+    # details: false for a retry without an API key, which only proves the caller knows the buyer's email and the key:
+    # the first call already had the order's details and checkout_url
+    def self.order_status(order, details: true)
       event = order.event
       # An order is saved with its key before its tickets and payment are set up, so a retry can find it part made
       status = if order.deleted_at
@@ -145,6 +158,10 @@ module Dandelion
       when 'expired'
         return { order_id: order.id.to_s, status: status,
                  message: 'This booking expired before it was paid for. To book again, call create_checkout_tool with a new idempotency_key.' }
+      end
+      unless details
+        return { order_id: order.id.to_s, status: status,
+                 message: 'This idempotency_key was already used for this booking. Its details, and any checkout_url, went to the call that made it.' }
       end
 
       {

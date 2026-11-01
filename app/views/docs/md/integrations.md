@@ -19,7 +19,7 @@ Zapier also calls `/z` to identify the signed-in account and `/z/organisation_ev
 
 ## MCP
 
-AI assistants can use Dandelion's MCP server to search and look up public records, and — with your API key — to book events for you and to read admin data for organisations and events you manage.
+AI assistants can use Dandelion's MCP server to search and look up public records, to book events, and — with your API key — to book events as you and to read admin data for organisations and events you manage.
 
 Public tools, which work without authentication:
 
@@ -28,11 +28,11 @@ Public tools, which work without authentication:
 - Get what booking an event involves (`get_event_checkout_requirements_tool`, by event `slug` or `id`): whether it can be booked and why not (sales closed, monthly donors only, members only, a donation required, no tickets on sale), its ticket types, the buyer details and questions the checkout form asks for, opt-ins, terms and the payment methods on offer, with whether each one works for agent bookings (`agent_checkout`) and whether it's only for when nothing is left to pay (`free_only`, like RSVP)
 - Get trending events
 - Get upcoming events for an organisation
+- Book fixed-price tickets to an event (`create_checkout_tool`): with your API key, as you; without one, for the `buyer` given (their name and email, and the other `buyer_fields`), as the checkout form books for someone signed out, creating an account for a new email. Pass ticket quantities by ticket type id, answers to the event's questions by index, and `accept_terms` when the terms must be accepted. Range and pay-what-you-want tickets are booked on the event page. Free bookings are confirmed straight away. Paid ones return a `checkout_url` where you pay with the event's card, bank or PayPal provider; unpaid orders are released after an hour (`pay_by`). Pass an `idempotency_key` so that a retry returns the first order rather than booking twice (`processing` while it's still being set up, or `expired` if it went unpaid, when booking again needs a new key); if the first try failed, a retry books again. Without your API key, a retry returns only the order's id and status, not its details or `checkout_url`. Orders are marked as coming via `mcp`
 
 Authenticated tools, which require your API key as a Bearer token:
 
 - Get the signed-in account
-- Book fixed-price tickets to an event as the signed-in account (`create_checkout_tool`): pass ticket quantities by ticket type id, answers to the event's questions by index, and `accept_terms` when the terms must be accepted. Range and pay-what-you-want tickets are booked on the event page. Free bookings are confirmed straight away. Paid ones return a `checkout_url` where you pay with the event's card, bank or PayPal provider; unpaid orders are released after an hour (`pay_by`). Pass an `idempotency_key` so that a retry returns the first order rather than booking twice (`processing` while it's still being set up, or `expired` if it went unpaid, when booking again needs a new key); if the first try failed, a retry books again. Orders are marked as coming via `mcp`
 - Get all events hosted or cohosted by an organisation you admin
 - Get organisation followers from the last 24 hours
 - Get the latest completed orders across all events of an organisation you admin

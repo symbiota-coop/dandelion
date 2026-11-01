@@ -366,12 +366,56 @@ class McpTest < ActiveSupport::TestCase
     Stripe::Checkout::Session.stub(:create, session, &)
   end
 
-  test 'create_checkout_tool requires authentication' do
+  test 'create_checkout_tool books for the buyer given without an API key' do
     create_event(prices: [0])
-    rpc = mcp_tool_call('create_checkout_tool', arguments: { slug: @event.slug, quantities: { @event.ticket_types.first.id.to_s => 1 } })
+    quantities = { @event.ticket_types.first.id.to_s => 1 }
 
+    rpc = mcp_tool_call('create_checkout_tool', arguments: { slug: @event.slug, quantities: quantities })
     assert rpc.dig('result', 'isError')
-    assert_includes tool_text(rpc), 'Authentication required'
+    assert_includes tool_text(rpc), 'Provide buyer'
+
+    buyer = { name: 'Agent Buyer', email: 'Agent.Buyer@example.com' }
+    rpc = mcp_tool_call('create_checkout_tool', arguments: { slug: @event.slug, quantities: quantities, buyer: buyer, idempotency_key: 'anon-1' })
+    order = JSON.parse(tool_text(rpc))
+    assert_equal 'complete', order['status']
+    account = Order.find(order['order_id']).account
+    assert_equal 'agent.buyer@example.com', account.email
+    assert_equal 'Agent Buyer', account.name
+
+    # A retry finds the order through the buyer's email, but without an API key doesn't get its details
+    rpc = mcp_tool_call('create_checkout_tool', arguments: { slug: @event.slug, quantities: quantities, buyer: buyer, idempotency_key: 'anon-1' })
+    retry_order = JSON.parse(tool_text(rpc))
+    assert_equal order['order_id'], retry_order['order_id']
+    assert_equal 'complete', retry_order['status']
+    assert_nil retry_order['tickets']
+    assert_equal 1, @event.tickets.count
+  end
+
+  test 'create_checkout_tool keeps the details of a booking made with an API key from a retry without one' do
+    create_event(prices: [10])
+    with_stubbed_stripe_session do
+      _rpc, order = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 }, idempotency_key: 'retry-1')
+      assert_equal 'https://checkout.stripe.com/test', order['checkout_url']
+
+      # Rack::Test keeps headers between requests
+      header 'Authorization', nil
+      rpc = mcp_tool_call('create_checkout_tool', arguments: { slug: @event.slug, quantities: { @event.ticket_types.first.id.to_s => 1 },
+                                                               buyer: { name: 'Someone', email: @buyer.email }, idempotency_key: 'retry-1' })
+      retry_order = JSON.parse(tool_text(rpc))
+      assert_equal order['order_id'], retry_order['order_id']
+      assert_nil retry_order['checkout_url']
+    end
+  end
+
+  test 'create_checkout_tool books an existing account without changing it, when given its email without an API key' do
+    create_event(prices: [0])
+    existing = FactoryBot.create(:account, name: 'Original Name')
+
+    rpc = mcp_tool_call('create_checkout_tool', arguments: { slug: @event.slug, quantities: { @event.ticket_types.first.id.to_s => 1 },
+                                                             buyer: { name: 'Someone Else', email: existing.email } })
+    order = JSON.parse(tool_text(rpc))
+    assert_equal existing, Order.find(order['order_id']).account
+    assert_equal 'Original Name', existing.reload.name
   end
 
   test 'create_checkout_tool books a free event for the authenticated account' do

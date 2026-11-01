@@ -295,21 +295,27 @@ module Dandelion
         Class.new(::MCP::Tool) do
           tool_name 'create_checkout_tool'
           title 'Create Checkout'
-          description 'Book fixed-price tickets to a Dandelion event for the authenticated account. Range and pay-what-you-want tickets are booked on the event page. Free bookings are confirmed straight away; paid ones return a checkout_url where the buyer pays, which they must open themselves before pay_by, when unpaid orders are released. Call get_event_checkout_requirements_tool first, and confirm the tickets, total and any terms with the buyer before calling this. Requires a Bearer API key.'
+          description 'Book fixed-price tickets to a Dandelion event: for the authenticated account with a Bearer API key, or without one for the buyer given. Range and pay-what-you-want tickets are booked on the event page. Free bookings are confirmed straight away; paid ones return a checkout_url where the buyer pays, which they must open themselves before pay_by, when unpaid orders are released. Call get_event_checkout_requirements_tool first, and confirm the tickets, total and any terms with the buyer before calling this.'
           input_schema(properties: {
                          slug: { type: 'string', description: 'Event slug' },
                          id: { type: 'string', description: 'Event ID' },
                          quantities: { type: 'object', description: 'Ticket type id => number of tickets', additionalProperties: { type: 'integer' } },
                          answers: { type: 'object', description: 'Question index => answer: a string, true/false for a checkbox, or an array of options for checkboxes' },
                          accept_terms: { type: 'boolean', description: 'The buyer has accepted the terms and conditions (required when terms.must_accept)' },
-                         idempotency_key: { type: 'string', description: 'A unique key for this booking. Retrying with the same key returns the first order instead of booking again (status processing while it is still being set up)' }
+                         idempotency_key: { type: 'string', description: 'A unique key for this booking. Retrying with the same key returns the first order instead of booking again (status processing while it is still being set up)' },
+                         buyer: {
+                           type: 'object',
+                           description: 'Who the tickets are for, with the fields buyer_fields lists. Required without an API key; with one, the booking is for that account and this is ignored',
+                           properties: { name: { type: 'string' }, email: { type: 'string' }, phone: { type: 'string' }, postcode: { type: 'string' }, country: { type: 'string' } },
+                           required: %w[name email]
+                         }
                        }, required: [:quantities])
           annotations(read_only_hint: false, destructive_hint: false, idempotent_hint: false, open_world_hint: true)
 
           # **_rest ignores arguments the tool doesn't take, rather than failing the call
-          define_singleton_method(:call) do |slug: nil, id: nil, quantities: nil, answers: nil, accept_terms: false, idempotency_key: nil, server_context: {}, **_rest|
+          define_singleton_method(:call) do |slug: nil, id: nil, quantities: nil, answers: nil, accept_terms: false, idempotency_key: nil, buyer: nil, server_context: {}, **_rest|
             Dandelion::MCP.perform_create_checkout(server_context: server_context, slug: slug, id: id, quantities: quantities, answers: answers,
-                                                   accept_terms: accept_terms, idempotency_key: idempotency_key)
+                                                   accept_terms: accept_terms, idempotency_key: idempotency_key, buyer: buyer)
           end
         end,
         Class.new(::MCP::Tool) do
@@ -414,7 +420,7 @@ module Dandelion
           name: 'dandelion',
           title: 'Dandelion',
           version: '1.0.0',
-          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings, and for booking events. To book: get_event_checkout_requirements_tool, confirm the details with the buyer, create_checkout_tool, then send the buyer to the checkout_url to pay. Authenticated tools such as get_me_tool, create_checkout_tool, get_organisation_events_tool, get_organisation_followers_tool, get_organisation_orders_tool, get_event_orders_tool and get_event_tickets_tool require a Bearer API key.',
+          instructions: 'Tools for querying Dandelion accounts, events, organisations and gatherings, and for booking events. To book: get_event_checkout_requirements_tool, confirm the details with the buyer, create_checkout_tool (as the authenticated account, or for the buyer given without an API key), then send the buyer to the checkout_url to pay. Authenticated tools such as get_me_tool, get_organisation_events_tool, get_organisation_followers_tool, get_organisation_orders_tool, get_event_orders_tool and get_event_tickets_tool require a Bearer API key.',
           tools: tools
         )
         def s.server_context
