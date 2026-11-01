@@ -11,6 +11,7 @@ Code map: controllers in `app/controllers`, views in `app/views`, CSS/JS in `app
 Dandelion is built with many coding agents (Claude Code, Codex, Cursor, opencode and others), on our own machines and in the cloud, and often several at once in the same checkout. It's set up so that any of them can work on it equally well, with nothing that only works for one:
 
 - Instructions: this file is the instructions for every agent. Write what an agent needs to know here, for any agent, rather than in a tool's own file (`CLAUDE.md`, `.cursor/rules`, `.github/copilot-instructions.md`...), which other agents wouldn't read and which would drift from this one. Claude Code reads this file itself when there's no `CLAUDE.md`
+- Memories: don't save what you learn to a tool's own memory (Claude Code's memory files, Cursor's or Codex's memories...), which only that tool reads, on one machine. If it's worth remembering, add it here
 - Rules: a rule that code can check gets a check (Custom checks), not just a line here, so it holds whichever agent wrote the code. The checks run where every agent passes: the pre-commit hook (Committing), as every agent commits with git, and CI. Don't rely on one tool's hooks or settings to enforce a rule
 - Setup: `script/agent-env/` installs and starts everything for any environment, and each tool's own config only calls it (Cloud agents)
 - MCP servers: defined once in `.mcp.json` and copied into each tool's format by `rake mcp:sync` (Cloud agents)
