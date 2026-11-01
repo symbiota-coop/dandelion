@@ -50,8 +50,34 @@ Dandelion::App.helpers do
     HTML
   end
 
-  def ignore_dandelion_donation?(details_form)
-    @event.donations_to_dandelion? && !EventPaymentMethod.object(details_form[:payment_method].to_s)&.platform_donations
-  end
+  # The checkout form's fields as OrderBuilder arguments. OrderBuilder handles
+  # its own failures; this only covers a malformed form.
+  def order_builder_args
+    ticket_form = params[:ticketForm]
+    details_form = params[:detailsForm]
+    account_data = details_form[:account]
+    # A checkbox sends '1', or ['0', '1'] when it follows a hidden field
+    checked = ->(value) { Array(value).include?('1') }
 
+    {
+      event: @event,
+      buyer: %i[name email phone postcode country].index_with { |field| account_data[field] },
+      signed_in_account: current_account,
+      new_account_currency: visitor_currency,
+      secret_ticket_type_id: ticket_form[:ticket_type_id],
+      payment_method: details_form[:payment_method],
+      answers: question_answer_pairs(details_form),
+      donation_via_modal: checked.(ticket_form[:donation_via_modal]),
+      opt_in_organisation: checked.(account_data[:opt_in_organisation]),
+      opt_in_facilitator: checked.(account_data[:opt_in_facilitator]),
+      confirmed_duplicate: checked.(params[:confirmed_duplicate]),
+      utm: %i[source medium campaign].index_with { |field| details_form[:"utm_#{field}"] }
+    }.merge(
+      %i[quantities prices donation_amount discount_code_id cohost affiliate_type affiliate_id].index_with { |field| ticket_form[field] },
+      %i[hear_about via http_referrer].index_with { |field| account_data[field] }
+    )
+  rescue StandardError => e
+    ErrorReporting.capture_exception(e)
+    halt 400
+  end
 end

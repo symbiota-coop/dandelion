@@ -1,14 +1,14 @@
 class EventPaymentMethod
   module Stripe
-    def self.call(order:, event:, account:, details_form:, ticket_form:)
-      cohost = ticket_form[:cohost] && Organisation.find_by(slug: ticket_form[:cohost])
+    def self.call(order:, event:, account:, cohost: nil, utm: {}, **)
+      cohost = cohost && Organisation.find_by(slug: cohost)
       event_image = event.image_source(cohost)&.image
       revenue_sharer_organisationship = event.revenue_sharer_organisationship
       tax_rate_id = event.tax_rate_id || event.organisation.tax_rate_id
 
       stripe_session_hash = {
         customer_email: account.email,
-        success_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{event.slug}?success=true&order_id=#{order.public_id}&utm_source=#{details_form[:utm_source]}&utm_medium=#{details_form[:utm_medium]}&utm_campaign=#{details_form[:utm_campaign]}"),
+        success_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{event.slug}?success=true&order_id=#{order.public_id}&utm_source=#{utm[:source]}&utm_medium=#{utm[:medium]}&utm_campaign=#{utm[:campaign]}"),
         cancel_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{event.slug}?cancelled=true"),
         metadata: order.metadata,
         billing_address_collection: event.organisation.billing_address_collection? ? 'required' : nil,
