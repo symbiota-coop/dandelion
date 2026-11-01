@@ -36,7 +36,7 @@ Dandelion::App.controller do
 
   get '/o/:slug/stripe_connect' do
     sign_in_required!
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     unless organisation_from_stripe_connect_oauth_state(params[:state], personal: true) == @organisation
       flash[:error] = 'Stripe connection failed security check. Please try again.'
       redirect "/o/#{@organisation.slug}"
@@ -69,7 +69,7 @@ Dandelion::App.controller do
 
   post '/o/:slug/stripe_disconnect' do
     sign_in_required!
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     @organisationship = current_account.organisationships.find_by(organisation: @organisation) || not_found
     @organisationship.set(stripe_connect_json: nil)
     redirect "/o/#{@organisation.slug}"

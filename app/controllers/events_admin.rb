@@ -1,13 +1,13 @@
 Dandelion::App.controller do
   get '/e/:slug/edit' do
-    @event = Event.unscoped.without(:voyage_embedding).find_by(slug: params[:slug]) || not_found
+    @event = Event.unscoped.without(:voyage_embedding).find_by_slug_or_id(slug: params[:slug]) || not_found
     kick! unless @event.organisation
     event_admins_only!
     erb :'events_build/build'
   end
 
   post '/e/:slug/edit' do
-    @event = Event.find_by(slug: params[:slug]) || not_found
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     kick! unless @event.organisation
     event_admins_only!
     @event.last_saved_by = current_account

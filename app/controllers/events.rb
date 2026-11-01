@@ -168,16 +168,9 @@ Dandelion::App.controller do
 
   get '/e/:slug', provides: %i[html ics json jpg], prerender: true do
     session[:via] = params[:via] if params[:via]
-    @event = Event.with_key_includes.without(:voyage_embedding).find_by(slug: params[:slug])
-    if !@event && params[:slug] =~ /[A-Z]/
-      @event = Event.with_key_includes.without(:voyage_embedding).find_by(slug: params[:slug].downcase)
-      redirect "/e/#{@event.slug}" if @event
-    end
-    unless @event
-      id = params[:slug]
-      @event = Event.with_key_includes.without(:voyage_embedding).find(id) || not_found
-      redirect request.url.gsub(id, @event.slug)
-    end
+    events = Event.with_key_includes.without(:voyage_embedding)
+    @event = events.find_by_slug_or_id(slug: params[:slug]) || events.find_by(slug: params[:slug].downcase) || not_found
+    redirect request.url.sub("/e/#{params[:slug]}", "/e/#{@event.slug}") unless @event.slug == params[:slug]
 
     redirect @event.purchase_url if @event.minimal_only? && @event.purchase_url
 
@@ -220,7 +213,7 @@ Dandelion::App.controller do
     @og_desc = when_details(@event) || 'On-demand'
     @title = @event.name
     @organisation = @event.organisation
-    cohost = params[:cohost] && Organisation.find_by(slug: params[:cohost])
+    cohost = params[:cohost] && Organisation.find_by_slug_or_id(slug: params[:cohost])
     image_source = @event.image_source(cohost)
     if image_source
       @event_image = image_source.image

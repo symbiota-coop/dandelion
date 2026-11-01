@@ -29,8 +29,8 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/a/:slug', prerender: true do
-    organisation = Organisation.find_by(slug: params[:organisation_slug]) || not_found
-    @activity = organisation.activities.find_by(slug: params[:slug]) || not_found
+    organisation = Organisation.find_by_slug_or_id(slug: params[:organisation_slug]) || not_found
+    @activity = organisation.activities.find_by_slug_or_id(slug: params[:slug]) || not_found
     @title = @activity.name
     kick!(redirect_url: "/o/#{@activity.organisation.slug}") if @activity.locked? && !activity_admin?
     @activityship = @activity.activityships.find_by(account: current_account) if current_account

@@ -11,7 +11,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/mailgun_webhook' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     body = request.body.read
     begin
       event = JSON.parse(body)

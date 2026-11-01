@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/g/:slug/teams/new' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team = Team.new
@@ -8,7 +8,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/teams/new' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team = @gathering.teams.build(mass_assigning(params[:team], Team))
@@ -22,7 +22,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/teams' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     if request.xhr?
@@ -33,7 +33,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/teams/:id' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
@@ -45,7 +45,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/teams/:id/edit' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
@@ -53,7 +53,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/teams/:id/edit' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
@@ -65,7 +65,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/teams/:id/destroy' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
@@ -92,7 +92,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/teamships/new' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @teamship = @gathering.teamships.build(mass_assigning(params[:teamship], Teamship))
@@ -105,7 +105,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/teams/:id/unsubscribe' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found

@@ -2,6 +2,7 @@ class Event
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  include SlugLookup
 
   extend Dragonfly::Model
   include Mongoid::Paranoia
@@ -83,14 +84,6 @@ class Event
 
   def self.fs(slug)
     find_by(slug: slug)
-  end
-
-  def self.find_by_slug_or_id(slug: nil, id: nil)
-    if id.present?
-      find(id)
-    elsif slug.present?
-      find_by(slug: slug)
-    end
   end
 
   def self.publicly_visible

@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/o/:slug/orders', provides: %i[html csv] do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @from = params[:from] ? parse_date(params[:from]) : nil
     @to = params[:to] ? parse_date(params[:to]) : nil

@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/o/:slug/feedback' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @event_feedbacks = @organisation.event_feedbacks.includes(:account, event: :organisation)
     erb :'organisations/event_feedbacks'

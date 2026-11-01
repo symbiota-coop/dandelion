@@ -29,8 +29,8 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/lg/:slug', prerender: true do
-    organisation = Organisation.find_by(slug: params[:organisation_slug]) || not_found
-    @local_group = organisation.local_groups.find_by(slug: params[:slug]) || not_found
+    organisation = Organisation.find_by_slug_or_id(slug: params[:organisation_slug]) || not_found
+    @local_group = organisation.local_groups.find_by_slug_or_id(slug: params[:slug]) || not_found
     @title = @local_group.name
     erb :'local_groups/local_group'
   end

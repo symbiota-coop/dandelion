@@ -399,7 +399,7 @@ Dandelion::App.controller do
   end
 
   get '/u/:username', prerender: true do
-    @account = Account.find_by(username: params[:username]) || not_found
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     if request.xhr?
       if @account.private?
         partial :'accounts/private'
@@ -510,7 +510,7 @@ Dandelion::App.controller do
   # minimal
 
   get '/u/:username/feedback' do
-    @account = Account.find_by(username: params[:username]) || not_found
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     erb :'accounts/feedback', layout: (params[:minimal] ? 'minimal' : nil)
   end
 

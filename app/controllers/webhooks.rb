@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   post '/o/:slug/stripe_webhook' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     halt 200 if @organisation.stripe_connect_json
 
     payload = request.body.read
@@ -23,7 +23,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/gocardless_webhook' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     webhook_endpoint_secret = @organisation.gocardless_endpoint_secret
     halt 200 unless webhook_endpoint_secret
 
@@ -61,7 +61,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/mollie_webhook' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     halt 200 unless @organisation.mollie_api_key
 
     payment_id = params[:id]
@@ -84,7 +84,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/paypal_webhook' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     halt 200 unless @organisation.paypal_client_id && @organisation.paypal_secret
 
     payload = begin

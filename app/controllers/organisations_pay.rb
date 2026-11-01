@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/o/:slug/contribute' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     erb :'organisations/contribute'
   end

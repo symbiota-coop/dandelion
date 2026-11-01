@@ -2,6 +2,7 @@ class Account
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  include SlugLookup
 
   extend Dragonfly::Model
   include AccountFields
@@ -15,6 +16,10 @@ class Account
   include AccountStripeSubscriptions
   include Geocoded
   include Searchable
+
+  def self.slug_field
+    :username
+  end
 
   def self.fu(username)
     Account.find_by(username: username)

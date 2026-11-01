@@ -5,6 +5,7 @@ class Organisation
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  include SlugLookup
 
   extend Dragonfly::Model
   include OrganisationFields
@@ -29,14 +30,6 @@ class Organisation
 
   def self.fs(slug)
     find_by(slug: slug)
-  end
-
-  def self.find_by_slug_or_id(slug: nil, id: nil)
-    if id.present?
-      find(id)
-    elsif slug.present?
-      find_by(slug: slug)
-    end
   end
 
   def self.prewarmed_image_derivative_sizes

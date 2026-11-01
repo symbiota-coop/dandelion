@@ -2,6 +2,7 @@ class Activity
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  include SlugLookup
 
   extend Dragonfly::Model
   include FeedbackSummaries

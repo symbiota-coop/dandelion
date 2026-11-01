@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/g/:slug/mapplications/:id' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @mapplication = @gathering.mapplications.find(params[:id]) || not_found
@@ -20,7 +20,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/apply' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     redirect '/' if @gathering.privacy == 'secret'
     redirect "/g/#{@gathering.slug}/join" if @gathering.privacy == 'open'
@@ -32,7 +32,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/apply' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     halt 403 if @gathering.privacy == 'secret'
 
     if current_account
@@ -77,7 +77,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/applications' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @mapplications = @gathering.mapplications.pending
@@ -86,14 +86,14 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/threshold' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     partial :'mapplications/threshold'
   end
 
   post '/g/:slug/threshold' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @membership.desired_threshold = params[:desired_threshold]
@@ -102,7 +102,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/applications/paused' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @mapplications = @gathering.mapplications.paused

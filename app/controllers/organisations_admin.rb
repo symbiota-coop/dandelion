@@ -1,12 +1,12 @@
 Dandelion::App.controller do
   get '/o/:slug/edit' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     erb :'organisations/build'
   end
 
   post '/o/:slug/edit' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     if @organisation.update_attributes(mass_assigning(params[:organisation], Organisation))
       flash[:notice] = 'The organisation was saved.'
@@ -28,13 +28,13 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/delete' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     erb :'organisations/delete'
   end
 
   post '/o/:slug/destroy' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     if params[:organisation_name] && (params[:organisation_name] == @organisation.name)
       @organisation.destroy
@@ -47,13 +47,13 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/emails' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     erb :'organisations/emails'
   end
 
   post '/o/:slug/emails' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     if @organisation.update_attributes(mass_assigning(params[:organisation], Organisation))
       flash[:notice] = 'Your settings were saved.'
@@ -65,13 +65,13 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/calendar_import' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     erb :'organisations/calendar_import'
   end
 
   post '/o/:slug/calendar_import' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     if @organisation.update_attributes(mass_assigning(params[:organisation], Organisation))
       if @organisation.calendar_import_urls_a.any?
@@ -88,13 +88,13 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/banned_emails' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     erb :'organisations/banned_emails'
   end
 
   post '/o/:slug/banned_emails' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     if @organisation.set(banned_emails: params[:organisation][:banned_emails])
       flash[:notice] = 'Your settings were saved.'
@@ -106,7 +106,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/add_follower' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
 
     unless params[:email]
@@ -132,7 +132,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/organisationships/admin' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find_by(account_id: params[:organisationship][:account_id]) || @organisation.organisationships.create(account_id: params[:organisationship][:account_id])
     if @organisationship.persisted?
@@ -142,7 +142,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/organisationships/unadmin' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find_by(account_id: params[:account_id]) || not_found
     @organisationship.set(admin: false)
@@ -150,14 +150,14 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/tiers' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisation_tier = @organisation.organisation_tiers.new
     erb :'organisation_tiers/organisation_tiers'
   end
 
   post '/o/:slug/organisation_tiers/new' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisation_tier = @organisation.organisation_tiers.build(mass_assigning(params[:organisation_tier], OrganisationTier))
     if @organisation_tier.save
@@ -169,14 +169,14 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/organisation_tiers/:organisation_tier_id/edit' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisation_tier = @organisation.organisation_tiers.find(params[:organisation_tier_id])
     erb :'organisation_tiers/build'
   end
 
   post '/o/:slug/organisation_tiers/:organisation_tier_id/edit' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisation_tier = @organisation.organisation_tiers.find(params[:organisation_tier_id])
     if @organisation_tier.update_attributes(mass_assigning(params[:organisation_tier], OrganisationTier))
@@ -188,7 +188,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/organisation_tiers/:organisation_tier_id/destroy' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisation_tier = @organisation.organisation_tiers.find(params[:organisation_tier_id])
     @organisation_tier.destroy
@@ -196,7 +196,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/followers', provides: %i[html csv] do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationships = @organisation.organisationships.includes(:account).order('created_at desc')
     @organisationships = @organisationships.and(:account_id.in => Account.search(params[:q], @organisation.members).pluck(:id)) if params[:q]
@@ -225,7 +225,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/followers' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     halt 400 unless params[:csv].is_a?(Tempfile)
     csv = ImportFromCsv.read(params[:csv])
@@ -262,13 +262,13 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/stats' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     erb :'organisations/stats'
   end
 
   get '/o/:slug/pmails', provides: [:html, :json] do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     @_organisation = @organisation
     organisation_admins_only!
     @pmails = @organisation.pmails
@@ -294,7 +294,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/receive_feedback/:f' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find_by(account: current_account) || not_found
     @organisationship.set(receive_feedback: params[:f].to_i == 1)
@@ -302,14 +302,14 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/subscribed/:organisationship_id' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find(params[:organisationship_id]) || not_found
     partial :'organisations/subscribed', locals: { organisationship: @organisationship }
   end
 
   post '/o/:slug/subscribed/:organisationship_id' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find(params[:organisationship_id]) || not_found
     @organisationship.set_unsubscribed!(!params[:subscribed])
@@ -317,14 +317,14 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/event_manager/:organisationship_id' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find(params[:organisationship_id]) || not_found
     partial :'organisations/event_manager', locals: { organisationship: @organisationship }
   end
 
   post '/o/:slug/event_manager/:organisationship_id' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @organisationship = @organisation.organisationships.find(params[:organisationship_id]) || not_found
     unless Organisation.admin?(@organisation, @organisationship.account)
@@ -353,7 +353,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/discount_codes' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @discount_codes = @organisation.discount_codes
     @scope = "organisation_id=#{@organisation.id}"
@@ -361,7 +361,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/carousels' do
-    @organisation = Organisation.find_by(slug: params[:slug]) || not_found
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!
     @carousels = @organisation.carousels.order('o asc')
     erb :'carousels/carousels'

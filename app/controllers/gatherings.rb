@@ -53,7 +53,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug', prerender: true do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     if @membership
       if request.xhr?
@@ -77,7 +77,7 @@ Dandelion::App.controller do
 
   get '/g/:slug/birthdays', provides: :ics do
     sign_in_via_ics_key
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
     cal = Icalendar::Calendar.new
@@ -96,21 +96,21 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/todos' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
     partial :'gatherings/todos'
   end
 
   get '/g/:slug/edit' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     erb :'gatherings/build'
   end
 
   post '/g/:slug/edit' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     if @gathering.update_attributes(mass_assigning(params[:gathering], Gathering))
@@ -124,7 +124,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/destroy' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @gathering.destroy
@@ -133,14 +133,14 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/subscribe' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     partial :'gatherings/subscribe', locals: { membership: @membership }
   end
 
   post '/g/:slug/set_subscribe' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @membership.set(unsubscribed: false)
@@ -148,7 +148,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/unsubscribe' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @membership.set(unsubscribed: true)
@@ -156,7 +156,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/show_in_sidebar' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @membership.set(hide_from_sidebar: false)
@@ -164,7 +164,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/hide_from_sidebar' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @membership.set(hide_from_sidebar: true)
@@ -172,7 +172,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/map' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @accounts = @gathering.members
@@ -180,7 +180,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/copy' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @destination_memberships = current_account.memberships.and(admin: true).and(:gathering_id.ne => @gathering.id)
@@ -193,7 +193,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/copy' do
-    @gathering = Gathering.find_by(slug: params[:slug]) || not_found
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
 
