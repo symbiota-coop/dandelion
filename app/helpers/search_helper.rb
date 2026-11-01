@@ -8,7 +8,7 @@ Dandelion::App.helpers do
       },
       Account => {
         icon: 'bi-person-fill',
-        redirect_path: ->(item) { params[:message] ? "/messages/#{item.id}" : "/u/#{item.username}" },
+        redirect_path: ->(item) { params[:message] ? "/messages/#{item.username}" : "/u/#{item.username}" },
         label_formatter: ->(item) { item.name }
       },
       Organisation => {

@@ -10,15 +10,15 @@ Dandelion::App.controller do
     redirect "/u/#{@account.username}"
   end
 
-  get '/follow/:id' do
+  get '/follow/:username' do
     sign_in_required!
-    @account = Account.find(params[:id]) || not_found
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     request.xhr? ? (partial :'accounts/follow', locals: { account: @account, btn_class: params[:btn_class] }) : redirect("/u/#{@account.username}")
   end
 
-  post '/follow/:id' do
+  post '/follow/:username' do
     sign_in_required!
-    @account = Account.find(params[:id]) || not_found
+    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     case params[:f]
     when 'not_following'
       current_account.follows_as_follower.find_by(followee: @account).try(:destroy)

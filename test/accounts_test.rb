@@ -348,7 +348,7 @@ class AccountsTest < ActiveSupport::TestCase
     account = FactoryBot.build_stubbed(:account)
     organisation = FactoryBot.build_stubbed(:organisation)
 
-    visit "/invite/#{referrer.id}"
+    visit "/invite/#{referrer.username}"
     fill_signup_form(account)
 
     assert page.has_current_path?(%r{/o/new}, ignore_query: true)
@@ -391,7 +391,7 @@ class AccountsTest < ActiveSupport::TestCase
     referrer = FactoryBot.create(:account, username: 'refclear', has_signed_in: true)
     account = FactoryBot.build_stubbed(:account)
 
-    visit "/invite/#{referrer.id}"
+    visit "/invite/#{referrer.username}"
     fill_signup_form(account)
     assert page.has_current_path?(%r{/o/new}, ignore_query: true)
 

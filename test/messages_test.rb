@@ -143,7 +143,7 @@ class MessagesTest < ActiveSupport::TestCase
     get '/messages'
     assert last_response.redirect?
 
-    post "/messages/#{@account1.id}/send", body: 'Hi'
+    post "/messages/#{@account1.username}/send", body: 'Hi'
     assert last_response.redirect?
   end
 
@@ -151,13 +151,13 @@ class MessagesTest < ActiveSupport::TestCase
     create_messaging_pair
     sign_in_with_rack(@account)
 
-    post "/messages/#{@account1.id}/send", body: 'Hi there'
+    post "/messages/#{@account1.username}/send", body: 'Hi there'
     assert_equal 200, last_response.status
     message = Message.between(@account, @account1).first
     assert_equal 'Hi there', message.body
 
     sign_in_with_rack(@account1)
-    get "/messages/#{@account.id}"
+    get "/messages/#{@account.username}"
     assert_equal 200, last_response.status
     assert_includes last_response.body, 'Hi there'
     assert Message.read?(@account, @account1)
@@ -171,7 +171,7 @@ class MessagesTest < ActiveSupport::TestCase
     poll = lambda do |stamp = nil|
       env = { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }
       env['HTTP_X_PAGELET_STAMP'] = stamp if stamp
-      get "/messages/#{@account1.id}", {}, env
+      get "/messages/#{@account1.username}", {}, env
     end
 
     poll.call
@@ -204,11 +204,11 @@ class MessagesTest < ActiveSupport::TestCase
     create_messaging_pair
     sign_in_with_rack(@account)
 
-    get "/messages/#{@account.id}"
+    get "/messages/#{@account.username}"
     assert last_response.redirect?
     assert_equal '/messages', URI(last_response.location).path
 
-    post "/messages/#{@account1.id}/send", body: ''
+    post "/messages/#{@account1.username}/send", body: ''
     assert_equal 400, last_response.status
   end
 

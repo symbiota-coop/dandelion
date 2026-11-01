@@ -192,7 +192,7 @@ class OrganisationsTest < ActiveSupport::TestCase
     organisation = FactoryBot.build_stubbed(:organisation)
 
     sign_in(creator)
-    visit "/invite/#{referrer.id}"
+    visit "/invite/#{referrer.username}"
     fill_in 'Organisation name', with: organisation.name
     fill_in 'URL', with: organisation.slug
     click_button 'Save and continue'
@@ -206,7 +206,7 @@ class OrganisationsTest < ActiveSupport::TestCase
     organisation = FactoryBot.build_stubbed(:organisation)
 
     sign_in(account)
-    visit "/invite/#{account.id}"
+    visit "/invite/#{account.username}"
     fill_in 'Organisation name', with: organisation.name
     fill_in 'URL', with: organisation.slug
     click_button 'Save and continue'

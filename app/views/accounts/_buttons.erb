@@ -3,9 +3,9 @@
 <% end %>
 <% unless current_account && current_account.id == account.id %>
   <% if current_account %>
-    <div class="d-block d-lg-inline-block " data-pagelet-url="/follow/<%= account.id %>?btn_class=<%= btn_class if defined?(btn_class) %>">
+    <div class="d-block d-lg-inline-block " data-pagelet-url="/follow/<%= account.username %>?btn_class=<%= btn_class if defined?(btn_class) %>">
       <%= partial :'accounts/follow', locals: { account: account, btn_class: (btn_class if defined?(btn_class)) } %>
     </div>
   <% end %>
-  <a href="/messages/<%= account.id %>" class="d-block d-lg-inline-block mb-1 <%= btn_class if defined?(btn_class) %> btn btn-outline-primary"><i class="bi bi-chat-left"></i> Message</a>
+  <a href="/messages/<%= account.username %>" class="d-block d-lg-inline-block mb-1 <%= btn_class if defined?(btn_class) %> btn btn-outline-primary"><i class="bi bi-chat-left"></i> Message</a>
 <% end %>

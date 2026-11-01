@@ -95,8 +95,8 @@ Dandelion::App.controller do
     partial :'accounts/minimal_subscribe', layout: 'minimal'
   end
 
-  get '/invite/:id' do
-    account = Account.find(params[:id]) || not_found
+  get '/invite/:username' do
+    account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     session[:organisation_referrer_id] = account.id.to_s
     redirect '/o/new'
   end
