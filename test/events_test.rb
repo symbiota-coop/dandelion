@@ -17,6 +17,41 @@ class EventsTest < ActiveSupport::TestCase
     click_link 'Everything else'
   end
 
+  # An event of a stripe-connected organisation with a coordinator, facilitator, tag, a checked-in ticket, donation,
+  # charge, rpayment and feedback, for the stats table and CSV
+  def create_stats_event(as)
+    create_organisation unless @organisation
+    @organisation.set(stripe_client_id: 'ca_test')
+    attendee = Account.find_by(name: 'Ada Lovelace') || FactoryBot.create(:account, name: 'Ada Lovelace')
+    coordinator = Account.find_by(name: 'Coco Ordinator') || FactoryBot.create(:account, name: 'Coco Ordinator')
+    facilitator = Account.find_by(name: 'Fay Cilitator') || FactoryBot.create(:account, name: 'Fay Cilitator')
+    tag = EventTag.find_by(name: 'wellbeing') || FactoryBot.create(:event_tag, name: 'wellbeing')
+    event = create_event(prices: [10], as: as, coordinator: coordinator, facebook_event_url: 'https://www.facebook.com/events/1')
+    event.event_facilitations.create!(account: facilitator)
+    event.event_tagships.create!(event_tag: tag)
+    order = event.orders.create!(account: attendee, currency: 'GBP', value: 10, payment_completed: true, payment_intent: "pi_#{as}")
+    event.tickets.create!(account: attendee, order: order, ticket_type: event.ticket_types.first, payment_completed: true, checked_in: true)
+    event.donations.create!(account: attendee, order: order, amount: 5, payment_completed: true)
+    @organisation.stripe_charges.create!(event: event, order: order, amount: 1500, currency: 'GBP', balance_float: 15, fees_float: 0.5, de_donation_revenue: 5)
+    event.rpayments.create!(account: @account, amount: 1, currency: 'GBP', role: 'organiser')
+    event.event_feedbacks.create!(account: attendee, rating: 4)
+    event
+  end
+
+  # The response body of the request the block makes, and how many Mongo commands it ran
+  def mongo_commands_during
+    commands = []
+    subscriber = Object.new
+    subscriber.define_singleton_method(:started) { |e| commands << e.command_name }
+    subscriber.define_singleton_method(:succeeded) { |_| nil }
+    subscriber.define_singleton_method(:failed) { |_| nil }
+    Mongoid.default_client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
+    yield
+    [last_response.body, commands.size]
+  ensure
+    Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
+  end
+
   def tag_event(event, tag)
     event.event_tagships.create!(event_tag: tag)
     event.reload
@@ -865,6 +900,71 @@ class EventsTest < ActiveSupport::TestCase
     assert_empty commands
   ensure
     Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber) if subscriber
+  end
+
+  test 'events stats CSV reads every event with the same queries, however many events there are' do
+    create_stats_event(:event1)
+    sign_in_with_rack(@account)
+    body, one_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats.csv", from: Date.today.to_s }
+    row = CSV.parse(body, headers: true).first
+    assert_equal 'Coco Ordinator', row['coordinator']
+    assert_includes row['facilitators'], 'Fay Cilitator'
+    assert_equal 'wellbeing', row['tags']
+    assert_equal '1/1', row['checked_in']
+    assert_equal '£10, £10', row['ticket_revenue']
+    assert_equal '£15 from 1 order', row['revenue_reported_by_dandelion']
+    assert_equal '£15 from 1 charge', row['revenue_reported_by_stripe']
+    assert_equal '1 response, (100%), 4.0', row['feedback']
+    assert_equal 'https://www.facebook.com/events/1', row['facebook_event']
+
+    create_stats_event(:event2)
+    create_stats_event(:event3)
+    body, three_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats.csv", from: Date.today.to_s }
+    assert_equal 3, CSV.parse(body, headers: true).size
+    assert_equal one_event_commands, three_event_commands
+  end
+
+  test "events stats CSV splits an order's credit with a revenue sharer with the same queries, however many events there are" do
+    sharer = FactoryBot.create(:account, name: 'Rev Sharer')
+    share_revenue = lambda do |event|
+      event.set(revenue_sharer_id: sharer.id, revenue_share_to_revenue_sharer: 50)
+      event.tickets.each { |ticket| ticket.set(organisation_revenue_share: 0.5) }
+      event.orders.each { |order| order.set(revenue_sharer_id: sharer.id, organisation_revenue_share: 0.5, credit_applied: 3) }
+    end
+    share_revenue.call(create_stats_event(:event1))
+    sign_in_with_rack(@account)
+    body, one_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats.csv", from: Date.today.to_s }
+    # £5 of the £10 tickets, less the sharer's part of the £3 credit: £3 × (£10 / £15) × 0.5 = £1
+    assert_includes CSV.parse(body, headers: true).first['ticket_revenue_to_revenue_sharer'], '£4'
+
+    share_revenue.call(create_stats_event(:event2))
+    share_revenue.call(create_stats_event(:event3))
+    body, three_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats.csv", from: Date.today.to_s }
+    assert_equal 3, CSV.parse(body, headers: true).size
+    assert_equal one_event_commands, three_event_commands
+  end
+
+  test 'events stats page renders every row itself, with the same queries however many events there are' do
+    create_stats_event(:event1)
+    # Every row shows the coordinator's avatar, whose url's Dragonfly job is found once for the page
+    coordinator = @event1.coordinator
+    coordinator.update!(image: File.open('app/assets/images/test-event.jpg'))
+    coordinator.image_thumb_or_gravatar_url
+    sign_in_with_rack(@account)
+    body, one_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s }
+    assert_includes body, 'Coco Ordinator'
+    assert_includes body, 'Fay Cilitator'
+    assert_includes body, 'wellbeing'
+    assert_includes body, '1/1 tickets sold'
+    assert_includes body, '1 order</a>'
+    assert_includes body, '1 response'
+    refute_includes body, 'data-pagelet-url="/events/'
+
+    create_stats_event(:event2)
+    create_stats_event(:event3)
+    body, three_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s }
+    assert_equal 3, body.scan('1 response').size
+    assert_equal one_event_commands, three_event_commands
   end
 
   test 'hosts cache sync finds and repairs a stale hosts_ids_cache' do

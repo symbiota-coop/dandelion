@@ -11,6 +11,7 @@ class Event
   include EventScopes
   include EventSerialization
   include EventAccounting
+  include EventStats
   include EventDuplication
   include EventNotifications
   include EventOpenCollective

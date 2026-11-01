@@ -1,5 +1,5 @@
 <td class="text-center text-nowrap">
-  <% if event.event_facilitations.exists? %>
+  <% if event.event_facilitations.any? %>
     <% event.event_facilitations.each do |event_facilitation| %>
       <a href="/u/<%= event_facilitation.account.username %>"><%= event_facilitation.account.name %></a>
       <br>

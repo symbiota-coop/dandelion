@@ -49,13 +49,6 @@ Dandelion::App.controller do
     partial :'events/progress', locals: { event: @event, full_width: params[:full_width] }
   end
 
-  get '/events/:id/stats_row' do
-    @event = Event.unscoped.find(params[:id]) || not_found
-    @organisation = Organisation.find(params[:organisation_id]) || not_found
-    event_admins_or_revenue_admins_only!
-    cp(:'events/event_stats_row', locals: { event: @event, organisation: @organisation, event_revenue_admin: event_revenue_admin? }, event: @event, key: "/events/#{@event.id}/stats_row?timezone=#{@event.start_time&.strftime('%Z')}&organisation_id=#{@organisation.id}&event_revenue_admin=#{event_revenue_admin? ? 1 : 0}")
-  end
-
   get '/events/:id/linked_image' do
     @event = Event.unscoped.find(params[:id]) || not_found
     @organisation = Organisation.find(params[:organisation_id]) || not_found
@@ -367,11 +360,5 @@ Dandelion::App.controller do
     event_admins_only!
     @event.set(hidden_from_homepage: false)
     200
-  end
-
-  get '/events/:id/checked_in' do
-    @event = Event.find(params[:id]) || not_found
-    event_admins_only!
-    partial :'events/checked_in', locals: { event: @event }
   end
 end

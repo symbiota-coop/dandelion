@@ -7,7 +7,16 @@ module OrderAccounting
     r
   end
 
+  # Event.preload_stats hands an order its tickets' and donations' revenue, read for many orders at a time, so splitting
+  # its credit and fixed discount with a revenue sharer doesn't query them
+  def assign_preloaded_revenue(discounted_ticket_revenue:, donation_revenue:)
+    @preloaded_discounted_ticket_revenue = discounted_ticket_revenue
+    @preloaded_donation_revenue = donation_revenue
+  end
+
   def discounted_ticket_revenue
+    return @preloaded_discounted_ticket_revenue if @preloaded_discounted_ticket_revenue
+
     r = Money.new(0, currency)
     tickets.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100, ticket.currency) }
     r
@@ -26,6 +35,8 @@ module OrderAccounting
   end
 
   def donation_revenue
+    return @preloaded_donation_revenue if @preloaded_donation_revenue
+
     r = Money.new(0, currency)
     donations.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
     r

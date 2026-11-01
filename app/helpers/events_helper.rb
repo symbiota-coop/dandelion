@@ -157,6 +157,24 @@ Dandelion::App.helpers do
     cal.to_ical
   end
 
+  # Loads events for the stats table or CSV (Event.preload_stats) and yields them, with the urls of the images their
+  # rows show (avatars and activity images) found in one query
+  def with_stats_events(events)
+    events = Event.preload_stats(events)
+    accounts = events.flat_map { |event| [event.coordinator, event.organiser, event.revenue_sharer] }.compact.uniq
+    images = accounts.filter_map { |account| account.image&.thumb('400x400#') } +
+             events.filter_map(&:activity).uniq.filter_map { |activity| activity.image&.thumb('500x500#') }
+    DragonflyJob.with_prefetched(images) { yield events }
+  end
+
+  # The stats table's rows (events/event_stats_row)
+  def event_stats_rows(events, organisation)
+    with_stats_events(events) do |stats_events|
+      stats_events.map { |event| partial(:'events/event_stats_row', locals: { event: event, organisation: organisation, event_revenue_admin: event_revenue_admin?(event) }) }
+    end
+  end
+
+  # The CSV's cells are the text of the stats table's cells (event_stats_row/), or their data-csv attribute
   def build_events_stats_csv(events, organisation)
     CSV.generate do |csv|
       headers = ['name']
@@ -175,41 +193,39 @@ Dandelion::App.helpers do
       headers << 'feedback'
       csv << headers
 
-      events.each do |event|
-        row = [event.name]
-        row += headers_basic.map { |h| partial(:"event_stats_row/#{h}", locals: { event: event, organisation: organisation }) }
+      with_stats_events(events) do |stats_events|
+        stats_events.each do |event|
+          cell = ->(name, **locals) { partial(:"event_stats_row/#{name}", locals: { event: event, organisation: organisation, **locals }) }
+          row = [event.name]
+          row += headers_basic.map { |h| cell.call(h) }
 
-        if organisation.stripe_client_id
-          row += headers_stripe_client_id.map { |h| partial(:"event_stats_row/#{h}", locals: { event: event, organisation: organisation }) }
-          if event_revenue_admin?(event)
-            row += [
-              partial(:'event_stats_row/profit', locals: { event: event, organisation: organisation }),
-              partial(:'event_stats_row/profit_less_donations_before_allocations', locals: { event: event, organisation: organisation })
-            ]
-            Event.profit_share_roles.each { |role| row << partial(:'event_stats_row/allocated_to_role', locals: { event: event, organisation: organisation, role: role }) }
-            row += [
-              partial(:'event_stats_row/profit_less_donations_after_allocations', locals: { event: event, organisation: organisation }),
-              partial(:'event_stats_row/profit_including_donations_after_allocations', locals: { event: event, organisation: organisation })
-            ]
-            Event.profit_share_roles.each { |role| row << m(event.send("remaining_to_#{role}").abs, event.currency) }
-            row << partial(:'event_stats_row/remaining_to_be_paid', locals: { event: event, organisation: organisation })
-          else
-            row += 13.times.map { '' }
+          if organisation.stripe_client_id
+            row += headers_stripe_client_id.map { |h| cell.call(h) }
+            if event_revenue_admin?(event)
+              row += [cell.call(:profit), cell.call(:profit_less_donations_before_allocations)]
+              Event.profit_share_roles.each { |role| row << cell.call(:allocated_to_role, role: role) }
+              row += [cell.call(:profit_less_donations_after_allocations), cell.call(:profit_including_donations_after_allocations)]
+              Event.profit_share_roles.each { |role| row << m(event.send("remaining_to_#{role}").abs, event.currency) }
+              row << cell.call(:remaining_to_be_paid)
+            else
+              row += Array.new(13, '')
+            end
           end
-        end
 
-        row << partial(:'event_stats_row/feedback', locals: { event: event, organisation: organisation })
-        row.map! { |cell| extract_csv_cell_text(cell) }
-        csv << row
+          row << cell.call(:feedback)
+          row.map! { |c| extract_csv_cell_text(c) }
+          csv << row
+        end
       end
     end
   end
 
   def extract_csv_cell_text(cell)
     html = Nokogiri::HTML(cell)
-    return cell if html.search('td').empty?
+    return cell unless (td = html.at('td'))
+    return td['data-csv'] if td['data-csv']
 
     html.search('script').remove
-    html.search('td').children.text.split("\n").reject(&:blank?).map(&:strip).join(', ')
+    td.children.text.split("\n").reject(&:blank?).map(&:strip).join(', ')
   end
 end

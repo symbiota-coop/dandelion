@@ -12,7 +12,7 @@ module EventAccounting
       define_method "paid_to_#{role}" do
         instance_var = :"@paid_to_#{role}"
         instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
-          s = rpayments.and(role: role).sum(&:amount_money)
+          s = rpayments_for_accounting.select { |rpayment| rpayment.role == role }.sum(&:amount_money)
           s == 0 ? Money.new(0, currency) : s
         end)
       end
@@ -26,6 +26,46 @@ module EventAccounting
         revenue_share_to_organisation > 0 ? profit_less_donations * send("profit_share_to_#{role}") / revenue_share_to_organisation : Money.new(0, currency)
       end
     end
+  end
+
+  # The fields of an event's tickets and donations that its sums and the stats table read, plucked rather than loaded
+  TICKET_ACCOUNTING_FIELDS = %i[discounted_price organisation_revenue_share currency payment_completed transferred checked_in account_id ticket_type_id made_available_at].freeze
+  DONATION_ACCOUNTING_FIELDS = %i[amount currency transferred application_fee_paid_to_dandelion].freeze
+  TicketAccountingRow = Struct.new(*TICKET_ACCOUNTING_FIELDS)
+  DonationAccountingRow = Struct.new(*DONATION_ACCOUNTING_FIELDS)
+
+  # The event's tickets, donations, charges, orders and rpayments, read once: a stats row sums each of them several
+  # ways. Event.preload_stats reads them for many events at a time
+  def ticket_accounting_rows
+    @ticket_accounting_rows ||= tickets.pluck(*TICKET_ACCOUNTING_FIELDS).map { |values| TicketAccountingRow.new(*values) }
+  end
+
+  def donation_accounting_rows
+    @donation_accounting_rows ||= donations.pluck(*DONATION_ACCOUNTING_FIELDS).map { |values| DonationAccountingRow.new(*values) }
+  end
+
+  def stripe_charges_for_accounting
+    @stripe_charges_for_accounting ||= stripe_charges.to_a
+  end
+
+  def orders_for_accounting
+    @orders_for_accounting ||= orders.to_a
+  end
+
+  def rpayments_for_accounting
+    @rpayments_for_accounting ||= rpayments.to_a
+  end
+
+  # The ids of the orders of the event's charges that were transferred to another event (a superset when preloaded)
+  def transferred_order_ids
+    @transferred_order_ids ||= Order.and(:id.in => stripe_charges_for_accounting.filter_map(&:order_id), transferred: true).pluck(:id).to_set
+  end
+
+  # The charges with a balance, split into those whose orders weren't transferred to another event and those whose were
+  def stripe_charges_by_transfer
+    @stripe_charges_by_transfer ||= stripe_charges_for_accounting
+                                    .select { |charge| charge.balance_float && charge.balance_float > 0 }
+                                    .partition { |charge| !transferred_order_ids.include?(charge.order_id) }
   end
 
   def remaining_sum
@@ -72,42 +112,42 @@ module EventAccounting
 
   def stripe_revenue
     @stripe_revenue ||= begin
-      s = stripe_charges.sum(&:balance)
+      s = stripe_charges_for_accounting.sum(&:balance)
       s == 0 ? Money.new(0, currency) : s
     end
   end
 
   def stripe_fees
     @stripe_fees ||= begin
-      s = stripe_charges.sum(&:fees)
+      s = stripe_charges_for_accounting.sum(&:fees)
       s == 0 ? Money.new(0, currency) : s
     end
   end
 
   def stripe_donations
     @stripe_donations ||= begin
-      s = stripe_charges.sum(&:donations)
+      s = stripe_charges_for_accounting.sum(&:donations)
       s == 0 ? Money.new(0, currency) : s
     end
   end
 
   def stripe_ticket_revenue
     @stripe_ticket_revenue ||= begin
-      s = stripe_charges.sum(&:ticket_revenue)
+      s = stripe_charges_for_accounting.sum(&:ticket_revenue)
       s == 0 ? Money.new(0, currency) : s
     end
   end
 
   def stripe_ticket_revenue_to_organisation
     @stripe_ticket_revenue_to_organisation ||= begin
-      s = stripe_charges.sum(&:ticket_revenue_to_organisation)
+      s = stripe_charges_for_accounting.sum(&:ticket_revenue_to_organisation)
       s == 0 ? Money.new(0, currency) : s
     end
   end
 
   def stripe_ticket_revenue_to_revenue_sharer
     @stripe_ticket_revenue_to_revenue_sharer ||= begin
-      s = stripe_charges.sum(&:ticket_revenue_to_revenue_sharer)
+      s = stripe_charges_for_accounting.sum(&:ticket_revenue_to_revenue_sharer)
       s == 0 ? Money.new(0, currency) : s
     end
   end
@@ -194,7 +234,7 @@ module EventAccounting
   def credit_applied
     @credit_applied ||= begin
       r = Money.new(0, currency)
-      orders.pluck(:credit_applied, :currency).each { |amount, order_currency| r += Money.new((amount || 0) * 100, order_currency) }
+      orders_for_accounting.each { |order| r += Money.new((order.credit_applied || 0) * 100, order.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -204,7 +244,7 @@ module EventAccounting
   def credit_on_behalf_of_organisation
     @credit_on_behalf_of_organisation ||= begin
       r = Money.new(0, currency)
-      orders.each { |order| r += Money.new((order.credit_on_behalf_of_organisation || 0) * 100, order.currency) }
+      orders_for_accounting.each { |order| r += Money.new((order.credit_on_behalf_of_organisation || 0) * 100, order.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -214,7 +254,7 @@ module EventAccounting
   def credit_on_behalf_of_revenue_sharer
     @credit_on_behalf_of_revenue_sharer ||= begin
       r = Money.new(0, currency)
-      orders.each { |order| r += Money.new((order.credit_on_behalf_of_revenue_sharer || 0) * 100, order.currency) }
+      orders_for_accounting.each { |order| r += Money.new((order.credit_on_behalf_of_revenue_sharer || 0) * 100, order.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -224,7 +264,7 @@ module EventAccounting
   def fixed_discounts_applied
     @fixed_discounts_applied ||= begin
       r = Money.new(0, currency)
-      orders.pluck(:fixed_discount_applied, :currency).each { |amount, order_currency| r += Money.new((amount || 0) * 100, order_currency) }
+      orders_for_accounting.each { |order| r += Money.new((order.fixed_discount_applied || 0) * 100, order.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -234,7 +274,7 @@ module EventAccounting
   def fixed_discounts_on_behalf_of_organisation
     @fixed_discounts_on_behalf_of_organisation ||= begin
       r = Money.new(0, currency)
-      orders.each { |order| r += Money.new((order.fixed_discount_on_behalf_of_organisation || 0) * 100, order.currency) }
+      orders_for_accounting.each { |order| r += Money.new((order.fixed_discount_on_behalf_of_organisation || 0) * 100, order.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -244,7 +284,7 @@ module EventAccounting
   def fixed_discounts_on_behalf_of_revenue_sharer
     @fixed_discounts_on_behalf_of_revenue_sharer ||= begin
       r = Money.new(0, currency)
-      orders.each { |order| r += Money.new((order.fixed_discount_on_behalf_of_revenue_sharer || 0) * 100, order.currency) }
+      orders_for_accounting.each { |order| r += Money.new((order.fixed_discount_on_behalf_of_revenue_sharer || 0) * 100, order.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -254,7 +294,7 @@ module EventAccounting
   def discounted_ticket_revenue
     @discounted_ticket_revenue ||= begin
       r = Money.new(0, currency)
-      tickets.complete.pluck(:discounted_price, :currency).each { |price, ticket_currency| r += Money.new((price || 0) * 100, ticket_currency) }
+      ticket_accounting_rows.select { |ticket| ticket.payment_completed == true }.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100, ticket.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -265,8 +305,8 @@ module EventAccounting
     instance_var = skip_transferred ? :@donation_revenue_without_transferred : :@donation_revenue
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
-      donations = skip_transferred ? self.donations.and(transferred: false) : self.donations
-      donations.pluck(:amount, :currency).each { |amount, donation_currency| r += Money.new((amount || 0) * 100, donation_currency) }
+      donations = skip_transferred ? donation_accounting_rows.select { |donation| donation.transferred == false } : donation_accounting_rows
+      donations.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -277,8 +317,8 @@ module EventAccounting
     instance_var = skip_transferred ? :@donation_revenue_less_application_fees_without_transferred : :@donation_revenue_less_application_fees
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
-      donations = skip_transferred ? self.donations.and(transferred: false) : self.donations
-      donations.and(application_fee_paid_to_dandelion: false).pluck(:amount, :currency).each { |amount, donation_currency| r += Money.new((amount || 0) * 100, donation_currency) }
+      donations = skip_transferred ? donation_accounting_rows.select { |donation| donation.transferred == false } : donation_accounting_rows
+      donations.select { |donation| donation.application_fee_paid_to_dandelion == false }.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -289,8 +329,8 @@ module EventAccounting
     instance_var = skip_transferred ? :@org_discounted_ticket_revenue_without_transferred : :@org_discounted_ticket_revenue
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
-      tickets = skip_transferred ? self.tickets.and(transferred: false) : self.tickets
-      tickets.complete.pluck(:discounted_price, :organisation_revenue_share, :currency).each { |price, share, ticket_currency| r += Money.new((price || 0) * 100 * (share || 1), ticket_currency) }
+      tickets = ticket_accounting_rows.select { |ticket| ticket.payment_completed == true && (!skip_transferred || ticket.transferred == false) }
+      tickets.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (ticket.organisation_revenue_share || 1), ticket.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -301,8 +341,8 @@ module EventAccounting
     instance_var = skip_transferred ? :@revenue_sharer_discounted_ticket_revenue_without_transferred : :@revenue_sharer_discounted_ticket_revenue
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
-      tickets = skip_transferred ? self.tickets.and(transferred: false) : self.tickets
-      tickets.complete.pluck(:discounted_price, :organisation_revenue_share, :currency).each { |price, share, ticket_currency| r += Money.new((price || 0) * 100 * (1 - (share || 1)), ticket_currency) }
+      tickets = ticket_accounting_rows.select { |ticket| ticket.payment_completed == true && (!skip_transferred || ticket.transferred == false) }
+      tickets.each { |ticket| r += Money.new((ticket.discounted_price || 0) * 100 * (1 - (ticket.organisation_revenue_share || 1)), ticket.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])

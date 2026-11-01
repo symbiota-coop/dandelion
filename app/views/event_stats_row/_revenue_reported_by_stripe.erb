@@ -1,9 +1,8 @@
 <%
-  stripe_charges = event.stripe_charges.and(:balance_float.gt => 0, :order_id.nin => Order.and(transferred: true).pluck(:id))
+  stripe_charges, stripe_charges_transferred = event.stripe_charges_by_transfer
   stripe_charges_money = stripe_charges.sum(&:balance)
   stripe = "#{m stripe_charges_money, event.currency} from #{pluralize(stripe_charges.count, 'charge')}"
 
-  stripe_charges_transferred = event.stripe_charges.and(:balance_float.gt => 0, :order_id.in => Order.and(transferred: true).pluck(:id))
   stripe_charges_transferred_money = stripe_charges_transferred.sum(&:balance)
   stripe_transferred = "#{m stripe_charges_transferred_money, event.currency} from #{pluralize(stripe_charges_transferred.count, 'transferred charge')}"
 
@@ -12,7 +11,7 @@
 %>
 <td data-sort="<%= event_method_in_organisation_currency(event, :stripe_revenue, organisation) %>" <% if bg_class %> class="<%= bg_class %>" <% end %>>
   <%= stripe.split(' from ').first %> from <a <% if bg_class %> class="text-white fw-bold" <% end %> href="/events/<%= event.id %>/stripe_charges"><%= stripe.split(' from ').last %></a>
-  <% if stripe_charges_transferred.exists? %>
+  <% if stripe_charges_transferred.any? %>
     +
     <%= stripe_transferred.split(' from ').first %> from <a <% if bg_class %> class="text-white fw-bold" <% end %> href="/events/<%= event.id %>/stripe_charges"><%= stripe_transferred.split(' from ').last %></a>
   <% end %>

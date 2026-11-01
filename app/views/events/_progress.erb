@@ -1,4 +1,4 @@
-<% tc = event.tickets.count %>
+<% tc = event.ticket_count %>
 <% slots_taken = event.slots_taken if event.capacity %>
 
 <% if event.purchase_url %>
@@ -24,7 +24,7 @@
       </div>
     </a>
   <% end %>
-  <% if event.orders.incomplete.exists? %>
+  <% if event.incomplete_orders? %>
     <i data-bs-toggle="tooltip" title="Someone is in the process of completing an order. If they don't complete it soon, the order will be removed." class="bi bi-spin bi-arrow-repeat"></i>
   <% end %>
   <% if event.sold_out_cache %>

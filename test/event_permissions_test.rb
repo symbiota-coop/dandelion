@@ -197,6 +197,8 @@ class EventPermissionsTest < ActiveSupport::TestCase
 
   test 'events stats page makes event managers revenue admins of hosted and cohosted events' do
     create_event
+    # Revenue admins' rows have the allocation columns, which link to the event's rpayments
+    @organisation.set(stripe_client_id: 'ca_test')
     manager = add_event_manager(@organisation)
     other_organisation = FactoryBot.create(:organisation)
     cohosted_event = FactoryBot.create(:event, organisation: other_organisation)
@@ -207,7 +209,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
 
     assert last_response.ok?
     [@event, cohosted_event].each do |event|
-      assert_match %r{/events/#{event.id}/stats_row\?[^"]*event_revenue_admin=1"}, last_response.body
+      assert_includes last_response.body, "/events/#{event.id}/rpayments"
     end
   end
 

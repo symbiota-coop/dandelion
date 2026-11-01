@@ -1,10 +1,10 @@
 <td>
-  <% if event.event_feedbacks.exists? %>
-    <a href="/events/<%= event.id %>/feedback"><%= pluralize(event.event_feedbacks.count, 'response') %></a>
-    <% if event.attendees.count > 0 %>
-      (<%= "#{(100 * (event.event_feedbacks.count.to_f / event.attendees.count)).round}%" %>)
+  <% if (feedback_count = event.feedback_count) > 0 %>
+    <a href="/events/<%= event.id %>/feedback"><%= pluralize(feedback_count, 'response') %></a>
+    <% if (attendees_count = event.attendees_count) > 0 %>
+      (<%= "#{(100 * (feedback_count.to_f / attendees_count)).round}%" %>)
     <% end %>
-    <% if (average_rating = event.event_feedbacks.average_rating) %>
+    <% if (average_rating = event.average_feedback_rating) %>
       <br>
       <span class="fs-5" title="Average rating <%= average_rating %>">
         <%= average_rating %>

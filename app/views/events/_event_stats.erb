@@ -36,34 +36,30 @@
 
       var dateIndex = $("#event_stats th").toArray().indexOf($("th[data-col-name='date']")[0])
 
-      $(document).ajaxStop(function() {
-        if (!$('#event_stats').hasClass('dataTable')) {
-          var table = $('#event_stats').DataTable({
-            info: false,
-            paging: false,
-            order: [[dateIndex, "asc"]],
-            searching: false
-          })
-          table.on('draw.dt', function() {
-            $("#event_stats th[data-sum], #event_stats th[data-money]").each(function() {
-              var index = $("#event_stats th").index(this);
-              var sum = 0
-              $('#event_stats tbody tr').each(function() {
-                var f = parseFloat($('td:eq('+index+')', this).attr('data-sort'))
-                if (isNaN(f))
-                  f = 0
-                sum += f
-              })
-              if ($(this).is('[data-money]'))
-                $('tfoot th').eq(index).html(<%== money_symbol(organisation.currency).to_json %> + sum.toLocaleString());
-              else
-                $('tfoot th').eq(index).html(sum);
-            });
-          })
-          table.columns(eventStatsZeroColumns()).visible(false)
-          table.draw();
-        }
+      var table = $('#event_stats').DataTable({
+        info: false,
+        paging: false,
+        order: [[dateIndex, "asc"]],
+        searching: false
       })
+      table.on('draw.dt', function() {
+        $("#event_stats th[data-sum], #event_stats th[data-money]").each(function() {
+          var index = $("#event_stats th").index(this);
+          var sum = 0
+          $('#event_stats tbody tr').each(function() {
+            var f = parseFloat($('td:eq('+index+')', this).attr('data-sort'))
+            if (isNaN(f))
+              f = 0
+            sum += f
+          })
+          if ($(this).is('[data-money]'))
+            $('tfoot th').eq(index).html(<%== money_symbol(organisation.currency).to_json %> + sum.toLocaleString());
+          else
+            $('tfoot th').eq(index).html(sum);
+        });
+      })
+      table.columns(eventStatsZeroColumns()).visible(false)
+      table.draw();
 
     })
   </script>
@@ -122,9 +118,9 @@
       <th>Feedback</th>
     </tr>
   </thead>
-  <% events.each { |event| %>
-  <tr data-pagelet-url="/events/<%= event.id %>/stats_row<%= "?timezone=#{event.start_time&.strftime('%Z')}&organisation_id=#{organisation.id}&event_revenue_admin=#{event_revenue_admin?(event) ? 1 : 0}" %>"><% if @event %><%= cp(:'events/event_stats_row', locals: { event: @event, organisation: organisation, event_revenue_admin: event_revenue_admin? }, event: @event, key: "/events/#{@event.id}/stats_row?timezone=#{@event.start_time&.strftime('%Z')}&organisation_id=#{organisation.id}&event_revenue_admin=#{event_revenue_admin? ? 1 : 0}") %><% end %></tr>
-  <% } %>
+  <% event_stats_rows(events, organisation).each do |row| %>
+    <tr><%= row %></tr>
+  <% end %>
   <% unless @event %>
     <tfoot>
       <tr>

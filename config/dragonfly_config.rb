@@ -24,11 +24,11 @@ Dragonfly.app.configure do
   secret ENV['DRAGONFLY_SECRET']
 
   define_url do |app, job, _opts|
-    if (dj = DragonflyJob.find_by(signature: job.signature))
+    if (uid = DragonflyJob.prefetched_uid(job.signature) || DragonflyJob.find_by(signature: job.signature)&.uid)
       if ENV['S3_CDN']
-        "#{ENV['S3_CDN']}/#{dj.uid}"
+        "#{ENV['S3_CDN']}/#{uid}"
       else
-        app.datastore.url_for(dj.uid)
+        app.datastore.url_for(uid)
       end
     else
       begin
