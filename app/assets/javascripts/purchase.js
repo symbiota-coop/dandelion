@@ -44,9 +44,11 @@ $(function () {
   $donationAmount.change(function () {
     if ($donationAmount.val().length > 0) {
       const donationAmount = parseFloat($donationAmount.val())
+      // A donation to Dandelion is the payment's application fee, which OrderBuilder refuses below the currency's
+      // smallest unit (DonationTooSmall). One to the organisation is only added to the total
       if (donationAmount < 0) {
         setDonationAmountValue('')
-      } else if (donationAmount > 0 && config.minimumApplicationFee && donationAmount < config.minimumApplicationFee) {
+      } else if (config.donationsToDandelion && donationAmount > 0 && config.minimumApplicationFee && donationAmount < config.minimumApplicationFee) {
         setDonationAmountValue(config.minimumApplicationFee)
       } else {
         setDonationAmountValue(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
