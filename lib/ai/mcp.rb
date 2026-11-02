@@ -341,6 +341,7 @@ module Dandelion
                          secret_ticket_type_id: { type: 'string', description: "A hidden ticket type's secret link, or the ticket_type_id in its query string, to book that ticket type" },
                          donation_amount: { type: 'number', description: 'A donation the buyer chose to add, where the requirements list a donation (at least its minimum, if it has one)' },
                          confirm_duplicate: { type: 'boolean', description: 'The buyer confirmed they want to book again, though this account already has a ticket' },
+                         confirm_email: { type: 'boolean', description: "The buyer confirmed their email address is right, though it looks mistyped (a slip from a common provider's)" },
                          attribution: {
                            type: 'object',
                            description: 'From the query string of the event link the buyer followed, if it has them',
@@ -352,11 +353,12 @@ module Dandelion
           # **_rest ignores arguments the tool doesn't take, rather than failing the call
           define_singleton_method(:call) do |slug: nil, id: nil, quantities: nil, prices: nil, answers: nil, accept_terms: false, idempotency_key: nil, buyer: nil, opt_ins: nil,
                                              discount_code: nil, payment_method: nil, secret_ticket_type_id: nil, donation_amount: nil, confirm_duplicate: false,
-                                             attribution: nil, server_context: {}, **_rest|
+                                             confirm_email: false, attribution: nil, server_context: {}, **_rest|
             Dandelion::MCP.perform_create_checkout(server_context: server_context, slug: slug, id: id, quantities: quantities, prices: prices, answers: answers,
                                                    accept_terms: accept_terms, idempotency_key: idempotency_key, buyer: buyer, opt_ins: opt_ins,
                                                    discount_code: discount_code, payment_method: payment_method, secret_ticket_type_id: secret_ticket_type_id,
-                                                   donation_amount: donation_amount, confirm_duplicate: confirm_duplicate, attribution: attribution)
+                                                   donation_amount: donation_amount, confirm_duplicate: confirm_duplicate, confirm_email: confirm_email,
+                                                   attribution: attribution)
           end
         end,
         Class.new(::MCP::Tool) do

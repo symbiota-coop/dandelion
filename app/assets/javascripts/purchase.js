@@ -322,9 +322,11 @@ $(function () {
   })
 
   let purchaseSubmitting = false
-  let embeddedDuplicateConfirmed = false
+  // What the buyer has confirmed, embedded, by pressing again: booking again though they have a ticket, and an email
+  // that looks mistyped. Both are for the email they confirmed them for
+  let embeddedConfirmed = {}
   $('#account_email').on('input', function () {
-    embeddedDuplicateConfirmed = false
+    embeddedConfirmed = {}
   })
   $(window).on('pageshow', function () {
     purchaseSubmitting = false
@@ -342,19 +344,8 @@ $(function () {
       setTotal()
     }
 
-    // OrderBuilder checks the rest (tickets chosen, places left, answers, terms, the phone number's country code), and
-    // the form shows what it says is wrong
-
-    // Signed out, catch a mistyped email before the tickets go nowhere: a domain one or two keystrokes from a common
-    // provider's (gmial.com, hotmail.con). Signed in, the email is a hidden field
-    const $emailField = $('#account_email[type=email]')
-    const email = ($emailField.val() || '').trim()
-    if (!config.embedded && emailLooksMistyped(email)) {
-      if (!confirm('You entered your email address as ' + email + '. Press OK to continue, or Cancel to go back.')) {
-        $emailField.trigger('focus')
-        return false
-      }
-    }
+    // OrderBuilder checks the rest (tickets chosen, places left, answers, terms, the phone number's country code, an
+    // email that looks mistyped), and the form shows what it says is wrong
 
     purchaseSubmitting = true
     $('#details form button[data-payment-method]').prop('disabled', true)
@@ -397,11 +388,13 @@ $(function () {
       }
     })
 
-    const postPurchase = function (confirmedDuplicate) {
+    // confirmed: what the buyer has confirmed (duplicate, email)
+    const postPurchase = function (confirmed) {
       $.post('/e/' + config.eventSlug + '/purchase', {
         ticketForm: ticketForm,
         detailsForm: $('#details form').serializeObject(),
-        confirmed_duplicate: confirmedDuplicate ? '1' : ''
+        confirmed_duplicate: confirmed.duplicate ? '1' : '',
+        confirmed_email: confirmed.email ? '1' : ''
       }, function (data) {
         (handlers[method] || handlers.default)(data)
       }).fail(function (xhr) {
@@ -413,17 +406,21 @@ $(function () {
           $('#details form button[data-payment-method]').prop('disabled', false)
           $('#details form button[data-payment-method-clicked] i').hide()
         }
-        if (json.duplicate && !confirmedDuplicate) {
+        // Something to confirm before booking: embedded, by pressing again, as confirm() can't be used there
+        const confirmation = (json.duplicate && 'duplicate') || (json.mistyped_email && 'email')
+        if (confirmation && !confirmed[confirmation]) {
           enableForm()
-          const message = json.error || 'A ticket to this event has already been booked for this email address.'
+          const again = confirmation === 'duplicate' ? 'get another ticket anyway' : 'book with this email address'
           if (config.embedded) {
-            embeddedDuplicateConfirmed = true
-            showPurchaseAlert(message + ' Press the button again to get another ticket anyway.')
-          } else if (confirm(message + ' Press OK to get another ticket anyway, or Cancel to go back.')) {
+            embeddedConfirmed[confirmation] = true
+            showPurchaseAlert(json.error + ' Press the button again to ' + again + '.')
+          } else if (confirm(json.error + ' Press OK to ' + again + ', or Cancel to go back.')) {
             purchaseSubmitting = true
             $('#details form button[data-payment-method]').prop('disabled', true)
             $('#details form button[data-payment-method-clicked] i').show()
-            postPurchase(true)
+            postPurchase(Object.assign({}, confirmed, { [confirmation]: true }))
+          } else if (confirmation === 'email') {
+            $('#account_email').trigger('focus')
           }
           return
         }
@@ -437,71 +434,9 @@ $(function () {
         $('#card-error').show()
       })
     }
-    postPurchase(embeddedDuplicateConfirmed)
+    postPurchase(config.embedded ? embeddedConfirmed : {})
 
     return false
   })
 })
 
-// Email providers' domains used by at least 20 Dandelion accounts (as of October 2026), most used first, then smaller ones
-// a slip from those: the domains people mistype, and real ones that shouldn't be 'corrected' to them. Universities, employers
-// and the typos themselves are left out
-const EMAIL_DOMAINS = [
-  'gmail.com', 'hotmail.com', 'hotmail.co.uk', 'yahoo.com', 'yahoo.co.uk', 'outlook.com', 'icloud.com', 'aol.com',
-  'googlemail.com', 'live.co.uk', 'me.com', 'btinternet.com', 'comcast.net', 'protonmail.com', 'live.com', 'msn.com',
-  'mac.com', 'gmx.de', 'cox.net', 'sbcglobal.net', 'web.de', 'ymail.com', 'att.net', 'proton.me', 'sky.com', 'mail.com',
-  'pm.me', 'mail.ru', 'rocketmail.com', 'verizon.net', 'hotmail.fr', 'bellsouth.net', 'posteo.de', 'ntlworld.com',
-  'charter.net', 'yahoo.fr', 'yahoo.de', 't-online.de', 'hotmail.it', 'gmx.net', 'blueyonder.co.uk', 'seznam.cz',
-  'gmx.com', 'duck.com', 'yahoo.ca', 'talktalk.net', 'gmx.at', 'hotmail.de', 'wp.pl', 'rogers.com', 'virginmedia.com',
-  'optonline.net', 'yahoo.it', 'aol.co.uk', 'yandex.ru', 'orange.fr', 'earthlink.net', 'bluewin.ch', 'yahoo.com.au',
-  'btopenworld.com', 'tiscali.co.uk', 'naver.com', 'libero.it', 'talk21.com', 'yahoo.es', 'gmx.co.uk', 'tutanota.com',
-  'posteo.net', 'aim.com', 'email.com', 'riseup.net', 'gmx.ch', 'live.ca', 'live.fr', 'live.nl', 'phonecoop.coop', 'wanadoo.fr', 'live.de',
-  'live.se', 'mailbox.org', 'freenet.de', 'o2.pl', 'windstream.net', 'sympatico.ca', 'live.com.au', 'hotmail.es',
-  'virgin.net', 'frontier.com', 'fastmail.com', 'bigpond.com', 'free.fr', 'tutamail.com', 'zoho.com', 'live.it', 'hey.com',
-  'outlook.de', 'yahoo.ie', 'protonmail.ch', '163.com', 'bk.ru', 'yandex.com', 'yahoo.com.br', 'tuta.io', 'qq.com',
-  'outlook.fr', 'fastmail.fm', 'btconnect.com', 'embarqmail.com', 'shaw.ca', 'ukr.net', 'email.cz', 'abv.bg', 'hotmail.ca',
-  'laposte.net', 'juno.com', 'roadrunner.com', 'opayq.com', 'telenet.be', 'twc.com', 'passmail.net', 'yahoo.gr', 'yahoo.se',
-  'netscape.net', 'hanmail.net', 'live.dk', 'nate.com', 'sfr.fr', 'zen.co.uk', 'inbox.lv', 'list.ru',
-  'op.pl', 'vp.pl', 'online.de', 'online.no', 'q.com', 'mozmail.com', 'myyahoo.com', 'y7mail.com', 'mail.co.uk', 'yopmail.com', 'foxmail.com'
-]
-
-// Endings that are a slip from .com, .net or .org (and never a real one people use)
-const EMAIL_TLD_SLIPS = ['con', 'cmo', 'ocm', 'vom', 'xom', 'comm', 'nte', 'ent', 'ner', 'ogr', 'prg']
-
-// Whether the address's domain looks like a typo of a common provider's or of .com, .net or .org
-function emailLooksMistyped (email) {
-  const at = email.lastIndexOf('@')
-  if (at < 1) { return false }
-  const domain = email.slice(at + 1).toLowerCase()
-  if (!domain || EMAIL_DOMAINS.includes(domain)) { return false }
-  if (EMAIL_TLD_SLIPS.includes(domain.split('.').pop())) { return true }
-
-  // Short domains are closer to each other, so only one slip is allowed in those. A provider with domains in several
-  // countries is most likely real at another country's (hotmail.nl, yahoo.co.in), unless the ending was cut short (hotmail.co)
-  const allowed = domain.length <= 8 ? 1 : 2
-  const name = domain.split('.')[0]
-  const ending = domain.slice(name.length + 1)
-  const countries = EMAIL_DOMAINS.filter(function (known) { return known.split('.')[0] === name }).length > 1
-  return EMAIL_DOMAINS.some(function (known) {
-    const knownName = known.split('.')[0]
-    if (knownName === name && countries && /^((co|com|net)\.)?[a-z]{2}$/.test(ending) && !known.slice(knownName.length + 1).startsWith(ending)) { return false }
-    return editDistance(domain, known) <= allowed
-  })
-}
-
-// How many insertions, deletions, substitutions and swaps of neighbouring letters turn a into b
-function editDistance (a, b) {
-  const d = []
-  for (let i = 0; i <= a.length; i++) { d[i] = [i] }
-  for (let j = 0; j <= b.length; j++) { d[0][j] = j }
-  for (let i = 1; i <= a.length; i++) {
-    for (let j = 1; j <= b.length; j++) {
-      const cost = a[i - 1] === b[j - 1] ? 0 : 1
-      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost)
-      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
-        d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1)
-      }
-    }
-  }
-  return d[a.length][b.length]
-}

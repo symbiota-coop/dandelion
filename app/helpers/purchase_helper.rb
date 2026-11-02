@@ -62,6 +62,7 @@ Dandelion::App.helpers do
       opt_in_organisation: checked.(account_data[:opt_in_organisation]),
       opt_in_facilitator: checked.(account_data[:opt_in_facilitator]),
       confirmed_duplicate: checked.(params[:confirmed_duplicate]),
+      confirmed_email: checked.(params[:confirmed_email]),
       utm: %i[source medium campaign].index_with { |field| details_form[:"utm_#{field}"] }
     }.merge(
       %i[quantities prices donation_amount cohost affiliate_type affiliate_id].index_with { |field| ticket_form[field] },

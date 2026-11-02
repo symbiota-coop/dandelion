@@ -119,6 +119,21 @@ class OrderBuilder
     end
   end
 
+  # The email typed in is a slip from a common provider's (EmailTypos), so the tickets would go nowhere. The buyer can
+  # confirm it with confirmed_email
+  class EmailLooksMistyped < Error
+    attr_reader :email
+
+    def initialize(email)
+      @email = email
+      super("You entered your email address as #{email}, which looks mistyped.")
+    end
+
+    def status
+      409
+    end
+  end
+
   attr_reader :order, :account
 
   # buyer: name, email, and optionally phone, postcode and country, of which only those the event asks for
@@ -132,7 +147,7 @@ class OrderBuilder
                  secret_ticket_type_id: nil, answers: nil, accepted_terms: false, donation_amount: nil, donation_via_modal: false,
                  discount_code: nil, cohost: nil, affiliate_type: nil, affiliate_id: nil,
                  opt_in_organisation: false, opt_in_facilitator: false, hear_about: nil, via: nil, http_referrer: nil,
-                 confirmed_duplicate: false, utm: {}, idempotency_key: nil)
+                 confirmed_duplicate: false, confirmed_email: false, utm: {}, idempotency_key: nil)
     @event = event
     @buyer = buyer
     @quantities = quantities
@@ -157,6 +172,7 @@ class OrderBuilder
     @via = via
     @http_referrer = http_referrer
     @confirmed_duplicate = confirmed_duplicate
+    @confirmed_email = confirmed_email
     @utm = utm || {}
     @idempotency_key = idempotency_key
   end
@@ -167,6 +183,7 @@ class OrderBuilder
     raise NotAllowed.new(restriction) if restriction
 
     check_choices
+    check_email unless @confirmed_email
     find_or_create_account
     check_duplicate unless @confirmed_duplicate
     create_order
@@ -255,6 +272,14 @@ class OrderBuilder
     raise DonationInvalid if @donation_amount.to_f.negative? || (@donation_amount.to_f.positive? && !@event.checkout_donation)
     # Donation's own validation only sees a donation that's made
     raise DonationRequired.new(@event.minimum_donation, @event.currency) if donation_below_minimum?
+  end
+
+  # Only an email typed in: a signed-in buyer's is their account's
+  def check_email
+    email = @buyer[:email].to_s.strip
+    return if @signed_in_account && @signed_in_account.email.casecmp?(email)
+
+    raise EmailLooksMistyped, email if EmailTypos.mistyped?(email)
   end
 
   def format_money(amount)

@@ -641,6 +641,26 @@ class McpTest < ActiveSupport::TestCase
     assert_equal 2, @event.orders.count
   end
 
+  test 'create_checkout_tool asks to confirm an email that looks mistyped, without an API key' do
+    create_event(prices: [0])
+    quantities = { @event.ticket_types.first.id.to_s => 1 }
+    buyer = { name: 'Typo Buyer', email: 'typo@gmial.com' }
+
+    rpc = mcp_tool_call('create_checkout_tool', arguments: { slug: @event.slug, quantities: quantities, buyer: buyer })
+    assert rpc.dig('result', 'isError')
+    assert_includes tool_text(rpc), "The buyer's email address, typo@gmial.com, looks mistyped"
+    assert_includes tool_text(rpc), 'confirm_email'
+    assert_nil Account.find_by(email: 'typo@gmial.com')
+
+    rpc = mcp_tool_call('create_checkout_tool', arguments: { slug: @event.slug, quantities: quantities, buyer: buyer, confirm_email: true })
+    assert_equal 'complete', JSON.parse(tool_text(rpc))['status']
+
+    # With an API key, the booking is for that account, with its own email
+    @buyer = FactoryBot.create(:account, email: 'keyholder@hotmail.con')
+    _rpc, order = create_checkout(quantities: quantities)
+    assert_equal 'complete', order['status']
+  end
+
   test 'create_checkout_tool refuses what agents cannot book' do
     create_event(prices: [10, '10-100', nil])
     fixed = @event.ticket_types.detect(&:price)

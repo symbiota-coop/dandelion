@@ -7,7 +7,7 @@ module Dandelion
     # someone signed out: finding the account with their email, or creating one
     def self.perform_create_checkout(server_context: nil, slug: nil, id: nil, quantities: nil, prices: nil, answers: nil, accept_terms: false, idempotency_key: nil,
                                      buyer: nil, opt_ins: nil, discount_code: nil, payment_method: nil, secret_ticket_type_id: nil, donation_amount: nil,
-                                     confirm_duplicate: false, attribution: nil)
+                                     confirm_duplicate: false, confirm_email: false, attribution: nil)
       return tool_error('Provide event slug or id') if slug.blank? && id.blank?
 
       event = Event.live.publicly_visible.find_by_slug_or_id(slug: slug, id: id)
@@ -69,6 +69,7 @@ module Dandelion
         opt_in_facilitator: opt_ins.include?('opt_in_facilitator'),
         hear_about: hear_about,
         confirmed_duplicate: confirm_duplicate == true,
+        confirmed_email: confirm_email == true,
         via: 'mcp',
         idempotency_key: idempotency_key
       )
@@ -88,6 +89,8 @@ module Dandelion
       end
 
       tool_error('This account already has a ticket to this event. If the buyer wants to book again, check with them, then call create_checkout_tool again with confirm_duplicate set to true.')
+    rescue OrderBuilder::EmailLooksMistyped => e
+      tool_error("The buyer's email address, #{e.email}, looks mistyped. Check it with the buyer: call create_checkout_tool again with the right one, or with confirm_email set to true if it's right.")
     rescue OrderBuilder::Error => e
       # OrderBuilder deletes a failed attempt's order: free its key, so that a retry books rather than finding it expired
       Order.unscoped.and(_id: builder.order.id).update_all('$unset' => { idempotency_key: 1 }) if builder&.order

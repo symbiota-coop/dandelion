@@ -438,6 +438,46 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert Account.find_by(email: 'someone@gmail.com')
   end
 
+  test 'embedded, a mistyped email domain is booked after pressing again' do
+    create_event(prices: [0])
+
+    visit "/e/#{@event.slug}?ticket_form_only=1"
+    fill_in 'account_name', with: 'Typo User'
+    fill_in 'account_email', with: 'someone@gmial.com'
+    click_button 'RSVP'
+    assert page.has_content? 'You entered your email address as someone@gmial.com, which looks mistyped. Press the button again to book with this email address.'
+    assert_nil Account.find_by(email: 'someone@gmial.com')
+
+    click_button 'RSVP'
+    assert page.has_current_path?(/success=true/, url: true)
+    assert Account.find_by(email: 'someone@gmial.com')
+  end
+
+  test 'purchase asks to confirm an email that looks mistyped, unless it is the signed-in account' do
+    create_event(prices: [0])
+    buyer = Account.new(name: 'Typo User', email: 'someone@gmial.com')
+
+    post_purchase(@event, buyer)
+    assert_equal 409, last_response.status
+    body = JSON.parse(last_response.body)
+    assert body['mistyped_email']
+    assert_equal 'You entered your email address as someone@gmial.com, which looks mistyped.', body['error']
+    assert_nil Account.find_by(email: 'someone@gmial.com')
+
+    header 'Accept', 'application/json'
+    post "/e/#{@event.slug}/purchase",
+         confirmed_email: '1',
+         ticketForm: { quantities: { @event.ticket_types.first.id.to_s => '1' } },
+         detailsForm: { payment_method: 'rsvp', account: { name: buyer.name, email: buyer.email } }
+    assert_equal 200, last_response.status
+
+    # Signed in, the email is the account's own
+    signed_in = FactoryBot.create(:account, email: 'other@hotmail.con')
+    sign_in_with_rack(signed_in)
+    post_purchase(@event, signed_in)
+    assert_equal 200, last_response.status
+  end
+
   test "the checkout form shows why a booking was refused, and books once it's fixed" do
     create_event(prices: [0], terms_and_conditions: 'Be kind', terms_and_conditions_check_box: true)
 
