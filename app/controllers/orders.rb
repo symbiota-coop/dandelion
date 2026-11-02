@@ -94,6 +94,11 @@ Dandelion::App.controller do
     @ticket = Ticket.find(params[:id]) || not_found
     halt 403 unless @ticket.account == current_account
     @event = @ticket.event
+    # A ticket on resale leaves the event's ticket counts, freeing its place, and only events that allow resales refund and
+    # remove it when the place sells (Ticket#payment_completed!): elsewhere the holder could free places, let them sell, and
+    # take their tickets back off resale, overbooking the event. Taking one off resale is always allowed, as it only puts
+    # the ticket back in the counts
+    halt 403 if !@ticket.made_available_at && !@event.enable_resales?
     @ticket.made_available_at = @ticket.made_available_at ? nil : Time.now
     @ticket.save
     redirect back

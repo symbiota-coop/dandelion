@@ -111,6 +111,26 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert_equal 0, ticket_type.remaining_including_made_available
   end
 
+  test 'a ticket can be put on resale only when the event allows resales' do
+    create_event(prices: [0])
+    account = FactoryBot.create(:account)
+    ticket = @event.ticket_types.first.tickets.create!(event: @event, account: account, payment_completed: true, price: 0)
+    sign_in_with_rack(account)
+
+    post "/tickets/#{ticket.id}/toggle_resale"
+    assert_equal 403, last_response.status
+    assert_nil ticket.reload.made_available_at
+
+    @event.set(enable_resales: true)
+    post "/tickets/#{ticket.id}/toggle_resale"
+    assert ticket.reload.made_available_at
+
+    # Resales turned off later: the ticket can still come off resale, back into the counts
+    @event.set(enable_resales: false)
+    post "/tickets/#{ticket.id}/toggle_resale"
+    assert_nil ticket.reload.made_available_at
+  end
+
   test 'stripe tickets do not require a manual refund' do
     create_event(prices: [30], enable_resales: true)
     ticket_type = @event.ticket_types.first
