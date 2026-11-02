@@ -110,8 +110,6 @@ module EventSerialization
   def checkout_donation
     if donations_to_dandelion?
       { to: 'dandelion', name: 'Dandelion', suggested: nil, minimum: FiatCurrency.minimum_unit_amount(currency)&.to_f, required: false,
-        suggested_percent: Event::DANDELION_DONATION_PERCENT,
-        higher_price: { over: dandelion_donation_higher_price_over, suggested_percent: Event::DANDELION_DONATION_HIGHER_PRICE_PERCENT },
         added_by_default: true }
     elsif suggested_donation
       minimum = (minimum_donation if minimum_donation&.positive?)

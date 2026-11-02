@@ -155,7 +155,7 @@ class Event
 
   # The donation to Dandelion the checkout form starts with: a percentage of the tickets, after percentage discounts, a
   # smaller one when they come to more than DANDELION_DONATION_HIGHER_PRICE_UNITS of the currency's smallest unit (£249),
-  # and at least that unit
+  # and at least that unit. Agent bookings add just that unit (default_dandelion_donation)
   DANDELION_DONATION_PERCENT = 5
   DANDELION_DONATION_HIGHER_PRICE_PERCENT = 2.5
   DANDELION_DONATION_HIGHER_PRICE_UNITS = 249
@@ -166,14 +166,11 @@ class Event
     (smallest * DANDELION_DONATION_HIGHER_PRICE_UNITS).to_f if smallest
   end
 
-  # The donation the checkout form suggests for tickets coming to ticket_total, as the agent checkout adds unless told
-  # otherwise. None for free tickets, so as not to make a free booking paid
-  def suggested_dandelion_donation(ticket_total)
+  # The donation to Dandelion an agent booking adds unless told otherwise: the smallest one there can be, the currency's
+  # smallest unit (£1). None for free tickets, so as not to make a free booking paid
+  def default_dandelion_donation(ticket_total)
     smallest = FiatCurrency.minimum_unit_amount(currency)
-    return unless donations_to_dandelion? && smallest && ticket_total.positive?
-
-    percent = ticket_total > dandelion_donation_higher_price_over ? DANDELION_DONATION_HIGHER_PRICE_PERCENT : DANDELION_DONATION_PERCENT
-    [(ticket_total * percent / 100).round(2), smallest.to_f].max
+    smallest.to_f if donations_to_dandelion? && smallest && ticket_total.positive?
   end
 
   def token

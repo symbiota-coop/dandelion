@@ -737,8 +737,8 @@ class McpTest < ActiveSupport::TestCase
     @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
     assert @event.reload.donations_to_dandelion?
     requirements = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))
-    assert_equal({ 'to' => 'dandelion', 'name' => 'Dandelion', 'suggested' => nil, 'minimum' => 1.0, 'required' => false, 'suggested_percent' => 5,
-                   'higher_price' => { 'over' => 249.0, 'suggested_percent' => 2.5 }, 'added_by_default' => true }, requirements['donation'])
+    assert_equal({ 'to' => 'dandelion', 'name' => 'Dandelion', 'suggested' => nil, 'minimum' => 1.0, 'required' => false, 'added_by_default' => true },
+                 requirements['donation'])
     quantities = { @event.ticket_types.first.id.to_s => 1 }
 
     rpc, = create_checkout(quantities: quantities, donation_amount: 0.1)
@@ -754,7 +754,7 @@ class McpTest < ActiveSupport::TestCase
     assert_equal 11.0, order['total']
   end
 
-  test 'create_checkout_tool adds the suggested donation to Dandelion unless given one, as the checkout form does' do
+  test 'create_checkout_tool adds the smallest donation to Dandelion unless given one' do
     create_event(prices: [10, 100, 300])
     @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
     ticket_types = @event.reload.ticket_types.sort_by(&:price)
@@ -765,8 +765,8 @@ class McpTest < ActiveSupport::TestCase
       Stripe::Checkout::Session.stub(:create, session) { create_checkout(quantities: { ticket_type.id.to_s => 1 }, **arguments).last }
     end
 
-    # 5%, at least £1, and 2.5% above £249
-    assert_equal([[1.0, 11.0], [5.0, 105.0], [7.5, 307.5]], ticket_types.map { |ticket_type| book.(ticket_type).values_at('donation', 'total') })
+    # £1, whatever the tickets cost, not the checkout form's percentage
+    assert_equal([[1.0, 11.0], [1.0, 101.0], [1.0, 301.0]], ticket_types.map { |ticket_type| book.(ticket_type).values_at('donation', 'total') })
 
     order = book.(ticket_types.first, donation_amount: 0)
     assert_nil order['donation']

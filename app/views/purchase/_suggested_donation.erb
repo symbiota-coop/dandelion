@@ -13,7 +13,7 @@
       <div>
         <div class="btn-group mt-1" id="donation-percent-buttons">
           <button type="button" class="btn btn-outline-secondary" data-percent="1" data-percent-high="1">1%</button>
-          <%# The one selected to start with, the suggestion agent bookings add too (Event#suggested_dandelion_donation) %>
+          <%# The one selected to start with (Event::DANDELION_DONATION_PERCENT) %>
           <button type="button" class="btn btn-outline-secondary active selected-percent" data-percent="<%= Event::DANDELION_DONATION_PERCENT %>" data-percent-high="<%= Event::DANDELION_DONATION_HIGHER_PRICE_PERCENT %>"><%= Event::DANDELION_DONATION_PERCENT %>%</button>
           <button type="button" class="btn btn-outline-secondary" data-percent="10" data-percent-high="5">10%</button>
         </div>

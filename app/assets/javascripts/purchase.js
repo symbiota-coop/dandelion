@@ -158,7 +158,7 @@ $(function () {
   function updateDonationPercentButtons () {
     const p = priceWithoutDonation()
 
-    // Event#suggested_dandelion_donation
+    // Event::DANDELION_DONATION_HIGHER_PRICE_UNITS
     const isHighPrice = config.dandelionDonationHigherPriceOver != null && p > config.dandelionDonationHigherPriceOver
 
     $('#donation-percent-buttons button').each(function () {
