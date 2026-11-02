@@ -438,16 +438,31 @@ class OrderBuilder
   end
 
   def apply_donation_and_discounts
-    # Without a donation_amount, the smallest donation to Dandelion, once the tickets' price is known
-    if @default_dandelion_donation && @donation_amount.nil?
-      @donation_amount = @event.default_dandelion_donation(@order.discounted_ticket_revenue.cents.to_f / 100)
+    if @event.donations_to_dandelion?
+      # A donation to Dandelion is our fee, not the organisation's revenue, so credit and fixed discounts pay only for
+      # the tickets: they're applied first, and the donation is added to what's left to pay
+      apply_credit_and_fixed_discount
+      # Without a donation_amount, the smallest donation to Dandelion, once what's left of the tickets' price is known
+      @donation_amount = @event.default_dandelion_donation(@order.total) if @default_dandelion_donation && @donation_amount.nil?
+      # Tickets that credit or a fixed discount paid for in full complete without a payment, which a donation to
+      # Dandelion needs
+      tickets_paid_for = @order.discounted_ticket_revenue.positive? && @order.total <= 0
+      create_donation unless tickets_paid_for
+    else
+      create_donation
+      apply_credit_and_fixed_discount
     end
-    @order.donations.create!(event: @event, account: @account, amount: @donation_amount) if @donation_amount.to_f > 0 && !ignore_dandelion_donation?
+    @order.set(original_description: @order.description)
+  end
 
+  def create_donation
+    @order.donations.create!(event: @event, account: @account, amount: @donation_amount) if @donation_amount.to_f > 0 && !ignore_dandelion_donation?
+  end
+
+  def apply_credit_and_fixed_discount
     # Credit belongs to the order account; only apply it if that account is signed in.
     @order.apply_credit if signed_in_as_buyer?
     @order.apply_fixed_discount
-    @order.set(original_description: @order.description)
   end
 
   def process_payment

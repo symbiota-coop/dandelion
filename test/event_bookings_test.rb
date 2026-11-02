@@ -896,6 +896,39 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 10, order.credit_applied
   end
 
+  test 'credit pays for tickets, not a donation to Dandelion' do
+    create_event(prices: [10])
+    @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
+    assert @event.reload.donations_to_dandelion?
+    @buyer = FactoryBot.create(:account)
+    grant_credit(@buyer, amount: 15)
+    sign_in_with_rack(@buyer)
+
+    # Credit covers the tickets, so the order completes with no payment, which a donation to Dandelion would need
+    post_checkout(ticket_form: { donation_amount: '1' })
+    assert_equal 200, last_response.status
+    order = @event.orders.find_by(account: @buyer)
+    assert_equal 10, order.credit_applied
+    assert_equal 0, order.total
+    assert order.payment_completed
+    assert_equal 0, order.donations.count
+  end
+
+  test 'a donation to Dandelion is added to what credit leaves to pay' do
+    create_event(prices: [10])
+    @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
+    @buyer = FactoryBot.create(:account)
+    grant_credit(@buyer, amount: 5)
+    sign_in_with_rack(@buyer)
+
+    with_stubbed_stripe_session { post_checkout(ticket_form: { donation_amount: '1' }) }
+    assert_equal 200, last_response.status
+    order = @event.orders.find_by(account: @buyer)
+    assert_equal 5, order.credit_applied
+    assert_equal 6, order.total
+    assert_equal 1, order.donations.first.amount
+  end
+
   test "purchase does not apply another account's credit when signed in as someone else" do
     create_event(prices: [10], suggested_donation: 0)
     victim = FactoryBot.create(:account)
