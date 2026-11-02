@@ -853,6 +853,26 @@ class AccountsTest < ActiveSupport::TestCase
     assert_nil Account.find(account.id)
   end
 
+  test 'a session from an email link needs a sign in code to disconnect a provider' do
+    account = FactoryBot.create(:account)
+    account.set(email_confirmed: true)
+    account.provider_links.create!(provider: 'Google', provider_uid: 'google-uid-disconnect', omniauth_hash: { 'uid' => 'google-uid-disconnect' })
+    account.generate_link_token!
+    clear_cookies
+    get '/accounts/edit', link_token: account.link_token
+    assert last_response.ok?
+
+    post '/accounts/disconnect/google_oauth2'
+    assert_equal '/accounts/sign_in_code', URI(last_response.location).path
+    assert_equal ['Google'], account.reload.provider_links.map(&:provider)
+
+    get '/', sign_in_code: account.issue_sign_in_code!
+    assert_equal '/accounts/providers', URI(last_response.location).path
+    post '/accounts/disconnect/google_oauth2'
+    assert_equal '/accounts/providers', URI(last_response.location).path
+    assert_empty account.reload.provider_links
+  end
+
   test 'the API key tab replaces the API key and the calendar key separately' do
     account = FactoryBot.create(:account)
     api_key = account.api_key
