@@ -189,7 +189,7 @@ Email fields may be empty depending on event privacy settings.
 
 ## Checkout requirements
 
-`get_event_checkout_requirements_tool`, with event `slug` or `id`, says what booking an event involves:
+`get_event_checkout_requirements_tool`, with event `slug` or `id`, says what booking an event involves. The booking and waitlist tools, and looking up an event, also take a link to the event as its `slug`. A secret event is found only by its slug or link, never by its id, and searches leave it out, so an agent can book one when the buyer gives it the link, as anyone with the link can on the event page:
 
 - Whether it can be booked, and why not (sales closed, monthly donors only, members only, no tickets on sale)
 - Its public ticket types: price (fixed, a range, or pay what you want), tickets available, whether each is sold out and when sales end, and whether it has a waitlist to join once it's sold out

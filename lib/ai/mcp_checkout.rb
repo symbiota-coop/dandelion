@@ -10,7 +10,7 @@ module Dandelion
                                      confirm_duplicate: false, confirm_email: false, attribution: nil)
       return tool_error('Provide event slug or id') if slug.blank? && id.blank?
 
-      event = Event.live.publicly_visible.find_by_slug_or_id(slug: slug, id: id)
+      event = bookable_event(slug: slug, id: id)
       return tool_error('Event not found') unless event
 
       signed_in_account = current_account_from(server_context)
@@ -259,7 +259,7 @@ module Dandelion
     def self.perform_join_waitlist(server_context: nil, slug: nil, id: nil, ticket_type_id: nil, buyer: nil)
       return tool_error('Provide event slug or id') if slug.blank? && id.blank?
 
-      event = Event.live.publicly_visible.find_by_slug_or_id(slug: slug, id: id)
+      event = bookable_event(slug: slug, id: id)
       return tool_error('Event not found') unless event
 
       if ticket_type_id.present?

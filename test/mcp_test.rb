@@ -331,7 +331,7 @@ class McpTest < ActiveSupport::TestCase
     assert rsvp['agent_checkout']
   end
 
-  test 'get_event_checkout_requirements_tool reports restrictions and hides secret events' do
+  test 'get_event_checkout_requirements_tool reports restrictions' do
     create_event(prices: [10], monthly_donors_only: true)
     restricted = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))
 
@@ -343,12 +343,23 @@ class McpTest < ActiveSupport::TestCase
 
     refute without_tickets['purchasable']
     assert_equal ['no_tickets'], without_tickets['restrictions']
+  end
 
-    create_event(prices: [10], secret: true, as: :secret_event)
-    rpc = mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @secret_event.slug })
+  test 'secret events are found by their slug or a link to them, never by id, and can be booked' do
+    create_event(prices: [0], secret: true)
+    link = "#{ENV['BASE_URI']}/e/#{@event.slug}?utm_source=newsletter"
 
-    assert rpc.dig('result', 'isError')
+    rpc = mcp_tool_call('get_event_checkout_requirements_tool', arguments: { id: @event.id.to_s })
     assert_includes tool_text(rpc), 'Event not found'
+    rpc = mcp_tool_call('get_event_tool', arguments: { id: @event.id.to_s })
+    assert_includes tool_text(rpc), 'Event not found'
+
+    assert JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))['purchasable']
+    assert_equal @event.name, JSON.parse(tool_text(mcp_tool_call('get_event_tool', arguments: { slug: @event.slug })))['name']
+
+    _rpc, order = create_checkout(slug: link, quantities: { @event.ticket_types.first.id.to_s => 1 })
+    assert_equal 'complete', order['status']
+    assert_equal @event.slug, order['event']['slug']
   end
 
   def buyer_headers

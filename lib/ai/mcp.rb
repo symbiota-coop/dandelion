@@ -51,6 +51,8 @@ module Dandelion
                elsif finder_value.present?
                  scope.find_by(config[:finder_field] => finder_value)
                end
+      # Searches leave out secret events, but the buyer can give their slug or link, as for booking
+      record ||= Event.live.secret.find_by(slug: event_slug_from(finder_value)) if model_class == Event && id.blank? && finder_value.present?
 
       return ::MCP::Tool::Response.new([{ type: 'text', text: "#{model_class.name} not found" }], error: true) unless record
 
@@ -65,12 +67,29 @@ module Dandelion
       nil
     end
 
+    # The event a booking tool is for, by slug or id. A secret event is found only by its slug, or a link with it in, as
+    # the event page is: the link is what keeps it secret, so it's never found by id, and searches leave it out
+    def self.bookable_event(slug: nil, id: nil)
+      return Event.live.publicly_visible.find(id.to_s) if id.present?
+
+      slug = event_slug_from(slug)
+      return if slug.empty?
+
+      Event.live.find_by(slug: slug) || Event.live.publicly_visible.find_by_slug_or_id(slug: slug)
+    end
+
+    # The slug itself, or the one in a link to the event (https://dandelion.events/e/slug?ticket_type_id=...)
+    def self.event_slug_from(value)
+      value = value.to_s.strip
+      value[%r{/e/([^/?#]+)}, 1] || value
+    end
+
     # secret_ticket_type_id lists the hidden ticket type its secret link unlocks, and discount_code says what the code
     # takes off, as the checkout form shows once a code is applied
     def self.perform_get_event_checkout_requirements(slug: nil, id: nil, secret_ticket_type_id: nil, discount_code: nil)
       return tool_error('Provide event slug or id') if slug.blank? && id.blank?
 
-      event = Event.live.publicly_visible.find_by_slug_or_id(slug: slug, id: id)
+      event = bookable_event(slug: slug, id: id)
       return tool_error('Event not found') unless event
 
       secret_ticket_type_id = secret_ticket_type_id_from(secret_ticket_type_id)
@@ -306,7 +325,7 @@ module Dandelion
           title 'Get Event Checkout Requirements'
           description 'Get what booking a Dandelion event involves, by slug or ID: whether it can be booked, its ticket types with prices, availability and waitlists, the buyer details and questions the checkout form asks for, opt-ins, any donation it offers, whether it takes discount codes, terms and the payment methods on offer. Pass a secret_ticket_type_id to list the hidden ticket type its link unlocks, and a discount_code to see what it takes off. Call this before create_checkout_tool or join_waitlist_tool.'
           input_schema(properties: {
-                         slug: { type: 'string', description: 'Event slug' },
+                         slug: { type: 'string', description: 'Event slug, or a link to the event. A secret event is only found by its slug or link, as the buyer has it' },
                          id: { type: 'string', description: 'Event ID' },
                          secret_ticket_type_id: { type: 'string', description: "A hidden ticket type's secret link, or the ticket_type_id in its query string" },
                          discount_code: { type: 'string', description: 'A discount code the buyer has' }
@@ -322,7 +341,7 @@ module Dandelion
           title 'Create Checkout'
           description "Book tickets to a Dandelion event: for the authenticated account with a Bearer API key, or without one for the buyer given. Free bookings are confirmed straight away; paid ones return a checkout_url where the buyer pays, which they must open themselves before pay_by, when unpaid orders are released. Call get_event_checkout_requirements_tool first, and confirm the tickets, prices, any donation and discount, the total and any terms with the buyer before calling this. Where the donation goes to Dandelion (added_by_default), the booking includes its suggested donation unless you pass donation_amount, as the checkout form does: include it in the total you tell the buyer, say it's optional, and pass 0 if they don't want it. Range and pay-what-you-want tickets need the price the buyer chose, in prices: never choose one for them. When the buyer has to finish on the event page, the error links to it with their choices filled in."
           input_schema(properties: {
-                         slug: { type: 'string', description: 'Event slug' },
+                         slug: { type: 'string', description: 'Event slug, or a link to the event. A secret event is only found by its slug or link, as the buyer has it' },
                          id: { type: 'string', description: 'Event ID' },
                          quantities: { type: 'object', description: 'Ticket type id => number of tickets', additionalProperties: { type: 'integer' } },
                          prices: { type: 'object', description: 'Ticket type id => the price per ticket the buyer chose, for range (within price_min and price_max) and pay_what_you_want ticket types', additionalProperties: { type: 'number' } },
@@ -366,7 +385,7 @@ module Dandelion
           title 'Join Waitlist'
           description "Join the waitlist for a sold-out ticket type of a Dandelion event (one get_event_checkout_requirements_tool lists with waitlist true), or for the event itself when event_waitlist is true: for the authenticated account with a Bearer API key, or without one for the buyer given. They're emailed when tickets become available. Check with the buyer before calling this."
           input_schema(properties: {
-                         slug: { type: 'string', description: 'Event slug' },
+                         slug: { type: 'string', description: 'Event slug, or a link to the event. A secret event is only found by its slug or link, as the buyer has it' },
                          id: { type: 'string', description: 'Event ID' },
                          ticket_type_id: { type: 'string', description: "The sold-out ticket type's id. Leave it out to join the event's waitlist" },
                          buyer: {
