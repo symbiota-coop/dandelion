@@ -131,6 +131,17 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert_nil ticket.reload.made_available_at
   end
 
+  test 'turning resales off takes tickets off resale' do
+    create_event(prices: [0], enable_resales: true)
+    ticket_type = @event.ticket_types.first
+    ticket = ticket_type.tickets.create!(event: @event, payment_completed: true, price: 0, made_available_at: Time.now)
+    assert_equal 0, Event.find(@event.id).ticket_counts[ticket_type.id]
+
+    @event.update!(enable_resales: false)
+    assert_nil ticket.reload.made_available_at
+    assert_equal 1, Event.find(@event.id).ticket_counts[ticket_type.id]
+  end
+
   test 'stripe tickets do not require a manual refund' do
     create_event(prices: [30], enable_resales: true)
     ticket_type = @event.ticket_types.first

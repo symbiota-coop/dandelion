@@ -15,6 +15,15 @@ module EventCallbacks
     after_save do
       set_browsable
 
+      # Only events that allow resales remove a ticket on resale when its place sells (Ticket#payment_completed!), so once
+      # they're turned off, tickets left on resale go back in the counts: otherwise their places could sell and the
+      # holders take them back off resale, overbooking the event. While resales were on, a sale past capacity removed
+      # one, so they fit
+      if previous_changes['enable_resales']&.first && !enable_resales
+        tickets.and(:made_available_at.ne => nil).update_all(made_available_at: nil)
+        refresh_sold_out_cache_and_notify_waitlist
+      end
+
       refresh_sold_out_cache_and_notify_waitlist if previous_changes.keys.intersect?(%w[capacity no_sales_after_end_time end_time])
 
       if previous_changes['activity_id'] && activity && activity.privacy == 'open' && previous_changes['activity_id'][0]
