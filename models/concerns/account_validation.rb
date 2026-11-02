@@ -38,6 +38,10 @@ module AccountValidation
         self.confirm_email_prompt_owed = false
       end
 
+      # Signal confirmations go only to numbers with their country code (SignalMessaging#normalize_phone). Checked only
+      # when it changes, so accounts with older numbers still save
+      errors.add(:phone, 'must start with the + country code (+44 for UK)') if phone_changed? && phone && !phone.strip.start_with?('+', '00')
+
       %w[email phone location].each do |p|
         send("#{p}_privacy=", 'People I follow') unless send("#{p}_privacy")
       end

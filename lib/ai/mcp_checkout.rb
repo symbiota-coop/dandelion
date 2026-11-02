@@ -196,7 +196,7 @@ module Dandelion
         # Agents don't choose an amount to give on the buyer's behalf
         "#{error.message} Ask the buyer how much they want to give, and pass it as donation_amount."
       when OrderBuilder::DonationTooSmall
-        "#{error.message} Ask the buyer whether to give at least that, or leave out donation_amount."
+        "#{error.message} Ask the buyer whether to give at least that, or pass a donation_amount of 0 to give nothing."
       when OrderBuilder::NotAllowed
         "#{error.message} If the buyer can book it, they can book with their own API key, or signed in at #{page_url}"
       else

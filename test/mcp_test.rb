@@ -732,7 +732,7 @@ class McpTest < ActiveSupport::TestCase
 
     rpc, = create_checkout(quantities: quantities, donation_amount: 0.1)
     assert_includes tool_text(rpc), 'A donation to Dandelion must be at least £1, or nothing.'
-    assert_includes tool_text(rpc), 'leave out donation_amount'
+    assert_includes tool_text(rpc), 'pass a donation_amount of 0 to give nothing'
     assert_equal 0, @event.orders.count
 
     order = nil
@@ -891,6 +891,16 @@ class McpTest < ActiveSupport::TestCase
     @buyer.reload
     assert_equal '+447700900000', @buyer.phone
     assert_equal name, @buyer.name
+  end
+
+  test 'create_checkout_tool refuses a phone number without its country code' do
+    create_event(prices: [0])
+    @organisation.update_attributes!(collect_phone: true)
+
+    rpc, = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 }, buyer: { name: 'Ignored', phone: '07700900000' })
+    assert rpc.dig('result', 'isError')
+    assert_includes tool_text(rpc), 'Phone number must start with the + country code'
+    assert_equal 0, @event.orders.count
   end
 
   test 'create_checkout_tool records the cohost and affiliate the buyer came through' do
