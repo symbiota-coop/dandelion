@@ -237,8 +237,15 @@ class Notification
       ['View event', "#{ENV['BASE_URI']}/e/#{notifiable.slug}"]
     when :created_organisation
       ['View organisation', "#{ENV['BASE_URI']}/o/#{notifiable.slug}"]
-    when :created_order, :left_feedback
+    when :created_order
       ['View event', "#{ENV['BASE_URI']}/e/#{notifiable.event.slug}"]
+    when :left_feedback
+      # Feedback can outlive its event
+      if (event = notifiable.event)
+        ['View event', "#{ENV['BASE_URI']}/e/#{event.slug}"]
+      else
+        ['View profile', "#{ENV['BASE_URI']}/u/#{notifiable.account.username}"]
+      end
     end
   end
 

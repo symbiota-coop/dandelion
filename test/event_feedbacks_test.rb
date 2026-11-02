@@ -82,6 +82,16 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     assert_equal 0, event_feedback.notifications.count
   end
 
+  test "a feedback notification links to the reviewer once its event is gone" do
+    create_attended_event
+    event_feedback = create_feedback(account: @attendee, rating: 5)
+    notification = event_feedback.notifications.first
+    assert_equal ['View event', "#{ENV['BASE_URI']}/e/#{@event.slug}"], notification.link
+
+    event_feedback.set(event_id: nil)
+    assert_equal ['View profile', "#{ENV['BASE_URI']}/u/#{@attendee.username}"], Notification.find(notification.id).link
+  end
+
   test 'admin event feedback page hides deleted feedback' do
     create_attended_event
     reviewer = FactoryBot.create(:account, name: 'Removed Reviewer')
