@@ -1,6 +1,6 @@
 Dandelion can connect to other apps via [Zapier](https://zapier.com/apps/dandelion/) and to AI assistants via the [Model Context Protocol](https://modelcontextprotocol.io/docs/2026-07-28/getting-started/intro) (MCP). Both use the same API key, from the [API keys tab](/accounts/api_key) of your account settings, which shows it once you've entered a sign in code we email you.
 
-All access is read-only. Email addresses are included only when you are allowed to view them.
+Admin data is read-only. Email addresses are included only when you are allowed to view them.
 
 ## Zapier
 
@@ -24,12 +24,12 @@ AI assistants can use Dandelion's MCP server to search and look up public record
 Public tools, which work without authentication:
 
 - Search events (recent and upcoming), organisations, gatherings and accounts
-- Look up events, organisations, gatherings and accounts, by slug/username or ID. An event comes with its currency and public ticket types: price (fixed, a range, or pay what you want), tickets available, whether it's sold out and when sales end
-- Get what booking an event involves (`get_event_checkout_requirements_tool`, by event `slug` or `id`): whether it can be booked and why not (sales closed, monthly donors only, members only, no tickets on sale), its ticket types (with whether each has a waitlist to join once it's sold out), whether the event's own waitlist is open (`event_waitlist`), the buyer details and questions the checkout form asks for, opt-ins, any donation it offers (to the organisation or to Dandelion, the suggested amount, any minimum and whether a donation is `required`: one to Dandelion is optional, but at least the currency's smallest unit, like £1), whether it takes discount codes, terms and the payment methods on offer, with whether each one works for agent bookings (`agent_checkout`) and whether it's only for when nothing is left to pay (`free_only`, like RSVP). Pass `secret_ticket_type_id` (a hidden ticket type's secret link, or the `ticket_type_id` in it) to list the ticket type it unlocks, and `discount_code` to see whether a code is valid, what it takes off and which ticket types it applies to
+- Look up events, organisations, gatherings and accounts, by slug/username or ID. Events include their currency and public ticket types
+- Get what booking an event involves: [checkout requirements](#checkout-requirements)
 - Get trending events
 - Get upcoming events for an organisation
-- Book tickets to an event (`create_checkout_tool`): with your API key, as you, updating your phone, postcode and country from `buyer` as the checkout form updates the signed-in account's; without one, for the `buyer` given (their name and email, and the other `buyer_fields`), as the checkout form books for someone signed out, creating an account for a new email. Pass ticket quantities by ticket type id, the price per ticket the buyer chose for range and pay-what-you-want tickets (`prices`, by ticket type id: agents don't choose one for them), answers to the event's questions by index, the `opt_ins` the buyer chose, `hear_about` in `buyer` when the event asks it (with your API key too), and `accept_terms` when the terms must be accepted. You can also pass a `discount_code`, the `payment_method` the buyer chose (one with `agent_checkout`; the first that pays by link otherwise), a `secret_ticket_type_id` to book a hidden ticket type, a `donation_amount` the buyer chose (at least the donation's `minimum`, when it has one), `confirm_duplicate` when the buyer confirms booking again though they already have a ticket, `confirm_email` when the buyer confirms an email address that looks mistyped (one or two keystrokes from a common provider's, like `gmial.com`, which the checkout form also asks about), and `attribution` (`cohost`, `affiliate_type`, `affiliate_id` and `utm_source`, `utm_medium` and `utm_campaign`, from the link the buyer followed). Free bookings are confirmed straight away. Paid ones return a `checkout_url` where you pay with the event's card, bank or PayPal provider; unpaid orders are released after an hour (`pay_by`). The order says what discounts, credit and donation it includes. When the buyer has to finish on the event page (no payment method agents can use, or an event only some can book), the error links to it with their choices filled in. Pass an `idempotency_key` so that a retry returns the first order rather than booking twice (`processing` while it's still being set up, or `expired` if it went unpaid, when booking again needs a new key); if the first try failed, a retry books again. Without your API key, a retry returns only the order's id and status, not its details or `checkout_url`. Orders are marked as coming via `mcp`
-- Join the waitlist for a sold-out ticket type, or for a sold-out event (`join_waitlist_tool`, with the ticket type's `ticket_type_id`, or without it for the event's own): with your API key, as you; without one, for the `buyer` given (name and email). They're emailed when tickets become available
+- Book tickets to an event: [booking](#booking)
+- Join the waitlist for a sold-out ticket type or event: [waitlists](#waitlists)
 
 Authenticated tools, which require your API key as a Bearer token:
 
@@ -186,3 +186,47 @@ Returns all completed tickets for an event you admin, most recent first.
 ```
 
 Email fields may be empty depending on event privacy settings.
+
+## Checkout requirements
+
+`get_event_checkout_requirements_tool`, with event `slug` or `id`, says what booking an event involves:
+
+- Whether it can be booked, and why not (sales closed, monthly donors only, members only, no tickets on sale)
+- Its public ticket types: price (fixed, a range, or pay what you want), tickets available, whether each is sold out and when sales end, and whether it has a waitlist to join once it's sold out
+- Whether the event's own waitlist is open (`event_waitlist`)
+- The buyer details and questions the checkout form asks for, and its opt-ins
+- Any donation it offers: to the organisation or to Dandelion, the suggested amount, any `minimum`, and whether a donation is `required`. One to Dandelion is optional, but at least the currency's smallest unit, like £1
+- Whether it takes discount codes, and any terms to accept
+- The payment methods on offer, with whether each works for agent bookings (`agent_checkout`) and whether it's only for when nothing is left to pay (`free_only`, like RSVP)
+
+Pass `secret_ticket_type_id` (a hidden ticket type's secret link, or the `ticket_type_id` in it) to list the ticket type it unlocks, and `discount_code` to see whether a code is valid, what it takes off and which ticket types it applies to.
+
+## Booking
+
+`create_checkout_tool` books tickets to an event. With your API key, it books as you, updating your phone, postcode and country from `buyer` as the checkout form updates the signed-in account's. Without one, it books for the `buyer` given (their name and email, and the other `buyer_fields`), as the checkout form books for someone signed out, creating an account for a new email.
+
+It takes:
+
+- Ticket quantities by ticket type id
+- `prices`: the price per ticket the buyer chose for range and pay-what-you-want tickets, by ticket type id. Agents don't choose one for them
+- Answers to the event's questions, by index
+- `opt_ins`: the opt-ins the buyer chose
+- `hear_about` in `buyer`, when the event asks it (with your API key too)
+- `accept_terms`, when the terms must be accepted
+
+And optionally:
+
+- `discount_code`
+- `payment_method`: the one the buyer chose, which must have `agent_checkout`; otherwise the first that pays by link
+- `secret_ticket_type_id`, to book a hidden ticket type
+- `donation_amount`: the donation the buyer chose, at least the donation's `minimum` when it has one
+- `confirm_duplicate`, when the buyer confirms booking again though they already have a ticket
+- `confirm_email`, when the buyer confirms an email address that looks mistyped (one or two keystrokes from a common provider's, like `gmial.com`, which the checkout form also asks about)
+- `attribution`: `cohost`, `affiliate_type`, `affiliate_id`, `utm_source`, `utm_medium` and `utm_campaign`, from the link the buyer followed
+- `idempotency_key`, so that a retry returns the first order rather than booking twice (`processing` while it's still being set up, or `expired` if it went unpaid, when booking again needs a new key). If the first try failed, a retry books again. Without your API key, a retry returns only the order's id and status, not its details or `checkout_url`
+
+Free bookings are confirmed straight away. Paid ones return a `checkout_url` where you pay with the event's card, bank or PayPal provider; unpaid orders are released after an hour (`pay_by`). The order says what discounts, credit and donation it includes. When the buyer has to finish on the event page (no payment method agents can use, or an event only some can book), the error links to it with their choices filled in. Orders are marked as coming via `mcp`.
+
+## Waitlists
+
+`join_waitlist_tool` joins the waitlist for a sold-out ticket type (with its `ticket_type_id`), or for a sold-out event (without one). With your API key, it joins as you; without one, for the `buyer` given (name and email). They're emailed when tickets become available.
