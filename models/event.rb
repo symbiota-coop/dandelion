@@ -451,6 +451,23 @@ class Event
     tickets.complete.includes(:account, :ticket_type, :order).order('created_at desc')
   end
 
+  # Once resales are off, tickets on resale go back in the ticket counts, as their places mustn't sell. Only those that
+  # fit, though: a place can already be held by a ticket that isn't paid for yet, and putting its ticket on resale back
+  # as well would overbook the event. Those stay on resale until the hold is paid for, which refunds and removes them
+  # (Ticket#payment_completed!), or let go, which puts them back (Ticket's after_destroy). The most recently put on
+  # resale go back first, as a sale removes the oldest
+  def put_back_tickets_on_resale_that_fit
+    tickets.and(:made_available_at.ne => nil).order('made_available_at desc').each do |ticket|
+      # Each fresh from the database, as the last one put back counts
+      remaining = if ticket.ticket_type_id && (ticket_type = TicketType.find(ticket.ticket_type_id))
+                    ticket_type.wiser_remaining
+                  else
+                    Event.find(id).places_remaining
+                  end
+      ticket.set(made_available_at: nil) if remaining.nil? || remaining >= 1
+    end
+  end
+
   def refresh_sold_out_cache_and_notify_waitlist
     reset_ticket_counts
     # Nested ticket types save on assignment, before this event is validated,

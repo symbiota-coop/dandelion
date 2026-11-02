@@ -142,6 +142,57 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert_equal 1, Event.find(@event.id).ticket_counts[ticket_type.id]
   end
 
+  test "turning resales off leaves on resale a ticket whose place is held, until it's paid for" do
+    create_event(prices: [0], enable_resales: true)
+    ticket_type = @event.ticket_types.first
+    ticket_type.set(quantity: 1)
+    original = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: Time.now)
+    # Holds the place, unpaid
+    replacement = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
+
+    @event.update!(enable_resales: false)
+    assert original.reload.made_available_at
+    assert_equal 1, Event.find(@event.id).ticket_counts[ticket_type.id]
+
+    replacement.stub :send_resale_notification_to_previous_ticketholder, nil do
+      replacement.stub :send_resale_notification_to_organiser, nil do
+        replacement.payment_completed!
+      end
+    end
+    assert original.reload.deleted?
+    assert_equal 1, Event.find(@event.id).ticket_counts[ticket_type.id]
+  end
+
+  test "turning resales off puts back a ticket whose hold is let go" do
+    create_event(prices: [0], enable_resales: true)
+    @event.set(capacity: 1)
+    ticket_type = @event.ticket_types.first
+    original = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: Time.now)
+    replacement = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
+
+    @event.update!(enable_resales: false)
+    assert original.reload.made_available_at
+
+    replacement.destroy
+    assert_nil original.reload.made_available_at
+    assert_equal 1, Event.find(@event.id).ticket_counts[ticket_type.id]
+  end
+
+  test 'a sale past the event capacity replaces a ticket on resale' do
+    create_event(prices: [0], enable_resales: true)
+    @event.set(capacity: 1)
+    ticket_type = @event.ticket_types.first
+    original = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: Time.now)
+    replacement = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
+
+    replacement.stub :send_resale_notification_to_previous_ticketholder, nil do
+      replacement.stub :send_resale_notification_to_organiser, nil do
+        replacement.payment_completed!
+      end
+    end
+    assert original.reload.deleted?
+  end
+
   test 'stripe tickets do not require a manual refund' do
     create_event(prices: [30], enable_resales: true)
     ticket_type = @event.ticket_types.first

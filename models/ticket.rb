@@ -78,8 +78,26 @@ class Ticket
     end
   end
 
+  # The oldest ticket on resale whose place this one took: of its type when the type's quantity is past, of its ticket
+  # group when the group's capacity is, or of the event when the event's is. Counting tickets on resale, as they still
+  # hold their places until they're removed
+  def ticket_on_resale_replaced
+    return unless ticket_type
+
+    on_resale = event.tickets.and(:made_available_at.ne => nil).order('made_available_at asc')
+    if ticket_type.remaining_including_made_available < 0
+      on_resale.and(ticket_type_id: ticket_type_id).first
+    elsif (group = ticket_type.ticket_group) && group.capacity - group.tickets.slots_taken < 0
+      on_resale.and(:ticket_type_id.in => group.ticket_types.pluck(:id)).first
+    elsif event.capacity && event.capacity - event.tickets.slots_taken < 0
+      on_resale.first
+    end
+  end
+
   def payment_completed!
-    if event.enable_resales? && ticket_type.remaining_including_made_available < 0 && (resold_ticket = ticket_type.tickets.and(:made_available_at.ne => nil).order('made_available_at asc').first)
+    # Not only while the event allows resales: tickets left on resale when they were turned off are those whose places
+    # were already held (Event#put_back_tickets_on_resale_that_fit)
+    if (resold_ticket = ticket_on_resale_replaced)
       resold_account = resold_ticket.account
       requires_manual_refund = resold_ticket.requires_manual_refund?
       gocardless_instalment = resold_ticket.gocardless_billing_request_id.present?
@@ -110,7 +128,11 @@ class Ticket
     event.refresh_sold_out_cache_and_notify_waitlist if event && !event.flagged_for_destroy? && !skip_event_refresh
   end
   after_destroy do
-    event.refresh_sold_out_cache_and_notify_waitlist if event && !event.flagged_for_destroy?
+    if event && !event.flagged_for_destroy?
+      # A place this held may be one a ticket on resale was left waiting for
+      event.put_back_tickets_on_resale_that_fit unless event.enable_resales?
+      event.refresh_sold_out_cache_and_notify_waitlist
+    end
   end
   after_restore do
     event.refresh_sold_out_cache_and_notify_waitlist if event && !event.flagged_for_destroy?
