@@ -178,6 +178,27 @@ class LintTest < Minitest::Test
     end
   end
 
+  def test_post_links
+    [
+      %(<a href="/comments/<%= comment.id %>/destroy">Delete</a>),
+      %(<a class="btn" href="/e/<%= @event.slug %>/destroy?no_refunds=1">Delete</a>),
+      %(<a href="/event_feedbacks/1/hard_destroy" data-method="get">x</a>),
+      %(<%= dropdown_nav [\n  ['Remove order', "/orders/\#{order.id}/destroy"]\n] %>),
+      %(<%= dropdown_nav [(['Refund', "/orders/\#{id}/refund_and_destroy"] if x)] %>)
+    ].each do |template|
+      offenses = erb_offenses(template).select { |linter, _| linter == 'PostLinks' }
+      assert_equal 1, offenses.size, "PostLinks on #{template}: #{offenses.inspect}"
+    end
+
+    [
+      %(<a data-method="post" href="/comments/<%= comment.id %>/destroy">Delete</a>),
+      %(<a href="/e/x/delete">Delete event</a><a href="/destroyers">x</a><a href="/x?then=destroy">x</a>),
+      %(<a href="javascript:;" onclick="$.post('/drafts/1/destroy')">x</a>),
+      %(<%= dropdown_nav [['Remove order', "/orders/\#{order.id}/destroy", { 'data-method' => 'post' }]] %>),
+      %(<%= f.submit_block destroy_url: "/teams/\#{team.id}/destroy" %>)
+    ].each { |template| assert_empty erb_offenses(template).select { |linter, _| linter == 'PostLinks' }, template }
+  end
+
   def test_cdn_tags
     {
       '<script src="https://cdn.jsdelivr.net/npm/x@1.0.0/x.min.js"></script>' => /cdn_tag/,

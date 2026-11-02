@@ -165,7 +165,7 @@
     </td>
     <% if organisation_admin?(event_feedback.event.try(:organisation)) %>
       <td class="desktop">
-        <a class="btn btn-danger" href="/event_feedbacks/<%= event_feedback.id %>/destroy" data-confirm="Are you sure you want to delete this feedback? It will disappear from admin pages, but remain visible as Removed on public pages."><i class="bi bi-x-lg"></i></a>
+        <a data-method="post" class="btn btn-danger" href="/event_feedbacks/<%= event_feedback.id %>/destroy" data-confirm="Are you sure you want to delete this feedback? It will disappear from admin pages, but remain visible as Removed on public pages."><i class="bi bi-x-lg"></i></a>
       </td>
     <% else %>
       <td class="desktop">

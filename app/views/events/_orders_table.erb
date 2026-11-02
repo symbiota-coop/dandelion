@@ -259,8 +259,8 @@
         ['Link to order confirmation', "/orders/#{order.public_id}"],
         ['Resend order confirmation', "/orders/#{order.id}/send_tickets", { 'data-method' => 'post' }],
         ['Transfer to another event', "/orders/#{order.id}/transfer"],
-        (['Remove and refund order', "/e/#{order.event.slug}/orders/#{order.id}/refund_and_destroy"] if order.refundable?),
-        ['Remove order', "/e/#{order.event.slug}/orders/#{order.id}/destroy"],
+        (['Remove and refund order', "/e/#{order.event.slug}/orders/#{order.id}/refund_and_destroy", { 'data-method' => 'post' }] if order.refundable?),
+        ['Remove order', "/e/#{order.event.slug}/orders/#{order.id}/destroy", { 'data-method' => 'post' }],
       ].compact, button_text: %(Actions), container_class: 'btn-group mb-1' %>
       <% end %>
     </td>

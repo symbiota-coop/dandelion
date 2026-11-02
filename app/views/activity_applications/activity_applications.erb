@@ -132,7 +132,7 @@
       <%= partial :'events/ticket_summary', locals: { tickets: activity_application.account.tickets.and(:event_id.in => @activity.events.pluck(:id)) } %>
     </td>
     <td>
-      <a class="btn btn-danger" href="<%= @activity.path %>/activity_applications/<%= activity_application.id %>/destroy"><i class="bi bi-x-lg"></i></a>
+      <a data-method="post" class="btn btn-danger" href="<%= @activity.path %>/activity_applications/<%= activity_application.id %>/destroy"><i class="bi bi-x-lg"></i></a>
     </td>
   </tr>
   <% } %>

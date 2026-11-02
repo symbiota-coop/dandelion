@@ -9,7 +9,7 @@
       <%= shift.description %>
     </a><% if @gathering.enable_shift_worth %><%= partial :'rotas/shift_worth', locals: {shift: shift, klass: 'rounded-start-0'} %>
     <% end %>
-    <a data-confirm="<% if shift.account_id == current_account.id %>Resign from this shift?<% else %>Remove this person from this shift?<% end %>" class="pagelet-trigger badge text-bg-danger mb-1" href="/shifts/<%= shift.id %>/destroy">
+    <a data-method="post" data-confirm="<% if shift.account_id == current_account.id %>Resign from this shift?<% else %>Remove this person from this shift?<% end %>" class="pagelet-trigger badge text-bg-danger mb-1" href="/shifts/<%= shift.id %>/destroy">
       <i class="bi bi-x-lg"></i>
     </a>
   <% else %>

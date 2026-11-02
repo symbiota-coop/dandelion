@@ -179,13 +179,8 @@ $(function () {
     setPageletLoading(pagelet)
 
     const href = $link.attr('href')
-    let path
-    try {
-      path = new URL(href, window.location.origin).pathname
-    } catch {
-      path = href
-    }
-    const request = ($link.data('method') === 'post' || /destroy$/.test(path)) ? $.post : $.get
+    // Only links our templates mark data-method="post" (destroy links among them), which user content can't carry
+    const request = $link.attr('data-method') === 'post' ? $.post : $.get
     request(href, function () {
       reloadPagelet(pagelet, function () { postLoad(pagelet) })
     }).fail(function () {

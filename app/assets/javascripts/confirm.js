@@ -1,4 +1,5 @@
-// Ask before going ahead with a click on a [data-confirm] element or a destroy link (whose path ends in destroy).
+// Ask before going ahead with a click on a [data-confirm] element or a destroy link (data-method="post", and a path ending
+// in destroy: destroyLinkFor).
 // Unless the main pointer is a finger, in a popover beside the element: the question (data-confirm, or Are you sure?), Cancel,
 // and a button named after the element (data-confirm-label, or its own text or title when short, or Confirm), red for
 // destroy links and danger buttons, otherwise primary. Confirming clicks the element again, and that click goes through.

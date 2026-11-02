@@ -66,7 +66,7 @@
     </td>
     <td>
       <% if (optionship = @gathering.optionships.find_by(option: option, account: current_account)) %>
-        <a class="pagelet-trigger btn btn-outline-primary" href="/optionships/<%= optionship.id %>/destroy">Leave</a>
+        <a data-method="post" class="pagelet-trigger btn btn-outline-primary" href="/optionships/<%= optionship.id %>/destroy">Leave</a>
       <% elsif !option.full? %>
         <% if option.by_invitation %>
           <span class="badge text-bg-secondary">By invitation</span>

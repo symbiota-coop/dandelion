@@ -27,9 +27,12 @@ function countUp (el, target, decimals = 0) {
   })
 }
 
-// The link a click was on, if its path ends in destroy. confirm.js asks before following these, and app.js sends them as a POST
+// The link a click was on, if it's a destroy link: one our templates mark data-method="post" whose path ends in destroy.
+// confirm.js asks before following these, and app.js sends them as a POST. Not a link whose path merely ends in destroy:
+// user content keeps relative links but not data-* attributes, so a link written into a feedback answer or a description
+// stays a plain GET link
 function destroyLinkFor (target) {
-  const anchor = target.closest('a[href]')
+  const anchor = target.closest('a[href][data-method="post"]')
   return anchor && /destroy$/.test(new URL(anchor.href, window.location.origin).pathname) ? anchor : null
 }
 

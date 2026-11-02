@@ -139,10 +139,10 @@
         (['Resend order confirmation', "/orders/#{ticket.order_id}/send_tickets", { 'data-method' => 'post' }] if ticket.order),
         ['Resend single ticket', "/tickets/#{ticket.id}/send_ticket", { 'data-method' => 'post' }],
         ['Change name or email', "/tickets/#{ticket.id}/edit"],
-        (['Remove and refund ticket', "/e/#{@event.slug}/tickets/#{ticket.id}/refund_and_destroy"] if ticket.refundable?),
-        ['Remove ticket', "/e/#{@event.slug}/tickets/#{ticket.id}/destroy"],
-        (['Remove and refund order', "/e/#{@event.slug}/orders/#{ticket.order_id}/refund_and_destroy"] if ticket.order && ticket.order.refundable?),
-        (['Remove order', "/e/#{@event.slug}/orders/#{ticket.order_id}/destroy"] if ticket.order),
+        (['Remove and refund ticket', "/e/#{@event.slug}/tickets/#{ticket.id}/refund_and_destroy", { 'data-method' => 'post' }] if ticket.refundable?),
+        ['Remove ticket', "/e/#{@event.slug}/tickets/#{ticket.id}/destroy", { 'data-method' => 'post' }],
+        (['Remove and refund order', "/e/#{@event.slug}/orders/#{ticket.order_id}/refund_and_destroy", { 'data-method' => 'post' }] if ticket.order && ticket.order.refundable?),
+        (['Remove order', "/e/#{@event.slug}/orders/#{ticket.order_id}/destroy", { 'data-method' => 'post' }] if ticket.order),
       ].compact, button_text: %(Actions), container_class: 'btn-group mb-1' %>
       <% end %>
     </td>

@@ -48,7 +48,7 @@
     <td>
       <strong>
         <% if @membership.admin? %>
-          <a class="pagelet-trigger" data-confirm="Delete this space?" href="/spaces/<%= space.id %>/destroy">
+          <a data-method="post" class="pagelet-trigger" data-confirm="Delete this space?" href="/spaces/<%= space.id %>/destroy">
             <%= space.name %>
           </a>
         <% else %>
@@ -70,7 +70,7 @@
     <td style="width: 1px">
       <strong>
         <% if @membership.admin? %>
-          <a class="pagelet-trigger" data-confirm="Delete this slot?" href="/tslots/<%= tslot.id %>/destroy">
+          <a data-method="post" class="pagelet-trigger" data-confirm="Delete this slot?" href="/tslots/<%= tslot.id %>/destroy">
             <%= tslot.name %>
           </a>
         <% else %>

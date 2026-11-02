@@ -58,11 +58,12 @@ $(function () {
   syncFixedHeaderHeight()
   $(window).on('resize', syncFixedHeaderHeight)
 
-  // Send data-method="post" and destroy links as a POST, once confirm.js has confirmed them.
+  // Send data-method="post" links (destroy links among them) as a POST, once confirm.js has confirmed them. Only those:
+  // the sanitizer strips data-* attributes from user content, so a link there can't make the viewer POST.
   // This listens in the capture phase, so it runs before any other click handler
   document.addEventListener('click', function (e) {
     if (!e.target.closest) return
-    const link = destroyLinkFor(e.target) || e.target.closest('a[data-method="post"]')
+    const link = e.target.closest('a[data-method="post"]')
     if (!link) return
     // pagelets.js sends pagelet-trigger links inside a pagelet itself
     if (link.classList.contains('pagelet-trigger') && link.closest('[data-pagelet-url]')) return

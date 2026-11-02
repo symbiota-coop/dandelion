@@ -26,7 +26,7 @@
             <div class="d-inline-block" data-pagelet-url="/teamships/<%= teamship.id %>/subscribe">
               <%= partial :'teams/subscribe', locals: { teamship: teamship } %>
             </div>
-            <a class="btn btn-primary mb-1" href="/teamships/<%= teamship.id %>/destroy?team_id=<%= @team.id %>">Leave team</a>
+            <a data-method="post" class="btn btn-primary mb-1" href="/teamships/<%= teamship.id %>/destroy?team_id=<%= @team.id %>">Leave team</a>
           <% else %>
             <a class="btn btn-primary mb-1" data-method="post" href="/teamships/create?team_id=<%= @team.id %>">Join</a>
           <% end %>
