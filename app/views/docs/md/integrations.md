@@ -195,7 +195,7 @@ Email fields may be empty depending on event privacy settings.
 - Its public ticket types: price (fixed, a range, or pay what you want), tickets available, whether each is sold out and when sales end, and whether it has a waitlist to join once it's sold out
 - Whether the event's own waitlist is open (`event_waitlist`)
 - The buyer details and questions the checkout form asks for, and its opt-ins
-- Any donation it offers: to the organisation or to Dandelion, the suggested amount, any `minimum`, and whether a donation is `required`. One to Dandelion is optional, but at least the currency's smallest unit, like £1
+- Any donation it offers: to the organisation or to Dandelion, the suggested amount, any `minimum`, and whether a donation is `required`. One to Dandelion is optional, but at least the currency's smallest unit, like £1, and is `added_by_default`: the `suggested_percent` of the tickets (5%, or `higher_price`'s 2.5% above £249), as the checkout form starts with
 - Whether it takes discount codes, and any terms to accept
 - The payment methods on offer, with whether each works for agent bookings (`agent_checkout`) and whether it's only for when nothing is left to pay (`free_only`, like RSVP)
 
@@ -219,7 +219,7 @@ And optionally:
 - `discount_code`
 - `payment_method`: the one the buyer chose, which must have `agent_checkout`; otherwise the first that pays by link
 - `secret_ticket_type_id`, to book a hidden ticket type
-- `donation_amount`: the donation the buyer chose, at least the donation's `minimum` when it has one
+- `donation_amount`: the donation the buyer chose, at least the donation's `minimum` when it has one. Left out where the donation goes to Dandelion, the booking adds the suggested one, as the checkout form does: tell the buyer it's included and optional, and pass `0` if they don't want it
 - `confirm_duplicate`, when the buyer confirms booking again though they already have a ticket
 - `confirm_email`, when the buyer confirms an email address that looks mistyped (one or two keystrokes from a common provider's, like `gmial.com`, which the checkout form also asks about)
 - `attribution`: `cohost`, `affiliate_type`, `affiliate_id`, `utm_source`, `utm_medium` and `utm_campaign`, from the link the buyer followed

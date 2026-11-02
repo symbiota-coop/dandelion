@@ -153,6 +153,29 @@ class Event
     !donations_to_organisation? && organisation.donations_to_dandelion? && EventPaymentMethod.platform_donations_available?(self) && (suggested_donation || ticket_types.any? { |ticket_type| (ticket_type.price && ticket_type.price > 0) || ticket_type.range }) ? true : false
   end
 
+  # The donation to Dandelion the checkout form starts with: a percentage of the tickets, after percentage discounts, a
+  # smaller one when they come to more than DANDELION_DONATION_HIGHER_PRICE_UNITS of the currency's smallest unit (£249),
+  # and at least that unit
+  DANDELION_DONATION_PERCENT = 5
+  DANDELION_DONATION_HIGHER_PRICE_PERCENT = 2.5
+  DANDELION_DONATION_HIGHER_PRICE_UNITS = 249
+
+  # Above this, the tickets get the smaller percentage
+  def dandelion_donation_higher_price_over
+    smallest = FiatCurrency.minimum_unit_amount(currency)
+    (smallest * DANDELION_DONATION_HIGHER_PRICE_UNITS).to_f if smallest
+  end
+
+  # The donation the checkout form suggests for tickets coming to ticket_total, as the agent checkout adds unless told
+  # otherwise. None for free tickets, so as not to make a free booking paid
+  def suggested_dandelion_donation(ticket_total)
+    smallest = FiatCurrency.minimum_unit_amount(currency)
+    return unless donations_to_dandelion? && smallest && ticket_total.positive?
+
+    percent = ticket_total > dandelion_donation_higher_price_over ? DANDELION_DONATION_HIGHER_PRICE_PERCENT : DANDELION_DONATION_PERCENT
+    [(ticket_total * percent / 100).round(2), smallest.to_f].max
+  end
+
   def token
     Token.all.find { |token| token.symbol == currency }
   end

@@ -207,6 +207,7 @@ discount_code_used_up = discount_code_problem == :used_up
     currency: @event.currency,
     currencySymbol: money_symbol(@event.currency),
     minimumApplicationFee: FiatCurrency.minimum_unit_amount(@event.currency),
+    dandelionDonationHigherPriceOver: @event.dandelion_donation_higher_price_over,
     stripePk: (@event.organisation.stripe_connect_json ? ENV['STRIPE_PK'] : @event.organisation.stripe_pk),
     stripeAccount: @event.revenue_sharer_organisationship && @event.direct_charges ? @event.revenue_sharer_organisationship.stripe_user_id : @event.organisation.stripe_user_id,
     organisationOcSlug: @event.organisation.oc_slug,

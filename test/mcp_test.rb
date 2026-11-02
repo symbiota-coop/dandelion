@@ -726,7 +726,8 @@ class McpTest < ActiveSupport::TestCase
     @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
     assert @event.reload.donations_to_dandelion?
     requirements = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))
-    assert_equal({ 'to' => 'dandelion', 'name' => 'Dandelion', 'suggested' => nil, 'minimum' => 1.0, 'required' => false }, requirements['donation'])
+    assert_equal({ 'to' => 'dandelion', 'name' => 'Dandelion', 'suggested' => nil, 'minimum' => 1.0, 'required' => false, 'suggested_percent' => 5,
+                   'higher_price' => { 'over' => 249.0, 'suggested_percent' => 2.5 }, 'added_by_default' => true }, requirements['donation'])
     quantities = { @event.ticket_types.first.id.to_s => 1 }
 
     rpc, = create_checkout(quantities: quantities, donation_amount: 0.1)
@@ -740,6 +741,25 @@ class McpTest < ActiveSupport::TestCase
     end
     assert_equal 'awaiting_payment', order['status']
     assert_equal 11.0, order['total']
+  end
+
+  test 'create_checkout_tool adds the suggested donation to Dandelion unless given one, as the checkout form does' do
+    create_event(prices: [10, 100, 300])
+    @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
+    ticket_types = @event.reload.ticket_types.sort_by(&:price)
+
+    book = lambda do |ticket_type, **arguments|
+      session = api_object(id: "cs_#{ticket_type.id}_#{arguments.key?(:donation_amount)}", payment_intent: "pi_#{ticket_type.id}_#{arguments.key?(:donation_amount)}",
+                           url: 'https://checkout.stripe.com/test')
+      Stripe::Checkout::Session.stub(:create, session) { create_checkout(quantities: { ticket_type.id.to_s => 1 }, **arguments).last }
+    end
+
+    # 5%, at least £1, and 2.5% above £249
+    assert_equal([[1.0, 11.0], [5.0, 105.0], [7.5, 307.5]], ticket_types.map { |ticket_type| book.(ticket_type).values_at('donation', 'total') })
+
+    order = book.(ticket_types.first, donation_amount: 0)
+    assert_nil order['donation']
+    assert_equal 10.0, order['total']
   end
 
   test 'create_checkout_tool refuses a donation the event does not take' do

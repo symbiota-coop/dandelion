@@ -158,8 +158,8 @@ $(function () {
   function updateDonationPercentButtons () {
     const p = priceWithoutDonation()
 
-    const threshold = config.minimumApplicationFee * 249
-    const isHighPrice = p > threshold
+    // Event#suggested_dandelion_donation
+    const isHighPrice = config.dandelionDonationHigherPriceOver != null && p > config.dandelionDonationHigherPriceOver
 
     $('#donation-percent-buttons button').each(function () {
       const $btn = $(this)

@@ -60,6 +60,8 @@ module Dandelion
         answers: answers,
         accepted_terms: accept_terms == true,
         donation_amount: donation_amount,
+        # Leaving out donation_amount takes the donation to Dandelion the checkout form starts with
+        suggested_dandelion_donation: donation_amount.nil?,
         discount_code: discount_code,
         cohost: attribution['cohost'],
         affiliate_type: attribution['affiliate_type'],

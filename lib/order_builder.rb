@@ -150,11 +150,13 @@ class OrderBuilder
   # (Questions.answer_pairs)
   # discount_code: the code the buyer applied
   # signed_in_account: whoever is signed in, if anyone; only they can update their profile or spend their credit
+  # suggested_dandelion_donation: without a donation_amount, add the donation to Dandelion the checkout form suggests
+  # (Event#suggested_dandelion_donation), as the form starts with it
   def initialize(event:, buyer:, quantities:, payment_method:, prices: {}, signed_in_account: nil, new_account_currency: nil,
                  secret_ticket_type_id: nil, answers: nil, accepted_terms: false, donation_amount: nil, donation_via_modal: false,
                  discount_code: nil, cohost: nil, affiliate_type: nil, affiliate_id: nil,
                  opt_in_organisation: false, opt_in_facilitator: false, hear_about: nil, via: nil, http_referrer: nil,
-                 confirmed_duplicate: false, confirmed_email: false, utm: {}, idempotency_key: nil)
+                 confirmed_duplicate: false, confirmed_email: false, utm: {}, idempotency_key: nil, suggested_dandelion_donation: false)
     @event = event
     @buyer = buyer
     @quantities = quantities
@@ -180,6 +182,7 @@ class OrderBuilder
     @http_referrer = http_referrer
     @confirmed_duplicate = confirmed_duplicate
     @confirmed_email = confirmed_email
+    @suggested_dandelion_donation = suggested_dandelion_donation
     @utm = utm || {}
     @idempotency_key = idempotency_key
   end
@@ -431,6 +434,10 @@ class OrderBuilder
   end
 
   def apply_donation_and_discounts
+    # Without a donation_amount, the donation to Dandelion the checkout form starts with, once the tickets' price is known
+    if @suggested_dandelion_donation && @donation_amount.nil?
+      @donation_amount = @event.suggested_dandelion_donation(@order.discounted_ticket_revenue.cents.to_f / 100)
+    end
     @order.donations.create!(event: @event, account: @account, amount: @donation_amount) if @donation_amount.to_f > 0 && !ignore_dandelion_donation?
 
     # Credit belongs to the order account; only apply it if that account is signed in.
