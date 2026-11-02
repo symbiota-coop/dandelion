@@ -659,6 +659,20 @@ class EventBookingsTest < ActiveSupport::TestCase
     Stripe::Checkout::Session.stub(:create, api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test'), &)
   end
 
+  test 'the Stripe payment page closes when the order stops holding its tickets' do
+    create_event(prices: [10], suggested_donation: 0)
+
+    session_params = nil
+    Stripe::Checkout::Session.stub(:create, proc { |params, _opts|
+      session_params = params
+      api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test')
+    }) do
+      post_checkout
+    end
+    assert_equal 200, last_response.status
+    assert_equal (@event.orders.first.created_at + Order::UNPAID_HOLD).to_i, session_params[:expires_at]
+  end
+
   test 'purchase needs the terms accepted when the event asks' do
     create_event(prices: [0], terms_and_conditions: 'Be kind', terms_and_conditions_check_box: true)
 

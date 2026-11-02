@@ -10,6 +10,9 @@ class EventPaymentMethod
         customer_email: account.email,
         success_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{event.slug}?success=true&order_id=#{order.public_id}&utm_source=#{utm[:source]}&utm_medium=#{utm[:medium]}&utm_campaign=#{utm[:campaign]}"),
         cancel_url: URI::DEFAULT_PARSER.escape("#{ENV['BASE_URI']}/e/#{event.slug}?cancelled=true"),
+        # Closes as the order's hold on its tickets ends, so no one pays for tickets the cleanup has released (Stripe's
+        # default is 24 hours)
+        expires_at: (order.created_at + Order::UNPAID_HOLD).to_i,
         metadata: order.metadata,
         billing_address_collection: event.organisation.billing_address_collection? ? 'required' : nil,
         line_items: line_items(order: order, event: event, event_image: event_image, tax_rate_id: tax_rate_id)
