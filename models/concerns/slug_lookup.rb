@@ -12,7 +12,8 @@ module SlugLookup
       if id.present?
         find(id)
       elsif slug.present?
-        find_by(slug_field => slug) || (find(slug) if BSON::ObjectId.legal?(slug))
+        # An id first, so a record whose slug is another's id can't take over that one's old links
+        (find(slug) if BSON::ObjectId.legal?(slug)) || find_by(slug_field => slug)
       end
     end
   end

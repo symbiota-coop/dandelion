@@ -147,6 +147,23 @@ class MessagesTest < ActiveSupport::TestCase
     assert last_response.redirect?
   end
 
+  test "a username that is another account's id doesn't take its old links" do
+    create_messaging_pair
+    impostor = create_messenger
+    impostor.set(username: @account1.id.to_s)
+    sign_in_with_rack(@account)
+
+    # Messages linked to accounts by id before they were linked by username
+    post "/messages/#{@account1.id}/send", body: 'For account1'
+    assert_equal 200, last_response.status
+    assert_equal 'For account1', Message.between(@account, @account1).first.body
+    assert_equal 0, Message.between(@account, impostor).count
+
+    get "/messages/#{@account1.id}/send"
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "/messages/#{@account1.username}/send"
+  end
+
   test 'sending a message and opening the thread marks it read' do
     create_messaging_pair
     sign_in_with_rack(@account)

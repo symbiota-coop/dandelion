@@ -26,6 +26,8 @@ module AccountValidation
       self.name = name.strip if name
       self.name_transliterated = I18n.transliterate(name) if name
       self.username = username.downcase if username
+      # Links made before accounts' URLs used usernames name them by id, which find_by_slug_or_id tries first
+      errors.add(:username, "can't look like an account id") if username_changed? && username && BSON::ObjectId.legal?(username)
       self.email = email.downcase.strip if email
       self.sign_ins_count = 0 unless sign_ins_count
       self.number_at_this_location = 0 unless number_at_this_location
