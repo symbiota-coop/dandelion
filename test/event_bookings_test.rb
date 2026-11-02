@@ -719,6 +719,21 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 5, @event.orders.last.total
   end
 
+  test 'purchase refuses a donation to Dandelion below the smallest unit' do
+    create_event(prices: [10])
+    @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
+    assert @event.reload.donations_to_dandelion?
+
+    post_checkout(ticket_form: { donation_amount: '0.1' })
+    assert_equal 400, last_response.status
+    assert_equal 'A donation to Dandelion must be at least £1, or nothing.', JSON.parse(last_response.body)['error']
+    assert_equal 0, @event.orders.count
+
+    with_stubbed_stripe_session { post_checkout(ticket_form: { donation_amount: '1' }) }
+    assert_equal 200, last_response.status
+    assert_equal 1, @event.orders.last.donations.first.amount
+  end
+
   test "purchase refuses a donation the event doesn't take" do
     create_event(prices: [10])
     @event.set(suggested_donation: nil)

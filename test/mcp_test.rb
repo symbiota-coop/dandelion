@@ -701,7 +701,7 @@ class McpTest < ActiveSupport::TestCase
     assert_equal 5, @event.minimum_donation
     requirements = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))
     assert_empty requirements['restrictions']
-    assert_equal({ 'to' => 'organisation', 'name' => @organisation.name, 'suggested' => 10.0, 'minimum' => 5.0 }, requirements['donation'])
+    assert_equal({ 'to' => 'organisation', 'name' => @organisation.name, 'suggested' => 10.0, 'minimum' => 5.0, 'required' => true }, requirements['donation'])
     quantities = { @event.ticket_types.first.id.to_s => 1 }
 
     rpc, = create_checkout(quantities: quantities)
@@ -719,6 +719,27 @@ class McpTest < ActiveSupport::TestCase
     assert_equal 'awaiting_payment', order['status']
     assert_equal 7.0, order['donation']
     assert_equal 7.0, order['total']
+  end
+
+  test 'create_checkout_tool takes a donation to Dandelion of at least the smallest unit' do
+    create_event(prices: [10])
+    @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
+    assert @event.reload.donations_to_dandelion?
+    requirements = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))
+    assert_equal({ 'to' => 'dandelion', 'name' => 'Dandelion', 'suggested' => nil, 'minimum' => 1.0, 'required' => false }, requirements['donation'])
+    quantities = { @event.ticket_types.first.id.to_s => 1 }
+
+    rpc, = create_checkout(quantities: quantities, donation_amount: 0.1)
+    assert_includes tool_text(rpc), 'A donation to Dandelion must be at least £1, or nothing.'
+    assert_includes tool_text(rpc), 'leave out donation_amount'
+    assert_equal 0, @event.orders.count
+
+    order = nil
+    with_stubbed_stripe_session do
+      _rpc, order = create_checkout(quantities: quantities, donation_amount: 1)
+    end
+    assert_equal 'awaiting_payment', order['status']
+    assert_equal 11.0, order['total']
   end
 
   test 'create_checkout_tool refuses a donation the event does not take' do

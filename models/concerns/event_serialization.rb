@@ -104,12 +104,15 @@ module EventSerialization
   end
 
   # The donation the checkout form offers to add, if any: to Dandelion, or to the organisation (with the amount it
-  # suggests, and any minimum it requires)
+  # suggests). minimum: the least it takes. required: whether there must be one, as the organisation's minimum
+  # requires; a donation to Dandelion is optional, but its minimum is the currency's smallest unit
+  # (FiatCurrency.minimum_unit_amount, £1), which the checkout form rounds a smaller one up to
   def checkout_donation
     if donations_to_dandelion?
-      { to: 'dandelion', name: 'Dandelion', suggested: nil, minimum: nil }
+      { to: 'dandelion', name: 'Dandelion', suggested: nil, minimum: FiatCurrency.minimum_unit_amount(currency)&.to_f, required: false }
     elsif suggested_donation
-      { to: 'organisation', name: organisation.name, suggested: suggested_donation, minimum: (minimum_donation if minimum_donation&.positive?) }
+      minimum = (minimum_donation if minimum_donation&.positive?)
+      { to: 'organisation', name: organisation.name, suggested: suggested_donation, minimum: minimum, required: !minimum.nil? }
     end
   end
 

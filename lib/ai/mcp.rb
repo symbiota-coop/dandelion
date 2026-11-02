@@ -339,7 +339,7 @@ module Dandelion
                          discount_code: { type: 'string', description: 'A discount code the buyer has' },
                          payment_method: { type: 'string', description: 'The payment method the buyer chose, from the payment_methods with agent_checkout. Defaults to the first one that pays by link' },
                          secret_ticket_type_id: { type: 'string', description: "A hidden ticket type's secret link, or the ticket_type_id in its query string, to book that ticket type" },
-                         donation_amount: { type: 'number', description: 'A donation the buyer chose to add, where the requirements list a donation (at least its minimum, if it has one)' },
+                         donation_amount: { type: 'number', description: 'A donation the buyer chose to add, where the requirements list a donation: at least its minimum, if it has one (needed when required, and otherwise only if the buyer gives one)' },
                          confirm_duplicate: { type: 'boolean', description: 'The buyer confirmed they want to book again, though this account already has a ticket' },
                          confirm_email: { type: 'boolean', description: "The buyer confirmed their email address is right, though it looks mistyped (a slip from a common provider's)" },
                          attribution: {

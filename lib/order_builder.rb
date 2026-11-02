@@ -78,6 +78,13 @@ class OrderBuilder
     MESSAGE = "This event doesn't take donations at checkout.".freeze
   end
 
+  # A donation to Dandelion below the currency's smallest unit (Event#checkout_donation's minimum)
+  class DonationTooSmall < Error
+    def initialize(minimum, currency)
+      super("A donation to Dandelion must be at least #{Money.new((minimum * 100).round, currency).format(no_cents_if_whole: true)}, or nothing.")
+    end
+  end
+
   # The event asks for a donation to the organisation of at least its minimum_donation
   class DonationRequired < Error
     def initialize(minimum, currency)
@@ -269,9 +276,15 @@ class OrderBuilder
   end
 
   def check_donation
-    raise DonationInvalid if @donation_amount.to_f.negative? || (@donation_amount.to_f.positive? && !@event.checkout_donation)
+    amount = @donation_amount.to_f
+    donation = @event.checkout_donation
+    raise DonationInvalid if amount.negative? || (amount.positive? && !donation)
     # Donation's own validation only sees a donation that's made
     raise DonationRequired.new(@event.minimum_donation, @event.currency) if donation_below_minimum?
+    # Unless the payment method drops it, as it does a donation to Dandelion when it can't take one
+    return unless donation && donation[:to] == 'dandelion' && donation[:minimum] && amount.positive? && !ignore_dandelion_donation?
+
+    raise DonationTooSmall.new(donation[:minimum], @event.currency) if amount < donation[:minimum]
   end
 
   # Only an email typed in: a signed-in buyer's is their account's
