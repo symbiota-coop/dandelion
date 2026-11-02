@@ -49,6 +49,20 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 2, hidden.tickets.count
   end
 
+  test 'a purchase without any ticket chosen is refused' do
+    create_event(prices: [0])
+    buyer = FactoryBot.create(:account)
+
+    # A form with no quantity chosen sends a blank ticketForm[quantities], which blanks_to_nils turns into nil
+    post_purchase(@event, buyer, quantities: '')
+    assert_equal 400, last_response.status
+    assert_equal OrderBuilder::NoTickets::MESSAGE, JSON.parse(last_response.body)['error']
+
+    post_purchase(@event, buyer, quantities: { @event.ticket_types.first.id.to_s => '0' })
+    assert_equal 400, last_response.status
+    assert_equal 0, @event.orders.count
+  end
+
   test 'a GoCardless purchase error names the rejected field in the email and the locked error' do
     create_event(prices: [0.5])
     @organisation.set(gocardless_instant_bank_pay: true, gocardless_access_token: 'test')

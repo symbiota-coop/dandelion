@@ -159,7 +159,8 @@ class OrderBuilder
                  confirmed_duplicate: false, confirmed_email: false, utm: {}, idempotency_key: nil, default_dandelion_donation: false)
     @event = event
     @buyer = buyer
-    @quantities = quantities
+    # The checkout form sends no quantities when no ticket is chosen (blanks_to_nils)
+    @quantities = quantities || {}
     @prices = prices || {}
     @payment_method = payment_method.to_s
     @signed_in_account = signed_in_account
@@ -229,8 +230,11 @@ class OrderBuilder
     @answer_pairs, error = Questions.answer_pairs(@event.questions, @answers)
     raise AnswersInvalid, error if error
 
+    chosen = @quantities.select { |_ticket_type_id, quantity| quantity.to_i.positive? }
+    raise NoTickets if chosen.empty?
+
     # Keyed as quantities are. create_tickets refuses ids that aren't the event's
-    ticket_types = @quantities.select { |_ticket_type_id, quantity| quantity.to_i.positive? }.keys.filter_map do |ticket_type_id|
+    ticket_types = chosen.keys.filter_map do |ticket_type_id|
       ticket_type = @event.ticket_types.find(ticket_type_id)
       [ticket_type_id, ticket_type] if ticket_type
     end
