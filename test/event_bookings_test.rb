@@ -438,6 +438,21 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert Account.find_by(email: 'someone@gmail.com')
   end
 
+  test "the checkout form shows why a booking was refused, and books once it's fixed" do
+    create_event(prices: [0], terms_and_conditions: 'Be kind', terms_and_conditions_check_box: true)
+
+    visit "/e/#{@event.slug}"
+    fill_in 'account_name', with: 'Terms User'
+    fill_in 'account_email', with: 'terms@example.com'
+    message = accept_alert { click_button 'RSVP' }
+    assert_equal 'You must agree to the terms and conditions.', message
+    assert_equal 0, @event.orders.count
+
+    find('label[for="accepted-terms"]').click
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
+  end
+
   # ═══════════════════════════════════════════════════════════════════════════
   # Purchase access
   # ═══════════════════════════════════════════════════════════════════════════
@@ -561,6 +576,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     end
 
     assert_equal 400, last_response.status
+    assert_equal 'Choose at least one ticket.', JSON.parse(last_response.body)['error']
     assert_empty reported
     assert_equal 0, @event.orders.count
   end
@@ -588,7 +604,8 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 5, @event.orders.first.donations.first.amount
   end
 
-  # The checkout form checks these in the browser, so these post without it, as a request needn't come from the form
+  # OrderBuilder checks these, and the checkout form shows its messages. These post without the form, as a request
+  # needn't come from it
 
   def post_checkout(ticket_form: {}, details_form: {})
     @buyer ||= FactoryBot.create(:account)
@@ -607,6 +624,7 @@ class EventBookingsTest < ActiveSupport::TestCase
 
     post_checkout(details_form: { payment_method: 'rsvp' })
     assert_equal 400, last_response.status
+    assert_equal 'You must agree to the terms and conditions.', JSON.parse(last_response.body)['error']
     assert_equal 0, @event.orders.count
 
     post_checkout(details_form: { payment_method: 'rsvp', accepted_terms: '1' })

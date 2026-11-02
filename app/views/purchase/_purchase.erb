@@ -44,7 +44,7 @@ discount_code_used_up = discount_code_problem == :used_up
         <%= hidden_field_tag :ticket_type_id, value: params[:ticket_type_id] %>
 
         <% if @concise_ticket_form %>
-          <%= hidden_field_tag :"quantities[#{free_ticket_type.id}]", value: 1, 'data-ticket-type-id': free_ticket_type.id, 'data-ticket-group-id': free_ticket_type.ticket_group_id, 'data-price': 0, 'data-slots': free_ticket_type.slots %>
+          <%= hidden_field_tag :"quantities[#{free_ticket_type.id}]", value: 1, 'data-ticket-type-id': free_ticket_type.id, 'data-price': 0 %>
         <% else %>
           <table class="table">
 
@@ -204,8 +204,6 @@ discount_code_used_up = discount_code_problem == :used_up
   config = {
     eventSlug: @event.slug,
     eventUrl: "#{ENV['BASE_URI']}/e/#{@event.slug}",
-    placesRemaining: @event.places_remaining,
-    ticketGroupPlacesRemaining: @event.ticket_groups.each_with_object({}) { |ticket_group, hash| hash[ticket_group.id.to_s] = ticket_group.places_remaining },
     currency: @event.currency,
     currencySymbol: money_symbol(@event.currency),
     minimumApplicationFee: FiatCurrency.minimum_unit_amount(@event.currency),

@@ -314,20 +314,6 @@ $(function () {
     }
   })
 
-  // Remove error styling when a checkbox in a required group is checked
-  $('[class*="checkbox-group-"][data-required="true"]').each(function () {
-    const checkboxGroup = $(this)
-    const groupIndex = checkboxGroup.attr('class').match(/checkbox-group-(\d+)/)
-    if (groupIndex) {
-      const checkboxes = $('.checkbox-group-item-' + groupIndex[1])
-      checkboxes.on('change', function () {
-        if (checkboxes.is(':checked')) {
-          checkboxes.removeClass('is-invalid')
-        }
-      })
-    }
-  })
-
   $('#details form button[data-payment-method]').click(function () {
     const method = $(this).attr('data-payment-method')
     $('input[type=hidden][name=payment_method]').prop('disabled', true)
@@ -356,77 +342,8 @@ $(function () {
       setTotal()
     }
 
-    let halt
-    $('input[type=checkbox][data-required]').each(function () {
-      if (!$(this).is(':checked')) {
-        showPurchaseAlert($(this).next().text().trim() + ' must be checked')
-        halt = true
-      }
-    })
-    if (halt) { return false }
-
-    $('[class*="checkbox-group-"][data-required="true"]').each(function () {
-      const checkboxGroup = $(this)
-      const groupIndex = checkboxGroup.attr('class').match(/checkbox-group-(\d+)/)[1]
-      const checkboxes = $('.checkbox-group-item-' + groupIndex)
-      const questionLabel = checkboxGroup.find('label').first().text().trim()
-
-      if (!checkboxes.is(':checked')) {
-        showPurchaseAlert('Please select at least one option for: ' + questionLabel)
-        checkboxes.addClass('is-invalid')
-        checkboxes.first().focus()
-        halt = true
-      }
-    })
-    if (halt) { return false }
-
-    let numberOfTickets = 0
-    $('[name^=quantities]').not(':disabled').each(function () {
-      numberOfTickets += parseInt($(this).val())
-    })
-    if (numberOfTickets === 0) {
-      showPurchaseAlert('Please select at least one ticket')
-      return false
-    }
-
-    function slotsForQuantityInput (input) {
-      const qty = parseInt($(input).val(), 10) || 0
-      const perTicket = parseInt($(input).attr('data-slots'), 10)
-      return qty * (Number.isNaN(perTicket) ? 1 : perTicket)
-    }
-
-    if (config.placesRemaining != null) {
-      let slotsSelected = 0
-      $('[name^=quantities]').not(':disabled').each(function () {
-        slotsSelected += slotsForQuantityInput(this)
-      })
-      if (slotsSelected > config.placesRemaining) {
-        showPurchaseAlert('This selection exceeds the event\'s remaining capacity')
-        return false
-      }
-    }
-
-    if (config.ticketGroupPlacesRemaining) {
-      const slotsByGroup = {}
-      $('[name^=quantities]').not(':disabled').each(function () {
-        const groupId = $(this).attr('data-ticket-group-id')
-        if (!groupId) { return }
-        slotsByGroup[groupId] = (slotsByGroup[groupId] || 0) + slotsForQuantityInput(this)
-      })
-      const groupExceeded = Object.keys(slotsByGroup).some(function (groupId) {
-        const remaining = config.ticketGroupPlacesRemaining[groupId]
-        return remaining != null && slotsByGroup[groupId] > remaining
-      })
-      if (groupExceeded) {
-        showPurchaseAlert('This selection exceeds a ticket group\'s remaining capacity')
-        return false
-      }
-    }
-
-    if ($('#accepted-terms').length > 0 && !$('#accepted-terms').is(':checked')) {
-      showPurchaseAlert('You must agree to the terms and conditions to proceed')
-      return false
-    }
+    // OrderBuilder checks the rest (tickets chosen, places left, answers, terms, the phone number's country code), and
+    // the form shows what it says is wrong
 
     // Signed out, catch a mistyped email before the tickets go nowhere: a domain one or two keystrokes from a common
     // provider's (gmial.com, hotmail.con). Signed in, the email is a hidden field
@@ -436,19 +353,6 @@ $(function () {
       if (!confirm('You entered your email address as ' + email + '. Press OK to continue, or Cancel to go back.')) {
         $emailField.trigger('focus')
         return false
-      }
-    }
-
-    const phoneField = $('#account_phone')
-    if (phoneField.length > 0) {
-      const phoneValue = phoneField.val()
-      if (phoneValue && phoneValue.trim() !== '') {
-        const trimmedPhone = phoneValue.trim()
-        if (!trimmedPhone.startsWith('+')) {
-          showPurchaseAlert('Please include the + country code in your phone number (e.g. +1234567890)')
-          phoneField.focus()
-          return false
-        }
       }
     }
 
@@ -504,10 +408,13 @@ $(function () {
         let json = {}
         try { json = xhr.responseJSON || JSON.parse(xhr.responseText || '{}') || {} } catch { }
         closePaymentWindow()
-        if (json.duplicate && !confirmedDuplicate) {
+        const enableForm = function () {
           purchaseSubmitting = false
           $('#details form button[data-payment-method]').prop('disabled', false)
           $('#details form button[data-payment-method-clicked] i').hide()
+        }
+        if (json.duplicate && !confirmedDuplicate) {
+          enableForm()
           const message = json.error || 'A ticket to this event has already been booked for this email address.'
           if (config.embedded) {
             embeddedDuplicateConfirmed = true
@@ -518,6 +425,12 @@ $(function () {
             $('#details form button[data-payment-method-clicked] i').show()
             postPurchase(true)
           }
+          return
+        }
+        // OrderBuilder refused the booking, saying why
+        if (json.error) {
+          enableForm()
+          showPurchaseAlert(json.error)
           return
         }
         $('#select-tickets, #details').hide()

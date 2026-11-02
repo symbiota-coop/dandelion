@@ -28,10 +28,9 @@ Dandelion::App.controller do
     OrderBuilder.new(**order_builder_args).call
   rescue OrderBuilder::Duplicate => e
     halt 409, { duplicate: true, error: e.message }.to_json
-  rescue OrderBuilder::TicketTypeNotFound
-    not_found
   rescue OrderBuilder::Error => e
-    halt e.status
+    # Its message says what went wrong, for the buyer: the form shows it
+    halt e.status, { error: e.message }.to_json
   end
 
   get '/e/:slug/orders/:order_id/payment_completed', provides: :json do
