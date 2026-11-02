@@ -262,8 +262,11 @@ Dandelion::App.controller do
     redirect '/accounts/api_key'
   end
 
+  # Deleting the account can't be undone, so like changing its email or password it needs a sign in code: a session from a
+  # link in a forwarded email mustn't be able to delete it (the page shows the email it asks for)
   get '/accounts/delete' do
     sign_in_required!
+    verification_required!(return_to: '/accounts/delete', notice: 'To delete your account, enter the code below.')
     @account = current_account
     erb :'accounts/delete'
   end
@@ -472,6 +475,7 @@ Dandelion::App.controller do
 
   post '/accounts/disconnect/:provider' do
     sign_in_required!
+    verification_required!(return_to: '/accounts/providers', notice: 'Nothing was disconnected: enter the code below, then disconnect it again.')
     @provider = Provider.object(params[:provider])
     @account = current_account
     if @account.provider_links.find_by(provider: @provider.display_name).try(:destroy)
@@ -493,6 +497,7 @@ Dandelion::App.controller do
 
   post '/accounts/destroy' do
     sign_in_required!
+    verification_required!(return_to: '/accounts/delete', notice: "Your account wasn't deleted: enter the code below, then delete it again.")
     if params[:email] && (params[:email] == current_account.email)
       flash[:notice] = 'Your account was deleted'
       current_account.destroy

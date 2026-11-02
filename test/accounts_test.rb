@@ -833,6 +833,26 @@ class AccountsTest < ActiveSupport::TestCase
     refute_includes last_response.body, account.api_key
   end
 
+  test 'a session from an email link needs a sign in code to delete the account' do
+    account = FactoryBot.create(:account)
+    account.set(email_confirmed: true)
+    account.generate_link_token!
+    clear_cookies
+    get '/accounts/edit', link_token: account.link_token
+    assert last_response.ok?
+
+    get '/accounts/delete'
+    assert_equal '/accounts/sign_in_code', URI(last_response.location).path
+    post '/accounts/destroy', email: account.email
+    assert_equal '/accounts/sign_in_code', URI(last_response.location).path
+    assert Account.find(account.id)
+
+    get '/', sign_in_code: account.issue_sign_in_code!
+    assert_equal '/accounts/delete', URI(last_response.location).path
+    post '/accounts/destroy', email: account.email
+    assert_nil Account.find(account.id)
+  end
+
   test 'the API key tab replaces the API key and the calendar key separately' do
     account = FactoryBot.create(:account)
     api_key = account.api_key
