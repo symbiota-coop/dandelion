@@ -929,6 +929,52 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 1, order.donations.first.amount
   end
 
+  test 'checkout books tickets credit pays for, without a donation to Dandelion' do
+    create_event(prices: [10])
+    @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
+    assert @event.reload.donations_to_dandelion?
+    grant_credit(@account, amount: 10)
+    sign_in(@account)
+    visit "/e/#{@event.slug}"
+    select 1, from: "quantities[#{@event.ticket_types.first.id}]"
+
+    # The donation the form starts with isn't added to what's left to pay
+    assert page.has_button? 'Use credit'
+    assert page.has_no_button? 'Pay £'
+    click_button 'Use credit'
+    assert page.has_content? 'Thanks for booking'
+
+    order = @event.orders.find_by(account: @account)
+    assert_equal 10, order.credit_applied
+    assert order.payment_completed
+    assert_equal 0, order.donations.count
+  end
+
+  test 'checkout adds a donation to Dandelion to what credit leaves to pay' do
+    create_event(prices: [10])
+    @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
+    grant_credit(@account, amount: 5)
+    sign_in(@account)
+    visit "/e/#{@event.slug}"
+    select 1, from: "quantities[#{@event.ticket_types.first.id}]"
+
+    fill_in 'donation_amount', with: (donation_amount = 2)
+    assert page.has_button? "Pay £#{format('%.2f', 10 - 5 + donation_amount)}"
+  end
+
+  test 'checkout takes credit off the tickets, not a donation to Dandelion, when the tickets are free' do
+    create_event(prices: [0, 10])
+    @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
+    assert @event.reload.donations_to_dandelion?
+    grant_credit(@account, amount: 2)
+    sign_in(@account)
+    visit "/e/#{@event.slug}"
+    select 1, from: "quantities[#{@event.ticket_types.find_by(price: 0).id}]"
+
+    fill_in 'donation_amount', with: (donation_amount = 5)
+    assert page.has_button? "Pay £#{format('%.2f', donation_amount)}"
+  end
+
   test "purchase does not apply another account's credit when signed in as someone else" do
     create_event(prices: [10], suggested_donation: 0)
     victim = FactoryBot.create(:account)
