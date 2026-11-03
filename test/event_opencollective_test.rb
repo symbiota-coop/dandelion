@@ -60,6 +60,7 @@ class EventOpenCollectiveTest < ActiveSupport::TestCase
   end
 
   test 'oc_transactions ignores unpaid Open Collective statuses even if the API returns them' do
+    covers 'events/opencollective-checkout-confirms-when-paid@169a4b'
     paid_at = Time.parse('2026-09-01T12:00:00Z')
     stub_oc_orders([
                      oc_node(status: 'NEW', secret: 'dandelion:newxx'),
@@ -78,6 +79,7 @@ class EventOpenCollectiveTest < ActiveSupport::TestCase
   end
 
   test 'check_oc_event does not complete a pending order from an unpaid Open Collective contribution' do
+    covers 'events/opencollective-checkout-confirms-when-paid@169a4b'
     create_oc_event
     unpaid = create_incomplete_oc_order(secret: 'dandelion:7h0vi')
     paid = create_incomplete_oc_order(secret: 'dandelion:g6m6t')
@@ -91,5 +93,19 @@ class EventOpenCollectiveTest < ActiveSupport::TestCase
 
     refute unpaid.reload.payment_completed?
     assert paid.reload.payment_completed?
+  end
+
+  test 'buyers see a Pay with Open Collective option at checkout once it is set up' do
+    covers 'events/opencollective-checkout-confirms-when-paid@169a4b'
+    create_organisation(oc_slug: 'south-west-grain-network')
+    create_event(prices: [15])
+    pm = EventPaymentMethod.object('opencollective')
+    refute pm.available?(@event)
+
+    @event.set(oc_slug: 'swgn-agm-2026')
+    assert pm.available?(@event.reload)
+    get "/e/#{@event.slug}"
+    assert last_response.ok?
+    assert_includes last_response.body, 'Pay with Open Collective'
   end
 end

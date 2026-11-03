@@ -2,6 +2,7 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class EventBoostsTest < ActiveSupport::TestCase
   include Capybara::DSL
+  include Rack::Test::Methods
 
   test 'boost payment can be marked complete' do
     create_event(prices: [0])
@@ -36,6 +37,7 @@ class EventBoostsTest < ActiveSupport::TestCase
   end
 
   test 'global listing renders boosted slot once on the first page' do
+    covers 'events/boosted-slot@240568'
     create_event(as: :event1, name: 'Spotlight listing event', prices: [0])
     create_event(as: :event2, name: 'Regular listing event', prices: [0])
 
@@ -97,6 +99,7 @@ class EventBoostsTest < ActiveSupport::TestCase
   end
 
   test 'boosted unpaid event appears in the boost slot but not the regular listing' do
+    covers 'events/boosted-slot@240568'
     create_organisation
     @organisation.set(paid_up: false)
     create_event(name: 'Promotion-only boosted event')
@@ -116,5 +119,62 @@ class EventBoostsTest < ActiveSupport::TestCase
     assert page.has_content?('Promotion-only boosted event')
     assert_equal 1, page.text.scan('Promotion-only boosted event').length
     assert_equal 1, @event.event_boost_impressions.count
+  end
+
+  test 'boosts are bought in whole-hour blocks' do
+    covers 'events/boost-whole-hours@2913d6'
+    create_event(prices: [0])
+    start_time = Time.zone.now.beginning_of_hour + 2.hours
+
+    boost = FactoryBot.build(:event_boost, event: @event, start_time: start_time + 30.minutes, hours: 1)
+    refute boost.valid?
+    assert_includes boost.errors[:start_time], 'must be on the hour'
+
+    boost = FactoryBot.build(:event_boost, event: @event, start_time: start_time, hours: 1.5)
+    refute boost.valid?
+    assert boost.errors[:hours].any?
+
+    boost = FactoryBot.create(:event_boost, event: @event, start_time: start_time, hours: 3, hourly_amount: 2)
+    assert_equal start_time + 3.hours, boost.end_time
+    assert_in_delta 6.0, boost.total_amount
+  end
+
+  test 'overlapping boosts for the same event stack together' do
+    covers 'events/boosts-stack@705d4b'
+    create_event(prices: [0])
+    start_time = Time.zone.now.beginning_of_hour
+    FactoryBot.create(:event_boost, event: @event, start_time: start_time, hours: 3, hourly_amount: 2)
+    FactoryBot.create(:event_boost, event: @event, start_time: start_time + 1.hour, hours: 1, hourly_amount: 3)
+
+    assert_equal({ @event.id => 200 }, EventBoost.active_hourly_weights_by_event_id([@event.id], time: start_time + 30.minutes))
+    assert_equal({ @event.id => 500 }, EventBoost.active_hourly_weights_by_event_id([@event.id], time: start_time + 90.minutes))
+    assert_equal({ @event.id => 200 }, EventBoost.active_hourly_weights_by_event_id([@event.id], time: start_time + 150.minutes))
+  end
+
+  test "an event's chance of the boost slot is its share of the boost pool, and higher in filtered listings" do
+    covers 'events/boost-pool-share@a0d853', 'events/boost-example-unfiltered@c7b401', 'events/boost-example-filtered@b5d026', 'events/boost-example-filtered-rave@3f664d'
+    create_event(as: :event1, name: 'Breathwork Journey', prices: [0])
+    create_event(as: :event2, name: 'Day Rave', prices: [0])
+    breathwork = FactoryBot.create(:event_tag, name: 'breathwork')
+    rave = FactoryBot.create(:event_tag, name: 'rave')
+    @event1.event_tagships.create!(event_tag: breathwork)
+    @event2.event_tagships.create!(event_tag: rave)
+    start_time = Time.zone.now.beginning_of_hour
+    FactoryBot.create(:event_boost, event: @event1, start_time: start_time, hours: 2, hourly_amount: 2)
+    FactoryBot.create(:event_boost, event: @event2, start_time: start_time, hours: 2, hourly_amount: 8)
+
+    # Each draw of the pool, in pence: £2 + £8 = 1000
+    picks = (0...1000).map do |draw|
+      EventBoost.pick_event_for_scope(Event.live.publicly_visible.future, rng: Struct.new(:draw) { def rand(_) = draw }.new(draw))&.name
+    end
+    assert_equal({ 'Breathwork Journey' => 200, 'Day Rave' => 800 }, picks.tally)
+    assert_in_delta 0.2, EventBoost.pool_hour_stats(@event1, slot_start: start_time)[:share]
+
+    xhr = { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }
+    3.times { get '/events', { event_tag_id: breathwork.id }, xhr }
+    assert_equal 3, @event1.event_boost_impressions.count
+    3.times { get '/events', { event_tag_id: rave.id }, xhr }
+    assert_equal 3, @event2.event_boost_impressions.count
+    assert_equal 3, @event1.event_boost_impressions.count
   end
 end

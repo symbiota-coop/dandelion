@@ -64,6 +64,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   test 'a GoCardless purchase error names the rejected field in the email and the locked error' do
+    covers 'events/payment-error-locks-event@a6adde'
     create_event(prices: [0.5])
     @organisation.set(gocardless_instant_bank_pay: true, gocardless_access_token: 'test')
     buyer = FactoryBot.create(:account)
@@ -129,6 +130,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   test 'booking onto a paid event with a range' do
+    covers 'events/price-range-slider@693b77'
     create_event(prices: ['10-100'], suggested_donation: 0)
     sign_in(@account)
     visit "/e/#{@event.slug}"
@@ -158,6 +160,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   test 'booking onto a paid event with a user-set price' do
+    covers 'events/pay-any-amount-when-price-blank@778398'
     create_event(prices: [nil], suggested_donation: 0)
     sign_in(@account)
     visit "/e/#{@event.slug}"
@@ -257,12 +260,31 @@ class EventBookingsTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test 'custom thank you text is shown after booking' do
+    covers 'events/thank-you-text-shown@7514dd'
     create_event(prices: [0], thank_you_text: '<p>See you at the circle</p>')
     sign_in(@account)
     visit "/e/#{@event.slug}"
     click_button 'RSVP'
     assert page.has_content? 'Thanks for booking'
     assert page.has_content? 'See you at the circle'
+  end
+
+  test 'a redirect URL replaces the thank you page after booking' do
+    covers 'events/thank-you-redirect-url@ed8cce'
+    create_event(prices: [0], redirect_url: 'https://example.com/welcome')
+    order = @event.orders.create!(account: FactoryBot.create(:account), currency: @event.currency, value: 0, payment_completed: true)
+    order.tickets.create!(event: @event, account: order.account, ticket_type: @event.ticket_types.first, price: 0)
+
+    get "/e/#{@event.slug}", order_id: order.token, success: true
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'Redirecting you to <a href="https://example.com/welcome">'
+    assert_includes last_response.body, 'window.location = "https://example.com/welcome"'
+    refute_includes last_response.body, 'If you booked'
+
+    @event.set(redirect_url: nil)
+    get "/e/#{@event.slug}", order_id: order.token, success: true
+    assert_includes last_response.body, 'If you booked'
+    refute_includes last_response.body, 'Redirecting you to'
   end
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -355,6 +377,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   test 'collect_location with postcode in local_group area subscribes user to local_group' do
+    covers 'organisations/followers-join-local-groups@336869'
     create_organisation(collect_location: true)
     # Local group with Gamla Stan polygon (from factory)
     local_group = FactoryBot.create(:local_group, organisation: @organisation)
@@ -512,6 +535,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test 'purchase is forbidden when the event is locked and the buyer cannot view the page' do
+    covers 'events/locked-events-admins-can-buy@145a18'
     create_full_event_hierarchy(event_options: { prices: [0], locked: true })
     buyer = FactoryBot.create(:account)
 
@@ -522,6 +546,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   test 'purchase is allowed when the event is locked and the buyer is an event admin' do
+    covers 'events/locked-events-admins-can-buy@145a18'
     create_full_event_hierarchy(event_options: { prices: [0], locked: true })
 
     sign_in_with_rack(@account)
@@ -532,6 +557,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   test 'purchase is forbidden when monthly_donors_only and the buyer is not a signed-in donor' do
+    covers 'organisations/monthly-donors-only-events@571550'
     create_full_event_hierarchy(event_options: { prices: [0], monthly_donors_only: true })
     buyer = FactoryBot.create(:account)
 
@@ -545,6 +571,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   test 'purchase is allowed when monthly_donors_only and the buyer is a signed-in donor' do
+    covers 'organisations/monthly-donors-only-events@571550'
     create_full_event_hierarchy(event_options: { prices: [0], monthly_donors_only: true })
     buyer = FactoryBot.create(:account)
     FactoryBot.create(:organisationship, organisation: @organisation, account: buyer, monthly_donation_method: 'Other', monthly_donation_amount: 1)
@@ -557,6 +584,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   test 'purchase is forbidden when the activity is closed and the buyer is not a member' do
+    covers 'events/application-gates-purchase@891514', 'organisations/application-only-activities@7b2afe'
     create_full_event_hierarchy(event_options: { prices: [0] })
     @activity.set(privacy: 'closed')
     buyer = FactoryBot.create(:account)
@@ -571,6 +599,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   test 'purchase is allowed when the activity is closed and the buyer is a signed-in member' do
+    covers 'events/application-gates-purchase@891514', 'organisations/application-only-activities@7b2afe'
     create_full_event_hierarchy(event_options: { prices: [0] })
     @activity.set(privacy: 'closed')
     buyer = FactoryBot.create(:account)
@@ -636,6 +665,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   test 'purchase needs at least the minimum donation' do
+    covers 'events/contribution-keeping-up@ab2a3a', 'events/checkout-donation-box-when-suggested@99f9e3'
     create_event(prices: [0], suggested_donation: 10, minimum_donation: 5)
     assert_equal 5, @event.minimum_donation
     refute @event.donations_to_dandelion?
@@ -715,6 +745,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   test 'purchase needs a price within range for range and pay-what-you-want tickets' do
+    covers 'events/price-range-slider@693b77'
     create_event(prices: ['10-100'], suggested_donation: 0)
     ticket_type_id = @event.ticket_types.first.id.to_s
 
@@ -763,6 +794,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   test "purchase refuses a donation the event doesn't take" do
+    covers 'events/checkout-donation-box-when-suggested@99f9e3'
     create_event(prices: [10])
     @event.set(suggested_donation: nil)
 
@@ -770,6 +802,119 @@ class EventBookingsTest < ActiveSupport::TestCase
 
     assert_equal 400, last_response.status
     assert_equal 0, @event.orders.count
+  end
+
+  test '?via= on the event URL is recorded on the order and shown on the Orders page' do
+    covers 'events/via-shown-on-orders@f74769'
+    create_event(prices: [0])
+    buyer = FactoryBot.create(:account)
+
+    get "/e/#{@event.slug}", via: 'may-newsletter'
+    assert_match(/<input[^>]*name="[^"]*via[^"]*"[^>]*value="may-newsletter"|<input[^>]*value="may-newsletter"[^>]*name="[^"]*via/, last_response.body)
+
+    header 'Accept', 'application/json'
+    post "/e/#{@event.slug}/purchase",
+         ticketForm: { quantities: { @event.ticket_types.first.id.to_s => '1' } },
+         detailsForm: { payment_method: 'rsvp', account: { name: buyer.name, email: buyer.email, via: 'may-newsletter' } }
+    assert_equal 200, last_response.status
+    assert_equal 'may-newsletter', @event.orders.find_by(account: buyer).via
+
+    header 'Accept', 'text/html'
+    sign_in_with_rack(@account)
+    get "/e/#{@event.slug}/orders"
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'may-newsletter'
+  end
+
+  test 'with Stripe Connect, checkout donations go to Dandelion while the organisation is behind on its contribution' do
+    covers 'events/contribution-keeping-up@ab2a3a', 'events/checkout-donations-to-dandelion@f1a028', 'events/checkout-donations-default-to-dandelion@61777f'
+    create_event(prices: [10])
+    # A new organisation owes nothing yet, so it starts paid up
+    assert @organisation.paid_up
+    @organisation.set(stripe_pk: nil, stripe_sk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
+    assert_equal 'dandelion', @event.reload.checkout_donation[:to]
+
+    get "/e/#{@event.slug}"
+    assert_includes last_response.body, 'Add a donation to Dandelion'
+
+    session_params = nil
+    Stripe::Checkout::Session.stub(:create, proc { |params, _opts|
+      session_params = params
+      api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test')
+    }) do
+      post_checkout(ticket_form: { donation_amount: '3' })
+    end
+    assert_equal 200, last_response.status
+    order = @event.orders.last
+    assert order.application_fee_paid_to_dandelion
+    assert_equal 13, order.total
+    # The donation is Dandelion's application fee, kept from the payment to the organisation's Stripe account
+    assert_equal 300, session_params[:payment_intent_data][:application_fee_amount]
+
+    # Once the organisation keeps up with its contribution, they go to it
+    @organisation.set(paid_up: true)
+    refute @event.reload.donations_to_dandelion?
+    assert_nil @event.checkout_donation
+  end
+
+  test "with Stripe Connect, a free event's suggested donation goes to Dandelion while the organisation is behind" do
+    covers 'events/checkout-donations-to-dandelion@f1a028', 'events/checkout-donation-box-when-suggested@99f9e3'
+    create_event(prices: [0, 0], suggested_donation: 5)
+    @organisation.set(stripe_pk: nil, stripe_sk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
+    assert_equal 'dandelion', @event.reload.checkout_donation[:to]
+
+    get "/e/#{@event.slug}"
+    assert_includes last_response.body, 'Add a donation to Dandelion'
+
+    # Once the organisation keeps up with its contribution, it goes to the organisation
+    @organisation.set(paid_up: true)
+    assert_equal({ to: 'organisation', suggested: 5 }, @event.reload.checkout_donation.slice(:to, :suggested))
+    get "/e/#{@event.slug}"
+    assert_includes last_response.body, "Add a donation to #{@organisation.name}"
+  end
+
+  test 'an event with one free ticket type books in one click, with no donation box, unless it always shows the full form' do
+    covers 'events/single-free-ticket-no-donation-box@7c1dde'
+    create_event(prices: [0], suggested_donation: 5)
+    @organisation.set(stripe_pk: nil, stripe_sk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
+    assert @event.reload.checkout_donation
+
+    get "/e/#{@event.slug}"
+    assert_includes last_response.body, "quantities[#{@event.ticket_types.first.id}]"
+    refute_includes last_response.body, 'id="donation_amount"'
+
+    @event.set(always_show_full_ticket_form: true)
+    get "/e/#{@event.slug}"
+    assert_includes last_response.body, 'id="donation_amount"'
+  end
+
+  test 'checkout donations go to Dandelion only with Stripe Connect, and otherwise always to the organisation' do
+    covers 'events/checkout-donations-default-to-dandelion@61777f'
+    create_event(prices: [10], suggested_donation: 5)
+    connect_json = { 'stripe_user_id' => 'acct_connect' }.to_json
+    # Behind on its contribution throughout
+    @organisation.set(stripe_pk: nil, stripe_sk: nil, stripe_connect_json: connect_json, paid_up: false)
+    assert_equal 'dandelion', @event.reload.checkout_donation[:to]
+
+    # Its own Stripe keys
+    @organisation.set(stripe_pk: 'pk_test_own', stripe_sk: 'sk_test_own')
+    assert_equal 'organisation', @event.reload.checkout_donation[:to]
+
+    # No Stripe at all
+    @organisation.set(stripe_pk: nil, stripe_sk: nil, stripe_connect_json: nil)
+    assert_equal 'organisation', @event.reload.checkout_donation[:to]
+  end
+
+  test 'checkouts have no donation box when donations would go to the organisation and it suggests none' do
+    covers 'events/checkout-donation-box-when-suggested@99f9e3'
+    create_event(prices: [10])
+    @event.set(suggested_donation: nil)
+    refute @event.reload.donations_to_dandelion?
+    assert_nil @event.checkout_donation
+
+    get "/e/#{@event.slug}"
+    assert_equal 200, last_response.status
+    refute_includes last_response.body, 'id="donation_amount"'
   end
 
   test 'purchase is allowed up to max_quantity_per_transaction' do
@@ -884,6 +1029,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   test 'purchase applies credit when the signed-in buyer is the order account' do
+    covers 'organisations/credit-applied-at-checkout@ebe0b1'
     create_event(prices: [10], suggested_donation: 0)
     buyer = FactoryBot.create(:account)
     grant_credit(buyer, amount: 10)

@@ -2,6 +2,7 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class ActivitiesTest < ActiveSupport::TestCase
   include Capybara::DSL
+  include Rack::Test::Methods
 
   APPLICATION_QUESTIONS = "q1\nq2\nq3".freeze
 
@@ -10,6 +11,25 @@ class ActivitiesTest < ActiveSupport::TestCase
     question_count.times do |i|
       fill_in "answers[#{i}]", with: "a#{i + 1}"
     end
+  end
+
+  # Stands in for Mailgun::BatchMessage, keeping who an email would go to
+  class RecordedEmail
+    attr_reader :recipients
+
+    def initialize
+      @recipients = []
+    end
+
+    def add_recipient(_type, email, _variables)
+      @recipients << email
+    end
+
+    def from(*); end
+    def subject(*); end
+    def body_html(*); end
+    def reply_to(*); end
+    def finalize; end
   end
 
   def create_activity_with_questions
@@ -109,5 +129,45 @@ class ActivitiesTest < ActiveSupport::TestCase
     assert_equal '1', answers[q[5]]
     assert_equal '2024-08-01', answers[q[6]]
   end
-end
 
+  def apply_with_rack(applicant)
+    answers = APPLICATION_QUESTIONS.split("\n").each_index.to_h { |i| [i.to_s, "a#{i + 1}"] }
+    post "#{@activity.path}/apply", account: { name: applicant.name, email: applicant.email }, answers: answers
+    assert_equal 302, last_response.status
+    assert_includes last_response.location, 'applied=true'
+  end
+
+  test 'organisers are emailed when people apply to an activity' do
+    covers 'events/activity-application-emails-organisers@c84fd8'
+    create_activity_with_questions
+    Delayed::Job.delete_all
+    applicant = FactoryBot.build_stubbed(:account)
+
+    apply_with_rack(applicant)
+    assert_equal 1, @activity.activity_applications.count
+
+    emails = []
+    Mailgun::BatchMessage.stub :new, proc { RecordedEmail.new.tap { |email| emails << email } } do
+      Delayed::Job.and(handler: /ActivityApplication.*send_notification/m).each(&:invoke_job)
+    end
+    assert_equal 1, emails.length
+    assert_includes emails.first.recipients, @account.email
+    assert_equal @activity.admins.pluck(:email).sort, emails.first.recipients.sort
+  end
+
+  test 'accepting an application makes the applicant a follower of the activity' do
+    covers 'organisations/application-only-activities@7b2afe'
+    create_activity_with_questions
+    apply_with_rack(FactoryBot.build_stubbed(:account))
+    application = @activity.activity_applications.first
+    applicant = application.account
+    assert_nil @activity.activityships.find_by(account: applicant)
+
+    sign_in_with_rack(@account)
+    post "#{@activity.path}/activity_applications/#{application.id}/set_status", status: 'Accepted'
+    assert_equal 200, last_response.status
+
+    assert_equal 'Accepted', application.reload.status
+    assert @activity.activityships.find_by(account: applicant), 'The applicant should follow the activity'
+  end
+end

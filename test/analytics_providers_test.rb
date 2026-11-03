@@ -14,6 +14,7 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
   end
 
   test 'facebook pixel strips blanks and rejects non-numeric ids' do
+    covers 'organisations/analytics-ids@905e12'
     create_organisation
     @organisation.facebook_pixel_id = ' 1234567890 '
     assert @organisation.valid?
@@ -29,6 +30,7 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
   end
 
   test 'facebook is enabled by organisation or event pixel' do
+    covers 'organisations/analytics-org-and-event-both-sent@6bdbdc'
     create_event
     provider = AnalyticsProvider.object('facebook')
     refute provider.enabled?(organisation: @organisation, event: @event)
@@ -42,6 +44,7 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
   end
 
   test 'facebook pixel ids are unique across organisation and event' do
+    covers 'organisations/analytics-org-and-event-both-sent@6bdbdc'
     create_event
     @organisation.facebook_pixel_id = '1111111111'
     @event.facebook_pixel_id = '1111111111'
@@ -75,6 +78,7 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
   end
 
   test 'google ads conversion requires both id and label' do
+    covers 'organisations/analytics-ids@905e12'
     create_organisation
     @organisation.google_ads_conversion_label = 'Purchase'
     refute @organisation.valid?
@@ -136,6 +140,7 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
   end
 
   test 'google ads conversions are unique across organisation and event' do
+    covers 'organisations/analytics-org-and-event-both-sent@6bdbdc'
     create_event
     @organisation.update!(
       google_ads_conversion_id: '6782912626',
@@ -153,6 +158,7 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
   end
 
   test 'organisation edit saves analytics provider fields' do
+    covers 'organisations/analytics-ids@905e12'
     create_organisation
     refute AnalyticsProvider.object('plausible').enabled?(organisation: @organisation)
     refute AnalyticsProvider.object('simple_analytics').enabled?(organisation: @organisation)
@@ -177,5 +183,99 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
     assert AnalyticsProvider.object('simple_analytics').enabled?(organisation: @organisation)
     assert AnalyticsProvider.object('facebook').enabled?(organisation: @organisation)
     assert AnalyticsProvider.object('google_ads').enabled?(organisation: @organisation)
+  end
+
+  # The analytics partials render only in production (layouts/_head.erb)
+  def get_in_production(path)
+    Padrino.stub(:env, :production) { get path }
+    assert last_response.ok?, last_response.status.to_s
+    Nokogiri::HTML(last_response.body)
+  end
+
+  # The marketing scripts on a page, which cookie_consent.js runs only once marketing cookies are allowed
+  def marketing_scripts(doc)
+    doc.css('script[data-cookie-category="marketing"]')
+  end
+
+  # The values the partials pass to their script's (function (x) { ... })(<json>) calls
+  def script_arguments(script)
+    script.text.scan(/^\s*\}\)\((.*)\);$/).map { |(json)| JSON.parse(json) }
+  end
+
+  def create_event_with_analytics
+    create_event(prices: [10])
+    @organisation.update!(facebook_pixel_id: '1234567890', google_ads_conversion_id: '6782912626', google_ads_conversion_label: 'Purchase', google_ads_enhanced_conversions: true)
+  end
+
+  def create_paid_order
+    buyer = FactoryBot.create(:account, phone: '+447700900123')
+    @order = @event.orders.create!(account: buyer, currency: 'GBP', value: 10, payment_completed: true)
+    @order.tickets.create!(event: @event, account: buyer, ticket_type: @event.ticket_types.first)
+  end
+
+  test 'pixel and google ads tags load on organisation and event pages, held back until marketing cookie consent' do
+    covers 'organisations/analytics-tags-need-marketing-consent@3bd32f', 'organisations/google-ads-conversion@d1d9d3'
+    create_event_with_analytics
+
+    ["/o/#{@organisation.slug}", "/e/#{@event.slug}"].each do |path|
+      doc = get_in_production(path)
+      scripts = marketing_scripts(doc)
+      # Held as text/plain until marketing consent, so the browser doesn't run them
+      assert(scripts.all? { |script| script['type'] == 'text/plain' }, path)
+      assert(scripts.any? { |script| script.text.include?("fbq('init', pixelId)") && script.text.include?('["1234567890"]') }, path)
+      assert(scripts.any? { |script| script['src'] == 'https://www.googletagmanager.com/gtag/js?id=AW-6782912626' }, path)
+      assert(scripts.any? { |script| script.text.include?('"id":"AW-6782912626"') }, path)
+      # Nothing runs the tags without consent
+      refute(doc.css('script').reject { |script| script['type'] == 'text/plain' }.any? { |script| script.text.include?('fbevents.js') || script.text.include?("gtag('config'") }, path)
+      refute(doc.css('script[src*="googletagmanager"]').any? { |script| script['type'] != 'text/plain' }, path)
+    end
+  end
+
+  test 'meta pixel tracks PageView and ViewContent on event pages, and a single Purchase after booking' do
+    covers 'organisations/meta-pixel-events@594c53', 'events/purchase-conversions-on-thank-you-page@3746ce'
+    create_event_with_analytics
+
+    pixel = marketing_scripts(get_in_production("/e/#{@event.slug}")).find { |script| script.text.include?('fbq(') }
+    assert_includes pixel.text, "fbq('track', 'PageView')"
+    view_content, purchase = script_arguments(pixel)
+    assert_equal({ 'content_name' => @event.name, 'content_ids' => [@event.id.to_s], 'content_type' => 'product' }, view_content)
+    assert_nil purchase
+
+    create_paid_order
+    pixel = marketing_scripts(get_in_production("/e/#{@event.slug}?order_id=#{@order.token}&success=true")).find { |script| script.text.include?('fbq(') }
+    assert_includes pixel.text, "fbq('track', 'PageView')"
+    view_content, purchase = script_arguments(pixel)
+    assert_nil view_content
+    assert_equal @order.id.to_s, purchase['order_id']
+    assert_equal({ 'currency' => 'GBP', 'value' => 10.0, 'content_type' => 'product', 'content_ids' => [@event.ticket_types.first.id.to_s],
+                   'content_name' => @event.name, 'num_items' => 1 }, purchase['params'])
+    # Sent once per order: the order ID dedupes it with Meta, and the page skips it if it has already sent it
+    assert_includes pixel.text, "fbq('track', 'Purchase', purchase.params, {eventID: orderId})"
+    assert_includes pixel.text, "sessionStorage.getItem(storageKey)) return"
+  end
+
+  test 'google ads fires a single conversion with value, currency and order ID, with hashed user data for enhanced conversions' do
+    covers 'organisations/google-ads-conversion@d1d9d3', 'organisations/google-ads-enhanced-conversions@c94e58', 'events/purchase-conversions-on-thank-you-page@3746ce'
+    create_event_with_analytics
+
+    gtag = marketing_scripts(get_in_production("/e/#{@event.slug}")).find { |script| script.text.include?('gtag(') }
+    assert_equal [nil], script_arguments(gtag)
+
+    create_paid_order
+    gtag = marketing_scripts(get_in_production("/e/#{@event.slug}?order_id=#{@order.token}&success=true")).find { |script| script.text.include?('gtag(') }
+    purchase = script_arguments(gtag).first
+    assert_equal({ 'value' => 10.0, 'currency' => 'GBP', 'transaction_id' => @order.id.to_s }, purchase['params'])
+    assert_equal ['AW-6782912626/Purchase'], purchase['send_to']
+    assert_includes gtag.text, "sessionStorage.getItem(storageKey)) return"
+    # gtag.js normalises and hashes user_data before sending it (allow_enhanced_conversions)
+    assert_equal({ 'email' => @order.account.email, 'phone_number' => '+447700900123' }, purchase['user_data'])
+    assert_includes gtag.text, "gtag('set', 'user_data', purchase.user_data)"
+    assert_includes gtag.text, "gtag('config', config.id, {allow_enhanced_conversions: true})"
+
+    @organisation.update!(google_ads_enhanced_conversions: false)
+    gtag = marketing_scripts(get_in_production("/e/#{@event.slug}?order_id=#{@order.token}&success=true")).find { |script| script.text.include?('gtag(') }
+    purchase = script_arguments(gtag).first
+    assert_equal @order.id.to_s, purchase['order_id']
+    assert_nil purchase['user_data']
   end
 end

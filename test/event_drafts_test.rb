@@ -27,6 +27,7 @@ class EventDraftsTest < ActiveSupport::TestCase
   end
 
   test 'draft save keeps ticket types and updates the same draft' do
+    covers 'events/draft-autosave-restores-tickets@38928c'
     create_organisation
     sign_in_with_rack(@account)
 
@@ -60,6 +61,7 @@ class EventDraftsTest < ActiveSupport::TestCase
   end
 
   test 'reloading a draft restores ticket types and groups' do
+    covers 'events/draft-autosave-restores-tickets@38928c'
     create_organisation
     draft = create_event_draft
     sign_in(@account)
@@ -108,6 +110,7 @@ class EventDraftsTest < ActiveSupport::TestCase
   end
 
   test 'creating an event from a restored draft keeps ticket types' do
+    covers 'events/draft-autosave-restores-tickets@38928c'
     create_organisation
     event = FactoryBot.build_stubbed(:event)
     draft = create_event_draft(name: event.name)

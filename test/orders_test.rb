@@ -52,6 +52,50 @@ class OrdersTest < ActiveSupport::TestCase
     end
   end
 
+  # Stands in for Mailgun::BatchMessage, keeping who an email would go to, with their variables, and its body
+  class RecordedEmail
+    attr_reader :recipients, :variables, :html
+
+    def initialize
+      @recipients = []
+      @variables = {}
+    end
+
+    def add_recipient(_type, email, variables = {})
+      @recipients << email
+      @variables[email] = variables
+    end
+
+    def body_html(html)
+      @html = html
+    end
+
+    def from(*); end
+    def subject(*); end
+    def reply_to(*); end
+    def add_attachment(*); end
+    def finalize; end
+  end
+
+  # The emails sent while the block runs, one for each Mailgun::BatchMessage made
+  def recorded_emails
+    emails = []
+    Mailgun::BatchMessage.stub :new, proc { (emails << RecordedEmail.new).last } do
+      yield
+    end
+    emails
+  end
+
+  # The jobs queued to run a handle_asynchronously or .delay method
+  def queued_jobs(method_name)
+    Delayed::Job.and(handler: /\b#{method_name}(_without_delay)?\b/)
+  end
+
+  # The emails the jobs queued to run a method send
+  def emails_from_jobs(method_name)
+    recorded_emails { queued_jobs(method_name).each(&:invoke_job) }
+  end
+
   def with_stubbed_stripe_refunds
     refunds = []
     payment_intent = api_object(charges: [api_object(id: 'ch_test')])
@@ -294,6 +338,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'check-in accepts the ticket token from the QR code, and legacy ticket mongo ids' do
+    covers 'events/check-in-link-for-assistants@079793', 'organisations/check-in-scanner-link@4740c2'
     create_complete_order_with_ticket
     secret = OpenSSL::HMAC.hexdigest('SHA256', ENV['CHECK_IN_SECRET'], "check_in:#{@event.id}")[0, 32]
 
@@ -327,6 +372,7 @@ class OrdersTest < ActiveSupport::TestCase
   # Refunds
 
   test 'destroying an order refunds it' do
+    covers 'events/refund-order-whole-payment@0235d0', 'events/refunds-to-original-method@119ce8'
     create_event(prices: [10])
     order = create_paid_order(@event)
     with_stubbed_stripe_refunds do |refunds|
@@ -336,6 +382,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'destroying an event refunds its orders' do
+    covers 'events/delete-event-refund-choice@eba303'
     create_event(prices: [10])
     create_paid_order(@event)
     with_stubbed_stripe_refunds do |refunds|
@@ -345,6 +392,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'destroying an event with prevent_order_refunds does not refund orders' do
+    covers 'events/delete-event-refund-choice@eba303'
     create_event(prices: [10])
     create_paid_order(@event)
     @event.prevent_order_refunds = true
@@ -355,6 +403,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'successful refund emails the buyer a confirmation' do
+    covers 'events/refund-order-whole-payment@0235d0', 'events/refund-confirmation-email@e7eb67'
     create_event(prices: [10])
     order = create_paid_order(@event)
     captured = nil
@@ -367,6 +416,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'failed refund does not email the buyer a confirmation' do
+    covers 'events/refund-confirmation-email@e7eb67'
     create_event(prices: [10])
     order = create_paid_order(@event)
     notified = false
@@ -384,6 +434,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'refunding a ticket emails the buyer a confirmation' do
+    covers 'events/refund-ticket-own-price@985cff', 'events/refund-confirmation-email@e7eb67'
     create_event(prices: [10])
     ticket = @event.ticket_types.first.tickets.create!(
       event: @event,
@@ -402,6 +453,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'refund confirmation email includes the amount' do
+    covers 'events/refund-confirmation-email@e7eb67'
     create_event(prices: [10])
     html = EmailHelper.html(:refund, event: @event, amount: '£10', provider: 'Stripe', header_image_url: nil)
 
@@ -452,6 +504,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'free orders with a donation to Dandelion get a receipt PDF' do
+    covers 'events/free-order-donation-receipt@388e58'
     create_complete_order_with_ticket
     @order.set(application_fee_paid_to_dandelion: true)
     refute @order.donation_receipt?
@@ -465,6 +518,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'paid orders with a donation to Dandelion do not get a receipt PDF' do
+    covers 'events/free-order-donation-receipt@388e58'
     create_complete_order
     @order.set(application_fee_paid_to_dandelion: true)
     @order.tickets.create!(event: @event, account: @attendee, ticket_type: @event.ticket_types.first, price: 5)
@@ -530,6 +584,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'complimentary tickets can be cancelled by their account' do
+    covers 'events/attendees-cancel-free-rsvps@2edb4c'
     ticket = create_complimentary_ticket
     assert ticket.cancellable?
     sign_in_with_rack(@attendee)
@@ -547,6 +602,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'complimentary tickets cannot be cancelled by another account' do
+    covers 'events/attendees-cancel-free-rsvps@2edb4c'
     ticket = create_complimentary_ticket
     sign_in_with_rack(FactoryBot.create(:account))
 
@@ -558,6 +614,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'priced complimentary tickets and tickets in orders cannot be cancelled as tickets' do
+    covers 'events/paid-orders-not-cancellable@9106dd'
     ticket = create_complimentary_ticket(price: 10)
     refute ticket.cancellable?
     sign_in_with_rack(@attendee)
@@ -566,5 +623,264 @@ class OrdersTest < ActiveSupport::TestCase
 
     create_complete_order_with_ticket
     refute @ticket.cancellable?
+  end
+
+  test 'free orders can be cancelled by their account, which emails them and tells the waitlist a place is available' do
+    covers 'events/attendees-cancel-free-rsvps@2edb4c', 'events/cancellation-emails-and-waitlist@ddd281'
+    Delayed::Job.delete_all
+    create_complete_order_with_ticket
+    @event.set(capacity: 1)
+    @event.refresh_sold_out_cache_and_notify_waitlist
+    Waitship.create!(event: @event, account: FactoryBot.create(:account))
+    assert Event.find(@event.id).sold_out_cache
+    sign_in_with_rack(@attendee)
+
+    get "/e/#{@event.slug}"
+    assert_includes last_response.body, "/orders/#{@order.id}/destroy"
+    get "/orders/#{@order.id}/confirm_cancel"
+    assert_equal 200, last_response.status
+    post "/orders/#{@order.id}/destroy", from_confirm: '1'
+    assert_equal "http://example.org/e/#{@event.slug}", last_response.location
+    assert_nil Order.find(@order.id)
+    assert_nil Ticket.find(@ticket.id)
+
+    assert_equal [[@attendee.email]], emails_from_jobs(:send_rsvp_cancelled_email).map(&:recipients)
+    assert_equal 1, queued_jobs(:send_waitlist_tickets_available).count
+  end
+
+  test 'cancelling a complimentary ticket emails its account to confirm' do
+    covers 'events/cancellation-emails-and-waitlist@ddd281'
+    Delayed::Job.delete_all
+    ticket = create_complimentary_ticket
+    sign_in_with_rack(@attendee)
+
+    post "/tickets/#{ticket.id}/destroy", from_confirm: '1'
+    assert_nil Ticket.find(ticket.id)
+    assert_equal [[@attendee.email]], emails_from_jobs(:send_rsvp_cancelled_email).map(&:recipients)
+  end
+
+  test 'the Cancel your RSVP links in ticket and reminder emails cancel a free order' do
+    covers 'events/attendees-cancel-free-rsvps@2edb4c'
+    create_complete_order_with_ticket
+    html = EmailHelper.html(:tickets, event: @event, order: @order, account: @attendee, tickets_table: '', header_image_url: nil)
+    assert_includes html, "/orders/#{@order.id}/confirm_cancel?link_token=%recipient.token%"
+    @event.set(reminder_hours_before: 24)
+
+    reminder = recorded_emails { @event.send_reminders_without_delay(@attendee.id) }.find { |email| email.recipients.any? }
+    assert_includes reminder.html, '%recipient.cancel_rsvp_url%'
+    cancel_url = URI(reminder.variables[@attendee.email]['cancel_rsvp_url'])
+    assert_equal "/orders/#{@order.id}/confirm_cancel", cancel_url.path
+
+    # Not signed in: the link's token signs them in
+    clear_cookies
+    get cancel_url.path, Rack::Utils.parse_query(cancel_url.query)
+    follow_redirect! while last_response.redirect?
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "/orders/#{@order.id}/destroy"
+    post "/orders/#{@order.id}/destroy", from_confirm: '1'
+    assert_nil Order.find(@order.id)
+  end
+
+  test 'paid orders and tickets cannot be cancelled or refunded by their attendee' do
+    covers 'events/paid-orders-not-cancellable@9106dd', 'events/attendees-cannot-refund@1c589f'
+    create_event(prices: [10])
+    order = create_paid_order(@event)
+    ticket = order.tickets.create!(event: @event, account: order.account, ticket_type: @event.ticket_types.first, price: 10,
+                                   payment_completed: true, payment_intent: order.payment_intent)
+    sign_in_with_rack(order.account)
+
+    get "/e/#{@event.slug}"
+    refute_includes last_response.body, "/orders/#{order.id}/destroy"
+    with_stubbed_stripe_refunds do |refunds|
+      get "/orders/#{order.id}/confirm_cancel"
+      assert_equal 403, last_response.status
+      post "/orders/#{order.id}/destroy"
+      assert_equal 403, last_response.status
+      post "/tickets/#{ticket.id}/destroy"
+      assert_equal 403, last_response.status
+      post "/e/#{@event.slug}/orders/#{order.id}/refund_and_destroy"
+      post "/e/#{@event.slug}/tickets/#{ticket.id}/refund_and_destroy"
+      assert_empty refunds
+    end
+    assert Order.find(order.id)
+    assert Ticket.find(ticket.id)
+  end
+
+  # Order notifications and confirmations
+
+  test 'order notifications are emailed to facilitators only when the event sends them' do
+    covers 'events/order-notification-emails@73c132'
+    Delayed::Job.delete_all
+    order = create_incomplete_order
+    facilitator = FactoryBot.create(:account)
+    @event.event_facilitations.create!(account: facilitator)
+    @event.set(send_order_notifications: true)
+
+    order.complete_or_restore
+    # The event's creator is a facilitator too
+    assert_equal [[@account.email, facilitator.email].sort], (emails_from_jobs(:send_notification).map { |email| email.recipients.sort })
+    refute_includes @event.event_facilitators, order.account
+
+    Delayed::Job.delete_all
+    order = create_incomplete_order
+    @event.set(send_order_notifications: false)
+    order.complete_or_restore
+    assert order.reload.payment_completed
+    assert_equal 0, queued_jobs(:send_notification).count
+  end
+
+  test 'only the orderer gets the order confirmation unless the event sends it to other ticketholders' do
+    covers 'events/ticketholder-confirmation-setting@b8610e'
+    Delayed::Job.delete_all
+    create_complete_order_with_ticket
+    @ticket.set(email: 'holder@example.com')
+    assert_equal [[@attendee.email]], recorded_emails { @order.send_tickets_without_delay }.map(&:recipients)
+
+    @ticket.set(email: nil)
+    post ticketholder_path(@order.token, 'email'), email: 'holder@example.com', success: 1
+    assert_equal 200, last_response.status
+    assert_equal 0, queued_jobs(:send_ticket).count
+
+    @event.set(send_ticketholder_confirmation: true)
+    post ticketholder_path(@order.token, 'email'), email: 'friend@example.com', success: 1
+    assert_equal 200, last_response.status
+    assert_equal [['friend@example.com']], emails_from_jobs(:send_ticket).map(&:recipients)
+  end
+
+  test 'the original ticket PDF still works after the ticketholder changes' do
+    covers 'events/ticket-pdf-works-after-transfer@a22930'
+    create_complete_order_with_ticket
+    token = @ticket.public_id
+
+    post ticketholder_path(@order.token, 'name'), name: 'New Holder'
+    post ticketholder_path(@order.token, 'email'), email: 'newholder@example.com', success: 1
+    assert_equal 'newholder@example.com', @ticket.reload.email
+    assert_equal token, @ticket.public_id
+
+    secret = OpenSSL::HMAC.hexdigest('SHA256', ENV['CHECK_IN_SECRET'], "check_in:#{@event.id}")[0, 32]
+    post "/e/#{@event.slug}/check_in/#{token}", checked_in: true, secret: secret
+    assert_equal 200, last_response.status
+    assert @ticket.reload.checked_in
+  end
+
+  # Refunds by provider
+
+  def create_order_paid_with(event, **payment_ids)
+    Order.create!(event: event, account: FactoryBot.create(:account), value: 10, payment_completed: true,
+                  currency: event.currency, **payment_ids)
+  end
+
+  test 'Mollie, PayPal and GoCardless refunds go back to the payment they were made with' do
+    covers 'events/refunds-to-original-method@119ce8'
+    create_event(prices: [10])
+
+    mollie_refunds = []
+    Mollie::Payment::Refund.stub :create, proc { |params| mollie_refunds << params } do
+      create_order_paid_with(@event, mollie_payment_id: 'tr_mollie').destroy
+    end
+    assert_equal [['tr_mollie', '10.00']], (mollie_refunds.map { |params| [params[:payment_id], params[:amount][:value]] })
+
+    paypal_refunds = []
+    paypal = Object.new
+    paypal.define_singleton_method(:refund_capture) { |capture_id, amount:, currency:| paypal_refunds << [capture_id, amount, currency] }
+    EventPaymentMethod::Paypal.stub :client_for, paypal do
+      create_order_paid_with(@event, paypal_capture_id: 'CAPTURE1').destroy
+    end
+    assert_equal [['CAPTURE1', 10, 'GBP']], paypal_refunds
+
+    gocardless_refunds = []
+    payments = Object.new
+    payments.define_singleton_method(:get) { |_id| Struct.new(:amount_refunded).new(0) }
+    refunds = Object.new
+    refunds.define_singleton_method(:create) { |params:| gocardless_refunds << params }
+    gocardless = Struct.new(:payments, :refunds).new(payments, refunds)
+    GoCardlessPro::Client.stub :new, gocardless do
+      create_order_paid_with(@event, gocardless_payment_id: 'PM123').destroy
+    end
+    assert_equal [['PM123', 1000]], (gocardless_refunds.map { |params| [params[:links][:payment], params[:amount]] })
+  end
+
+  test 'Remove and refund order refunds the whole payment, including a donation to Dandelion' do
+    covers 'events/refund-order-whole-payment@0235d0'
+    create_event(prices: [10])
+    @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json)
+    order = create_paid_order(@event)
+    order.set(value: 15, application_fee_amount: 5, application_fee_paid_to_dandelion: true)
+    order.tickets.create!(event: @event, account: order.account, ticket_type: @event.ticket_types.first, price: 10, payment_completed: true)
+    order.donations.create!(account: order.account, event: @event, amount: 5)
+    sign_in_with_rack(@account)
+
+    refund_params = []
+    Stripe::PaymentIntent.stub :retrieve, api_object(charges: [api_object(id: 'ch_test')]) do
+      Stripe::Refund.stub :create, proc { |params, _opts| refund_params << params } do
+        post "/e/#{@event.slug}/orders/#{order.id}/refund_and_destroy"
+      end
+    end
+    # No amount refunds the whole charge
+    assert_equal [{ charge: 'ch_test', refund_application_fee: true }], refund_params
+    assert_nil Order.find(order.id)
+  end
+
+  test 'Remove order and Remove ticket remove without refunding' do
+    covers 'events/remove-without-refund@febcde'
+    create_event(prices: [10])
+    order = create_paid_order(@event)
+    other_order = create_paid_order(@event)
+    ticket = other_order.tickets.create!(event: @event, account: other_order.account, ticket_type: @event.ticket_types.first, price: 10,
+                                         payment_completed: true, payment_intent: other_order.payment_intent)
+    sign_in_with_rack(@account)
+
+    with_stubbed_stripe_refunds do |refunds|
+      post "/e/#{@event.slug}/orders/#{order.id}/destroy"
+      post "/e/#{@event.slug}/tickets/#{ticket.id}/destroy"
+      assert_empty refunds
+    end
+    assert_nil Order.find(order.id)
+    assert_nil Ticket.find(ticket.id)
+  end
+
+  test 'refund options appear only for Stripe, GoCardless, Mollie and PayPal payments' do
+    covers 'events/refunds-to-original-method@119ce8', 'events/refund-options-only-for-providers@a51af0'
+    create_event(prices: [10])
+    @event.ticket_types.first.set(quantity: 20)
+    refundable = [{ payment_intent: 'pi_1' }, { gocardless_payment_id: 'PM1' }, { mollie_payment_id: 'tr_1' }, { paypal_capture_id: 'CAP1' }]
+    not_refundable = [{ oc_secret: 'oc1' }, { evm_secret: 'evm1' }, {}]
+    orders = (refundable + not_refundable).map do |payment_ids|
+      order = create_order_paid_with(@event, **payment_ids)
+      order.tickets.create!(event: @event, account: order.account, ticket_type: @event.ticket_types.first, price: 10, payment_completed: true,
+                            **payment_ids.slice(:payment_intent, :gocardless_payment_id, :mollie_payment_id, :paypal_capture_id))
+      order
+    end
+    sign_in_with_rack(@account)
+
+    get "/e/#{@event.slug}/orders"
+    assert_equal 200, last_response.status
+    orders.each_with_index do |order, i|
+      assert_includes last_response.body, "/e/#{@event.slug}/orders/#{order.id}/destroy"
+      assert_equal i < refundable.size, last_response.body.include?("/e/#{@event.slug}/orders/#{order.id}/refund_and_destroy"), order.attributes.slice('payment_intent', 'gocardless_payment_id', 'mollie_payment_id', 'paypal_capture_id', 'oc_secret', 'evm_secret').inspect
+    end
+
+    get "/e/#{@event.slug}/tickets"
+    assert_equal 200, last_response.status
+    orders.each_with_index do |order, i|
+      ticket = order.tickets.first
+      assert_includes last_response.body, "/e/#{@event.slug}/tickets/#{ticket.id}/destroy"
+      assert_equal i < refundable.size, last_response.body.include?("/e/#{@event.slug}/tickets/#{ticket.id}/refund_and_destroy")
+    end
+  end
+
+  test 'a failed refund emails the organiser the error' do
+    covers 'events/refund-failure-email@176a81'
+    create_event(prices: [10])
+    order = create_paid_order(@event)
+    emails = nil
+    Stripe::PaymentIntent.stub :retrieve, api_object(charges: [api_object(id: 'ch_test')]) do
+      Stripe::Refund.stub :create, proc { raise Stripe::InvalidRequestError.new('Charge ch_test has already been refunded.', nil) } do
+        emails = recorded_emails { order.destroy }
+      end
+    end
+    email = emails.find { |e| e.recipients.include?(@account.email) }
+    assert email
+    assert_includes email.html, 'Charge ch_test has already been refunded.'
   end
 end

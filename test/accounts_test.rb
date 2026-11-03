@@ -514,6 +514,7 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'signing up with the activity_id of a closed activity does not join it' do
+    covers 'organisations/application-only-activities@7b2afe'
     create_organisation
     activity = FactoryBot.create(:activity, organisation: @organisation, privacy: 'closed')
     account = FactoryBot.build_stubbed(:account)
@@ -815,6 +816,7 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'the API key tab shows the key only after a sign in code' do
+    covers 'integrations/zapier-and-mcp-same-api-key@a1a235'
     account = FactoryBot.create(:account)
     account.set(email_confirmed: true)
     account.generate_link_token!

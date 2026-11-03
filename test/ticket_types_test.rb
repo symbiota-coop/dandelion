@@ -307,6 +307,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test 'nil slots is saved as 1' do
+    covers 'events/slots-default-one@4abd36'
     create_event(prices: [0], capacity: 10)
     ticket_type = @event.ticket_types.first
     ticket_type.quantity = 10
@@ -348,6 +349,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'event places remaining uses slots rather than ticket count' do
+    covers 'events/capacity-counts-slots@d8b46e'
     create_event(prices: [0], capacity: 10)
     ticket_type = @event.ticket_types.first
     ticket_type.set(slots: 2, quantity: 10)
@@ -359,6 +361,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'add-on tickets with 0 slots do not reduce event capacity' do
+    covers 'events/zero-slot-add-ons@ff75c7'
     create_event(prices: [0], capacity: 1)
     main = @event.ticket_types.first
     main.set(quantity: 10, slots: 1)
@@ -375,6 +378,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'couples tickets take two places from event capacity' do
+    covers 'events/two-slot-couples-tickets@2f6b97'
     create_event(prices: [0], capacity: 3)
     ticket_type = @event.ticket_types.first
     ticket_type.set(slots: 2, quantity: 10)
@@ -389,6 +393,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'ticket group places remaining uses slots' do
+    covers 'events/capacity-counts-slots@d8b46e'
     create_event(prices: [0])
     ticket_group = @event.ticket_groups.create!(name: 'Saturday', capacity: 3)
     ticket_type = @event.ticket_types.first
@@ -404,6 +409,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'add-on tickets with 0 slots do not reduce ticket group capacity' do
+    covers 'events/zero-slot-add-ons@ff75c7'
     create_event(prices: [0])
     ticket_group = @event.ticket_groups.create!(name: 'Saturday', capacity: 1)
     main = @event.ticket_types.first
@@ -494,12 +500,14 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'public_description strips a valid quantity formula' do
+    covers 'events/formula-stripped-from-description@203280'
     ticket_type = TicketType.new(description: 'For followers only [=Leader*1.1:15]')
 
     assert_equal 'For followers only', ticket_type.public_description
   end
 
   test 'public_description is blank when the description is only a formula' do
+    covers 'events/formula-stripped-from-description@203280'
     ticket_type = TicketType.new(description: '[=Leader*1.1:15]')
 
     assert_nil ticket_type.public_description
@@ -529,6 +537,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'quantity formula uses the minimum when no matching tickets have sold' do
+    covers 'events/formula-max-capped-by-quantity@7bbe37', 'events/formula-multiplier-and-minimum@823c65', 'events/formula-leader-follower-example@7eec11'
     create_role_balance_event
 
     assert_equal 15, @follower.effective_quantity
@@ -537,6 +546,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'quantity formula releases more tickets as matching types sell' do
+    covers 'events/formula-max-capped-by-quantity@7bbe37', 'events/formula-multiplier-and-minimum@823c65', 'events/formula-leader-follower-example@7eec11'
     create_role_balance_event
     20.times { @leader.tickets.create!(event: @event, payment_completed: true) }
     @event.reload
@@ -547,6 +557,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'quantity formula never exceeds the ticket type quantity' do
+    covers 'events/formula-max-capped-by-quantity@7bbe37', 'events/formula-leader-follower-example@7eec11'
     create_role_balance_event(follower_quantity: 18)
     20.times { @leader.tickets.create!(event: @event, payment_completed: true) }
     @event.reload
@@ -557,6 +568,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'quantity formula without a minimum starts at zero' do
+    covers 'events/formula-multiplier-and-minimum@823c65'
     create_role_balance_event(follower_description: '[=Leader*1.1]')
 
     assert_equal 0, @follower.effective_quantity
@@ -565,6 +577,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'quantity formula sums all other types whose names include the token' do
+    covers 'events/formula-matches-other-types-by-substring@76cbac'
     create_role_balance_event
     early = FactoryBot.create(:ticket_type, event: @event, name: 'Leader early bird', quantity: 20)
     3.times { @leader.tickets.create!(event: @event, payment_completed: true) }
@@ -581,7 +594,36 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert_equal 22, @follower.effective_quantity
   end
 
+  test 'quantity formula matches names whatever their case' do
+    covers 'events/formula-matches-other-types-by-substring@76cbac'
+    create_role_balance_event(follower_description: '[=leader*1.1:15]')
+    @leader.set(name: 'LEADER')
+    20.times { @leader.tickets.create!(event: @event, payment_completed: true) }
+    @event.reload
+    @follower = @event.ticket_types.detect { |ticket_type| ticket_type.name == 'Follower' }
+
+    assert_equal 22, @follower.effective_quantity
+  end
+
+  test 'ticket types with the same quantity formula each get their own cap' do
+    covers 'events/formula-separate-caps@dae08f'
+    create_role_balance_event
+    second_follower = FactoryBot.create(:ticket_type, event: @event, name: 'Second follower', quantity: 80, description: '[=Leader*1.1:15]')
+    15.times { @follower.tickets.create!(event: @event, payment_completed: true) }
+    @event.reload
+    @follower = @event.ticket_types.detect { |ticket_type| ticket_type.name == 'Follower' }
+    second_follower = @event.ticket_types.detect { |ticket_type| ticket_type.id == second_follower.id }
+
+    assert_equal 15, @follower.effective_quantity
+    assert_equal 0, @follower.remaining
+    assert @follower.sold_out?
+    assert_equal 15, second_follower.effective_quantity
+    assert_equal 15, second_follower.remaining
+    refute second_follower.sold_out?
+  end
+
   test 'quantity formula does not count the type it is written on' do
+    covers 'events/formula-matches-other-types-by-substring@76cbac'
     create_event(prices: [0])
     ticket_type = @event.ticket_types.first
     ticket_type.set(name: 'Leader', quantity: 10)

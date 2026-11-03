@@ -2,6 +2,7 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class PmailsTest < ActiveSupport::TestCase
   include Capybara::DSL
+  include Rack::Test::Methods
 
   test 'creating a pmail' do
     create_organisation
@@ -98,6 +99,7 @@ class PmailsTest < ActiveSupport::TestCase
   end
 
   test 'event admins cannot target recipients they do not administer' do
+    covers 'organisations/who-becomes-event-admin@459b2f', 'organisations/table-organisation-mailer@64db60'
     create_event
     create_event(as: :event2)
     organiser = FactoryBot.create(:account)
@@ -178,6 +180,7 @@ class PmailsTest < ActiveSupport::TestCase
   end
 
   test 'ticket type waitlist pmails target waiters for a ticket type or all ticket types' do
+    covers 'events/mailer-to-waitlist@62f7ed', 'events/mailer-to-ticket-type-waitlists@c83e93', 'mailer/waitlist-recipients@085f4c'
     create_event(allow_ticket_type_waitlists: true)
     weekend = FactoryBot.create(:ticket_type, event: @event, quantity: 0, name: 'Weekend')
     day = FactoryBot.create(:ticket_type, event: @event, quantity: 0, name: 'Day')
@@ -265,6 +268,7 @@ class PmailsTest < ActiveSupport::TestCase
   end
 
   test 'event pmail to options include ticket type waitlists when enabled' do
+    covers 'events/mailer-to-waitlist@62f7ed', 'events/mailer-to-ticket-type-waitlists@c83e93', 'mailer/waitlist-recipients@085f4c'
     create_event(allow_ticket_type_waitlists: true)
     ticket_type = FactoryBot.create(:ticket_type, event: @event, quantity: 1, name: 'Weekend')
 
@@ -345,5 +349,140 @@ class PmailsTest < ActiveSupport::TestCase
     pmail = FactoryBot.build(:pmail, organisation: @organisation, event: event)
 
     assert pmail.valid?, pmail.errors.full_messages.to_sentence
+  end
+
+  # Sets these ENV variables while the block runs. .env.test has no Mailgun settings: production's free gift is for up to
+  # MAILGUN_FREE_SUBSCRIBER_LIMIT=1000 subscribers, sent from Dandelion's MAILGUN_PMAILS_HOST
+  def with_env(vars)
+    previous = vars.keys.to_h { |key| [key, ENV.fetch(key, nil)] }
+    vars.each { |key, value| ENV[key] = value }
+    yield
+  ensure
+    previous.each { |key, value| ENV[key] = value }
+  end
+
+  def add_followers(organisation, count)
+    Organisationship.collection.insert_many(Array.new(count) do
+      { account_id: BSON::ObjectId.new, organisation_id: organisation.id, created_at: Time.now.utc, updated_at: Time.now.utc, unsubscribed: false }
+    end)
+  end
+
+  test 'the free gift is one email a month for up to 1000 subscribers, beyond which a Mailgun account is needed, and event attendees can always be emailed' do
+    covers 'organisations/free-gift-email@02e4c6', 'mailer/free-gift-limit@c4bc26'
+    with_env('MAILGUN_FREE_SUBSCRIBER_LIMIT' => '1000') do
+      create_event
+      # With its creator, 1000
+      add_followers(@organisation, 999)
+      assert_equal 1000, @organisation.organisationships.count
+      pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone')
+      assert pmail.sendable?
+
+      # Sent through Dandelion's Mailgun, as a gift
+      pmail.send_batch_message
+      assert pmail.reload.gift?
+
+      # One a month
+      pmail.set(requested_send_at: Time.now, sent_at: Time.now)
+      next_pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone')
+      refute next_pmail.sendable?
+      pmail.set(requested_send_at: 32.days.ago, sent_at: 32.days.ago)
+      assert next_pmail.sendable?
+
+      # Up to 1000 subscribers
+      add_followers(@organisation, 1)
+      refute next_pmail.sendable?
+
+      # Beyond that, a Mailgun account
+      @organisation.set(mailgun_api_key: 'key-test', mailgun_domain: 'mg.example.com')
+      assert next_pmail.reload.sendable?
+      @organisation.set(mailgun_api_key: nil, mailgun_domain: nil)
+
+      # Event attendees, always
+      pmail.set(requested_send_at: Time.now, sent_at: Time.now)
+      event_pmail = FactoryBot.create(:pmail, organisation: @organisation, mailable: @event, recipient_kind: 'event')
+      refute next_pmail.reload.sendable?
+      assert event_pmail.sendable?
+      event_pmail.send_batch_message
+      refute event_pmail.reload.gift?
+    end
+  end
+
+  test 'followers who unsubscribed count towards the free gift limit' do
+    covers 'organisations/free-gift-email@02e4c6', 'mailer/free-gift-limit@c4bc26'
+    with_env('MAILGUN_FREE_SUBSCRIBER_LIMIT' => '1000') do
+      create_event
+      # With its creator, 1000
+      add_followers(@organisation, 999)
+      pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone')
+      assert pmail.sendable?
+
+      Organisationship.collection.insert_one(account_id: BSON::ObjectId.new, organisation_id: @organisation.id, created_at: Time.now.utc,
+                                             updated_at: Time.now.utc, unsubscribed: true)
+      refute pmail.reload.sendable?
+    end
+  end
+
+  # Mailgun's tag stats for a month with these totals
+  def mailgun_tag_stats(delivered:, opened:, clicked:)
+    {
+      'stats' => [{
+        'accepted' => { 'incoming' => 0, 'outgoing' => delivered, 'total' => delivered },
+        'delivered' => { 'smtp' => delivered, 'http' => 0, 'optimized' => 0, 'total' => delivered },
+        'failed' => {
+          'temporary' => { 'espblock' => 0, 'total' => 0 },
+          'permanent' => { 'suppress-bounce' => 0, 'suppress-unsubscribe' => 0, 'suppress-complaint' => 0, 'bounce' => 0,
+                           'delayed-bounce' => 0, 'webhook' => 0, 'optimized' => 0, 'total' => 0 }
+        },
+        'stored' => { 'total' => 0 },
+        'opened' => { 'total' => opened, 'unique' => opened },
+        'clicked' => { 'total' => clicked, 'unique' => clicked },
+        'unsubscribed' => { 'total' => 0 },
+        'complained' => { 'total' => 0 }
+      }]
+    }
+  end
+
+  # The pmail's edit page, with Mailgun answering its tag stats with stats, and the domains asked for in domains
+  def get_pmail_edit_page(pmail, stats:, domains:)
+    tags = Object.new
+    tags.define_singleton_method(:get_tag_stats) do |domain, *|
+      domains << domain
+      stats
+    end
+    Mailgun::Tags.stub(:new, tags) { get "/pmails/#{pmail.id}/edit?organisation_id=#{@organisation.id}" }
+    assert last_response.ok?
+    last_response.body
+  end
+
+  test 'a sent free gift message shows its delivery, open and click rates, and own Mailgun accounts also get a link to Mailgun analytics' do
+    covers 'organisations/free-gift-email-analytics@2fc6d9', 'mailer/free-gift-rates@6782fe'
+    stats = mailgun_tag_stats(delivered: 200, opened: 50, clicked: 10)
+    create_organisation
+    sign_in_with_rack(@account)
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone')
+    pmail.set(gift: true, requested_send_at: Time.now, sent_at: Time.now)
+
+    with_env('MAILGUN_API_KEY' => 'key-dandelion', 'MAILGUN_PMAILS_HOST' => 'mailer.dandelion.test') do
+      domains = []
+      body = get_pmail_edit_page(pmail, stats: stats, domains: domains)
+      # Read from Dandelion's Mailgun, which sent it
+      assert_equal ['mailer.dandelion.test'], domains.uniq
+      assert_includes body, 'Delivered rate'
+      assert_includes body, '100.00%'
+      assert_includes body, 'Opened rate'
+      assert_includes body, '25.00%'
+      assert_includes body, 'Clicked rate'
+      assert_includes body, '5.00%'
+      refute_includes body, 'View analytics on Mailgun'
+    end
+
+    @organisation.set(mailgun_api_key: 'key-test', mailgun_domain: 'mg.example.com')
+    pmail.set(gift: false)
+    domains = []
+    body = get_pmail_edit_page(pmail, stats: stats, domains: domains)
+    assert_equal ['mg.example.com'], domains.uniq
+    assert_includes body, 'Opened rate'
+    assert_includes body, 'View analytics on Mailgun'
+    assert_includes body, 'https://app.mailgun.com/mg/reporting/metrics?'
   end
 end

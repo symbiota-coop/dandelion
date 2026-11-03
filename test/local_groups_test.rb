@@ -49,6 +49,7 @@ class LocalGroupsTest < ActiveSupport::TestCase
   end
 
   test 'a polygon with a hole keeps the hole, and members in the hole are not added' do
+    covers 'organisations/followers-join-local-groups@336869'
     outer = [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]
     hole = [[4, 4], [4, 6], [6, 6], [6, 4], [4, 4]]
     local_group = FactoryBot.create(:local_group, geometry: { type: 'Polygon', coordinates: [outer, hole] }.to_json)

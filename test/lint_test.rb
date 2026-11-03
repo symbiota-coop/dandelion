@@ -12,6 +12,7 @@ require 'tmpdir'
 require 'yaml'
 require 'rubocop'
 require 'erb_lint/all'
+require_relative '../lib/doc_claims'
 
 class LintTest < Minitest::Test
   ROOT = File.expand_path('..', __dir__)
@@ -338,6 +339,44 @@ class LintTest < Minitest::Test
     listed = JSON.parse(File.read(File.join(ROOT, 'frontend/package.json')))['dependencies'].keys
     loaded = urls.filter_map { |url| url[%r{/npm/((?:@[^/]+/)?[^/@]+)@}, 1] }.uniq
     assert_empty listed - loaded, 'nothing loads these: remove them from frontend/package.json'
+  end
+
+  def test_doc_claims_are_the_text_before_each_marker
+    source = "Intro. <!-- claim: first --> Then  more. <!-- claim: second --> Untested.\n- An item <!-- claim: item -->\n> Quoted <!-- claim: quote -->\n"
+    claims = DocClaims.claims(source)
+    assert_equal([['first', 'Intro.', 1], ['second', 'Then more.', 1], ['item', 'An item', 2], ['quote', 'Quoted', 3]], claims.map { |c| c.values_at(:id, :text, :line) })
+    assert_equal DocClaims.hash('Intro.'), claims.first[:hash]
+    assert_equal "Intro. Then  more. Untested.\n- An item\n> Quoted\n", DocClaims.strip(source)
+  end
+
+  # AGENTS.md, Docs and tests: each claim the docs mark is covered by a test, checked against the claim's current text
+  def test_doc_claims_are_tested
+    claims = Dir[File.join(ROOT, 'app/views/docs/md/*.md')].flat_map do |path|
+      page = File.basename(path, '.md')
+      DocClaims.claims(File.read(path, encoding: 'UTF-8')).map { |c| c.merge(ref: "#{page}/#{c[:id]}", at: "app/views/docs/md/#{page}.md:#{c[:line]}") }
+    end
+    refute_empty claims
+    duplicates = claims.group_by { |c| c[:ref] }.select { |_, cs| cs.size > 1 }.keys
+    assert_empty duplicates, 'Give each claim on a page its own id'
+    claims = claims.to_h { |c| [c[:ref], c] }
+
+    covers = Dir[File.join(ROOT, 'test/*_test.rb')].flat_map do |path|
+      File.readlines(path, encoding: 'UTF-8').each_with_index.flat_map do |line, index|
+        line[/\A\s*covers ('.+)/, 1].to_s.scan(/'([^']*)'/).flatten.map { |ref| [ref, "test/#{File.basename(path)}:#{index + 1}"] }
+      end
+    end
+    problems = covers.filter_map do |ref, at|
+      id, hash = ref.split('@')
+      claim = claims[id]
+      if claim.nil?
+        "#{at}: no claim #{id} in the docs (covers 'page/id@hash')"
+      elsif hash != claim[:hash]
+        "#{at}: #{claim[:at]} has changed since this test was checked against it. Check the test still tests \"#{claim[:text]}\", then cover '#{id}@#{claim[:hash]}'"
+      end
+    end
+    assert_empty problems, problems.join("\n")
+    untested = claims.values.reject { |c| covers.any? { |ref, _| ref.split('@').first == c[:ref] } }.map { |c| "#{c[:at]}: #{c[:ref]}" }
+    assert_empty untested, "No test covers these claims: write one and add covers '<ref>@<hash>' to it\n#{untested.join("\n")}"
   end
 
   # AGENTS.md, Build/vendored code: CKEditor 38 and later show a Powered by CKEditor badge under the GPL

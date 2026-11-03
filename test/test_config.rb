@@ -82,6 +82,10 @@ module ActiveSupport
       save_screenshot if !ENV['CI'] && respond_to?(:save_screenshot)
     end
 
+    # The doc claims this test checks, as 'page/id@hash' (lib/doc_claims.rb): test/lint_test.rb reads them, so they do
+    # nothing here
+    def covers(*claims); end
+
     def reset!
       Capybara.reset_sessions!
       AppModels.all.each do |model|

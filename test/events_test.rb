@@ -67,6 +67,42 @@ class EventsTest < ActiveSupport::TestCase
     JSON.parse(last_response.body).map { |event| event['id'] }
   end
 
+  # Stands in for Mailgun::BatchMessage, keeping what an email would say
+  class RecordedEmail
+    attr_reader :recipients, :subject_line, :html
+
+    def initialize
+      @recipients = []
+    end
+
+    def add_recipient(_type, email, _variables)
+      @recipients << email
+    end
+
+    def subject(text)
+      @subject_line = text
+    end
+
+    def body_html(html)
+      @html = html
+    end
+
+    def from(*); end
+    def reply_to(*); end
+    def finalize; end
+  end
+
+  # The emails the block would send, one per Mailgun::BatchMessage it makes
+  def recorded_emails(&)
+    emails = []
+    Mailgun::BatchMessage.stub(:new, ->(*) { RecordedEmail.new.tap { |email| emails << email } }, &)
+    emails
+  end
+
+  def xhr_get(path, params = {})
+    get path, params, { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }
+  end
+
   test 'creating an event' do
     create_organisation
     event = FactoryBot.build_stubbed(:event)
@@ -80,6 +116,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'creating an event with a range' do
+    covers 'events/price-range-slider@693b77'
     create_organisation
     event = FactoryBot.build_stubbed(:event)
     ticket_type = FactoryBot.build_stubbed(:ticket_type, price_or_range: '10-100')
@@ -102,6 +139,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'public event submission creates draft and notifies admins' do
+    covers 'organisations/who-becomes-event-admin@459b2f', 'organisations/community-event-submissions@e06059'
     Delayed::Job.delete_all if defined?(Delayed::Job)
     create_organisation(allow_event_submissions: true)
     submitter = FactoryBot.create(:account)
@@ -132,6 +170,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'event admin can lock but only lock admin can unlock' do
+    covers 'organisations/who-becomes-event-admin@459b2f', 'organisations/community-event-submissions@e06059', 'organisations/table-unlock-locked@ec36f3'
     create_organisation(allow_event_submissions: true)
     org_admin = @account
     coordinator = FactoryBot.create(:account)
@@ -182,6 +221,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'a duplicated event says it is a copy until it is first saved' do
+    covers 'events/duplicate-starts-locked@9b7b43'
     create_event(prices: [0])
     sign_in(@account)
     duplicate = @event.duplicate!(@account)
@@ -645,6 +685,7 @@ class EventsTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test 'reminder is due when its send time falls within the next hour' do
+    covers 'events/reminder-before-event@004602'
     now = Time.utc(2026, 3, 13, 8, 55, 0)
     event = Event.new(start_time: Time.utc(2026, 3, 13, 10, 0, 0), reminder_hours_before: 1)
 
@@ -652,6 +693,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'reminder is not due once the event has started' do
+    covers 'events/reminder-before-event@004602'
     now = Time.utc(2026, 3, 13, 10, 0, 0)
     event = Event.new(start_time: now - 5.minutes, reminder_hours_before: 1)
 
@@ -659,6 +701,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'feedback request is due when its send time falls within the next hour' do
+    covers 'events/feedback-request-after-event@2bacdf'
     now = Time.utc(2026, 3, 13, 10, 55, 0)
     event = Event.new(
       organisation: FactoryBot.build_stubbed(:organisation),
@@ -671,6 +714,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'feedback request with blank hours is due at event end' do
+    covers 'events/feedback-request-blank-at-end@f0b3f9'
     now = Time.utc(2026, 3, 13, 9, 55, 0)
     event = Event.new(
       organisation: FactoryBot.build_stubbed(:organisation),
@@ -682,6 +726,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'feedback request is not sent once it has already been sent' do
+    covers 'events/feedback-request-after-event@2bacdf'
     now = Time.utc(2026, 3, 13, 10, 55, 0)
     event = Event.new(
       organisation: FactoryBot.build_stubbed(:organisation),
@@ -707,6 +752,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'feedback request delay cannot exceed 30 days' do
+    covers 'events/feedback-request-max-30-days@52678f'
     event = Event.new(feedback_hours_after: Event::MAX_FEEDBACK_HOURS_AFTER + 1)
     event.valid?
 
@@ -1076,5 +1122,206 @@ class EventsTest < ActiveSupport::TestCase
     assert page.has_css?('#map-canvas', visible: true)
     assert page.has_no_css?('#map-start')
     assert evaluate_script('window.mapStarted')
+  end
+
+  test 'a duplicated event starts locked' do
+    covers 'events/duplicate-starts-locked@9b7b43'
+    create_event(prices: [0], locked: false)
+    sign_in_with_rack(@account)
+    post "/e/#{@event.slug}/duplicate"
+    duplicate = Event.find_by(duplicated_from_id: @event.id)
+    assert_equal "/e/#{duplicate.slug}/edit", URI(last_response.location).path
+    assert duplicate.locked?
+    refute @event.reload.locked?
+  end
+
+  test "event stats lists all of an organisation's events, including secret and locked ones" do
+    covers 'events/event-stats-all-events@6626d6'
+    create_event(as: :event1, name: 'Open stats event', prices: [0])
+    create_event(as: :event2, name: 'Secret stats event', prices: [0], secret: true)
+    create_event(as: :event3, name: 'Locked stats event', prices: [0], locked: true)
+    sign_in_with_rack(@account)
+
+    get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s, table: 1
+    assert_equal 200, last_response.status
+    ['Open stats event', 'Secret stats event', 'Locked stats event'].each { |name| assert_includes last_response.body, name }
+
+    get "/o/#{@organisation.slug}/events/stats.csv", from: Date.today.to_s
+    assert_equal ['Locked stats event', 'Open stats event', 'Secret stats event'], CSV.parse(last_response.body, headers: true).map { |row| row['name'] }.sort
+  end
+
+  test 'a new event defaults to a reminder 24 hours before it' do
+    covers 'events/reminder-default-and-blank@b3faac'
+    create_organisation
+    sign_in_with_rack(@account)
+    get '/events/new', organisation_id: @organisation.id
+    assert_equal 200, last_response.status
+    assert_match(/<input[^>]*name="event\[reminder_hours_before\]"[^>]*value="24"|<input[^>]*value="24"[^>]*name="event\[reminder_hours_before\]"/, last_response.body)
+  end
+
+  test 'leaving the reminder hours blank skips the reminder' do
+    covers 'events/reminder-default-and-blank@b3faac'
+    create_event(prices: [0], start_time: 2.hours.from_now, end_time: 3.hours.from_now, reminder_hours_before: nil)
+    order = @event.orders.create!(account: @account, currency: 'GBP', value: 0, payment_completed: true)
+    @event.tickets.create!(account: @account, order: order, ticket_type: @event.ticket_types.first, payment_completed: true)
+
+    refute @event.reminder_due_within?(1.hour)
+    assert_empty(recorded_emails { @event.send_reminders_without_delay(:all) })
+    assert_nil @event.reload.sent_reminders_at
+  end
+
+  test 'the reminder email subject and body can be customised by the organisation and the event' do
+    covers 'events/reminder-custom-subject-body@179fcd'
+    create_organisation(reminder_email_title: 'Organisation reminder for [event_name]', reminder_email_body: '<p>Organisation reminder body</p>')
+    create_event(name: 'Reminded event', prices: [0], start_time: 2.hours.from_now, end_time: 3.hours.from_now, reminder_hours_before: 24)
+    order = @event.orders.create!(account: @account, currency: 'GBP', value: 0, payment_completed: true)
+    @event.tickets.create!(account: @account, order: order, ticket_type: @event.ticket_types.first, payment_completed: true)
+
+    emails = recorded_emails { @event.send_reminders_without_delay(@account.id) }
+    assert_equal ['Organisation reminder for Reminded event'], emails.map(&:subject_line).uniq
+    emails.each { |email| assert_includes email.html, 'Organisation reminder body' }
+    assert_equal [@account.email], emails.flat_map(&:recipients)
+
+    @event.update!(reminder_email_title: 'Event reminder for [event_name]', reminder_email_body: '<p>Event reminder body</p>')
+    emails = recorded_emails { @event.send_reminders_without_delay(@account.id) }
+    assert_equal ['Event reminder for Reminded event'], emails.map(&:subject_line).uniq
+    emails.each do |email|
+      assert_includes email.html, 'Event reminder body'
+      refute_includes email.html, 'Organisation reminder body'
+    end
+  end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Recordings
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  test 'a past event with a recording keeps its date and tells buyers they are getting a recording' do
+    covers 'events/recording-keeps-date@836029'
+    start_time = 3.days.ago.change(hour: 10)
+    create_event(prices: [0], start_time: start_time, end_time: start_time + 2.hours, extra_info_for_recording_email: '<p>Watch it here</p>')
+    @event.reload
+    assert @event.recording?
+    assert_equal start_time.to_i, @event.start_time.to_i
+
+    get "/e/#{@event.slug}"
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "Access a recording of this event that started on #{start_time.to_date}"
+  end
+
+  test 'the recording tab appears once the event is past' do
+    covers 'events/recording-tab-once-past@64905b'
+    create_event(prices: [0])
+    sign_in_with_rack(@account)
+    get "/e/#{@event.slug}/edit"
+    assert_equal 200, last_response.status
+    refute_includes last_response.body, 'href="#tab-recording"'
+
+    @event.update!(start_time: 2.days.ago, end_time: 2.days.ago + 2.hours)
+    get "/e/#{@event.slug}/edit"
+    assert_includes last_response.body, 'href="#tab-recording"'
+    assert_includes last_response.body, 'event[extra_info_for_recording_email]'
+  end
+
+  test 'extra info for a recording is in the confirmation emails of bookings made once the event is past' do
+    covers 'events/recording-extra-info-in-confirmation@b014b8'
+    create_event(prices: [0], extra_info_for_recording_email: '<p>Recording link: https://vimeo.com/1</p>', extra_info_for_ticket_email: '<p>Zoom link</p>')
+    order = @event.orders.new(account: @account)
+    html = EmailHelper.html(:tickets, event: @event, order: order, account: @account, tickets_table: '', header_image_url: nil)
+    assert_includes html, 'Zoom link'
+    refute_includes html, 'Recording link'
+
+    @event.update!(start_time: 2.days.ago, end_time: 2.days.ago + 2.hours)
+    html = EmailHelper.html(:tickets, event: @event, order: order, account: @account, tickets_table: '', header_image_url: nil)
+    assert_includes html, 'Recording link: https://vimeo.com/1'
+    refute_includes html, 'Zoom link'
+  end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Embeds
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  test 'embed listing parameters hide the featured title, search, view options, listings and later carousels' do
+    covers 'events/embed-listing-params@d85f53'
+    create_event(name: 'Featured embed event', prices: [0])
+    @event.set(featured: true, has_image: true)
+    carousel1 = @organisation.carousels.create!(name: 'First carousel')
+    carousel2 = @organisation.carousels.create!(name: 'Second carousel')
+
+    get "/o/#{@organisation.slug}/events", minimal: 1
+    assert_includes last_response.body, 'id="events-search-near"'
+    assert_includes last_response.body, 'aria-label="View as"'
+    assert_includes last_response.body, "carousels/featured?hide_featured_title=\""
+    assert_includes last_response.body, "id=\"carousel-#{carousel1.id}\""
+    assert_includes last_response.body, "id=\"carousel-#{carousel2.id}\""
+    get "/o/#{@organisation.slug}/carousels/featured"
+    assert_includes last_response.body, '<h2 class="text-center">Featured</h2>'
+    xhr_get "/o/#{@organisation.slug}/events", minimal: 1
+    assert_includes last_response.body, 'Featured embed event'
+
+    get "/o/#{@organisation.slug}/events", minimal: 1, hide_featured_title: 1, no_search: 1, first_carousel_only: 1
+    refute_includes last_response.body, 'id="events-search-near"'
+    assert_includes last_response.body, 'aria-label="View as"'
+    assert_includes last_response.body, 'carousels/featured?hide_featured_title=1'
+    assert_includes last_response.body, "id=\"carousel-#{carousel1.id}\""
+    refute_includes last_response.body, "id=\"carousel-#{carousel2.id}\""
+    get "/o/#{@organisation.slug}/carousels/featured", hide_featured_title: 1
+    assert_includes last_response.body, 'slick-item'
+    refute_includes last_response.body, '<h2 class="text-center">Featured</h2>'
+
+    get "/o/#{@organisation.slug}/events", minimal: 1, no_search: 1, no_view_options: 1
+    refute_includes last_response.body, 'id="events-search-near"'
+    refute_includes last_response.body, 'aria-label="View as"'
+
+    xhr_get "/o/#{@organisation.slug}/events", minimal: 1, no_listings: 1
+    assert_equal 200, last_response.status
+    refute_includes last_response.body, 'Featured embed event'
+  end
+
+  test 'embed listings with recordings=1 show past events with a recording, most recent first, and past=1 all past events' do
+    covers 'events/embed-recordings-param@50657a', 'events/embed-past-param@02bb96'
+    create_event(as: :event1, name: 'Older recorded event', prices: [0], start_time: 10.days.ago, end_time: 10.days.ago + 2.hours, extra_info_for_recording_email: '<p>Recording</p>')
+    create_event(as: :event2, name: 'Newer recorded event', prices: [0], start_time: 3.days.ago, end_time: 3.days.ago + 2.hours, extra_info_for_recording_email: '<p>Recording</p>')
+    create_event(as: :event3, name: 'Unrecorded past event', prices: [0], start_time: 5.days.ago, end_time: 5.days.ago + 2.hours)
+    create_event(as: :event4, name: 'Upcoming event', prices: [0])
+
+    xhr_get "/o/#{@organisation.slug}/events", minimal: 1, recordings: 1
+    body = last_response.body
+    assert_includes body, 'Newer recorded event'
+    assert_includes body, 'Older recorded event'
+    assert_operator body.index('Newer recorded event'), :<, body.index('Older recorded event')
+    refute_includes body, 'Unrecorded past event'
+    refute_includes body, 'Upcoming event'
+
+    carousel = @organisation.carousels.create!(name: 'A carousel')
+    get "/o/#{@organisation.slug}/events", minimal: 1, recordings: 1
+    assert_includes last_response.body, "id=\"carousel-#{carousel.id}\""
+    # With the referer the embedding page sends: Rack::Attack challenges a search without one
+    get "/o/#{@organisation.slug}/events", { minimal: 1, recordings: 1, search: 1, display: 'grid' }, { 'HTTP_REFERER' => 'https://example.com/' }
+    refute_includes last_response.body, "id=\"carousel-#{carousel.id}\""
+    assert_includes last_response.body, 'id="events-grid"'
+
+    xhr_get "/o/#{@organisation.slug}/events", minimal: 1, past: 1
+    body = last_response.body
+    ['Newer recorded event', 'Unrecorded past event', 'Older recorded event'].each { |name| assert_includes body, name }
+    refute_includes body, 'Upcoming event'
+  end
+
+  test 'ticket_form_only limits the event page to the ticket form' do
+    covers 'events/embed-ticket-form-only@7366b1'
+    create_event(prices: [0], description: '<p>A description only the full event page shows</p>')
+
+    # The page body, after the head's meta description
+    page_body = -> { last_response.body.split('</head>', 2).last }
+
+    get "/e/#{@event.slug}"
+    assert_includes page_body.call, 'A description only the full event page shows'
+    assert_includes page_body.call, 'id="select-tickets"'
+    assert_includes page_body.call, 'id="header"'
+
+    get "/e/#{@event.slug}", ticket_form_only: 1
+    assert_equal 200, last_response.status
+    assert_includes page_body.call, 'id="select-tickets"'
+    refute_includes page_body.call, 'A description only the full event page shows'
+    refute_includes page_body.call, 'id="header"'
   end
 end

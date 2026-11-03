@@ -36,32 +36,32 @@ Events in Dandelion must be created under an Organisation. (See [Organisations](
 - Click the organisation dropdown at the top of the main window and select Create an event
 - Provide the required details and click Create event. You will then notice a new dropdown containing further admin options for your event at the top of the main window.
 
-While you are creating an event, Dandelion autosaves a draft. If you leave and come back via **Drafts** on the create-event page, the form is restored including ticket types and ticket groups. (You still need to save the event before you can assign ticket types to new ticket groups.)
+While you are creating an event, Dandelion autosaves a draft. If you leave and come back via **Drafts** on the create-event page, the form is restored including ticket types and ticket groups. <!-- claim: draft-autosave-restores-tickets --> (You still need to save the event before you can assign ticket types to new ticket groups.)
 
 ## Customising the thank you page
 
-After someone books, they see a thank you page on Dandelion (unless you've set a redirect URL under **Everything else**). Under **Appearance**, you can add **Thank you text** to show a custom message on that page—for example a welcome note or a link to a community group. Leave it blank to keep the default thank you page.
+After someone books, they see a thank you page on Dandelion (unless you've set a redirect URL under **Everything else**). <!-- claim: thank-you-redirect-url --> Under **Appearance**, you can add **Thank you text** to show a custom message on that page—for example a welcome note or a link to a community group. <!-- claim: thank-you-text-shown --> Leave it blank to keep the default thank you page.
 
-Meta and Google Ads purchase conversions also fire on this page (see [Organisations](/docs/organisations#analytics)). You can also set a pixel or Google Ads conversion on an individual event under **Integrations**; if both organisation and event values are set and different, events are sent to both.
+Meta and Google Ads purchase conversions also fire on this page (see [Organisations](/docs/organisations#analytics)). <!-- claim: purchase-conversions-on-thank-you-page --> You can also set a pixel or Google Ads conversion on an individual event under **Integrations**; if both organisation and event values are set and different, events are sent to both.
 
 ## Let attendees choose how much to pay
 
 To let your attendees choose how much to pay for a ticket type:
 
-- Leave the 'Price or range' field of a ticket type blank to allow attendees to pay any amount
-- Enter two numbers separated by a dash to create a slider e.g. 5-50 creates a slider where attendees can choose to pay any amount between £5–50 ($/€/etc)
+- Leave the 'Price or range' field of a ticket type blank to allow attendees to pay any amount <!-- claim: pay-any-amount-when-price-blank -->
+- Enter two numbers separated by a dash to create a slider e.g. 5-50 creates a slider where attendees can choose to pay any amount between £5–50 ($/€/etc) <!-- claim: price-range-slider -->
 
 ## Ticket slots and capacity
 
 Each ticket type has a **Quantity** (how many of that ticket you want to sell) and **Slots** (how many places each of those tickets takes from the event's total capacity and any ticket group capacity).
 
-Slots defaults to 1. Set it to:
+Slots defaults to 1. <!-- claim: slots-default-one --> Set it to:
 
-- **0** for add-on tickets that should not count towards venue capacity, such as meals
-- **2** for a couples ticket
+- **0** for add-on tickets that should not count towards venue capacity, such as meals <!-- claim: zero-slot-add-ons -->
+- **2** for a couples ticket <!-- claim: two-slot-couples-tickets -->
 - **1** (the default) for a standard ticket
 
-If you set a total capacity on the event or on a ticket group, Dandelion uses slots rather than the raw number of tickets sold.
+If you set a total capacity on the event or on a ticket group, Dandelion uses slots rather than the raw number of tickets sold. <!-- claim: capacity-counts-slots -->
 
 ### Role balance (linked ticket type quantity)
 
@@ -71,15 +71,15 @@ To release tickets of one type based on sales of another, put a formula at the e
 [=Leader*1.1:15]
 ```
 
-That means: sell at most `max(matching tickets sold × 1.1, 15)`, and never more than this type's Quantity.
+That means: sell at most `max(matching tickets sold × 1.1, 15)`, and never more than this type's Quantity. <!-- claim: formula-max-capped-by-quantity -->
 
-- `Leader` is matched as a case-insensitive substring of other ticket type names on the same event (not this type). Sold counts of all matches are added together.
-- `1.1` is the multiplier. `:15` is an optional minimum to release even if nothing matching has sold yet.
-- The formula is stripped from the description buyers see.
+- `Leader` is matched as a case-insensitive substring of other ticket type names on the same event (not this type). Sold counts of all matches are added together. <!-- claim: formula-matches-other-types-by-substring -->
+- `1.1` is the multiplier. `:15` is an optional minimum to release even if nothing matching has sold yet. <!-- claim: formula-multiplier-and-minimum -->
+- The formula is stripped from the description buyers see. <!-- claim: formula-stripped-from-description -->
 
-Example: ticket types named `Leader` and `Follower`, with the follower description `[=Leader*1.1:15]` and quantity 80. Up to 15 follower tickets are available immediately; more are released as leader tickets sell, up to 80.
+Example: ticket types named `Leader` and `Follower`, with the follower description `[=Leader*1.1:15]` and quantity 80. Up to 15 follower tickets are available immediately; more are released as leader tickets sell, up to 80. <!-- claim: formula-leader-follower-example -->
 
-If you have several follower types each with the same formula, each gets its own cap. Put them in a ticket group if they should share a pool.
+If you have several follower types each with the same formula, each gets its own cap. <!-- claim: formula-separate-caps --> Put them in a ticket group if they should share a pool.
 
 ## Allowing people to pay in instalments
 
@@ -87,9 +87,9 @@ You can collect ticket payments as a fixed number of monthly Direct Debit instal
 
 1. In your organisation settings under Payments, click **Set up GoCardless**, add an access token and webhook secret, then check **Enable Instalments**.
 2. Set the webhook to send **billing request** events. Include **payments** as well if you also use Instant Bank Pay.
-3. Edit the event and, under Integrations, set **GoCardless instalments** to the number of monthly payments (2–24). This field appears once instalments are enabled on the organisation.
+3. Edit the event and, under Integrations, set **GoCardless instalments** to the number of monthly payments (2–24). This field appears once instalments are enabled on the organisation. <!-- claim: instalment-count-field -->
 
-At checkout, buyers see a **Pay in X instalments** button on GBP and EUR events. They need a bank account in the event currency (a UK account for GBP, a Eurozone account for EUR). Tickets are emailed when the payment schedule is set up (i.e. straight away/not at the final instalment). You can refund collected instalments from the GoCardless dashboard. Note that Dandelion does not cancel orders if later instalments fail — you need to remove orders with unpaid instalments yourself. If a ticket paid this way is later resold, Dandelion emails you that a refund is required (see [Ticket resales](#ticket-resales)).
+At checkout, buyers see a **Pay in X instalments** button on GBP and EUR events. <!-- claim: instalments-gbp-eur-only --> They need a bank account in the event currency (a UK account for GBP, a Eurozone account for EUR). <!-- claim: instalments-bank-account-in-event-currency --> Note that Dandelion does not cancel orders if later instalments fail — you need to remove orders with unpaid instalments yourself. <!-- claim: instalment-failures-not-cancelled --> Tickets are emailed when the payment schedule is set up (i.e. straight away/not at the final instalment). <!-- claim: instalment-tickets-issued-at-schedule-setup --> You can refund collected instalments from the GoCardless dashboard. If a ticket paid this way is later resold, Dandelion emails you that a refund is required (see [Ticket resales](#ticket-resales)).
 
 You can also enable an instalment payment method on your Stripe account, such as [Klarna](https://docs.stripe.com/payments/klarna) or [Clearpay/Afterpay](https://docs.stripe.com/payments/afterpay-clearpay). Customers will then be able to pay for the purchase in instalments at checkout, and receive tickets immediately.
 
@@ -103,7 +103,7 @@ First, [add a tax rate on Stripe](https://dashboard.stripe.com/tax-rates) (for t
 
 To enable automated receipts for Stripe payments, toggle 'Successful payments' on in your [customer emails settings](https://dashboard.stripe.com/settings/emails).
 
-When a free order includes a donation to Dandelion, Dandelion attaches its own donation receipt to the ticket email.
+When a free order includes a donation to Dandelion, Dandelion attaches its own donation receipt to the ticket email. <!-- claim: free-order-donation-receipt -->
 
 ## Taking payments with Open Collective
 
@@ -113,7 +113,7 @@ If your organisation has an [Open Collective](https://opencollective.com/) accou
 2. Create an event on Open Collective under your organisation
 3. Edit your Dandelion event and enter the Open Collective event slug under Integrations
 
-Ticket buyers will then see a 'Pay with Open Collective' option at checkout. Dandelion only confirms the booking once Open Collective marks the contribution as paid.
+Ticket buyers will then see a 'Pay with Open Collective' option at checkout. Dandelion only confirms the booking once Open Collective marks the contribution as paid. <!-- claim: opencollective-checkout-confirms-when-paid -->
 
 ## Taking payments with Mollie
 
@@ -123,7 +123,7 @@ If your organisation has a [Mollie](https://www.mollie.com/) account, you can ac
 2. Paste your live API key from [Developers > API keys](https://my.mollie.com/dashboard/developers/api-keys) in the Mollie Dashboard
 3. Enable the payment methods you want on your [website profile](https://my.mollie.com/dashboard/settings/profiles)
 
-Ticket buyers will then see a **Pay with Mollie** button at checkout on fiat-currency events. They are sent to Mollie's hosted checkout (iDEAL, cards, Bancontact, and other methods you have enabled). Dandelion confirms the booking when Mollie marks the payment as paid.
+Ticket buyers will then see a **Pay with Mollie** button at checkout on fiat-currency events. <!-- claim: mollie-fiat-events --> They are sent to Mollie's hosted checkout (iDEAL, cards, Bancontact, and other methods you have enabled). <!-- claim: mollie-hosted-checkout --> Dandelion confirms the booking when Mollie marks the payment as paid. <!-- claim: mollie-confirms-when-paid -->
 
 ## Taking payments with PayPal
 
@@ -132,15 +132,15 @@ If your organisation has a [PayPal](https://www.paypal.com/) business account, y
 1. Go to the Payments tab in your organisation's settings and click **Set up PayPal**
 2. Create an app under [Apps & Credentials](https://developer.paypal.com/dashboard/applications/live) in the PayPal Developer Dashboard and paste the live client ID and secret
 
-Ticket buyers will then see a **Pay with PayPal** button at checkout on fiat-currency events. They are sent to PayPal to approve the payment. Dandelion captures the payment when they return to the event page, and also registers a webhook so the booking still completes if they do not come back.
+Ticket buyers will then see a **Pay with PayPal** button at checkout on fiat-currency events. <!-- claim: paypal-fiat-events --> They are sent to PayPal to approve the payment. <!-- claim: paypal-approve-on-paypal --> Dandelion captures the payment when they return to the event page, and also registers a webhook so the booking still completes if they do not come back. <!-- claim: paypal-capture-on-return-or-webhook -->
 
 ## Get email notifications of orders
 
-Make sure the 'Send email notifications of orders' checkbox is checked in the first tab 'Basics' when creating/editing your event.
+Make sure the 'Send email notifications of orders' checkbox is checked in the first tab 'Basics' when creating/editing your event. <!-- claim: order-notification-emails -->
 
 ## Track how people discovered the event
 
-Add `?via=` to the end of your event URL and you will see the result on the Orders page e.g. [https://dandelion.events/e123f?via=may-newsletter](https://dandelion.events/e123f?via=may-newsletter)
+Add `?via=` to the end of your event URL and you will see the result on the Orders page e.g. [https://dandelion.events/e123f?via=may-newsletter](https://dandelion.events/e123f?via=may-newsletter) <!-- claim: via-shown-on-orders -->
 
 ## Checking people in
 
@@ -148,21 +148,21 @@ Click the event dropdown and go to the Tickets page for the event. There you can
 
 You can also access a check-in scanner by clicking the event dropdown and selecting 'Check-in scanner'. The scanner works well on mobile.
 
-There you can also find a link you can share with assistants which allows them to check people in, without assistants gaining full admin access to the event.
+There you can also find a link you can share with assistants which allows them to check people in, without assistants gaining full admin access to the event. <!-- claim: check-in-link-for-assistants -->
 
 ## Adding event facilitators
 
 Go to your event (the main page, not the settings page), click the plus icon next to Facilitators and search for the desired facilitator by name.
 
-A facilitator becomes an event admin of that event: they can edit it, handle tickets and orders, check people in, and email attendees. They do not get organisation-wide access. See [Roles and privileges](/docs/organisations#roles-and-privileges) for the full comparison.
+A facilitator becomes an event admin of that event: they can edit it, handle tickets and orders, check people in, and email attendees. They do not get organisation-wide access. <!-- claim: facilitator-no-organisation-access --> See [Roles and privileges](/docs/organisations#roles-and-privileges) for the full comparison.
 
-Once a facilitator has received feedback on an event, they appear on the [Facilitators](/facilitators) page.
+Once a facilitator has received feedback on an event, they appear on the [Facilitators](/facilitators) page. <!-- claim: facilitators-page-after-feedback -->
 
 ## Adding co-hosts
 
 Go to your event (the main page, not the settings page), click the plus icon next to Hosted by and search for the desired organisation by name.
 
-Because admins and event managers of a co-host organisation become event admins and can see attendee emails, only admins and event managers of the host organisation can add co-hosts. They, and admins of the event's activity or local group, can remove them. Only admins and event managers of a co-host organisation can feature the event in that organisation's carousels.
+Because admins and event managers of a co-host organisation become event admins and can see attendee emails, only admins and event managers of the host organisation can add co-hosts. <!-- claim: only-host-admins-add-cohosts --> They, and admins of the event's activity or local group, can remove them. <!-- claim: who-can-remove-cohosts --> Only admins and event managers of a co-host organisation can feature the event in that organisation's carousels. <!-- claim: cohost-carousel-feature -->
 
 ## Emailing attendees
 
@@ -182,44 +182,44 @@ Ticket groups are created on the Tickets tab when editing your event. To assign 
 
 2. **Create multiple events under a single Activity:** Create an Activity under your Organisation (see the [Organisations](/docs/organisations) page for details on how to do this), and then create multiple events under this activity. Share the link to the Activity for people to view all available dates.
 
-(If the events are the same/very similar, you can create the first event, then duplicate it for all the dates the event occurs by selecting 'Duplicate event' in the event dropdown of the initial event.) The duplicate starts locked, and says which event it's a duplicate of until you first save it.
+(If the events are the same/very similar, you can create the first event, then duplicate it for all the dates the event occurs by selecting 'Duplicate event' in the event dropdown of the initial event.) The duplicate starts locked, and says which event it's a duplicate of until you first save it. <!-- claim: duplicate-starts-locked -->
 
 ## Cancelling/deleting an event
 
 Click the event dropdown and select **Delete event**. If the event has orders, email ticketholders first to let them know.
 
-You can then **Delete event and attempt to refund all orders**, or **Delete event without refunding orders** if you have already refunded people (or don't intend to). See [Refunds](#refunds) for refunding individual tickets or orders instead of deleting the event.
+You can then **Delete event and attempt to refund all orders**, or **Delete event without refunding orders** if you have already refunded people (or don't intend to). <!-- claim: delete-event-refund-choice --> See [Refunds](#refunds) for refunding individual tickets or orders instead of deleting the event.
 
 ## Where did my secret/locked event go?
 
-You can see all events under an organisation (including events marked secret or locked) by clicking the organisation dropdown and going to **Event stats**.
+You can see all events under an organisation (including events marked secret or locked) by clicking the organisation dropdown and going to **Event stats**. <!-- claim: event-stats-all-events -->
 
-Locked events are hidden from the public. Anyone who can view the event page (event admins) can still purchase tickets, so you can test checkout before unlocking.
+Locked events are hidden from the public. Anyone who can view the event page (event admins) can still purchase tickets, so you can test checkout before unlocking. <!-- claim: locked-events-admins-can-buy -->
 
-If your payment provider returns an error that means no one can buy tickets (an unverified account, say), Dandelion locks the event and emails the organisation's admins. The error also shows on the event page until you fix it with your provider and unlock the event.
+If your payment provider returns an error that means no one can buy tickets (an unverified account, say), Dandelion locks the event and emails the organisation's admins. <!-- claim: payment-error-locks-event --> The error also shows on the event page until you fix it with your provider and unlock the event.
 
 ## Reminders
 
-Dandelion can send event attendees a reminder email before the event starts. Set **Hours before the event to send the reminder email** in the event's Emails tab (default: 24). Leave blank to skip the reminder. You can also customise the reminder subject and body in your organisation or event settings.
+Dandelion can send event attendees a reminder email before the event starts. <!-- claim: reminder-before-event --> Set **Hours before the event to send the reminder email** in the event's Emails tab (default: 24). Leave blank to skip the reminder. <!-- claim: reminder-default-and-blank --> You can also customise the reminder subject and body in your organisation or event settings. <!-- claim: reminder-custom-subject-body -->
 
 ## Attendees cancelling free RSVPs
 
-Attendees can cancel free orders, and free complimentary tickets you've added from the Tickets page, themselves: from the event page, and via the **Cancel your RSVP** link in their ticket and reminder emails. They're emailed to confirm the cancellation, and anyone on the waitlist is told a place is available. Paid orders and tickets can't be cancelled by attendees; see [Refunds](#refunds).
+Attendees can cancel free orders, and free complimentary tickets you've added from the Tickets page, themselves: from the event page, and via the **Cancel your RSVP** link in their ticket and reminder emails. <!-- claim: attendees-cancel-free-rsvps --> They're emailed to confirm the cancellation, and anyone on the waitlist is told a place is available. <!-- claim: cancellation-emails-and-waitlist --> Paid orders and tickets can't be cancelled by attendees; see [Refunds](#refunds). <!-- claim: paid-orders-not-cancellable -->
 
 ## Feedback
 
-Attendees receive an email with a request for feedback after the event ends. Set **Hours after the event to send the feedback request email** in the event's Emails tab (maximum: 720 hours, or 30 days). Leave blank to send when the event ends.
+Attendees receive an email with a request for feedback after the event ends. <!-- claim: feedback-request-after-event --> Set **Hours after the event to send the feedback request email** in the event's Emails tab (maximum: 720 hours, or 30 days). <!-- claim: feedback-request-max-30-days --> Leave blank to send when the event ends. <!-- claim: feedback-request-blank-at-end -->
 
-You can resend these emails by going to the Orders page for your event and clicking 'Resend feedback email' next to an order.
+You can resend these emails by going to the Orders page for your event and clicking 'Resend feedback email' next to an order. <!-- claim: resend-feedback-email -->
 
-Alternatively, attendees can provide feedback by logging in to Dandelion, going to the event page and clicking 'Give feedback'.
+Alternatively, attendees can provide feedback by logging in to Dandelion, going to the event page and clicking 'Give feedback'. <!-- claim: attendees-give-feedback -->
 
 ## Event recordings
 
-After a scheduled event has finished, you can sell or give access to a recording of it. The event stays tied to its original date; buyers see that they are getting access to a recording of that session.
+After a scheduled event has finished, you can sell or give access to a recording of it. The event stays tied to its original date; buyers see that they are getting access to a recording of that session. <!-- claim: recording-keeps-date -->
 
 - **Save the event with a start and end time** and run it as usual.
-- Once the event is **in the past**, edit it again: a **Recording** tab appears. Open it and add to **Extra info for order confirmation email**—usually the link to the recording (Vimeo, YouTube, etc.) and any password or viewing instructions. This content is included in the order confirmation email sent to people who book from that point on.
+- Once the event is **in the past**, edit it again: a **Recording** tab appears. <!-- claim: recording-tab-once-past --> Open it and add to **Extra info for order confirmation email**—usually the link to the recording (Vimeo, YouTube, etc.) and any password or viewing instructions. This content is included in the order confirmation email sent to people who book from that point on. <!-- claim: recording-extra-info-in-confirmation -->
 - Optionally, further customise the **Order confirmation email for the recording of the event** in the **Emails** tab.
 
 Recordings are distinct from **evergreen/on-demand** events, which never had a fixed date (see below).
@@ -230,9 +230,9 @@ Evergreen events are for selling access to something that has **no fixed start t
 
 - When creating or editing an event, use the link **Mark as evergreen/on-demand, with no dates or location** on the **Basics** tab. That reveals the evergreen option; once enabled, date, time, and location fields are hidden.
 - Enter the link to the video/course etc on the **Description and confirmation** tab under **Extra info for order confirmation email** (similar to where you'd enter a Zoom link for a live, online event). 
-- In listings and carousels, evergreen events show first, as **On-demand** instead of under a date.
-- **Reminder emails** and **automated feedback request** emails are not sent for evergreen events. You can still use the Mailer to email attendees manually.
-- **PDF tickets** are not issued, and the order confirmation refers to access as a **link** rather than tickets.
+- In your organisation's events listing and its Featured carousel, evergreen events show first, without a date: the grid and the carousel mark them **On-demand**. <!-- claim: evergreen-first-without-date -->
+- **Reminder emails** and **automated feedback request** emails are not sent for evergreen events. <!-- claim: evergreen-no-reminders-or-feedback --> You can still use the Mailer to email attendees manually.
+- **PDF tickets** are not issued, and the order confirmation refers to access as a **link** rather than tickets. <!-- claim: evergreen-no-pdf-link -->
 
 Evergreen events are different from **recordings of dated live events** (see above): recordings keep the original event date for context.
 
@@ -240,10 +240,10 @@ Evergreen events are different from **recordings of dated live events** (see abo
 
 Click the dropdown for your event (/activity/local group/organisation), and select Feedback.
 
-- **If someone allows their written answers to be quoted publicly** and the form has a single question, an extract is suggested for 5-star feedback (AI picks one or two sentences, or nothing if the answer is not suitable to quote). You can edit it in the box, or click **Show an extract** if none has appeared yet.
-- **If a piece of feedback has no extract control,** it means the person that submitted the feedback doesn't want it shown publicly.
-- **On public pages,** feedback opens with the average rating and how many ratings each star level got, then lists every rating, newest first, with its public extract and your reply if there is one.
-- **If you delete a piece of feedback,** it disappears from admin lists. On public pages it stays listed as Removed, with the reviewer's name and date.
+- **If someone allows their written answers to be quoted publicly** and the form has a single question, an extract is suggested for 5-star feedback (AI picks one or two sentences, or nothing if the answer is not suitable to quote). You can edit it in the box, or click **Show an extract** if none has appeared yet. <!-- claim: public-extract-suggested -->
+- **If a piece of feedback has no extract control,** it means the person that submitted the feedback doesn't want it shown publicly. <!-- claim: no-extract-control-not-public -->
+- **On public pages,** feedback opens with the average rating and how many ratings each star level got, then lists every rating, newest first, with its public extract. <!-- claim: public-feedback-summary --> Your reply shows under ratings that have a public extract. <!-- claim: public-feedback-reply-needs-extract -->
+- **If you delete a piece of feedback,** it disappears from admin lists. <!-- claim: deleted-feedback-hidden-from-admin --> On public pages it stays listed as Removed, with the reviewer's name and date. <!-- claim: deleted-feedback-removed-on-public-pages -->
 
 ## Discount codes
 
@@ -251,29 +251,29 @@ To create a discount code, click the dropdown for your event (or organisation, a
 
 ## Waitlists
 
-If your event sells out, a waitlist will be activated automatically. You can view people on the waitlist by selecting Waitlist in the event dropdown.
+If your event sells out, a waitlist will be activated automatically. <!-- claim: waitlist-on-sell-out --> You can view people on the waitlist by selecting Waitlist in the event dropdown.
 
-If **Send email notifications of orders and waitlist registrations** is turned on, event facilitators are emailed when someone joins the waitlist.
+If **Send email notifications of orders and waitlist registrations** is turned on, event facilitators are emailed when someone joins the waitlist. <!-- claim: waitlist-facilitators-emailed -->
 
-Dandelion automatically emails people on your waitlist if tickets become available again (either by you releasing more tickets, cancelling existing orders, or someone marking a ticket for resale with resales enabled).
+Dandelion automatically emails people on your waitlist if tickets become available again (either by you releasing more tickets, cancelling existing orders, or someone marking a ticket for resale with resales enabled). <!-- claim: waitlist-emailed-when-tickets-available -->
 
-You can email your waitlist via Dandelion by going to Mailer in the event dropdown, creating a new message and selecting the waitlist under the To field. Alternatively, you can simply copy and paste the email addresses from the waitlist page into your own email app.
+You can email your waitlist via Dandelion by going to Mailer in the event dropdown, creating a new message and selecting the waitlist under the To field. <!-- claim: mailer-to-waitlist --> Alternatively, you can simply copy and paste the email addresses from the waitlist page into your own email app.
 
 ### Waitlists for individual ticket types
 
 This is optional and separate from the event-wide waitlist above.
 
-When **Waitlists for ticket types** is turned on (under **Everything else** while editing your event), people can join a waitlist for each ticket type once that ticket type is sold out, as long as sales for that ticket type are still open (for example its per-ticket-type sales deadline has not passed, and the event is not treating sales as closed).
+When **Waitlists for ticket types** is turned on (under **Everything else** while editing your event), people can join a waitlist for each ticket type once that ticket type is sold out, as long as sales for that ticket type are still open (for example its per-ticket-type sales deadline has not passed, and the event is not treating sales as closed). <!-- claim: ticket-type-waitlists -->
 
-On the booking form, sold-out ticket types show a **Join waitlist** action for that row.
+On the booking form, sold-out ticket types show a **Join waitlist** action for that row. <!-- claim: ticket-type-waitlist-join-button -->
 
-If **Send email notifications of orders and waitlist registrations** is turned on, event facilitators are emailed when someone joins a ticket type waitlist.
+If **Send email notifications of orders and waitlist registrations** is turned on, event facilitators are emailed when someone joins a ticket type waitlist. <!-- claim: ticket-type-waitlist-facilitators-emailed -->
 
-Dandelion automatically emails people on a ticket type waitlist if tickets for that ticket type become available again.
+Dandelion automatically emails people on a ticket type waitlist if tickets for that ticket type become available again. <!-- claim: ticket-type-waitlist-emailed -->
 
-To see who joined: choose **Ticket type waitlists** in the event dropdown (the item appears once at least one person has joined). From there you can filter by ticket type and copy email addresses for outreach.
+To see who joined: choose **Ticket type waitlists** in the event dropdown (the item appears once at least one person has joined). <!-- claim: ticket-type-waitlists-menu-item --> From there you can filter by ticket type and copy email addresses for outreach.
 
-You can also email ticket type waitlists via Dandelion by going to Mailer in the event dropdown, creating a new message and selecting **Ticket type waitlists** (everyone waiting on any ticket type) or a specific ticket type waitlist under the To field.
+You can also email ticket type waitlists via Dandelion by going to Mailer in the event dropdown, creating a new message and selecting **Ticket type waitlists** (everyone waiting on any ticket type) or a specific ticket type waitlist under the To field. <!-- claim: mailer-to-ticket-type-waitlists -->
 
 ## Fees and payouts
 
@@ -287,35 +287,39 @@ Dandelion does not take any money from ticket sales. Your chosen payment process
 
 If you take payments with Stripe, go to **Stripe report** in an event's dropdown to see what Stripe took for it: charges, refunds (including those made in Stripe's dashboard), Stripe's fees and what reached your account. It's fetched from Stripe when you load the page, in the currency your Stripe account pays out in.
 
-Alternatively, you can accept completely fee-free crypto payments via Gnosis, Celo or Base. Go to the Payments tab in your organisation's settings, click **Set up Crypto**, and enter an Ethereum-compatible wallet address. Copy it straight from your wallet: a mixed-case address carries a checksum, and Dandelion won't save one whose checksum doesn't match, as that usually means a character was mistyped.
+Alternatively, you can accept completely fee-free crypto payments via Gnosis, Celo or Base. Go to the Payments tab in your organisation's settings, click **Set up Crypto**, and enter an Ethereum-compatible wallet address.
+Copy it straight from your wallet: a mixed-case address carries a checksum, and Dandelion won't save one whose checksum doesn't match, as that usually means a character was mistyped. <!-- claim: evm-address-checksum -->
 
 ## Donations and the suggested contribution
 
 Dandelion takes nothing from your ticket sales and charges no fees. It runs as a gift economy instead, on what people choose to give.
 
-### Donations at checkout
+By default, donations at checkout go to Dandelion. <!-- claim: checkout-donations-default-to-dandelion --> That's how Dandelion is mostly funded.
 
-Every checkout has a box where ticket buyers can add a donation on top of their tickets. When you take payments with Stripe, these donations go to **Dandelion** by default, and that's how Dandelion is mostly funded.
+If you'd like donations at checkout to go to **your organisation** instead, we ask your organisation to contribute 1% of its ticket sales to Dandelion, to make up for the donations Dandelion no longer receives. You pay it yourself: click your organisation's dropdown and select **Contribute**. Dandelion never takes it out of your ticket sales. <!-- claim: contribution-never-from-ticket-sales -->
 
-### The suggested contribution
+It's a running total across all your events, not a one-off payment or a monthly fee. Every ticket sale adds 1% of its price to it. The Contribute page shows how much your events have added up to, how much you've contributed and what's left. <!-- claim: contribution-running-total -->
 
-If you'd like donations at checkout to go to **your organisation** instead, we ask your organisation to contribute 1% of its ticket sales to Dandelion, to make up for the donations Dandelion no longer receives. You pay it yourself: click your organisation's dropdown and select **Contribute**. Dandelion never takes it out of your ticket sales.
+While you're keeping up with it (you've contributed at least 90% of it, with no more than £100 outstanding), checkout donations go to your organisation, and the settings on an event's **Donations** tab (the suggested and minimum donation, and the text beside them) take effect. As you sell more tickets you can fall behind again, and checkout donations then go back to Dandelion until you catch up. <!-- claim: contribution-keeping-up -->
 
-It's a running total across all your events, not a one-off payment or a monthly fee. Every ticket sale adds 1% of its price to it, and events that don't sell tickets on Dandelion add nothing. The Contribute page shows how much your events have added up to, how much you've contributed and what's left.
+The easiest way to stay caught up is to **enable auto top-up** on the Contribute page. Dandelion then tops you up to 100% whenever you fall behind, and checkout donations always go to your organisation. <!-- claim: contribution-auto-top-up -->
 
-While you're keeping up with it (you've contributed at least 90% of it, with no more than £100 outstanding), checkout donations go to your organisation, and the settings on an event's **Donations** tab (the suggested and minimum donation, and the text beside them) take effect. As you sell more tickets you can fall behind again, and checkout donations then go back to Dandelion until you catch up.
+### Which checkouts have a donation box
 
-The easiest way to stay caught up is to **enable auto top-up** on the Contribute page. Dandelion then tops you up to 100% whenever you fall behind, and checkout donations always go to your organisation.
+- **While donations go to Dandelion:** events with paid tickets or a suggested donation. <!-- claim: checkout-donations-to-dandelion -->
+- **While they go to your organisation:** only events where you've set a suggested donation on the **Donations** tab. <!-- claim: checkout-donation-box-when-suggested -->
+
+An event with a single free ticket type books in one click, with no donation box. To show one, check **Always show the full ticket form** under **Appearance**. <!-- claim: single-free-ticket-no-donation-box -->
 
 ## Sending confirmation to other ticketholders
 
-By default, only the person who placed the order receives the order confirmation email. Under **Everything else** when editing an event, you can enable **Send order confirmation to other ticketholders**. When that is on, entering a ticketholder email on the order confirmation page (or via Edit ticketholders) also emails that person the order confirmation.
+By default, only the person who placed the order receives the order confirmation email. Under **Everything else** when editing an event, you can enable **Send order confirmation to other ticketholders**. When that is on, entering a ticketholder email on the order confirmation page (or via Edit ticketholders) also emails that person the order confirmation. <!-- claim: ticketholder-confirmation-setting -->
 
 ## Transferring tickets
 
 **Event attendees:** Log in to Dandelion, go to the event page, click 'Edit ticketholders' and enter the name and email address of the person you gifted/sold your ticket to.
 
-The original ticket PDF will still work, so you can simply forward it to the new ticketholder. If the event has **Send order confirmation to other ticketholders** enabled, they will also receive the order confirmation automatically. Otherwise, if it's important that the PDF is reissued under the new name, you can get in touch with the event organiser and ask them to 'Resend single ticket' following the instructions below.
+The original ticket PDF will still work, so you can simply forward it to the new ticketholder. <!-- claim: ticket-pdf-works-after-transfer --> If the event has **Send order confirmation to other ticketholders** enabled, they will also receive the order confirmation automatically. Otherwise, if it's important that the PDF is reissued under the new name, you can get in touch with the event organiser and ask them to 'Resend single ticket' following the instructions below.
 
 **Event organisers that have received a request to transfer a ticket:** Click the event dropdown, go to the Tickets page, and select 'Change name or email' in the Actions menu for the ticket(s).
 
@@ -323,51 +327,51 @@ If you want to resend the ticket PDF to the new email address, after entering th
 
 ## Refunds
 
-Refunds for Stripe, GoCardless, Mollie, and PayPal payments can be issued from the event's Tickets or Orders pages. The money goes back to the original payment method.
+Refunds for Stripe, GoCardless, Mollie, and PayPal payments can be issued from the event's Tickets or Orders pages. The money goes back to the original payment method. <!-- claim: refunds-to-original-method -->
 
 1. Click the event dropdown and go to **Tickets** or **Orders**.
 2. Open **Actions** next to the ticket or order.
 3. Choose:
-   - **Remove and refund ticket** — refunds that ticket's price and removes it. The rest of the order stays in place.
-   - **Remove and refund order** — refunds the whole payment (including any donation on the order) and removes the order.
-   - **Remove ticket** / **Remove order** — removes without refunding. Use this if you already refunded via Stripe, GoCardless, Mollie, or PayPal, or the payment was not taken through those processors.
+   - **Remove and refund ticket** — refunds that ticket's price and removes it. The rest of the order stays in place. <!-- claim: refund-ticket-own-price -->
+   - **Remove and refund order** — refunds the whole payment (including any donation on the order) and removes the order. <!-- claim: refund-order-whole-payment -->
+   - **Remove ticket** / **Remove order** — removes without refunding. <!-- claim: remove-without-refund --> Use this if you already refunded via Stripe, GoCardless, Mollie, or PayPal, or the payment was not taken through those processors.
 
-You'll be asked to confirm. The refund options only appear for Stripe, GoCardless, Mollie, and PayPal payments. For Open Collective, crypto, complimentary, or cash tickets, remove the ticket or order here and refund via that platform if needed.
+The refund options only appear for Stripe, GoCardless, Mollie, and PayPal payments. For Open Collective, crypto, complimentary, or cash tickets, remove the ticket or order here and refund via that platform if needed. <!-- claim: refund-options-only-for-providers --> You'll be asked to confirm.
 
-The attendee is emailed a confirmation when the refund succeeds. If a refund fails, you'll get an email with the error. You can retry from your [Stripe](https://dashboard.stripe.com/refunds), [GoCardless](https://manage.gocardless.com/), [Mollie](https://my.mollie.com/dashboard/payments), or [PayPal](https://www.paypal.com/activity) dashboard.
+The attendee is emailed a confirmation when the refund succeeds. <!-- claim: refund-confirmation-email --> If a refund fails, you'll get an email with the error. <!-- claim: refund-failure-email --> You can retry from your [Stripe](https://dashboard.stripe.com/refunds), [GoCardless](https://manage.gocardless.com/), [Mollie](https://my.mollie.com/dashboard/payments), or [PayPal](https://www.paypal.com/activity) dashboard.
 
 GoCardless instalment payments should be refunded from the GoCardless dashboard (see [Allowing people to pay in instalments](#allowing-people-to-pay-in-instalments)).
 
-Attendees cannot refund themselves. They need to contact you, or [resell the ticket](#ticket-resales) if you have enabled resales.
+Attendees cannot refund themselves. <!-- claim: attendees-cannot-refund --> They need to contact you, or [resell the ticket](#ticket-resales) if you have enabled resales.
 
 ## Ticket resales
 
 The ticket resale feature allows event attendees to resell their tickets through the event page. (Technically, what happens is that the original ticket is refunded, and a new ticket is issued to the new buyer.)
 
-Check 'enable resales' under 'Everything else' when editing an event to enable resales.
+Check 'enable resales' under 'Everything else' when editing an event to enable resales. <!-- claim: resales-are-enabled-per-event -->
 
-Attendees mark a ticket for resale by logging in to Dandelion, visiting the event page and selecting 'Mark for resale' next to a ticket. They can do this at any time, whether or not the event is sold out.
+Attendees mark a ticket for resale by logging in to Dandelion, visiting the event page and selecting 'Mark for resale' next to a ticket. They can do this at any time, whether or not the event is sold out. <!-- claim: resale-at-any-time -->
 
-A ticket marked for resale frees its place: in its ticket type, in its ticket group if it has one, and in the event's capacity (see [Ticket slots and capacity](#ticket-slots-and-capacity)). Anyone can then buy that place, including with a different ticket type (a concession ticket can take the place of a standard one when the event as a whole is full). If the event was sold out, people on your waitlist are emailed that tickets are available again.
+A ticket marked for resale frees its place: in its ticket type, in its ticket group if it has one, and in the event's capacity (see [Ticket slots and capacity](#ticket-slots-and-capacity)). <!-- claim: resale-frees-place --> Anyone can then buy that place, including with a different ticket type (a concession ticket can take the place of a standard one when the event as a whole is full). <!-- claim: resale-any-ticket-type --> If the event was sold out, people on your waitlist are emailed that tickets are available again. <!-- claim: resale-emails-waitlist -->
 
-The ticket is resold when a purchase would otherwise take its ticket type, its ticket group or the event past its limit. Then:
+The ticket is resold when a purchase would otherwise take its ticket type, its ticket group or the event past its limit. <!-- claim: resold-past-limit --> Then:
 
-- the original ticket is removed and its price refunded
-- the original ticketholder is emailed that their ticket was resold
-- the event's facilitators (see [Adding event facilitators](#adding-event-facilitators)) are emailed about the resale
+- the original ticket is removed and its price refunded <!-- claim: resold-ticket-refunded -->
+- the original ticketholder is emailed that their ticket was resold <!-- claim: resale-emails-ticketholder -->
+- the event's facilitators (see [Adding event facilitators](#adding-event-facilitators)) are emailed about the resale <!-- claim: resale-emails-facilitators -->
 - the new buyer gets their ticket as with any purchase
 
-If several tickets are on resale, the one that has been on resale longest is resold first. A ticket that takes more than one place (see [Ticket slots and capacity](#ticket-slots-and-capacity)) resells as many tickets on resale as it needs places. While the ticket type, group and event still have places left, a purchase just takes one of those, and tickets on resale stay on resale.
+If several tickets are on resale, the one that has been on resale longest is resold first. <!-- claim: resale-oldest-first --> A ticket that takes more than one place (see [Ticket slots and capacity](#ticket-slots-and-capacity)) resells as many tickets on resale as it needs places. <!-- claim: resale-of-several-places --> While the ticket type, group and event still have places left, a purchase just takes one of those, and tickets on resale stay on resale. <!-- claim: resale-only-when-full -->
 
-Only the price paid for the ticket is refunded (less any percentage discount), not other tickets in the same order or a donation. The new buyer pays the ticket's current price, which may be different. If Dandelion can't refund the ticket automatically (for example if the payment provider is unavailable), the ticket is still resold, and the event's contacts and Dandelion admins are emailed to refund the original ticketholder themselves.
+Only the price paid for the ticket is refunded (less any percentage discount), not other tickets in the same order or a donation. <!-- claim: resale-refunds-own-price --> If Dandelion can't refund the ticket automatically (for example if the payment provider is unavailable), the ticket is still resold, and the event's contacts and Dandelion admins are emailed to refund the original ticketholder themselves. <!-- claim: resale-refund-fails --> The new buyer pays the ticket's current price, which may be different.
 
-Until a ticket is resold, its holder can take it off resale by selecting 'Remove from resale'. They can't while someone else is partway through buying its place, as the place is held for them until they pay or their order lapses.
+Until a ticket is resold, its holder can take it off resale by selecting 'Remove from resale'. <!-- claim: resale-can-be-removed --> They can't while someone else is partway through buying its place, as the place is held for them until they pay or their order lapses. <!-- claim: resale-held-for-buyer -->
 
-If you turn resales off, tickets on resale are taken off resale and their holders keep them, unless someone is already buying their places. Those tickets are resold when the purchase is paid for, or taken off resale if it isn't.
+If you turn resales off, tickets on resale are taken off resale and their holders keep them, unless someone is already buying their places. <!-- claim: resales-off-returns-tickets --> Those tickets are resold when the purchase is paid for, or taken off resale if it isn't. <!-- claim: resales-off-while-held -->
 
-If the original ticket was paid by GoCardless instalments (or another method Dandelion cannot refund automatically), the event's creator, coordinator, revenue sharer and facilitators, and Dandelion admins, are emailed that a refund is required, and the original ticketholder is told the organiser will process the refund (not that they will receive one automatically). Refund collected instalments and cancel the remaining schedule from the GoCardless dashboard.
+If the original ticket was paid by GoCardless instalments (or another method Dandelion cannot refund automatically), the event's creator, coordinator, revenue sharer and facilitators, and Dandelion admins, are emailed that a refund is required, and the original ticketholder is told the organiser will process the refund (not that they will receive one automatically). <!-- claim: resale-instalments-refunded-by-hand --> Refund collected instalments and cancel the remaining schedule from the GoCardless dashboard.
 
-The same happens if the original ticket was bought in an order that used credit or a fixed discount. These come off the order as a whole, so the ticket's price can be more than was paid for it. The email says what the order paid in all, so you can refund the ticketholder their share.
+The same happens if the original ticket was bought in an order that used credit or a fixed discount. <!-- claim: resale-credit-refunded-by-hand --> These come off the order as a whole, so the ticket's price can be more than was paid for it. The email says what the order paid in all, so you can refund the ticketholder their share. <!-- claim: resale-credit-email-says-order-total -->
 
 ## Gating events with an application form
 
@@ -375,30 +379,30 @@ You can make it so people must first be accepted to an Activity before being abl
 
 Click your organisation dropdown and select 'Activities' then 'Create an activity'. Under 'Access', select 'People must apply to join' and enter some application questions (answers in textboxes).
 
-Edit your event(s) and assign them to this new activity. Now, people will have to apply and be accepted to the activity before they can purchase tickets to the event(s). This is enforced when tickets are bought, not only on the event page.
+Edit your event(s) and assign them to this new activity. Now, people will have to apply and be accepted to the activity before they can purchase tickets to the event(s). This is enforced when tickets are bought, not only on the event page. <!-- claim: application-gates-purchase -->
 
-You'll be notified via email when people apply.
+You'll be notified via email when people apply. <!-- claim: activity-application-emails-organisers -->
 
 ## Event boosts
 
-Dandelion has a 'boosted event' slot at the top of the event listings. If you'd like your event to show there, you can boost your event from the **Boosts** page in the event admin menu.
+Dandelion has a 'boosted event' slot at the top of the event listings. <!-- claim: boosted-slot --> If you'd like your event to show there, you can boost your event from the **Boosts** page in the event admin menu.
 
-- Boosts are bought in whole-hour blocks.
+- Boosts are bought in whole-hour blocks. <!-- claim: boost-whole-hours -->
 - You choose a start time, a number of hours, and an amount per hour.
-- Overlapping boosts for the same event stack together.
+- Overlapping boosts for the same event stack together. <!-- claim: boosts-stack -->
 
-An event's share of the boost pool corresponds to the probability of the event being shown in the boost slot at the top of the unfiltered public events listing (the probability can be higher for filtered listings where the number of relevant events is smaller).
+An event's share of the boost pool corresponds to the probability of the event being shown in the boost slot at the top of the unfiltered public events listing (the probability can be higher for filtered listings where the number of relevant events is smaller). <!-- claim: boost-pool-share -->
 
 For example, if during one hour:
 
 'Breathwork Journey' tagged 'breathwork' is boosted for £2<br />
 'Day Rave' tagged 'rave' is boosted for £8
 
-Then the probability that 'Breathwork Journey' will be shown in the boosted slot when someone views the unfiltered public events listing is 2/(2+8) = 20%.
+Then the probability that 'Breathwork Journey' will be shown in the boosted slot when someone views the unfiltered public events listing is 2/(2+8) = 20%. <!-- claim: boost-example-unfiltered -->
 
-The probability that 'Breathwork Journey' will be shown in the boosted slot when someone views the public events listings, filtered for the tag 'breathwork' is 100% (as it's the only boosted event that matches the filters).
+The probability that 'Breathwork Journey' will be shown in the boosted slot when someone views the public events listings, filtered for the tag 'breathwork' is 100% (as it's the only boosted event that matches the filters). <!-- claim: boost-example-filtered -->
 
-Likewise, the probability that 'Day Rave' will be shown in the boosted slot when someone views the public events listings, filtered for the tag 'rave' is 100%.
+Likewise, the probability that 'Day Rave' will be shown in the boosted slot when someone views the public events listings, filtered for the tag 'rave' is 100%. <!-- claim: boost-example-filtered-rave -->
 
 ## Using automated revenue sharing
 
@@ -416,9 +420,9 @@ Embed an [iframe](https://www.techtarget.com/whatis/definition/IFrame-Inline-Fra
 <iframe style="overflow: scroll; border: 0; width:100%; height: 100vh;" class="dandelion-auto-height"  src="https://dandelion.events/o/the-psychedelic-society/events?minimal=1"></iframe>
 ```
 
-You can also experiment with the parameters `hide_featured_title`, `no_search`, `no_view_options`, `no_listings` and `first_carousel_only` e.g. `?minimal=1&hide_featured_title=1&no_search=1&no_view_options=1&no_listings=1&first_carousel_only=1`
+You can also experiment with the parameters `hide_featured_title`, `no_search`, `no_view_options`, `no_listings` and `first_carousel_only` e.g. `?minimal=1&hide_featured_title=1&no_search=1&no_view_options=1&no_listings=1&first_carousel_only=1` <!-- claim: embed-listing-params -->
 
-To show past events with a [recording](#event-recordings), most recent first, add `recordings=1` (and `search=1` to leave out the carousels, `display=grid` for a grid) e.g. `?minimal=1&recordings=1&search=1&no_search=1&no_view_options=1&display=grid`. `past=1` shows all past events.
+To show past events with a [recording](#event-recordings), most recent first, add `recordings=1` (and `search=1` to leave out the carousels, `display=grid` for a grid) e.g. `?minimal=1&recordings=1&search=1&no_search=1&no_view_options=1&display=grid`. <!-- claim: embed-recordings-param --> `past=1` shows all past events. <!-- claim: embed-past-param -->
 
 Put this in your head to set the iframe to the correct height:
 
@@ -440,7 +444,7 @@ Embed an iframe like this, replacing `https://dandelion.events/e/my-event` with 
 <iframe style="overflow: scroll; border: 0; width:100%; height: 100vh" class="dandelion-auto-height" src="https://dandelion.events/e/my-event"></iframe>
 ```
 
-Add the `ticket_form_only` query parameter to limit the embed to the ticket form:
+Add the `ticket_form_only` query parameter to limit the embed to the ticket form: <!-- claim: embed-ticket-form-only -->
 
 ```html
 <iframe style="overflow: scroll; border: 0; width:100%; height: 100vh" class="dandelion-auto-height" src="https://dandelion.events/e/my-event?ticket_form_only=1"></iframe>

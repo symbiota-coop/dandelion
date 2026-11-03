@@ -16,13 +16,13 @@ Check out the video below, which does assume you have a [Stripe](https://stripe.
 >
 > Enter the name of the gathering.
 >
-> Choose from three access modes: Anyone with the link can join, People must apply to join, and Invitation-only.
+> Choose from three access modes: Anyone with the link can join, People must apply to join, and Invitation-only. <!-- claim: video-access-modes -->
 >
 > Let's go with 'People must apply to join'.
 >
-> We can then set the questions for the application form.
+> We can then set the questions for the application form. <!-- claim: video-application-questions -->
 >
-> Let's also enable supporters, and set a magic number. When an application gets this many proposers plus supporters, with at least one proposer, it will be automatically accepted.
+> Let's also enable supporters, and set a magic number. When an application gets this many proposers plus supporters, with at least one proposer, it will be automatically accepted. <!-- claim: video-magic-number -->
 >
 > Under the Payments tab, we'll enter our Stripe API keys so we can accept payments.
 >
@@ -32,7 +32,7 @@ Check out the video below, which does assume you have a [Stripe](https://stripe.
 >
 > Under 'Applications', we can see outstanding applications and the application link. Let's preview the application form.
 >
-> This is what we see once someone has applied. We can click Propose to act as a proposer for this application.
+> This is what we see once someone has applied. We can click Propose to act as a proposer for this application. <!-- claim: video-propose -->
 >
 > In the 'Choose and Pay' section, let's add a low income tier.
 >
@@ -40,7 +40,7 @@ Check out the video below, which does assume you have a [Stripe](https://stripe.
 >
 > After adding Standard and Higher income tiers also, it will look like this.
 >
-> If we then click to join the Standard tier, we see a request for payment.
+> If we then click to join the Standard tier, we see a request for payment. <!-- claim: video-join-tier-payment -->
 >
 > OK, now let's create a Timetable.
 >
@@ -48,13 +48,13 @@ Check out the video below, which does assume you have a [Stripe](https://stripe.
 >
 > Next let's propose an activity.
 >
-> Schedule the activity by dragging it onto the timetable.
+> Schedule the activity by dragging it onto the timetable. <!-- claim: video-schedule-activity -->
 >
 > Finally, let's create a Rota.
 >
 > We'll create some time slots and roles. Rows are for time slots, and columns are for roles.
 >
-> Click 'Sign up' to sign up to a shift.
+> Click 'Sign up' to sign up to a shift. <!-- claim: video-shift-signup -->
 >
 > That completes the brief tour of Dandelion's Gatherings feature. Happy co-creating!
 
@@ -66,21 +66,21 @@ Check out the video below, which does assume you have a [Stripe](https://stripe.
 | Request contributions towards costs | Sell tickets |
 | Can create Teams to discuss different aspects of the gathering | Have a single discussion box |
 
-It can also work to use both: you can sell tickets to an Event, and choose to automatically add anyone that buys a ticket to one of your Gatherings.
+It can also work to use both: you can sell tickets to an Event, and choose to automatically add anyone that buys a ticket to one of your Gatherings. <!-- claim: ticket-buyers-join-gathering -->
 
 ## Gathering access
 
-You can choose from three access modes: Anyone with the link can join, People must apply to join, and Invitation-only. If you select People must apply to join, you will be able to define the questions people are asked on the application form.
+You can choose from three access modes: Anyone with the link can join, People must apply to join, and Invitation-only. <!-- claim: access-modes --> If you select People must apply to join, you will be able to define the questions people are asked on the application form. <!-- claim: application-questions -->
 
 ## Applications
 
-Applications can be seen and voted on by all existing members. You can choose to have just one vote type, Proposers, or two, Proposers and Supporters.
+Applications can be seen and voted on by all existing members. <!-- claim: members-see-and-vote --> You can choose to have just one vote type, Proposers, or two, Proposers and Supporters. <!-- claim: vote-types -->
 
-The 'magic number' is the number of proposers + supporters required for an application to be accepted. (Note applications must always have at least one proposer to pass.) The magic number can be specified in the gathering settings, or you can choose to allow all members of the gathering to suggest a magic number, and use the median.
+The 'magic number' is the number of proposers + supporters required for an application to be accepted. (Applications need at least one proposer to pass, unless the magic number is 0: then an application is accepted as soon as it's made.) <!-- claim: magic-number --> The magic number can be specified in the gathering settings, or you can choose to allow all members of the gathering to suggest a magic number, and use the median. <!-- claim: median-magic-number -->
 
 ## Features
 
-There are 6 optional features of gatherings that can be enabled or disabled according to your needs:
+There are 6 optional features of gatherings that can be enabled or disabled according to your needs: <!-- claim: optional-features -->
 
 - **Choose & Pay**: Allow people to select and pay for core costs, accommodation and transport
 - **Teams**: Create Slack/Facebook-like channels to organise different aspects of the gathering
@@ -97,8 +97,8 @@ To copy a gathering's structure, navigate to the old gathering and click Copy. Y
 
 The following elements are copied:
 
-- **Timetables**: including all time slots and spaces (but not scheduled activities)
-- **Rotas**: including all time slots and roles (but not shift signups)
-- **Options**: including name, description, capacity, cost and other settings
+- **Timetables**: including all time slots and spaces (but not scheduled activities) <!-- claim: copy-timetables -->
+- **Rotas**: including all time slots and roles (but not shift signups) <!-- claim: copy-rotas -->
+- **Options**: including name, description, capacity, cost and other settings <!-- claim: copy-options -->
 
-Members, payments, activities and shift signups are not copied — only the structure is transferred.
+Members, payments, activities and shift signups are not copied — only the structure is transferred. <!-- claim: copy-not-members -->

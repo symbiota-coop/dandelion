@@ -211,6 +211,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'instant bank pay is only available for GBP and EUR events' do
+    covers 'organisations/gocardless-gbp-eur-only@10a545'
     create_instant_event
     pm = EventPaymentMethod.object('gocardless_instant')
 
@@ -325,6 +326,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'instalments are only available for GBP and EUR events' do
+    covers 'events/instalments-gbp-eur-only@4c16dc', 'organisations/gocardless-gbp-eur-only@10a545'
     create_instalment_event
     pm = EventPaymentMethod.object('gocardless_instalment')
 
@@ -336,6 +338,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'instalment checkout stores the billing request id' do
+    covers 'events/instalments-bank-account-in-event-currency@6c40e6'
     create_instalment_event(instalment_count: 4)
     order = create_incomplete_order(@event, value: 40)
     billing_request = api_object(id: 'BRQ123')
@@ -356,6 +359,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'fulfilled billing request webhook creates the schedule and issues tickets' do
+    covers 'events/instalment-tickets-issued-at-schedule-setup@98500a'
     create_instalment_event
     order = create_incomplete_order(@event, value: 30, gocardless_billing_request_id: "BRQ#{SecureRandom.hex(4)}")
     client, captured = stub_gocardless_schedule_client
@@ -381,6 +385,71 @@ class WebhooksTest < ActiveSupport::TestCase
     assert restored
     assert restored.payment_completed?
     assert restored.tickets.first
+  end
+
+  test 'gocardless instalment count must be between 2 and 24' do
+    covers 'events/instalment-count-field@f5776c'
+    create_instalment_event
+    { 1 => false, 2 => true, 24 => true, 25 => false }.each do |count, valid|
+      @event.gocardless_instalment_count = count
+      assert_equal valid, @event.valid?, "#{count} instalments"
+      assert_includes @event.errors[:gocardless_instalment_count], 'must be between 2 and 24' unless valid
+    end
+  end
+
+  test 'the gocardless instalments field appears once instalments are enabled on the organisation' do
+    covers 'events/instalment-count-field@f5776c'
+    create_organisation(gocardless_access_token: 'sandbox_token')
+    create_event(prices: [30])
+    sign_in_with_rack(@account)
+
+    get "/e/#{@event.slug}/edit"
+    assert last_response.ok?
+    refute_includes last_response.body, 'event[gocardless_instalment_count]'
+
+    @organisation.set(gocardless_instalments: true)
+    get "/e/#{@event.slug}/edit"
+    assert last_response.ok?
+    assert_includes last_response.body, 'event[gocardless_instalment_count]'
+  end
+
+  test 'eur instalment checkout asks for a sepa mandate in euros' do
+    covers 'events/instalments-bank-account-in-event-currency@6c40e6'
+    create_instalment_event
+    @event.set(currency: 'EUR')
+    order = create_incomplete_order(@event, value: 30)
+    client, brq_params, flow_params = stub_billing_request_checkout(api_object(id: 'BRQ123'))
+
+    GoCardlessPro::Client.stub :new, client do
+      EventPaymentMethod::GoCardlessInstalment.call(order: order, event: @event)
+    end
+
+    assert_equal 'sepa_core', brq_params[:mandate_request][:scheme]
+    assert_equal 'EUR', brq_params[:mandate_request][:currency]
+    assert_equal true, flow_params[:lock_currency]
+  end
+
+  test 'a failed later instalment does not cancel the order' do
+    covers 'events/instalment-failures-not-cancelled@011b34'
+    create_instalment_event
+    order = create_incomplete_order(@event, value: 30, gocardless_billing_request_id: "BRQ#{SecureRandom.hex(4)}")
+    client, = stub_gocardless_schedule_client
+    deliver_gocardless_webhook(@organisation, billing_request_event(order.gocardless_billing_request_id), client)
+    assert order.reload.payment_completed?
+
+    failed = GoCardlessPro::Resources::Event.new(
+      'id' => 'EV124',
+      'resource_type' => 'payments',
+      'action' => 'failed',
+      'links' => { 'payment' => 'PM456' }
+    )
+    deliver_gocardless_webhook(@organisation, failed, client)
+
+    assert_equal 200, last_response.status
+    order = Order.find(order.id)
+    assert order, 'the order was deleted'
+    assert order.payment_completed?
+    assert order.tickets.first.reload.payment_completed?
   end
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -429,6 +498,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'mollie is available for fiat-currency events when an API key is set' do
+    covers 'events/mollie-fiat-events@8e9a10'
     create_mollie_event
     pm = EventPaymentMethod.object('mollie')
 
@@ -466,6 +536,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'mollie purchase creates an incomplete order then webhook issues the ticket' do
+    covers 'events/mollie-hosted-checkout@8e7b2a', 'events/mollie-confirms-when-paid@4e04c7'
     create_mollie_event
     buyer = FactoryBot.create(:account)
     payment = stub_mollie_payment
@@ -516,6 +587,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'unpaid mollie webhook does not complete the order' do
+    covers 'events/mollie-confirms-when-paid@4e04c7'
     create_mollie_event
     order = create_incomplete_order(@event, mollie_payment_id: "tr_#{SecureRandom.hex(4)}")
 
@@ -603,6 +675,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'paypal is available for fiat-currency events when credentials are set' do
+    covers 'events/paypal-fiat-events@e7236d'
     create_paypal_event
     pm = EventPaymentMethod.object('paypal')
 
@@ -614,6 +687,20 @@ class WebhooksTest < ActiveSupport::TestCase
     @organisation.unset(:paypal_secret)
     @event.organisation.reload
     refute pm.available?(@event)
+  end
+
+  test 'mollie and paypal are not offered on crypto-currency events' do
+    covers 'events/mollie-fiat-events@8e9a10', 'events/paypal-fiat-events@e7236d'
+    create_organisation(mollie_api_key: 'test_molliekey', paypal_client_id: 'paypal_client', paypal_secret: 'paypal_secret')
+    create_event(prices: [10])
+    mollie = EventPaymentMethod.object('mollie')
+    paypal = EventPaymentMethod.object('paypal')
+    assert mollie.available?(@event)
+    assert paypal.available?(@event)
+
+    @event.set(currency: EVM_CURRENCIES.first)
+    refute mollie.available?(@event)
+    refute paypal.available?(@event)
   end
 
   test 'paypal checkout stores the order id' do
@@ -642,6 +729,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'paypal purchase creates an incomplete order then webhook issues the ticket' do
+    covers 'events/paypal-approve-on-paypal@61b06f', 'events/paypal-capture-on-return-or-webhook@1d2561'
     create_paypal_event
     buyer = FactoryBot.create(:account)
     created = stub_paypal_order
@@ -716,6 +804,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'paypal return to success page captures and completes the order' do
+    covers 'events/paypal-capture-on-return-or-webhook@1d2561'
     create_paypal_event
     order = create_incomplete_order(@event, paypal_order_id: "PAYPAL-#{SecureRandom.hex(4)}")
     approved = stub_paypal_order(id: order.paypal_order_id, status: 'APPROVED')
@@ -780,6 +869,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'create_paypal_webhook_if_necessary registers the webhook in production' do
+    covers 'events/paypal-capture-on-return-or-webhook@1d2561'
     create_paypal_event
     created = {}
     client = stub_paypal_client
@@ -944,6 +1034,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'a click webhook signed with the organisation\'s key is counted' do
+    covers 'organisations/mailgun-click-webhook@cc88d6'
     create_organisation(mailgun_webhook_signing_key: 'organisation-key')
     pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone')
     post "/o/#{@organisation.slug}/mailgun_webhook", mailgun_click_event(pmail, key: 'organisation-key'), 'CONTENT_TYPE' => 'application/json'
@@ -952,6 +1043,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'a click webhook signed with Dandelion\'s key is refused' do
+    covers 'organisations/mailgun-click-webhook@cc88d6'
     with_mailgun_signing_key('dandelion-key') do
       [nil, 'organisation-key'].each do |organisation_key|
         organisation = FactoryBot.create(:organisation, account: FactoryBot.create(:account), mailgun_webhook_signing_key: organisation_key)

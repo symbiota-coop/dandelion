@@ -44,6 +44,7 @@ class OrganisationsTest < ActiveSupport::TestCase
   end
 
   test 'syncing Patreon records active patrons in the currency they pay and clears those who stopped' do
+    covers 'organisations/monthly-donors-synced@c49f69', 'organisations/patreon-pledge-currency@991e09'
     create_organisation(currency: 'GBP', patreon_client_id: 'client', patreon_client_secret: 'secret', patreon_refresh_token: 'refresh')
     recorded_by_hand = @organisation.organisationships.create!(account: FactoryBot.create(:account, email: 'jl@example.com'), monthly_donation_method: 'Other',
                                                                monthly_donation_amount: 11.5, monthly_donation_currency: 'GBP', sent_monthly_donation_welcome: true)
@@ -81,6 +82,7 @@ class OrganisationsTest < ActiveSupport::TestCase
   end
 
   test 'admins can record, update or clear a monthly donor by hand, but not one synced from Patreon' do
+    covers 'organisations/monthly-donation-by-hand@ec117b'
     create_organisation(currency: 'GBP')
     donor = @organisation.organisationships.create!(account: FactoryBot.create(:account), sent_monthly_donation_welcome: true)
     @organisation.set(monthly_donors_count: 1)
@@ -142,6 +144,7 @@ class OrganisationsTest < ActiveSupport::TestCase
   end
 
   test 'mailgun_domain is reduced to a hostname and must not be the API address' do
+    covers 'organisations/mailgun-sending-domain@ba4027'
     create_organisation
     @organisation.assign_attributes(mailgun_api_key: 'key-123', mailgun_region: 'US', mailgun_domain: ' https://MG.example.com/ ')
     assert @organisation.valid?
@@ -157,6 +160,7 @@ class OrganisationsTest < ActiveSupport::TestCase
   end
 
   test 'evm_address must match its EIP-55 checksum when in mixed case' do
+    covers 'events/evm-address-checksum@121bf6'
     create_organisation
     # EIP-55's own example address, which checksums to this case
     @organisation.evm_address = ' 0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed '
@@ -452,6 +456,7 @@ class OrganisationsTest < ActiveSupport::TestCase
   end
 
   test 'events count the promotion fee paid for them, and nothing for events without ticket sales' do
+    covers 'events/contribution-running-total@535bd5'
     create_organisation(currency: 'GBP')
     create_event(fixed_contribution_gbp: 10)
     create_event(as: :event2, promotion_fee_gbp: 25)
@@ -606,5 +611,313 @@ class OrganisationsTest < ActiveSupport::TestCase
 
     assert_equal 'The CSV needs a column headed email', ImportFromCsv.error("Name,Email Address\nBob,bob@example.com\n")
     assert_equal "The CSV couldn't be read (there's a problem on line 2)", ImportFromCsv.error("Name,Email\nBob,\"bob\"@example.com\n")
+  end
+
+  test 'a new organisation takes the currency of where you are, or your own default currency' do
+    covers 'organisations/currency-defaults-to-local@019877'
+    account = FactoryBot.create(:account)
+    sign_in_with_rack(account)
+
+    header 'CF-IPCountry', 'SE'
+    post '/o/new', organisation: { name: 'Stockholm Circle', slug: 'stockholm-circle' }
+    assert_equal 'SEK', Organisation.find_by(slug: 'stockholm-circle').currency
+
+    account.set(default_currency: 'CAD')
+    post '/o/new', organisation: { name: 'Toronto Circle', slug: 'toronto-circle' }
+    assert_equal 'CAD', Organisation.find_by(slug: 'toronto-circle').currency
+
+    # And can be changed
+    post '/o/new', organisation: { name: 'Oslo Circle', slug: 'oslo-circle', currency: 'NOK' }
+    assert_equal 'NOK', Organisation.find_by(slug: 'oslo-circle').currency
+  end
+
+  # GoCardless's API client, answering with these active subscriptions, each [subscription, customer]
+  def gocardless_client(subscriptions)
+    records = subscriptions.map(&:first)
+    customers = subscriptions.to_h { |subscription, customer| [subscription.links.mandate, customer] }
+    list = api_object(records: records, after: nil)
+    subscriptions_service = Object.new
+    subscriptions_service.define_singleton_method(:list) { |params:| params[:status] == 'active' ? list : raise }
+    mandates = customers.keys.to_h { |id| [id, api_object(links: api_object(customer: id))] }
+    mandates_service = Object.new
+    mandates_service.define_singleton_method(:get) { |id| mandates.fetch(id) }
+    customers_service = Object.new
+    customers_service.define_singleton_method(:get) { |id| customers.fetch(id) }
+    api_object(subscriptions: subscriptions_service, mandates: mandates_service, customers: customers_service)
+  end
+
+  def gocardless_subscription(id, amount:, currency:, name: 'Monthly donation')
+    api_object(status: 'active', name: name, amount: amount, currency: currency, start_date: '2026-09-01', links: api_object(mandate: "MD#{id}"))
+  end
+
+  test 'syncing GoCardless records active subscribers as monthly donors and clears those who stopped' do
+    covers 'organisations/monthly-donors-synced@c49f69'
+    create_organisation(currency: 'GBP', gocardless_access_token: 'token', gocardless_subscriptions: true)
+    lapsed = @organisation.organisationships.create!(account: FactoryBot.create(:account), monthly_donation_method: 'GoCardless',
+                                                     monthly_donation_amount: 5, monthly_donation_currency: 'GBP', sent_monthly_donation_welcome: true)
+    existing = FactoryBot.create(:account, email: 'existing@example.com')
+    client = gocardless_client([
+                                 [gocardless_subscription(1, amount: 1000, currency: 'GBP'),
+                                  api_object(given_name: 'Ex', family_name: 'Isting', email: ' Existing@example.com ', postal_code: nil)],
+                                 [gocardless_subscription(2, amount: 12_000, currency: 'EUR', name: 'Annual donation'),
+                                  api_object(given_name: 'New', family_name: 'Donor', email: 'new.donor@example.com', postal_code: nil)]
+                               ])
+
+    GoCardlessPro::Client.stub(:new, client) { @organisation.sync_with_gocardless }
+
+    organisationship = @organisation.organisationships.find_by(account: existing)
+    assert_equal ['GoCardless', 10.0, 'GBP'], [organisationship.monthly_donation_method, organisationship.monthly_donation_amount, organisationship.monthly_donation_currency]
+    new_donor = @organisation.organisationships.find_by(account: Account.find_by(email: 'new.donor@example.com'))
+    # An annual subscription counts as a twelfth of it a month
+    assert_equal ['GoCardless', 10.0, 'EUR'], [new_donor.monthly_donation_method, new_donor.monthly_donation_amount, new_donor.monthly_donation_currency]
+    assert new_donor.monthly_donation_annual
+    assert_nil lapsed.reload.monthly_donation_method
+    assert_nil lapsed.monthly_donation_amount
+  end
+
+  def enable_affiliate_credits
+    create_organisation(currency: 'GBP', affiliate_credit_percentage: 10)
+    create_event(prices: [10], suggested_donation: 0)
+  end
+
+  # Books quantity tickets for buyer through Stripe, via the link the attendee's order confirmation gives them, and
+  # completes the payment
+  def book_via_affiliate_link(buyer, affiliate, quantity: 1)
+    header 'Accept', 'application/json'
+    Stripe::Checkout::Session.stub(:create, api_object(id: "cs_#{SecureRandom.hex(4)}", payment_intent: "pi_#{SecureRandom.hex(4)}", url: 'https://checkout.stripe.com/test')) do
+      post "/e/#{@event.slug}/purchase",
+           ticketForm: { quantities: { @event.ticket_types.first.id.to_s => quantity.to_s }, affiliate_type: 'Account', affiliate_id: affiliate.id.to_s },
+           detailsForm: { payment_method: 'stripe', account: { name: buyer.name, email: buyer.email } }
+    end
+    assert_equal 200, last_response.status, last_response.body
+    order = @event.orders.order('created_at desc').first
+    order.set(payment_completed: true)
+    order
+  end
+
+  test "an attendee's order confirmation email has their personal affiliate link" do
+    covers 'organisations/affiliate-link-in-confirmation@7d220b'
+    enable_affiliate_credits
+    attendee = FactoryBot.create(:account)
+    order = @event.orders.create!(account: attendee, currency: 'GBP', value: 10, payment_completed: true)
+    @event.tickets.create!(account: attendee, order: order, ticket_type: @event.ticket_types.first, payment_completed: true)
+
+    email = lambda do
+      tickets_table = EmailHelper.render(:_tickets_table, event: @event, account: attendee)
+      EmailHelper.html(:tickets, event: @event.reload, order: order, account: attendee, tickets_table: tickets_table, header_image_url: nil)
+    end
+    affiliate_link = "#{ENV['BASE_URI']}/e/#{@event.slug}?affiliate_type=Account&amp;affiliate_id=#{attendee.id}"
+    assert_match(/<a href="#{Regexp.escape(affiliate_link)}"[^>]*>Here's your affiliate link for this event.<\/a>/, email.call)
+    assert_includes email.call, 'equal to 10% of the order value'
+
+    # The link fills in the booking form's affiliate
+    get "/e/#{@event.slug}?affiliate_type=Account&affiliate_id=#{attendee.id}"
+    assert_match(/name="affiliate_id"[^>]*value="#{attendee.id}"|value="#{attendee.id}"[^>]*name="affiliate_id"/, last_response.body)
+
+    @organisation.set(affiliate_credit_percentage: nil)
+    refute_includes email.call, 'affiliate link'
+  end
+
+  test 'a referrer earns the set percentage of each order made via their link as credit, but not on their own orders' do
+    covers 'organisations/affiliate-credit-percentage@90cfee'
+    enable_affiliate_credits
+    referrer = FactoryBot.create(:account)
+    referrership = @organisation.organisationships.create!(account: referrer)
+
+    order = book_via_affiliate_link(FactoryBot.create(:account), referrer, quantity: 3)
+    assert_equal referrer.id, order.affiliate_id
+    assert_equal 30, order.value
+    assert_equal Money.new(300, 'GBP'), referrership.credit_granted
+
+    book_via_affiliate_link(FactoryBot.create(:account), referrer)
+    assert_equal Money.new(400, 'GBP'), referrership.credit_granted
+
+    # Their own order, via their own link, earns nothing
+    own_order = book_via_affiliate_link(referrer, referrer, quantity: 5)
+    assert_nil own_order.affiliate_id
+    assert_equal Money.new(400, 'GBP'), referrership.reload.credit_granted
+    # Nor does one marked as theirs some other way
+    own_order.set(affiliate_type: 'Account', affiliate_id: referrer.id)
+    assert_equal Money.new(400, 'GBP'), referrership.reload.credit_granted
+  end
+
+  test 'credit earned through referrals is applied when the referrer books a future event' do
+    covers 'organisations/credit-applied-at-checkout@ebe0b1'
+    enable_affiliate_credits
+    referrer = FactoryBot.create(:account)
+    @organisation.organisationships.create!(account: referrer)
+    book_via_affiliate_link(FactoryBot.create(:account), referrer, quantity: 10)
+    create_event(as: :future_event, prices: [10], suggested_donation: 0)
+
+    sign_in_with_rack(referrer)
+    header 'Accept', 'application/json'
+    post "/e/#{@future_event.slug}/purchase",
+         ticketForm: { quantities: { @future_event.ticket_types.first.id.to_s => '1' } },
+         detailsForm: { payment_method: 'rsvp', account: { name: referrer.name, email: referrer.email } }
+    assert_equal 200, last_response.status, last_response.body
+    order = @future_event.orders.find_by(account: referrer)
+    assert_equal 10, order.credit_applied
+    assert order.payment_completed
+    assert_equal Money.new(0, 'GBP'), @organisation.organisationships.find_by(account: referrer).credit_balance
+  end
+
+  test "an attendee's credit balance shows on the organisation page, and its breakdown of credit earned and used" do
+    covers 'organisations/credit-balance-shown@e73de3'
+    enable_affiliate_credits
+    referrer = FactoryBot.create(:account)
+    referred = FactoryBot.create(:account, name: 'Referred Person')
+    book_via_affiliate_link(referred, referrer, quantity: 3)
+    referrership = @organisation.organisationships.find_or_create_by!(account: referrer)
+    create_event(as: :future_event, prices: [1], suggested_donation: 0)
+    @future_event.orders.create!(account: referrer, currency: 'GBP', value: 0, credit_applied: 1, payment_completed: true)
+
+    sign_in_with_rack(referrer)
+    get "/o/#{@organisation.slug}"
+    assert last_response.ok?
+    assert_includes last_response.body, %(href="/organisationships/#{referrership.id}/credit_balance">£2 credit</a>)
+
+    get "/organisationships/#{referrership.id}/credit_balance"
+    assert last_response.ok?
+    assert_includes last_response.body, '<span class="badge text-bg-primary">£2</span>'
+    assert_includes last_response.body, "£3.00 for Referred Person&#39;s order to #{@event.name}"
+    assert_includes last_response.body, "£1.00 on #{@future_event.name}"
+
+    # Not someone else's
+    sign_in_with_rack(referred)
+    get "/organisationships/#{referrership.id}/credit_balance"
+    refute last_response.ok?
+    get "/o/#{@organisation.slug}"
+    refute_includes last_response.body, 'credit</a>'
+  end
+
+  # An organisation taking payment through Dandelion's Stripe Connect, so that checkout donations go to Dandelion
+  # while it's behind with its contribution
+  def create_stripe_connect_organisation
+    create_organisation(currency: 'GBP', stripe_pk: nil, stripe_sk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json)
+  end
+
+  # Completed ticket sales of these prices
+  def sell_tickets(event, *prices)
+    prices.each do |price|
+      buyer = FactoryBot.create(:account)
+      order = event.orders.create!(account: buyer, currency: event.currency, value: price, payment_completed: true)
+      event.tickets.create!(account: buyer, order: order, ticket_type: event.ticket_types.first, price: price, payment_completed: true)
+    end
+  end
+
+  def contribute(amount)
+    @organisation.organisation_contributions.create!(amount: amount, currency: 'GBP', payment_completed: true)
+    @organisation.update_paid_up_without_delay
+  end
+
+  test 'checkout takes only the donation to Dandelion, never the contribution, out of a ticket sale' do
+    covers 'events/contribution-never-from-ticket-sales@73c546'
+    create_stripe_connect_organisation
+    create_event(prices: [100], suggested_donation: 5)
+    @organisation.set(paid_up: false)
+    assert @event.reload.donations_to_dandelion?
+
+    checkout = lambda do |ticket_form|
+      buyer = FactoryBot.create(:account)
+      session_params = nil
+      Stripe::Checkout::Session.stub(:create, proc { |params, _opts|
+        session_params = params
+        api_object(id: "cs_#{buyer.id}", payment_intent: "pi_#{buyer.id}", url: 'https://checkout.stripe.com/test')
+      }) do
+        header 'Accept', 'application/json'
+        post "/e/#{@event.slug}/purchase",
+             ticketForm: { quantities: { @event.ticket_types.first.id.to_s => '1' } }.merge(ticket_form),
+             detailsForm: { payment_method: 'stripe', account: { name: buyer.name, email: buyer.email } }
+      end
+      assert_equal 200, last_response.status, last_response.body
+      session_params
+    end
+
+    assert_equal 0, checkout.call({})[:payment_intent_data][:application_fee_amount]
+    assert_equal 500, checkout.call({ donation_amount: '5' })[:payment_intent_data][:application_fee_amount]
+
+    @organisation.set(paid_up: true)
+    refute @event.reload.donations_to_dandelion?
+    assert_nil checkout.call({ donation_amount: '5' })[:payment_intent_data][:application_fee_amount]
+  end
+
+  test 'each ticket sale adds 1% of its price to the contribution, and the Contribute page shows the total, what was contributed and what is left' do
+    covers 'events/contribution-never-from-ticket-sales@73c546', 'events/contribution-running-total@535bd5'
+    create_stripe_connect_organisation
+    create_event(as: :event1, prices: [100])
+    create_event(as: :event2, prices: [50])
+    create_event(as: :no_sales_event)
+    sell_tickets(@event1, 100, 100, 100)
+    sell_tickets(@event2, 50, 50)
+
+    assert_equal Money.new(300, 'GBP'), @event1.contribution_gbp
+    assert_equal Money.new(100, 'GBP'), @event2.contribution_gbp
+    assert_equal Money.new(0, 'GBP'), @no_sales_event.contribution_gbp
+    assert_equal Money.new(400, 'GBP'), @organisation.contribution_requested
+
+    contribute(1.5)
+    sign_in_with_rack(@account)
+    get "/o/#{@organisation.slug}/contribute"
+    assert last_response.ok?
+    assert_match(/contributed\s+£1.50\s+of a\s+suggested £4,\s+leaving a balance of £2.50\./, last_response.body)
+  end
+
+  test 'checkout donations go to the organisation while it has contributed 90% with no more than £100 outstanding, and back to Dandelion when it falls behind' do
+    covers 'events/contribution-never-from-ticket-sales@73c546', 'events/contribution-keeping-up@ab2a3a', 'events/checkout-donations-to-dandelion@f1a028'
+    create_stripe_connect_organisation
+    create_event(prices: [10_000], suggested_donation: 5, minimum_donation: 3)
+    sell_tickets(@event, *[10_000] * 10) # £1000 to contribute
+
+    contribute(899)
+    refute @organisation.reload.paid_up
+    assert @event.reload.donations_to_dandelion?
+
+    contribute(1) # 90%, £100 outstanding
+    assert @organisation.reload.paid_up
+    refute @event.reload.donations_to_dandelion?
+    # The event's Donations settings take effect
+    donation = @event.donations.new(account: @account, amount: 2)
+    refute donation.valid?
+    assert_includes donation.errors[:amount], 'is insufficient'
+
+    # More sales: 90% of £1100 contributed, but £110 outstanding
+    sell_tickets(@event, 10_000)
+    @organisation.update_paid_up_without_delay
+    refute @organisation.reload.paid_up
+    assert @event.reload.donations_to_dandelion?
+    donation = @event.donations.new(account: @account, amount: 2)
+    donation.valid?
+    assert_empty donation.errors[:amount]
+  end
+
+  test 'auto top-up tops the organisation up to 100% when it falls behind, so checkout donations always go to it' do
+    covers 'events/contribution-auto-top-up@6c1573'
+    create_stripe_connect_organisation
+    create_event(prices: [10_000])
+    sell_tickets(@event, *[10_000] * 5) # £500 to contribute
+    contribute(450)
+    @organisation.set(stripe_customer_id: 'cus_test')
+
+    # Keeping up, so nothing to top up
+    Stripe::PaymentIntent.stub(:create, proc { raise 'charged while keeping up' }) { @organisation.stripe_topup }
+
+    @organisation.update_paid_up_without_delay
+    assert @organisation.reload.paid_up
+    sell_tickets(@event, *[10_000] * 5) # £1000, 45% contributed
+    @organisation.update_paid_up_without_delay
+    # Behind, but still sending checkout donations to the organisation
+    assert @organisation.reload.paid_up
+    refute @event.reload.donations_to_dandelion?
+
+    charged = nil
+    Stripe::Customer.stub(:list_payment_methods, [api_object(id: 'pm_test')]) do
+      Stripe::PaymentIntent.stub(:create, proc { |params, _opts|
+        charged = params
+        api_object(id: 'pi_topup')
+      }) { @organisation.stripe_topup }
+    end
+    assert_equal [55_000, 'GBP', 'cus_test', 'pm_test'], charged.values_at(:amount, :currency, :customer, :payment_method)
+    assert_equal 550, @organisation.organisation_contributions.find_by(payment_intent: 'pi_topup').amount
+    assert_equal Money.new(0, 'GBP'), @organisation.contribution_remaining
   end
 end

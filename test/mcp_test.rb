@@ -43,6 +43,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'public tools remain available without authentication' do
+    covers 'integrations/public-tools-work-without-key@1474aa'
     rpc = mcp_tool_call('get_trending_events_tool', arguments: { limit: 1 })
 
     assert_equal 200, last_response.status
@@ -51,6 +52,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'get_me_tool requires authentication' do
+    covers 'integrations/authenticated-tools-require-key@f25321'
     rpc = mcp_tool_call('get_me_tool')
 
     assert_equal 200, last_response.status
@@ -59,6 +61,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'get_me_tool returns the authenticated account' do
+    covers 'integrations/authenticated-tools-require-key@f25321', 'integrations/account-returns-authenticated-account@f5b358'
     account = FactoryBot.create(:account)
 
     rpc = mcp_tool_call('get_me_tool', headers: { 'Authorization' => "Bearer #{account.api_key}" })
@@ -74,6 +77,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'invalid bearer token is rejected' do
+    covers 'integrations/invalid-key-rejected@a21fde'
     mcp_tool_call('get_me_tool', headers: { 'Authorization' => 'Bearer not-a-real-key' })
 
     assert_equal 401, last_response.status
@@ -82,6 +86,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'event order and ticket tools require authentication' do
+    covers 'integrations/authenticated-tools-require-key@f25321'
     %w[get_event_orders_tool get_event_tickets_tool get_organisation_events_tool get_organisation_followers_tool get_organisation_orders_tool].each do |name|
       rpc = mcp_tool_call(name, arguments: { slug: 'example' })
 
@@ -92,6 +97,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'event admin can query orders and tickets' do
+    covers 'integrations/event-orders-returns-completed-orders@2599ad', 'integrations/event-tickets-returns-completed-tickets@2c4319'
     create_event_with_order_and_ticket
     headers = { 'Authorization' => "Bearer #{@account.api_key}" }
 
@@ -120,6 +126,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'non-admin cannot query event orders or tickets' do
+    covers 'integrations/event-orders-returns-completed-orders@2599ad', 'integrations/event-tickets-returns-completed-tickets@2c4319'
     create_event_with_order_and_ticket
     stranger = FactoryBot.create(:account)
     headers = { 'Authorization' => "Bearer #{stranger.api_key}" }
@@ -134,6 +141,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'get_event_orders_tool returns all completed orders' do
+    covers 'integrations/event-orders-returns-completed-orders@2599ad'
     create_event_with_order_and_ticket
     21.times do
       @event.orders.create!(
@@ -152,6 +160,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'get_event_tickets_tool returns all completed tickets' do
+    covers 'integrations/event-tickets-returns-completed-tickets@2c4319'
     create_event_with_order_and_ticket
     @event.ticket_types.first.set(quantity: 100)
     21.times do
@@ -170,6 +179,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'organisation admin can list hosted and cohosted events' do
+    covers 'integrations/organisation-events-returns-events@1b8177'
     create_event_with_order_and_ticket
     headers = { 'Authorization' => "Bearer #{@account.api_key}" }
 
@@ -185,6 +195,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'organisation admin can list recent followers' do
+    covers 'integrations/organisation-followers-last-24-hours@8e8cf5'
     create_event_with_order_and_ticket
     follower = FactoryBot.create(:account, name: 'New Follower')
     organisationship = @organisation.organisationships.create!(account: follower)
@@ -202,6 +213,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'organisation admin can list orders across all events, including cohosted ones' do
+    covers 'integrations/organisation-orders-most-recently-completed@db1be3', 'integrations/opt-in-organisation-field@c68ae5'
     create_event_with_order_and_ticket
     create_event(prices: [0], as: :event2)
     later_order = @event2.orders.create!(account: @attendee, currency: @event2.currency, value: 0, payment_completed: true, original_description: 'MCP second event order', opt_in_organisation: true)
@@ -230,6 +242,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'organisation orders put an order that completes later above newer orders' do
+    covers 'integrations/organisation-orders-most-recently-completed@db1be3'
     create_event_with_order_and_ticket
     pending_order = @event.orders.create!(account: @attendee, currency: @event.currency, value: 10, payment_completed: false, original_description: 'MCP late payment')
     newer_order = @event.orders.create!(account: @attendee, currency: @event.currency, value: 0, payment_completed: true, original_description: 'MCP newer order')
@@ -244,6 +257,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'organisation orders list orders without completed_at last, newest first' do
+    covers 'integrations/organisation-orders-most-recently-completed@db1be3', 'integrations/completed-at-null-for-older-orders@63c67d'
     create_event_with_order_and_ticket
     yesterday_order = @event.orders.create!(account: @attendee, currency: @event.currency, value: 0, payment_completed: true, original_description: 'MCP older order')
     [@order, yesterday_order].each { |order| order.unset(:completed_at) }
@@ -259,6 +273,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'non-admin cannot query organisation events or followers' do
+    covers 'integrations/organisation-events-returns-events@1b8177', 'integrations/organisation-orders-most-recently-completed@db1be3'
     create_event_with_order_and_ticket
     stranger = FactoryBot.create(:account)
     headers = { 'Authorization' => "Bearer #{stranger.api_key}" }
@@ -273,6 +288,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'event order and ticket tools hide emails from event admins who cannot view them' do
+    covers 'events/facilitator-no-organisation-access@ec2446', 'organisations/attendee-emails-admins-and-managers-only@10b712', 'integrations/order-email-may-be-empty@d03f03', 'integrations/ticket-emails-may-be-empty@54ad94', 'integrations/emails-only-when-allowed@a6c1bb'
     facilitator = FactoryBot.create(:account)
     attendee = FactoryBot.create(:account, name: 'Hidden Email')
     create_event(prices: [0], show_emails: false)
@@ -291,6 +307,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'get_event_tool includes public ticket types' do
+    covers 'integrations/requirements-public-ticket-types@b1c443', 'integrations/look-up-by-slug-or-id@d69717', 'integrations/events-include-currency-ticket-types@18bab5'
     create_event(prices: [10, '5-20', ''])
     @event.ticket_types.create!(name: 'Secret', price: 1, quantity: 5, hidden: true)
 
@@ -308,6 +325,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'get_event_checkout_requirements_tool describes the checkout form' do
+    covers 'integrations/checkout-requirements-says-what-booking-involves@610554', 'integrations/requirements-bookable-and-why-not@11def2', 'integrations/requirements-buyer-details-questions-opt-ins@3cbcec', 'integrations/requirements-payment-methods@48eafc'
     create_event(prices: [0], ask_hear_about: true, opt_in_organisation: true,
                  questions: "# About you\nDietary requirements\nT-shirt size <S, M, L>*\n[I agree to the code of conduct]*")
     @organisation.update_attributes!(collect_phone: true)
@@ -332,6 +350,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'get_event_checkout_requirements_tool reports restrictions' do
+    covers 'integrations/requirements-bookable-and-why-not@11def2'
     create_event(prices: [10], monthly_donors_only: true)
     restricted = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))
 
@@ -346,6 +365,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'secret events are found by their slug or a link to them, never by id, and can be booked' do
+    covers 'integrations/tools-take-event-link-as-slug@7a5e0d', 'integrations/secret-event-found-by-slug-or-link@d9e645'
     create_event(prices: [0], secret: true)
     link = "#{ENV['BASE_URI']}/e/#{@event.slug}?utm_source=newsletter"
 
@@ -378,6 +398,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool books for the buyer given without an API key' do
+    covers 'integrations/checkout-books-for-buyer-without-api-key@f7be6d', 'integrations/idempotency-retry-without-key-id-and-status@664443'
     create_event(prices: [0])
     quantities = { @event.ticket_types.first.id.to_s => 1 }
 
@@ -403,6 +424,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool keeps the details of a booking made with an API key from a retry without one' do
+    covers 'integrations/idempotency-retry-without-key-id-and-status@664443'
     create_event(prices: [10])
     with_stubbed_stripe_session do
       _rpc, order = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 }, idempotency_key: 'retry-1')
@@ -419,6 +441,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool takes the opt-ins and hear_about the event asks for' do
+    covers 'integrations/checkout-opt-ins@ca9668', 'integrations/checkout-hear-about@3cc931'
     create_event(prices: [0], ask_hear_about: true, opt_in_organisation: true)
     quantities = { @event.ticket_types.first.id.to_s => 1 }
 
@@ -436,6 +459,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool books an existing account without changing it, when given its email without an API key' do
+    covers 'integrations/checkout-books-for-buyer-without-api-key@f7be6d'
     create_event(prices: [0])
     existing = FactoryBot.create(:account, name: 'Original Name')
 
@@ -447,6 +471,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool books a free event for the authenticated account' do
+    covers 'integrations/checkout-books-as-you-with-api-key@06e7e4', 'integrations/checkout-answers-by-index@c3d14e', 'integrations/free-bookings-confirmed@d14b75', 'integrations/orders-via-mcp@5bbb5f'
     create_event(prices: [0], questions: "Dietary requirements\nT-shirt size <S, M, L>*\n[Photos are fine]\n[Add me to the list]")
     ticket_type = @event.ticket_types.first
 
@@ -465,6 +490,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool returns a payment link for a paid event' do
+    covers 'integrations/checkout-payment-method@c5f11b', 'integrations/paid-bookings-checkout-url-pay-by@0961c7'
     create_event(prices: [10])
     ticket_type = @event.ticket_types.first
 
@@ -481,6 +507,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool returns the first order when retried with the same idempotency key' do
+    covers 'integrations/idempotency-retry-returns-first-order@fb1f36'
     create_event(prices: [10])
     ticket_type = @event.ticket_types.first
 
@@ -504,6 +531,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool says a retry is still processing while the first call sets up payment' do
+    covers 'integrations/idempotency-retry-returns-first-order@fb1f36'
     create_event(prices: [10])
     ticket_type = @event.ticket_types.first
 
@@ -523,6 +551,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool books again when retried after the first attempt failed' do
+    covers 'integrations/idempotency-failed-retry-books-again@8344c5'
     create_event(prices: [10])
     ticket_type = @event.ticket_types.first
 
@@ -544,6 +573,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool returns the first order when a retry of a free booking arrives at the same time' do
+    covers 'integrations/idempotency-retry-returns-first-order@fb1f36'
     create_event(prices: [0])
     ticket_type = @event.ticket_types.first
     _rpc, first = create_checkout(quantities: { ticket_type.id.to_s => 1 }, idempotency_key: 'retry-1')
@@ -562,6 +592,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool books paid tickets that credit covers, with no payment method agents can use' do
+    covers 'integrations/order-includes-discounts-credit-donation@873ca3'
     create_event(prices: [10], suggested_donation: 0)
     buyer_headers
     @organisation.organisationships.find_or_create_by(account: @buyer).creditings.create!(account: @account, amount: 10, currency: @event.currency)
@@ -573,6 +604,7 @@ class McpTest < ActiveSupport::TestCase
 
     assert_equal 'complete', order['status']
     assert_equal 10, Order.find(order['order_id']).credit_applied
+    assert_equal 10, order['discounts']['credit']
   end
 
   test 'create_checkout_tool says to try again when the order it clashed with has already failed' do
@@ -598,6 +630,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool returns the first order when a retry arrives at the same time' do
+    covers 'integrations/idempotency-retry-returns-first-order@fb1f36'
     create_event(prices: [10])
     ticket_type = @event.ticket_types.first
     index = 'event_id_1_account_id_1_idempotency_key_1_unique'
@@ -623,6 +656,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool checks questions, terms and duplicates' do
+    covers 'integrations/checkout-answers-by-index@c3d14e', 'integrations/checkout-accept-terms@f6946b', 'integrations/checkout-confirm-duplicate@ecdd19'
     create_event(prices: [0], questions: 'T-shirt size <S, M, L>*', terms_and_conditions: 'Be kind', terms_and_conditions_check_box: true)
     quantities = { @event.ticket_types.first.id.to_s => 1 }
 
@@ -653,6 +687,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool asks to confirm an email that looks mistyped, without an API key' do
+    covers 'integrations/checkout-confirm-email@d67261'
     create_event(prices: [0])
     quantities = { @event.ticket_types.first.id.to_s => 1 }
     buyer = { name: 'Typo Buyer', email: 'typo@gmial.com' }
@@ -673,6 +708,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool refuses what agents cannot book' do
+    covers 'integrations/checkout-prices-chosen-by-buyer@e549fb', 'integrations/error-links-to-event-page@87ed40'
     create_event(prices: [10, '10-100', nil])
     fixed = @event.ticket_types.detect(&:price)
     range = @event.ticket_types.detect(&:range)
@@ -708,6 +744,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool adds the donation the buyer chose' do
+    covers 'integrations/requirements-donation@d65d4f', 'integrations/checkout-donation-amount-minimum@dbdbe1', 'integrations/order-includes-discounts-credit-donation@873ca3'
     create_event(prices: [0], suggested_donation: 10, minimum_donation: 5)
     assert_equal 5, @event.minimum_donation
     requirements = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))
@@ -733,6 +770,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool takes a donation to Dandelion of at least the smallest unit' do
+    covers 'integrations/requirements-donation@d65d4f', 'integrations/donation-to-dandelion-minimum-smallest-unit@71d952'
     create_event(prices: [10])
     @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
     assert @event.reload.donations_to_dandelion?
@@ -755,6 +793,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool adds the smallest donation to Dandelion unless given one' do
+    covers 'integrations/donation-to-dandelion-minimum-smallest-unit@71d952', 'integrations/checkout-dandelion-donation-added-by-default@06a504'
     create_event(prices: [10, 100, 300])
     @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
     ticket_types = @event.reload.ticket_types.sort_by(&:price)
@@ -774,6 +813,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool refuses a donation the event does not take' do
+    covers 'integrations/checkout-donation-amount-minimum@dbdbe1'
     create_event(prices: [0])
 
     rpc, = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 }, donation_amount: 5)
@@ -793,15 +833,19 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool keeps to who may book the event' do
+    covers 'integrations/error-links-to-event-page@87ed40'
     create_event(prices: [0], monthly_donors_only: true)
 
     rpc, = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 })
 
     assert_includes tool_text(rpc), 'Only monthly donors to this organisation can book this event'
+    # Someone who can book it can do so on the event page, with their choices filled in
+    assert_includes tool_text(rpc), "signed in at #{ENV['BASE_URI']}/e/#{@event.slug}?quantities%5B#{@event.ticket_types.first.id}%5D=1#select-tickets"
     assert_equal 0, @event.orders.count
   end
 
   test 'create_checkout_tool sells hidden ticket types only with their secret link' do
+    covers 'integrations/requirements-secret-ticket-type-and-discount-code@8423d7', 'integrations/checkout-secret-ticket-type@de93f5'
     create_event(prices: [0])
     hidden = @event.ticket_types.create!(name: 'Secret', price: 0, quantity: 5, hidden: true)
 
@@ -823,6 +867,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool books range and pay-what-you-want tickets at the price the buyer chose' do
+    covers 'events/pay-any-amount-when-price-blank@778398', 'integrations/checkout-prices-chosen-by-buyer@e549fb'
     create_event(prices: ['10-100', nil])
     range = @event.ticket_types.detect(&:range)
     pay_what_you_want = @event.ticket_types.detect { |ticket_type| !ticket_type.range }
@@ -842,6 +887,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool applies a discount code' do
+    covers 'integrations/requirements-discount-codes-and-terms@332fd9', 'integrations/requirements-secret-ticket-type-and-discount-code@8423d7', 'integrations/order-includes-discounts-credit-donation@873ca3'
     create_event(prices: [10, 20])
     early, late = @event.ticket_types.sort_by(&:price)
     early.set(name: 'Early bird')
@@ -872,6 +918,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool pays with the payment method the buyer chose' do
+    covers 'integrations/checkout-payment-method@c5f11b', 'integrations/paid-bookings-checkout-url-pay-by@0961c7'
     create_event(prices: [10])
     @organisation.set(paypal_client_id: 'client', paypal_secret: 'secret')
     quantities = { @event.ticket_types.first.id.to_s => 1 }
@@ -892,6 +939,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool updates the profile of the account it books for with an API key' do
+    covers 'integrations/checkout-books-as-you-with-api-key@06e7e4'
     create_event(prices: [0])
     @organisation.update_attributes!(collect_phone: true)
     buyer_headers
@@ -915,6 +963,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'create_checkout_tool records the cohost and affiliate the buyer came through' do
+    covers 'integrations/checkout-attribution@65a63c'
     create_event(prices: [0])
     affiliate = FactoryBot.create(:account)
 
@@ -926,6 +975,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test 'join_waitlist_tool joins a sold-out ticket type waitlist' do
+    covers 'events/ticket-type-waitlists@ac1e0a', 'integrations/requirements-public-ticket-types@b1c443', 'integrations/requirements-event-waitlist@7ebced', 'integrations/join-waitlist-sold-out-ticket-type-or-event@1c20be', 'integrations/join-waitlist-as-you-or-buyer@a2d0b1'
     create_event(prices: [10, 20], allow_ticket_type_waitlists: true)
     sold_out, on_sale = @event.ticket_types.sort_by(&:price)
     sold_out.set(quantity: 0)
@@ -952,6 +1002,7 @@ class McpTest < ActiveSupport::TestCase
   end
 
   test "join_waitlist_tool joins a sold-out event's waitlist as the authenticated account" do
+    covers 'integrations/requirements-event-waitlist@7ebced', 'integrations/join-waitlist-sold-out-ticket-type-or-event@1c20be', 'integrations/join-waitlist-as-you-or-buyer@a2d0b1'
     create_event(prices: [10])
     rpc = mcp_tool_call('join_waitlist_tool', arguments: { slug: @event.slug }, headers: buyer_headers)
     assert_includes tool_text(rpc), "isn't sold out"
@@ -963,5 +1014,212 @@ class McpTest < ActiveSupport::TestCase
     rpc = mcp_tool_call('join_waitlist_tool', arguments: { slug: @event.slug }, headers: buyer_headers)
     assert_equal 'joined', JSON.parse(tool_text(rpc))['status']
     assert @event.waitships.find_by(account: @buyer)
+  end
+
+  test 'admin tools only read data' do
+    covers 'integrations/admin-data-read-only@122ed7'
+    tools = mcp_rpc('tools/list').dig('result', 'tools').index_by { |tool| tool['name'] }
+
+    %w[get_me_tool get_organisation_events_tool get_organisation_followers_tool get_organisation_orders_tool get_event_orders_tool get_event_tickets_tool].each do |name|
+      assert tools[name].dig('annotations', 'readOnlyHint'), name
+      refute tools[name].dig('annotations', 'destructiveHint'), name
+    end
+  end
+
+  test 'search tools find recent and upcoming events, organisations, gatherings and accounts' do
+    covers 'integrations/emails-only-when-allowed@a6c1bb', 'integrations/search-tools@56e647', 'integrations/secret-event-found-by-slug-or-link@d9e645'
+    create_event(name: 'Moonlit Drumming Circle')
+    create_event(name: 'Moonlit Drumming Recap', as: :recent_event, start_time: 3.days.ago, end_time: 3.days.ago + 2.hours)
+    create_event(name: 'Moonlit Drumming Archive', as: :old_event, start_time: 3.weeks.ago, end_time: 3.weeks.ago + 2.hours)
+    create_event(name: 'Moonlit Drumming Secret', as: :secret_event, secret: true)
+    [@event, @recent_event, @old_event, @secret_event].each { |event| event.set(browsable: true) }
+    @organisation.set(name: 'Moonlit Collective')
+    create_gathering(name: 'Moonlit Gathering')
+    account = FactoryBot.create(:account, name: 'Moonlit Dancer')
+    account.set(has_signed_in: true)
+
+    events = JSON.parse(tool_text(mcp_tool_call('search_events_tool', arguments: { query: 'Moonlit Drumming' })))
+    assert_equal [@event.id.to_s, @recent_event.id.to_s].sort, events.pluck('id').sort
+    assert_equal "#{ENV['BASE_URI']}/e/#{@event.slug}", events.find { |event| event['id'] == @event.id.to_s }['url']
+
+    organisations = JSON.parse(tool_text(mcp_tool_call('search_organisations_tool', arguments: { query: 'Moonlit' })))
+    assert_equal [@organisation.slug], organisations.pluck('slug')
+
+    gatherings = JSON.parse(tool_text(mcp_tool_call('search_gatherings_tool', arguments: { query: 'Moonlit' })))
+    assert_equal [@gathering.slug], gatherings.pluck('slug')
+
+    accounts = JSON.parse(tool_text(mcp_tool_call('search_accounts_tool', arguments: { query: 'Moonlit' })))
+    assert_equal [account.username], accounts.pluck('username')
+    assert_nil accounts.first['email']
+  end
+
+  test 'get tools look up organisations, gatherings and accounts by slug or username or id, and events by id' do
+    covers 'integrations/emails-only-when-allowed@a6c1bb', 'integrations/look-up-by-slug-or-id@d69717', 'integrations/events-include-currency-ticket-types@18bab5'
+    create_event(prices: [10])
+    create_gathering
+    account = FactoryBot.create(:account)
+    account.set(has_signed_in: true)
+
+    [{ slug: @organisation.slug }, { id: @organisation.id.to_s }].each do |arguments|
+      assert_equal @organisation.name, JSON.parse(tool_text(mcp_tool_call('get_organisation_tool', arguments: arguments)))['name']
+    end
+    [{ slug: @gathering.slug }, { id: @gathering.id.to_s }].each do |arguments|
+      assert_equal @gathering.name, JSON.parse(tool_text(mcp_tool_call('get_gathering_tool', arguments: arguments)))['name']
+    end
+    [{ username: account.username }, { id: account.id.to_s }].each do |arguments|
+      payload = JSON.parse(tool_text(mcp_tool_call('get_account_tool', arguments: arguments)))
+      assert_equal account.name, payload['name']
+      assert_nil payload['email']
+    end
+
+    event = JSON.parse(tool_text(mcp_tool_call('get_event_tool', arguments: { id: @event.id.to_s })))
+    assert_equal @event.slug, event['slug']
+    assert_equal 'GBP', event['currency']
+    assert_equal [@event.ticket_types.first.id.to_s], event['ticket_types'].pluck('id')
+
+    assert_includes tool_text(mcp_tool_call('get_organisation_tool', arguments: { slug: 'no-such-organisation' })), 'Organisation not found'
+  end
+
+  test 'get_trending_events_tool returns trending upcoming events first' do
+    covers 'integrations/trending-events@28cb75'
+    create_event(as: :soonest, start_time: 1.day.from_now, end_time: 1.day.from_now + 1.hour)
+    create_event(as: :trending_event, start_time: 2.months.from_now, end_time: 2.months.from_now + 1.hour)
+    create_event(as: :without_image)
+    create_event(as: :past_event, start_time: 2.days.ago, end_time: 2.days.ago + 1.hour)
+    [@soonest, @trending_event, @past_event].each { |event| event.set(has_image: true, browsable: true) }
+    @without_image.set(browsable: true)
+    @trending_event.set(trending: true)
+
+    events = JSON.parse(tool_text(mcp_tool_call('get_trending_events_tool', arguments: { limit: 10 })))
+
+    assert_equal [@trending_event.id.to_s, @soonest.id.to_s], events.pluck('id')
+    assert_equal @trending_event.slug, events.first['slug']
+  end
+
+  test 'get_organisation_upcoming_events_tool returns its upcoming hosted and cohosted events, soonest first' do
+    covers 'integrations/organisation-upcoming-events@8f832f'
+    create_event(as: :later, start_time: 2.months.from_now, end_time: 2.months.from_now + 1.hour)
+    create_event(as: :past_event, start_time: 2.days.ago, end_time: 2.days.ago + 1.hour)
+    create_event(as: :secret_event, secret: true)
+    cohosted = FactoryBot.create(:event, organisation: FactoryBot.create(:organisation, account: FactoryBot.create(:account)),
+                                         start_time: 1.week.from_now, end_time: 1.week.from_now + 1.hour)
+    cohosted.cohostships.create!(organisation: @organisation)
+
+    events = JSON.parse(tool_text(mcp_tool_call('get_organisation_upcoming_events_tool', arguments: { slug: @organisation.slug })))
+    assert_equal [cohosted.id.to_s, @later.id.to_s], events.pluck('id')
+
+    events = JSON.parse(tool_text(mcp_tool_call('get_organisation_upcoming_events_tool', arguments: { id: @organisation.id.to_s, to: 1.month.from_now.to_date.iso8601 })))
+    assert_equal [cohosted.id.to_s], events.pluck('id')
+  end
+
+  test 'get_event_tool and join_waitlist_tool take a link to the event as its slug, and searches leave out secret events' do
+    covers 'integrations/tools-take-event-link-as-slug@7a5e0d', 'integrations/secret-event-found-by-slug-or-link@d9e645'
+    create_event(name: 'Hushed Listening Session', prices: [10], secret: true)
+    @event.set(browsable: true)
+    link = "#{ENV['BASE_URI']}/e/#{@event.slug}?utm_source=newsletter"
+
+    assert_equal @event.id.to_s, JSON.parse(tool_text(mcp_tool_call('get_event_tool', arguments: { slug: link })))['id']
+    assert_empty JSON.parse(tool_text(mcp_tool_call('search_events_tool', arguments: { query: 'Hushed Listening' })))
+
+    @event.ticket_types.first.set(quantity: 0)
+    @event.refresh_sold_out_cache_and_notify_waitlist
+    rpc = mcp_tool_call('join_waitlist_tool', arguments: { slug: link, buyer: { name: 'Wait Er', email: 'waiter@example.com' } })
+    assert_equal 'joined', JSON.parse(tool_text(rpc))['status']
+    assert @event.waitships.find_by(account: Account.find_by(email: 'waiter@example.com'))
+  end
+
+  test 'get_event_checkout_requirements_tool says when sales have closed or the event is for members only' do
+    covers 'integrations/requirements-bookable-and-why-not@11def2'
+    create_event(prices: [10], start_time: 2.days.ago, end_time: 1.day.ago, no_sales_after_end_time: true)
+    closed = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))
+
+    refute closed['purchasable']
+    assert_equal ['sales_closed'], closed['restrictions']
+
+    activity = FactoryBot.create(:activity, organisation: @organisation, privacy: 'closed')
+    create_event(prices: [10], as: :members_event, activity: activity)
+    members = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @members_event.slug })))
+
+    refute members['purchasable']
+    assert_equal ['members_only'], members['restrictions']
+  end
+
+  test 'get_event_checkout_requirements_tool says which ticket types are sold out and when their sales end' do
+    covers 'integrations/requirements-public-ticket-types@b1c443'
+    create_event(prices: [10, 20])
+    sold_out, on_sale = @event.ticket_types.sort_by(&:price)
+    sold_out.set(quantity: 0)
+    sales_end = 1.week.from_now.change(usec: 0)
+    on_sale.set(sales_end: sales_end)
+
+    ticket_types = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))['ticket_types'].index_by { |ticket_type| ticket_type['id'] }
+
+    assert ticket_types[sold_out.id.to_s]['sold_out']
+    refute ticket_types[on_sale.id.to_s]['sold_out']
+    assert_equal sales_end, Time.zone.parse(ticket_types[on_sale.id.to_s]['sales_end'])
+    assert_nil ticket_types[sold_out.id.to_s]['sales_end']
+  end
+
+  test 'get_event_checkout_requirements_tool lists the terms to accept' do
+    covers 'integrations/requirements-discount-codes-and-terms@332fd9'
+    create_event(prices: [0], terms_and_conditions: 'Be kind', terms_and_conditions_check_box: true)
+
+    terms = JSON.parse(tool_text(mcp_tool_call('get_event_checkout_requirements_tool', arguments: { slug: @event.slug })))['terms']
+
+    assert_includes terms['text'], 'Be kind'
+    assert terms['must_accept']
+    assert_equal "#{ENV['BASE_URI']}/terms", terms['platform_terms_url']
+  end
+
+  test 'create_checkout_tool records the cohost and passes on the UTM fields' do
+    covers 'integrations/checkout-attribution@65a63c'
+    create_event(prices: [10])
+    cohost = FactoryBot.create(:organisation, account: FactoryBot.create(:account))
+    @event.cohostships.create!(organisation: cohost)
+    session = api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test')
+    session_hash = nil
+
+    order = nil
+    Stripe::Checkout::Session.stub(:create, ->(hash, *) { session_hash = hash; session }) do
+      _rpc, order = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 },
+                                    attribution: { cohost: cohost.slug, utm_source: 'newsletter', utm_medium: 'email', utm_campaign: 'spring' })
+    end
+
+    # The cohost is recorded as the order's affiliate, as the checkout form records it
+    assert_equal cohost, Order.find(order['order_id']).affiliate
+    assert_includes session_hash[:success_url], 'utm_source=newsletter&utm_medium=email&utm_campaign=spring'
+  end
+
+  test 'create_checkout_tool says unpaid orders are released after an hour' do
+    covers 'integrations/paid-bookings-checkout-url-pay-by@0961c7'
+    create_event(prices: [10])
+    session_hash = nil
+
+    order = nil
+    Stripe::Checkout::Session.stub(:create, ->(hash, *) { session_hash = hash; api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test') }) do
+      _rpc, order = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 })
+    end
+
+    created_at = Order.find(order['order_id']).created_at
+    assert_equal (created_at + 1.hour).to_i, Time.zone.parse(order['pay_by']).to_i
+    # The payment page closes then too
+    assert_equal (created_at + 1.hour).to_i, session_hash[:expires_at]
+  end
+
+  test 'get_event_tickets_tool hides ordered_for_email from event admins who cannot view emails' do
+    covers 'integrations/emails-only-when-allowed@a6c1bb', 'integrations/ticket-emails-may-be-empty@54ad94'
+    facilitator = FactoryBot.create(:account)
+    attendee = FactoryBot.create(:account)
+    create_event(prices: [0], show_emails: false)
+    @event.event_facilitations.create!(account: facilitator)
+    order = @event.orders.create!(account: attendee, currency: @event.currency, value: 0, payment_completed: true, original_description: 'MCP privacy test')
+    @event.tickets.create!(account: attendee, order: order, ticket_type: @event.ticket_types.first, payment_completed: true, name: 'Bob Guest', email: 'bob.guest@example.com')
+
+    ticket = JSON.parse(tool_text(mcp_tool_call('get_event_tickets_tool', arguments: { slug: @event.slug }, headers: { 'Authorization' => "Bearer #{facilitator.api_key}" }))).first
+    assert_equal 'Bob Guest', ticket['ordered_for_name']
+    assert_equal '', ticket['ordered_for_email']
+
+    ticket = JSON.parse(tool_text(mcp_tool_call('get_event_tickets_tool', arguments: { slug: @event.slug }, headers: { 'Authorization' => "Bearer #{@account.api_key}" }))).first
+    assert_equal 'bob.guest@example.com', ticket['ordered_for_email']
   end
 end

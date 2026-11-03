@@ -140,6 +140,7 @@ class CalendarTest < ActiveSupport::TestCase
   end
 
   test 'syncing multiple iCal feeds creates events from each feed' do
+    covers 'organisations/ical-multiple-urls@e4d7f5'
     organisation = FactoryBot.create(:organisation, calendar_import_urls: "#{ICS_URL_1}\n#{WEBCAL_URL_2}")
 
     stub_faraday(
@@ -167,6 +168,7 @@ class CalendarTest < ActiveSupport::TestCase
   end
 
   test 'syncing multiple feeds keeps updates scoped to the correct feed' do
+    covers 'organisations/ical-import-and-sync@e9f417'
     organisation = FactoryBot.create(:organisation, calendar_import_urls: "#{ICS_URL_1}\n#{ICS_URL_2}")
 
     stub_faraday(
@@ -228,6 +230,7 @@ class CalendarTest < ActiveSupport::TestCase
   INVALID_ICAL_RESPONSE = '<html><body>Sign in first</body></html>'.freeze
 
   test 'syncing when an event drops out of the feed destroys the imported event' do
+    covers 'organisations/ical-import-and-sync@e9f417'
     organisation = FactoryBot.create(:organisation, calendar_import_urls: ICS_URL_1)
 
     stub_faraday(ICS_URL_1 => { status: 200, body: TEST_ICAL_1 }) do
@@ -270,6 +273,7 @@ class CalendarTest < ActiveSupport::TestCase
   end
 
   test 'syncing a cancelled iCal event unpublishes the imported event' do
+    covers 'organisations/ical-import-and-sync@e9f417'
     organisation = FactoryBot.create(:organisation, calendar_import_urls: ICS_URL_1)
 
     stub_faraday(ICS_URL_1 => { status: 200, body: TEST_ICAL_1 }) do
@@ -290,6 +294,7 @@ class CalendarTest < ActiveSupport::TestCase
   end
 
   test 'Luma iCal uses LOCATION as source URL and fetches og:image when URL property is absent' do
+    covers 'organisations/ical-feed-url-as-rsvp@35ecc6'
     organisation = FactoryBot.create(:organisation, calendar_import_urls: LUMA_ICS_URL)
     luma_event_url = 'https://luma.com/event/evt-test'
     resolved_page_url = 'https://lu.ma/evt-test'
@@ -374,6 +379,7 @@ class CalendarTest < ActiveSupport::TestCase
   end
 
   test 'Luma iCal derives purchase URL from evt- UID when URL and LOCATION lack a Luma link' do
+    covers 'organisations/ical-feed-url-as-rsvp@35ecc6'
     organisation = FactoryBot.create(:organisation, calendar_import_urls: LUMA_ICS_URL)
     luma_event_url = 'https://luma.com/event/evt-inperson'
     fetched_urls = []
@@ -416,6 +422,7 @@ class CalendarTest < ActiveSupport::TestCase
   end
 
   test 'rejects iCal URLs on hosts outside the allowlist' do
+    covers 'organisations/ical-supported-hosts@8e1723'
     organisation = FactoryBot.build(:organisation, calendar_import_urls: 'https://evil.example.com/feed.ics')
 
     refute organisation.valid?
@@ -423,6 +430,7 @@ class CalendarTest < ActiveSupport::TestCase
   end
 
   test 'allows api.luma.com and api2.luma.com iCal hosts' do
+    covers 'organisations/ical-supported-hosts@8e1723'
     %w[api.luma.com api2.luma.com].each do |host|
       organisation = FactoryBot.build(:organisation, calendar_import_urls: "https://#{host}/ics/get?entity=calendar&id=cal-test")
       assert organisation.valid?, "expected #{host} to be allowed"

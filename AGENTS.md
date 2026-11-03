@@ -96,6 +96,14 @@ Straight after a click or submit, assert something on the new page before checki
 - `lib/form_builder.rb` defines the `_block` helpers like `text_block`, `wysiwyg_block` etc.
 - You can find documentation at app/views/docs/md. Keep it up to date.
 
+## Docs and tests
+
+What the docs (`app/views/docs/md`) say the app does is checked by tests, through claims (`lib/doc_claims.rb`):
+
+- Mark a rule the docs state with `<!-- claim: some-id -->` straight after it. The claim is the text before the marker, back to the start of its line (after any list bullet or quote marker) or the marker before it, so put untested sentences after the last marker on a line, not between two. Markers come out before the docs render. Mark rules about what happens (a refund, an email, which ticket goes first), not how to click through the UI
+- A test that checks a claim starts with `covers 'page/some-id@hash'` (one or more), the hash being of the claim's text. `test/lint_test.rb` fails when a claim has no test, a test covers a claim that's gone, or a claim's text has changed since its tests were checked against it: then read the new text, make sure each test still tests it (or change the test), and update the hash the message gives
+- When you add or change what the docs say, mark the rules it states and cover them
+
 ## Security reviews
 
 - Every model runs `sanitize_fields` (`models/concerns/core_extensions.rb`) before validation: it strips tags and drops `<` and `>` from `name`, `title` and `subject` (`CoreExtensions::SANITIZED_FIELDS`). So a view or helper that outputs one of these unescaped (e.g. `dropdown_nav`, `ul_nav`, `"#{x.name}".html_safe`, Tribute's mention menu) is not an XSS on its own. Before reporting one, show a write path that skips validation (`set`, `update_one`, `save(validate: false)`) or a field outside that list, and check whether a form can set the field at all (`mass_assigning`, below)

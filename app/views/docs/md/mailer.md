@@ -8,18 +8,18 @@
 ## Emailing a waitlist for an event
 
 - Click the event dropdown, select Mailer, and click 'New message'
-- Change the 'To' field to 'Waitlist' for the event-wide waitlist, 'Ticket type waitlists' for everyone waiting on any ticket type, or a specific ticket type waitlist
+- Change the 'To' field to 'Waitlist' for the event-wide waitlist, 'Ticket type waitlists' for everyone waiting on any ticket type, or a specific ticket type waitlist <!-- claim: waitlist-recipients -->
 - Enter a subject and body and follow the steps above to preview and send your mail
 
 ## Emailing your organisation
 
-We offer a free gift of 1 email per month for up to 1000 subscribers.
+We offer a free gift of 1 email per month to organisations with up to 1000 followers (counting any who've unsubscribed). <!-- claim: free-gift-limit -->
 
 - Click the organisation dropdown, select Mailer, and click 'New message'
 - Change the 'To' field to 'Everyone' or another option
 - Enter a subject and body and follow the steps above to preview and send your mail
 
-After a free gift email is sent, open the message from Mailer to see delivery, open, and click rates.
+After a free gift email is sent, open the message from Mailer to see delivery, open, and click rates. <!-- claim: free-gift-rates -->
 
 ## Creating buttons
 

@@ -39,6 +39,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'remaining excludes tickets made available again' do
+    covers 'events/resale-frees-place@9c6500'
     create_event(prices: [0])
     ticket_type = @event.ticket_types.first
     ticket_type.set(quantity: 2)
@@ -50,6 +51,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'a ticket can be put on resale only when the event allows resales' do
+    covers 'events/resales-are-enabled-per-event@54eb5b', 'events/resale-at-any-time@182662', 'events/resale-can-be-removed@7f031e'
     create_event(prices: [0])
     account = FactoryBot.create(:account)
     ticket = @event.ticket_types.first.tickets.create!(event: @event, account: account, payment_completed: true, price: 0)
@@ -70,6 +72,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'turning resales off takes tickets off resale' do
+    covers 'events/resale-frees-place@9c6500', 'events/resales-off-returns-tickets@ad509e'
     create_event(prices: [0], enable_resales: true)
     ticket_type = @event.ticket_types.first
     ticket = ticket_type.tickets.create!(event: @event, payment_completed: true, price: 0, made_available_at: Time.now)
@@ -81,6 +84,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test "turning resales off leaves on resale a ticket whose place is held, until it's paid for" do
+    covers 'events/resales-off-while-held@71db3d', 'events/resold-past-limit@0b575f'
     create_event(prices: [0], enable_resales: true)
     ticket_type = @event.ticket_types.first
     ticket_type.set(quantity: 1)
@@ -103,6 +107,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test "turning resales off puts back a ticket whose hold is let go" do
+    covers 'events/resales-off-while-held@71db3d'
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 1)
     ticket_type = @event.ticket_types.first
@@ -119,6 +124,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'a sale past the event capacity replaces a ticket on resale' do
+    covers 'events/resold-past-limit@0b575f'
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 1)
     ticket_type = @event.ticket_types.first
@@ -134,6 +140,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'a sale of another ticket type past the event capacity replaces a ticket on resale' do
+    covers 'events/resale-any-ticket-type@206f1d'
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 1)
     standard = @event.ticket_types.first
@@ -150,6 +157,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'a sale past a ticket group capacity replaces a ticket on resale in the group' do
+    covers 'events/resold-past-limit@0b575f', 'events/resale-frees-place@9c6500'
     create_event(prices: [0], enable_resales: true)
     standard = @event.ticket_types.first
     concession = @event.ticket_types.create!(name: 'Concession', price: 0, quantity: 10)
@@ -172,6 +180,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test "a ticket can't come off resale while its place is held" do
+    covers 'events/resale-held-for-buyer@9f6b27'
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 1)
     ticket_type = @event.ticket_types.first
@@ -192,6 +201,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'buying a zero-slot add-on at a full event leaves a ticket on resale alone' do
+    covers 'events/resold-past-limit@0b575f'
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 1)
     admission = @event.ticket_types.first
@@ -232,6 +242,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'reselling an instalment ticket tells organisers a refund is required' do
+    covers 'events/resale-instalments-refunded-by-hand@b16ce9', 'events/resale-emails-ticketholder@659bbc'
     create_event(prices: [30], enable_resales: true)
     ticket_type = @event.ticket_types.first
     ticket_type.set(quantity: 1)
@@ -270,6 +281,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'resale email mentions a GoCardless instalment refund' do
+    covers 'events/resale-instalments-refunded-by-hand@b16ce9'
     create_event(prices: [30], enable_resales: true)
     previous_account = FactoryBot.create(:account)
     html = EmailHelper.html(
@@ -288,6 +300,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'previous ticketholder resale email does not promise an automatic refund for instalments' do
+    covers 'events/resale-instalments-refunded-by-hand@b16ce9'
     create_event(prices: [30], enable_resales: true)
     html = EmailHelper.html(
       :ticket_resale_previous_ticketholder,
@@ -316,6 +329,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'previous ticketholder resale email promises a refund when one can be issued automatically' do
+    covers 'events/resale-emails-ticketholder@659bbc'
     create_event(prices: [30], enable_resales: true)
     html = EmailHelper.html(
       :ticket_resale_previous_ticketholder,
@@ -328,6 +342,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'the ticket on resale longest is resold first' do
+    covers 'events/resale-oldest-first@a644b1'
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 2)
     ticket_type = @event.ticket_types.first
@@ -341,6 +356,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'a sale of a ticket taking two places resells two tickets on resale taking one' do
+    covers 'events/resale-of-several-places@162449'
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 2)
     single = @event.ticket_types.first
@@ -380,6 +396,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test "an error reselling a ticket doesn't stop the sale completing" do
+    covers 'events/resale-refund-fails@856deb'
     create_event(prices: [15], enable_resales: true)
     @event.set(capacity: 1)
     ticket_type = @event.ticket_types.first
@@ -440,6 +457,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'a sale reselling two tickets from an order with credit tells the organisers what the order paid' do
+    covers 'events/resale-credit-email-says-order-total@33bfce'
     create_event(prices: [15], enable_resales: true)
     @event.set(capacity: 2)
     single = @event.ticket_types.first
@@ -462,6 +480,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'a sale while places are left leaves tickets on resale alone' do
+    covers 'events/resale-only-when-full@d69dd8'
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 2)
     ticket_type = @event.ticket_types.first
@@ -474,6 +493,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'putting a ticket on resale at a sold-out event emails the waitlist' do
+    covers 'events/resale-emails-waitlist@be56ac', 'events/resale-at-any-time@182662', 'events/waitlist-emailed-when-tickets-available@a5c6b3'
     Delayed::Job.delete_all
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 1)
@@ -489,6 +509,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'a resold ticket is refunded only its own price' do
+    covers 'events/resold-ticket-refunded@81ebca', 'events/resale-refunds-own-price@2a9826', 'events/refund-ticket-own-price@985cff'
     create_event(prices: [15], enable_resales: true)
     @event.set(capacity: 2)
     ticket_type = @event.ticket_types.first
@@ -510,6 +531,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'a resold ticket from an order with credit is left for the organiser to refund' do
+    covers 'events/resale-credit-refunded-by-hand@33f9e9', 'events/resale-credit-email-says-order-total@33bfce'
     create_event(prices: [15], enable_resales: true)
     @event.set(capacity: 2)
     ticket_type = @event.ticket_types.first
@@ -545,6 +567,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test "a resale emails the event's facilitators" do
+    covers 'events/resale-emails-facilitators@2d3044'
     create_event(prices: [0], enable_resales: true)
     facilitator = FactoryBot.create(:account)
     @event.event_facilitations.create!(account: facilitator)
@@ -557,6 +580,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test "a resale that needs a manual refund emails the event's contacts and Dandelion admins" do
+    covers 'events/resale-refund-fails@856deb'
     create_event(prices: [0], enable_resales: true)
     facilitator = FactoryBot.create(:account)
     @event.event_facilitations.create!(account: facilitator)
@@ -571,6 +595,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'turning resales off at a full event gives the tickets on resale back to their holders' do
+    covers 'events/resales-off-returns-tickets@ad509e'
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 1)
     ticket_type = @event.ticket_types.first
