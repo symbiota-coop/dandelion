@@ -116,9 +116,11 @@ class Ticket
       resold_account = resold_ticket.account
       requires_manual_refund = resold_ticket.requires_manual_refund?
       gocardless_instalment = resold_ticket.gocardless_billing_request_id.present?
+      # What the order paid, as the ticket's price may be more than was paid for it
+      order_total = resold_ticket.order.total if resold_ticket.order_discounted_as_a_whole?
       refund_amount = resold_ticket.discounted_price
       refund_currency = resold_ticket.currency
-      resold_ticket.refund
+      resold_ticket.refund unless requires_manual_refund
       resold_ticket.destroy
       send_resale_notification_to_previous_ticketholder(
         resold_account,
@@ -130,6 +132,7 @@ class Ticket
         requires_manual_refund: requires_manual_refund,
         gocardless_instalment: gocardless_instalment,
         refund_amount: refund_amount,
+        order_total: order_total,
         currency: refund_currency
       )
     end
@@ -298,8 +301,14 @@ class Ticket
     account
   end
 
+  # When resold. Credit and fixed discounts come off an order as a whole rather than off its tickets, so a ticket's own
+  # price can be more than was paid for it, and refunding it would refund the holder more than they paid
   def requires_manual_refund?
-    discounted_price && discounted_price > 0 && payment_completed && !refundable?
+    discounted_price && discounted_price > 0 && payment_completed && (!refundable? || order_discounted_as_a_whole?)
+  end
+
+  def order_discounted_as_a_whole?
+    order && ((order.credit_applied || 0) > 0 || (order.fixed_discount_applied || 0) > 0)
   end
 
   def refund

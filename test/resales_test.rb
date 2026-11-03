@@ -388,6 +388,41 @@ class ResalesTest < ActiveSupport::TestCase
     assert_equal [{ charge: 'ch_resold', amount: 1500 }], refund_params
   end
 
+  test 'a resold ticket from an order with credit is left for the organiser to refund' do
+    create_event(prices: [15], enable_resales: true)
+    @event.set(capacity: 2)
+    ticket_type = @event.ticket_types.first
+    account = FactoryBot.create(:account)
+    order = Order.create!(event: @event, account: account, value: 20, credit_applied: 10, payment_completed: true, payment_intent: 'pi_credit', currency: 'GBP')
+    original = ticket_type.tickets.create!(event: @event, order: order, account: account, payment_completed: true, price: 15, payment_intent: 'pi_credit', made_available_at: Time.now)
+    ticket_type.tickets.create!(event: @event, order: order, account: account, payment_completed: true, price: 15, payment_intent: 'pi_credit')
+    replacement = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 15)
+    assert original.requires_manual_refund?
+    assert_equal 20, order.total
+
+    refunds = 0
+    previous_ticketholder_email = organiser_email = nil
+    Stripe::PaymentIntent.stub :retrieve, api_object(charges: [api_object(id: 'ch_credit')]) do
+      Stripe::Refund.stub :create, proc { refunds += 1 } do
+        replacement.stub :send_resale_notification_to_previous_ticketholder, proc { |_account, **kwargs| previous_ticketholder_email = kwargs } do
+          replacement.stub :send_resale_notification_to_organiser, proc { |_account, **kwargs| organiser_email = kwargs } do
+            replacement.payment_completed!
+          end
+        end
+      end
+    end
+    assert original.reload.deleted?
+    assert_equal 0, refunds
+    assert previous_ticketholder_email[:requires_manual_refund]
+    assert organiser_email[:requires_manual_refund]
+    # What the order paid with both its tickets, not what it's worth once the resold one is gone
+    assert_equal 20, organiser_email[:order_total]
+
+    html = EmailHelper.html(:ticket_resale, account: replacement.account, event: @event, previous_account: account, **organiser_email)
+    assert_includes html, 'used credit or a fixed discount'
+    assert_includes html, 'the order paid £20 in all'
+  end
+
   test "a resale emails the event's facilitators" do
     create_event(prices: [0], enable_resales: true)
     facilitator = FactoryBot.create(:account)

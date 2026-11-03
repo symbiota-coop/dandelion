@@ -5,7 +5,14 @@
     purchased a resale ticket for the event <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>"><%= event.name %></a>
     from <%= previous_account.name %> (<a href="mailto:<%= previous_account.email %>"><%= previous_account.email %></a>).
   </p>
-  <% if defined?(requires_manual_refund) && requires_manual_refund %>
+  <% if defined?(order_total) && order_total && currency %>
+    <p>
+      Dandelion did not refund this ticket automatically. It was bought in an order that used credit or a fixed discount,
+      so its price<% if refund_amount %> (<%= Money.new(refund_amount * 100, currency).format(no_cents_if_whole: true) %>)<% end %>
+      may be more than was paid for it: the order paid <%= Money.new(order_total * 100, currency).format(no_cents_if_whole: true) %> in all.
+      Please refund the original ticketholder what they paid for this ticket.
+    </p>
+  <% elsif defined?(requires_manual_refund) && requires_manual_refund %>
     <p>
       Dandelion could not refund this ticket automatically<% if refund_amount && currency %> (<%= Money.new(refund_amount * 100, currency).format(no_cents_if_whole: true) %>)<% end %>.
       <% if gocardless_instalment %>

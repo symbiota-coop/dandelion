@@ -136,7 +136,7 @@ module TicketNotifications
     batch_message.finalize if Padrino.env == :production
   end
 
-  def send_resale_notification_to_organiser(previous_account, requires_manual_refund: false, gocardless_instalment: false, refund_amount: nil, currency: nil)
+  def send_resale_notification_to_organiser(previous_account, requires_manual_refund: false, gocardless_instalment: false, refund_amount: nil, order_total: nil, currency: nil)
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
     batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
@@ -159,6 +159,7 @@ module TicketNotifications
       requires_manual_refund: requires_manual_refund,
       gocardless_instalment: gocardless_instalment,
       refund_amount: refund_amount,
+      order_total: order_total,
       currency: currency
     )
 

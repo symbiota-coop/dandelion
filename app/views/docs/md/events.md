@@ -359,13 +359,15 @@ The ticket is resold when a purchase would otherwise take its ticket type, its t
 
 If several tickets are on resale, the one that has been on resale longest is resold first. While the ticket type, group and event still have places left, a purchase just takes one of those, and tickets on resale stay on resale.
 
-Only the price paid for the ticket is refunded, not other tickets in the same order or a donation. The new buyer pays the ticket's current price, which may be different.
+Only the price paid for the ticket is refunded (less any percentage discount), not other tickets in the same order or a donation. The new buyer pays the ticket's current price, which may be different.
 
 Until a ticket is resold, its holder can take it off resale by selecting 'Remove from resale'. They can't while someone else is partway through buying its place, as the place is held for them until they pay or their order lapses.
 
 If you turn resales off, tickets on resale are taken off resale and their holders keep them, unless someone is already buying their places. Those tickets are resold when the purchase is paid for, or taken off resale if it isn't.
 
 If the original ticket was paid by GoCardless instalments (or another method Dandelion cannot refund automatically), the event's creator, coordinator, revenue sharer and facilitators, and Dandelion admins, are emailed that a refund is required, and the original ticketholder is told the organiser will process the refund (not that they will receive one automatically). Refund collected instalments and cancel the remaining schedule from the GoCardless dashboard.
+
+The same happens if the original ticket was bought in an order that used credit or a fixed discount. These come off the order as a whole, so the ticket's price can be more than was paid for it. The email says what the order paid in all, so you can refund the ticketholder their share.
 
 ## Gating events with an application form
 
