@@ -241,6 +241,9 @@ Dandelion::App.controller do
         partial :'purchase/purchase', layout: :minimal
       else
         @body_class = 'canvas'
+        # Other sites can frame the full event page as well as the ticket form: framed, it's signed out (the
+        # session cookie is SameSite=Lax), so there's nothing signed in to clickjack
+        @embeddable = true
         erb :'events/event'
       end
     when :json

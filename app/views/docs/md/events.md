@@ -415,9 +415,15 @@ Put this in your head to set the iframe to the correct height:
 </script>
 ```
 
-## Embedding ticket forms
+## Embedding event pages and ticket forms
 
-Embed an iframe like this, replacing `https://dandelion.events/e/my-event` with your event URL. The `ticket_form_only` query parameter limits the embed to the ticket form:
+Embed an iframe like this, replacing `https://dandelion.events/e/my-event` with your event URL:
+
+```html
+<iframe style="overflow: scroll; border: 0; width:100%; height: 100vh" class="dandelion-auto-height" src="https://dandelion.events/e/my-event"></iframe>
+```
+
+Add the `ticket_form_only` query parameter to limit the embed to the ticket form:
 
 ```html
 <iframe style="overflow: scroll; border: 0; width:100%; height: 100vh" class="dandelion-auto-height" src="https://dandelion.events/e/my-event?ticket_form_only=1"></iframe>
