@@ -148,7 +148,8 @@ class TicketTypesTest < ActiveSupport::TestCase
     ticket_type.set(quantity: 1)
     original = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: Time.now)
     # Holds the place, unpaid
-    replacement = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
+    replacement = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 10)
+    refute replacement.payment_completed
 
     @event.update!(enable_resales: false)
     assert original.reload.made_available_at
@@ -168,7 +169,8 @@ class TicketTypesTest < ActiveSupport::TestCase
     @event.set(capacity: 1)
     ticket_type = @event.ticket_types.first
     original = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: Time.now)
-    replacement = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
+    replacement = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 10)
+    refute replacement.payment_completed
 
     @event.update!(enable_resales: false)
     assert original.reload.made_available_at
@@ -193,6 +195,64 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert original.reload.deleted?
   end
 
+  test 'a sale of another ticket type past the event capacity replaces a ticket on resale' do
+    create_event(prices: [0], enable_resales: true)
+    @event.set(capacity: 1)
+    standard = @event.ticket_types.first
+    concession = @event.ticket_types.create!(name: 'Concession', price: 0, quantity: 10)
+    original = standard.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: Time.now)
+    replacement = concession.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
+
+    replacement.stub :send_resale_notification_to_previous_ticketholder, nil do
+      replacement.stub :send_resale_notification_to_organiser, nil do
+        replacement.payment_completed!
+      end
+    end
+    assert original.reload.deleted?
+  end
+
+  test 'a sale past a ticket group capacity replaces a ticket on resale in the group' do
+    create_event(prices: [0], enable_resales: true)
+    standard = @event.ticket_types.first
+    concession = @event.ticket_types.create!(name: 'Concession', price: 0, quantity: 10)
+    outside = @event.ticket_types.create!(name: 'Outside', price: 0, quantity: 10)
+    ticket_group = @event.ticket_groups.create!(name: 'Dance', capacity: 1)
+    standard.update_attributes!(ticket_group: ticket_group)
+    concession.update_attributes!(ticket_group: ticket_group)
+    # Older, but not in the group
+    elsewhere = outside.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: 1.minute.ago)
+    original = standard.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: Time.now)
+    replacement = concession.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
+
+    replacement.stub :send_resale_notification_to_previous_ticketholder, nil do
+      replacement.stub :send_resale_notification_to_organiser, nil do
+        replacement.payment_completed!
+      end
+    end
+    assert original.reload.deleted?
+    refute elsewhere.reload.deleted?
+  end
+
+  test "a ticket can't come off resale while its place is held" do
+    create_event(prices: [0], enable_resales: true)
+    @event.set(capacity: 1)
+    ticket_type = @event.ticket_types.first
+    account = FactoryBot.create(:account)
+    original = ticket_type.tickets.create!(event: @event, account: account, payment_completed: true, price: 0, made_available_at: Time.now)
+    # Holds the place, unpaid
+    hold = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 10)
+    refute hold.payment_completed
+    sign_in_with_rack(account)
+
+    post "/tickets/#{original.id}/toggle_resale"
+    assert original.reload.made_available_at
+    assert_equal 1, Event.find(@event.id).ticket_counts[ticket_type.id]
+
+    hold.destroy
+    post "/tickets/#{original.id}/toggle_resale"
+    assert_nil original.reload.made_available_at
+  end
+
   test 'buying a zero-slot add-on at a full event leaves a ticket on resale alone' do
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 1)
@@ -200,7 +260,8 @@ class TicketTypesTest < ActiveSupport::TestCase
     add_on = @event.ticket_types.create!(name: 'Add-on', price: 0, quantity: 10, slots: 0)
     original = admission.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: Time.now)
     # Holds the place, unpaid
-    replacement = admission.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
+    replacement = admission.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 10)
+    refute replacement.payment_completed
     extra = add_on.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
 
     extra.stub :send_resale_notification_to_previous_ticketholder, nil do

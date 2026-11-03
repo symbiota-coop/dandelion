@@ -211,7 +211,7 @@ module EventFields
         reminder_hours_before: 'Number of hours before the event to send the reminder email. Leave blank to skip the reminder.',
         feedback_hours_after: "Number of hours after the event ends to send the feedback request email (maximum: #{Event::MAX_FEEDBACK_HOURS_AFTER}, or 30 days). Leave blank to send when the event ends.",
         stripe_revenue_adjustment: 'Positive or negative adjustment to the revenue reported by Stripe, e.g. +20 or -10',
-        enable_resales: 'Allow ticketholders to resell tickets via the event once a ticket type sells out (experimental)',
+        enable_resales: 'Allow ticketholders to resell tickets via the event when it, or their ticket type or group, sells out',
         hide_few_left: "Hide the 'few tickets left' labels at checkout when tickets are running low",
         hide_organisation_footer: 'Hide the organisation footer in the event confirmation email',
         no_tickets_pdf: 'Skip the PDF attachment in the confirmation email',

@@ -97,6 +97,18 @@ class Ticket
     end
   end
 
+  # Whether this ticket on resale can go back in the ticket counts. Its place may already be held by a ticket that isn't
+  # paid for yet, and putting it back as well would overbook the event: it stays on resale until the hold is paid for,
+  # which refunds and removes it (payment_completed!), or let go. Fresh from the database, as the last one put back counts
+  def fits_back_in_counts?
+    remaining = if ticket_type_id && (ticket_type = TicketType.find(ticket_type_id))
+                  ticket_type.wiser_remaining
+                else
+                  Event.find(event_id).places_remaining
+                end
+    remaining.nil? || remaining >= 1
+  end
+
   def payment_completed!
     # Not only while the event allows resales: tickets left on resale when they were turned off are those whose places
     # were already held (Event#put_back_tickets_on_resale_that_fit)

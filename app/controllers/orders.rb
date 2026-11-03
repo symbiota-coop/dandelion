@@ -96,10 +96,18 @@ Dandelion::App.controller do
     @event = @ticket.event
     # A ticket on resale leaves the event's ticket counts, freeing its place, and only events that allow resales refund and
     # remove it when the place sells (Ticket#payment_completed!): elsewhere the holder could free places, let them sell, and
-    # take their tickets back off resale, overbooking the event. Taking one off resale is always allowed, as it only puts
-    # the ticket back in the counts
+    # take their tickets back off resale, overbooking the event
     halt 403 if !@ticket.made_available_at && !@event.enable_resales?
-    @ticket.made_available_at = @ticket.made_available_at ? nil : Time.now
+    if @ticket.made_available_at
+      # Its place may already be held by a ticket that isn't paid for yet, which would replace it once paid for
+      unless @ticket.fits_back_in_counts?
+        flash[:error] = "Someone is buying this ticket's place, so it can't come off resale"
+        redirect back
+      end
+      @ticket.made_available_at = nil
+    else
+      @ticket.made_available_at = Time.now
+    end
     @ticket.save
     redirect back
   end
