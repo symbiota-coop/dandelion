@@ -80,17 +80,20 @@ class Ticket
 
   # The oldest ticket on resale whose place this one took: of its type when the type's quantity is past, of its ticket
   # group when the group's capacity is, or of the event when the event's is. Counting tickets on resale, as they still
-  # hold their places until they're removed
+  # hold their places until they're removed. Only a ticket that takes places can take another's place in a group or
+  # the event, and only from a ticket that takes places: a zero-slot add-on ignores capacity, so it mustn't settle an
+  # admission's resale (whose excess may be an unpaid hold), nor an admission an add-on's
   def ticket_on_resale_replaced
     return unless ticket_type
 
     on_resale = event.tickets.and(:made_available_at.ne => nil).order('made_available_at asc')
-    if ticket_type.remaining_including_made_available < 0
-      on_resale.and(ticket_type_id: ticket_type_id).first
-    elsif (group = ticket_type.ticket_group) && group.capacity - group.tickets.slots_taken < 0
-      on_resale.and(:ticket_type_id.in => group.ticket_types.pluck(:id)).first
+    return on_resale.and(ticket_type_id: ticket_type_id).first if ticket_type.remaining_including_made_available < 0
+    return unless ticket_type.slots.positive?
+
+    if (group = ticket_type.ticket_group) && group.capacity - group.tickets.slots_taken < 0
+      on_resale.and(:ticket_type_id.in => group.ticket_types.to_a.select { |t| t.slots.positive? }.map(&:id)).first
     elsif event.capacity && event.capacity - event.tickets.slots_taken < 0
-      on_resale.first
+      on_resale.and(:ticket_type_id.nin => event.ticket_types.to_a.reject { |t| t.slots.positive? }.map(&:id)).first
     end
   end
 

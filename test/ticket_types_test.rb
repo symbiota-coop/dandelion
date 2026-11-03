@@ -193,6 +193,31 @@ class TicketTypesTest < ActiveSupport::TestCase
     assert original.reload.deleted?
   end
 
+  test 'buying a zero-slot add-on at a full event leaves a ticket on resale alone' do
+    create_event(prices: [0], enable_resales: true)
+    @event.set(capacity: 1)
+    admission = @event.ticket_types.first
+    add_on = @event.ticket_types.create!(name: 'Add-on', price: 0, quantity: 10, slots: 0)
+    original = admission.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: Time.now)
+    # Holds the place, unpaid
+    replacement = admission.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
+    extra = add_on.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
+
+    extra.stub :send_resale_notification_to_previous_ticketholder, nil do
+      extra.stub :send_resale_notification_to_organiser, nil do
+        extra.payment_completed!
+      end
+    end
+    refute original.reload.deleted?
+
+    replacement.stub :send_resale_notification_to_previous_ticketholder, nil do
+      replacement.stub :send_resale_notification_to_organiser, nil do
+        replacement.payment_completed!
+      end
+    end
+    assert original.reload.deleted?
+  end
+
   test 'stripe tickets do not require a manual refund' do
     create_event(prices: [30], enable_resales: true)
     ticket_type = @event.ticket_types.first
