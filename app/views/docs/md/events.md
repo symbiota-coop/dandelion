@@ -357,9 +357,9 @@ The ticket is resold when a purchase would otherwise take its ticket type, its t
 - the event's facilitators (see [Adding event facilitators](#adding-event-facilitators)) are emailed about the resale
 - the new buyer gets their ticket as with any purchase
 
-If several tickets are on resale, the one that has been on resale longest is resold first. While the ticket type, group and event still have places left, a purchase just takes one of those, and tickets on resale stay on resale.
+If several tickets are on resale, the one that has been on resale longest is resold first. A ticket that takes more than one place (see [Ticket slots and capacity](#ticket-slots-and-capacity)) resells as many tickets on resale as it needs places. While the ticket type, group and event still have places left, a purchase just takes one of those, and tickets on resale stay on resale.
 
-Only the price paid for the ticket is refunded (less any percentage discount), not other tickets in the same order or a donation. The new buyer pays the ticket's current price, which may be different.
+Only the price paid for the ticket is refunded (less any percentage discount), not other tickets in the same order or a donation. The new buyer pays the ticket's current price, which may be different. If Dandelion can't refund the ticket automatically (for example if the payment provider is unavailable), the ticket is still resold, and the event's contacts and Dandelion admins are emailed to refund the original ticketholder themselves.
 
 Until a ticket is resold, its holder can take it off resale by selecting 'Remove from resale'. They can't while someone else is partway through buying its place, as the place is held for them until they pay or their order lapses.
 

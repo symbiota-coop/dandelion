@@ -109,24 +109,46 @@ class Ticket
     remaining.nil? || remaining >= 1
   end
 
-  def payment_completed!
-    # Not only while the event allows resales: tickets left on resale when they were turned off are those whose places
-    # were already held (Event#put_back_tickets_on_resale_that_fit)
-    if (resold_ticket = ticket_on_resale_replaced)
-      resold_account = resold_ticket.account
-      requires_manual_refund = resold_ticket.requires_manual_refund?
-      gocardless_instalment = resold_ticket.gocardless_billing_request_id.present?
-      # What the order paid, as the ticket's price may be more than was paid for it
-      order_total = resold_ticket.order.total if resold_ticket.order_discounted_as_a_whole?
-      refund_amount = resold_ticket.discounted_price
-      refund_currency = resold_ticket.currency
-      resold_ticket.refund unless requires_manual_refund
-      resold_ticket.destroy
+  # The tickets on resale whose places this one took, until they've freed as many places as it takes: one of its own
+  # type frees as many, but a ticket taking two places can take those of two that take one. Each is claimed as it's
+  # found, by removing it there and then, so that payments completing at once resell different tickets
+  def claim_tickets_on_resale_replaced
+    places = ticket_type ? ticket_type.slots : 1
+    claimed = []
+    while (claimed.empty? || places.positive?) && (resold_ticket = ticket_on_resale_replaced)
+      next if Ticket.collection.update_one(
+        { _id: resold_ticket.id, made_available_at: { '$ne' => nil }, deleted_at: nil },
+        { '$set' => { deleted_at: Time.now } }
+      ).modified_count.zero?
+
+      claimed << resold_ticket
+      places -= resold_ticket.ticket_type ? resold_ticket.ticket_type.slots : 1
+    end
+    claimed
+  end
+
+  # Refunds a ticket on resale whose place this one took, removes it, and emails its holder and the organisers. This
+  # ticket's payment has completed, so errors are reported rather than raised: raised, they'd stop its order
+  # completing, and its tickets would never be sent
+  def complete_resale(resold_ticket)
+    resold_account = resold_ticket.account
+    requires_manual_refund = resold_ticket.requires_manual_refund?
+    gocardless_instalment = resold_ticket.gocardless_billing_request_id.present?
+    # What the order paid, as the ticket's price may be more than was paid for it
+    order_total = resold_ticket.order.total if resold_ticket.order_discounted_as_a_whole?
+    refund_amount = resold_ticket.discounted_price
+    refund_currency = resold_ticket.currency
+    # Left for the organisers to refund if refunding raises
+    requires_manual_refund = !reporting_resale_errors(resold_ticket) { resold_ticket.refund } unless requires_manual_refund
+    reporting_resale_errors(resold_ticket) { resold_ticket.destroy }
+    reporting_resale_errors(resold_ticket) do
       send_resale_notification_to_previous_ticketholder(
         resold_account,
         requires_manual_refund: requires_manual_refund,
         gocardless_instalment: gocardless_instalment
       )
+    end
+    reporting_resale_errors(resold_ticket) do
       send_resale_notification_to_organiser(
         resold_account,
         requires_manual_refund: requires_manual_refund,
@@ -136,6 +158,21 @@ class Ticket
         currency: refund_currency
       )
     end
+  end
+
+  # Whether the block ran without raising
+  def reporting_resale_errors(resold_ticket)
+    yield
+    true
+  rescue StandardError => e
+    ErrorReporting.capture_exception(e, context: { ticket_id: id.to_s, resold_ticket_id: resold_ticket.id.to_s })
+    false
+  end
+
+  def payment_completed!
+    # Not only while the event allows resales: tickets left on resale when they were turned off are those whose places
+    # were already held (Event#put_back_tickets_on_resale_that_fit)
+    claim_tickets_on_resale_replaced.each { |resold_ticket| complete_resale(resold_ticket) }
     event.waitships.find_by(account: account).try(:destroy)
     ticket_type.ticket_type_waitships.find_by(account: account).try(:destroy) if ticket_type && account
     event.gathering.memberships.create(account: account, unsubscribed: true) if event.gathering

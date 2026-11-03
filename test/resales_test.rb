@@ -340,6 +340,74 @@ class ResalesTest < ActiveSupport::TestCase
     refute newer.reload.deleted?
   end
 
+  test 'a sale of a ticket taking two places resells two tickets on resale taking one' do
+    create_event(prices: [0], enable_resales: true)
+    @event.set(capacity: 2)
+    single = @event.ticket_types.first
+    pair = @event.ticket_types.create!(name: 'Pair', price: 0, quantity: 10, slots: 2)
+    older = single.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: 2.minutes.ago)
+    newer = single.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: 1.minute.ago)
+    replacement = pair.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
+
+    complete_without_notifications(replacement)
+    assert older.reload.deleted?
+    assert newer.reload.deleted?
+  end
+
+  test 'payments completing at once resell different tickets on resale' do
+    create_event(prices: [0], enable_resales: true)
+    @event.set(capacity: 2)
+    ticket_type = @event.ticket_types.first
+    older = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: 2.minutes.ago)
+    newer = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: 1.minute.ago)
+    first = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
+    second = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
+    # What the second payment found before the first resold it
+    stale = Ticket.find(older.id)
+
+    complete_without_notifications(first)
+    assert older.reload.deleted?
+
+    found = [stale]
+    resold_again = false
+    stale.stub :refund, -> { resold_again = true } do
+      second.stub :ticket_on_resale_replaced, -> { found.shift || Ticket.instance_method(:ticket_on_resale_replaced).bind_call(second) } do
+        complete_without_notifications(second)
+      end
+    end
+    refute resold_again
+    assert newer.reload.deleted?
+  end
+
+  test "an error reselling a ticket doesn't stop the sale completing" do
+    create_event(prices: [15], enable_resales: true)
+    @event.set(capacity: 1)
+    ticket_type = @event.ticket_types.first
+    account = FactoryBot.create(:account)
+    order = Order.create!(event: @event, account: account, value: 15, payment_completed: true, payment_intent: 'pi_resold', currency: 'GBP')
+    original = ticket_type.tickets.create!(event: @event, order: order, account: account, payment_completed: true, price: 15, payment_intent: 'pi_resold', made_available_at: Time.now)
+    buyer = FactoryBot.create(:account)
+    Waitship.create!(event: @event, account: buyer)
+    replacement = ticket_type.tickets.create!(event: @event, account: buyer, payment_completed: false, price: 15)
+
+    reported = []
+    organiser_email = nil
+    ErrorReporting.stub(:capture_exception, ->(e, **) { reported << e }) do
+      Stripe::PaymentIntent.stub :retrieve, proc { raise Stripe::APIConnectionError, 'Stripe is down' } do
+        replacement.stub :send_resale_notification_to_previous_ticketholder, proc { raise Mailgun::CommunicationError, 'Mailgun is down' } do
+          replacement.stub :send_resale_notification_to_organiser, proc { |_account, **kwargs| organiser_email = kwargs } do
+            replacement.payment_completed!
+          end
+        end
+      end
+    end
+    assert original.reload.deleted?
+    # Left for the organisers to refund
+    assert organiser_email[:requires_manual_refund]
+    assert_nil @event.waitships.find_by(account: buyer)
+    assert_equal [Stripe::APIConnectionError, Mailgun::CommunicationError], reported.map(&:class)
+  end
+
   test 'a sale while places are left leaves tickets on resale alone' do
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 2)
