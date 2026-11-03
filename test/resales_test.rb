@@ -3,6 +3,41 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 class ResalesTest < ActiveSupport::TestCase
   include Rack::Test::Methods
 
+  # Stands in for Mailgun::BatchMessage, keeping who an email would go to
+  class RecordedEmail
+    attr_reader :recipients
+
+    def initialize
+      @recipients = []
+    end
+
+    def add_recipient(_type, email, _variables)
+      @recipients << email
+    end
+
+    def from(*); end
+    def subject(*); end
+    def body_html(*); end
+    def reply_to(*); end
+    def finalize; end
+  end
+
+  def recorded_email
+    email = RecordedEmail.new
+    Mailgun::BatchMessage.stub :new, email do
+      yield
+    end
+    email
+  end
+
+  def complete_without_notifications(ticket)
+    ticket.stub :send_resale_notification_to_previous_ticketholder, nil do
+      ticket.stub :send_resale_notification_to_organiser, nil do
+        ticket.payment_completed!
+      end
+    end
+  end
+
   test 'remaining excludes tickets made available again' do
     create_event(prices: [0])
     ticket_type = @event.ticket_types.first
@@ -290,5 +325,104 @@ class ResalesTest < ActiveSupport::TestCase
 
     assert_includes html, 'You should receive a refund shortly.'
     refute_includes html, 'organiser has been notified'
+  end
+
+  test 'the ticket on resale longest is resold first' do
+    create_event(prices: [0], enable_resales: true)
+    @event.set(capacity: 2)
+    ticket_type = @event.ticket_types.first
+    newer = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: 1.minute.ago)
+    older = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: 2.minutes.ago)
+    replacement = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 10)
+
+    complete_without_notifications(replacement)
+    assert older.reload.deleted?
+    refute newer.reload.deleted?
+  end
+
+  test 'a sale while places are left leaves tickets on resale alone' do
+    create_event(prices: [0], enable_resales: true)
+    @event.set(capacity: 2)
+    ticket_type = @event.ticket_types.first
+    original = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: Time.now)
+    sale = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 10)
+
+    complete_without_notifications(sale)
+    refute original.reload.deleted?
+    assert original.made_available_at
+  end
+
+  test 'putting a ticket on resale at a sold-out event emails the waitlist' do
+    Delayed::Job.delete_all
+    create_event(prices: [0], enable_resales: true)
+    @event.set(capacity: 1)
+    account = FactoryBot.create(:account)
+    ticket = @event.ticket_types.first.tickets.create!(event: @event, account: account, payment_completed: true, price: 0)
+    Waitship.create!(event: @event, account: FactoryBot.create(:account))
+    assert Event.find(@event.id).sold_out_cache
+    sign_in_with_rack(account)
+
+    post "/tickets/#{ticket.id}/toggle_resale"
+    assert ticket.reload.made_available_at
+    assert_equal 1, Delayed::Job.and(handler: /send_waitlist_tickets_available/).count
+  end
+
+  test 'a resold ticket is refunded only its own price' do
+    create_event(prices: [15], enable_resales: true)
+    @event.set(capacity: 2)
+    ticket_type = @event.ticket_types.first
+    account = FactoryBot.create(:account)
+    order = Order.create!(event: @event, account: account, value: 30, payment_completed: true, payment_intent: 'pi_resold', currency: 'GBP')
+    original = ticket_type.tickets.create!(event: @event, order: order, account: account, payment_completed: true, price: 15, payment_intent: 'pi_resold', made_available_at: Time.now)
+    kept = ticket_type.tickets.create!(event: @event, order: order, account: account, payment_completed: true, price: 15, payment_intent: 'pi_resold')
+    replacement = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 15)
+
+    refund_params = []
+    Stripe::PaymentIntent.stub :retrieve, api_object(charges: [api_object(id: 'ch_resold')]) do
+      Stripe::Refund.stub :create, proc { |params, _opts| refund_params << params } do
+        complete_without_notifications(replacement)
+      end
+    end
+    assert original.reload.deleted?
+    refute kept.reload.deleted?
+    assert_equal [{ charge: 'ch_resold', amount: 1500 }], refund_params
+  end
+
+  test "a resale emails the event's facilitators" do
+    create_event(prices: [0], enable_resales: true)
+    facilitator = FactoryBot.create(:account)
+    @event.event_facilitations.create!(account: facilitator)
+    ticket = @event.ticket_types.first.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0)
+    previous_account = FactoryBot.create(:account)
+
+    email = recorded_email { ticket.send_resale_notification_to_organiser(previous_account) }
+    # The organisation's only admin was made a facilitator when the event was created
+    assert_equal [@organisation.admins.first.email, facilitator.email].sort, email.recipients.sort
+  end
+
+  test "a resale that needs a manual refund emails the event's contacts and Dandelion admins" do
+    create_event(prices: [0], enable_resales: true)
+    facilitator = FactoryBot.create(:account)
+    @event.event_facilitations.create!(account: facilitator)
+    admin = FactoryBot.create(:account, admin: true)
+    ticket = @event.ticket_types.first.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0)
+    previous_account = FactoryBot.create(:account)
+
+    email = recorded_email { ticket.send_resale_notification_to_organiser(previous_account, requires_manual_refund: true) }
+    assert_includes email.recipients, @event.account.email
+    assert_includes email.recipients, facilitator.email
+    assert_includes email.recipients, admin.email
+  end
+
+  test 'turning resales off at a full event gives the tickets on resale back to their holders' do
+    create_event(prices: [0], enable_resales: true)
+    @event.set(capacity: 1)
+    ticket_type = @event.ticket_types.first
+    ticket = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: true, price: 0, made_available_at: Time.now)
+
+    @event.update!(enable_resales: false)
+    refute ticket.reload.deleted?
+    assert_nil ticket.made_available_at
+    assert Event.find(@event.id).sold_out?
   end
 end
