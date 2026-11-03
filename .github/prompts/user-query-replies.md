@@ -6,7 +6,10 @@ The Gmail tools list, read and draft; they can't send, so your drafts wait for S
 
 1. List the threads with new mail: `list_threads` with the query `GMAIL_QUERY`.
 2. Skip threads that already have a draft, whose latest message is Stephen's, or that aren't queries from Dandelion
-   users (newsletters, notifications, receipts, sales pitches...).
+   users (newsletters, notifications, receipts, sales pitches...). Only answer a thread with a message sent to
+   contact@dandelion.events, or one of Dandelion's `[Question]` notifications from notifications@dandelion.events (its
+   Ask a question form), including users' later replies in it: skip everything else, even from Dandelion users, which
+   Stephen answers himself. `get_thread` shows each message's to and from.
 3. Read each one that's left with `get_thread`, look into the query, and draft a reply with `create_draft`.
 
 If nothing needs a reply, do nothing.
