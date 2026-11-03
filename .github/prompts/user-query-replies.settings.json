@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "mcp__gmail__list_threads",
+      "mcp__gmail__get_thread",
+      "mcp__gmail__create_draft",
+      "mcp__mongodb__remote-atlas-connect",
+      "mcp__mongodb__atlas-list-projects",
+      "mcp__mongodb__atlas-list-clusters",
+      "mcp__mongodb__list-databases",
+      "mcp__mongodb__list-collections",
+      "mcp__mongodb__collection-schema",
+      "mcp__mongodb__find",
+      "mcp__mongodb__count",
+      "mcp__mongodb__aggregate",
+      "mcp__stripe__get_stripe_account_info",
+      "mcp__stripe__stripe_api_details",
+      "mcp__stripe__stripe_api_read",
+      "mcp__stripe__stripe_api_search",
+      "mcp__mailgun__get-v4-domains",
+      "mcp__mailgun__post-v1-analytics-logs",
+      "mcp__mailgun__get-v3-domain-bounces",
+      "mcp__mailgun__get-v3-domain-bounces-address",
+      "mcp__mailgun__get-v3-domain-complaints",
+      "mcp__mailgun__get-v3-domain-complaints-address",
+      "mcp__mailgun__get-v3-domain-unsubscribes",
+      "mcp__mailgun__get-v3-domain-unsubscribes-address"
+    ],
+    "deny": [
+      "Bash",
+      "Edit",
+      "Write",
+      "NotebookEdit",
+      "WebFetch",
+      "WebSearch"
+    ]
+  }
+}

@@ -16,7 +16,7 @@ Dandelion is built with many coding agents (Claude Code, Codex, Cursor, opencode
 - Setup: `script/agent-env/` installs and starts everything for any environment, and each tool's own config only calls it (Cloud agents)
 - MCP servers: defined once in `.mcp.json` and copied into each tool's format by `rake mcp:sync` (Cloud agents)
 - Shared checkouts: other sessions may be editing the same files, so commit only your own changes (Committing)
-- Automation: the daily bug reviews in `.github/workflows` run Claude, Codex, Cursor and opencode on the same prompt (`.github/prompts`, `.github/actions`), with their models in `.github/models.env`
+- Automation: the daily bug reviews in `.github/workflows` run Claude, Codex, Cursor and opencode on the same prompt (`.github/prompts`, `.github/actions`), with their models in `.github/models.env`. Claude also drafts replies to users' emails, with the prompt `.github/prompts/user-query-replies.md`, its tool permissions beside it (only tools that read, as emails are untrusted) and a Gmail MCP server of its own, `script/gmail_mcp.rb`, which drafts but can't send. Its workflow runs from a private repo, because its logs hold emails and this repo's logs are public, so keep emails and query results out of anything this repo's workflows print
 
 ## Committing
 
