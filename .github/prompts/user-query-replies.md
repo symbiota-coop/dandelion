@@ -14,7 +14,8 @@ If nothing needs a reply, do nothing.
 ## Looking into a query
 Use the Mongo MCP (Dandelion's production database, read-only), the Stripe MCP and the Mailgun MCP (did our emails
 reach them, or bounce?) where they help, and read the code to see how things work rather than guessing. Start from the
-account with the sender's email.
+account with the sender's email. When something used to work for them, `git log`, `git show` and `git blame` (the only
+commands you can run) show what changed and when.
 
 ## The reply
 Write as Stephen, in the first person. `create_draft`'s `html` is the reply alone, with `<br><br>` between
