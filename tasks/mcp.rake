@@ -7,6 +7,8 @@ module McpConfigFiles
   SOURCE = '.mcp.json'.freeze
   VARIABLE = /\$\{(\w+)\}/
   BEARER = /\ABearer \$\{(\w+)\}\z/
+  # A token under another scheme (Sentry's Sentry-Bearer, as its server keeps Bearer for its own OAuth tokens)
+  OTHER_SCHEME = /\A[\w-]+ \$\{\w+\}\z/
 
   def self.servers
     JSON.parse(File.read(File.join(ROOT, SOURCE)))['mcpServers']
@@ -42,13 +44,16 @@ module McpConfigFiles
   end
 
   # Codex doesn't expand variables in config.toml: it passes env vars through by name (env_vars),
-  # and takes a bearer token from a named env var (bearer_token_env_var)
+  # and takes a bearer token from a named env var (bearer_token_env_var). It can't put another scheme before a
+  # token, so a server with one is left to sign in with OAuth (codex mcp login <name>)
   def self.codex
     sections = servers.map do |name, server|
       lines = ["[mcp_servers.#{name}]"]
       if server['url']
         lines << "url = #{server['url'].to_json}"
         (server['headers'] || {}).each do |header, value|
+          next if header == 'Authorization' && value !~ BEARER && value =~ OTHER_SCHEME
+
           raise "#{SOURCE}: #{name}'s #{header} header can't be written for Codex" unless header == 'Authorization' && value =~ BEARER
 
           lines << "bearer_token_env_var = #{Regexp.last_match(1).to_json}"

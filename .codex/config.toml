@@ -28,6 +28,7 @@ bearer_token_env_var = "GITHUB_PAT"
 
 [mcp_servers.cloudflare-api]
 url = "https://mcp.cloudflare.com/mcp"
+bearer_token_env_var = "CLOUDFLARE_API_TOKEN"
 
 [mcp_servers.mailgun]
 command = "npx"

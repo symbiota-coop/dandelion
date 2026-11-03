@@ -2,7 +2,10 @@
   "mcpServers": {
     "sentry": {
       "type": "http",
-      "url": "https://mcp.sentry.dev/mcp"
+      "url": "https://mcp.sentry.dev/mcp",
+      "headers": {
+        "Authorization": "Sentry-Bearer ${env:SENTRY_ACCESS_TOKEN}"
+      }
     },
     "render": {
       "type": "http",
@@ -38,7 +41,10 @@
     },
     "cloudflare-api": {
       "type": "http",
-      "url": "https://mcp.cloudflare.com/mcp"
+      "url": "https://mcp.cloudflare.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:CLOUDFLARE_API_TOKEN}"
+      }
     },
     "mailgun": {
       "command": "npx",
