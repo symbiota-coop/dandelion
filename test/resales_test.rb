@@ -408,6 +408,59 @@ class ResalesTest < ActiveSupport::TestCase
     assert_equal [Stripe::APIConnectionError, Mailgun::CommunicationError], reported.map(&:class)
   end
 
+  test "a resold ticket whose refund email fails isn't left for the organisers to refund again" do
+    create_event(prices: [15], enable_resales: true)
+    @event.set(capacity: 1)
+    ticket_type = @event.ticket_types.first
+    account = FactoryBot.create(:account)
+    order = Order.create!(event: @event, account: account, value: 15, payment_completed: true, payment_intent: 'pi_resold', currency: 'GBP')
+    original = ticket_type.tickets.create!(event: @event, order: order, account: account, payment_completed: true, price: 15, payment_intent: 'pi_resold', made_available_at: Time.now)
+    replacement = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 15)
+
+    reported = []
+    refunds = 0
+    organiser_email = nil
+    ErrorReporting.stub(:capture_exception, ->(e, **) { reported << e }) do
+      Stripe::PaymentIntent.stub :retrieve, api_object(charges: [api_object(id: 'ch_resold')]) do
+        Stripe::Refund.stub :create, proc { refunds += 1 } do
+          Mailgun::Client.stub :new, proc { raise Mailgun::CommunicationError, 'Mailgun is down' } do
+            replacement.stub :send_resale_notification_to_previous_ticketholder, nil do
+              replacement.stub :send_resale_notification_to_organiser, proc { |_account, **kwargs| organiser_email = kwargs } do
+                replacement.payment_completed!
+              end
+            end
+          end
+        end
+      end
+    end
+    assert original.reload.deleted?
+    assert_equal 1, refunds
+    refute organiser_email[:requires_manual_refund]
+    assert_equal [Mailgun::CommunicationError], reported.map(&:class)
+  end
+
+  test 'a sale reselling two tickets from an order with credit tells the organisers what the order paid' do
+    create_event(prices: [15], enable_resales: true)
+    @event.set(capacity: 2)
+    single = @event.ticket_types.first
+    pair = @event.ticket_types.create!(name: 'Pair', price: 0, quantity: 10, slots: 2)
+    account = FactoryBot.create(:account)
+    order = Order.create!(event: @event, account: account, value: 20, credit_applied: 10, payment_completed: true, payment_intent: 'pi_credit', currency: 'GBP')
+    2.times do |i|
+      single.tickets.create!(event: @event, order: order, account: account, payment_completed: true, price: 15, payment_intent: 'pi_credit', made_available_at: (i + 1).minutes.ago)
+    end
+    replacement = pair.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 0)
+
+    organiser_emails = []
+    replacement.stub :send_resale_notification_to_previous_ticketholder, nil do
+      replacement.stub :send_resale_notification_to_organiser, proc { |_account, **kwargs| organiser_emails << kwargs } do
+        replacement.payment_completed!
+      end
+    end
+    assert_equal 0, order.tickets.count
+    assert_equal [20, 20], organiser_emails.pluck(:order_total)
+  end
+
   test 'a sale while places are left leaves tickets on resale alone' do
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 2)

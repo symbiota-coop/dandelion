@@ -27,7 +27,13 @@ module Refundable
     )
     return if failed || result.nil?
 
-    notify_of_refund(amount: amount || try(:value))
+    # The refund has gone through, so an email that fails is reported rather than raised: raised, it would look as if
+    # the refund had failed
+    begin
+      notify_of_refund(amount: amount || try(:value))
+    rescue StandardError => e
+      ErrorReporting.capture_exception(e, context: { model: self.class.name, id: id.to_s })
+    end
   end
 
   def notify_of_refund(amount:)

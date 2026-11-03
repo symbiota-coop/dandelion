@@ -134,8 +134,10 @@ class Ticket
     resold_account = resold_ticket.account
     requires_manual_refund = resold_ticket.requires_manual_refund?
     gocardless_instalment = resold_ticket.gocardless_billing_request_id.present?
-    # What the order paid, as the ticket's price may be more than was paid for it
-    order_total = resold_ticket.order.total if resold_ticket.order_discounted_as_a_whole?
+    # What the order paid, as the ticket's price may be more than was paid for it. Its value, set when it was paid for, as
+    # its total leaves out its tickets that have been resold, including those this sale resells. Orders paid for with
+    # nothing (RSVPs) have none
+    order_total = resold_ticket.order.value || 0 if resold_ticket.order_discounted_as_a_whole?
     refund_amount = resold_ticket.discounted_price
     refund_currency = resold_ticket.currency
     # Left for the organisers to refund if refunding raises
