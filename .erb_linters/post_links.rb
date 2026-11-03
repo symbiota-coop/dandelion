@@ -2,9 +2,11 @@
 
 module ERBLint
   module Linters
-    # Links that POST, destroy links among them, carry data-method="post" (AGENTS.md): app.js and pagelets.js send no other
+    # Links that POST, destroy links among them, carry data-method="post": app.js and pagelets.js send no other
     # link as a POST, so that a link in user content, which keeps relative hrefs but loses data-* attributes, can't make
-    # whoever clicks it delete something. Checks <a> tags and dropdown_nav items whose path ends in destroy
+    # whoever clicks it delete something. confirm.js also asks before a destroy link only when it has it. In a dropdown_nav
+    # item it's { 'data-method' => 'post' }, and the form builder's submit_block adds it to its destroy_url. Checks <a> tags
+    # and dropdown_nav items whose path ends in destroy
     class PostLinks < Linter
       include LinterRegistry
 

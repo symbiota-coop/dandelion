@@ -120,7 +120,8 @@ const rules = {
   eqeqeq: ['error', 'smart'],
   // A closure made in a loop over var sees the loop's last value
   'no-loop-func': 'error',
-  // Requests use jQuery, not fetch (templates get the same check from .erb_linters/jquery_requests.rb)
+  // Requests use jQuery, not fetch (templates get the same check from .erb_linters/jquery_requests.rb). Where an API needs a
+  // real Promise (ClipboardItem), wrap the request: Promise.resolve($.get(url))
   'no-restricted-globals': ['error', { name: 'fetch', message: 'Use jQuery ($.get, $.getJSON, $.post, $.ajax) for requests, not fetch.' }],
   // Rules from the Design section of AGENTS.md (templates get the same checks from .erb_linters/design_classes.rb)
   'no-restricted-syntax': ['error',

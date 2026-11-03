@@ -2,7 +2,7 @@
 
 module ERBLint
   module Linters
-    # Requests use jQuery, not fetch (AGENTS.md), in the JavaScript in a template's Ruby (onclick: '...'). ESLint checks the
+    # Requests use jQuery, not fetch, in the JavaScript in a template's Ruby (onclick: '...'). ESLint checks the
     # template's own scripts and event attributes (eslint.config.mjs)
     class JqueryRequests < Linter
       include LinterRegistry

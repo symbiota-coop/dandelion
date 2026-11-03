@@ -12,136 +12,29 @@ Dandelion is built with many coding agents (Claude Code, Codex, Cursor, opencode
 
 - Instructions: this file is the instructions for every agent. Write what an agent needs to know here, for any agent, rather than in a tool's own file (`CLAUDE.md`, `.cursor/rules`, `.github/copilot-instructions.md`...), which other agents wouldn't read and which would drift from this one. Claude Code reads this file itself when there's no `CLAUDE.md`
 - Memories: don't save what you learn to a tool's own memory (Claude Code's memory files, Cursor's or Codex's memories...), which only that tool reads, on one machine. If it's worth remembering, add it here
-- Rules: a rule that code can check gets a check (Custom checks), not just a line here, so it holds whichever agent wrote the code. The checks run where every agent passes: the pre-commit hook (Committing), as every agent commits with git, and CI. Don't rely on one tool's hooks or settings to enforce a rule
+- Rules: a rule that code can check gets a check (Linting), not just a line here, so it holds whichever agent wrote the code. The checks run where every agent passes: the pre-commit hook (Linting), as every agent commits with git, and CI. Don't rely on one tool's hooks or settings to enforce a rule
 - Setup: `script/agent-env/` installs and starts everything for any environment, and each tool's own config only calls it (Cloud agents)
 - MCP servers: defined once in `.mcp.json` and copied into each tool's format by `rake mcp:sync` (Cloud agents)
 - Shared checkouts: other sessions may be editing the same files, so commit only your own changes (Committing)
 - Automation: the daily bug reviews in `.github/workflows` run Claude, Codex, Cursor and opencode on the same prompt (`.github/prompts`, `.github/actions`), with their models in `.github/models.env`
 
-## Custom checks
-
-CI fails on each rule below, and each names its check. When you add a rule to this file that code can check, add a check for it, list it here, and add cases to `test/lint_test.rb`, which tests our checks (each cop's `@example`, good and bad, is tested as it stands). It doesn't boot the app, so it runs without foreman: `bundle exec ruby -I test test/lint_test.rb`. CI's lint job runs it, and the pre-commit hook does when you commit a file it checks (a linter or its config, a file an Other check compares, or a new test file). Disable a check only where its rule genuinely doesn't apply, and say why in the comment.
-
-### RuboCop
-
-Our cops (`Dandelion/...`) are in `.rubocop/dandelion/`, and also run on the Ruby in templates through erb_lint (its `RubocopTags` linter, `.erb_linters/rubocop_tags.rb`, which also checks the conditions of `<% if %>`, `<% unless %>` and `<% elsif %>` tags). Disable one on a line with `# rubocop:disable Dandelion/... -- reason`.
-
-- `Dandelion/MongoidOr`: Never use Mongoid `.or` — it ORs against whatever is already in the selector (`Event.live.or(featured: true)` means live or featured). Use `self.and('$or' => [...])` so the OR is just another AND-ed filter (`Event.live.and('$or' => [...])` means live and (this or that))
-- `Dandelion/MongoidIndex`: Mongo indexes are created directly in the database, not declared in models with Mongoid's `index`. It checks `models`
-- `Dandelion/MongoidScope`: Query filters are class methods that return `self.and(...)` so they chain (`Event.live.future`). Do not use `scope :live, -> { ... }`
-- `Dandelion/MongoidWhere`: Use `scope.and` rather than `scope.where`. Mongoid rejects JavaScript `$where` strings (`where('this.paid < this.requested_contribution')`), so compare two fields with `$expr`: `memberships.and('$expr' => { '$lt' => ['$paid', '$requested_contribution'] })`
-- `Dandelion/BelongsTo`: Use `belongs_to_without_parent_validation`, not Mongoid `belongs_to` (its parent check fails when the parent is only in memory)
-- `Dandelion/HasManyThrough`: Use `has_many_through` for join collections, not `has_many :x, through:` (Mongoid has no `through`)
-- `Dandelion/ValidatesPresence`: Use `validates_presence_of`, not `validates :name, presence: true`
-- `Dandelion/ValidateBlock`: Put field cleanup and `errors.add` in `before_validation`, not `validate do`
-- `Dandelion/ParamsBlank`: `lib/param_helpers.rb` runs `blanks_to_nils!` on `params`, so blank values are already nil: just do `if params[:x]` (or `unless`), with no `.present?` or `.blank?`
-- `Dandelion/Presence`: Don't use `.presence`, on `params` or anywhere else
-- `Dandelion/ErrorReporting`: Report rescued errors with `ErrorReporting.capture_exception(e, context:, tags:)`, not `Sentry.capture_exception`
-- `Dandelion/Redcarpet`: Render markdown with `md(text)` in views and helpers, or `MarkdownRenderer.render` elsewhere (`lib/markdown_renderer.rb`, the one place that uses Redcarpet), so it renders the same everywhere. Its output is sanitized unless you pass `trusted: true`, which is only for our own files (docs, terms); `hard_wrap: true` turns single newlines into `<br>`, and `inline: true` is for one paragraph of model output
-- `Dandelion/SlugLookup`: URLs name organisations (`/o/:slug`), gatherings (`/g/:slug`), events (`/e/:slug`), activities and local groups (under their organisation's: `/o/:organisation_slug/a/:slug`, `/o/:organisation_slug/lg/:slug`, `Activity#path` and `LocalGroup#path`) and accounts (`/u/:username`) by slug, never by id: find them with `find_by_slug_or_id` (`SlugLookup`, `models/concerns/slug_lookup.rb`), or `activity_from_params` and `local_group_from_params`, which also take the id in older links. Ids from forms and query strings (`params[:organisation_id]`) are fine, as are ids in the URLs of records with no slug (`/orders/:id`). The old id URLs (`/events/:id/...` and the like) redirect with a 307, which keeps the method and body. It checks `app/controllers`
-- `Dandelion/RailsController`: Controllers are `Dandelion::App.controller` blocks (Padrino), not Rails controllers: `before do`, not `before_action`; `erb`, `partial` or `cp`, not `render`; `redirect`, not `redirect_to`; `provides:` and `content_type`, not `respond_to`; and no strong parameters: pass `params[:x]` through `mass_assigning(params[:x], Model)`. It checks `app/controllers`
-- `Dandelion/CapybaraHasNoAfterClick`: Straight after a click, assert something on the new page before checking something isn't there (`has_no_*`, `assert_no_*`), or that check can pass on the old page. A click whose confirm is dismissed (`dismiss_confirm`) doesn't leave the page. It checks `test`
-- `Dandelion/TestInstanceVariable`: In a test, `@` variables come from helpers (`create_organisation`, `create_event`, `create_gathering`, `create_full_event_hierarchy`, and file-local setup methods); anything created inline in a test is a local. A test may refresh a variable one of its file's helpers sets. It checks `test`
-- `Dandelion/CapybaraCurrentPath`: Check the page's path with `assert page.has_current_path?(...)` (with `ignore_query: true` to compare the path alone, or `url: true` for the whole URL), which waits for the page: `current_path` and `current_url` don't, so straight after a click they can still be the old page's. It checks `test`
-- `Dandelion/CapybaraRefuteHas`: To check something isn't on the page, use `assert page.has_no_css?` (`has_no_content?`, `has_no_link?`, `has_no_title?`...), never `refute page.has_css?`: the `has_` form waits the full 10 s `default_max_wait_time` for it to appear before passing
-
-CI fails on warnings and above (`--fail-level warning`), so convention cops are off, apart from these, which catch bugs and `.rubocop.yml` raises to warning (in templates too):
-
-- `Style/AndOr`: `&&` and `||`, not `and` and `or`, which bind more loosely than `=` (`ok = a and b` sets `ok` to `a`)
-- `Style/RescueModifier`: No `x rescue y`, which rescues every error: rescue the ones you expect in a `begin` block
-- `Style/RescueStandardError`: Name the errors you rescue (`rescue ArgumentError`), so a typo's `NoMethodError` isn't swallowed
-- `Style/MutableConstant`: Freeze constants, as Puma's threads share them. A per-process cache filled as it goes disables it, saying so
-- `Style/OpenStructUse`: No `OpenStruct` (`ostruct` isn't a default gem). A test's stand-in for an API object is `api_object(id: 'cs_test', url: ...)` (`test/test_config.rb`), which answers only what it's given
-- rubocop-minitest's cops that catch tests that don't test what they seem to (`.rubocop.yml` lists them): expected before actual (`assert_equal 'a0', field.value`, `Minitest/LiteralAsActualArgument`), test methods public (above `private`, `Minitest/NonPublicTestMethod`), and no unreachable, duplicate or useless assertions
-
-### erb_lint
-
-Our linters, `SafeErb`, `DesignClasses`, `JqueryRequests`, `CdnTags` and `PostLinks`, are in `.erb_linters/`, beside `RubocopTags`, which runs RuboCop on the Ruby in templates (RuboCop). Disable one on a line with `<%# erb_lint:disable DesignClasses: reason %>`. Their checks on JavaScript calls (`addClass('d-none')`, `fetch`) cover only the JavaScript in a template's Ruby (`onclick: '...'` options), as ESLint checks the template's own scripts and event attributes. Their checks on class names and attributes run on the whole template, so an HTML string in a script can get the same message from both
-
-- `SafeErb`: better_html's ErbSafety, less its script type check (`AllowedScriptType` checks script types against `.erb_lint.yml`'s list instead), and checking every script (better_html's skipped a `<script>` the same as an earlier one). ERB output in a `<script>` is `<%== x.to_json %>`, and in an event attribute (`onclick="..."`) `<%= x.to_json %>`; no `<%==`, `raw` or `.html_safe` in an attribute; and no `<% %>` statements inside a `<script>`: put the `<% if %>` around the script, or branch in the JavaScript (`if ($(this).find('.g-recaptcha').length)`)
-- `DesignClasses`: To show and hide elements from JS, start them hidden with `style="display: none"` and use jQuery `.show()` / `.hide()` / `.toggle()`, not `d-none` with `addClass` / `removeClass` (Bootstrap's `d-*` classes are `!important`). Keep `d-none d-md-block` and friends for purely responsive hiding
-- `DesignClasses`: Success is the theme colour, so use `-primary`, never `-success`. Badges are `badge text-bg-*`; there is no `.label` and no `badge-*` colour class
-- `DesignClasses`: Bootstrap 5, not 4: `data-bs-*` attributes and logical spacing and alignment (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-end`, `float-start`). `config/bootstrap4_leftovers.json` lists the Bootstrap 4 classes and attributes it flags, with what replaces each; add one there if you find another
-- `DesignClasses`: Selects take `form-select` (`<select>` tags and `select_tag`; the form builder's `select_block` adds it), even ones Select2 replaces, so they look right until it loads
-- `JqueryRequests`: The ESLint `no-restricted-globals` rule below (jQuery, not `fetch`)
-- `PostLinks`: A link that POSTs, destroy links among them, carries `data-method="post"` (`{ 'data-method' => 'post' }` in a `dropdown_nav` item; the form builder's `submit_block` adds it to its `destroy_url`). `app.js` and `pagelets.js` send no other link as a POST, and confirm.js asks before a destroy link (one whose path ends in `destroy`) only when it has it: user content keeps relative links but loses `data-*` attributes, so a link written into feedback or a description can't make whoever clicks it delete something. It checks `<a>` tags and `dropdown_nav` items whose path ends in `destroy`
-- `CdnTags`: Load a CDN file with `<%= cdn_tag 'fullcalendar', 'all/global.js' %>`, naming an npm package and its file (a `.css` file gets a stylesheet link; pass `defer: true` or `type: 'module'` as needed), not a bare `<script>` or `<link>`. The version comes from `frontend/package.json`, so a package missing there is flagged, as is a jsDelivr npm URL written out; only a file that isn't an npm package's is a URL (`cdn_tag 'https://cdn.jsdelivr.net/gh/...'`). It adds the file's hash from `frontend/integrity.json` as its `integrity` attribute, so the browser won't run the file if it changes; a file with no hash there is flagged too: run `rake frontend:integrity` (Dependencies)
-
-### ESLint
-
-Our rules are in `eslint.config.mjs`. Disable one with `// eslint-disable-next-line <rule> -- reason` (or `/* eslint-disable-line <rule> -- reason */` in an event attribute).
-
-ESLint checks `app/assets/javascripts` and the JavaScript in templates: their inline `<script>`s (not `src` ones or other types, like JSON) and event attributes (`onclick="..."`), each template as one script, where ERB output is the global `__erb`. Scripts share the page's globals, so a library or a function another file or template defines needs adding to `libraries` or `shared` in `eslint.config.mjs`.
-
-- `no-restricted-syntax`: The `DesignClasses` rules above (showing and hiding; `-success`, `badge-*` and `.label`; Bootstrap 4 leftovers; `form-select`), in the strings and template literals of scripts
-- `no-restricted-globals`: Requests use jQuery (`$.get`, `$.getJSON`, `$.post`, `$.ajax`), not `fetch`. Where an API needs a real Promise (`ClipboardItem`), wrap the request: `Promise.resolve($.get(url))`
-- `eqeqeq` (`smart`): `===` and `!==`, as `==` converts types (`'' == 0`). `== null` is fine, matching null and undefined; compare ids from different sources as strings (`String(a) === String(b)`)
-- `prefer-const` and `no-loop-func` (a closure made in a loop sees a `var`'s last value: declare it with `const` or `let` in the loop)
-
-### Stylelint
-
-Our rules are in `stylelint.config.mjs`. Disable one with `/* stylelint-disable <rule> -- reason */` and `/* stylelint-enable <rule> */` (or `/* stylelint-disable-line <rule> -- reason */`; in a template, `<%# stylelint-disable-next-line <rule> -- reason %>` also works, and prints nothing, which suits CSS in a style attribute or Ruby string).
-
-Stylelint checks `app/assets/stylesheets` and the CSS in templates: their `<style>`s and `style="..."` attributes (including those in Ruby strings, but not `style:` options), each template as one stylesheet, where ERB output in a value is `__erb`.
-
-- `declaration-property-value-disallowed-list` and `color-named`: Colours come from tokens (`--theme-*`, `--color-*`, `--bs-gray-*`, `--hairline`...), so organisation themes follow: never hex values, `rgb()`/`hsl()` of numbers or named colours, which the check allows only where a custom property is defined. Translucent black and white are `rgba(var(--bs-black-rgb), a)` and `rgba(var(--bs-white-rgb), a)`; don't add other translucent tints beyond those the design guide lists (not checked)
-- `declaration-property-value-disallowed-list`: Radii come from Bootstrap's variables (`--bs-border-radius`, `-sm`, `-lg`, `-xl`, `-pill`), or are 0, 50% or inherit. A shadow with blur is an elevation, so it's one of Bootstrap's (`--bs-box-shadow-sm`, `--bs-box-shadow`, `--bs-box-shadow-lg` or the `shadow-*` classes); unblurred rings (the focus ring, hairline rings, image overlays) are fine. The check flags lengths in radii and blurred shadows
-- `declaration-property-unit-disallowed-list`: Spacing comes from the scale: Bootstrap's spacing utilities in markup, `--space-*` tokens in CSS, never px. Off the scale only to size a control to match another or to line up with a fixed layout dimension (the design guide's Spacing lists them). Other sizes are in rem (or em); px only for hairlines, shadows, the focus ring, breakpoints and Google Maps overrides. The check flags px in margins, padding, gaps, insets (`inset*`, `top`, `right`, `bottom`, `left`) and font sizes
-- `declaration-property-value-disallowed-list`: Motion: transitions animate only colours, shadows, masks, opacity, `translate` and `rotate` (not `all`, `transform`, `scale` or sizes), over `--transition-fast` or `--transition-enter` rather than a duration of their own, and only loading indicators loop (`infinite`). Loading indicators, which may loop on their own timing, disable it where they are, as do the one other loop, the signed-out home's typewriter cursor, which blinks as it pauses, and the guide's two older exceptions (the quick theme colours and feedback stars grow on hover); don't add more
-- `declaration-property-value-disallowed-list` (override for `event_details.css`, `email.css` and the email templates, `emails/` and `layouts/email.erb` and `pmail.erb`): Emails, and the stylesheets inlined into them, can't use CSS custom properties (`var(--x)`). The colour, radius, shadow and spacing checks above don't apply to them
-
-### Herb
-
-Herb (https://herb-tools.dev) parses each template's HTML and ERB together, so it checks the HTML's structure, which erb_lint doesn't. Its config is `.herb.yml`, which turns on only the rules below: most of Herb's others are Rails conventions (`.html.erb` names, Turbo, no `@` variables in partials, CSP nonces) or style. Its disable comment takes no reason, so give it in an ERB comment on the line above: `<%# sheets.js fills it in %>` then `<h3></h3> <%# herb:disable html-no-empty-headings %>` at the end of the line it's on.
-
-- `parser-no-errors`: Each tag closes in the template and the scope (`if` branch, block) it opens in, so a template doesn't leave a tag for another to close: pass it the extra content instead (`events/_block_main.erb`'s `extra_items`, built with `capture_html`). Each ERB tag holds whole control flow: `<% case x %>` and `<% when 1 %>` in tags of their own, and not a block and an `if` in one tag (`<% xs.each { |x| next unless x %>`, not `<% xs.each { |x| if x %>`). It can't be disabled, and a template it fails is checked for nothing else
-- `html-no-duplicate-attributes`, `html-no-self-closing` (`<i />` opens an `<i>` that stays open) and `html-require-closing-tags`
-- `html-img-require-alt` (`alt=""` for decorative images and icons beside their text), `html-iframe-has-title`, `html-no-empty-headings` (a loading placeholder is a `div` with the heading's class) and `html-no-aria-hidden-on-focusable`
-- `erb-no-unused-local-variable`
-- `erb-no-empty-control-flow`: no empty branches (`<% if x %><% else %>...` is `<% unless x %>...`)
-
-### zizmor
-
-zizmor (https://docs.zizmor.sh) audits the GitHub Actions workflows and actions in `.github` for security problems, with its default audits, run by `uvx` (install uv if you don't have it). In CI, which gives it a `GH_TOKEN`, it also runs its online audits; elsewhere `script/lint` runs it offline, as a token outside CI (cloud agents have one) may not reach GitHub's API. Ignore a finding on a line with `# zizmor: ignore[<audit>] -- reason`.
-
-- `unpinned-uses`: Actions are pinned to a commit, with its release as a comment: `uses: actions/checkout@<sha> # v4.4.0`, a release at least 7 days old (Dependencies). CI's online audits check the comment matches the commit
-- `artipacked`: Checkouts set `persist-credentials: false`, unless a later step pushes with git
-- `self-repository`: Actions in this repository are `uses: $/.github/actions/...`, not `./.github/actions/...`
-
-### actionlint
-
-actionlint (https://github.com/rhysd/actionlint) checks the GitHub Actions workflows in `.github/workflows`: their syntax, expressions, types and the `run:` scripts, which it checks with ShellCheck (below), run by `uvx` from the `actionlint-py` package with `shellcheck-py` beside it. Its config, `.github/actionlint.yaml`, ignores its one message about the `$/` self-repository syntax (zizmor's `self-repository`), which it doesn't know yet. It has no disable comments: a finding that genuinely doesn't apply gets an `ignore` pattern there, with a comment saying why. It looks for its config in the git repository it's run in.
-
-### ShellCheck
-
-ShellCheck (https://www.shellcheck.net) checks the shell scripts (`*.sh`, like `script/agent-env/`, and the hooks in `.githooks`) with all its checks, run by `uvx` from the `shellcheck-py` package, which ships its binary. Disable one on the line above with `# shellcheck disable=SC2086 # reason` (ShellCheck can't parse `--` after a directive). A script that sources a file outside the repository (`/etc/os-release`) says so with `# shellcheck source=/dev/null`, which isn't a disable.
-
-### Other checks
-
-Rules no linter covers, checked by `test/lint_test.rb` or `script/lint` (both run by CI's lint job and the pre-commit hook). Each names its check.
-
-- `test_mcp_copies_match_mcp_json`: `.cursor/mcp.json`, `.opencode/opencode.json` and `.codex/config.toml` are copies of `.mcp.json`: only edit `.mcp.json`, then run `rake mcp:sync` (Cloud agents)
-- `test_ci_runs_every_test_file`: CI's test jobs, one per test file, are listed in `.github/workflows/ruby.yml`: add a new test file there (Tests)
-- `test_every_disable_says_why`: every disable comment gives its reason, after `--` (or after `Linter:` for erb_lint, or in an ERB comment on the line above for Herb), including zizmor's in `.github` and ShellCheck's (after `#`), as each linter's section shows
-- `test_dependency_versions_are_exact`: the root `package.json`, `frontend/package.json` (the CDN packages), the CDN files' URLs and the packages rake tasks install name exact versions, so none arrives unchosen (Dependencies)
-- `test_cdn_files_have_integrity`: every CDN file the app loads has a hash in `frontend/integrity.json`, no hash is left over, and `frontend/package.json` lists only packages the app loads (Dependencies)
-- `test_ckeditor_stays_on_37`: CKEditor stays on 37 (Build/vendored code)
-- `test_iframe_resizer_stays_on_4`: iframe-resizer stays on 4 (Dependencies)
-- `script/lint`: `bootstrap5.css`, `ext/ckeditor.js` and the jQuery UI builds (`ext/jquery-ui-*.min.js`) are built (Build/vendored code), so a commit that changes one without its source (`bootstrap5.scss`, `ckeditor/`, or `tasks/build.rake`, where their rake tasks are) fails
-
 ## Committing
 
 Commit only the changes you made: other sessions may be editing the same checkout, so stage your files by name rather than with `git add -A` or `git commit -a`.
 
-`script/lint` runs our linters, RuboCop, erb_lint, ESLint, Stylelint, Herb, zizmor, actionlint and ShellCheck, each on the files of its kind. CI's lint job (`.github/workflows/ruby.yml`) runs it too, so it is the one place their commands and flags are set: change a linter's flags or add a linter there, not in the workflow. Run it on the files you added or changed as you go, and fix what it reports:
+## Linting
+
+`script/lint` runs our linters, each on the files of its kind: RuboCop, with our own cops (`.rubocop/dandelion/`), also on the Ruby in templates through erb_lint; erb_lint (`.erb_linters/`); ESLint (`eslint.config.mjs`) and Stylelint (`stylelint.config.mjs`), also on the scripts and styles in templates; Herb (`.herb.yml`); zizmor and actionlint (`.github/actionlint.yaml`) on `.github`; ShellCheck; and `test/lint_test.rb`, which tests our checks and the rules no linter covers. Each rule's message says what to do instead, and its config or code says why. CI's lint job runs it, so it is the one place their commands and flags are set. Run it on the files you add or change as you go, and fix what it reports:
 
 ```bash
 script/lint <files>
 ```
 
-If a linter's config is among them (`.rubocop.yml`, `.rubocop/`, `.erb_lint.yml`, `.erb_linters/`, `eslint.config.mjs`, `stylelint.config.mjs`, `.herb.yml`, `package.json`, `zizmor.yml`, `.github/actionlint.yaml`, `.shellcheckrc`), it runs that linter on everything, as CI does; `script/lint --all` runs them all, and `--only <linter>` just one. Run `npm ci` first if `node_modules` is missing, and install uv (https://docs.astral.sh/uv/) if `uvx` is.
-
-The pre-commit hook (`.githooks/pre-commit`) runs `script/lint --staged`, which lints the staged version of each staged file, so another session's unstaged edits don't count (`test/lint_test.rb`, which it runs when you commit a file it checks, reads from disk). Git runs it once `core.hooksPath` is `.githooks`, which `script/agent-env/install.sh` sets; in a checkout of your own, run `git config core.hooksPath .githooks` once. If it fails, fix the offenses (or disable a check where its rule genuinely doesn't apply, as above) and commit again. Never skip it with `--no-verify`.
+- A linter's config among the files runs that linter on everything, as CI does; `--all` runs them all, and `--only <linter>` just one. Run `npm ci` first if `node_modules` is missing, and install uv (https://docs.astral.sh/uv/) if `uvx` is
+- The pre-commit hook (`.githooks/pre-commit`) runs `script/lint --staged`, on the staged version of each file, so another session's unstaged edits don't count. Git runs it once `core.hooksPath` is `.githooks` (`script/agent-env/install.sh` sets it; otherwise run `git config core.hooksPath .githooks` once). If it fails, fix the offenses and commit again. Never skip it with `--no-verify`
+- Disable a check only where its rule genuinely doesn't apply, and say why (`test_every_disable_says_why`): `# rubocop:disable Dandelion/... -- reason`, `<%# erb_lint:disable DesignClasses: reason %>`, `// eslint-disable-next-line <rule> -- reason`, `/* stylelint-disable-line <rule> -- reason */` (or `<%# stylelint-disable-next-line <rule> -- reason %>` in a template), `# zizmor: ignore[<audit>] -- reason`, `# shellcheck disable=SC2086 # reason`, and for Herb the reason in an ERB comment on the line above. actionlint has no disable comments: add an `ignore` pattern to its config, saying why
+- Scripts in templates share the page's globals, so a library or a function another file or template defines needs adding to `libraries` or `shared` in `eslint.config.mjs`
+- A rule that code can check gets a check: a cop, linter or config rule, or a test in `test/lint_test.rb`, with cases there (each cop's `@example`, good and bad, is tested as it stands). It doesn't boot the app: `bundle exec ruby -I test test/lint_test.rb`
 
 ## Crucial restrictions
 
@@ -198,6 +91,7 @@ Straight after a click or submit, assert something on the new page before checki
 ## Conventions
 
 - Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` (`Dandelion/RailsController` checks for Rails habits)
+- URLs name organisations, gatherings, events, activities, local groups and accounts by slug, never by id: find them with `find_by_slug_or_id`, or `activity_from_params` and `local_group_from_params` (`Dandelion/SlugLookup`). Ids from forms and query strings are fine
 - Files in lib are auto-loaded by Padrino.load!. No explicit require is necessary.
 - `lib/form_builder.rb` defines the `_block` helpers like `text_block`, `wysiwyg_block` etc.
 - You can find documentation at app/views/docs/md. Keep it up to date.
@@ -220,13 +114,13 @@ Straight after a click or submit, assert something on the new page before checki
 
 ## Design
 
-The design guide (`/design`, `app/views/design.erb`) shows the colours, type, spacing, components and their classes. Check it before styling anything, and keep it up to date when you change them. The rules it doesn't spell out are below, apart from those with a check (showing and hiding, success and badge classes, colours, spacing), which are in Custom checks:
+The design guide (`/design`, `app/views/design.erb`) shows the colours, type, spacing, components and their classes. Check it before styling anything, and keep it up to date when you change them. The rules it doesn't spell out are below, apart from those with a check (showing and hiding, success and badge classes, colours, spacing), which the linters check:
 
 - Stylesheets are plain CSS. Override Bootstrap in `app.css` (see Build/vendored code for changing its variables). Page-specific styles go in their own file loaded only by those pages (e.g. `docs.css`, `messages.css`)
-- Bootstrap 5 with jQuery: `mb-3` between fields (its `data-bs-*` attributes, logical spacing and `form-select` are checks, under erb_lint)
+- Bootstrap 5 with jQuery: `mb-3` between fields (its `data-bs-*` attributes, logical spacing and `form-select` are checked by erb_lint)
 - Filter forms above lists and tables use `.form-inline` and `.form-group` (kept in `app.css`) inside `.searchForm`; add `.submitOnChange` to submit when a field changes. Date fields take `.datepicker` or `.datetimepicker`, which `forms.js` wires up
 - Tooltips are `data-bs-toggle="tooltip"` and a `title`; `app.js` handles them for the whole page, so content loaded later needs no setup
-- Motion: shows where things come from and go, and is otherwise kept out of the way. State changes fade over `--transition-fast`; things that float (dropdown menus, the confirm popover, flash toasts) fade in over `--transition-enter`, moving at most `--space-2xs`; modals keep Bootstrap's slide; chevrons on things that open in place turn. Nothing bounces or reveals on scroll; what transitions may animate, their durations and looping are a check, under Stylelint
+- Motion: shows where things come from and go, and is otherwise kept out of the way. State changes fade over `--transition-fast`; things that float (dropdown menus, the confirm popover, flash toasts) fade in over `--transition-enter`, moving at most `--space-2xs`; modals keep Bootstrap's slide; chevrons on things that open in place turn. Nothing bounces or reveals on scroll; what transitions may animate, their durations and looping are checked by Stylelint
 - Avatars: `partial :'accounts/square', locals: { account:, size: :xs }` (`:xs` to `:2xl`, default `:sm`, or `:fill`). For a bare `<img>` of an account, use `class="avatar avatar-sm"` rather than a width
 
 ## Dependencies
@@ -234,7 +128,7 @@ The design guide (`/design`, `app/views/design.erb`) shows the colours, type, sp
 Cooldown: never use a gem or JS package version released less than 7 days ago. This guards against supply-chain attacks on freshly published versions. If a version that was just released can't be found, that's why: wait until it's a week old rather than removing or shortening the cooldown.
 
 - Gems: the Gemfile's source has `cooldown: 7`, so Bundler enforces it
-- GitHub Actions are pinned to a commit of a release at least 7 days old, with the release as a comment (`unpinned-uses`, under zizmor), but for ruby/setup-ruby when the Gemfile's Ruby is newer than that release knows: then it's the first release that knows it. zizmor's, actionlint's and ShellCheck's own versions are in `script/lint`, and uv's in `.github/workflows/ruby.yml` and `script/agent-env/install.sh`
+- GitHub Actions are pinned to a commit of a release at least 7 days old, with the release as a comment (zizmor's `unpinned-uses`), but for ruby/setup-ruby when the Gemfile's Ruby is newer than that release knows: then it's the first release that knows it. zizmor's, actionlint's and ShellCheck's own versions are in `script/lint`, and uv's in `.github/workflows/ruby.yml` and `script/agent-env/install.sh`
 - `rake bootstrap:build` runs `npm install` with `--before` set to 7 days ago
 - The root `package.json` is only linters: ESLint, which CI runs as `npx eslint` over `app/assets/javascripts` and the templates in `app/views` (`eslint.config.mjs`), and Stylelint, which it runs over `app/assets/stylesheets` and the templates (`stylelint.config.mjs`, which parses templates with PostCSS, also listed; `npm run lint` runs both), and Herb's linter, which it runs over the templates (`.herb.yml`). It installs from `package-lock.json` (`npm ci`): pin exact versions, and when adding or bumping one run `npm install --before=<the date a week ago>` so its own dependencies are a week old too
 - `ckeditor/` installs from its `yarn.lock`. Yarn 1 has no cooldown, so when refreshing the lockfile (`yarn upgrade`), check the new versions' release dates (`npm view <package> time`) and pin back any that are under a week old

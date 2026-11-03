@@ -26,13 +26,15 @@ module ERBLint
 
       # class="..." attributes and class: '...' options in Ruby
       CLASS_LISTS = /\bclass(?:=|:\s*)(['"])(.*?)\1/m
-      # <select> tags and select_tag calls, which take form-select
+      # <select> tags and select_tag calls, which take form-select, even ones Select2 replaces, so they look right until it
+      # loads (the form builder's select_block adds it)
       SELECTS = /<select\b(?:[^>"']|"[^"]*"|'[^']*')*>|\bselect_tag\b.*?%>/m
       FORM_SELECT = /(?<![\w-])form-select(?![\w-])/
       # Classes added from JavaScript
       CLASS_CALLS = /\b(?:(?:add|remove|toggle)Class|classList\.(?:add|remove|toggle))\(\s*(['"])(.*?)\1/
 
-      # Bootstrap 4 classes and attributes that Bootstrap 5 renamed or dropped, shared with ESLint
+      # Bootstrap 4 classes and attributes that Bootstrap 5 renamed or dropped, with what replaces each, shared with ESLint:
+      # add one there if you find another
       BOOTSTRAP_4 = JSON.parse(File.read(File.expand_path('../config/bootstrap4_leftovers.json', __dir__), encoding: 'UTF-8'))
       BOOTSTRAP_4_CLASSES = BOOTSTRAP_4['classes'].to_h do |entry|
         [/(?<![\w-])(?:#{entry['pattern']})(?![\w-])/, "Bootstrap 4 class: in Bootstrap 5, use #{entry['use']}."]

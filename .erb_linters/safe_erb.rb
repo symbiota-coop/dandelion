@@ -2,6 +2,10 @@
 
 module ERBLint
   module Linters
+    # ERB output in a <script> is <%== x.to_json %>, and in an event attribute (onclick="...") <%= x.to_json %>; no <%==,
+    # raw or .html_safe in an attribute; and no <% %> statements inside a <script>: put the <% if %> around the script, or
+    # branch in the JavaScript (if ($(this).find('.g-recaptcha').length))
+    #
     # ErbSafety, with two changes:
     # - It leaves out better_html's script type check, whose list of types is fixed: the AllowedScriptType linter checks
     #   script types against our own list instead

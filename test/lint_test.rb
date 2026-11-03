@@ -1,4 +1,4 @@
-# Tests our own checks (AGENTS.md, Custom checks): the Dandelion cops, the erb_lint linters, the ESLint, Stylelint and
+# Tests our own checks (AGENTS.md, Linting): the Dandelion cops, the erb_lint linters, the ESLint, Stylelint and
 # Herb rules, and script/lint. It doesn't boot the app, so it runs without foreman or Mongo:
 #
 #   bundle exec ruby -I test test/lint_test.rb
@@ -119,11 +119,6 @@ class LintTest < Minitest::Test
     cop = RuboCop::Cop::Registry.global.find_by_cop_name('Dandelion/Redcarpet')
     assert_empty cop_offenses(cop, 'Redcarpet::Markdown.new(x)', 'lib/markdown_renderer.rb')
     assert_equal 1, cop_offenses(cop, 'Redcarpet::Markdown.new(x)', 'lib/x.rb').size
-  end
-
-  def test_agents_md_lists_each_cop
-    listed = File.read(File.join(ROOT, 'AGENTS.md'), encoding: 'UTF-8').scan(/^- `(Dandelion\/\w+)`/).flatten
-    assert_equal DANDELION_COPS.map(&:cop_name).sort, listed.sort
   end
 
   # The offenses erb_lint (with .erb_lint.yml) finds in a template, as [linter, message]
@@ -260,7 +255,7 @@ class LintTest < Minitest::Test
     end
   end
 
-  # AGENTS.md, Custom checks: disable a check only where its rule doesn't apply, and say why in the comment
+  # AGENTS.md, Linting: disable a check only where its rule doesn't apply, and say why in the comment
   DISABLES = {
     /rubocop:(?:disable|todo)\s/ => /rubocop:(?:disable|todo) [\w\/, ]+ -- \S/,
     /eslint-disable(?:-next-line|-line)?\s/ => /eslint-disable(?:-next-line|-line)? [\w\/@, -]+ -- \S/,

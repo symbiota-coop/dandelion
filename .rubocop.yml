@@ -3,7 +3,7 @@
 # (Style, Layout, Naming, Minitest) are off, so plain `rubocop` reports what CI does.
 # .erb_lint.yml inherits this file for the Ruby in templates.
 
-# Our own cops (.rubocop/dandelion), which check rules from AGENTS.md
+# Our own cops (.rubocop/dandelion), each explaining its rule in its doc comment
 require:
   - ./.rubocop/dandelion.rb
 

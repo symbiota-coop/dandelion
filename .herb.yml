@@ -1,5 +1,7 @@
 # Herb (https://herb-tools.dev) parses each template's HTML and ERB together, so it catches broken HTML structure that
-# erb_lint, which looks at the ERB tags, doesn't. script/lint runs it; AGENTS.md (Custom checks, Herb) lists the rules
+# erb_lint, which looks at the ERB tags, doesn't. script/lint runs it. Its disable comment takes no reason, so give it in an
+# ERB comment on the line above: <%# sheets.js fills it in %>, then <%# herb:disable html-no-empty-headings %> at the end of
+# the line it's on
 version: 0.11.1
 
 framework: sinatra
@@ -19,7 +21,10 @@ linter:
     all:
       enabled: false
 
-    # Templates parse: tags close in the scope they open in, and each ERB tag holds whole Ruby control flow
+    # Templates parse: each tag closes in the template and the scope (if branch, block) it opens in, so a template doesn't
+    # leave a tag for another to close: pass it the extra content instead (events/_block_main.erb's extra_items, built
+    # with capture_html). Each ERB tag holds whole control flow: <% case x %> and <% when 1 %> in tags of their own, and
+    # not a block and an if in one tag. It can't be disabled, and a template it fails is checked for nothing else
     parser-no-errors:
       enabled: true
     html-no-duplicate-attributes:
@@ -33,6 +38,7 @@ linter:
       enabled: true
     html-iframe-has-title:
       enabled: true
+    # A loading placeholder is a div with the heading's class
     html-no-empty-headings:
       enabled: true
     html-no-aria-hidden-on-focusable:

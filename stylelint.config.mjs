@@ -38,14 +38,17 @@ export default {
     'declaration-property-value-disallowed-list': [
       {
         // Colours come from tokens: a hex or rgb()/hsl()... of numbers only where a token is defined (--color-x: #...).
-        // Translucent black and white are rgba(var(--bs-black-rgb), a), which this allows
+        // Translucent black and white are rgba(var(--bs-black-rgb), a), which this allows; don't add other translucent tints
+        // beyond those the design guide lists
         '/^(?!--)/': ['/#[0-9a-fA-F]{3,8}\\b/', '/\\b(rgb|hsl|hwb|lab|lch|oklab|oklch)a?\\(\\s*[\\d.]/'],
         // Radii come from Bootstrap's variables (--bs-border-radius*), or are 0, 50% or inherit
         '/radius$/': ['/\\d(px|r?em)\\b/'],
         // A blurred shadow is an elevation, so it's one of Bootstrap's: unblurred rings (the focus ring, overlays) are fine
         '/^(box|text)-shadow$/': ['/(^|,)\\s*(inset\\s+)?-?[\\d.]+[a-z]*\\s+-?[\\d.]+[a-z]*\\s+(\\d*\\.)?\\d*[1-9]/'],
         // Motion: transitions animate only colours, shadows, masks, opacity, translate and rotate (nothing scales or grows),
-        // over --transition-fast or --transition-enter, and only loading indicators loop
+        // over --transition-fast or --transition-enter, and only loading indicators loop. Loading indicators, which may loop on
+        // their own timing, disable it where they are, as do the signed-out home's typewriter cursor and the design guide's two
+        // older exceptions (the quick theme colours and feedback stars grow on hover); don't add more
         '/^transition(-property|-duration)?$/': [
           '/(^|,)\\s*(all|transform|scale|width|height|max-height|min-height|top|right|bottom|left|inset|margin[\\w-]*|padding[\\w-]*)(\\s|,|$)/',
           '/(^|[\\s,])\\d*\\.?\\d+m?s(\\s|,|$)/'
@@ -67,7 +70,9 @@ export default {
       }
     ],
     'color-named': ['never', { ignoreProperties: ['/^--/'], message: 'Use a colour token (--bs-white, --bs-black...), not a named colour' }],
-    // Spacing comes from the scale (--space-* in CSS) and other sizes are in rem or em
+    // Spacing comes from the scale (Bootstrap's spacing utilities in markup, --space-* in CSS) and other sizes are in rem or
+    // em. Off the scale only to size a control to match another or to line up with a fixed layout dimension (the design
+    // guide's Spacing lists them); px only for hairlines, shadows, the focus ring, breakpoints and Google Maps overrides
     'declaration-property-unit-disallowed-list': [
       { '/^(margin|padding|gap|row-gap|column-gap|inset)/': ['px'], '/^(top|right|bottom|left)$/': ['px'], 'font-size': ['px'] },
       { message: 'Use --space-* for spacing and insets and rem or em for font sizes, not px' }
