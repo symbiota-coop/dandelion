@@ -124,6 +124,7 @@ jobs:
           - orders
           - organisations
           - pmails
+          - resales
           - search
           - ticket_types
           - tour
