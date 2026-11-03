@@ -70,14 +70,14 @@ $(function () {
     return p
   }
 
+  function donation () {
+    if ($('#donation_amount').length > 0 && $('#donation_amount').val() !== '') { return parseFloat($('#donation_amount').val()) }
+    return 0
+  }
+
   function price () {
-    let p = 0
-
-    p += priceWithoutDonation()
-
-    if ($('#donation_amount').length > 0 && $('#donation_amount').val() !== '') { p += parseFloat($('#donation_amount').val()) }
-
-    return p
+    if (ticketsPaidFor()) { return priceWithoutDonation() }
+    return priceWithoutDonation() + donation()
   }
 
   function credit () {
@@ -96,10 +96,18 @@ $(function () {
     return d
   }
 
+  // As OrderBuilder#apply_donation_and_discounts: a donation to Dandelion is our fee, so credit and fixed discounts pay
+  // only for the tickets, and tickets they pay for in full complete without a payment, so without the donation
+  function ticketsPaidFor () {
+    return !!config.donationsToDandelion && priceWithoutDonation() > 0 && (priceWithoutDonation() - credit() - fixedDiscount()) <= 0
+  }
+
   function balance () {
-    let b = price() - credit() - fixedDiscount()
-    if (b < 0) { b = 0 }
-    return b
+    if (config.donationsToDandelion) {
+      if (ticketsPaidFor()) { return 0 }
+      return Math.max(0, priceWithoutDonation() - credit() - fixedDiscount()) + donation()
+    }
+    return Math.max(0, price() - credit() - fixedDiscount())
   }
 
   $donationAmount.focus(function () {
@@ -398,6 +406,13 @@ $(function () {
         confirmed_duplicate: confirmed.duplicate ? '1' : '',
         confirmed_email: confirmed.email ? '1' : ''
       }, function (data) {
+        // An order OrderBuilder completed without a payment (credit or a fixed discount paid for the tickets) comes back
+        // with only its id, as an RSVP's does
+        if (data && data.order_id && Object.keys(data).length === 1) {
+          closePaymentWindow()
+          handlers.rsvp(data)
+          return
+        }
         (handlers[method] || handlers.default)(data)
       }).fail(function (xhr) {
         let json = {}
