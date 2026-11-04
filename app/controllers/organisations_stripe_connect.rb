@@ -65,7 +65,19 @@ Dandelion::App.controller do
         code: params[:code],
         grant_type: 'authorization_code'
       )
-      raise "Stripe OAuth token exchange failed with status #{response.status}" unless response.success?
+      unless response.success?
+        stripe_error = begin
+          JSON.parse(response.body)['error']
+        rescue JSON::ParserError
+          nil
+        end
+        # Stripe's codes are single-use, so this is a repeated or expired link (a reload or back button), not a fault
+        if stripe_error == 'invalid_grant'
+          flash[:error] = 'That Stripe connection link has already been used or has expired. Please try connecting again.'
+          redirect "/o/#{@organisation.slug}"
+        end
+        raise "Stripe OAuth token exchange failed with status #{response.status} (#{stripe_error || 'no error code'})"
+      end
 
       stripe_connect_json = response.body
       stripe_user_id = JSON.parse(stripe_connect_json).fetch('stripe_user_id')
