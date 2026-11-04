@@ -7,9 +7,10 @@
   </a>
 <% elsif (event.live? || tc > 0) %>
   <a href="/e/<%= event.slug %>/tickets">
-    <% if defined?(full_width) && !event.capacity %>
+    <%# Always the ticket count, above any bar: the bar counts places, which differ when a ticket type takes more than one %>
+    <% if defined?(full_width) %>
       <%= pluralize(tc, 'ticket') %>
-    <% elsif !defined?(full_width) %>
+    <% else %>
       <%= tc %>
     <% end %>
   </a>
