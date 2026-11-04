@@ -7,31 +7,15 @@ Dandelion::App.controller do
       redirect "/o/#{@organisation.slug}/edit#tab-payments"
     end
     begin
-      response = Faraday.new { |f| f.request :url_encoded }.post(
-        'https://connect.stripe.com/oauth/token',
-        client_secret: ENV['STRIPE_SK'],
-        code: params[:code],
-        grant_type: 'authorization_code'
-      )
-      unless response.success?
-        stripe_error = begin
-          JSON.parse(response.body)['error']
-        rescue JSON::ParserError
-          nil
-        end
-        # Stripe's codes are single-use, so this is a repeated or expired link (a reload or back button), not a fault
-        if stripe_error == 'invalid_grant'
-          flash[:error] = 'That Stripe connection link has already been used or has expired. Please try connecting again.'
-          redirect "/o/#{@organisation.slug}/edit#tab-payments"
-        end
-        raise "Stripe OAuth token exchange failed with status #{response.status} (#{stripe_error || 'no error code'})"
+      stripe_connect_json = stripe_connect_token_exchange(client_secret: ENV['STRIPE_SK'], code: params[:code])
+      if stripe_connect_json
+        stripe_user_id = JSON.parse(stripe_connect_json).fetch('stripe_user_id')
+        stripe_account_json = Stripe::Account.retrieve(stripe_user_id, StripeOpts.call).to_json
+        @organisation.set(stripe_connect_json: stripe_connect_json, stripe_account_json: stripe_account_json)
+        flash[:notice] = 'Connected!'
+      else
+        flash[:error] = STRIPE_CONNECT_LINK_EXPIRED_MESSAGE
       end
-
-      stripe_connect_json = response.body
-      stripe_user_id = JSON.parse(stripe_connect_json).fetch('stripe_user_id')
-      stripe_account_json = Stripe::Account.retrieve(stripe_user_id, StripeOpts.call).to_json
-      @organisation.set(stripe_connect_json: stripe_connect_json, stripe_account_json: stripe_account_json)
-      flash[:notice] = 'Connected!'
     rescue StandardError => e
       ErrorReporting.capture_exception(e)
       flash[:error] = 'There was an error connecting your organisation'
@@ -59,31 +43,15 @@ Dandelion::App.controller do
       redirect "/o/#{@organisation.slug}"
     end
     begin
-      response = Faraday.new { |f| f.request :url_encoded }.post(
-        'https://connect.stripe.com/oauth/token',
-        client_secret: @organisation.stripe_sk,
-        code: params[:code],
-        grant_type: 'authorization_code'
-      )
-      unless response.success?
-        stripe_error = begin
-          JSON.parse(response.body)['error']
-        rescue JSON::ParserError
-          nil
-        end
-        # Stripe's codes are single-use, so this is a repeated or expired link (a reload or back button), not a fault
-        if stripe_error == 'invalid_grant'
-          flash[:error] = 'That Stripe connection link has already been used or has expired. Please try connecting again.'
-          redirect "/o/#{@organisation.slug}"
-        end
-        raise "Stripe OAuth token exchange failed with status #{response.status} (#{stripe_error || 'no error code'})"
+      stripe_connect_json = stripe_connect_token_exchange(client_secret: @organisation.stripe_sk, code: params[:code])
+      if stripe_connect_json
+        stripe_user_id = JSON.parse(stripe_connect_json).fetch('stripe_user_id')
+        stripe_account_json = Stripe::Account.retrieve(stripe_user_id, StripeOpts.call(api_key: @organisation.stripe_sk)).to_json
+        @organisationship.set(stripe_connect_json: stripe_connect_json, stripe_account_json: stripe_account_json)
+        flash[:notice] = "Connected to #{@organisation.name}!"
+      else
+        flash[:error] = STRIPE_CONNECT_LINK_EXPIRED_MESSAGE
       end
-
-      stripe_connect_json = response.body
-      stripe_user_id = JSON.parse(stripe_connect_json).fetch('stripe_user_id')
-      stripe_account_json = Stripe::Account.retrieve(stripe_user_id, StripeOpts.call(api_key: @organisation.stripe_sk)).to_json
-      @organisationship.set(stripe_connect_json: stripe_connect_json, stripe_account_json: stripe_account_json)
-      flash[:notice] = "Connected to #{@organisation.name}!"
     rescue StandardError => e
       ErrorReporting.capture_exception(e)
       flash[:error] = 'There was an error connecting your account'
