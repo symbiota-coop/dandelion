@@ -479,6 +479,63 @@ class ResalesTest < ActiveSupport::TestCase
     assert_equal [20, 20], organiser_emails.pluck(:order_total)
   end
 
+  # Stands in for Stripe while tickets are resold, keeping the amount of each refund in pence
+  def stripe_refund_amounts
+    amounts = []
+    Stripe::PaymentIntent.stub :retrieve, api_object(charges: [api_object(id: 'ch_resold')]) do
+      Stripe::Refund.stub :create, proc { |params, _opts| amounts << params[:amount] } do
+        yield
+      end
+    end
+    amounts
+  end
+
+  test 'a resold ticket is refunded in full when its order keeps a cheaper ticket' do
+    create_event(prices: [30], enable_resales: true)
+    @event.set(capacity: 2)
+    ticket_type = @event.ticket_types.first
+    account = FactoryBot.create(:account)
+    order = Order.create!(event: @event, account: account, value: 40, payment_completed: true, payment_intent: 'pi_resold', currency: 'GBP')
+    original = ticket_type.tickets.create!(event: @event, order: order, account: account, payment_completed: true, price: 30, payment_intent: 'pi_resold', made_available_at: Time.now)
+    kept = ticket_type.tickets.create!(event: @event, order: order, account: account, payment_completed: true, price: 10, payment_intent: 'pi_resold')
+    replacement = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 30)
+
+    amounts = stripe_refund_amounts { complete_without_notifications(replacement) }
+    assert original.reload.deleted?
+    refute kept.reload.deleted?
+    assert_equal [3000], amounts
+  end
+
+  test 'two tickets resold from one order are each refunded in full' do
+    create_event(prices: [30], enable_resales: true)
+    @event.set(capacity: 2)
+    single = @event.ticket_types.first
+    pair = @event.ticket_types.create!(name: 'Pair', price: 60, quantity: 10, slots: 2)
+    account = FactoryBot.create(:account)
+    order = Order.create!(event: @event, account: account, value: 60, payment_completed: true, payment_intent: 'pi_resold', currency: 'GBP')
+    2.times do |i|
+      single.tickets.create!(event: @event, order: order, account: account, payment_completed: true, price: 30, payment_intent: 'pi_resold', made_available_at: (i + 1).minutes.ago)
+    end
+    replacement = pair.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 60)
+
+    amounts = stripe_refund_amounts { complete_without_notifications(replacement) }
+    assert_equal 0, order.tickets.count
+    assert_equal [3000, 3000], amounts
+  end
+
+  test 'a removed ticket is refunded no more than its order paid' do
+    create_event(prices: [30])
+    account = FactoryBot.create(:account)
+    order = Order.create!(event: @event, account: account, value: 20, credit_applied: 10, payment_completed: true, payment_intent: 'pi_credit', currency: 'GBP')
+    ticket = @event.ticket_types.first.tickets.create!(event: @event, order: order, account: account, payment_completed: true, price: 30, payment_intent: 'pi_credit')
+    # Removed as a sale claims it, and its order loaded, which puts it back in that copy of the order's tickets
+    Ticket.collection.update_one({ _id: ticket.id }, { '$set' => { deleted_at: Time.now } })
+    assert_equal 20, ticket.order.total
+
+    amounts = stripe_refund_amounts { ticket.refund }
+    assert_equal [2000], amounts
+  end
+
   test 'a sale while places are left leaves tickets on resale alone' do
     covers 'events/resale-only-when-full@d69dd8'
     create_event(prices: [0], enable_resales: true)

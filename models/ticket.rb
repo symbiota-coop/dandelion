@@ -353,6 +353,9 @@ class Ticket
   def refund
     return unless event && event.organisation && discounted_price && discounted_price > 0 && payment_completed && refundable?
 
+    # order.total counts this ticket even once it's removed, as a ticket on resale is when a sale claims it, before it's
+    # refunded: loading a ticket's order puts the ticket in that order's tickets (Mongoid's belongs_to binding), whatever
+    # the database says. So read the order through this ticket, not afresh, or a resold ticket's refund leaves it out
     refund_amount = order ? [discounted_price, order.total].min : discounted_price
     return if refund_amount <= 0
 
