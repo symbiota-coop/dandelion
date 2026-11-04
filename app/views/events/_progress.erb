@@ -15,7 +15,7 @@
   </a>
   <% if event.capacity && event.capacity > 0; w = ((slots_taken/event.capacity.to_f)*100).round %>
     <a class="d-block text-decoration-none" href="/e/<%= event.slug %>/tickets">
-      <div class="progress" data-bs-toggle="tooltip" title="<%= slots_taken %>/<%= event.capacity %> places filled">
+      <div class="progress" data-bs-toggle="tooltip" title="<%= slots_taken %>/<%= event.capacity %> places filled" data-progress-label="<%= slots_taken %>/<%= event.capacity %>">
         <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
           <% if defined?(full_width) %>
             <%= slots_taken %>/<%= event.capacity %>
