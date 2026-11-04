@@ -51,9 +51,8 @@ $(function () {
       }
       const $item = $('<div class="list-group-item d-flex justify-content-between align-items-start gap-3"></div>')
         .append($('<span class="text-body-secondary"></span>').text(label), $value)
-      // A progress bar (events/_progress.erb) goes on a line of its own below, the width of the sheet
-      const $progress = $value.find('.progress').closest('a')
-      if ($progress.length) $item.addClass('flex-wrap row-gap-1').append($progress.addClass('w-100'))
+      // A progress bar (events/_progress.erb) fills the value column, rather than shrinking to the count's width
+      if ($value.find('.progress').length) $value.addClass('flex-grow-1')
       $list.append($item)
     })
     showSheet('Stats').append($list)
