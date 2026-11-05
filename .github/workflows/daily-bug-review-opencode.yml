@@ -12,6 +12,9 @@ on:
 jobs:
   bug-review:
     runs-on: ubuntu-26.04
+    # A review takes up to about half an hour, so one still going after an hour has hung: fail it then rather than
+    # at GitHub's default of 6 hours
+    timeout-minutes: 60
     permissions:
       actions: read
       contents: read
@@ -53,17 +56,24 @@ jobs:
         run: |
           opencode_log="$(mktemp)"
           opencode_err="$(mktemp)"
+          stream_error="$(mktemp -u)"
 
           # --auto approves every permission request (bash, writing /tmp/issue-body.md outside the checkout...), which
           # `opencode run` would otherwise reject, as there's no one to ask. --print-logs puts opencode's own warnings
           # and errors on stderr, as a model call that fails can otherwise end the run with no event to say why.
+          # When the main (build) agent's model call fails for good (a stream error, e.g. Too Many Requests once its
+          # retries run out), opencode logs it and then waits forever rather than exiting, until the job's timeout
+          # cancels it hours later, so stop it there. (awk reads on to the end, so tee never writes to a closed pipe.)
           # The JSON events are kept for the summary, and shown in the log as a trace of what it's doing
           set +e
           opencode run --auto --model "$OPENCODE_MODEL" --variant "$OPENCODE_EFFORT" \
             --format json \
             --print-logs --log-level WARN \
             "$PROMPT_TEXT" \
-            2> >(tee "$opencode_err" >&2) | tee "$opencode_log" | jq --unbuffered -r -R '
+            2> >(tee "$opencode_err" >(awk -v flag="$stream_error" '
+              !done && /level=ERROR/ && /message="stream error"/ && /agent=build/ {
+                done = 1; system("touch \"" flag "\"; pkill -x opencode")
+              }') >&2) | tee "$opencode_log" | jq --unbuffered -r -R '
               fromjson?
               | if .type == "text" then "\n" + .part.text + "\n"
                 elif .type == "tool_use" then
@@ -88,7 +98,11 @@ jobs:
             [split("\n")[] | fromjson? | select(.type == "step_start" or .type == "step_finish")] | last
             | .type == "step_finish" and .part.reason == "stop"
           ' "$opencode_log")
-          if [ "$opencode_status" -eq 0 ] && [ "$finished" != "true" ]; then
+          if [ -e "$stream_error" ]; then
+            echo "::error::opencode's model call failed (see the stream error above), so it was stopped rather than left waiting."
+            opencode_status=1
+            finished=false
+          elif [ "$opencode_status" -eq 0 ] && [ "$finished" != "true" ]; then
             echo "::error::opencode stopped part-way through the review, without finishing its last step."
             opencode_status=1
           fi

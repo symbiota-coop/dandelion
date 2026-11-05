@@ -12,6 +12,9 @@ on:
 jobs:
   bug-review:
     runs-on: ubuntu-26.04
+    # A review takes up to about half an hour, so one still going after an hour has hung: fail it then rather than
+    # at GitHub's default of 6 hours
+    timeout-minutes: 60
     permissions:
       actions: read
       contents: read
