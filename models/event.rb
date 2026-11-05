@@ -353,6 +353,11 @@ class Event
     end
   end
 
+  # Every ticket type takes one place, so places filled is the ticket count
+  def one_place_per_ticket?
+    ticket_types.to_a.all? { |ticket_type| ticket_type.slots == 1 }
+  end
+
   def places_remaining
     capacity - slots_taken if capacity
   end

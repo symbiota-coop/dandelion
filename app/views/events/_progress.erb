@@ -1,20 +1,24 @@
 <% tc = event.ticket_count %>
 <% slots_taken = event.slots_taken if event.capacity %>
+<%# The bar counts places, which differ from tickets when a ticket type takes more than one: then show the ticket count above it too %>
+<% bar = event.capacity && event.capacity > 0 %>
+<% show_count = !bar || !event.one_place_per_ticket? %>
 
 <% if event.purchase_url %>
   <a target="_blank" href="<%= event.purchase_url %>">
     <span class="badge text-bg-primary"><%= HttpUrl.host(event.purchase_url) %></span>
   </a>
 <% elsif (event.live? || tc > 0) %>
-  <a href="/e/<%= event.slug %>/tickets">
-    <%# Always the ticket count, above any bar: the bar counts places, which differ when a ticket type takes more than one %>
-    <% if defined?(full_width) %>
-      <%= pluralize(tc, 'ticket') %>
-    <% else %>
-      <%= tc %>
-    <% end %>
-  </a>
-  <% if event.capacity && event.capacity > 0; w = ((slots_taken/event.capacity.to_f)*100).round %>
+  <% if show_count %>
+    <a href="/e/<%= event.slug %>/tickets">
+      <% if defined?(full_width) %>
+        <%= pluralize(tc, 'ticket') %>
+      <% else %>
+        <%= tc %>
+      <% end %>
+    </a>
+  <% end %>
+  <% if bar; w = ((slots_taken/event.capacity.to_f)*100).round %>
     <a class="d-block text-decoration-none" href="/e/<%= event.slug %>/tickets">
       <div class="progress" data-bs-toggle="tooltip" title="<%= slots_taken %>/<%= event.capacity %> places filled" data-progress-label="<%= slots_taken %>/<%= event.capacity %>">
         <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">

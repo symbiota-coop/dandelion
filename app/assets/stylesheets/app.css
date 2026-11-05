@@ -3659,7 +3659,7 @@ img.private:hover {
 
 /* Match the pre-Bootstrap 5 flicker: a faint grey a full line high, fading from opacity 1 to 0.5 */
 .placeholder {
-  background-color: rgba(var(--bs-black-rgb), 0.1);
+  background-color: rgba(var(--bs-black-rgb), 0.06);
   opacity: 1;
   min-height: 1lh;
 }
