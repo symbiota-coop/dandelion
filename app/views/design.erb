@@ -894,7 +894,7 @@
             <% event.define_singleton_method(:slots_taken) { taken } %>
             <div><%= partial :'events/progress', locals: { event: event, **locals } %></div>
           <% end %>
-          <div class="spec">Places filled (events/_progress.erb, _ticket_types_progress.erb), pay and rota progress · --theme-500 on --theme-200 · places filled in the bar's tooltip, and inside the bar too where it's full width · the ticket count as a link above it only when a ticket type takes more than one place, so places can outnumber tickets</div>
+          <div class="spec">Places filled (events/_progress.erb, _ticket_types_progress.erb), pay and rota progress · --theme-500 on --theme-200 · places filled across the middle of the bar (progress-labelled: --theme-800 on the track, white on the fill) · the ticket count as a link above it only when a ticket type takes more than one place, so places can outnumber tickets</div>
           <div class="d-flex align-items-center gap-3">
             <i class="bi bi-spin bi-slash-lg fs-4"></i>
             <span class="placeholder-glow col-4"><span class="placeholder w-100"></span></span>

@@ -56,14 +56,6 @@ $(function () {
       $list.append($item)
     })
     showSheet('Stats').append($list)
-    // Show places filled inside each bar where they fit in its filled part
-    $list.find('[data-progress-label]').each(function () {
-      const bar = $(this).children('.progress-bar')[0]
-      if (!bar || bar.textContent.trim()) return
-      // Measured against the width the bar should have, as a bar widens to fit its text (and its column stretches the span)
-      const label = $('<span class="align-self-center px-1"></span>').text($(this).attr('data-progress-label')).appendTo(bar)[0]
-      if (label.offsetWidth > this.clientWidth * parseFloat(bar.style.width) / 100) label.remove()
-    })
   })
 
   function showSheet (title) {

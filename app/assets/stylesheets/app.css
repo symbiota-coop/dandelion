@@ -1085,6 +1085,28 @@ p.action a {
   --bs-progress-bar-bg: var(--theme-500);
 }
 
+/* A bar with its count across the middle (events/_progress.erb): dark on the track, and again light on the filled part,
+   clipped to it, so the count reads wherever the fill ends. --progress is the filled width */
+.progress-labelled {
+  position: relative;
+}
+
+.progress-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-800);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.progress-label-on-bar {
+  color: var(--bs-progress-bar-color);
+  clip-path: inset(0 calc(100% - var(--progress)) 0 0);
+}
+
 .form-check-input:focus {
   box-shadow: var(--focus-ring);
 }
