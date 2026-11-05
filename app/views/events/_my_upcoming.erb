@@ -20,7 +20,7 @@
       <td>
         <h4 class="mb-2">
           <a href="/e/<%= event.slug %>"><%= event.name %></a>
-          <div data-with-placeholder class="d-inline" data-pagelet-url="/e/<%= event.slug %>/star?block_edit=1"><i class="bi bi-star opacity-0"></i></div>
+          <div data-with-placeholder class="d-inline" data-pagelet-url="/e/<%= event.slug %>/star?block_edit=1"><i class="bi bi-star opacity-0 block-edit"></i></div>
         </h4>
         <% if event_admin?(event) %>
           <div class="mb-3">
