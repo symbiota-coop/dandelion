@@ -22,7 +22,7 @@
     <td>
       <strong>
         <% if gathering_admin? || option.cost == 0 %>
-          <a href="/g/<%= @gathering.slug %>/options/<%= option.id %>/edit">
+          <a href="/g/<%= @gathering.slug %>/options/<%= option.id %>/edit" data-open-in-modal>
             <%= option.name %>
           </a>
         <% else %>

@@ -183,6 +183,23 @@ class GatheringsTest < ActiveSupport::TestCase
     assert_equal 100, @gathering.options.find_by(name: 'Cabin').cost
   end
 
+  test 'admins edit an option in a modal from the options page' do
+    create_gathering
+    option = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account)
+    sign_in(@account)
+
+    visit "/g/#{@gathering.slug}/options"
+    click_link 'Tent'
+    within '#modal' do
+      assert page.has_field? 'Name', with: 'Tent'
+      fill_in 'Name', with: 'Bell tent'
+      click_button 'Update option'
+    end
+    assert page.has_content? 'Bell tent'
+    assert page.has_current_path?("/g/#{@gathering.slug}/options", ignore_query: true)
+    assert_equal 'Bell tent', option.reload.name
+  end
+
   test 'inventory item cannot be assigned a team from another gathering' do
     create_two_gatherings
     other_team = @other_gathering.teams.create!(name: 'Kitchen', account: @other_account)

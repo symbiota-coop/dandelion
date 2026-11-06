@@ -50,7 +50,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     @option = @gathering.options.find(params[:id]) || not_found
     @option.cost > 0 ? gathering_admins_only! : membership_required!
-    erb :'options/build'
+    request.xhr? ? partial(:'gatherings/modal_content', locals: { title: @option.name, form: :'options/build' }) : erb(:'options/build')
   end
 
   post '/g/:slug/options/:id/edit' do
