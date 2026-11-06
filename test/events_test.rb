@@ -103,6 +103,18 @@ class EventsTest < ActiveSupport::TestCase
     get path, params, { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }
   end
 
+  test 'upcoming events on the home page show whether each is starred, with the page' do
+    create_event(as: :starred_event)
+    create_event(as: :unstarred_event)
+    @unstarred_event.tickets.create!(account: @account, ticket_type: FactoryBot.create(:ticket_type, event: @unstarred_event), payment_completed: true)
+    @starred_event.event_stars.create!(account: @account)
+
+    sign_in_with_rack(@account)
+    get '/'
+    assert_includes last_response.body, %(href="/e/#{@starred_event.slug}/unstar")
+    assert_includes last_response.body, %(href="/e/#{@unstarred_event.slug}/do_star")
+  end
+
   test 'creating an event' do
     create_organisation
     event = FactoryBot.build_stubbed(:event)
