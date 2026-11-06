@@ -226,15 +226,14 @@ Dandelion::App.controller do
     @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     @event.event_facilitations.create(account_id: params[:event_facilitation][:account_id])
-    # Back to the facilitators rather than the top of the page, to add another
-    redirect back('#facilitators')
+    redirect back
   end
 
   post '/e/:slug/event_facilitations/destroy' do
     @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     @event.event_facilitations.find_by(account_id: params[:account_id]).try(:destroy)
-    redirect back('#facilitators')
+    redirect back
   end
 
   get '/e/:slug/pmails' do

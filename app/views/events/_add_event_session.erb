@@ -1,4 +1,4 @@
-<ul class="icon-list mb-0" id="event-sessions">
+<ul class="icon-list mb-0 add-remove-box" id="event-sessions">
   <% event_sessions.each_with_index { |event_session,i| %>
   <li <% if i > 2 %> style="display:none" <% end %>>
     <i data-bs-toggle="tooltip" title="Session <%= i+1 %>" class="bi bi-clock"></i>
@@ -25,6 +25,7 @@
       <a data-bs-toggle="tooltip" title="Add a session" id="add-event-session" href="javascript:;" onclick="$(this).hide().next().show(); $('#remove-event-session').hide()"><i class="bi bi-plus-square-fill"></i></a>
       <div style="display: none;">
         <% form_for new_object, new_url, class: 'bg-white shadow-sm p-3 mb-3 rounded', style: 'position: relative; top: 0.5rem' do |f| %>
+          <%= hidden_field_tag :_anchor, value: 'event-sessions' %>
           <%= f.datetime_block :start_time, data: { 'flatpickr-min-date': @event.start_time.to_fs(:db_local), 'flatpickr-max-date': @event.end_time.to_fs(:db_local), 'flatpickr-linked-end': '#event_session_end_time' } %>
           <%= f.datetime_block :end_time, data: { 'flatpickr-min-date': @event.start_time.to_fs(:db_local), 'flatpickr-max-date': @event.end_time.to_fs(:db_local) } %>
           <%= f.submit_block button_text: 'Add session' %>
@@ -34,6 +35,7 @@
         <a data-bs-toggle="tooltip" title="Remove a session" id="remove-event-session" href="javascript:;" onclick="$(this).hide().next().show(); $('#add-event-session').hide()"><i class="bi bi-dash-square-fill"></i></a>
         <div style="display: none">
           <% form_tag destroy_url, class: 'bg-white shadow-sm p-3 mb-3 rounded', style: 'position: relative; top: 0.5rem' do |f| %>
+            <%= hidden_field_tag :_anchor, value: 'event-sessions' %>
             <%= select_tag :event_session_id, options: event_sessions.map { |event_session| [when_details(event_session, with_zone: false), event_session.id] }, class: 'form-select mb-1' %>
             <%= submit_tag 'Remove session', class: 'btn btn-danger' %>
           <% end %>

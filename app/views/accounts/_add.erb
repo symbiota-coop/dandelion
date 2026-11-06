@@ -1,27 +1,32 @@
-<div class="image-wall mb-1">
-  <% accounts.each { |account| %>
-  <%= partial :'accounts/square', locals: { account: account } %>
-  <% } %>
-</div>
-<% if add_and_remove %>
-  <div>
-    <a class="add-role-toggle" href="javascript:;" onclick="$(this).hide().next().show();
-        $(this).siblings('.remove-role-toggle').hide()"><i class="bi bi-plus-square-fill"></i></a>
-    <div style="display: none">
-      <% form_for new_object, new_url, class: 'add-block bg-white shadow-sm p-3 mt-2 mb-3 rounded' do |f| %>
-        <%= f.lookup_block :account_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>
-        <%= f.submit_block button_text: "Add #{role}" %>
-      <% end %>
-    </div>
-    <% if accounts.count > (defined?(min_accounts) ? min_accounts : 0) %>
-      <a class="remove-role-toggle" href="javascript:;" onclick="$(this).hide().next().show();
-        $(this).siblings('.add-role-toggle').hide()"><i class="bi bi-dash-square-fill"></i></a>
+<% anchor = defined?(role) ? role.parameterize.pluralize : nil %>
+<div<% if anchor %> id="<%= anchor %>"<% end %> class="add-remove-box">
+  <div class="image-wall mb-1">
+    <% accounts.each { |account| %>
+    <%= partial :'accounts/square', locals: { account: account } %>
+    <% } %>
+  </div>
+  <% if add_and_remove %>
+    <div>
+      <a class="add-role-toggle" href="javascript:;" onclick="$(this).hide().next().show();
+          $(this).siblings('.remove-role-toggle').hide()"><i class="bi bi-plus-square-fill"></i></a>
       <div style="display: none">
-        <% form_tag destroy_url, class: 'add-block bg-white shadow-sm p-3 mt-2 mb-3 rounded' do |f| %>
-          <%= select_tag :account_id, options: accounts.map { |account| ["#{account.name} (#{account.username})", account.id] }, class: 'form-select mb-1' %>
-          <%= submit_tag "Remove #{role}", class: 'btn btn-danger', 'data-confirm' => "Are you sure you want to remove this #{role}?" %>
+        <% form_for new_object, new_url, class: 'add-block bg-white shadow-sm p-3 mt-2 mb-3 rounded' do |f| %>
+          <%= hidden_field_tag :_anchor, value: anchor %>
+          <%= f.lookup_block :account_id, lookup_url: '/accounts.json', placeholder: 'Search accounts' %>
+          <%= f.submit_block button_text: "Add #{role}" %>
         <% end %>
       </div>
-    <% end %>
-  </div>
-<% end %>
+      <% if accounts.count > (defined?(min_accounts) ? min_accounts : 0) %>
+        <a class="remove-role-toggle" href="javascript:;" onclick="$(this).hide().next().show();
+          $(this).siblings('.add-role-toggle').hide()"><i class="bi bi-dash-square-fill"></i></a>
+        <div style="display: none">
+          <% form_tag destroy_url, class: 'add-block bg-white shadow-sm p-3 mt-2 mb-3 rounded' do |f| %>
+            <%= hidden_field_tag :_anchor, value: anchor %>
+            <%= select_tag :account_id, options: accounts.map { |account| ["#{account.name} (#{account.username})", account.id] }, class: 'form-select mb-1' %>
+            <%= submit_tag "Remove #{role}", class: 'btn btn-danger', 'data-confirm' => "Are you sure you want to remove this #{role}?" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

@@ -3795,7 +3795,7 @@ a.home-feedback {
   border-style: dashed;
 }
 
-/* Adding or removing a facilitator comes back to their row (events_admin.rb), clear of the fixed header */
-#facilitators {
+/* Adding or removing someone (accounts/_add.erb) comes back to the box, clear of the fixed header */
+.add-remove-box {
   scroll-margin-top: calc(var(--header-height) + var(--space-base));
 }
