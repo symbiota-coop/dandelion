@@ -131,6 +131,13 @@ Dandelion::App.controller do
     redirect back
   end
 
+  # The admins box on an organisation's page is a pagelet, which reloads from this after each add or remove
+  get '/o/:slug/organisationships/admins' do
+    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    organisation_admins_only!
+    partial :'organisations/admins_box'
+  end
+
   post '/o/:slug/organisationships/admin' do
     @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
     organisation_admins_only!

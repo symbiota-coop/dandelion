@@ -1,0 +1,9 @@
+<%# An event's facilitators and the forms to add and remove them, a pagelet (/e/:slug/event_facilitations) that reloads after either %>
+<%= partial :'accounts/add', locals: {
+      role: 'event facilitator',
+      accounts: @event.event_facilitators.order('name asc'),
+      add_and_remove: event_admin?,
+      new_object: EventFacilitation.new,
+      new_url: "/e/#{@event.slug}/event_facilitations/new",
+      destroy_url: "/e/#{@event.slug}/event_facilitations/destroy"
+    } %>

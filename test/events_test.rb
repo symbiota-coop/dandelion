@@ -127,6 +127,28 @@ class EventsTest < ActiveSupport::TestCase
     assert page.has_content? 'Add to calendar'
   end
 
+  test 'adding a facilitator updates the facilitators box in place, without reloading the page' do
+    create_event
+    facilitator = FactoryBot.create(:account, name: 'Maya Okoro', has_signed_in: true)
+    sign_in(@account)
+    visit "/e/#{@event.slug}"
+    page.execute_script('window.notReloaded = true')
+
+    box = "[data-pagelet-url='/e/#{@event.slug}/event_facilitations']"
+    within(box) do
+      find('.add-role-toggle').click
+      find('.select2-selection').click
+    end
+    # select2 puts its search and results at the end of the page, outside the box
+    find('.select2-search__field').send_keys('Maya')
+    find('.select2-results__option', text: facilitator.name).click
+    within(box) { click_button 'Add event facilitator' }
+
+    assert page.has_css? "#{box} img[alt='#{facilitator.name}']"
+    assert @event.event_facilitations.find_by(account: facilitator)
+    assert page.evaluate_script('window.notReloaded')
+  end
+
   test 'creating an event with a range' do
     covers 'events/price-range-slider@693b77'
     create_organisation

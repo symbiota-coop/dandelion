@@ -1,0 +1,10 @@
+<%# An activity's admins and the forms to add and remove them, a pagelet (/o/:organisation_slug/a/:slug/activityships/admins) that reloads after either %>
+<%= partial :'accounts/add', locals: {
+      role: 'admin',
+      accounts: @activity.admins.order('name asc'),
+      add_and_remove: activity_admin?,
+      min_accounts: 1,
+      new_object: Activityship.new,
+      new_url: "#{@activity.path}/activityships/admin",
+      destroy_url: "#{@activity.path}/activityships/unadmin"
+    } %>

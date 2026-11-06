@@ -122,6 +122,13 @@ Dandelion::App.controller do
     redirect back
   end
 
+  # The admins box on a local group's page is a pagelet, which reloads from this after each add or remove
+  get '/o/:organisation_slug/lg/:slug/local_groupships/admins' do
+    @local_group = local_group_from_params || not_found
+    local_group_admins_only!
+    partial :'local_groups/admins_box'
+  end
+
   post '/o/:organisation_slug/lg/:slug/local_groupships/admin' do
     @local_group = local_group_from_params || not_found
     local_group_admins_only!

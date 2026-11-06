@@ -1,0 +1,10 @@
+<%# An event's co-hosts and the forms to add and remove them, a pagelet (/e/:slug/cohostships) that reloads after either %>
+<%= partial :'organisations/add', locals: {
+      role: 'co-host',
+      organisations: @event.cohosts.order('name asc'),
+      add: event_cohost_adder?,
+      remove: event_cohost_remover?,
+      new_object: Cohostship.new,
+      new_url: "/e/#{@event.slug}/cohostships/new",
+      destroy_url: "/e/#{@event.slug}/cohostships/destroy"
+    } %>

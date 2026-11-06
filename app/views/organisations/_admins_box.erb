@@ -1,0 +1,10 @@
+<%# An organisation's admins and the forms to add and remove them, a pagelet (/o/:slug/organisationships/admins) that reloads after either %>
+<%= partial :'accounts/add', locals: {
+      role: 'admin',
+      accounts: @organisation.admins.order('name asc'),
+      add_and_remove: organisation_admin?,
+      min_accounts: 1,
+      new_object: Organisationship.new,
+      new_url: "/o/#{@organisation.slug}/organisationships/admin",
+      destroy_url: "/o/#{@organisation.slug}/organisationships/unadmin"
+    } %>

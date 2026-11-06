@@ -8,10 +8,7 @@ Dandelion::App.helpers do
     Mongo::QueryCache.clear
   end
 
-  # Back to the page the request came from. A form can name the part of the page to come back to with an _anchor
-  # param (accounts/_add.erb), so adding or removing something doesn't land at the top of the page
   def back(fragment = nil)
-    fragment ||= params[:_anchor] if params[:_anchor].to_s.match?(/\A[\w-]+\z/)
     uri = internal_redirect_uri(request.referer) || URI.parse('/')
     params = uri.query ? Rack::Utils.parse_query(uri.query) : {}
     params.except!('_')

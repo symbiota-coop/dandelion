@@ -17,15 +17,9 @@
           <i class="bi bi-exclamation-triangle-fill"></i> Revenue sharer not connect to this organisation
         </span>
       <% end %>
-      <%= partial :'organisations/add', locals: {
-          role: 'co-host',
-          organisations: @event.cohosts.order('name asc'),
-          add: event_cohost_adder?,
-          remove: event_cohost_remover?,
-          new_object: Cohostship.new,
-          new_url: "/e/#{@event.slug}/cohostships/new",
-          destroy_url: "/e/#{@event.slug}/cohostships/destroy"
-        } %>
+      <div data-pagelet-url="/e/<%= @event.slug %>/cohostships">
+        <%= partial :'events/cohosts_box' %>
+      </div>
     </td>
   </tr>
   <% if @event.activity && !@event.activity.locked? && @event.activity.name != @event.organisation.name %>
@@ -48,14 +42,9 @@
     <tr>
       <td>Facilitators</td>
       <td>
-        <%= partial :'accounts/add', locals: {
-            role: 'event facilitator',
-            accounts: @event.event_facilitators.order('name asc'),
-            add_and_remove: event_admin?,
-            new_object: EventFacilitation.new,
-            new_url: "/e/#{@event.slug}/event_facilitations/new",
-            destroy_url: "/e/#{@event.slug}/event_facilitations/destroy"
-          } %>
+        <div data-pagelet-url="/e/<%= @event.slug %>/event_facilitations">
+          <%= partial :'events/facilitators_box' %>
+        </div>
       </td>
     </tr>
   <% end %>

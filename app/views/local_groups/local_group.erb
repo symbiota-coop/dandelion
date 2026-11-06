@@ -20,15 +20,9 @@
         <tr>
           <td>Admins</td>
           <td>
-            <%= partial :'accounts/add', locals: {
-                  role: 'admin',
-                  accounts: @local_group.admins.order('name asc'),
-                  add_and_remove: local_group_admin?,
-                  min_accounts: 1,
-                  new_object: LocalGroupship.new,
-                  new_url: "#{@local_group.path}/local_groupships/admin",
-                  destroy_url: "#{@local_group.path}/local_groupships/unadmin"
-                } %>
+            <div data-pagelet-url="<%= @local_group.path %>/local_groupships/admins">
+              <%= partial :'local_groups/admins_box' %>
+            </div>
           </td>
         </tr>
       <% end %>

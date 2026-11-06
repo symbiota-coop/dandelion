@@ -884,12 +884,10 @@ class EventPermissionsTest < ActiveSupport::TestCase
       ticket.set(checked_in: false)
 
       other = FactoryBot.create(:account)
-      post "/e/#{@event.slug}/event_facilitations/new", event_facilitation: { account_id: other.id.to_s }, _anchor: 'event-facilitators'
+      post "/e/#{@event.slug}/event_facilitations/new", event_facilitation: { account_id: other.id.to_s }
       assert @event.event_facilitations.find_by(account: other)
-      assert last_response.location.end_with?('#event-facilitators'), "came back to #{last_response.location}"
-      post "/e/#{@event.slug}/event_facilitations/destroy", account_id: other.id.to_s, _anchor: '"><script>'
+      post "/e/#{@event.slug}/event_facilitations/destroy", account_id: other.id.to_s
       refute @event.event_facilitations.find_by(account: other)
-      refute_includes last_response.location, '#'
     end
   end
 

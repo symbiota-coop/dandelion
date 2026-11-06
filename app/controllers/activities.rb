@@ -150,6 +150,13 @@ Dandelion::App.controller do
     redirect back
   end
 
+  # The admins box on an activity's page is a pagelet, which reloads from this after each add or remove
+  get '/o/:organisation_slug/a/:slug/activityships/admins' do
+    @activity = activity_from_params || not_found
+    activity_admins_only!
+    partial :'activities/admins_box'
+  end
+
   post '/o/:organisation_slug/a/:slug/activityships/admin' do
     @activity = activity_from_params || not_found
     activity_admins_only!

@@ -222,6 +222,25 @@ Dandelion::App.controller do
     erb :'events/ticket_type_waitlists'
   end
 
+  # The add/remove boxes on an event's page are pagelets, which reload from these after each add or remove
+  get '/e/:slug/event_facilitations' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    event_admins_only!
+    partial :'events/facilitators_box'
+  end
+
+  get '/e/:slug/cohostships' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    event_admins_only!
+    partial :'events/cohosts_box'
+  end
+
+  get '/e/:slug/event_sessions' do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    event_admins_only!
+    partial :'events/sessions_box'
+  end
+
   post '/e/:slug/event_facilitations/new' do
     @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!

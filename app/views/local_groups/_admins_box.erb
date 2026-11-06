@@ -1,0 +1,10 @@
+<%# A local group's admins and the forms to add and remove them, a pagelet (/o/:organisation_slug/lg/:slug/local_groupships/admins) that reloads after either %>
+<%= partial :'accounts/add', locals: {
+      role: 'admin',
+      accounts: @local_group.admins.order('name asc'),
+      add_and_remove: local_group_admin?,
+      min_accounts: 1,
+      new_object: LocalGroupship.new,
+      new_url: "#{@local_group.path}/local_groupships/admin",
+      destroy_url: "#{@local_group.path}/local_groupships/unadmin"
+    } %>

@@ -46,15 +46,9 @@
         <tr>
           <td>Admins</td>
           <td>
-            <%= partial :'accounts/add', locals: {
-                  role: 'admin',
-                  accounts: @activity.admins.order('name asc'),
-                  add_and_remove: activity_admin?,
-                  min_accounts: 1,
-                  new_object: Activityship.new,
-                  new_url: "#{@activity.path}/activityships/admin",
-                  destroy_url: "#{@activity.path}/activityships/unadmin"
-                } %>
+            <div data-pagelet-url="<%= @activity.path %>/activityships/admins">
+              <%= partial :'activities/admins_box' %>
+            </div>
           </td>
         </tr>
       <% end %>
