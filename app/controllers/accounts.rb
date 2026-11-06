@@ -509,13 +509,6 @@ Dandelion::App.controller do
     end
   end
 
-  post '/u/:username/image' do
-    admins_only!
-    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
-    @account.set(image: params[:image])
-    redirect back
-  end
-
   get '/u/:username/show_feedback' do
     @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
     partial :'event_feedbacks/event_feedbacks', locals: { event_feedbacks: @account.public_event_feedbacks_as_facilitator }

@@ -2,11 +2,6 @@
 <% account = membership.account %>
 <td>
   <%= partial :'accounts/account', object: account, locals: { membership: membership, show_email: viewable?(account, :email) } %>
-  <% if admin? && !account.image %>
-    <% form_tag "/u/#{account.username}/image", multipart: true do %>
-      <%= file_field_tag :image, onchange: 'this.form.submit()' %>
-    <% end %>
-  <% end %>
   <div>
     <% membership.teamships.each { |teamship| next if teamship.team.name == 'General' %>
     <a href="/g/<%= @gathering.slug %>/teams/<%= teamship.team_id %>">

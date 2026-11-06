@@ -832,7 +832,7 @@
             <tr class="table-warning"><td>Solidarity</td><td>9/10</td><td class="text-end">£8</td></tr>
           </tbody>
         </table>
-        <div class="spec">Row colours: table-warning flags a row to look at (low delivery rate), table-danger a problem (a blocked ASN). Both use the warning and danger 50 and 200. text-body-secondary greys a row that's past (a past boost slot) · Wide tables (the stats for many events, a gathering's members) take .table-sticky: the name column and header row stick, the page scrolls sideways under them, and the sidebar fades out once the table reaches it</div>
+        <div class="spec">Row colours: table-warning flags a row to look at (low delivery rate), table-danger a problem (a blocked ASN). Both use the warning and danger 50 and 200. text-body-secondary greys a row that's past (a past boost slot) · Wide tables (the stats for many events, a gathering's members) take .table-sticky: the name column and header row stick, the page scrolls sideways under them, and the sidebar fades out once the table reaches it. The name column is 15em, where event names wrap; .table-sticky-fit sizes it to its longest line instead, where members' emails stay on one line</div>
         <%# will_paginate with BootstrapRenderer, on page 2 of 3: lists show only the arrows (page_links: false), the admin lists the page numbers too %>
         <% sample_page = WillPaginate::Collection.new(2, 10, 30) %>
         <%= will_paginate sample_page, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>

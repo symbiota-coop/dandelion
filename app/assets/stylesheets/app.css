@@ -2236,6 +2236,18 @@ body .table > tfoot > tr > th {
   z-index: 1;
 }
 
+/* .table-sticky-fit sizes the name column to its longest line instead, such as a member's email, kept on one line */
+.table-sticky-fit th:first-child,
+.table-sticky-fit td:first-child {
+  width: 1px;
+  min-width: 0;
+  max-width: none;
+}
+
+.table-sticky-fit .account-email {
+  white-space: nowrap;
+}
+
 /* A shadow off the name column's right edge, over the columns scrolling under it. It's on a pseudo-element, as Bootstrap and DataTables paint stripes and hover as the cells' own inset box-shadow, and each cell is clipped at its top and bottom so the column reads as one */
 .table-sticky th:first-child,
 .table-sticky td:first-child {
