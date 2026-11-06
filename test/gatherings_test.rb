@@ -482,7 +482,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'members sign up to shifts and admins schedule activities onto the timetable' do
-    covers 'gatherings/video-schedule-activity@396032', 'gatherings/video-shift-signup@1e4391'
+    covers 'gatherings/video-schedule-activity@396032', 'gatherings/video-shift-signup@8c93ae'
     create_gathering
     member = FactoryBot.create(:account)
     @gathering.memberships.create!(account: member)

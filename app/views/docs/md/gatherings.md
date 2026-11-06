@@ -54,7 +54,7 @@ Check out the video below, which does assume you have a [Stripe](https://stripe.
 >
 > We'll create some time slots and roles. Rows are for time slots, and columns are for roles.
 >
-> Click 'Sign up' to sign up to a shift. <!-- claim: video-shift-signup -->
+> Click a hand to sign up to a shift. <!-- claim: video-shift-signup -->
 >
 > That completes the brief tour of Dandelion's Gatherings feature. Happy co-creating!
 

@@ -3751,3 +3751,10 @@ a.home-feedback {
   color: var(--bs-body-color);
   text-decoration: none;
 }
+
+/* A line between two side-by-side columns (the budget page's incomings and outgoings), from lg up, where they sit side by side */
+@media (min-width: 992px) {
+  .col-lg-divider {
+    border-left: 1px solid var(--bs-border-color);
+  }
+}

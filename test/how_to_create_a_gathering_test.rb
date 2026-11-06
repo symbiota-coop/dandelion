@@ -132,8 +132,8 @@ class HowToCreateAGatheringTest < ActiveSupport::TestCase
         sleep 1
       end
     }
-    narrate %(Click 'Sign up' to sign up to a shift.), lambda {
-      all('a', text: 'Sign up')[0].click
+    narrate %(Click a hand to sign up to a shift.), lambda {
+      all('a[aria-label="Sign up"]')[0].click
     }
     narrate %(That completes the brief tour of Dandelion's Gatherings feature. Happy co-creating!)
     create_video

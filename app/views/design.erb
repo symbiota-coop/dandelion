@@ -74,7 +74,7 @@
           } %>
     <% end %>
 
-    <% design_subsection 'Yellow', "For highlighted or rewarded things, through <code>text-bg-yellow</code>: Featured, Co-host, rota points, PATCH routes. Its steps come from --color-yellow-500." do %>
+    <% design_subsection 'Yellow', "For highlighted or rewarded things, through <code>text-bg-yellow</code>: Featured, Co-host, PATCH routes. Its steps come from --color-yellow-500." do %>
       <%= partial :'design/ramp', locals: {
             prefix: '--color-yellow',
             notes: {
@@ -426,7 +426,7 @@
                  ['text-bg-secondary', 'Neutral detail', ['Locked', 'Secret', 'SPRING: £5']],
                  ['text-bg-warning', 'Needs attention, not yet a problem', ['On hold']],
                  ['text-bg-danger', 'A problem or a hard limit', ['Sold out', 'Sales ended', 'Full', 'Rejected, to contact']],
-                 ['text-bg-yellow', 'Highlighted or rewarded', ['Featured', 'Co-host', '<i class="bi bi-hand-index"></i> 2']],
+                 ['text-bg-yellow', 'Highlighted or rewarded', ['Featured', 'Co-host']],
                  ['text-bg-dark', 'Counts in a gathering\'s nav', ['3', '12/20']],
                  ['text-primary border border-primary', 'Outline: a group label, or an unselected choice', ['Available', 'Weekend pass', 'London']],
                  ['text-bg-stripe', 'Reported by Stripe', ['£1,240']]
@@ -849,17 +849,17 @@
 
       <% design_subsection 'Striped table', col: 'col-lg-6' do %>
         <table class="table table-striped mb-0">
-          <tr><td></td><td><strong>Kitchen</strong><br><span class="badge text-bg-yellow mb-1"><i class="bi bi-hand-index"></i> 2</span></td><td><strong>Welcome desk</strong><br><span class="badge text-bg-yellow mb-1"><i class="bi bi-hand-index"></i> 1</span></td></tr>
+          <tr><td></td><td><strong>Kitchen</strong><br><span class="badge text-bg-secondary mb-1">2</span></td><td><strong>Welcome desk</strong><br><span class="badge text-bg-secondary mb-1">1</span></td></tr>
           <% [%w[Friday maya amara], ['Saturday', 'jonas', nil], ['Sunday', nil, 'maya']].each do |slot, *people| %>
             <tr>
               <td><strong><%= slot %></strong></td>
               <% people.each do |img| %>
-                <td><% if img %><img src="/images/samples/<%= img %>.jpg" alt="" class="avatar avatar-sm"><% else %><a class="btn btn-primary btn-sm mb-1" href="#components">Sign up</a><% end %></td>
+                <td><% if img %><img src="/images/samples/<%= img %>.jpg" alt="" class="avatar avatar-sm"><% else %><a class="btn btn-primary btn-sm mb-1" href="#components" data-bs-toggle="tooltip" title="Sign up" aria-label="Sign up"><i class="bi bi-hand-index" aria-hidden="true"></i></a><% end %></td>
               <% end %>
             </tr>
           <% end %>
         </table>
-        <div class="spec">Grids of slots: rotas (rotas/_rota.erb), timetables and the admin dashboard; also some admin lists (members, applications, teams, mailers) · stripes --bs-tertiary-bg · each cell an avatar-sm or a btn-sm to sign up · roles and slots carry their points as text-bg-yellow badges</div>
+        <div class="spec">Grids of slots: rotas (rotas/_rota.erb), timetables and the admin dashboard; also some admin lists (members, applications, teams, mailers) · stripes --bs-tertiary-bg · each cell an avatar-sm or a btn-sm to sign up · roles and slots carry their points as text-bg-secondary badges, the number alone (a tooltip says points) · Sign up is a btn-primary btn-sm with bi-hand-index</div>
       <% end %>
     </div>
 

@@ -2,16 +2,22 @@
   <% account = shift.account %>
   <% if (shift.account && shift.account_id == current_account.id) || gathering_admin? %>
     <% if shift.account %>
-      <a href="/shifts/<%= shift.id %>/edit">
-        <% if params[:view] == 'names' %>
-          <%= account.name %>
-        <% else %>
-          <img alt="<%= account.name %>" data-bs-toggle="tooltip" class="avatar avatar-sm <%= account.avatar_class %>" title="<%= account.name %>" src="<%= u account.image_thumb_or_gravatar_url %>">
-        <% end %>
-      </a>
+      <div class="dropdown d-inline-block" data-bs-toggle="tooltip" title="<%= account.name %>">
+        <a href="javascript:;" data-bs-toggle="dropdown" aria-expanded="false" aria-label="<%= account.name %>: edit or remove">
+          <% if params[:view] == 'names' %>
+            <%= account.name %>
+          <% else %>
+            <img alt="<%= account.name %>" class="avatar avatar-sm <%= account.avatar_class %>" src="<%= u account.image_thumb_or_gravatar_url %>">
+          <% end %>
+        </a>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="/shifts/<%= shift.id %>/edit"><i class="bi bi-pencil"></i> Edit</a>
+          <a class="pagelet-trigger dropdown-item" data-method="post" data-confirm="<% if shift.account_id == current_account.id %>Resign from this shift?<% else %>Remove this person from this shift?<% end %>" href="/shifts/<%= shift.id %>/destroy"><i class="bi bi-trash"></i> Remove</a>
+        </div>
+      </div>
     <% else %>
-      <a data-method="post" href="/shifts/<%= shift.id %>/destroy">
-        n/a
+      <a class="text-body-secondary" data-method="post" href="/shifts/<%= shift.id %>/destroy" data-bs-toggle="tooltip" title="Not needed: click to reopen" aria-label="Not needed: click to reopen">
+        <i class="bi bi-slash-circle" aria-hidden="true"></i>
       </a>
     <% end %>
   <% else %>
@@ -22,12 +28,14 @@
         <%= partial :'accounts/square', locals: { account: account } %>
       <% end %>
     <% else %>
-      n/a
+      <span class="text-body-secondary" data-bs-toggle="tooltip" title="Not needed">
+        <i class="bi bi-slash-circle" aria-hidden="true"></i><span class="visually-hidden">Not needed</span>
+      </span>
     <% end %>
   <% end %>
 <% else %>
-  <a class="pagelet-trigger btn btn-primary btn-sm mb-1" data-method="post" href="/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>">Sign up</a>
+  <a class="pagelet-trigger btn btn-primary btn-sm mb-1" data-method="post" href="/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>" data-bs-toggle="tooltip" title="Sign up" aria-label="Sign up"><i class="bi bi-hand-index" aria-hidden="true"></i></a>
   <% if gathering_admin? %>
-    <a class="pagelet-trigger btn btn-primary btn-sm mb-1" data-method="post" href="/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>&na=true">n/a</a>
+    <a class="pagelet-trigger btn btn-outline-secondary btn-sm mb-1" data-method="post" href="/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>&na=true" data-bs-toggle="tooltip" title="Mark as not needed" aria-label="Mark as not needed"><i class="bi bi-slash-circle" aria-hidden="true"></i></a>
   <% end %>
 <% end %>
