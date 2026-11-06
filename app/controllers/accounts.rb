@@ -4,11 +4,17 @@ Dandelion::App.controller do
 
     @accounts = Account.publicly_visible
     @accounts = @accounts.and(id: params[:id]) if params[:id]
-    @accounts = @accounts.and(:id.in => Account.search(params[:q], @accounts).pluck(:id)) if params[:q]
+    accounts = @accounts.only(:name, :username)
+    if params[:q]
+      # Best matches first, as the search ranks them: a query on the ids would return them in natural order
+      ids = Account.search(params[:q], @accounts, limit: 20).pluck(:id)
+      accounts_by_id = accounts.and(:id.in => ids).index_by(&:id)
+      accounts = ids.filter_map { |id| accounts_by_id[id] }
+    end
     case content_type
     when :json
       {
-        results: @accounts.only(:name, :username).map { |account| { id: account.id.to_s, text: "#{account.name} (#{account.username})" } }
+        results: accounts.map { |account| { id: account.id.to_s, text: "#{account.name} (#{account.username})" } }
       }.to_json
     end
   end
