@@ -174,14 +174,6 @@ Dandelion::App.controller do
     redirect "/g/#{@gathering.slug}"
   end
 
-  get '/g/:slug/map' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
-    confirmed_membership_required!
-    @accounts = @gathering.members
-    erb :'gatherings/map'
-  end
-
   get '/g/:slug/copy' do
     @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
