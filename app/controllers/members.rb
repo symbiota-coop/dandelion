@@ -19,7 +19,8 @@ Dandelion::App.controller do
         @gathering.joining_questions_a.each { |q| row << q }
         @gathering.application_questions_a.each { |q| row << q }
         csv << row
-        @memberships.each do |membership|
+        # A query per collection rather than a few per member, though it also fetches tickets and shifts the CSV doesn't use
+        Membership.preload_rows(@gathering, @memberships, viewer: nil).each do |membership|
           row = [
             membership.account.name,
             membership.account.firstname,

@@ -530,6 +530,10 @@ class GatheringsTest < ActiveSupport::TestCase
 
     get "/g/#{@gathering.slug}/timetables/#{timetable.id}"
     assert_includes last_response.body, '1 person interested'
+
+    get "/g/#{@gathering.slug}/members.csv"
+    member_row = CSV.parse(last_response.body, headers: true).find { |csv_row| csv_row['name'] == 'Member Person' }
+    assert_equal @account.name, member_row['proposed_by']
   end
 
   test 'each of the six features can be enabled or disabled' do
