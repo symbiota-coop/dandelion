@@ -1,4 +1,5 @@
-<% anchor = role.parameterize.pluralize %>
+<%# The id this box comes back to after adding or removing (back in helpers.rb). Not parameterize: template strings can be ASCII-8BIT, which it refuses %>
+<% anchor = "#{role.tr(' ', '-')}s" %>
 <div id="<%= anchor %>" class="add-remove-box">
   <% organisations.each { |organisation| %>
   <div class="my-1">
