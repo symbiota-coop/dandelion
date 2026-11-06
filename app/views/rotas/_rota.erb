@@ -69,6 +69,8 @@
           <%= text_field_tag :name, class: 'form-control', style: 'width: 10em', placeholder: 'New slot' %>
         <% end %>
       </td>
+      <%# The rest of the row, its roles' columns and New role's, so the stripe runs the width of the table %>
+      <td colspan="<%= rota.roles.count + 1 %>"></td>
     </tr>
   <% end %>
 </table>
