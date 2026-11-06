@@ -2,6 +2,8 @@
    orders = orders.paginate(page: params[:page], per_page: 50)
    # Load the page once: orders is a criteria, so each map or each would query it again
    orders_on_page = orders.to_a
+   # Each event's progress bar, rendered once however many of its orders are on the page
+   progress_by_event = {}
    # Batch load event feedbacks to avoid N+1 queries
    if @event
      order_account_ids = orders_on_page.map(&:account_id).compact
@@ -118,7 +120,12 @@
             </span>
           <% end %>
         </div>
-        <div data-pagelet-url="/e/<%= order.event.slug %>/progress?full_width=true" class="my-1"></div>
+        <% if event_admin?(order.event) %>
+          <div data-pagelet-url="/e/<%= order.event.slug %>/progress?full_width=true" class="my-1">
+            <% progress_by_event[order.event_id] ||= partial(:'events/progress', locals: { event: order.event, full_width: true }) %>
+            <%= progress_by_event[order.event_id] %>
+          </div>
+        <% end %>
         <% if order.event.discounted_ticket_revenue > 0 %>
           <%= m order.event.discounted_ticket_revenue, order.event.currency %>
         <% end %>

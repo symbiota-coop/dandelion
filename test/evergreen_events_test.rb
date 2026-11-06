@@ -164,6 +164,16 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     assert page.has_content? @attendee.name
   end
 
+  test "organisation orders page shows each event's progress with the page, rather than a request for each order" do
+    create_evergreen_order
+    @event.tickets.create!(account: @attendee, order: @order, ticket_type: @event.ticket_types.first, payment_completed: true)
+
+    sign_in_with_rack(@account)
+    get "/o/#{@organisation.slug}/orders"
+    assert_equal 200, last_response.status
+    assert_match %r{data-pagelet-url="/e/#{@event.slug}/progress\?full_width=true" class="my-1">\s*<a href="/e/#{@event.slug}/tickets">}, last_response.body
+  end
+
   test 'evergreen event calendar endpoints return not found' do
     create_evergreen_order
 
