@@ -169,7 +169,7 @@ Dandelion::App.controller do
     @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     @stripe_charges = @event.stripe_charges.includes(:account, order: %i[account event]).and(:balance_transaction.ne => nil)
-    @stripe_charges = @stripe_charges.and(:account_id.in => Account.search(params[:q], child_scope: @stripe_charges).pluck(:id)) if params[:q]
+    @stripe_charges = @stripe_charges.and(:account_id.in => Account.search(params[:q], child_scope: @stripe_charges, regex_search: true).pluck(:id)) if params[:q]
 
     if request.xhr?
       partial :'events/stripe_charges_table', locals: { stripe_charges: @stripe_charges, show_emails: event_email_viewer? }
@@ -182,7 +182,7 @@ Dandelion::App.controller do
     @event = Event.unscoped.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     @donations = @event.donations.includes(:account, :order)
-    @donations = @donations.and(:account_id.in => Account.search(params[:q], child_scope: @donations).pluck(:id)) if params[:q]
+    @donations = @donations.and(:account_id.in => Account.search(params[:q], child_scope: @donations, regex_search: true).pluck(:id)) if params[:q]
     erb :'events/donations'
   end
 
@@ -209,7 +209,7 @@ Dandelion::App.controller do
     @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     @waitships = @event.waitships.includes(:account)
-    @waitships = @waitships.and(:account_id.in => Account.search(params[:q], child_scope: @waitships).pluck(:id)) if params[:q]
+    @waitships = @waitships.and(:account_id.in => Account.search(params[:q], child_scope: @waitships, regex_search: true).pluck(:id)) if params[:q]
     erb :'events/waitlist'
   end
 
@@ -218,7 +218,7 @@ Dandelion::App.controller do
     event_admins_only!
     @ticket_type_waitships = TicketTypeWaitship.and(:ticket_type_id.in => @event.ticket_type_ids).includes(:account, :ticket_type)
     @ticket_type_waitships = @ticket_type_waitships.and(ticket_type_id: params[:ticket_type_id]) if params[:ticket_type_id]
-    @ticket_type_waitships = @ticket_type_waitships.and(:account_id.in => Account.search(params[:q], child_scope: @ticket_type_waitships).pluck(:id)) if params[:q]
+    @ticket_type_waitships = @ticket_type_waitships.and(:account_id.in => Account.search(params[:q], child_scope: @ticket_type_waitships, regex_search: true).pluck(:id)) if params[:q]
     erb :'events/ticket_type_waitlists'
   end
 
