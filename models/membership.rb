@@ -2,6 +2,7 @@ class Membership
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  include MembershipRows
 
   belongs_to_without_parent_validation :gathering
   belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :memberships
@@ -59,10 +60,6 @@ class Membership
     gathering
   end
 
-  def proposed_by
-    mapplication ? mapplication.verdicts.proposers.map(&:account) : ([added_by] if added_by)
-  end
-
   after_create :send_email
   def send_email
     mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
@@ -101,10 +98,6 @@ class Membership
       end
     end
     account.account_notification_cache&.refresh_gathering_ids!
-  end
-
-  def invitations_extended
-    gathering.memberships.and(added_by: account).count
   end
 
   def smart_invitations_granted
@@ -154,9 +147,5 @@ class Membership
 
   def self.protected_attributes
     %w[admin]
-  end
-
-  def shift_points
-    shifts.map(&:worth).sum
   end
 end

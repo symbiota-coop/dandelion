@@ -1,17 +1,20 @@
-<% if tactivity.attendances.exists? %>
-  <span data-bs-toggle="tooltip" title="<%= tactivity.attendances.map { |attendance| attendance.account.name }.join('<br />') %>">
-    <% if tactivity.attendances.find_by(account: current_account) %>
-      <% if tactivity.attendances.count == 1 %>
+<%# attendances: the tactivity's attendances with their accounts, when they've been fetched already (_timetable) %>
+<% attendances ||= tactivity.attendances.includes(:account).to_a
+   interested = current_account && attendances.any? { |attendance| attendance.account_id == current_account.id } %>
+<% if attendances.any? %>
+  <span data-bs-toggle="tooltip" title="<%= attendances.map { |attendance| attendance.account.name }.join('<br />') %>">
+    <% if interested %>
+      <% if attendances.size == 1 %>
         You're interested
       <% else %>
-        You and <%= pluralize(tactivity.attendances.count - 1, 'other') %> interested
+        You and <%= pluralize(attendances.size - 1, 'other') %> interested
       <% end %>
     <% else %>
-      <%= pluralize(tactivity.attendances.count, 'person') %> interested
+      <%= pluralize(attendances.size, 'person') %> interested
     <% end %>
   </span>
 <% end %>
-<% if tactivity.attendances.find_by(account: current_account) %>
+<% if interested %>
   <a class="pagelet-trigger" title="No longer interested" data-method="post" href="/tactivities/<%= tactivity.id %>/unattend"><i class="bi bi-x-lg"></i></a>
 <% else %>
   <a class="pagelet-trigger" title="Interested" data-method="post" href="/tactivities/<%= tactivity.id %>/attend"><i class="bi bi-hand-thumbs-up"></i></a>

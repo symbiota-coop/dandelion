@@ -1,5 +1,6 @@
-<% shifts = defined?(rota) ? membership.shifts.and(rota: rota) : membership.shifts %>
-<% if defined?(show_title) && show_title && shifts.exists? %>
+<%# shifts: the membership's shifts, when they've been fetched already (Membership.preload_rows) %>
+<% shifts ||= defined?(rota) ? membership.shifts.and(rota: rota) : membership.shifts %>
+<% if defined?(show_title) && show_title && shifts.any? %>
   <h3>Your shifts</h3>
 <% end %>
 <%# On one line, wrapping where they don't fit, each shift's badges kept together %>

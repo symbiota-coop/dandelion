@@ -132,6 +132,17 @@ class Gathering
     self
   end
 
+  # Whether the members table shows tickets and shifts, worked out once for the table rather than once a row
+  def any_events?
+    @any_events = events.exists? unless defined?(@any_events)
+    @any_events
+  end
+
+  def rotas_shown?
+    @rotas_shown = enable_rotas? && rotas.exists? unless defined?(@rotas_shown)
+    @rotas_shown
+  end
+
   def welcome_email_default
     %(<p>Hi %recipient.firstname%,</p>
 

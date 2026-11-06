@@ -1,3 +1,4 @@
+<%# Membership.preload_rows hands each membership what its row shows, for the whole table at once %>
 <% account = membership.account %>
 <td>
   <%= partial :'accounts/account', object: account, locals: { membership: membership, show_email: viewable?(account, :email) } %>
@@ -15,7 +16,7 @@
 </div>
 </td>
 <td>
-  <%= partial :'accounts/buttons', locals: { account: account, btn_class: 'btn-sm' } %>
+  <%= partial :'accounts/buttons', locals: { account: account, btn_class: 'btn-sm', follow: membership.viewer_follow } %>
 </td>
 <td>
   <%= membership.proposed_by.map(&:name).to_sentence(last_word_connector: ' and ') if membership.proposed_by %>
@@ -37,18 +38,16 @@
   <%= membership.created_at %>
 <% end %>
 <% if mapplication %>
-  <span title="Accepted at <%= mapplication.verdicts.proposers.count + mapplication.verdicts.supporters.count %> <%= @gathering.vouchers %>" class="badge text-bg-primary mb-1"><%= mapplication.verdicts.proposers.count + mapplication.verdicts.supporters.count %></span>
+  <span title="Accepted at <%= membership.vouchers_count %> <%= @gathering.vouchers %>" class="badge text-bg-primary mb-1"><%= membership.vouchers_count %></span>
 <% end %>
 </td>
 <% if @gathering.democratic_threshold %>
   <td><%= membership.desired_threshold %></td>
 <% end %>
-<% if @gathering.events.exists? %>
+<% if @gathering.any_events? %>
   <td>
-    <% @gathering.events.each { |event| %>
-    <% event.tickets.complete.and(account: account).each { |ticket| %>
+    <% membership.event_tickets.each { |event, ticket| %>
     <a href="/e/<%= event.slug %>/tickets" class="badge text-bg-primary text-decoration-none"><i class="bi bi-ticket-detailed-fill"></i> <%= (ticket.ticket_type.name + ', ') if ticket.ticket_type %><%= event.name %></a>
-    <% } %>
     <% } %>
   </td>
 <% end %>
@@ -87,10 +86,10 @@
     </td>
   <% end %>
 <% end %>
-<% if @gathering.enable_rotas? && @gathering.rotas.exists? %>
+<% if @gathering.rotas_shown? %>
   <td>
 
-    <%= partial :'rotas/shift_summary', locals: {membership: membership} %>
+    <%= partial :'rotas/shift_summary', locals: { membership: membership, shifts: membership.shifts_list } %>
 
     <% if @gathering.enable_shift_worth %>
       <span data-bs-toggle="tooltip" title="<%= sprintf('%g', membership.shift_points) %>/<%= pluralize(membership.shift_points_required ? sprintf('%g', membership.shift_points_required) : '?', 'shift point') %>">

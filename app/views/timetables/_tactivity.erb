@@ -1,5 +1,5 @@
-<% image = tactivity.image %>
-<div class="tactivity<%= ' tactivity-image' if image %> mb-2" data-attendances-count="<%= tactivity.attendances.count %>" data-tactivity-id="<%= tactivity.id %>"<% if image %> style="--tactivity-image: url('<%= image.thumb('400x400').url %>')"<% end %>>
+<% image = tactivity.image; attendances = tactivity.attendances.to_a %>
+<div class="tactivity<%= ' tactivity-image' if image %> mb-2" data-attendances-count="<%= attendances.size %>" data-tactivity-id="<%= tactivity.id %>"<% if image %> style="--tactivity-image: url('<%= image.thumb('400x400').url %>')"<% end %>>
   <div class="position-absolute" style="bottom: .5rem; left: .5rem">
     <h3 class="mt-0 mb-0 position-relative" data-bs-toggle="tooltip">
       <a href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>"><%= tactivity.name %></a>
@@ -10,7 +10,9 @@
       <a href="/u/<%= tactivity.account.username %>"><%= tactivity.account.name %></a>
     </span>
     <div>
-      <div class="d-inline-block" data-pagelet-url="/tactivities/<%= tactivity.id %>/attendees"></div>
+      <div class="d-inline-block" data-pagelet-url="/tactivities/<%= tactivity.id %>/attendees">
+        <%= partial :'timetables/attendees', locals: { tactivity: tactivity, attendances: attendances } %>
+      </div>
     </div>
   </div>
   <div style="right: .5rem; bottom: .5rem" class="position-absolute">

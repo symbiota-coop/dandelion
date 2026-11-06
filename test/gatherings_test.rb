@@ -505,6 +505,33 @@ class GatheringsTest < ActiveSupport::TestCase
     assert_equal space.id, tactivity.space_id
   end
 
+  test 'the members table and the timetable render their rows with the page' do
+    create_gathering
+    member = FactoryBot.create(:account, name: 'Member Person')
+    @gathering.memberships.create!(account: member, added_by: @account)
+    event = FactoryBot.create(:event, gathering: @gathering, last_saved_by: @account, name: 'Opening night')
+    Ticket.create!(event: event, account: member, ticket_type: FactoryBot.create(:ticket_type, event: event, name: 'Early bird'), payment_completed: true)
+    rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
+    Shift.create!(account: member, role: Role.create!(name: 'Cook', rota: rota), rslot: Rslot.create!(name: 'Morning', rota: rota), rota: rota)
+    timetable = @gathering.timetables.create!(name: 'Workshops', account: @account)
+    tactivity = timetable.tactivities.create!(name: 'Yoga', account: member)
+    tactivity.attendances.create!(account: member)
+
+    sign_in_with_rack(@account)
+    get "/g/#{@gathering.slug}/members"
+    assert last_response.ok?
+    row = last_response.body[/<tr data-pagelet-url="\/membership_row\/#{@gathering.memberships.find_by(account: member).id}">.*?<\/tr>/m]
+    assert_includes row, 'Member Person'
+    assert_includes row, 'Early bird, Opening night'
+    assert_includes row, 'Kitchen: Cook, Morning'
+    assert_includes row, ERB::Util.h(@account.name) # proposed by
+    get "/membership_row/#{@gathering.memberships.find_by(account: member).id}"
+    assert_includes last_response.body, 'Early bird, Opening night'
+
+    get "/g/#{@gathering.slug}/timetables/#{timetable.id}"
+    assert_includes last_response.body, '1 person interested'
+  end
+
   test 'each of the six features can be enabled or disabled' do
     covers 'gatherings/optional-features@9dfad8'
     features = { contributions: 'options', teams: 'teams', timetables: 'timetables/new', rotas: 'rotas/new', inventory: 'inventory', budget: 'budget' }

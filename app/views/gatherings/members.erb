@@ -116,7 +116,7 @@
     </li>
     <% } %>
   </ul>
-<% when 'details'; @memberships = @memberships.paginate(page: params[:page], per_page: 50) %>
+<% when 'details'; @memberships = @memberships.paginate(page: params[:page], per_page: 50); memberships = Membership.preload_rows(@gathering, @memberships, viewer: current_account) %>
   <table class="table table-striped">
     <thead>
       <tr>
@@ -127,7 +127,7 @@
         <% if @gathering.democratic_threshold %>
           <th>Suggested magic number</th>
         <% end %>
-        <% if @gathering.events.exists? %>
+        <% if @gathering.any_events? %>
           <th>Tickets</th>
         <% end %>
         <% if @gathering.enable_contributions %>
@@ -137,7 +137,7 @@
             <th>Paid</th>
           <% end %>
         <% end %>
-        <% if @gathering.enable_rotas? && @gathering.rotas.exists? %>
+        <% if @gathering.rotas_shown? %>
           <th>Shifts</th>
         <% end %>
         <% if gathering_admin? || !@gathering.hide_invitations %>
@@ -148,8 +148,10 @@
         <% end %>
       </tr>
     </thead>
-    <% @memberships.each { |membership| %>
-    <tr data-pagelet-url="/membership_row/<%= membership.id %>"></tr>
+    <% memberships.each { |membership| %>
+    <tr data-pagelet-url="/membership_row/<%= membership.id %>">
+      <%= partial :'gatherings/membership_row', locals: { membership: membership } %>
+    </tr>
     <% } %>
     <tr>
       <th style="width: 1px"></th>
@@ -159,7 +161,7 @@
       <% if @gathering.democratic_threshold %>
         <th></th>
       <% end %>
-      <% if @gathering.events.exists? %>
+      <% if @gathering.any_events? %>
         <th></th>
       <% end %>
       <% if @gathering.enable_contributions %>
@@ -172,7 +174,7 @@
           </th>
         <% end %>
       <% end %>
-      <% if @gathering.enable_rotas? && @gathering.rotas.exists? %>
+      <% if @gathering.rotas_shown? %>
         <th></th>
       <% end %>
       <% if gathering_admin? || !@gathering.hide_invitations %>

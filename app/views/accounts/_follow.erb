@@ -1,6 +1,7 @@
 <% if current_account %>
   <% unless current_account.id == account.id %>
-    <% follow = current_account.follows_as_follower.find_by(followee: account)
+    <%# preloaded_follow: the viewer's follow of the account (false if none), when it's been fetched already %>
+    <% follow = defined?(preloaded_follow) && !preloaded_follow.nil? ? preloaded_follow : current_account.follows_as_follower.find_by(followee: account)
        state_options = {
          'not_following' => 'Not following',
          'follow_without_subscribing' => 'Following',
