@@ -33,7 +33,7 @@
     <%= partial :view_as, locals: { view_options: [
       { key: 'details', label: 'Details', icon: 'bi-list-task' },
       { key: 'pictures', label: 'Pictures', icon: 'bi-person-square' },
-      { key: 'dietary_requirements', label: 'Dietary requirements', icon: 'bi-egg-fried' },
+      { key: 'dietary_requirements', label: 'Dietary requirements', icon: 'bi-fork-knife' },
       { key: 'map', label: 'Map', icon: 'bi-geo-alt-fill' }
     ].map { |opt| opt.merge(active: opt[:key] == display) } } %>
   </div>
