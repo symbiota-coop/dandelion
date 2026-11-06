@@ -220,6 +220,25 @@ class LintTest < Minitest::Test
                  "Gathering pages go back with <%= partial :'gatherings/back', locals: { to: 'rota', path: ... } %>, under their heading"
   end
 
+  def test_icon_first
+    [
+      %(<a class="btn btn-primary" href="#">Star <i class="bi bi-star"></i></a>),
+      %(<button class="btn btn-sm">\n  <%= label %>\n  <i class="bi bi-qr-code"></i>\n</button>)
+    ].each do |template|
+      offenses = erb_offenses(template).select { |linter, _| linter == 'IconFirst' }
+      assert_equal 1, offenses.size, "IconFirst on #{template}: #{offenses.inspect}"
+    end
+
+    [
+      %(<a class="btn btn-primary" href="#"><i class="bi bi-star"></i> Star</a>),
+      %(<a class="btn" href="#"><i class="bi bi-pencil"></i></a>), # just an icon
+      %(<button class="btn">Pay <i class="bi bi-spin bi-slash-lg" style="display: none"></i></button>), # a spinner while it waits
+      %(<a class="text-primary" href="#">Info <i class="bi bi-info-circle"></i></a>), # not a button
+      %(<a class="btn <%= 'active' if x %>" href="#"<% if y %> rel="nofollow"<% end %>><i class="bi bi-map"></i> Map</a>), # ERB in the tag
+      %(<a class="btn" href="#"><% if heart %><i class="bi bi-heart-fill"></i><% else %><%= emoji %><% end %></a>) # logic isn't text
+    ].each { |template| assert_empty erb_offenses(template).select { |linter, _| linter == 'IconFirst' }, template }
+  end
+
   def test_money_fields
     [
       %(<%= f.number_block :cost %>), %(<%= f.number_block :amount, min: 0 %>), %(<%= f.number_block(:ticket_price) %>)

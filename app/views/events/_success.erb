@@ -4,8 +4,8 @@
 
     <p>
       <a target="_blank" href="/orders/<%= @order.public_id %>" class="btn btn-outline-primary">
-        View confirmation <% unless @event.no_tickets_pdf? %>and <%= @order.tickets.count == 1 ? 'ticket' : 'tickets' %><% end %>
         <i class="bi bi-qr-code"></i>
+        View confirmation <% unless @event.no_tickets_pdf? %>and <%= @order.tickets.count == 1 ? 'ticket' : 'tickets' %><% end %>
       </a>
     </p>
 
