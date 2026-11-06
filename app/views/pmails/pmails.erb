@@ -84,7 +84,7 @@
         </td>
         <td>
           <% if pmail.sent_at %>
-            <a class="btn btn-primary me-1 mb-1" href="<%= edit_url %>">
+            <a class="btn btn-primary text-nowrap me-1 mb-1" href="<%= edit_url %>">
               <i class="bi bi-check-lg"></i> Sent
             </a>
             <div class="mt-1">
@@ -94,7 +94,7 @@
               Sent at <%= pmail.sent_at %>
             </div>
           <% elsif pmail.requested_send_at %>
-            <a class="btn btn-secondary me-1 mb-1" href="<%= edit_url %>">
+            <a class="btn btn-secondary text-nowrap me-1 mb-1" href="<%= edit_url %>">
               <i class="bi bi-spin bi-slash-lg"></i> Sending
             </a>
             <div class="mt-1">
@@ -107,7 +107,7 @@
             Last saved at <%= pmail.updated_at %><br>
             Will be sent at <%= pmail.delayed_job.run_at %>
           <% else %>
-            <a class="btn btn-secondary" href="<%= edit_url %>">
+            <a class="btn btn-secondary text-nowrap" href="<%= edit_url %>">
               <i class="bi bi-pencil-fill"></i> Edit
             </a>
             <div class="mt-1">
