@@ -8,26 +8,6 @@
       })
     })
   }
-
-  $(function() {
-    // Hide the sidebar as soon as the table's first column reaches it when scrolling sideways
-    var sidebarHidden = false;
-
-    $(window).scroll(function() {
-      var $table = $('#event_stats');
-      if (!$table.length) return;
-      // Below md the sidebar is an offcanvas for the mobile nav, so leave it alone
-      var desktop = window.matchMedia('(min-width: 768px)').matches;
-      var hide = desktop && $table.offset().left - $(window).scrollLeft() < $('#sidebar').outerWidth();
-      if (hide === sidebarHidden) return;
-      sidebarHidden = hide;
-      var $sidebar = $('#sidebar').stop(true, true);
-      if (hide) $sidebar.fadeOut(150);
-      // Clear fadeIn's inline display, which would otherwise hold the mobile offcanvas open
-      else if (desktop) $sidebar.fadeIn(150, function() { $sidebar.css('display', '') });
-      else $sidebar.css('display', '');
-    });
-  });
 </script>
 
 <% if !@event %>
@@ -76,7 +56,7 @@
 <% if @event %>
   <%== '<div class="table-responsive mb-3">' %>
 <% end %>
-<table id="event_stats" class="table <% if @event %> mb-0 <% else %> table-striped table-hover event-stats-sticky <% end %> table-sm small">
+<table id="event_stats" class="table <% if @event %> mb-0 <% else %> table-striped table-hover table-sticky <% end %> table-sm small">
   <thead>
     <tr>
       <th>Name</th>

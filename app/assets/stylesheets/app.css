@@ -2223,11 +2223,11 @@ body .table > tfoot > tr > th {
   border-bottom: none;
 }
 
-/* Stats for many events (events/_event_stats.erb): the name column stays put when scrolling sideways, and the header row stays under the fixed header when scrolling down, so both need a background. Odd rows take the stripe, which Bootstrap paints over the background as an inset shadow.
+/* Wide tables (.table-sticky: stats for many events, a gathering's members): the name column stays put when scrolling sideways, and the header row stays under the fixed header when scrolling down, so both need a background. Odd rows take the stripe, which Bootstrap paints over the background as an inset shadow.
    The background is set through --bs-table-bg, as DataTables' table.table.dataTable cells rule paints that over ours.
    The page itself scrolls both ways (no ancestor of the table has overflow), so both stick to the viewport */
-.event-stats-sticky th:first-child,
-.event-stats-sticky td:first-child {
+.table-sticky th:first-child,
+.table-sticky td:first-child {
   position: sticky;
   left: 0;
   width: 15em;
@@ -2237,13 +2237,13 @@ body .table > tfoot > tr > th {
 }
 
 /* A shadow off the name column's right edge, over the columns scrolling under it. It's on a pseudo-element, as Bootstrap and DataTables paint stripes and hover as the cells' own inset box-shadow, and each cell is clipped at its top and bottom so the column reads as one */
-.event-stats-sticky th:first-child,
-.event-stats-sticky td:first-child {
+.table-sticky th:first-child,
+.table-sticky td:first-child {
   clip-path: inset(0 -2rem 0 0);
 }
 
-.event-stats-sticky th:first-child::after,
-.event-stats-sticky td:first-child::after {
+.table-sticky th:first-child::after,
+.table-sticky td:first-child::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -2251,26 +2251,26 @@ body .table > tfoot > tr > th {
   pointer-events: none;
 }
 
-.event-stats-sticky thead th {
+.table-sticky thead th {
   position: sticky;
   top: var(--header-offset);
   z-index: 2;
 }
 
-.event-stats-sticky thead th:first-child {
+.table-sticky thead th:first-child {
   z-index: 3;
 }
 
-.event-stats-sticky td:first-child {
+.table-sticky td:first-child {
   border-right: 1px solid var(--bs-black);
 }
 
-.event-stats-sticky td:first-child,
-.event-stats-sticky th {
+.table-sticky td:first-child,
+.table-sticky th {
   --bs-table-bg: var(--bs-white);
 }
 
-.event-stats-sticky thead {
+.table-sticky thead {
   background: var(--bs-white);
 }
 

@@ -80,6 +80,22 @@ $(function () {
     })
   }
 
+  // A wide table (.table-sticky) hides the sidebar as soon as its first column reaches it when scrolling sideways
+  let sidebarHiddenByTable = false
+  $(window).on('scroll', function () {
+    const $table = $('.table-sticky').first()
+    if (!$table.length) return
+    // Below md the sidebar is an offcanvas for the mobile nav, so leave it alone
+    const hide = desktop.matches && $table.offset().left - $(window).scrollLeft() < $('#sidebar').outerWidth()
+    if (hide === sidebarHiddenByTable) return
+    sidebarHiddenByTable = hide
+    const $sidebar = $('#sidebar').stop(true, true)
+    if (hide) $sidebar.fadeOut(150)
+    // Clear fadeIn's inline display, which would otherwise hold the mobile offcanvas open
+    else if (desktop.matches) $sidebar.fadeIn(150, function () { $sidebar.css('display', '') })
+    else $sidebar.css('display', '')
+  })
+
   // Close the sidebar as the user leaves the page, so it isn't open when they press back
   $(window).on('beforeunload', function () {
     const sidebar = bootstrap.Offcanvas.getInstance('#sidebar')
