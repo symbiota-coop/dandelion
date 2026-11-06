@@ -1,11 +1,11 @@
-<% public_a = @event_feedback.public_answers ? @event_feedback.public_answers[params[:i].to_i][1] : nil %>
+<% public_a = event_feedback.public_answers ? event_feedback.public_answers[i][1] : nil %>
 <% if !public_a %>
   <a href="javascript:;" onclick="$(this).hide().next().show()">Show an extract</a>
 <% end %>
-<% form_tag "/event_feedbacks/#{@event_feedback.id}/public_answers/#{params[:i]}", style: ('display: none' if !public_a) do %>
+<% form_tag "/event_feedbacks/#{event_feedback.id}/public_answers/#{i}", style: ('display: none' if !public_a) do %>
   <div class="ask-box">
-    <label class="visually-hidden" for="public-answer-<%= params[:i].to_i %>">Public extract</label>
-    <%= text_area_tag :public_answer, id: "public-answer-#{params[:i].to_i}", rows: 1, onchange: '$(this.form).submit()', class: 'form-control autosize', value: public_a, placeholder: 'Paste an extract here to show it publicly' %>
+    <label class="visually-hidden" for="public-answer-<%= event_feedback.id %>-<%= i %>">Public extract</label>
+    <%= text_area_tag :public_answer, id: "public-answer-#{event_feedback.id}-#{i}", rows: 1, onchange: '$(this.form).submit()', class: 'form-control autosize', value: public_a, placeholder: 'Paste an extract here to show it publicly' %>
     <div class="ask-box-actions">
       <button type="submit" class="btn btn-primary btn-sm" aria-label="Save extract">
         <i class="bi bi-arrow-right" aria-hidden="true"></i>

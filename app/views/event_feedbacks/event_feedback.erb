@@ -40,7 +40,9 @@
         <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
         <% if @event_feedback.publicly_visible? %>
           <div class="mt-3">
-            <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/public_answers/<%= i %>"></div>
+            <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/public_answers/<%= i %>">
+              <%= partial :'event_feedbacks/public', locals: { event_feedback: @event_feedback, i: i } %>
+            </div>
           </div>
         <% end %>
       <% end %>
@@ -53,7 +55,9 @@
         Your response
       </th>
       <td>
-        <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/response"></div>
+        <div data-pagelet-url="/event_feedbacks/<%= @event_feedback.id %>/response">
+          <%= partial :'event_feedbacks/response', locals: { event_feedback: @event_feedback } %>
+        </div>
       </td>
     </tr>
   <% end %>

@@ -497,6 +497,10 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     assert_includes last_response.body, 'The teacher was kind and the room was too cold.'
     refute_includes last_response.body, 'Show an extract'
 
+    # The feedback table shows each extract with the page, rather than loading it
+    get "/e/#{@event.slug}/feedback"
+    assert_includes last_response.body, 'The teacher was kind and the room was too cold.'
+
     post "/event_feedbacks/#{feedback.id}/public_answers/0", public_answer: 'It was a wonderful day.'
     assert_equal 200, last_response.status
     assert_equal [['How was it?', 'It was a wonderful day.']], feedback.reload.public_answers

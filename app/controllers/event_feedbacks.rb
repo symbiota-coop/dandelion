@@ -118,7 +118,7 @@ Dandelion::App.controller do
     @event_feedback = EventFeedback.find(params[:id]) || not_found
     @event = @event_feedback.event
     event_admins_only!
-    partial :'event_feedbacks/response'
+    partial :'event_feedbacks/response', locals: { event_feedback: @event_feedback }
   end
 
   post '/event_feedbacks/:id/response' do
@@ -135,7 +135,7 @@ Dandelion::App.controller do
     @event_feedback = EventFeedback.find(params[:id]) || not_found
     @event = @event_feedback.event
     event_admins_only!
-    partial :'event_feedbacks/public'
+    partial :'event_feedbacks/public', locals: { event_feedback: @event_feedback, i: params[:i].to_i }
   end
 
   post '/event_feedbacks/:id/public_answers/:i' do
