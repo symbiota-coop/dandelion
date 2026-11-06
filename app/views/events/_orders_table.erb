@@ -2,8 +2,10 @@
    orders = orders.paginate(page: params[:page], per_page: 50)
    # Load the page once: orders is a criteria, so each map or each would query it again
    orders_on_page = orders.to_a
-   # Each event's progress bar, rendered once however many of its orders are on the page
+   # Each event's progress bar, rendered once however many of its orders are on the page, and its revenue, from its
+   # tickets read for every event on the page at once
    progress_by_event = {}
+   Event.preload_ticket_accounting_rows(orders_on_page.filter_map(&:event).uniq(&:id)) if defined?(event_name)
    # Batch load event feedbacks to avoid N+1 queries
    if @event
      order_account_ids = orders_on_page.map(&:account_id).compact

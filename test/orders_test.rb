@@ -599,6 +599,34 @@ class OrdersTest < ActiveSupport::TestCase
     Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber) if subscriber
   end
 
+  test "the organisation orders page shows each event's revenue, reading every event's tickets at once" do
+    create_event(prices: [10])
+    sign_in_with_rack(@account)
+    sell = lambda do |event, price|
+      order = event.orders.create!(account: FactoryBot.create(:account), currency: event.currency, value: price, payment_completed: true)
+      order.tickets.create!(event: event, account: order.account, ticket_type: event.ticket_types.first, price: price, payment_completed: true)
+    end
+    # An event's column in its orders' rows: its name, countdown, progress and revenue
+    event_cell = ->(event) { last_response.body[%r{<td>\s*<a href="/e/#{event.slug}">.*?</td>}m] }
+    ticket_queries = lambda do
+      queries = queries_during { get "/o/#{@organisation.slug}/orders" }
+      assert_equal 200, last_response.status
+      queries.count(%w[find tickets])
+    end
+
+    sell.call(@event, 10)
+    one_event = ticket_queries.call
+    assert_includes event_cell.call(@event), '£10'
+
+    others = [25, 40].each_with_index.map do |price, i|
+      create_event(prices: [price], as: :"event#{i}").tap { |event| 2.times { sell.call(event, price) } }
+    end
+    assert_equal one_event, ticket_queries.call
+    assert_includes event_cell.call(@event), '£10'
+    assert_includes event_cell.call(others[0]), '£50'
+    assert_includes event_cell.call(others[1]), '£80'
+  end
+
   test 'event tickets and orders pages run the same queries however many orders there are' do
     create_event(prices: [10])
     @event.ticket_types.first.update!(quantity: 10)

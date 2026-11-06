@@ -17,13 +17,8 @@ module EventStats
     def preload_stats(events)
       events = events.with_stats_includes.to_a
       event_ids = events.map(&:id)
-      rows = lambda do |model, fields, row_class|
-        model.and(:event_id.in => event_ids).pluck(:event_id, *fields).each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |(event_id, *values), rows_by_event|
-          rows_by_event[event_id] << row_class.new(*values)
-        end
-      end
-      ticket_rows = rows.call(Ticket, EventAccounting::TICKET_ACCOUNTING_FIELDS, EventAccounting::TicketAccountingRow)
-      donation_rows = rows.call(Donation, EventAccounting::DONATION_ACCOUNTING_FIELDS, EventAccounting::DonationAccountingRow)
+      ticket_rows = accounting_rows_by_event(Ticket, EventAccounting::TICKET_ACCOUNTING_FIELDS, EventAccounting::TicketAccountingRow, event_ids)
+      donation_rows = accounting_rows_by_event(Donation, EventAccounting::DONATION_ACCOUNTING_FIELDS, EventAccounting::DonationAccountingRow, event_ids)
       charged_order_ids = events.flat_map { |event| event.stripe_charges.filter_map(&:order_id) }.uniq
       transferred_order_ids = charged_order_ids.empty? ? Set.new : Order.and(:id.in => charged_order_ids, transferred: true).pluck(:id).to_set
       events.each do |event|
@@ -35,6 +30,20 @@ module EventStats
       end
       preload_split_order_revenue(events.flat_map(&:orders_for_accounting))
       events
+    end
+
+    # Hands each event the fields of its tickets, read for all of them at once, so its revenue sums (the orders table's
+    # event column) read those rather than querying an event at a time
+    def preload_ticket_accounting_rows(events)
+      ticket_rows = accounting_rows_by_event(Ticket, EventAccounting::TICKET_ACCOUNTING_FIELDS, EventAccounting::TicketAccountingRow, events.map(&:id))
+      events.each { |event| event.assign_ticket_accounting_rows(ticket_rows[event.id]) }
+    end
+
+    # The given fields of a model's records for the events, as row_class structs, by event id
+    def accounting_rows_by_event(model, fields, row_class, event_ids)
+      model.and(:event_id.in => event_ids).pluck(:event_id, *fields).each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |(event_id, *values), rows_by_event|
+        rows_by_event[event_id] << row_class.new(*values)
+      end
     end
 
     # The orders whose credit or fixed discount is split with a revenue sharer read their tickets' and donations'
@@ -54,6 +63,10 @@ module EventStats
         next
       end
     end
+  end
+
+  def assign_ticket_accounting_rows(ticket_rows)
+    @ticket_accounting_rows = ticket_rows
   end
 
   def assign_preloaded_stats(ticket_rows:, donation_rows:, transferred_order_ids:)
