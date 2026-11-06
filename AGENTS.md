@@ -82,7 +82,7 @@ Each test run gets its own database (`dandelion_test_<pid>`, dropped when the ru
 
 CI runs each test file as its own job, listed in `.github/workflows/ruby.yml`: add a new test file there.
 
-Always ask permission before running tests. Your default posture should be to suggest only added/modified tests and any other clearly relevant tests, unless the change is substantial, in which case it may be appropriate to run whole files. Never attempt to run the full test suite.
+Never attempt to run the full test suite. Your default posture should be to run only added/modified tests and any other clearly relevant tests, unless the change is substantial, in which case it may be appropriate to run whole files.
 
 `@` instance variables come from helpers, and anything created inline in a test is a local (`Dandelion/TestInstanceVariable`). Use `create_event(as: :event1)` when a test needs more than one event.
 
