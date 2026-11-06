@@ -317,6 +317,52 @@ class SearchTest < ActiveSupport::TestCase
     assert_equal 1, collection.pipelines.length
   end
 
+  def should_clauses_for(pipeline)
+    pipeline.first.fetch(:$search).fetch(:compound).fetch(:should)
+  end
+
+  test 'searches of a model with an autocomplete field also match the start of a word in it' do
+    collection = CapturingCollection.new
+    Account.stub(:collection, collection) { Account.search('Alek', Account.unscoped, regex_search: false) }
+    assert_includes should_clauses_for(collection.pipelines.first), { autocomplete: { query: 'Alek', path: 'name' } }
+
+    collection = CapturingCollection.new
+    Account.stub(:collection, collection) { Account.search('Alek', Account.unscoped, regex_search: false, autocomplete: nil) }
+    assert(should_clauses_for(collection.pipelines.first).none? { |clause| clause.key?(:autocomplete) })
+  end
+
+  test "each searchable model's autocomplete field is one of its search fields" do
+    AtlasChecks.searchable_models.each do |model|
+      assert_includes model.search_fields, model.autocomplete_field, model.name if model.autocomplete_field
+    end
+  end
+
+  test "a given query vector is searched with, rather than the query's embedding" do
+    collection = CapturingCollection.new
+    vector = [0.4, 0.5, 0.6]
+
+    Event.stub(:collection, collection) do
+      OpenRouter.stub(:embedding, ->(*) { flunk 'asked OpenRouter for an embedding' }) do
+        Event.search('Sound', Event.unscoped, regex_search: false, vector_weight: 0.5, query_vector: vector)
+      end
+    end
+
+    vector_search = collection.pipelines.first.first.dig(:$rankFusion, :input, :pipelines, :vectorPipeline, 0, :$vectorSearch)
+    assert_equal vector, vector_search[:queryVector]
+  end
+
+  test 'the Atlas checks page checks each searchable model, and fails them on plain MongoDB' do
+    assert_equal %w[Account Activity Event Gathering LocalGroup Organisation Pmail], AtlasChecks.searchable_models.map(&:name)
+
+    sign_in_with_rack(FactoryBot.create(:account, admin: true))
+    get '/stats/atlas'
+
+    assert last_response.ok?, last_response.status.to_s
+    AtlasChecks.searchable_models.each { |model| assert_includes last_response.body, "<th colspan=\"4\">#{model.name}</th>" }
+    assert_includes last_response.body, 'Event embeddings'
+    assert_includes last_response.body, 'Failed'
+  end
+
   test 'built search results count as saved, so their through associations query the database' do
     account = FactoryBot.create(:account)
     followee = FactoryBot.create(:account)

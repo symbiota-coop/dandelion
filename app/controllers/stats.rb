@@ -77,6 +77,12 @@ Dandelion::App.controller do
     erb :'stats/messages'
   end
 
+  # Checks the Atlas-only features (AtlasChecks), which CI can't, on plain MongoDB
+  get '/stats/atlas' do
+    @checks = AtlasChecks.run
+    erb :'stats/atlas'
+  end
+
   get '/stats/openrouter' do
     @generations = OpenRouterGeneration.order('created_at desc').paginate(page: params[:page], per_page: 50)
     erb :'stats/openrouter'

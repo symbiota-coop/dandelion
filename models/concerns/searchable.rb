@@ -16,7 +16,7 @@ module Searchable
   RANGE_OPERATORS = %w[$gt $gte $lt $lte].freeze
 
   class_methods do
-    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, autocomplete: autocomplete_field, vector_weight: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil)
+    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, autocomplete: autocomplete_field, vector_weight: nil, query_vector: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil)
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
@@ -105,14 +105,16 @@ module Searchable
         suffix_stages << { '$unset' => [EMBEDDING_FIELD] } if build_records && fields.key?(EMBEDDING_FIELD)
         suffix_stages << { '$project': { _id: 1 } } unless build_records
 
-        # Try to get embedding for vector search if enabled and model has embedding field
-        query_vector = nil
+        # Vector search when asked for and the model has embeddings, with the query's embedding unless given one
+        # (query_vector: /stats/atlas searches with a stored event's)
         if vector_weight && vector_weight > 0 && fields.key?(EMBEDDING_FIELD)
-          query_vector = begin
+          query_vector ||= begin
             OpenRouter.embedding(query, input_type: 'search_query', timeout: VECTOR_EMBEDDING_TIMEOUT_SECONDS)
           rescue StandardError
             nil
           end
+        else
+          query_vector = nil
         end
 
         fusion_stages =
