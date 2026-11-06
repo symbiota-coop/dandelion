@@ -235,7 +235,7 @@
           <%= f.wysiwyg_block :ticket_email_greeting %>
           <% if @event.persisted? %>
             <p class="field-note text-body-secondary">
-              No need to repeat information you already entered on the <code>Description and confirmation</code> tab; it will be included below this greeting.
+              No need to repeat information you already entered on the <a href="#tab-description">Description and confirmation</a> tab; it will be included below this greeting.
               <br>
               <a target="_blank" href="/e/<%= @event.slug %>/ticket_email">Preview order confirmation email &rarr;</a></p>
           <% end %>

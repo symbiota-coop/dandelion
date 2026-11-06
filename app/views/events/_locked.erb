@@ -29,7 +29,7 @@
         <%== EmailHelper.render(:_purchase_error, account: nil, event: @event, provider: @event.locked_error_provider, message: @event.locked_error, help: EventPaymentMethod.dashboard_help_for(@event.locked_error_provider)) %>
         <% if payment_method_missing %>
           <p>
-            You must <a href="/o/<%= @event.organisation.slug %>/edit">add details for Stripe or another payment processor in the Payments tab of your organisation</a> to take payments.
+            You must <a href="/o/<%= @event.organisation.slug %>/edit#tab-payments">add details for Stripe or another payment processor in the Payments tab of your organisation</a> to take payments.
           </p>
         <% end %>
       <% else %>
@@ -39,7 +39,7 @@
             This event is currently locked and visible to event admins only.
           <% end %>
           <% if payment_method_missing %>
-            You must <a href="/o/<%= @event.organisation.slug %>/edit">add details for Stripe or another payment processor in the Payments tab of your organisation</a> to take payments.
+            You must <a href="/o/<%= @event.organisation.slug %>/edit#tab-payments">add details for Stripe or another payment processor in the Payments tab of your organisation</a> to take payments.
           <% elsif @event.locked? %>
             <% if event_lock_admin? %>
               <% if request.path.include?('/edit') %>
