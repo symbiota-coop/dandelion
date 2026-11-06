@@ -28,9 +28,10 @@ module Refundable
     return if failed || result.nil?
 
     # The refund has gone through, so an email that fails is reported rather than raised: raised, it would look as if
-    # the refund had failed
+    # the refund had failed. A provider that can refund less than was asked for (Stripe, when some was refunded
+    # already) returns the amount it refunded
     begin
-      notify_of_refund(amount: amount || try(:value))
+      notify_of_refund(amount: result.is_a?(Numeric) ? result : amount || try(:value))
     rescue StandardError => e
       ErrorReporting.capture_exception(e, context: { model: self.class.name, id: id.to_s })
     end

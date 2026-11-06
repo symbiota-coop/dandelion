@@ -333,7 +333,7 @@ Refunds for Stripe, GoCardless, Mollie, and PayPal payments can be issued from t
 2. Open **Actions** next to the ticket or order.
 3. Choose:
    - **Remove and refund ticket** — refunds that ticket's price and removes it. The rest of the order stays in place. <!-- claim: refund-ticket-own-price -->
-   - **Remove and refund order** — refunds the whole payment (including any donation on the order) and removes the order. <!-- claim: refund-order-whole-payment -->
+   - **Remove and refund order** — refunds the whole payment (including any donation on the order) and removes the order. <!-- claim: refund-order-whole-payment --> For Stripe payments, if some of it has been refunded already (by refunding its tickets one by one, or in Stripe's dashboard), only what's left is refunded, and if nothing is left the order is just removed. <!-- claim: refund-order-only-whats-left -->
    - **Remove ticket** / **Remove order** — removes without refunding. <!-- claim: remove-without-refund --> Use this if you already refunded via Stripe, GoCardless, Mollie, or PayPal, or the payment was not taken through those processors.
 
 The refund options only appear for Stripe, GoCardless, Mollie, and PayPal payments. For Open Collective, crypto, complimentary, or cash tickets, remove the ticket or order here and refund via that platform if needed. <!-- claim: refund-options-only-for-providers --> You'll be asked to confirm.

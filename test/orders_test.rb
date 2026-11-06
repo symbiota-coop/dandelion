@@ -96,9 +96,10 @@ class OrdersTest < ActiveSupport::TestCase
     recorded_emails { queued_jobs(method_name).each(&:invoke_job) }
   end
 
+  # Stubs Stripe for refunds of a £10 order, its charge
   def with_stubbed_stripe_refunds
     refunds = []
-    payment_intent = api_object(charges: [api_object(id: 'ch_test')])
+    payment_intent = stripe_payment_intent('ch_test', amount: 1000)
     Stripe::PaymentIntent.stub :retrieve, payment_intent do
       Stripe::Refund.stub :create, proc { refunds << true } do
         yield refunds
@@ -415,6 +416,38 @@ class OrdersTest < ActiveSupport::TestCase
     assert_equal 10, captured
   end
 
+  test 'Remove and refund order refunds only what is left of a Stripe charge, and nothing if it has all been refunded' do
+    covers 'events/refund-order-only-whats-left@50bbbe'
+    create_event(prices: [10])
+
+    # Partly refunded already: refunds the rest, and the buyer's email says how much
+    order = create_paid_order(@event)
+    refund_params = []
+    notified_amount = nil
+    Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_test', amount: 1000, amount_refunded: 400) do
+      Stripe::Refund.stub :create, proc { |params, _opts| refund_params << params } do
+        order.stub :notify_of_refund, proc { |amount:| notified_amount = amount } do
+          order.destroy
+        end
+      end
+    end
+    assert_equal [{ charge: 'ch_test', amount: 600 }], refund_params
+    assert_equal 6, notified_amount
+
+    # All refunded already, as when its tickets were refunded one by one: refunds nothing, and emails no one
+    order = create_paid_order(@event)
+    refund_params = []
+    emails = nil
+    Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_test', amount: 1000, amount_refunded: 1000) do
+      Stripe::Refund.stub :create, proc { |params, _opts| refund_params << params } do
+        emails = recorded_emails { order.destroy }
+      end
+    end
+    assert_empty refund_params
+    assert_empty emails
+    assert_nil Order.find(order.id)
+  end
+
   test 'failed refund does not email the buyer a confirmation' do
     covers 'events/refund-confirmation-email@e7eb67'
     create_event(prices: [10])
@@ -468,7 +501,7 @@ class OrdersTest < ActiveSupport::TestCase
     @event.organisation.set(stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json)
     order = create_paid_order(@event)
     captured_opts = nil
-    payment_intent = api_object(charges: [api_object(id: 'ch_test')])
+    payment_intent = stripe_payment_intent('ch_test')
     Stripe::PaymentIntent.stub :retrieve, payment_intent do
       Stripe::Refund.stub :create, proc { |_params, opts| captured_opts = opts } do
         order.destroy
@@ -811,7 +844,7 @@ class OrdersTest < ActiveSupport::TestCase
     sign_in_with_rack(@account)
 
     refund_params = []
-    Stripe::PaymentIntent.stub :retrieve, api_object(charges: [api_object(id: 'ch_test')]) do
+    Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_test') do
       Stripe::Refund.stub :create, proc { |params, _opts| refund_params << params } do
         post "/e/#{@event.slug}/orders/#{order.id}/refund_and_destroy"
       end
@@ -874,13 +907,13 @@ class OrdersTest < ActiveSupport::TestCase
     create_event(prices: [10])
     order = create_paid_order(@event)
     emails = nil
-    Stripe::PaymentIntent.stub :retrieve, api_object(charges: [api_object(id: 'ch_test')]) do
-      Stripe::Refund.stub :create, proc { raise Stripe::InvalidRequestError.new('Charge ch_test has already been refunded.', nil) } do
+    Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_test') do
+      Stripe::Refund.stub :create, proc { raise Stripe::InvalidRequestError.new('Insufficient funds in Stripe account.', nil) } do
         emails = recorded_emails { order.destroy }
       end
     end
     email = emails.find { |e| e.recipients.include?(@account.email) }
     assert email
-    assert_includes email.html, 'Charge ch_test has already been refunded.'
+    assert_includes email.html, 'Insufficient funds in Stripe account.'
   end
 end

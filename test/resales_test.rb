@@ -438,7 +438,7 @@ class ResalesTest < ActiveSupport::TestCase
     refunds = 0
     organiser_email = nil
     ErrorReporting.stub(:capture_exception, ->(e, **) { reported << e }) do
-      Stripe::PaymentIntent.stub :retrieve, api_object(charges: [api_object(id: 'ch_resold')]) do
+      Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_resold') do
         Stripe::Refund.stub :create, proc { refunds += 1 } do
           Mailgun::Client.stub :new, proc { raise Mailgun::CommunicationError, 'Mailgun is down' } do
             replacement.stub :send_resale_notification_to_previous_ticketholder, nil do
@@ -482,7 +482,7 @@ class ResalesTest < ActiveSupport::TestCase
   # Stands in for Stripe while tickets are resold, keeping the amount of each refund in pence
   def stripe_refund_amounts
     amounts = []
-    Stripe::PaymentIntent.stub :retrieve, api_object(charges: [api_object(id: 'ch_resold')]) do
+    Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_resold') do
       Stripe::Refund.stub :create, proc { |params, _opts| amounts << params[:amount] } do
         yield
       end
@@ -577,7 +577,7 @@ class ResalesTest < ActiveSupport::TestCase
     replacement = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 15)
 
     refund_params = []
-    Stripe::PaymentIntent.stub :retrieve, api_object(charges: [api_object(id: 'ch_resold')]) do
+    Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_resold') do
       Stripe::Refund.stub :create, proc { |params, _opts| refund_params << params } do
         complete_without_notifications(replacement)
       end
@@ -602,7 +602,7 @@ class ResalesTest < ActiveSupport::TestCase
 
     refunds = 0
     previous_ticketholder_email = organiser_email = nil
-    Stripe::PaymentIntent.stub :retrieve, api_object(charges: [api_object(id: 'ch_credit')]) do
+    Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_credit') do
       Stripe::Refund.stub :create, proc { refunds += 1 } do
         replacement.stub :send_resale_notification_to_previous_ticketholder, proc { |_account, **kwargs| previous_ticketholder_email = kwargs } do
           replacement.stub :send_resale_notification_to_organiser, proc { |_account, **kwargs| organiser_email = kwargs } do

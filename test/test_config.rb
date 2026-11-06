@@ -162,5 +162,11 @@ module ActiveSupport
     def api_object(**attributes)
       Struct.new(*attributes.keys).new(*attributes.values)
     end
+
+    # A Stripe payment intent with one charge, of amount and amount_refunded cents. The default is more than any test's
+    # refund, so refunds aren't capped at what's left unless a test sets it
+    def stripe_payment_intent(charge_id, amount: 1_000_000, amount_refunded: 0)
+      api_object(charges: [api_object(id: charge_id, amount: amount, amount_refunded: amount_refunded)])
+    end
   end
 end

@@ -101,25 +101,29 @@ class EventPaymentMethod
         stripe_account: event.organisation.stripe_user_id
       )
       pi = ::Stripe::PaymentIntent.retrieve(record.payment_intent, opts)
+      charge = pi.charges.first
+
+      # Some or all of the charge may have been refunded already, by refunding its order's tickets one by one or in
+      # Stripe's dashboard, and Stripe refuses to refund more than is left. So refund only what's left, and nothing
+      # (without an error) if that's nothing
+      unrefunded_cents = charge.amount - charge.amount_refunded
+      return if unrefunded_cents <= 0
+
+      refund_cents = amount ? [(amount * 100).to_i, unrefunded_cents].min : unrefunded_cents
+      params = { charge: charge.id }
+      # With no amount, Stripe refunds the whole charge
+      params[:amount] = refund_cents if amount || charge.amount_refunded.positive?
 
       if event.revenue_sharer_organisationship
-        params = {
-          charge: pi.charges.first.id,
-          refund_application_fee: true,
-          reverse_transfer: true
-        }
-        params[:amount] = (amount * 100).to_i if amount
+        params.merge!(refund_application_fee: true, reverse_transfer: true)
         ::Stripe::Refund.create(params, opts.except(:stripe_account))
-      elsif event.organisation.stripe_user_id
-        params = { charge: pi.charges.first.id }
-        params[:amount] = (amount * 100).to_i if amount
-        params[:refund_application_fee] = true if refund_application_fee
-        ::Stripe::Refund.create(params, opts)
       else
-        params = { charge: pi.charges.first.id }
-        params[:amount] = (amount * 100).to_i if amount
+        params[:refund_application_fee] = true if event.organisation.stripe_user_id && refund_application_fee
         ::Stripe::Refund.create(params, opts)
       end
+
+      # What was refunded, for the attendee's email, as it can be less than was asked for
+      refund_cents / 100.0
     rescue ::Stripe::InvalidRequestError => e
       on_error.call(e) if on_error
       true
