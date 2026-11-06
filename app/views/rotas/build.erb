@@ -1,8 +1,10 @@
-<h2><%= @rota.new_record? ? 'Create a rota' : 'Edit rota' %></h2>
-<div class="container">
-  <% form_for @rota ||= Rota.new, @rota.new_record? ? "/g/#{@gathering.slug}/rotas/new" : "/g/#{@gathering.slug}/rotas/#{@rota.id}/edit" do |f| %>
-    <%= f.text_block :name %>
-    <%= f.wysiwyg_block :description %>
-    <%= f.submit_block destroy_url: ("/g/#{@gathering.slug}/rotas/#{@rota.id}/destroy" if gathering_admin?) %>
-  <% end %>
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h2><%= @rota.new_record? ? 'Create a rota' : 'Edit rota' %></h2>
+    <% form_for @rota ||= Rota.new, @rota.new_record? ? "/g/#{@gathering.slug}/rotas/new" : "/g/#{@gathering.slug}/rotas/#{@rota.id}/edit" do |f| %>
+      <%= f.text_block :name %>
+      <%= f.wysiwyg_block :description %>
+      <%= f.submit_block destroy_url: ("/g/#{@gathering.slug}/rotas/#{@rota.id}/destroy" if gathering_admin?) %>
+    <% end %>
+  </div>
 </div>

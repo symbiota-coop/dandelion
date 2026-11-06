@@ -1,0 +1,44 @@
+<%# Lists to drag into order, side by side (the rota's roles and slots, the timetable's spaces and slots), in a card that a
+    Reorder link beside the page's other links opens: onclick="$('#reorder').toggle()".
+    lists: [{ title:, url:, owner: { rota_id: id }, ids_param:, items: [[id, name]] }]; grid: the id of the pagelet that shows the order,
+    reloaded after each change. Needs jquery-ui-interactions.min.js %>
+<div class="card reorder my-3" id="reorder" style="display: none">
+  <div class="card-body">
+    <div class="row g-4">
+      <% lists.each do |list| %>
+        <div class="col-md-6">
+          <h3 class="h5 mb-1"><%= list[:title] %></h3>
+          <p class="small text-body-secondary mb-2">Drag to reorder</p>
+          <ul class="list-group reorder-list" data-url="<%= list[:url] %>" data-owner="<%= list[:owner].to_json %>" data-ids-param="<%= list[:ids_param] %>" data-grid="<%= grid %>">
+            <% list[:items].each do |id, name| %>
+              <li class="list-group-item d-flex align-items-center gap-2" id="<%= id %>">
+                <i class="bi bi-grip-vertical text-body-secondary" aria-hidden="true"></i>
+                <%= name %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+    <a class="btn btn-outline-primary mt-3" href="javascript:;" onclick="$('#reorder').hide()">Done</a>
+  </div>
+</div>
+<script>
+  $(function () {
+    $('.reorder-list').sortable({
+      axis: 'y',
+      placeholder: 'list-group-item reorder-placeholder',
+      forcePlaceholderSize: true,
+      update: function (event) {
+        const list = $(event.target)
+        const data = Object.assign({}, list.data('owner'))
+        data[list.attr('data-ids-param')] = list.sortable('toArray')
+        $.post(list.attr('data-url'), data, function () {
+          // The grid shows the new order straight away
+          const grid = $('#' + list.attr('data-grid'))
+          grid.load(grid.attr('data-pagelet-url'))
+        })
+      }
+    })
+  })
+</script>

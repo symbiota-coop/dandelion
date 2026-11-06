@@ -6,6 +6,19 @@
   <a class="underline-dotted" href="/g/<%= @gathering.slug %>/timetables/<%= @timetable.id %>/edit">
     Edit timetable
   </a>
+  <% unless @timetable.hide_schedule? %>
+    &middot;
+    <a class="underline-dotted" href="javascript:;" onclick="$('#reorder').toggle()">
+      Reorder
+    </a>
+    <%= partial :reorder, locals: {
+          grid: 'timetable-grid',
+          lists: [
+            { title: 'Spaces', url: '/spaces/order', owner: { timetable_id: @timetable.id.to_s }, ids_param: 'space_ids', items: @timetable.spaces.order('o asc').map { |space| [space.id, space.name] } },
+            { title: 'Slots', url: '/tslots/order', owner: { timetable_id: @timetable.id.to_s }, ids_param: 'tslot_ids', items: @timetable.tslots.order('o asc').map { |tslot| [tslot.id, tslot.name] } }
+          ]
+        } %>
+  <% end %>
 <% end %>
 <% if @timetable.description %>
   <div class="my-3">
@@ -20,55 +33,10 @@
     <%= partial :'timetables/tactivity_form', locals: { timetable: @timetable } %>
   </div>
   <div class="mt-2">
-    <%# jQuery UI's sortable, for the spaces and slots below, and draggable and droppable, for the activities in the timetable partial, which the pagelet reloads without this page %>
+    <%# jQuery UI's sortable, for the Reorder lists above, and draggable and droppable, for the activities in the timetable partial, which the pagelet reloads without this page %>
     <script src="<%= cachebust('/javascripts/ext/jquery-ui-interactions.min.js') %>" defer></script>
-    <div data-pagelet-url="/g/<%= @gathering.slug %>/timetables/<%= @timetable.id %>">
+    <div id="timetable-grid" data-pagelet-url="/g/<%= @gathering.slug %>/timetables/<%= @timetable.id %>">
       <%= partial :'timetables/timetable', locals: { timetable: @timetable } %>
     </div>
-    <% if gathering_admin? && !@timetable.hide_schedule? %>
-      <script>
-        $(function () {
-          $(".spaces").sortable({
-            update: function (event) {
-              $.post('/spaces/order', {timetable_id: $(event.target).attr('data-timetable-id'), space_ids: $(event.target).sortable("toArray")}, function () {
-                $(event.target).next().show()
-              })
-            }
-          });
-
-          $(".tslots").sortable({
-            update: function (event) {
-              $.post('/tslots/order', {timetable_id: $(event.target).attr('data-timetable-id'), tslot_ids: $(event.target).sortable("toArray")}, function () {
-                $(event.target).next().show()
-              })
-            }
-          });
-        });
-      </script>
-      <style>
-        .spaces li, .tslots li { cursor: move }
-      </style>
-      <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="bi bi-arrow-left-right"></i> Reorder</a>
-      <div style="display: none" class="tactivity-form">
-        <h3>Reorder spaces</h3>
-        <ul class="spaces" data-timetable-id="<%= @timetable.id %>">
-          <% @timetable.spaces.order('o asc').each { |space| %>
-          <li id="<%= space.id %>"><%= space.name %></li>
-          <% } %>
-        </ul>
-        <p style="display: none">
-          <em>Refresh the page to see your changes</em>
-        </p>
-        <h3>Reorder slots</h3>
-        <ul class="tslots" data-timetable-id="<%= @timetable.id %>">
-          <% @timetable.tslots.order('o asc').each { |tslot| %>
-          <li id="<%= tslot.id %>"><%= tslot.name %></li>
-          <% } %>
-        </ul>
-        <p style="display: none">
-          <em>Refresh the page to see your changes</em>
-        </p>
-      </div>
-    <% end %>
   </div>
 </div>

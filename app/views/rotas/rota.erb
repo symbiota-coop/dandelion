@@ -13,6 +13,23 @@
 <a class="underline-dotted" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>.csv">
   Export as CSV
 </a>
+&middot;
+<%# Switches the grid below between pictures and names, reloading it in place %>
+<a class="underline-dotted" href="javascript:;" data-base-url="<%= "/g/#{@gathering.slug}/rotas/#{@rota.id}" %>" onclick="const grid = $('#rota-grid'); const names = !grid.attr('data-pagelet-url').includes('view=names'); grid.attr('data-pagelet-url', $(this).attr('data-base-url') + (names ? '?view=names' : '')); grid.load(grid.attr('data-pagelet-url')); $(this).text(names ? 'Show pictures' : 'Show names')">Show names</a>
+<% if gathering_admin? %>
+  &middot;
+  <a class="underline-dotted" href="javascript:;" onclick="$('#reorder').toggle()">
+    Reorder
+  </a>
+  <script src="<%= cachebust('/javascripts/ext/jquery-ui-interactions.min.js') %>" defer></script>
+  <%= partial :reorder, locals: {
+        grid: 'rota-grid',
+        lists: [
+          { title: 'Roles', url: '/roles/order', owner: { rota_id: @rota.id.to_s }, ids_param: 'role_ids', items: @rota.roles.order('o asc').map { |role| [role.id, role.name] } },
+          { title: 'Slots', url: '/rslots/order', owner: { rota_id: @rota.id.to_s }, ids_param: 'rslot_ids', items: @rota.rslots.order('o asc').map { |rslot| [rslot.id, rslot.name] } }
+        ]
+      } %>
+<% end %>
 
 <% if @rota.description %>
   <div class="my-3">
@@ -22,56 +39,6 @@
   </div>
 <% end %>
 
-<div data-pagelet-url="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>">
+<div id="rota-grid" data-pagelet-url="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>">
   <%= partial :'rotas/rota', locals: { rota: @rota } %>
 </div>
-<% if gathering_admin? %>
-  <script src="<%= cachebust('/javascripts/ext/jquery-ui-interactions.min.js') %>" defer></script>
-  <style>
-    .roles li, .rslots li { cursor: move }
-  </style>
-  <script>
-    $(function () {
-
-      $(".roles").sortable({
-        update: function (event) {
-          $.post('/roles/order', {rota_id: $(event.target).attr('data-rota-id'), role_ids: $(event.target).sortable("toArray")}, function () {
-            $(event.target).next().show()
-          })
-        }
-      });
-
-      $(".rslots").sortable({
-        update: function (event) {
-          $.post('/rslots/order', {rota_id: $(event.target).attr('data-rota-id'), rslot_ids: $(event.target).sortable("toArray")}, function () {
-            $(event.target).next().show()
-          })
-        }
-      });
-
-    })
-  </script>
-  <div class="mt-2">
-    <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="bi bi-arrow-left-right"></i> Reorder</a>
-    <div style="display: none" class="tactivity-form">
-      <h3>Reorder roles</h3>
-      <ul class="roles" data-rota-id="<%= @rota.id %>">
-        <% @rota.roles.order('o asc').each { |role| %>
-        <li id="<%= role.id %>"><%= role.name %></li>
-        <% } %>
-      </ul>
-      <p style="display: none">
-        <em>Refresh the page to see your changes</em>
-      </p>
-      <h3>Reorder slots</h3>
-      <ul class="rslots" data-rota-id="<%= @rota.id %>">
-        <% @rota.rslots.order('o asc').each { |rslot| %>
-        <li id="<%= rslot.id %>"><%= rslot.name %></li>
-        <% } %>
-      </ul>
-      <p style="display: none">
-        <em>Refresh the page to see your changes</em>
-      </p>
-    </div>
-  </div>
-<% end %>

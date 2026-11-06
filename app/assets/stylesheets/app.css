@@ -3758,3 +3758,19 @@ a.home-feedback {
     border-left: 1px solid var(--bs-border-color);
   }
 }
+
+/* Reorder lists (_reorder.erb): list-group items picked up by their whole row, a dashed gap where they'll drop */
+.reorder-list .list-group-item {
+  cursor: move;
+}
+
+.reorder-list .ui-sortable-helper {
+  cursor: move;
+  box-shadow: var(--bs-box-shadow-sm);
+}
+
+.reorder-list .reorder-placeholder {
+  visibility: visible !important;
+  background-color: var(--bs-tertiary-bg);
+  border-style: dashed;
+}

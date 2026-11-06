@@ -195,6 +195,22 @@ class LintTest < Minitest::Test
     ].each { |template| assert_empty erb_offenses(template).select { |linter, _| linter == 'PostLinks' }, template }
   end
 
+  def test_heading_container
+    [
+      %(<h2>Edit rota</h2>\n<div class="container">\n  <form></form>\n</div>),
+      %(<h2><%= x ? 'Create' : 'Edit' %></h2>\n<%# the form %>\n<div class="container mt-3">)
+    ].each do |template|
+      offenses = erb_offenses(template).select { |linter, _| linter == 'HeadingContainer' }
+      assert_equal 1, offenses.size, "HeadingContainer on #{template}: #{offenses.inspect}"
+    end
+
+    [
+      %(<h2>Edit rota</h2>\n<form></form>),
+      %(<%= partial :'accounts/nav' %>\n<div class="container">),
+      %(<h2>Teams</h2>\n<div class="container-fluid">\n<div class="my-container">)
+    ].each { |template| assert_empty erb_offenses(template).select { |linter, _| linter == 'HeadingContainer' }, template }
+  end
+
   def test_cdn_tags
     {
       '<script src="https://cdn.jsdelivr.net/npm/x@1.0.0/x.min.js"></script>' => /cdn_tag/,

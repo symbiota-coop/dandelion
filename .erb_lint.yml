@@ -34,6 +34,9 @@ linters:
   # Destroy links carry data-method="post" (.erb_linters/post_links.rb)
   PostLinks:
     enabled: true
+  # No heading straight above a .container, which centres what follows out of line with it (.erb_linters/heading_container.rb)
+  HeadingContainer:
+    enabled: true
   # Replaced by RubocopTags (.erb_linters/rubocop_tags.rb), which also checks the conditions of if, unless and elsif tags
   Rubocop:
     enabled: false

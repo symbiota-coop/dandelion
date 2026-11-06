@@ -1,10 +1,12 @@
-<h2><%= @timetable.new_record? ? 'Create a timetable' : 'Edit timetable' %></h2>
-<div class="container">
-  <% form_for @timetable ||= Timetable.new, @timetable.new_record? ? "/g/#{@gathering.slug}/timetables/new" : "/g/#{@gathering.slug}/timetables/#{@timetable.id}/edit" do |f| %>
-    <%= f.text_block :name %>
-    <%= f.wysiwyg_block :description %>
-    <%= f.check_box_block :scheduling_by_all %>
-    <%= f.check_box_block :hide_schedule %>
-    <%= f.submit_block destroy_url: ("/g/#{@gathering.slug}/timetables/#{@timetable.id}/destroy" if gathering_admin?) %>
-  <% end %>
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h2><%= @timetable.new_record? ? 'Create a timetable' : 'Edit timetable' %></h2>
+    <% form_for @timetable ||= Timetable.new, @timetable.new_record? ? "/g/#{@gathering.slug}/timetables/new" : "/g/#{@gathering.slug}/timetables/#{@timetable.id}/edit" do |f| %>
+      <%= f.text_block :name %>
+      <%= f.wysiwyg_block :description %>
+      <%= f.check_box_block :scheduling_by_all %>
+      <%= f.check_box_block :hide_schedule %>
+      <%= f.submit_block destroy_url: ("/g/#{@gathering.slug}/timetables/#{@timetable.id}/destroy" if gathering_admin?) %>
+    <% end %>
+  </div>
 </div>

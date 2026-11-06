@@ -1,2 +1,6 @@
-<h2><%= @inventory_item.new_record? ? 'Create a inventory item' : 'Edit inventory item' %></h2>
-<%= partial :'inventory/build' %>
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h2><%= @inventory_item.new_record? ? 'Create a inventory item' : 'Edit inventory item' %></h2>
+    <%= partial :'inventory/build' %>
+  </div>
+</div>
