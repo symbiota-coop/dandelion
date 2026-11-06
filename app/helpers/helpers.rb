@@ -210,8 +210,10 @@ Dandelion::App.helpers do
     )
   end
 
+  # The query string's params, to carry over to another view of the same list: not the route's own (slug), which the
+  # path already has
   def view_base_params
-    params.to_h.reject { |k, v| %w[captures format search name display].include?(k) || v == false }
+    params.to_h.select { |k, _| request.GET.key?(k) }.reject { |k, v| %w[format search name display].include?(k) || v == false }
   end
 
   def view_url(display, path: nil)

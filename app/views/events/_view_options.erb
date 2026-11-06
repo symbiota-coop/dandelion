@@ -11,7 +11,7 @@
   <% if params[:display] != 'map' %>
     <div>
       <% form_tag (path if defined?(path)).to_s, method: 'get', class: 'form-inline submitOnChange' do %>
-        <% view_base_params.reject { |k, _| %w[search order slug].include?(k) }.each do |k, v| %>
+        <% view_base_params.reject { |k, _| %w[search order].include?(k) }.each do |k, v| %>
           <% if v.is_a?(Array) %>
             <% v.each { |item| %>
             <%= hidden_field_tag "#{k}[]", value: item %>
