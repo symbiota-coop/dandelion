@@ -121,12 +121,29 @@ class EventPaymentMethod
         params[:refund_application_fee] = true if event.organisation.stripe_user_id && refund_application_fee
         ::Stripe::Refund.create(params, opts)
       end
+      refund_rest_of_application_fee(charge, opts) if refund_application_fee && params[:amount] && refund_cents == unrefunded_cents
 
       # What was refunded, for the attendee's email, as it can be less than was asked for
       refund_cents / 100.0
     rescue ::Stripe::InvalidRequestError => e
       on_error.call(e) if on_error
       true
+    end
+
+    # A refund with an amount returns only its share of the application fee (fee × amount / charge), even when it
+    # refunds the rest of a charge, so a fee that earlier refunds left with the platform (ticket refunds don't refund it,
+    # nor need refunds in Stripe's dashboard) would stay there, and the connected account would fund the buyer's refund
+    # of it. So once the charge is all refunded, refund whatever of the fee is left. The buyer's refund has gone
+    # through, so a failure here is reported rather than emailed as a failed refund
+    def self.refund_rest_of_application_fee(charge, opts)
+      return unless charge.application_fee
+
+      platform_opts = opts.except(:stripe_account)
+      fee = ::Stripe::ApplicationFee.retrieve(charge.application_fee, platform_opts)
+      left = fee.amount - fee.amount_refunded
+      ::Stripe::ApplicationFee.create_refund(fee.id, { amount: left }, platform_opts) if left.positive?
+    rescue ::Stripe::StripeError => e
+      ErrorReporting.capture_exception(e, context: { charge: charge.id, application_fee: charge.application_fee })
     end
   end
 end

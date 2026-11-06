@@ -448,6 +448,25 @@ class OrdersTest < ActiveSupport::TestCase
     assert_nil Order.find(order.id)
   end
 
+  test 'Remove and refund order refunds the rest of the application fee when it refunds the rest of a Stripe charge' do
+    create_event(prices: [10])
+    # A £10 order with a £2 donation to Dandelion, whose tickets' refunds (£8) left the fee with the platform. Refunding
+    # the last £2 returns only £2 × 2/10 of the fee, so the rest is refunded on its own
+    order = create_paid_order(@event)
+    order.set(application_fee_amount: 2)
+    fee_refunds = []
+    Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_test', amount: 1000, amount_refunded: 800, application_fee: 'fee_test') do
+      Stripe::Refund.stub :create, proc { |_params, _opts| nil } do
+        Stripe::ApplicationFee.stub :retrieve, api_object(id: 'fee_test', amount: 200, amount_refunded: 40) do
+          Stripe::ApplicationFee.stub :create_refund, proc { |id, params, opts| fee_refunds << [id, params, opts[:stripe_account]] } do
+            order.stub(:notify_of_refund, proc { |amount:| amount }) { order.destroy }
+          end
+        end
+      end
+    end
+    assert_equal [['fee_test', { amount: 160 }, nil]], fee_refunds
+  end
+
   test 'failed refund does not email the buyer a confirmation' do
     covers 'events/refund-confirmation-email@e7eb67'
     create_event(prices: [10])
