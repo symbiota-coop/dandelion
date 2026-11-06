@@ -3794,3 +3794,8 @@ a.home-feedback {
   background-color: var(--bs-tertiary-bg);
   border-style: dashed;
 }
+
+/* Adding or removing a facilitator comes back to their row (events_admin.rb), clear of the fixed header */
+#facilitators {
+  scroll-margin-top: calc(var(--header-height) + var(--space-base));
+}
