@@ -11,6 +11,14 @@
   let confirmed = null
   let confirming = null
 
+  // Focus goes back to the element for keyboard users, but without the tooltip that focusing it shows. Disposed rather
+  // than hidden, as Bootstrap shows it on a timer, after a hide would have run; hovering makes it again
+  function refocus (el) {
+    el.focus()
+    const tooltip = bootstrap.Tooltip.getInstance(el)
+    if (tooltip) tooltip.dispose()
+  }
+
   function closeConfirm (returnFocus) {
     if (!confirming) return
     const el = confirming
@@ -20,10 +28,13 @@
       $(el).one('hidden.bs.popover', function () {
         const hidden = bootstrap.Popover.getInstance(el)
         if (hidden) hidden.dispose()
+        // Once it's gone, as focusing makes the element's tooltip, which can't register while the popover is there
+        if (returnFocus) refocus(el)
       })
       popover.hide()
+    } else if (returnFocus) {
+      refocus(el)
     }
-    if (returnFocus) el.focus()
   }
 
   function askToConfirm (el, danger) {
@@ -50,6 +61,10 @@
     // One still fading out from the last time is replaced
     const stale = bootstrap.Popover.getInstance(el)
     if (stale) stale.dispose()
+    // Bootstrap keeps one instance per element, so the element's own tooltip (made on hover, like the rota's n/a links)
+    // would stop the popover registering, and Cancel couldn't find it to hide it. Hovering makes the tooltip again
+    const tooltip = bootstrap.Tooltip.getInstance(el)
+    if (tooltip) tooltip.dispose()
     $(el).one('shown.bs.popover', function () { confirmButton.trigger('focus') })
     new bootstrap.Popover(el, {
       content: body[0],
