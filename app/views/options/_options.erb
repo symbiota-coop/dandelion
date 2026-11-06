@@ -6,7 +6,7 @@
       <th>Cost</th>
       <th>Places</th>
       <th></th>
-      <% if @membership.confirmed? %>
+      <% if @membership&.confirmed? || gathering_admin? %>
         <th style="width: 33%" class="d-none d-lg-table-cell">People</th>
       <% end %>
     </tr>
@@ -21,7 +21,7 @@
   <tr>
     <td>
       <strong>
-        <% if @membership.admin? || option.cost == 0 %>
+        <% if gathering_admin? || option.cost == 0 %>
           <a href="/g/<%= @gathering.slug %>/options/<%= option.id %>/edit">
             <%= option.name %>
           </a>
@@ -45,8 +45,8 @@
       <% end %>
     </td>
     <td nowrap>
-      <% if @membership.confirmed? %>
-        <% if !@membership.admin? && option.hide_members? %>
+      <% if @membership&.confirmed? || gathering_admin? %>
+        <% if !gathering_admin? && option.hide_members? %>
           <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
         <% else %>
           <a href="javascript:;" onclick="$('#modal .modal-content').load(<%= "/g/#{@gathering.slug}/options/#{option.id}".to_json %>, function () {
@@ -75,16 +75,16 @@
         <% end %>
       <% end %>
     </td>
-    <% if @membership.confirmed? %>
+    <% if @membership&.confirmed? || gathering_admin? %>
       <td class="d-none d-lg-table-cell">
-        <% if !@membership.admin? && option.hide_members? %>
+        <% if !gathering_admin? && option.hide_members? %>
           <%= pluralize option.optionships.count, 'person' %>
         <% else %>
           <% y = [] %>
           <% option.optionships.order('created_at asc').each { |optionship| account = optionship.account; %>
           <% if params[:view] == 'names' %>
             <% y << capture do %>
-              <% if @membership.admin? %>
+              <% if gathering_admin? %>
                 <a href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit">
                   <%= account.name %>
                 </a>
@@ -94,7 +94,7 @@
             <% end %>
           <% else %>
             <% y << capture do %>
-              <% if @membership.admin? %>
+              <% if gathering_admin? %>
                 <a class="me-1" href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit"><img alt="<%= account.name %>" data-bs-toggle="tooltip" class="avatar avatar-sm <%= account.avatar_class %>" title="<%= account.name %>" src="<%= u account.image_thumb_or_gravatar_url %>"></a>
               <% else %>
                 <%= partial :'accounts/square', locals: { account: account } %>

@@ -3,6 +3,6 @@
   <% form_for @role, "/roles/#{@role.id}/edit" do |f| %>
     <%= f.text_block :name %>
     <%= f.number_block :worth %>
-    <%= f.submit_block destroy_url: ("/roles/#{@role.id}/destroy" if admin? || @membership.admin?) %>
+    <%= f.submit_block destroy_url: ("/roles/#{@role.id}/destroy" if gathering_admin?) %>
   <% end %>
 </div>

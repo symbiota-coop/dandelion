@@ -1,8 +1,10 @@
 <%= partial :'rotas/progress', locals: {rota: @rota} %>
 
-<div class="my-3">
-  <%= partial :'rotas/shift_summary', locals: {membership: @membership, rota: @rota, show_title: true} %>
-</div>
+<% if @membership %>
+  <div class="my-3">
+    <%= partial :'rotas/shift_summary', locals: {membership: @membership, rota: @rota, show_title: true} %>
+  </div>
+<% end %>
 
 <% shifts_by_rslot_role = rota.shifts.includes(:account).index_by { |s| [s.rslot_id, s.role_id] } %>
 <table class="table table-striped mt-3">
@@ -11,7 +13,7 @@
     <% rota.roles.order('o asc').each { |role| %>
     <td>
       <strong>
-        <% if @membership.admin? %>
+        <% if gathering_admin? %>
           <a href="/roles/<%= role.id %>/edit">
             <%= role.name %>
           </a>
@@ -25,7 +27,7 @@
       </strong>
     </td>
     <% } %>
-    <% if @membership.admin? %>
+    <% if gathering_admin? %>
       <td>
         <% form_tag "/roles/create?rota_id=#{rota.id}", class: 'form-inline', style: 'display: inline' do %>
           <%= text_field_tag :name, class: 'form-control', style: 'width: 10em', placeholder: 'New role' %>
@@ -37,7 +39,7 @@
   <tr>
     <td>
       <strong>
-        <% if @membership.admin? %>
+        <% if gathering_admin? %>
           <a href="/rslots/<%= rslot.id %>/edit">
             <%= rslot.name %>
           </a>
@@ -55,12 +57,12 @@
       <%= partial :'rotas/rota_rslot_role', locals: { rota: rota, rslot: rslot, role: role, shift: shifts_by_rslot_role[[rslot.id, role.id]] } %>
     </td>
     <% } %>
-    <% if @membership.admin? %>
+    <% if gathering_admin? %>
       <td></td>
     <% end %>
   </tr>
   <% } %>
-  <% if @membership.admin? %>
+  <% if gathering_admin? %>
     <tr>
       <td>
         <% form_tag "/rslots/create?rota_id=#{rota.id}", class: 'form-inline', style: 'display: inline' do %>

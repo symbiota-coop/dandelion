@@ -16,7 +16,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @spend = @gathering.spends.new(mass_assigning(params[:spend], Spend))
-    @spend.account = current_account unless @membership.admin?
+    @spend.account = current_account unless gathering_admin?
     if @spend.save
       redirect back
     else
@@ -38,7 +38,7 @@ Dandelion::App.controller do
     confirmed_membership_required!
     @spend = @gathering.spends.find(params[:id]) || not_found
     spend_params = (params[:spend] || {}).dup
-    spend_params.delete(:account_id) unless @membership.admin?
+    spend_params.delete(:account_id) unless gathering_admin?
     if @spend.update_attributes(mass_assigning(spend_params, Spend))
       redirect "/g/#{@gathering.slug}/budget"
     else

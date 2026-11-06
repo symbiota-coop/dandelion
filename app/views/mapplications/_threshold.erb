@@ -10,7 +10,7 @@
         Automatically accepting applications with <%= @gathering.threshold %> <%= @gathering.vouchers %>
       </p>
     <% end %>
-    <% if @gathering.democratic_threshold %>
+    <% if @gathering.democratic_threshold && @membership %>
       What do you think the magic number should be?
       <% form_tag "/g/#{@gathering.slug}/threshold", style: 'display: inline' do %>
         <%= number_field_tag :desired_threshold, min: 0, class: 'form-control', value: @membership.desired_threshold, style: 'display: inline-block; width: 4em', onchange: '$(this.form).submit()' %>

@@ -5,6 +5,6 @@
     <%= f.wysiwyg_block :description %>
     <%= f.check_box_block :scheduling_by_all %>
     <%= f.check_box_block :hide_schedule %>
-    <%= f.submit_block destroy_url: ("/g/#{@gathering.slug}/timetables/#{@timetable.id}/destroy" if admin? || @membership.admin?) %>
+    <%= f.submit_block destroy_url: ("/g/#{@gathering.slug}/timetables/#{@timetable.id}/destroy" if gathering_admin?) %>
   <% end %>
 </div>

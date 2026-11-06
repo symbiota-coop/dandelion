@@ -28,5 +28,5 @@
     <%= f.select_block :space_id, options: @tactivity.space_ids %>
     <%= f.select_block :tslot_id, options: @tactivity.tslot_ids %>
   <% end %>
-  <%= f.submit_block button_text: @tactivity.new_record? ? 'Create activity' : 'Update activity', destroy_url: ("/tactivities/#{@tactivity.id}/destroy" if admin? || @membership.admin?) %>
+  <%= f.submit_block button_text: @tactivity.new_record? ? 'Create activity' : 'Update activity', destroy_url: ("/tactivities/#{@tactivity.id}/destroy" if gathering_admin?) %>
 <% end %>

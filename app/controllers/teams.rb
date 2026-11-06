@@ -86,7 +86,7 @@ Dandelion::App.controller do
     @gathering = @teamship.team.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    halt unless (@teamship.account.id == current_account.id) || @membership.admin?
+    halt unless (@teamship.account.id == current_account.id) || gathering_admin?
     @teamship.destroy
     redirect back
   end
@@ -119,7 +119,7 @@ Dandelion::App.controller do
     @gathering = @teamship.team.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    halt unless (@teamship.account.id == current_account.id) || @membership.admin?
+    halt unless (@teamship.account.id == current_account.id) || gathering_admin?
     partial :'teams/subscribe', locals: { teamship: @teamship }
   end
 
@@ -129,7 +129,7 @@ Dandelion::App.controller do
     @gathering = @teamship.team.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    halt unless (@teamship.account.id == current_account.id) || @membership.admin?
+    halt unless (@teamship.account.id == current_account.id) || gathering_admin?
     @teamship.set(unsubscribed: false)
     if request.xhr?
       200
@@ -145,7 +145,7 @@ Dandelion::App.controller do
     @gathering = @teamship.team.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    halt unless (@teamship.account.id == current_account.id) || @membership.admin?
+    halt unless (@teamship.account.id == current_account.id) || gathering_admin?
     @teamship.set(unsubscribed: true)
     @team.subscriptions.and(account: current_account).destroy_all
     if request.xhr?

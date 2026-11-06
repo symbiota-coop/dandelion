@@ -2,6 +2,9 @@ Dandelion::App.controller do
   get '/gatherings', provides: %i[html json] do
     @gatherings = if current_account && params[:my_gatherings]
                     Gathering.and(:id.in => current_account.memberships.pluck(:gathering_id))
+                  elsif admin?
+                    # Site admins see every gathering, unlisted and secret ones too
+                    Gathering.all
                   else
                     Gathering.and(:listed => true, :privacy.ne => 'secret')
                   end
@@ -10,8 +13,8 @@ Dandelion::App.controller do
 
     case content_type
     when :html
-      # Your own gatherings show whether or not they have an image
-      @gatherings = @gatherings.and(has_image: true) unless current_account && params[:my_gatherings]
+      # Your own gatherings, and every gathering for site admins, show whether or not they have an image
+      @gatherings = @gatherings.and(has_image: true) unless (current_account && params[:my_gatherings]) || admin?
       @gatherings = @gatherings.paginate(page: params[:gatherings_page], per_page: 16)
       erb :'gatherings/gatherings'
     when :json
@@ -55,7 +58,7 @@ Dandelion::App.controller do
   get '/g/:slug', prerender: true do
     @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
-    if @membership
+    if @membership || gathering_admin?
       if request.xhr?
         partial :newsfeed, locals: { notifications: @gathering.notifications_as_circle.order('created_at desc').paginate(page: params[:page]), include_circle_name: false }
       elsif @gathering.redirect_home
@@ -135,7 +138,7 @@ Dandelion::App.controller do
   get '/g/:slug/subscribe' do
     @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
-    confirmed_membership_required!
+    confirmed_membership_required!(site_admins: false)
     partial :'gatherings/subscribe', locals: { membership: @membership }
   end
 
@@ -150,7 +153,7 @@ Dandelion::App.controller do
   get '/g/:slug/unsubscribe' do
     @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
-    confirmed_membership_required!
+    confirmed_membership_required!(site_admins: false)
     @membership.set(unsubscribed: true)
     request.xhr? ? 200 : redirect('/accounts/subscriptions')
   end

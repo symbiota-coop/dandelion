@@ -2,7 +2,7 @@
 <h2>
   <%= @rota.name %>
 </h2>
-<% if @membership.admin? %>
+<% if gathering_admin? %>
   <a class="underline-dotted" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>/edit">
     Edit rota
   </a> &middot;
@@ -25,7 +25,7 @@
 <div data-pagelet-url="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>">
   <%= partial :'rotas/rota', locals: { rota: @rota } %>
 </div>
-<% if @membership.admin? %>
+<% if gathering_admin? %>
   <script src="<%= cachebust('/javascripts/ext/jquery-ui-interactions.min.js') %>" defer></script>
   <style>
     .roles li, .rslots li { cursor: move }

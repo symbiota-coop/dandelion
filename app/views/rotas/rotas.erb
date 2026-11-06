@@ -1,25 +1,27 @@
 <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
-<% if @membership.admin? %>
+<% if gathering_admin? %>
   <div class="my-2">
     <a class="btn btn-primary" href="/g/<%= @gathering.slug %>/rotas/new"><i class="bi bi-plus-lg"></i> Create a rota</a>
   </div>
 <% end %>
 
-<div class="mb-3">
-  <h2>
-    Your shifts
-    <% if @gathering.enable_shift_worth %>
-      <span class="badge <% if @membership.shift_points >= (@membership.shift_points_required || 0) %>text-bg-primary<% else %>text-bg-danger<% end %>" data-bs-toggle="tooltip" title="<%= sprintf('%g', @membership.shift_points) %>/<%= pluralize(@membership.shift_points_required ? sprintf('%g', @membership.shift_points_required) : '?', 'shift point') %>">
-        <%= sprintf('%g', @membership.shift_points) %>/<%= @membership.shift_points_required ? sprintf('%g', @membership.shift_points_required) : '?' %>
-      </span>
+<% if @membership %>
+  <div class="mb-3">
+    <h2>
+      Your shifts
+      <% if @gathering.enable_shift_worth %>
+        <span class="badge <% if @membership.shift_points >= (@membership.shift_points_required || 0) %>text-bg-primary<% else %>text-bg-danger<% end %>" data-bs-toggle="tooltip" title="<%= sprintf('%g', @membership.shift_points) %>/<%= pluralize(@membership.shift_points_required ? sprintf('%g', @membership.shift_points_required) : '?', 'shift point') %>">
+          <%= sprintf('%g', @membership.shift_points) %>/<%= @membership.shift_points_required ? sprintf('%g', @membership.shift_points_required) : '?' %>
+        </span>
+      <% end %>
+    </h2>
+    <% if @membership.shifts.exists? %>
+      <%= partial :'rotas/shift_summary', locals: {membership: @membership} %>
+    <% else %>
+      Sign up below!
     <% end %>
-  </h2>
-  <% if @membership && @membership.shifts.exists? %>
-    <%= partial :'rotas/shift_summary', locals: {membership: @membership} %>
-  <% else %>
-    Sign up below!
-  <% end %>
-</div>
+  </div>
+<% end %>
 
 <h2>Sign up to shifts</h2>
 <% @gathering.rotas.each { |rota| %>

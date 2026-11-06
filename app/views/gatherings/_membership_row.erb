@@ -21,7 +21,7 @@
   <%= membership.proposed_by.map(&:name).to_sentence(last_word_connector: ' and ') if membership.proposed_by %>
 </td>
 <td>
-  <% mapplication = membership.mapplication; if @membership.admin? && mapplication && mapplication.answers %>
+  <% mapplication = membership.mapplication; if gathering_admin? && mapplication && mapplication.answers %>
   <a href="javascript:;" onclick="$('#modal .modal-content').load(<%= "/g/#{@gathering.slug}/mapplications/#{mapplication.id}".to_json %>, function () {
           $('#modal').modal('show')
         });">
@@ -55,7 +55,7 @@
 <% if @gathering.enable_contributions %>
   <td>
     <% membership.optionships.each { |optionship| %>
-    <% if !@membership.admin? && optionship.option.hide_members? %>
+    <% if !gathering_admin? && optionship.option.hide_members? %>
       <a href="/g/<%= @gathering.slug %>/options" class="badge text-bg-secondary">
         <i class="bi <%= optionship.option.icon %>"></i> <%= optionship.option.type %>
       </a>
@@ -66,12 +66,12 @@
     <% end %>
     <% } %>
   </td>
-  <% if @membership.admin? || !@gathering.hide_paid %>
+  <% if gathering_admin? || !@gathering.hide_paid %>
     <td>
       <%= m membership.requested_contribution, @gathering.currency %>
     </td>
     <td>
-      <% if @membership.admin? %>
+      <% if gathering_admin? %>
         <% if membership.paid %>
           <a href="javascript:;" onclick="$(this).hide().next().show().find('input').focus()"><%= m membership.paid, @gathering.currency.to_s if membership.paid %></a>
         <% end %>
@@ -94,7 +94,7 @@
 
     <% if @gathering.enable_shift_worth %>
       <span data-bs-toggle="tooltip" title="<%= sprintf('%g', membership.shift_points) %>/<%= pluralize(membership.shift_points_required ? sprintf('%g', membership.shift_points_required) : '?', 'shift point') %>">
-        <% if @membership.admin? %>
+        <% if gathering_admin? %>
           <%= sprintf('%g', membership.shift_points) %>/<a href="javascript:;" onclick="$(this).hide().next().css('display', 'inline').find('input').focus()"><%= membership.shift_points_required ? sprintf('%g', membership.shift_points_required) : '?' %></a>
           <% form_tag "/memberships/#{membership.id}/shift_points_required", class: 'form-inline', style: 'display:none' do %>
             <%= number_field_tag :shift_points_required, class: 'form-control', style: 'width: 6em', min: 0, value: membership.shift_points_required, onblur: '$(this.form).submit()' %>
@@ -107,9 +107,9 @@
 
   </td>
 <% end %>
-<% if (admin? || @membership.admin?) || !@gathering.hide_invitations %>
+<% if gathering_admin? || !@gathering.hide_invitations %>
   <td>
-    <% if @membership.admin? %>
+    <% if gathering_admin? %>
       <% if membership.smart_invitations_granted %>
         <%= membership.invitations_extended %>/<a href="javascript:;" onclick="$(this).hide().next().css('display', 'inline').find('input').focus()"><%= membership.smart_invitations_granted %></a>
       <% end %>
@@ -121,7 +121,7 @@
     <% end %>
   </td>
 <% end %>
-<% if @membership.admin? %>
+<% if gathering_admin? %>
   <td class="small">
     <% y = [] %>
     <% if membership.admin %>

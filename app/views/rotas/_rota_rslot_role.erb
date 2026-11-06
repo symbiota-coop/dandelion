@@ -1,6 +1,6 @@
 <% if shift %>
   <% account = shift.account %>
-  <% if (shift.account && shift.account_id == current_account.id) || @membership.admin? %>
+  <% if (shift.account && shift.account_id == current_account.id) || gathering_admin? %>
     <% if shift.account %>
       <a href="/shifts/<%= shift.id %>/edit">
         <% if params[:view] == 'names' %>
@@ -27,7 +27,7 @@
   <% end %>
 <% else %>
   <a class="pagelet-trigger btn btn-primary btn-sm mb-1" data-method="post" href="/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>">Sign up</a>
-  <% if @membership.admin? %>
+  <% if gathering_admin? %>
     <a class="pagelet-trigger btn btn-primary btn-sm mb-1" data-method="post" href="/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>&na=true">n/a</a>
   <% end %>
 <% end %>

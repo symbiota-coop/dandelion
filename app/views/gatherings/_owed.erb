@@ -1,3 +1,4 @@
+<% if @membership %>
 <% if @membership.requested_contribution && @membership.requested_contribution > 0 && (!@membership.paid || (@membership.paid < @membership.requested_contribution)) %>
   <div id="owed" class="card text-bg-danger mb-3">
     <div class="card-body">
@@ -39,3 +40,4 @@
     })
   })
 </script>
+<% end %>

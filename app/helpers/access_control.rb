@@ -364,9 +364,16 @@ Dandelion::App.helpers do
     end
   end
 
-  def membership_required!(gathering = nil, account = current_account)
+  # Site admins can browse (GET) a gathering's pages without being a member, but not act in it. Pass
+  # site_admins: false for a GET that acts on the viewer's own membership
+  def site_admin_browsing_gathering?(gathering, account, site_admins: true)
+    site_admins && gathering && request.get? && admin?(account)
+  end
+
+  def membership_required!(gathering = nil, account = current_account, site_admins: true)
     gathering ||= @gathering
     return if account && gathering && gathering.memberships.find_by(account: account)
+    return if site_admin_browsing_gathering?(gathering, account, site_admins: site_admins)
 
     kick!(
       notice: 'You must be a member of that gathering to access that page',
@@ -374,9 +381,10 @@ Dandelion::App.helpers do
     )
   end
 
-  def confirmed_membership_required!(gathering = nil, account = current_account)
+  def confirmed_membership_required!(gathering = nil, account = current_account, site_admins: true)
     gathering ||= @gathering
     return if account && gathering && (membership = gathering.memberships.find_by(account: account)) && membership.confirmed?
+    return if !membership && site_admin_browsing_gathering?(gathering, account, site_admins: site_admins)
 
     kick!(
       notice: (membership ? 'You must make a payment before accessing that page.' : 'You must be a member of the gathering to access that page.'),

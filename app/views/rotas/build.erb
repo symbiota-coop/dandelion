@@ -3,6 +3,6 @@
   <% form_for @rota ||= Rota.new, @rota.new_record? ? "/g/#{@gathering.slug}/rotas/new" : "/g/#{@gathering.slug}/rotas/#{@rota.id}/edit" do |f| %>
     <%= f.text_block :name %>
     <%= f.wysiwyg_block :description %>
-    <%= f.submit_block destroy_url: ("/g/#{@gathering.slug}/rotas/#{@rota.id}/destroy" if admin? || @membership.admin?) %>
+    <%= f.submit_block destroy_url: ("/g/#{@gathering.slug}/rotas/#{@rota.id}/destroy" if gathering_admin?) %>
   <% end %>
 </div>

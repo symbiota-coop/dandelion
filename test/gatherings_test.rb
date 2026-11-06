@@ -557,4 +557,53 @@ class GatheringsTest < ActiveSupport::TestCase
     assert_equal 0, @other_gathering.shifts.count
     assert_equal 0, @other_gathering.optionships.count
   end
+
+  test 'site admins can browse and administer every gathering without being a member, but not act as a member' do
+    create_gathering(privacy: 'secret', listed: false)
+    team = @gathering.teams.create!(name: 'Kitchen', account: @account)
+    rota = @gathering.rotas.create!(name: 'Bar', account: @account)
+    @gathering.rotas.create!(name: 'Door', account: @account) # with one rota, the rotas overview redirects to it
+    timetable = @gathering.timetables.create!(name: 'Workshops', account: @account)
+    member = FactoryBot.create(:account, name: 'Member Person')
+    @gathering.memberships.create!(account: member)
+    @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account).optionships.create!(account: member, gathering: @gathering)
+    shift = Shift.create!(account: member, role: Role.create!(name: 'Cook', rota: rota), rslot: Rslot.create!(name: 'Morning', rota: rota), rota: rota)
+    site_admin = FactoryBot.create(:account, admin: true)
+    outsider = FactoryBot.create(:account)
+
+    sign_in_with_rack(outsider)
+    get '/gatherings'
+    assert_not_includes last_response.body, @gathering.name
+    get "/g/#{@gathering.slug}/members"
+    assert last_response.redirect?
+
+    sign_in_with_rack(site_admin)
+    get '/gatherings'
+    assert_includes last_response.body, @gathering.name
+    [
+      '', '/todos', '/members', '/applications', '/applications/paused', '/threshold', '/options', '/teams', "/teams/#{team.id}",
+      '/rotas', "/rotas/#{rota.id}", '/timetables', "/timetables/#{timetable.id}", '/inventory', '/budget', '/payments', '/edit'
+    ].each do |path|
+      get "/g/#{@gathering.slug}#{path}"
+      assert last_response.ok?, "GET /g/#{@gathering.slug}#{path} returned #{last_response.status}"
+    end
+
+    get "/g/#{@gathering.slug}/options"
+    assert_includes last_response.body, 'Member Person'
+
+    get "/shifts/#{shift.id}/edit"
+    assert last_response.ok?
+    post "/shifts/#{shift.id}/destroy"
+    refute Shift.find(shift.id)
+
+    post "/g/#{@gathering.slug}/rotas/#{rota.id}/destroy"
+    refute @gathering.rotas.find(rota.id)
+
+    post "/g/#{@gathering.slug}/teams/new", team: { name: 'Garden' }
+    assert last_response.redirect?
+    refute @gathering.teams.find_by(name: 'Garden')
+    get "/g/#{@gathering.slug}/unsubscribe"
+    assert last_response.redirect?
+    refute @gathering.memberships.find_by(account: site_admin)
+  end
 end

@@ -242,8 +242,8 @@ Dandelion::App.controller do
     @shift = Shift.find(params[:id]) || not_found
     @gathering = @shift.rota.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
-    confirmed_membership_required!
-    halt unless (@shift.account && (@shift.account_id == current_account.id)) || @membership.admin?
+    confirmed_membership_required! unless gathering_admin?
+    halt unless (@shift.account && (@shift.account_id == current_account.id)) || gathering_admin?
     erb :'rotas/shift'
   end
 
@@ -251,10 +251,10 @@ Dandelion::App.controller do
     @shift = Shift.find(params[:id]) || not_found
     @gathering = @shift.rota.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
-    confirmed_membership_required!
-    halt unless (@shift.account && (@shift.account_id == current_account.id)) || @membership.admin?
+    confirmed_membership_required! unless gathering_admin?
+    halt unless (@shift.account && (@shift.account_id == current_account.id)) || gathering_admin?
     shift_params = (params[:shift] || {}).dup
-    shift_params.delete(:account_id) unless @membership.admin?
+    shift_params.delete(:account_id) unless gathering_admin?
     if @shift.update_attributes(mass_assigning(shift_params, Shift))
       redirect "/g/#{@gathering.slug}/rotas/#{@shift.rota_id}"
     else
@@ -267,8 +267,8 @@ Dandelion::App.controller do
     @shift = Shift.find(params[:id]) || not_found
     @gathering = @shift.rota.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
-    confirmed_membership_required!
-    halt unless (@shift.account && (@shift.account_id == current_account.id)) || @membership.admin?
+    confirmed_membership_required! unless gathering_admin?
+    halt unless (@shift.account && (@shift.account_id == current_account.id)) || gathering_admin?
     @shift.destroy
     request.xhr? ? 200 : redirect("/g/#{@gathering.slug}/rotas/#{@shift.rota_id}")
   end

@@ -1,5 +1,5 @@
 <td>
-  <%= partial :'accounts/account', locals: { account: (account = mapplication.account), show_email: (@membership.admin? || viewable?(account, :email)) } %>
+  <%= partial :'accounts/account', locals: { account: (account = mapplication.account), show_email: (gathering_admin? || viewable?(account, :email)) } %>
 </td>
 <td>
   <a href="javascript:;" onclick="$('#modal .modal-content').load(<%= "/g/#{@gathering.slug}/mapplications/#{mapplication.id}".to_json %>, function () {
@@ -23,9 +23,9 @@
   <% if mapplication.status != 'accepted' %>
     <% if mapplication.status == 'paused' %>
       Paused by <%= mapplication.processed_by.name %>
-      <% if @membership.admin? %> &middot; <% end %>
+      <% if gathering_admin? %> &middot; <% end %>
     <% end %>
-    <% if @membership.admin? %>
+    <% if gathering_admin? %>
       <% if mapplication.acceptable? %>
         <a class="btn mb-1 btn-primary" data-method="post" href="/mapplications/<%= mapplication.id %>/process?status=accepted">Accept</a>
       <% end %>

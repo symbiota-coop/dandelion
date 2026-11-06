@@ -60,7 +60,7 @@ class Gathering
   end
 
   def self.admin?(gathering, account)
-    account && gathering and ((membership = gathering.memberships.find_by(account: account)) and membership.admin?)
+    account && gathering and (account.admin? || ((membership = gathering.memberships.find_by(account: account)) and membership.admin?))
   end
 
   def self.currencies

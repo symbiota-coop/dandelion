@@ -97,9 +97,9 @@ Dandelion::App.controller do
   post '/g/:slug/add_member' do
     @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
-    confirmed_membership_required!
+    confirmed_membership_required! unless gathering_admin?
 
-    if !@membership.admin? && @membership.invitations_remaining <= 0
+    if !gathering_admin? && @membership.invitations_remaining <= 0
       flash[:error] = 'You have run out of invitations'
       redirect back
     end

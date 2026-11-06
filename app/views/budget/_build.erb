@@ -2,7 +2,7 @@
   <%= f.text_block :item %>
   <%= f.number_block :amount %>
   <%= f.select_block :team_id, options: @gathering.teams.order('name asc').map { |team| [team.name, team.id] } %>
-  <% if @membership.admin? %>
+  <% if gathering_admin? %>
     <%= f.select_block :account_id, options: @gathering.members.order('name asc').map { |account| [account.name, account.id] } %>
   <% end %>
   <%= f.submit_block destroy_url: "/g/#{@gathering.slug}/spends/#{@spend.id}/destroy" %>

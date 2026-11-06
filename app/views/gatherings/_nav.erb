@@ -6,19 +6,19 @@
 <% teams = gathering.teams.order('name asc').to_a if gathering.enable_teams %>
 <% timetables = gathering.timetables.to_a if gathering.enable_timetables %>
 <% rotas = gathering.rotas.to_a if gathering.enable_rotas %>
-<% owed = membership.owes_contribution? %>
-<% pay_badge = ->(colour) { %(<span class="contribution-label badge #{owed ? 'text-bg-danger' : colour}" data-colour="#{colour}">#{m (membership.paid or 0), gathering.currency}/#{m membership.requested_contribution, gathering.currency}</span>) } %>
+<% owed = membership&.owes_contribution? %>
+<% pay_badge = ->(colour) { next unless membership; %(<span class="contribution-label badge #{owed ? 'text-bg-danger' : colour}" data-colour="#{colour}">#{m (membership.paid or 0), gathering.currency}/#{m membership.requested_contribution, gathering.currency}</span>) } %>
 <%# Pills on desktop, and on mobile the same pill-and-sheet nav as organisations and events %>
 <div id="gathering-nav" class="mb-3 bg-dark p-1 rounded d-none d-md-block">
   <%= ul_nav [
         [%(<span class="fw-semibold">#{ERB::Util.html_escape(gathering.name)}</span>), base],
-        (['Settings', "#{base}/edit"] if membership.admin),
+        (['Settings', "#{base}/edit"] if gathering_admin?(gathering)),
         [%(Members <span class="badge text-bg-dark">#{members_badge}</span>), "#{base}/members"],
         ([%(Applications #{%(<span class="badge text-bg-dark">#{pending_applications}</span>) if pending_applications.positive?}), "#{base}/applications"] if show_applications),
         ([%(#{gathering.choose_and_pay_label || 'Choose & Pay'} #{pay_badge.('text-bg-dark')}), "#{base}/options"] if gathering.enable_contributions),
         (['Teams', [['Overview', "#{base}/teams"], ['Create a team', "#{base}/teams/new"]] + teams.map { |team| ["#&nbsp;#{team.name}", "#{base}/teams/#{team.id}"] }] if gathering.enable_teams),
-        (['Timetables', timetables.map { |timetable| [timetable.name, "#{base}/timetables/#{timetable.id}"] } + (membership.admin? ? [['Create a timetable', "#{base}/timetables/new"]] : [])] if gathering.enable_timetables),
-        (['Shifts', (rotas.size > 1 ? [['Overview', "#{base}/rotas"]] : []) + rotas.map { |rota| [rota.name, "#{base}/rotas/#{rota.id}"] } + (membership.admin? ? [['Create a rota', "#{base}/rotas/new"]] : [])] if gathering.enable_rotas),
+        (['Timetables', timetables.map { |timetable| [timetable.name, "#{base}/timetables/#{timetable.id}"] } + (gathering_admin?(gathering) ? [['Create a timetable', "#{base}/timetables/new"]] : [])] if gathering.enable_timetables),
+        (['Shifts', (rotas.size > 1 ? [['Overview', "#{base}/rotas"]] : []) + rotas.map { |rota| [rota.name, "#{base}/rotas/#{rota.id}"] } + (gathering_admin?(gathering) ? [['Create a rota', "#{base}/rotas/new"]] : [])] if gathering.enable_rotas),
         (['Inventory', "#{base}/inventory"] if gathering.enable_inventory),
         (['Budget', "#{base}/budget"] if gathering.enable_budget)
       ].compact,
@@ -41,7 +41,7 @@
 <div class="nav-crumbs mb-3 d-md-none">
   <%= dropdown_nav [
         ['<i class="bi bi-house-fill"></i> Home', base],
-        (['<i class="bi bi-gear-fill"></i> Settings', "#{base}/edit"] if membership.admin),
+        (['<i class="bi bi-gear-fill"></i> Settings', "#{base}/edit"] if gathering_admin?(gathering)),
         [%(<i class="bi bi-people-fill"></i> Members <span class="badge text-bg-primary">#{members_badge}</span>), "#{base}/members"],
         ([%(<i class="bi bi-person-plus-fill"></i> Applications #{%(<span class="badge text-bg-primary">#{pending_applications}</span>) if pending_applications.positive?}), "#{base}/applications"] if show_applications),
         ([%(<i class="bi bi-wallet2"></i> #{gathering.choose_and_pay_label || 'Choose & Pay'} #{pay_badge.('text-bg-primary')}), "#{base}/options"] if gathering.enable_contributions),
@@ -54,13 +54,13 @@
         *(if gathering.enable_timetables
             [[], ['Timetables']] +
               timetables.map { |timetable| [timetable.name, "#{base}/timetables/#{timetable.id}"] } +
-              (membership.admin? ? [['Create a timetable', "#{base}/timetables/new"]] : [])
+              (gathering_admin?(gathering) ? [['Create a timetable', "#{base}/timetables/new"]] : [])
           end),
         *(if gathering.enable_rotas
             [[], ['Shifts']] +
               (rotas.size > 1 ? [['Overview', "#{base}/rotas"]] : []) +
               rotas.map { |rota| [rota.name, "#{base}/rotas/#{rota.id}"] } +
-              (membership.admin? ? [['Create a rota', "#{base}/rotas/new"]] : [])
+              (gathering_admin?(gathering) ? [['Create a rota', "#{base}/rotas/new"]] : [])
           end)
       ].compact, button_text: ERB::Util.html_escape(gathering.name), container_class: 'btn-group mb-1' %>
 </div>

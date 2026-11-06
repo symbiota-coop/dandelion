@@ -90,7 +90,7 @@ Dandelion::App.controller do
     @optionship = Optionship.find(params[:id]) || not_found
     @gathering = @optionship.option.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
-    halt unless (@optionship.account.id == current_account.id) || @membership.admin?
+    halt unless (@optionship.account.id == current_account.id) || gathering_admin?
     @optionship.destroy
     200
   end

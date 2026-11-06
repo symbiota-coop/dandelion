@@ -1,5 +1,5 @@
 <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
-<% if @membership.admin? %>
+<% if gathering_admin? %>
   <div class="my-2">
     <a class="btn btn-primary" href="/g/<%= @gathering.slug %>/timetables/new"><i class="bi bi-plus-lg"></i> Create a timetable</a>
   </div>
