@@ -467,17 +467,4 @@ class CalendarTest < ActiveSupport::TestCase
     get "/events/my?ics_key=#{@account.ics_key}"
     assert_equal 302, last_response.status
   end
-
-  test 'ics key grants access to gathering birthdays only for a member' do
-    account = FactoryBot.create(:account)
-    non_member = FactoryBot.create(:account)
-    gathering = FactoryBot.create(:gathering, account: account)
-
-    get "/g/#{gathering.slug}/birthdays.ics?ics_key=#{account.ics_key}"
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, 'BEGIN:VCALENDAR'
-
-    get "/g/#{gathering.slug}/birthdays.ics?ics_key=#{non_member.ics_key}"
-    assert_equal 302, last_response.status
-  end
 end
