@@ -29,6 +29,11 @@ class Gathering
     %w[name intro_for_non_members]
   end
 
+  # Its Atlas Search index maps name as autocomplete too, so searches match the start of a word (Searchable)
+  def self.autocomplete_field
+    'name'
+  end
+
   def self.search_scope
     self.and(listed: true).and(:privacy.ne => 'secret')
   end

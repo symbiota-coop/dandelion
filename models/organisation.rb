@@ -44,6 +44,11 @@ class Organisation
     %w[name intro_text]
   end
 
+  # Its Atlas Search index maps name as autocomplete too, so searches match the start of a word (Searchable)
+  def self.autocomplete_field
+    'name'
+  end
+
   def self.search_scope
     all
   end

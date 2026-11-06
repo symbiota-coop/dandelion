@@ -51,6 +51,11 @@ class Activity
     %w[name]
   end
 
+  # Its Atlas Search index maps name as autocomplete too, so searches match the start of a word (Searchable)
+  def self.autocomplete_field
+    'name'
+  end
+
   def self.feedback_summaries_scope
     Activity.and(:id.in => EventFeedback.pluck(:activity_id))
   end

@@ -88,6 +88,11 @@ class Pmail
     %w[subject]
   end
 
+  # Its Atlas Search index maps subject as autocomplete too, so searches match the start of a word (Searchable)
+  def self.autocomplete_field
+    'subject'
+  end
+
   validates_presence_of :from, :subject, :body
   validates_format_of :from, with: %r{\A\s*([\p{L}\d\s]+?)\s*<([\w.!#$%&â€™*+/=?^_`{|}~-]+@[\w-]+(?:\.[\w-]+)+)>\s*\Z}
 

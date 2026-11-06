@@ -24,6 +24,11 @@ class LocalGroup
     %w[name]
   end
 
+  # Its Atlas Search index maps name as autocomplete too, so searches match the start of a word (Searchable)
+  def self.autocomplete_field
+    'name'
+  end
+
   validates_presence_of :name, :geometry, :slug
   validates_uniqueness_of :slug, scope: :organisation_id
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/
