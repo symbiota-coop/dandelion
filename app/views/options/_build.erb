@@ -13,7 +13,7 @@
   <%= f.text_area_block :description %>
   <%= f.select_block :type %>
   <%= f.number_block :capacity %>
-  <%= f.number_block :cost, disabled: !gathering_admin?, hint: ('Only admins can add paid options' if !gathering_admin?) %>
+  <%= f.currency_block :cost, money_symbol: money_symbol(@gathering.currency), disabled: !gathering_admin?, hint: ('Only admins can add paid options' if !gathering_admin?) %>
   <%= f.check_box_block :split_cost, disabled: !gathering_admin? %>
   <%= f.check_box_block :by_invitation %>
   <%= f.check_box_block :hide_members %>

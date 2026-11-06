@@ -2,25 +2,17 @@
 <h2>
   <%= @rota.name %>
 </h2>
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <% if gathering_admin? %>
+    <a class="btn btn-sm btn-primary" href="javascript:;" data-bs-toggle="modal" data-bs-target="#add-shift"><i class="bi bi-person-plus"></i> Add someone to a shift</a>
+    <a class="btn btn-sm btn-outline-primary" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>/edit"><i class="bi bi-pencil"></i> Edit rota</a>
+    <a class="btn btn-sm btn-outline-primary" href="javascript:;" onclick="$('#reorder').toggle()"><i class="bi bi-arrow-down-up"></i> Reorder</a>
+  <% end %>
+  <%= partial :'gatherings/names_toggle', locals: { grid: 'rota-grid', url: "/g/#{@gathering.slug}/rotas/#{@rota.id}" } %>
+  <a class="btn btn-sm btn-outline-primary" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>.csv"><i class="bi bi-download"></i> Export as CSV</a>
+</div>
 <% if gathering_admin? %>
-  <a class="underline-dotted" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>/edit">
-    Edit rota
-  </a> &middot;
-  <a class="underline-dotted" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>/create_shift">
-    Add someone to a shift
-  </a> &middot;
-<% end %>
-<a class="underline-dotted" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>.csv">
-  Export as CSV
-</a>
-&middot;
-<%# Switches the grid below between pictures and names, reloading it in place %>
-<a class="underline-dotted" href="javascript:;" data-base-url="<%= "/g/#{@gathering.slug}/rotas/#{@rota.id}" %>" onclick="const grid = $('#rota-grid'); const names = !grid.attr('data-pagelet-url').includes('view=names'); grid.attr('data-pagelet-url', $(this).attr('data-base-url') + (names ? '?view=names' : '')); grid.load(grid.attr('data-pagelet-url')); $(this).text(names ? 'Show pictures' : 'Show names')">Show names</a>
-<% if gathering_admin? %>
-  &middot;
-  <a class="underline-dotted" href="javascript:;" onclick="$('#reorder').toggle()">
-    Reorder
-  </a>
+  <%= partial :'gatherings/form_modal', locals: { id: 'add-shift', title: 'Add someone to a shift', form: :'rotas/create_shift' } %>
   <script src="<%= cachebust('/javascripts/ext/jquery-ui-interactions.min.js') %>" defer></script>
   <%= partial :reorder, locals: {
         grid: 'rota-grid',

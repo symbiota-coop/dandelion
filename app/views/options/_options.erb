@@ -82,24 +82,15 @@
         <% else %>
           <% y = [] %>
           <% option.optionships.order('created_at asc').each { |optionship| account = optionship.account; %>
-          <% if params[:view] == 'names' %>
-            <% y << capture do %>
-              <% if gathering_admin? %>
-                <a href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit">
-                  <%= account.name %>
-                </a>
-              <% else %>
-                <%= partial :'accounts/square', locals: { account: account } %>
-              <% end %>
-            <% end %>
-          <% else %>
-            <% y << capture do %>
-              <% if gathering_admin? %>
-                <a class="me-1" href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/edit"><img alt="<%= account.name %>" data-bs-toggle="tooltip" class="avatar avatar-sm <%= account.avatar_class %>" title="<%= account.name %>" src="<%= u account.image_thumb_or_gravatar_url %>"></a>
-              <% else %>
-                <%= partial :'accounts/square', locals: { account: account } %>
-              <% end %>
-            <% end %>
+          <% mine = optionship.account_id == current_account.id %>
+          <% y << capture do %>
+            <%= partial :'gatherings/avatar_menu', locals: {
+                  account: account, names: params[:view] == 'names',
+                  # Admins edit it in a modal, which has its own Delete; the person themself can only leave
+                  edit_url: ("/g/#{@gathering.slug}/optionships/#{optionship.id}/edit" if gathering_admin?), edit_in_modal: true,
+                  remove_url: ("/optionships/#{optionship.id}/destroy" if mine),
+                  remove_confirm: (mine ? "Leave #{option.name}?" : "Remove this person from #{option.name}?")
+                } %>
           <% end %>
           <% } %>
           <% if params[:view] == 'names' %>
@@ -116,9 +107,3 @@
   <% } %>
 <% } %>
 </table>
-<% if params[:view] != 'names' %>
-  <div class="d-none d-lg-block">
-    <% names_url = "/g/#{@gathering.slug}/options?view=names" %>
-    <a onclick="$(this).closest('[data-pagelet-url]').attr('data-pagelet-url', <%= names_url.to_json %>)" href="<%= names_url %>" class="pagelet-trigger">Show names instead of pictures</a>
-  </div>
-<% end %>

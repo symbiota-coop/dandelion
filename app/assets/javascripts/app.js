@@ -81,6 +81,19 @@ $(function () {
     })
   })
 
+  // A link with data-open-in-modal opens its page in #modal: the route answers the background request with just the
+  // modal's contents (gatherings/_modal_content.erb), and the link's href stays a page of its own to fall back on
+  $(document).on('click', 'a[data-open-in-modal]', function (e) {
+    e.preventDefault()
+    $('#modal .modal-content').load($(this).attr('href'), function () {
+      $('#modal').modal('show')
+      hideTooltips()
+    })
+  })
+  $(document).on('shown.bs.modal', '#modal', function () {
+    $(this).find('form').find('input:visible, textarea:visible, select:visible').not('[type=hidden]').first().trigger('focus')
+  })
+
   // Opening the notifications or messages dropdown (_nav_top.erb) marks them as checked: the unread dot (.with-label) goes,
   // and data-check-url records it
   $(document).on('click', '[data-check-url]', function () {

@@ -94,12 +94,10 @@
       </tr>
     </table>
     <h2>Actual outgoings</h2>
-    <div class="my-2">
-      <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="bi bi-plus-lg"></i> List expense</a>
-      <div style="display: none">
-        <%= partial :'budget/build' %>
-      </div>
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      <a class="btn btn-sm btn-primary" href="javascript:;" data-bs-toggle="modal" data-bs-target="#add-spend"><i class="bi bi-plus-lg"></i> List expense</a>
     </div>
+    <%= partial :'gatherings/form_modal', locals: { id: 'add-spend', title: 'List an expense', form: :'budget/build' } %>
     <table class="table">
       <tr>
         <th class="w-50">Item</th>
@@ -125,11 +123,10 @@
         </td>
         <td><a href="/u/<%= spend.account.username %>"><%= spend.account.name %></a></td>
         <td>
-          <% if spend.reimbursed %>
-            <i role="button" class="bi bi-check-lg" onclick="$(this).hide().next().show().find('input').click()"></i>
-          <% end %>
-          <% form_tag "/spends/#{spend.id}/reimbursed", style: ('display:none' if spend.reimbursed) do %>
-            <%= check_box_tag :reimbursed, value: true, checked: spend.reimbursed, onclick: '$(this.form).submit()' %>
+          <% form_tag "/spends/#{spend.id}/reimbursed" do %>
+            <div class="form-check form-switch mb-0">
+              <%= check_box_tag :reimbursed, value: true, checked: spend.reimbursed, id: "spend-#{spend.id}-reimbursed", class: 'form-check-input', role: 'switch', 'aria-label': 'Reimbursed', onclick: '$(this.form).submit()' %>
+            </div>
           <% end %>
         </td>
       </tr>

@@ -2,23 +2,24 @@
 <h2>
   <%= @timetable.name %>
 </h2>
-<% if gathering_admin? %>
-  <a class="underline-dotted" href="/g/<%= @gathering.slug %>/timetables/<%= @timetable.id %>/edit">
-    Edit timetable
-  </a>
-  <% unless @timetable.hide_schedule? %>
-    &middot;
-    <a class="underline-dotted" href="javascript:;" onclick="$('#reorder').toggle()">
-      Reorder
-    </a>
-    <%= partial :reorder, locals: {
-          grid: 'timetable-grid',
-          lists: [
-            { title: 'Spaces', url: '/spaces/order', owner: { timetable_id: @timetable.id.to_s }, ids_param: 'space_ids', items: @timetable.spaces.order('o asc').map { |space| [space.id, space.name] } },
-            { title: 'Slots', url: '/tslots/order', owner: { timetable_id: @timetable.id.to_s }, ids_param: 'tslot_ids', items: @timetable.tslots.order('o asc').map { |tslot| [tslot.id, tslot.name] } }
-          ]
-        } %>
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a class="btn btn-sm btn-primary" href="javascript:;" data-bs-toggle="modal" data-bs-target="#propose-activity"><i class="bi bi-plus-lg"></i> Propose an activity</a>
+  <% if gathering_admin? %>
+    <a class="btn btn-sm btn-outline-primary" href="/g/<%= @gathering.slug %>/timetables/<%= @timetable.id %>/edit"><i class="bi bi-pencil"></i> Edit timetable</a>
+    <% unless @timetable.hide_schedule? %>
+      <a class="btn btn-sm btn-outline-primary" href="javascript:;" onclick="$('#reorder').toggle()"><i class="bi bi-arrow-down-up"></i> Reorder</a>
+    <% end %>
   <% end %>
+</div>
+<%= partial :'gatherings/form_modal', locals: { id: 'propose-activity', title: 'Propose an activity', form: :'timetables/tactivity_form', form_locals: { timetable: @timetable } } %>
+<% if gathering_admin? && !@timetable.hide_schedule? %>
+  <%= partial :reorder, locals: {
+        grid: 'timetable-grid',
+        lists: [
+          { title: 'Spaces', url: '/spaces/order', owner: { timetable_id: @timetable.id.to_s }, ids_param: 'space_ids', items: @timetable.spaces.order('o asc').map { |space| [space.id, space.name] } },
+          { title: 'Slots', url: '/tslots/order', owner: { timetable_id: @timetable.id.to_s }, ids_param: 'tslot_ids', items: @timetable.tslots.order('o asc').map { |tslot| [tslot.id, tslot.name] } }
+        ]
+      } %>
 <% end %>
 <% if @timetable.description %>
   <div class="my-3">
@@ -28,15 +29,9 @@
   </div>
 <% end %>
 <div class="my-3">
-  <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="bi bi-plus-lg"></i> Propose an activity</a>
-  <div style="display: none" class="tactivity-form">
-    <%= partial :'timetables/tactivity_form', locals: { timetable: @timetable } %>
-  </div>
-  <div class="mt-2">
-    <%# jQuery UI's sortable, for the Reorder lists above, and draggable and droppable, for the activities in the timetable partial, which the pagelet reloads without this page %>
-    <script src="<%= cachebust('/javascripts/ext/jquery-ui-interactions.min.js') %>" defer></script>
-    <div id="timetable-grid" data-pagelet-url="/g/<%= @gathering.slug %>/timetables/<%= @timetable.id %>">
-      <%= partial :'timetables/timetable', locals: { timetable: @timetable } %>
-    </div>
+  <%# jQuery UI's sortable, for the Reorder lists above, and draggable and droppable, for the activities in the timetable partial, which the pagelet reloads without this page %>
+  <script src="<%= cachebust('/javascripts/ext/jquery-ui-interactions.min.js') %>" defer></script>
+  <div id="timetable-grid" data-pagelet-url="/g/<%= @gathering.slug %>/timetables/<%= @timetable.id %>">
+    <%= partial :'timetables/timetable', locals: { timetable: @timetable } %>
   </div>
 </div>

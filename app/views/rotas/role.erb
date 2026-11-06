@@ -1,10 +1,8 @@
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
 <div class="row justify-content-center">
   <div class="col-lg-8">
-    <h2>Edit role</h2>
-    <% form_for @role, "/roles/#{@role.id}/edit" do |f| %>
-      <%= f.text_block :name %>
-      <%= f.number_block :worth %>
-      <%= f.submit_block destroy_url: ("/roles/#{@role.id}/destroy" if gathering_admin?) %>
-    <% end %>
+    <h2><%= @role.name_was %></h2>
+    <%= partial :'gatherings/back', locals: { to: 'rota', path: "/g/#{@gathering.slug}/rotas/#{@role.rota_id}" } %>
+    <%= partial :'rotas/role_form' %>
   </div>
 </div>

@@ -6,6 +6,11 @@
 flatpickr.l10ns.default.firstDayOfWeek = 1
 
 $(function () {
+  // A form in a modal (gatherings/_form_modal.erb) starts at its first field, as one shown in place did
+  $(document).on('shown.bs.modal', '.form-modal', function () {
+    $(this).find('input:visible, textarea:visible, select:visible').not('[type=hidden]').first().trigger('focus')
+  })
+
   // Scrolling over a focused number field changes its value (1 becomes 0 on a trackpad flick), so let go of the field
   // and scroll the page instead
   $(document).on('wheel', 'input[type=number]:focus', function () {

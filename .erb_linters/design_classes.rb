@@ -48,6 +48,12 @@ module ERBLint
         ]
       end.freeze
 
+      # .show on a .btn is Bootstrap's open-dropdown state, styled like .active, so an outline button with it looks solid
+      # (options.erb and teams.erb hooked their scripts on it)
+      BUTTON = /(?<![\w-])btn(?![\w-])/
+      SHOW = /(?<![\w-])show(?![\w-])/
+      BUTTON_SHOW = '`.show` on a `.btn` is Bootstrap\'s open-dropdown state, which fills it in like `.active`: hook scripts on a class of our own (`form-toggle`).'
+
       def run(processed_source)
         source = processed_source.file_content
 
@@ -59,6 +65,7 @@ module ERBLint
           match = Regexp.last_match
           classes = match[2].gsub(/<%.*?%>/m) { |erb| ' ' * erb.length } # Ruby inside the attribute isn't a class
           check_classes(processed_source, classes, match.begin(2), label: true)
+          check_button_show(processed_source, classes, match.begin(2))
         end
 
         source.scan(SELECTS) do
@@ -90,6 +97,12 @@ module ERBLint
             add(processed_source, range, message)
           end
         end
+      end
+
+      def check_button_show(processed_source, classes, offset)
+        return unless classes.match?(BUTTON) && (match = classes.match(SHOW))
+
+        add(processed_source, (offset + match.begin(0))...(offset + match.end(0)), BUTTON_SHOW)
       end
 
       def add(processed_source, range, message)

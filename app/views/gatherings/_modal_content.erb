@@ -1,0 +1,9 @@
+<%# What a gathering's edit page shows when it's loaded into #modal (a link with data-open-in-modal), rather than as a
+    page: a header with its title, then the form. form: the form's partial, with form_locals if it takes any %>
+<div class="modal-header">
+  <h3 class="modal-title"><%= title %></h3>
+  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+  <%= partial form, locals: (defined?(form_locals) && form_locals) || {} %>
+</div>

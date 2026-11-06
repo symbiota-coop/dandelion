@@ -1,6 +1,8 @@
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
 <div class="row justify-content-center">
   <div class="col-lg-8">
-    <h2><%= @timetable.new_record? ? 'Create a timetable' : 'Edit timetable' %></h2>
+    <h2><%= @timetable.new_record? ? 'Create a timetable' : @timetable.name_was %></h2>
+    <%= partial :'gatherings/back', locals: { to: (@timetable.new_record? ? 'timetables' : 'timetable'), path: (@timetable.new_record? ? "/g/#{@gathering.slug}/timetables" : "/g/#{@gathering.slug}/timetables/#{@timetable.id}") } %>
     <% form_for @timetable ||= Timetable.new, @timetable.new_record? ? "/g/#{@gathering.slug}/timetables/new" : "/g/#{@gathering.slug}/timetables/#{@timetable.id}/edit" do |f| %>
       <%= f.text_block :name %>
       <%= f.wysiwyg_block :description %>

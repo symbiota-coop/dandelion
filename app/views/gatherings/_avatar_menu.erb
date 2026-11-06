@@ -1,0 +1,39 @@
+<%# Someone's avatar (or name, in a names view) on a gathering's record of them, a shift, a team or an option: clicked, a
+    menu to Edit it or Remove it, for whoever may (the person themself or an admin). edit_url, remove_url: either or
+    both, or neither for the plain avatar; edit_in_modal: the avatar itself opens the edit form in #modal (its route
+    answers with gatherings/_modal_content.erb), with no menu, as that form has its own Delete; remove_confirm: the
+    question Remove asks; names: show the name, not the avatar %>
+<% edit_url = nil unless defined?(edit_url) %>
+<% remove_url = nil unless defined?(remove_url) %>
+<% names = false unless defined?(names) %>
+<% if edit_url && defined?(edit_in_modal) && edit_in_modal %>
+  <a href="<%= edit_url %>" data-open-in-modal data-bs-toggle="tooltip" title="<%= account.name %>" aria-label="<%= account.name %>: edit">
+    <% if names %>
+      <%= account.name %>
+    <% else %>
+      <img alt="<%= account.name %>" class="avatar avatar-sm <%= account.avatar_class %>" src="<%= u account.image_thumb_or_gravatar_url %>">
+    <% end %>
+  </a>
+<% elsif edit_url || remove_url %>
+  <div class="dropdown d-inline-block" data-bs-toggle="tooltip" title="<%= account.name %>">
+    <a href="javascript:;" data-bs-toggle="dropdown" aria-expanded="false" aria-label="<%= account.name %>: edit or remove">
+      <% if names %>
+        <%= account.name %>
+      <% else %>
+        <img alt="<%= account.name %>" class="avatar avatar-sm <%= account.avatar_class %>" src="<%= u account.image_thumb_or_gravatar_url %>">
+      <% end %>
+    </a>
+    <div class="dropdown-menu">
+      <% if edit_url %>
+        <a class="dropdown-item" href="<%= edit_url %>"><i class="bi bi-pencil"></i> Edit</a>
+      <% end %>
+      <% if remove_url %>
+        <a class="pagelet-trigger dropdown-item" data-method="post" data-confirm="<%= defined?(remove_confirm) && remove_confirm ? remove_confirm : 'Remove?' %>" href="<%= remove_url %>"><i class="bi bi-trash"></i> Remove</a>
+      <% end %>
+    </div>
+  </div>
+<% elsif names %>
+  <%= account.name %>
+<% else %>
+  <%= partial :'accounts/square', locals: { account: account } %>
+<% end %>

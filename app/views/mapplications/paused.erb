@@ -1,2 +1,4 @@
 <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+<h2>Paused applications</h2>
+<%= partial :'gatherings/back', locals: { to: 'applications', path: "/g/#{@gathering.slug}/applications" } %>
 <%= partial :'mapplications/mapplications' %>

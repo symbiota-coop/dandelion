@@ -144,7 +144,8 @@ class LintTest < Minitest::Test
       '<a data-toggle="tooltip">' => /data-bs-\*/,
       %(<%= link_to 'x', '#', data: { toggle: 'dropdown' } %>) => /data-bs-\*/,
       '<select name="x" class="me-1">' => /form-select/,
-      "<%= select_tag :x,\n  class: 'me-1', options: [] %>" => /form-select/
+      "<%= select_tag :x,\n  class: 'me-1', options: [] %>" => /form-select/,
+      '<a class="btn btn-sm btn-outline-primary show mb-1">' => /open-dropdown/
     }.each do |template, message|
       offenses = erb_offenses(template).select { |linter, _| linter == 'DesignClasses' }
       assert_equal 1, offenses.size, "DesignClasses on #{template}: #{offenses.inspect}"
@@ -158,6 +159,7 @@ class LintTest < Minitest::Test
       '<p>Close it, then align it left</p>',
       %(<select class="form-select form-select-sm" data-x="a>b">), %(<%= select_tag :x, options: [1, 2],\n  class: 'form-select d-inline-block' %>),
       '<p>A select_tag needs one too</p>',
+      '<div class="collapse show"><a class="btn form-toggle">', # .show is fine off a button, as on an open collapse
       # ESLint checks the template's own scripts and event attributes
       %(<script>$('#x').addClass('d-none')</script><a onclick="$(this).removeClass('text-left')">)
     ].each { |template| assert_empty erb_offenses(template), template }
@@ -193,6 +195,43 @@ class LintTest < Minitest::Test
       %(<%= dropdown_nav [['Remove order', "/orders/\#{order.id}/destroy", { 'data-method' => 'post' }]] %>),
       %(<%= f.submit_block destroy_url: "/teams/\#{team.id}/destroy" %>)
     ].each { |template| assert_empty erb_offenses(template).select { |linter, _| linter == 'PostLinks' }, template }
+  end
+
+  # A gathering's pages, in these folders, all show its nav (gatherings/_nav.erb), so none feels cut off from the rest
+  GATHERING_VIEW_DIRS = %w[gatherings rotas timetables teams options inventory budget mapplications].freeze
+  # Pages for people outside the gathering, and a team's page, whose layout (layouts/teams.erb) shows the nav
+  GATHERING_PAGES_WITHOUT_NAV = %w[gatherings/gatherings gatherings/join mapplications/apply teams/team].freeze
+
+  def test_gathering_pages_show_the_gathering_nav
+    missing = GATHERING_VIEW_DIRS.flat_map { |dir| Dir[File.join(ROOT, 'app/views', dir, '[!_]*.erb')] }.filter_map do |path|
+      page = path.delete_prefix(File.join(ROOT, 'app/views/')).delete_suffix('.erb')
+      page unless GATHERING_PAGES_WITHOUT_NAV.include?(page) || File.read(path, encoding: 'UTF-8').include?("partial :'gatherings/nav'")
+    end
+    assert_empty missing, "Gathering pages show the gathering nav: add <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %> " \
+                          'at the top, or list the page in GATHERING_PAGES_WITHOUT_NAV if it is for people outside the gathering'
+  end
+
+  # A gathering's subpages go back with gatherings/_back.erb, under their heading, so the links all look and sit the same
+  def test_gathering_back_links_use_the_partial
+    offenders = GATHERING_VIEW_DIRS.flat_map { |dir| Dir[File.join(ROOT, 'app/views', dir, '*.erb')] }.select do |path|
+      File.read(path, encoding: 'UTF-8').match?(/>\s*(?:<i [^>]*><\/i>\s*)?Return to /) && !path.end_with?('gatherings/_back.erb')
+    end
+    assert_empty offenders.map { |path| path.delete_prefix("#{ROOT}/") },
+                 "Gathering pages go back with <%= partial :'gatherings/back', locals: { to: 'rota', path: ... } %>, under their heading"
+  end
+
+  def test_money_fields
+    [
+      %(<%= f.number_block :cost %>), %(<%= f.number_block :amount, min: 0 %>), %(<%= f.number_block(:ticket_price) %>)
+    ].each do |template|
+      offenses = erb_offenses(template).select { |linter, _| linter == 'MoneyFields' }
+      assert_equal 1, offenses.size, "MoneyFields on #{template}: #{offenses.inspect}"
+    end
+
+    [
+      %(<%= f.currency_block :cost, money_symbol: money_symbol(@gathering.currency) %>),
+      %(<%= f.number_block :capacity %>), %(<%= f.number_block :worth %>), %(<%= f.number_block :costume_count %>)
+    ].each { |template| assert_empty erb_offenses(template).select { |linter, _| linter == 'MoneyFields' }, template }
   end
 
   def test_heading_container

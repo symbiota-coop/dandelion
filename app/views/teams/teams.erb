@@ -1,11 +1,10 @@
 <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
-<div class="my-2">
-  <a class="btn btn-primary show mb-1" href="/g/<%= @gathering.slug %>/teams/new"><i class="bi bi-plus-lg"></i> Create a team</a>
-  <a class="btn btn-primary show mb-1" href="javascript:;" onclick="$(this).parent().find('a.show').hide(); $(this).next().show()"><i class="bi bi-person-fill-add"></i> Add someone to a team</a>
-  <div style="display: none" class="option-form mt-3">
-    <%= partial :'teams/teamship' %>
-  </div>
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a class="btn btn-sm btn-primary" href="/g/<%= @gathering.slug %>/teams/new"><i class="bi bi-plus-lg"></i> Create a team</a>
+  <a class="btn btn-sm btn-outline-primary" href="javascript:;" data-bs-toggle="modal" data-bs-target="#add-teamship"><i class="bi bi-person-fill-add"></i> Add someone to a team</a>
+  <%= partial :'gatherings/names_toggle', locals: { grid: 'teams-grid', url: "/g/#{@gathering.slug}/teams" } %>
 </div>
-<div data-pagelet-url="/g/<%= @gathering.slug %>/teams">
+<%= partial :'gatherings/form_modal', locals: { id: 'add-teamship', title: 'Add someone to a team', form: :'teams/teamship' } %>
+<div id="teams-grid" data-pagelet-url="/g/<%= @gathering.slug %>/teams">
   <%= partial :'teams/teams' %>
 </div>

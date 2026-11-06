@@ -34,7 +34,8 @@
   <div class="row justify-content-between">
     <div class="col">
       <% if ((@membership && @membership.invitations_remaining > 0) || gathering_admin?) && (!@gathering.member_limit || @gathering.memberships.count < @gathering.member_limit) %>
-        <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show().find('input[name=email]').focus()"><i class="bi bi-plus-lg"></i> Add member</a>
+        <%# One field, so shown in place rather than in a modal %>
+        <a class="btn btn-sm btn-primary" href="javascript:;" onclick="$(this).hide().next().show().find('input[name=email]').focus()"><i class="bi bi-plus-lg"></i> Add member</a>
         <% if !gathering_admin? && @membership.invitations_remaining > 0 %>
           <%= pluralize(@membership.invitations_remaining <= 0 ? 0 : @membership.invitations_remaining, 'invitation') %> remaining
         <% end %>
@@ -50,7 +51,7 @@
     </div>
     <div class="col-auto">
       <% if gathering_admin? %>
-        <a class="btn btn-outline-primary" href="<%= request.path %>.csv?<%= request.query_string %>"><i class="bi bi-download"></i> CSV</a>
+        <a class="btn btn-sm btn-outline-primary" href="<%= request.path %>.csv?<%= request.query_string %>"><i class="bi bi-download"></i> CSV</a>
       <% end %>
     </div>
   </div>

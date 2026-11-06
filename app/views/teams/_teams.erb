@@ -19,14 +19,13 @@
       <% if team.teamships.exists? %>
         <% y = [] %>
         <% team.teamships.each { |teamship| account = teamship.account; %>
-        <% if params[:view] == 'names' %>
-          <% y << capture do %>
-            <%== Sanitize.fragment(account.name) %>
-          <% end %>
-        <% else %>
-          <% y << capture do %>
-            <%= partial :'accounts/square', locals: { account: account } %>
-          <% end %>
+        <% mine = teamship.account_id == current_account.id %>
+        <% y << capture do %>
+          <%= partial :'gatherings/avatar_menu', locals: {
+                account: account, names: params[:view] == 'names',
+                remove_url: ("/teamships/#{teamship.id}/destroy" if mine || gathering_admin?),
+                remove_confirm: (mine ? "Leave #{team.name}?" : "Remove this person from #{team.name}?")
+              } %>
         <% end %>
         <% } %>
         <% if params[:view] == 'names' %>
@@ -43,7 +42,3 @@
   </tr>
   <% } %>
 </table>
-<% if params[:view] != 'names' %>
-  <% names_url = "/g/#{@gathering.slug}/teams?view=names" %>
-  <a onclick="$(this).closest('[data-pagelet-url]').attr('data-pagelet-url', <%= names_url.to_json %>)" href="<%= names_url %>" class="pagelet-trigger">Show names instead of pictures</a>
-<% end %>

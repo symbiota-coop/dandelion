@@ -1,9 +1,7 @@
-<div class="my-2">
-  <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="bi bi-plus-lg"></i> List item</a>
-  <div style="display: none">
-    <%= partial :'inventory/build' %>
-  </div>
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a class="btn btn-sm btn-primary" href="javascript:;" data-bs-toggle="modal" data-bs-target="#add-inventory-item"><i class="bi bi-plus-lg"></i> List item</a>
 </div>
+<%= partial :'gatherings/form_modal', locals: { id: 'add-inventory-item', title: 'List an item', form: :'inventory/build' } %>
 <table class="table">
   <tr>
     <th>Item</th>
@@ -33,11 +31,8 @@
       <% end %>
     </td>
     <td>
-      <% if inventory_item.responsible %>
-        <a href="javascript:;" onclick="$(this).hide().next().show()"><%= inventory_item.responsible.name %></a>
-      <% end %>
-      <% form_tag "/g/#{@gathering.slug}/inventory_items/#{inventory_item.id}/provided", style: ('display:none' if inventory_item.responsible) do %>
-        <%= select_tag :responsible_id, class: 'form-select', options: [''] + @gathering.members.order('name asc').map { |account| [account.name, account.id] }, selected: inventory_item.responsible.try(:id), onchange: '$(this.form).submit()' %>
+      <% form_tag "/g/#{@gathering.slug}/inventory_items/#{inventory_item.id}/provided" do %>
+        <%= select_tag :responsible_id, class: 'form-select form-select-sm', 'aria-label': 'Responsible', options: [''] + @gathering.members.order('name asc').map { |account| [account.name, account.id] }, selected: inventory_item.responsible.try(:id), onchange: '$(this.form).submit()' %>
       <% end %>
     </td>
   </tr>

@@ -24,7 +24,7 @@
     <% end %>
   </div>
   <div class="col-12 mb-3 col-lg-auto mb-lg-0">
-    <a id="create-ticket-button" class="btn btn-primary show mb-1" href="javascript:;" onclick="$(this).hide(); $('#create-ticket').show().find('input').first().focus()"><i class="bi bi-plus-lg"></i> Create a ticket</a>
+    <a id="create-ticket-button" class="btn btn-primary mb-1" href="javascript:;" onclick="$(this).hide(); $('#create-ticket').show().find('input').first().focus()"><i class="bi bi-plus-lg"></i> Create a ticket</a>
   </div>
 </div>
 <% if params[:create_ticket] %>
@@ -36,7 +36,7 @@
   <%= f.text_block :name %>
   <%= f.text_block :email %>
   <%= f.select_block :ticket_type_id, options: @event.ticket_types.map { |ticket_type| [ticket_type.name, ticket_type.id] } %>
-  <%= f.number_block :price %>
+  <%= f.currency_block :price, money_symbol: money_symbol(@event.currency) %>
   <%= f.submit_block %>
 <% end %>
 <div id="tickets-table" data-pagelet-url="/e/<%= @event.slug %>/tickets">

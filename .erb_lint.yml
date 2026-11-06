@@ -34,6 +34,9 @@ linters:
   # Destroy links carry data-method="post" (.erb_linters/post_links.rb)
   PostLinks:
     enabled: true
+  # Money fields show their currency, with currency_block (.erb_linters/money_fields.rb)
+  MoneyFields:
+    enabled: true
   # No heading straight above a .container, which centres what follows out of line with it (.erb_linters/heading_container.rb)
   HeadingContainer:
     enabled: true

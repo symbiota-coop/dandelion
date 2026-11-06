@@ -241,7 +241,7 @@
           </div>
         <% end %>
       </div>
-      <div class="small text-body-secondary"><code>.h1</code>–<code>.h5</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. h5 is the smallest heading we use, a step above body text; h6, at --font-size-base, is left to user-written descriptions. bootstrap5.scss sets the heading sizes (<code>$h1-font-size</code>…) to these tokens, so <code>.fs-1</code>–<code>.fs-5</code> make text a heading's size without its weight or font. <code>.small</code> is Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is <code>--bs-secondary-color</code> (--bs-gray-600), set with <code>.text-body-secondary</code>; form-text takes it too. <code>.subtle</code> is for links in it, which turn the theme colour on hover. <code>.underline-dotted</code> is for quiet links that read as part of a sentence (a rota's edit links) and text to copy.</div>
+      <div class="small text-body-secondary"><code>.h1</code>–<code>.h5</code> give any element a heading's style, e.g. <code>&lt;h4 class="h2"&gt;</code> for block titles. h5 is the smallest heading we use, a step above body text; h6, at --font-size-base, is left to user-written descriptions. bootstrap5.scss sets the heading sizes (<code>$h1-font-size</code>…) to these tokens, so <code>.fs-1</code>–<code>.fs-5</code> make text a heading's size without its weight or font. <code>.small</code> is Bootstrap's class for smaller text without the meaning of <code>&lt;small&gt;</code>, which is for small print. Secondary text is <code>--bs-secondary-color</code> (--bs-gray-600), set with <code>.text-body-secondary</code>; form-text takes it too. <code>.subtle</code> is for links in it, which turn the theme colour on hover. <code>.underline-dotted</code> is for quiet links that read as part of a sentence and text to copy (a webhook address). A page's own actions, under its heading, are a row of small buttons with an icon each, in a d-flex flex-wrap gap-2 (a rota's Edit rota, Reorder and Export as CSV), not links. Show names (gatherings/_names_toggle.erb) switches a grid of people to names in place; Reorder opens _reorder.erb, list groups with a grip and a move cursor, side by side in a card under the buttons, each drop saved and the grid redrawn. In the row: btn-sm, at most one btn-primary for the main action (Propose an activity, Create a team) and the rest btn-outline-primary. Every page of a gathering's features does this, and on its home page the notification and sidebar buttons are toggles, solid while on (Email notifications on, Showing in sidebar) and outlined while off, beside outlined Copy and Leave gathering. A button that opens a short form (Add someone to a team, List expense, Propose an activity) opens it in a modal, gatherings/_form_modal.erb, which focuses its first field, rather than showing it in place, and so do short edit forms reached from a grid (a rota's roles, slots and shifts): their links take data-open-in-modal and their routes answer a background request with gatherings/_modal_content.erb; a one-field form (Add member's email) still shows in place, and longer ones (Create a team) are pages of their own.</div>
     <% end %>
   <% end %>
 
@@ -495,7 +495,7 @@
             <label for="dg-range" class="form-label">Pay what you can</label>
             <input type="range" class="form-range" id="dg-range" autocomplete="off" min="5" max="50" value="20">
           </div>
-          <div class="spec">input .875rem with .5rem vertical padding, the same height as a button (about 2.4rem) · border --bs-gray-400 · labels 700 · errors: lib/form_builder.rb adds is-invalid and an .invalid-feedback message in --bs-danger, the field name first · .field-note, for a note or link under a field (a preview link, a resend link), pulls it up into the field's mb-3 so it reads as the field's own</div>
+          <div class="spec">input .875rem with .5rem vertical padding, the same height as a button (about 2.4rem) · border --bs-gray-400 · labels 700 · errors: lib/form_builder.rb adds is-invalid and an .invalid-feedback message in --bs-danger, the field name first · .field-note, for a note or link under a field (a preview link, a resend link), pulls it up into the field's mb-3 so it reads as the field's own · an on/off in a table row (an expense's Reimbursed) is a form-switch that submits as it changes, not a bare checkbox, and a choice there (an inventory item's Responsible) a form-select-sm shown as it is, not revealed by clicking a name</div>
         </div>
       <% end %>
 
@@ -555,7 +555,7 @@
           </ul>
         </div>
       </div>
-      <div class="spec">bg-dark bar, p-1 and rounded · links --font-size-xs (.75rem) in white, padding .5rem .75rem · hover, focus and the active page --bs-black · counts and amounts text-bg-dark badges · wraps onto a second line when a gathering has most features on</div>
+      <div class="spec">bg-dark bar, p-1 and rounded · links --font-size-xs (.75rem) in white, padding .5rem .75rem · hover, focus and the active page --bs-black · counts and amounts text-bg-dark badges · wraps onto a second line when a gathering has most features on · every page of a gathering shows it, its subpages too, and those (editing a rota, a role, a team, adding someone to a shift) put their heading and then gatherings/_back.erb, Return to rota, in a centred col-lg-8 · an edit page's heading is the thing's name (Kitchen), a create page's what it makes (Create a rota)</div>
     <% end %>
 
     <div class="row g-5">
@@ -581,7 +581,7 @@
               <input type="number" class="form-control form-control-sm" id="dg-capacity" autocomplete="off" value="80" style="width: 5em">
             </div>
           </div>
-          <div class="spec">input-group-text for currency symbols (money_symbol) and inline labels · a button on the end for one-field forms (sign in, search, reactions, deleting an account), so the two stay together on phones · d-inline-flex w-auto when the field is narrow · input-group-sm with form-control-sm</div>
+          <div class="spec">input-group-text for currency symbols (money_symbol) and inline labels · a button on the end for one-field forms (sign in, search, reactions, deleting an account), so the two stay together on phones · d-inline-flex w-auto when the field is narrow · input-group-sm with form-control-sm · money fields are <code>f.currency_block :field, money_symbol: money_symbol(currency)</code>, the symbol before the number, never a bare number_block (MoneyFields checks it)</div>
         </div>
       <% end %>
 
@@ -1416,7 +1416,7 @@
 
       <% design_subsection 'Image wall', col: 'col-lg-5' do %>
         <%= partial :'accounts/add', locals: { accounts: [['Maya Okoro', 'maya'], ['Jonas Berg', 'jonas'], ['Amara Nwosu', 'amara']].cycle.first(7).map { |name, photo| design_sample_account(name, photo) }, add_and_remove: false } %>
-        <div class="spec">.image-wall: groups of people as avatars that wrap, --space-2xs between rows: who chose an option or is interested in an activity, team and gathering members, followers · on options, teams and rotas, a "Show names instead of pictures" link reloads them as names separated by middots</div>
+        <div class="spec">.image-wall: groups of people as avatars that wrap, --space-2xs between rows: who chose an option or is interested in an activity, team and gathering members, followers · on options, teams and rotas, a "Show names instead of pictures" link reloads them as names separated by middots · where someone can edit or remove a place (a shift, a team, an option), the avatar opens gatherings/_avatar_menu.erb, a dropdown of Edit and Remove for that person or an admin, Remove asking first; where the edit form opens in a modal (a shift, an admin on an option), the avatar opens it straight away, as the form has its own Delete</div>
       <% end %>
     </div>
 

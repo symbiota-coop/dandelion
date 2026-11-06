@@ -70,17 +70,21 @@ class HowToCreateAGatheringTest < ActiveSupport::TestCase
       fill_in 'Cost', with: 50
     }
     click_button 'Create option'
+    # Each option is saved and the page reloaded before the next click, as the form's modal is open until then
+    assert page.has_css?('td', text: 'Low income')
     narrate %(After adding Standard and Higher income tiers also, it will look like this.), lambda {
       click_link 'Add an option'
       fill_in 'Name', with: 'Standard'
       fill_in 'Capacity', with: 100
       fill_in 'Cost', with: 75
       click_button 'Create option'
+      assert page.has_css?('td', text: 'Standard')
       click_link 'Add an option'
       fill_in 'Name', with: 'Higher income'
       fill_in 'Capacity', with: 100
       fill_in 'Cost', with: 100
       click_button 'Create option'
+      assert page.has_css?('td', text: 'Higher income')
     }
     narrate %(If we then click to join the Standard tier, we see a request for payment.), lambda {
       all('a', text: 'Join')[1].click
@@ -108,6 +112,7 @@ class HowToCreateAGatheringTest < ActiveSupport::TestCase
       fill_in 'tactivity_name', with: 'Piano jam'
     }
     click_button 'Create activity'
+    assert page.has_css?('.bi-pencil-fill')
     narrate %(Schedule the activity by dragging it onto the timetable.), lambda {
       find('.bi-pencil-fill').click
       select 'Saturday morning', from: 'Slot'

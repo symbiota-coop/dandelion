@@ -140,7 +140,7 @@ Dandelion::App.controller do
     @gathering = @role.rota.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
-    erb :'rotas/role'
+    request.xhr? ? partial(:'gatherings/modal_content', locals: { title: @role.name, form: :'rotas/role_form' }) : erb(:'rotas/role')
   end
 
   post '/roles/:id/edit' do
@@ -192,7 +192,7 @@ Dandelion::App.controller do
     @gathering = @rslot.rota.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
-    erb :'rotas/rslot'
+    request.xhr? ? partial(:'gatherings/modal_content', locals: { title: @rslot.name, form: :'rotas/rslot_form' }) : erb(:'rotas/rslot')
   end
 
   post '/rslots/:id/edit' do
@@ -244,7 +244,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
     halt unless (@shift.account && (@shift.account_id == current_account.id)) || gathering_admin?
-    erb :'rotas/shift'
+    request.xhr? ? partial(:'gatherings/modal_content', locals: { title: "#{@shift.account.name}'s #{@shift.rota.name} shift", form: :'rotas/shift_form' }) : erb(:'rotas/shift')
   end
 
   post '/shifts/:id/edit' do

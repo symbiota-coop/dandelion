@@ -1,2 +1,8 @@
-<a class="d-inline-block mb-3" href="/g/<%= @gathering.slug %>/options"><i class="bi bi-arrow-left"></i> Return to options</a>
-<%= partial :'options/optionship' %>
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h2><%= @optionship.new_record? ? 'Add someone to an option' : 'Edit contribution' %></h2>
+    <%= partial :'gatherings/back', locals: { to: 'options', path: "/g/#{@gathering.slug}/options" } %>
+    <%= partial :'options/optionship' %>
+  </div>
+</div>

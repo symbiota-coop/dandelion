@@ -112,8 +112,12 @@ Dandelion::App.controller do
     @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
-    @optionship = @gathering.optionships.find(params[:id])
-    erb :'options/optionship'
+    @optionship = @gathering.optionships.find(params[:id]) || not_found
+    if request.xhr?
+      partial :'gatherings/modal_content', locals: { title: "#{@optionship.account.name}: #{@optionship.option.name}", form: :'options/optionship' }
+    else
+      erb :'options/optionship'
+    end
   end
 
   post '/g/:slug/optionships/:id/edit' do

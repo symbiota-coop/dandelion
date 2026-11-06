@@ -1,10 +1,13 @@
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
 <div class="row justify-content-center">
   <div class="col-lg-8">
+    <h2><%= @team.new_record? ? 'Create a team' : @team.name_was %></h2>
+    <%= partial :'gatherings/back', locals: { to: (@team.new_record? ? 'teams' : 'team'), path: (@team.new_record? ? "/g/#{@gathering.slug}/teams" : "/g/#{@gathering.slug}/teams/#{@team.id}") } %>
     <% form_for @team, @team.new_record? ? "/g/#{@gathering.slug}/teams/new" : "/g/#{@gathering.slug}/teams/#{@team.id}/edit" do |f| %>
       <%= f.text_block :name %>
       <%= f.wysiwyg_block :intro %>
       <% if @gathering.enable_budget %>
-        <%= f.number_block :budget %>
+        <%= f.currency_block :budget, money_symbol: money_symbol(@gathering.currency) %>
       <% end %>
       <%= f.submit_block destroy_url: "/g/#{@gathering.slug}/teams/#{@team.id}/destroy" %>
     <% end %>

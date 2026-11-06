@@ -1,2 +1,8 @@
-<a class="d-inline-block mb-3" href="/g/<%= @gathering.slug %>/teams"><i class="bi bi-arrow-left"></i> Return to teams</a>
-<%= partial :'teams/teamship' %>
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h2><%= @teamship.new_record? ? 'Add someone to a team' : 'Edit team member' %></h2>
+    <%= partial :'gatherings/back', locals: { to: 'teams', path: "/g/#{@gathering.slug}/teams" } %>
+    <%= partial :'teams/teamship' %>
+  </div>
+</div>

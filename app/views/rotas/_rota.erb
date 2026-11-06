@@ -14,7 +14,7 @@
     <td>
       <strong>
         <% if gathering_admin? %>
-          <a href="/roles/<%= role.id %>/edit">
+          <a href="/roles/<%= role.id %>/edit" data-open-in-modal>
             <%= role.name %>
           </a>
         <% else %>
@@ -40,7 +40,7 @@
     <td>
       <strong>
         <% if gathering_admin? %>
-          <a href="/rslots/<%= rslot.id %>/edit">
+          <a href="/rslots/<%= rslot.id %>/edit" data-open-in-modal>
             <%= rslot.name %>
           </a>
         <% else %>

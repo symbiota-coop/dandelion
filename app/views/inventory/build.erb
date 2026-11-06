@@ -1,6 +1,8 @@
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
 <div class="row justify-content-center">
   <div class="col-lg-8">
-    <h2><%= @inventory_item.new_record? ? 'Create a inventory item' : 'Edit inventory item' %></h2>
+    <h2><%= @inventory_item.new_record? ? 'Add an item' : @inventory_item.name_was %></h2>
+    <%= partial :'gatherings/back', locals: { to: 'inventory', path: "/g/#{@gathering.slug}/inventory" } %>
     <%= partial :'inventory/build' %>
   </div>
 </div>

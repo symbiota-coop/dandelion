@@ -1,4 +1,6 @@
+<%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
 <h2>
   <a href="/u/<%= @mapplication.account.username %>"><%= @mapplication.account.name %></a>'s application
 </h2>
+<%= partial :'gatherings/back', locals: { to: 'applications', path: "/g/#{@gathering.slug}/applications" } %>
 <%= partial :'mapplications/mapplication', locals: { mapplication: @mapplication } %>

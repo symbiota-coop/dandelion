@@ -1,0 +1,15 @@
+<%# A form a gathering page opens from a button, in a modal rather than shown in place: the button takes
+    data-bs-toggle="modal" data-bs-target="#<id>". form: the form's partial, with form_locals if it takes any %>
+<div class="modal fade form-modal" id="<%= id %>" tabindex="-1" aria-labelledby="<%= id %>-title" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="<%= id %>-title"><%= title %></h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <%= partial form, locals: (defined?(form_locals) && form_locals) || {} %>
+      </div>
+    </div>
+  </div>
+</div>
