@@ -109,6 +109,18 @@ class EventPermissionsTest < ActiveSupport::TestCase
     assert @event.cohostships.find_by(organisation: cohost)
   end
 
+  test 'the host organisation cannot be added as a co-host' do
+    covers 'events/host-cannot-be-cohost@eb8558'
+    create_event
+
+    sign_in_with_rack(@account)
+    post "/e/#{@event.slug}/cohostships/new", cohostship: { organisation_id: @organisation.id }
+
+    assert last_response.redirect?
+    assert_nil @event.cohostships.find_by(organisation: @organisation)
+    assert_empty @event.reload.cohosts_ids_cache || []
+  end
+
   test 'event admin cannot add a restricted org they do not admin' do
     create_event
     restricted = FactoryBot.create(:organisation, restrict_cohosting: true)

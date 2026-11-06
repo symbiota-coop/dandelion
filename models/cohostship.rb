@@ -28,6 +28,8 @@ class Cohostship
   end
 
   before_validation do
+    # New ones only, so any such co-hostship already saved can still be edited or removed
+    errors.add(:organisation, 'is already the host') if new_record? && event && organisation_id == event.organisation_id
     if image
       begin
         if measure_image?
