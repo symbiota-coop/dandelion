@@ -1,0 +1,15 @@
+<%# A progress bar filled to percent (clamped to 0-100). With a label, it's written across the middle of the bar twice:
+    dark on the track, and light on the filled part, clipped to it, so it reads wherever the fill ends.
+    Optional locals: label, title (a tooltip), bar_class and bar_style (e.g. the bar's height) %>
+<% w = percent.to_f.clamp(0, 100).round(2) %>
+<% label = nil unless defined?(label) %>
+<% title = nil unless defined?(title) %>
+<% bar_class = nil unless defined?(bar_class) %>
+<% bar_style = nil unless defined?(bar_style) %>
+<div class="progress<%= ' progress-labelled' if label %><%= " #{bar_class}" if bar_class %>"<% if title %> data-bs-toggle="tooltip" title="<%= title %>"<% end %> style="--progress: <%= w %>%;<%= " #{bar_style}" if bar_style %>">
+  <div class="progress-bar" role="progressbar" style="width: <%= w %>%;"></div>
+  <% if label %>
+    <span class="progress-label"><%= label %></span>
+    <span class="progress-label progress-label-on-bar" aria-hidden="true"><%= label %></span>
+  <% end %>
+</div>

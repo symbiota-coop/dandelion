@@ -10,11 +10,7 @@
         <a href="/o/<%= organisation.slug %>"><%= organisation.name %></a>
       <% end %>
     </h5>
-    <div class="progress mb-2" style="height: 1.25rem;">
-      <div class="progress-bar d-flex align-items-center justify-content-center" role="progressbar" style="width: <%= percentage %>%;">
-        <%= percentage.round %>%
-      </div>
-    </div>
+    <%= partial :progress_bar, locals: { percent: percentage, label: "#{percentage.round}%", bar_class: 'mb-2', bar_style: 'height: 1.25rem;' } %>
     <div class="d-flex justify-content-between align-items-center">
       <span><%= m([revenue, threshold].min, 'EUR') %> / <%= m(threshold, 'EUR') %></span>
       <% if example %>

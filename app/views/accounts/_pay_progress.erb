@@ -9,11 +9,8 @@
        target += base_target
      end %>
 
-  <div class="progress" style="height: 1.875rem">
-    <div class="progress-bar" role="progressbar" style="width: <%= "#{w = 100*monthly_contributions/target}%" %>;">
-      <% if w > 0 %><%= w.to_f.round %>%<% end %>
-    </div>
-  </div>
+  <% w = 100 * monthly_contributions / target %>
+  <%= partial :progress_bar, locals: { percent: w, label: "#{w.to_f.round}%", bar_style: 'height: 1.875rem;' } %>
   <p class="mt-1 mb-0 text-center">
     <%= monthly_contributions.format(no_cents: true) %> raised of <%= m target, currency %> monthly target
     <% if admin? %>

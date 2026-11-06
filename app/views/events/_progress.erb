@@ -20,14 +20,9 @@
   <% end %>
   <% if bar; w = ((slots_taken/event.capacity.to_f)*100).round %>
     <a class="d-block text-decoration-none" href="/e/<%= event.slug %>/tickets">
-      <%# Places filled across the middle of the bar, twice: dark on the track, and light on the filled part, clipped to it.
-          The small bar has room for places filled alone, with the capacity in its tooltip %>
+      <%# The small bar has room for places filled alone, with the capacity in its tooltip %>
       <% label = defined?(full_width) ? "#{slots_taken}/#{event.capacity}" : slots_taken %>
-      <div class="progress progress-labelled" data-bs-toggle="tooltip" title="<%= slots_taken %>/<%= event.capacity %> places filled" style="--progress: <%= "#{w}%" %>;">
-        <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"></div>
-        <span class="progress-label"><%= label %></span>
-        <span class="progress-label progress-label-on-bar" aria-hidden="true"><%= label %></span>
-      </div>
+      <%= partial :progress_bar, locals: { percent: w, label: label, title: "#{slots_taken}/#{event.capacity} places filled" } %>
     </a>
   <% end %>
   <% if event.incomplete_orders? %>

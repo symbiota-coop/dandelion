@@ -42,11 +42,7 @@
         </p>
 
         <% if w && w <= 100 %>
-          <div class="progress my-3" style="height: 1.875rem">
-            <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;">
-              <% if w > 0 %><%= w.to_f.round %>%<% end %>
-            </div>
-          </div>
+          <%= partial :progress_bar, locals: { percent: w, label: "#{w.to_f.round}%", bar_class: 'my-3', bar_style: 'height: 1.875rem;' } %>
         <% end %>
 
         <% form_tag '', class: 'form-inline mb-3', id: 'pay-form' do %>

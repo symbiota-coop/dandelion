@@ -64,11 +64,7 @@
         <% end %>
         <% w = organisation.fraction_paid*100 if organisation.fraction_paid %>
         <% if w %>
-          <div class="progress my-3" style="height: 1.875rem">
-            <div class="progress-bar" role="progressbar" style="width: <%= "#{w > 100 ? 100 : w}%" %>;">
-              <% if w > 0 %><%= w.to_f.round %>%<% end %>
-            </div>
-          </div>
+          <%= partial :progress_bar, locals: { percent: w, label: "#{w.to_f.round}%", bar_class: 'my-3', bar_style: 'height: 1.875rem;' } %>
         <% end %>
       </td>
     </tr>

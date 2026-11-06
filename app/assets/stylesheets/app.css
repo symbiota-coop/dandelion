@@ -1081,11 +1081,12 @@ p.action a {
 }
 
 .progress {
+  font-family: var(--body-font-family);
   background-color: var(--theme-200);
   --bs-progress-bar-bg: var(--theme-500);
 }
 
-/* A bar with its count across the middle (events/_progress.erb): dark on the track, and again light on the filled part,
+/* A bar with its count across the middle (_progress_bar.erb): dark on the track, and again light on the filled part,
    clipped to it, so the count reads wherever the fill ends. --progress is the filled width */
 .progress-labelled {
   position: relative;

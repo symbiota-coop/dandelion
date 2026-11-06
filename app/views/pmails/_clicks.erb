@@ -24,9 +24,7 @@
           <% end %>
         </td>
         <td>
-          <div class="progress">
-            <div class="progress-bar" role="progressbar" style="width: <%= "#{w}%" %>;"><%= link.clicks %></div>
-          </div>
+          <%= partial :progress_bar, locals: { percent: w, label: link.clicks.to_i } %>
         </td>
         <% if show_device_breakdown %>
           <% if link.device_breakdown? %>
