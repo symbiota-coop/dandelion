@@ -79,6 +79,29 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal "#{ENV['BASE_URI']}/avatar/v2/%C3%89Z.png", URI.decode_www_form(URI(src).query).to_h['d']
   end
 
+  test 'an image url uses the derivative another process stored while this one made it, dropping its own copy' do
+    datastore = Dragonfly.app.datastore
+    job = Dragonfly.app.fetch(Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg')))
+    theirs = DragonflyJob.create!(signature: job.signature, uid: Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg')))
+
+    # The first lookup misses: the worker (warm_image_derivatives) stores theirs while this request makes its own
+    find_by = DragonflyJob.method(:find_by)
+    lookups = 0
+    find_by_after_their_store = lambda do |*args|
+      lookups += 1
+      lookups == 1 ? nil : find_by.call(*args)
+    end
+    destroyed = []
+    url = DragonflyJob.stub(:find_by, find_by_after_their_store) do
+      datastore.stub(:destroy, ->(uid) { destroyed << uid }) { job.url }
+    end
+
+    assert_equal datastore.url_for(theirs.uid), url
+    assert_equal 1, DragonflyJob.and(signature: job.signature).count
+    assert_equal 1, destroyed.size
+    refute_equal theirs.uid, destroyed.first
+  end
+
   test 'generated avatars are PNGs, for initials of one or two Latin letters' do
     # ImageMagick, which draws them, isn't on CI's runner, so this checks the routes, not the drawing
     { '/avatar/v2.png' => nil, '/avatar/v2/SR.png' => 'SR', '/avatar/v2/%C3%89Z.png' => 'ÉZ' }.each do |path, initials|

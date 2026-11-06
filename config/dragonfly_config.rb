@@ -34,11 +34,13 @@ Dragonfly.app.configure do
       begin
         uid = job.store
         dj = begin
-          DragonflyJob.create(uid: uid, signature: job.signature)
-        rescue Mongo::Error::OperationFailure => e
+          DragonflyJob.create!(uid: uid, signature: job.signature)
+        rescue Mongo::Error::OperationFailure, Mongoid::Errors::Validations => e
           # Another process (a page view, or warm_image_derivatives in the worker) stored the same derivative first:
-          # use theirs and drop our copy
-          raise unless e.code == 11_000 && (existing = DragonflyJob.find_by(signature: job.signature))
+          # use theirs and drop our copy. The uniqueness validation sees theirs if it was stored while we made ours,
+          # the unique index if it was stored between that validation and our insert
+          duplicate = e.is_a?(Mongoid::Errors::Validations) ? e.document.errors.of_kind?(:signature, :taken) : e.code == 11_000
+          raise unless duplicate && (existing = DragonflyJob.find_by(signature: job.signature))
 
           app.datastore.destroy(uid)
           existing
