@@ -3,14 +3,7 @@ class EventTag
   include Mongoid::Timestamps
   include CoreExtensions
 
-  include Searchable
-
   field :name, type: String
-
-
-  def self.search_fields
-    %w[name]
-  end
 
   validates_uniqueness_of :name
 
