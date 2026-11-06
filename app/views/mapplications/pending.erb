@@ -11,12 +11,15 @@
       <label>Search applicants</label>
       <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
     </div>
-    <div class="form-group">
-      <label>View as</label>
-      <%= select_tag :view, class: 'form-select', options: %w[details pictures].map { |view| [view.to_s.humanize.capitalize, view] }, selected: params[:view] %>
-    </div>
+    <%= hidden_field_tag :display, value: params[:display] if params[:display] %>
     <%= submit_tag 'Search', class: 'btn btn-primary me-2' %>
   <% end %>
+</div>
+<div class="mb-3">
+  <%= partial :view_as, locals: { view_options: [
+    { key: 'details', label: 'Details', icon: 'bi-list-task', active: params[:display] != 'pictures' },
+    { key: 'pictures', label: 'Pictures', icon: 'bi-person-square', active: params[:display] == 'pictures' }
+  ] } %>
 </div>
 
 <%= partial :'mapplications/mapplications' %>

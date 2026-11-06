@@ -8,10 +8,7 @@
       <label>Search members</label>
       <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
     </div>
-    <div class="form-group">
-      <label>View as</label>
-      <%= select_tag :view, class: 'form-select', options: %w[details pictures dietary_requirements map birthdays].map { |view| [view.to_s.humanize.capitalize, view] }, selected: params[:view] %>
-    </div>
+    <%= hidden_field_tag :display, value: params[:display] if params[:display] %>
     <%= submit_tag 'Search', class: 'btn btn-primary me-2' %>
 
     <style>
@@ -30,6 +27,16 @@
       <% } %>
     </div>
   <% end %>
+
+  <% display = params[:display].presence_in(%w[pictures dietary_requirements map]) || 'details' %>
+  <div class="mb-3">
+    <%= partial :view_as, locals: { view_options: [
+      { key: 'details', label: 'Details', icon: 'bi-list-task' },
+      { key: 'pictures', label: 'Pictures', icon: 'bi-person-square' },
+      { key: 'dietary_requirements', label: 'Dietary requirements', icon: 'bi-egg-fried' },
+      { key: 'map', label: 'Map', icon: 'bi-geo-alt-fill' }
+    ].map { |opt| opt.merge(active: opt[:key] == display) } } %>
+  </div>
 
   <div class="row justify-content-between">
     <div class="col">
@@ -64,7 +71,7 @@
   </pre>
 <% end %>
 
-<% case (params[:view] || 'details') %>
+<% case display %>
 <% when 'pictures' %>
   <% member_account_ids = @memberships.pluck(:account_id); all_member_accounts = Account.and(:id.in => member_account_ids) %>
   <div class="row mt-3">
@@ -104,18 +111,6 @@
   <% end %>
 <% when 'map' %>
   <%= partial :'maps/map', locals: { points: Account.and(:id.in => @memberships.pluck(:account_id)).and(:coordinates.ne => nil) } %>
-<% when 'birthdays' %>
-  <a data-bs-toggle="tooltip" title="iCal feed" class="text-primary fs-4" id="ical" target="_blank" href="/g/<%= @gathering.slug %>/birthdays.ics?ics_key=<%= current_account.ensure_ics_key! %>">
-    <i class="bi bi-rss-fill"></i>
-  </a>
-  <% birthday_ids = Account.and(:id.in => @memberships.pluck(:account_id)).ids_by_next_birthday; birthday_accounts = Account.and(:id.in => birthday_ids).index_by { |a| a.id.to_s } %>
-  <ul class="search-result-list my-3">
-    <% birthday_ids.each { |account_id| account = birthday_accounts[account_id.to_s]; next unless account %>
-    <li>
-      <%= partial 'accounts/search_result', locals: { account: account, birthday: true } %>
-    </li>
-    <% } %>
-  </ul>
 <% when 'details'; @memberships = @memberships.paginate(page: params[:page], per_page: 50); memberships = Membership.preload_rows(@gathering, @memberships, viewer: current_account) %>
   <table class="table table-striped table-sticky table-sticky-fit">
     <thead>
