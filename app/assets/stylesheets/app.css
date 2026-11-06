@@ -3582,10 +3582,11 @@ td .tactivity-accept {
   }
 }
 
-/* Avatars that wrap, touching across and between rows, whether or not the template leaves whitespace between them */
+/* Avatars that wrap, the same small gap across and between rows, whether or not the template leaves whitespace between them */
 .image-wall {
   display: flex;
   flex-wrap: wrap;
+  gap: var(--space-2xs);
 }
 
 .image-wall img {

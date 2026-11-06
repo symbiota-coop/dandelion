@@ -1416,7 +1416,7 @@
 
       <% design_subsection 'Image wall', col: 'col-lg-5' do %>
         <%= partial :'accounts/add', locals: { accounts: [['Maya Okoro', 'maya'], ['Jonas Berg', 'jonas'], ['Amara Nwosu', 'amara']].cycle.first(7).map { |name, photo| design_sample_account(name, photo) }, add_and_remove: false } %>
-        <div class="spec">.image-wall: groups of people as avatars that wrap, touching with no gap: who chose an option or is interested in an activity, team and gathering members, followers · on options, teams and rotas, a "Show names instead of pictures" link reloads them as names separated by middots · where someone can edit or remove a place (a shift, a team, an option), the avatar opens gatherings/_avatar_menu.erb, a dropdown of Edit and Remove for that person or an admin, Remove asking first; where the edit form opens in a modal (a shift, an admin on an option), the avatar opens it straight away, as the form has its own Delete</div>
+        <div class="spec">.image-wall: groups of people as avatars that wrap, with a small gap (<code>--space-2xs</code>) between them: who chose an option or is interested in an activity, team and gathering members, followers · on options, teams and rotas, a "Show names instead of pictures" link reloads them as names separated by middots · where someone can edit or remove a place (a shift, a team, an option), the avatar opens gatherings/_avatar_menu.erb, a dropdown of Edit and Remove for that person or an admin, Remove asking first; where the edit form opens in a modal (a shift, an admin on an option), the avatar opens it straight away, as the form has its own Delete</div>
       <% end %>
     </div>
 
