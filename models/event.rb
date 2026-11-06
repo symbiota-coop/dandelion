@@ -102,9 +102,9 @@ class Event
     %w[name description location tag_names_cache]
   end
 
-  # Its Atlas Search index maps name as autocomplete too, so searches match the start of a word (Searchable)
-  def self.autocomplete_field
-    'name'
+  # Its Atlas Search index maps name as autocomplete too, so searches match the start of a word in it (Searchable)
+  def self.autocomplete_fields
+    %w[name]
   end
 
   def self.search_scope

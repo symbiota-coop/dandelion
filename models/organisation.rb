@@ -41,12 +41,12 @@ class Organisation
   end
 
   def self.search_fields
-    %w[name intro_text]
+    %w[name slug intro_text]
   end
 
-  # Its Atlas Search index maps name as autocomplete too, so searches match the start of a word (Searchable)
-  def self.autocomplete_field
-    'name'
+  # Its Atlas Search index maps name and slug as autocomplete too, so searches match the start of a word in them (Searchable)
+  def self.autocomplete_fields
+    %w[name slug]
   end
 
   def self.search_scope

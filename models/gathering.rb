@@ -26,12 +26,12 @@ class Gathering
   end
 
   def self.search_fields
-    %w[name intro_for_non_members]
+    %w[name slug intro_for_non_members]
   end
 
-  # Its Atlas Search index maps name as autocomplete too, so searches match the start of a word (Searchable)
-  def self.autocomplete_field
-    'name'
+  # Its Atlas Search index maps name and slug as autocomplete too, so searches match the start of a word in them (Searchable)
+  def self.autocomplete_fields
+    %w[name slug]
   end
 
   def self.search_scope

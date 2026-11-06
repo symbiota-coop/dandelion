@@ -16,7 +16,7 @@ module Searchable
   RANGE_OPERATORS = %w[$gt $gte $lt $lte].freeze
 
   class_methods do
-    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, autocomplete: autocomplete_field, vector_weight: nil, query_vector: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil)
+    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, autocomplete: autocomplete_fields, vector_weight: nil, query_vector: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil)
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
@@ -75,12 +75,12 @@ module Searchable
             { text: { query: variant, path: search_fields, fuzzy: { maxEdits: 2, prefixLength: 2 } } }
           end)
         end
-        # autocomplete (autocomplete_field unless given): a field the model's Atlas Search index also maps as autocomplete
-        # (edge n-grams), so the start of a word matches ("Alek" finds Aleksandra). Not fuzzy: that scored near misses
-        # ("Alesya" for "Aleks") as high as real prefixes
-        if autocomplete
+        # autocomplete (autocomplete_fields unless given): fields the model's Atlas Search index also maps as autocomplete
+        # (edge n-grams), so the start of a word in any of them matches ("Alek" finds Aleksandra), with a clause each as
+        # the operator takes one path. Not fuzzy: that scored near misses ("Alesya" for "Aleks") as high as real prefixes
+        Array(autocomplete).each do |path|
           should_clauses.concat(query_variants.map do |variant|
-            { autocomplete: { query: variant, path: autocomplete } }
+            { autocomplete: { query: variant, path: path } }
           end)
         end
 
@@ -217,10 +217,10 @@ module Searchable
       raise NotImplementedError, "#{self} must implement search_fields class method"
     end
 
-    # A field the model's Atlas Search index also maps as autocomplete, which searches then match by the start of a word
-    # (search's autocomplete:). None unless the model names one
-    def autocomplete_field
-      nil
+    # Fields the model's Atlas Search index also maps as autocomplete, which searches then match by the start of a word
+    # (search's autocomplete:). None unless the model names them
+    def autocomplete_fields
+      []
     end
 
     def atlas_search_timeout?(error)

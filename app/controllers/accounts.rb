@@ -7,7 +7,7 @@ Dandelion::App.controller do
     accounts = @accounts.only(:name, :username)
     if params[:q]
       # Best matches first, as the search ranks them: a query on the ids would return them in natural order
-      # Whole-word matches before those on part of a name (Account.autocomplete_field)
+      # Whole-word matches before those on part of a name (Account.autocomplete_fields)
       ids = Account.search(params[:q], @accounts, limit: 20, phrase_boost: 2).pluck(:id)
       accounts_by_id = accounts.and(:id.in => ids).index_by(&:id)
       accounts = ids.filter_map { |id| accounts_by_id[id] }

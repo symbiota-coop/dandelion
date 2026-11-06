@@ -321,19 +321,20 @@ class SearchTest < ActiveSupport::TestCase
     pipeline.first.fetch(:$search).fetch(:compound).fetch(:should)
   end
 
-  test 'searches of a model with an autocomplete field also match the start of a word in it' do
+  test 'searches of a model with autocomplete fields also match the start of a word in each' do
     collection = CapturingCollection.new
     Account.stub(:collection, collection) { Account.search('Alek', Account.unscoped, regex_search: false) }
     assert_includes should_clauses_for(collection.pipelines.first), { autocomplete: { query: 'Alek', path: 'name' } }
+    assert_includes should_clauses_for(collection.pipelines.first), { autocomplete: { query: 'Alek', path: 'username' } }
 
     collection = CapturingCollection.new
     Account.stub(:collection, collection) { Account.search('Alek', Account.unscoped, regex_search: false, autocomplete: nil) }
     assert(should_clauses_for(collection.pipelines.first).none? { |clause| clause.key?(:autocomplete) })
   end
 
-  test "each searchable model's autocomplete field is one of its search fields" do
+  test "each searchable model's autocomplete fields are among its search fields" do
     AtlasChecks.searchable_models.each do |model|
-      assert_includes model.search_fields, model.autocomplete_field, model.name if model.autocomplete_field
+      model.autocomplete_fields.each { |field| assert_includes model.search_fields, field, model.name }
     end
   end
 

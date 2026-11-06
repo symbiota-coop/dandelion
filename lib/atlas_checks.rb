@@ -40,8 +40,8 @@ module AtlasChecks
         index = search_index(model, model.to_s.underscore.pluralize)
         index_state(index)
       end]
-      field = model.autocomplete_field
-      if field
+      fields = model.autocomplete_fields
+      fields.each do |field|
         checks << check(group, "#{field} mapped as autocomplete") do
           raise 'no search index' unless index
 
@@ -49,17 +49,19 @@ module AtlasChecks
           [types.include?('autocomplete') && types.include?('string'), types.any? ? types.join(', ') : 'not mapped']
         end
       end
-      record, word = sample(model, field || model.search_fields.first)
       checks << check(group, 'Whole-word search') do
+        record, word = sample(model, fields.first || model.search_fields.first)
         raise 'no record with a long enough word to search for' unless record
 
         found(model, record, word, autocomplete: nil)
       end
-      if field
-        checks << check(group, 'Search by the start of a word') do
-          raise 'no record with a long enough word to search for' unless record
+      # Each field's own clause, so one field mapped wrongly can't pass on another's match
+      fields.each do |field|
+        checks << check(group, "Search by the start of a word in #{field}") do
+          record, word = sample(model, field)
+          raise "no record with a long enough word in #{field} to search for" unless record
 
-          found(model, record, word[0, AUTOCOMPLETE_PREFIX])
+          found(model, record, word[0, AUTOCOMPLETE_PREFIX], autocomplete: [field])
         end
       end
       checks
