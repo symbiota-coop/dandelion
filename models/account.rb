@@ -33,6 +33,11 @@ class Account
     %w[name name_transliterated email username]
   end
 
+  # The accounts Atlas Search index maps name as autocomplete too, so part of a name finds someone ("Alek" finds Aleksandra)
+  def self.autocomplete_field
+    'name'
+  end
+
   def self.search_scope
     publicly_visible
   end

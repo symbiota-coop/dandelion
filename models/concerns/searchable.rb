@@ -16,7 +16,7 @@ module Searchable
   RANGE_OPERATORS = %w[$gt $gte $lt $lte].freeze
 
   class_methods do
-    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, vector_weight: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil)
+    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, autocomplete: autocomplete_field, vector_weight: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil)
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
@@ -73,6 +73,14 @@ module Searchable
         if fuzzy_text
           should_clauses.concat(query_variants.map do |variant|
             { text: { query: variant, path: search_fields, fuzzy: { maxEdits: 2, prefixLength: 2 } } }
+          end)
+        end
+        # autocomplete (autocomplete_field unless given): a field the model's Atlas Search index also maps as autocomplete
+        # (edge n-grams), so the start of a word matches ("Alek" finds Aleksandra). Not fuzzy: that scored near misses
+        # ("Alesya" for "Aleks") as high as real prefixes
+        if autocomplete
+          should_clauses.concat(query_variants.map do |variant|
+            { autocomplete: { query: variant, path: autocomplete } }
           end)
         end
 
@@ -205,6 +213,12 @@ module Searchable
 
     def search_fields
       raise NotImplementedError, "#{self} must implement search_fields class method"
+    end
+
+    # A field the model's Atlas Search index also maps as autocomplete, which searches then match by the start of a word
+    # (search's autocomplete:). None unless the model names one
+    def autocomplete_field
+      nil
     end
 
     def atlas_search_timeout?(error)
