@@ -3407,8 +3407,8 @@ td .tactivity-accept {
   position: relative;
   z-index: 99;
   color: var(--bs-body-color);
-  background: var(--bs-white);
-  border: 2px solid var(--bs-body-color)
+  background: linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-paper) 50%);
+  border: 1px solid var(--hairline)
 }
 
 /* --tactivity-image is set inline to the activity's image */
