@@ -994,23 +994,41 @@ class AccountsTest < ActiveSupport::TestCase
     assert_nil other_browser.last_request.session[:account_id]
   end
 
-  test 'maps show accounts at about town level, whoever is looking' do
+  test 'maps show accounts at the centre of their tenth-of-a-degree cell, whoever is looking' do
     public_account = FactoryBot.create(:account, location_privacy: 'Public')
     public_account.set(coordinates: [-3.68765, 50.43214])
     private_account = FactoryBot.create(:account, location_privacy: 'Only me')
     private_account.set(coordinates: [-3.12345, 50.98765])
-    map_points = lambda do
-      get '/map.json', west: -4, south: 50, east: -3, north: 51
-      JSON.parse(last_response.body)['points'].to_h { |point| [map_point_account_id(point), [point['lat'], point['lng']]] }
+    map_points = lambda do |west, south, east, north|
+      get '/map.json', west: west, south: south, east: east, north: north
+      response = JSON.parse(last_response.body)
+      [response['pointsCount'], response['points'].to_h { |point| [map_point_account_id(point), [point['lat'], point['lng']]] }]
     end
 
     clear_cookies
-    points = map_points.call
-    assert_equal [50.4, -3.7], points[public_account.id.to_s]
-    assert_equal [51.0, -3.1], points[private_account.id.to_s]
+    count, points = map_points.call(-4, 50, -3, 51)
+    assert_equal 2, count
+    assert_equal [50.45, -3.65], points[public_account.id.to_s]
+    assert_equal [50.95, -3.15], points[private_account.id.to_s]
+
+    # A box around where the account is, but not its cell's centre, finds nothing, so narrowing boxes can't find it
+    assert_equal [0, {}], map_points.call(-3.69, 50.43, -3.68, 50.44)
+    # A box around where the map shows it finds it, so it doesn't vanish on zooming in
+    assert_equal [1, { public_account.id.to_s => [50.45, -3.65] }], map_points.call(-3.66, 50.44, -3.64, 50.46)
+    # A box whose edges move within the cells finds the same
+    assert_equal [1, { public_account.id.to_s => [50.45, -3.65] }], map_points.call(-3.6999, 50.4001, -3.6001, 50.4999)
 
     env 'rack.session', { 'account_id' => private_account.id.to_s, 'session_token' => private_account.session_token! }
-    assert_equal [51.0, -3.1], map_points.call[private_account.id.to_s]
+    assert_equal [50.95, -3.15], map_points.call(-4, 50, -3, 51)[1][private_account.id.to_s]
+  end
+
+  test 'an account on the edge of a map cell is shown and found in the cell it starts' do
+    account = FactoryBot.create(:account)
+    account.set(coordinates: [-3.7, 50.4])
+    app = Dandelion::App.new!
+    assert_equal [-3.65, 50.45], app.account_map_coordinates(account.coordinates)
+    assert_equal 1, app.account_map_points_in_box(Account.all, -3.66, 50.44, -3.64, 50.46).count
+    assert_equal 0, app.account_map_points_in_box(Account.all, -3.76, 50.34, -3.74, 50.36).count
   end
 
   def map_point_account_id(point)

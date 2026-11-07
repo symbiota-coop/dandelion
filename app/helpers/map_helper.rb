@@ -21,13 +21,39 @@ Dandelion::App.helpers do
     { model_name: parts[1], id: parts[2] }
   end
 
-  # Maps show accounts' locations rounded to a tenth of a degree (about 11 km north to south), about where their town
-  # is, so they still show how many people are in an area without pinpointing anyone
-  def account_map_coordinates(coordinates)
-    coordinates.map { |c| c.to_f.round(1) }
+  # Maps show accounts at about their town, not where they are: each account at the centre of the tenth-of-a-degree
+  # cell (about 11 km north to south) it's in, so maps still show how many people are in an area without pinpointing
+  # anyone. Cell k holds coordinates from k / 10 up to, but not including, (k + 1) / 10 (ACCOUNT_MAP_CELLS_PER_DEGREE)
+  def account_map_cell(coordinate)
+    cell = (coordinate.to_f * ACCOUNT_MAP_CELLS_PER_DEGREE).floor
+    # Multiplying can land a coordinate on the far side of an edge, so check it against the edges as Mongo will
+    cell -= 1 while coordinate < cell.to_f / ACCOUNT_MAP_CELLS_PER_DEGREE
+    cell += 1 while coordinate >= (cell + 1).to_f / ACCOUNT_MAP_CELLS_PER_DEGREE
+    cell
   end
 
-  # [lat, lng] for a point on a map, with accounts' locations rounded as account_map_coordinates says
+  def account_map_coordinates(coordinates)
+    coordinates.map { |c| ((account_map_cell(c) + 0.5) / ACCOUNT_MAP_CELLS_PER_DEGREE).round(2) }
+  end
+
+  # The accounts a map's box shows: those whose cell's centre is in the box, found by where they are in the cells, so
+  # which accounts it finds and how many depend only on their cells. Moving the box within a cell changes nothing, and
+  # an account shown in the box is always found by it
+  def account_map_points_in_box(points, west, south, east, north)
+    edges = [[west, east], [south, north]].map do |low, high|
+      first = ((low * ACCOUNT_MAP_CELLS_PER_DEGREE) - 0.5).ceil
+      last = ((high * ACCOUNT_MAP_CELLS_PER_DEGREE) - 0.5).floor
+      [first.to_f / ACCOUNT_MAP_CELLS_PER_DEGREE, (last + 1).to_f / ACCOUNT_MAP_CELLS_PER_DEGREE] if first <= last
+    end
+    return points.none unless edges.all?
+
+    (west_edge, east_edge), (south_edge, north_edge) = edges
+    # $box includes its far edges, which belong to the next cells, so they're left out
+    points.and(coordinates: { '$geoWithin' => { '$box' => [[west_edge, south_edge], [east_edge, north_edge]] } })
+          .and('coordinates.0' => { '$lt' => east_edge }, 'coordinates.1' => { '$lt' => north_edge })
+  end
+
+  # [lat, lng] for a point on a map, with accounts' locations as account_map_coordinates says
   def map_point_lat_lng(point)
     return [point.lat, point.lng] unless point.coordinates
 
@@ -36,15 +62,19 @@ Dandelion::App.helpers do
   end
 
   def map_json(points)
-    box = [[params[:west].to_f, params[:south].to_f], [params[:east].to_f, params[:north].to_f]]
-    points = points.and(coordinates: { '$geoWithin' => { '$box' => box } })
+    west, south, east, north = %i[west south east north].map { |p| params[p].to_f }
+    accounts = points.klass == Account
+    points = if accounts
+               account_map_points_in_box(points, west, south, east, north)
+             else
+               points.and(coordinates: { '$geoWithin' => { '$box' => [[west, south], [east, north]] } })
+             end
 
     points_count = points.count
 
     point_hashes = []
     if points_count <= MAP_POINTS_LIMIT
       model_name = points.klass.to_s
-      accounts = points.klass == Account
       point_records = points.pluck(:id, :coordinates)
 
       point_hashes = point_records.map.with_index do |(id, coordinates), n|
