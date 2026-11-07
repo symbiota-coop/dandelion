@@ -9,7 +9,7 @@ module MapHexagons
   # so after changing it, set every account's map_hex again
   SIZE = 0.015
   # How wide hexagons on a map are on screen, at least, in pixels: up to twice this, as they grow a doubling at a time
-  PIXELS = 80
+  PIXELS = 75
 
   module_function
 
