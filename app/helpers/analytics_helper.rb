@@ -51,7 +51,9 @@ Dandelion::App.helpers do
 
     data = {}
     data[:email] = account.email if account.email
-    data[:phone_number] = account.phone if account.phone
+    # Anyone with the order's link sees this page, and a guest booking with an email joins the order to that email's
+    # account, so the account's phone, which this booking may not have given, goes only to the account itself
+    data[:phone_number] = account.phone if account.phone && current_account == account
     data
   end
 

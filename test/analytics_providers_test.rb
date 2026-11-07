@@ -255,7 +255,7 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
   end
 
   test 'google ads fires a single conversion with value, currency and order ID, with hashed user data for enhanced conversions' do
-    covers 'organisations/google-ads-conversion@d1d9d3', 'organisations/google-ads-enhanced-conversions@c94e58', 'events/purchase-conversions-on-thank-you-page@3746ce'
+    covers 'organisations/google-ads-conversion@d1d9d3', 'organisations/google-ads-enhanced-conversions@fbfbbf', 'events/purchase-conversions-on-thank-you-page@3746ce'
     create_event_with_analytics
 
     gtag = marketing_scripts(get_in_production("/e/#{@event.slug}")).find { |script| script.text.include?('gtag(') }
@@ -268,7 +268,12 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
     assert_equal ['AW-6782912626/Purchase'], purchase['send_to']
     assert_includes gtag.text, "sessionStorage.getItem(storageKey)) return"
     # gtag.js normalises and hashes user_data before sending it (allow_enhanced_conversions)
-    assert_equal({ 'email' => @order.account.email, 'phone_number' => '+447700900123' }, purchase['user_data'])
+    # Anyone with the order's link sees this page, so the account's phone goes only to the account itself
+    assert_equal({ 'email' => @order.account.email }, purchase['user_data'])
+    env 'rack.session', { 'account_id' => @order.account.id.to_s, 'session_token' => @order.account.session_token! }
+    gtag = marketing_scripts(get_in_production("/e/#{@event.slug}?order_id=#{@order.token}&success=true")).find { |script| script.text.include?('gtag(') }
+    assert_equal({ 'email' => @order.account.email, 'phone_number' => '+447700900123' }, script_arguments(gtag).first['user_data'])
+    env 'rack.session', {}
     assert_includes gtag.text, "gtag('set', 'user_data', purchase.user_data)"
     assert_includes gtag.text, "gtag('config', config.id, {allow_enhanced_conversions: true})"
 
