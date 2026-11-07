@@ -89,19 +89,28 @@ Dandelion::App.helpers do
   end
 
   # A map of many accounts in its box, as JSON: one point for each cell they're in, at its centre, with how many are
-  # there, so a place many people share, like a town everyone gives as their location, still shows. No more than
-  # MAP_POINTS_LIMIT cells come back, the most crowded first
+  # there, so a place many people share, like a town everyone gives as their location, still shows. When there'd be more
+  # than MAP_POINTS_LIMIT cells, as a map zoomed out over a country might have, neighbouring cells merge into ones 2, 4,
+  # 8... times as wide until there aren't, so everyone is still counted and the map needn't say there are too many
   def account_cells_map_json(accounts)
     west, south, east, north = %i[west south east north].map { |p| params[p].to_f }
     cells = account_map_points_in_box(accounts, west, south, east, north).pluck(:coordinates)
-                                                                         .group_by { |coordinates| account_map_coordinates(coordinates) }
-    point_hashes = cells.map { |(lng, lat), in_cell| { model_name: 'Account', lat: lat, lng: lng, count: in_cell.length } }
-                        .max_by(MAP_POINTS_LIMIT) { |cell| cell[:count] }
-                        .each_with_index.map { |cell, n| cell.merge(n: n) }
+                                                                         .map { |lng, lat| [account_map_cell(lng), account_map_cell(lat)] }
+                                                                         .tally
+    scale = 1
+    while cells.length > MAP_POINTS_LIMIT
+      scale *= 2
+      cells = cells.each_with_object(Hash.new(0)) { |((x, y), count), merged| merged[[x.div(2), y.div(2)]] += count }
+    end
+
+    centre = ->(cell) { (((cell + 0.5) * scale) / ACCOUNT_MAP_CELLS_PER_DEGREE).round(6) }
+    point_hashes = cells.each_with_index.map do |((x, y), count), n|
+      { model_name: 'Account', lat: centre.(y), lng: centre.(x), count: count, n: n }
+    end
 
     {
       points: point_hashes,
-      pointsCount: cells.length
+      pointsCount: point_hashes.length
     }.to_json
   end
 end

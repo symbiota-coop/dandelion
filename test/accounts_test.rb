@@ -1010,6 +1010,24 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal [1, [[50.43, -3.69, 2]]], map_cells.call(-3.695, 50.425, -3.685, 50.435)
   end
 
+  test 'a map with more occupied cells than it can show merges neighbouring cells, still counting everyone' do
+    organisation = FactoryBot.create(:organisation)
+    # Its creator's account is in it, somewhere else
+    already = Account.and(organisation_ids_public_cache: organisation.id, :coordinates.ne => nil).count
+    # One account in each of MAP_POINTS_LIMIT + 1 cells side by side, and two more in the first
+    coordinates = (0..MAP_POINTS_LIMIT).map { |i| [-100 + ((i + 0.5) / ACCOUNT_MAP_CELLS_PER_DEGREE), 50.001] } + ([[-99.999, 50.001]] * 2)
+    Account.collection.insert_many(coordinates.map { |c| { coordinates: c, organisation_ids_public_cache: [organisation.id] } })
+
+    get '/map.json', organisation_id: organisation.id, west: -180, south: -90, east: 180, north: 90
+    response = JSON.parse(last_response.body)
+    assert_operator response['points'].length, :<=, MAP_POINTS_LIMIT
+    assert_equal response['points'].length, response['pointsCount']
+    assert_equal(already + MAP_POINTS_LIMIT + 3, response['points'].sum { |point| point['count'] })
+    # Pairs of cells merge into one twice as wide, at its centre
+    first = response['points'].min_by { |point| point['lng'] }
+    assert_equal [-100 + (1.0 / ACCOUNT_MAP_CELLS_PER_DEGREE), 4], [first['lng'], first['count']]
+  end
+
   test 'there is no map of every account, only of an organisation, activity or local group' do
     get '/map.json', west: -4, south: 50, east: -3, north: 51
     assert_equal 404, last_response.status
