@@ -982,9 +982,9 @@ class AccountsTest < ActiveSupport::TestCase
     assert_nil other_browser.last_request.session[:account_id]
   end
 
-  test 'maps of many accounts show how many are in each tenth-of-a-degree cell, at its centre, whoever is looking' do
+  test 'maps of many accounts show how many are in each cell, at its centre, whoever is looking' do
     organisation = FactoryBot.create(:organisation)
-    [[-3.68765, 50.43214, 'Public'], [-3.61234, 50.48765, 'Only me'], [-3.12345, 50.98765, 'Only me']].each do |lng, lat, privacy|
+    [[-3.68765, 50.43214, 'Public'], [-3.68001, 50.43999, 'Only me'], [-3.12345, 50.98765, 'Only me']].each do |lng, lat, privacy|
       FactoryBot.create(:account, location_privacy: privacy).set(coordinates: [lng, lat], organisation_ids_public_cache: [organisation.id])
     end
     map_cells = lambda do |west, south, east, north|
@@ -994,20 +994,20 @@ class AccountsTest < ActiveSupport::TestCase
     end
 
     clear_cookies
-    # Two accounts share a cell, so they're one point: no account's own place or id is sent
-    assert_equal [2, [[50.45, -3.65, 2], [50.95, -3.15, 1]]], map_cells.call(-4, 50, -3, 51)
+    # Two accounts share a cell, from -3.70 to -3.68 and 50.42 to 50.44, so they're one point: no account's own place or id is sent
+    assert_equal [2, [[50.43, -3.69, 2], [50.99, -3.13, 1]]], map_cells.call(-4, 50, -3, 51)
     refute_includes last_response.body, '"id"'
 
     # A box around where the accounts are, but not their cell's centre, finds nothing, so narrowing boxes can't find them
-    assert_equal [0, []], map_cells.call(-3.69, 50.43, -3.68, 50.44)
+    assert_equal [0, []], map_cells.call(-3.688, 50.431, -3.681, 50.439)
     # A box around where the map shows them finds them, so they don't vanish on zooming in
-    assert_equal [1, [[50.45, -3.65, 2]]], map_cells.call(-3.66, 50.44, -3.64, 50.46)
+    assert_equal [1, [[50.43, -3.69, 2]]], map_cells.call(-3.695, 50.425, -3.685, 50.435)
     # A box whose edges move within the cells finds the same
-    assert_equal [1, [[50.45, -3.65, 2]]], map_cells.call(-3.6999, 50.4001, -3.6001, 50.4999)
+    assert_equal [1, [[50.43, -3.69, 2]]], map_cells.call(-3.6999, 50.4201, -3.6801, 50.4399)
 
     account = Account.find_by(location_privacy: 'Public')
     env 'rack.session', { 'account_id' => account.id.to_s, 'session_token' => account.session_token! }
-    assert_equal [1, [[50.45, -3.65, 2]]], map_cells.call(-3.66, 50.44, -3.64, 50.46)
+    assert_equal [1, [[50.43, -3.69, 2]]], map_cells.call(-3.695, 50.425, -3.685, 50.435)
   end
 
   test 'there is no map of every account, only of an organisation, activity or local group' do
@@ -1021,9 +1021,9 @@ class AccountsTest < ActiveSupport::TestCase
     account = FactoryBot.create(:account)
     account.set(coordinates: [-3.7, 50.4])
     app = Dandelion::App.new!
-    assert_equal [-3.65, 50.45], app.account_map_coordinates(account.coordinates)
-    assert_equal 1, app.account_map_points_in_box(Account.all, -3.66, 50.44, -3.64, 50.46).count
-    assert_equal 0, app.account_map_points_in_box(Account.all, -3.76, 50.34, -3.74, 50.36).count
+    assert_equal [-3.69, 50.41], app.account_map_coordinates(account.coordinates)
+    assert_equal 1, app.account_map_points_in_box(Account.all, -3.695, 50.405, -3.685, 50.415).count
+    assert_equal 0, app.account_map_points_in_box(Account.all, -3.715, 50.385, -3.705, 50.395).count
   end
 
   test 'a session from before session tokens is kept until the account revokes its sessions' do

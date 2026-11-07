@@ -21,9 +21,10 @@ Dandelion::App.helpers do
     { model_name: parts[1], id: parts[2] }
   end
 
-  # Maps show accounts at about their town, not where they are: each account at the centre of the tenth-of-a-degree
-  # cell (about 11 km north to south) it's in, so maps still show how many people are in an area without pinpointing
-  # anyone. Cell k holds coordinates from k / 10 up to, but not including, (k + 1) / 10 (ACCOUNT_MAP_CELLS_PER_DEGREE)
+  # Maps show accounts at about their neighbourhood, not where they are: each account at the centre of the cell it's
+  # in, a fiftieth of a degree across (about 2 km north to south; ACCOUNT_MAP_CELLS_PER_DEGREE), so maps still show how
+  # many people are in an area without pinpointing anyone. Cell k holds coordinates from k / 50 up to, but not
+  # including, (k + 1) / 50
   def account_map_cell(coordinate)
     cell = (coordinate.to_f * ACCOUNT_MAP_CELLS_PER_DEGREE).floor
     # Multiplying can land a coordinate on the far side of an edge, so check it against the edges as Mongo will
@@ -33,7 +34,7 @@ Dandelion::App.helpers do
   end
 
   def account_map_coordinates(coordinates)
-    coordinates.map { |c| ((account_map_cell(c) + 0.5) / ACCOUNT_MAP_CELLS_PER_DEGREE).round(2) }
+    coordinates.map { |c| ((account_map_cell(c) + 0.5) / ACCOUNT_MAP_CELLS_PER_DEGREE).round(6) }
   end
 
   # The accounts a map's box shows: those whose cell's centre is in the box, found by where they are in the cells, so
