@@ -2888,6 +2888,18 @@ ul.map-event li {
   --map-cluster-color: var(--color-red-500);
   font-size: 14px;
 }
+/* The number of people in a hexagon of a map of many people (map.js drawCells), centred on it */
+.map-cell-count {
+  transform: translateY(50%);
+  color: var(--bs-black);
+  font-family: var(--body-font-family);
+  font-size: 13px;
+  font-weight: 700;
+  /* A white halo, as map labels have, so it reads over any shade of hexagon and the roads and names under it: the
+  stroke is painted under the letters, so it widens them outward without thinning them */
+  -webkit-text-stroke: 3px var(--bs-white);
+  paint-order: stroke fill;
+}
 /* stylelint-enable declaration-property-unit-disallowed-list */
 
 /* A marker or cluster whose details are loading */

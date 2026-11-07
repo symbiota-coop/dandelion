@@ -982,50 +982,54 @@ class AccountsTest < ActiveSupport::TestCase
     assert_nil other_browser.last_request.session[:account_id]
   end
 
-  test 'maps of many accounts show how many are in each cell, at its centre, whoever is looking' do
+  test 'maps of many accounts show how many are in each hexagon, whoever is looking' do
     organisation = FactoryBot.create(:organisation)
-    [[-3.68765, 50.43214, 'Public'], [-3.68001, 50.43999, 'Only me'], [-3.12345, 50.98765, 'Only me']].each do |lng, lat, privacy|
-      FactoryBot.create(:account, location_privacy: privacy).set(coordinates: [lng, lat], organisation_ids_public_cache: [organisation.id])
+    app = Dandelion::App.new!
+    hackney = [-0.0553, 51.545]
+    centre_lng, centre_lat = app.account_map_coordinates(hackney)
+    far_lng, far_lat = app.account_map_coordinates([-3.12345, 50.98765])
+    [[hackney, 'Public'], [[centre_lng, centre_lat], 'Only me'], [[-3.12345, 50.98765], 'Only me']].each do |coordinates, privacy|
+      FactoryBot.create(:account, location_privacy: privacy).set(coordinates: coordinates, organisation_ids_public_cache: [organisation.id])
     end
     map_cells = lambda do |west, south, east, north|
       get '/map.json', organisation_id: organisation.id, west: west, south: south, east: east, north: north
       response = JSON.parse(last_response.body)
-      [response['pointsCount'], response['points'].map { |point| [point['lat'], point['lng'], point['count']] }.sort]
+      assert(response['cells'].all? { |cell| cell['corners'].length == 6 })
+      response['cells'].map { |cell| [cell['lat'], cell['lng'], cell['count']] }.sort
     end
 
     clear_cookies
-    # Two accounts share a cell, from -3.70 to -3.68 and 50.42 to 50.44, so they're one point: no account's own place or id is sent
-    assert_equal [2, [[50.43, -3.69, 2], [50.99, -3.13, 1]]], map_cells.call(-4, 50, -3, 51)
+    # Two accounts share a hexagon, so they're one cell: no account's own place or id is sent
+    assert_equal [[far_lat, far_lng, 1], [centre_lat, centre_lng, 2]].sort, map_cells.call(-4, 50, 1, 52)
     refute_includes last_response.body, '"id"'
 
-    # A box around where the accounts are, but not their cell's centre, finds nothing, so narrowing boxes can't find them
-    assert_equal [0, []], map_cells.call(-3.688, 50.431, -3.681, 50.439)
-    # A box around where the map shows them finds them, so they don't vanish on zooming in
-    assert_equal [1, [[50.43, -3.69, 2]]], map_cells.call(-3.695, 50.425, -3.685, 50.435)
-    # A box whose edges move within the cells finds the same
-    assert_equal [1, [[50.43, -3.69, 2]]], map_cells.call(-3.6999, 50.4201, -3.6801, 50.4399)
+    # A box around where an account is, but not its hexagon's centre, finds nothing, so narrowing boxes can't find it
+    assert((centre_lng - hackney[0]).abs > 0.001 || (centre_lat - hackney[1]).abs > 0.001)
+    assert_equal [], map_cells.call(hackney[0] - 0.001, hackney[1] - 0.001, hackney[0] + 0.001, hackney[1] + 0.001)
+    # Boxes around where the map shows them find them, so they don't vanish on zooming in, wherever their edges are
+    assert_equal [[centre_lat, centre_lng, 2]], map_cells.call(centre_lng - 0.001, centre_lat - 0.001, centre_lng + 0.001, centre_lat + 0.001)
+    assert_equal [[centre_lat, centre_lng, 2]], map_cells.call(centre_lng - 0.004, centre_lat - 0.0001, centre_lng + 0.0002, centre_lat + 0.003)
 
     account = Account.find_by(location_privacy: 'Public')
     env 'rack.session', { 'account_id' => account.id.to_s, 'session_token' => account.session_token! }
-    assert_equal [1, [[50.43, -3.69, 2]]], map_cells.call(-3.695, 50.425, -3.685, 50.435)
+    assert_equal [[centre_lat, centre_lng, 2]], map_cells.call(centre_lng - 0.001, centre_lat - 0.001, centre_lng + 0.001, centre_lat + 0.001)
   end
 
-  test 'a map with more occupied cells than it can show merges neighbouring cells, still counting everyone' do
+  test 'a map with more occupied hexagons than it can show uses bigger ones, still counting everyone' do
     organisation = FactoryBot.create(:organisation)
     # Its creator's account is in it, somewhere else
     already = Account.and(organisation_ids_public_cache: organisation.id, :coordinates.ne => nil).count
-    # One account in each of MAP_POINTS_LIMIT + 1 cells side by side, and two more in the first
-    coordinates = (0..MAP_POINTS_LIMIT).map { |i| [-100 + ((i + 0.5) / ACCOUNT_MAP_CELLS_PER_DEGREE), 50.001] } + ([[-99.999, 50.001]] * 2)
+    # One account in each of MAP_POINTS_LIMIT + 1 hexagons side by side, a hexagon's width apart
+    width = Math.sqrt(3) * ACCOUNT_MAP_HEX_SIZE
+    coordinates = (0..MAP_POINTS_LIMIT).map { |i| [-100 + (i * width), 0.001] }
     Account.collection.insert_many(coordinates.map { |c| { coordinates: c, organisation_ids_public_cache: [organisation.id] } })
 
-    get '/map.json', organisation_id: organisation.id, west: -180, south: -90, east: 180, north: 90
-    response = JSON.parse(last_response.body)
-    assert_operator response['points'].length, :<=, MAP_POINTS_LIMIT
-    assert_equal response['points'].length, response['pointsCount']
-    assert_equal(already + MAP_POINTS_LIMIT + 3, response['points'].sum { |point| point['count'] })
-    # Pairs of cells merge into one twice as wide, at its centre
-    first = response['points'].min_by { |point| point['lng'] }
-    assert_equal [-100 + (1.0 / ACCOUNT_MAP_CELLS_PER_DEGREE), 4], [first['lng'], first['count']]
+    get '/map.json', organisation_id: organisation.id, west: -180, south: -85, east: 180, north: 85
+    cells = JSON.parse(last_response.body)['cells']
+    assert_operator cells.length, :<=, MAP_POINTS_LIMIT
+    assert_equal(already + MAP_POINTS_LIMIT + 1, cells.sum { |cell| cell['count'] })
+    # The hexagons are twice as wide
+    assert_in_delta 2 * width, (cells.first['corners'][0][1] - cells.first['corners'][3][1]).abs, 0.000002
   end
 
   test 'there is no map of every account, only of an organisation, activity or local group' do
@@ -1035,13 +1039,14 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal 404, last_response.status
   end
 
-  test 'an account on the edge of a map cell is shown and found in the cell it starts' do
-    account = FactoryBot.create(:account)
-    account.set(coordinates: [-3.7, 50.4])
+  test 'maps that show each account show it at the centre of its hexagon' do
     app = Dandelion::App.new!
-    assert_equal [-3.69, 50.41], app.account_map_coordinates(account.coordinates)
-    assert_equal 1, app.account_map_points_in_box(Account.all, -3.695, 50.405, -3.685, 50.415).count
-    assert_equal 0, app.account_map_points_in_box(Account.all, -3.715, 50.385, -3.705, 50.395).count
+    account = FactoryBot.create(:account)
+    account.set(coordinates: [-0.0553, 51.545])
+    centre = app.account_map_coordinates(account.coordinates)
+    assert_operator Math.hypot(centre[0] + 0.0553, app.account_map_mercator_y(centre[1]) - app.account_map_mercator_y(51.545)), :<=, ACCOUNT_MAP_HEX_SIZE
+    assert_equal centre, app.account_map_coordinates(centre)
+    assert_equal centre.reverse, app.map_point_lat_lng(account)
   end
 
   test 'a session from before session tokens is kept until the account revokes its sessions' do

@@ -2,8 +2,9 @@ RACK_ENV = ENV['RACK_ENV'] ||= 'development' unless defined?(RACK_ENV)
 PADRINO_ROOT = File.expand_path('..', __dir__) unless defined?(PADRINO_ROOT)
 EMAIL_REGEX = /\A[^@\s]+@[^@\s]+\.[^@\s]+\z/
 MAP_POINTS_LIMIT = 1000
-# Maps show accounts at the centre of the cell they're in, a fiftieth of a degree across (map_helper.rb)
-ACCOUNT_MAP_CELLS_PER_DEGREE = 50
+# Maps show accounts at the centre of the hexagon they're in, this many degrees of longitude from its centre to a corner
+# (map_helper.rb)
+ACCOUNT_MAP_HEX_SIZE = 0.015
 # The default theme colour, Dandelion's green (--color-green-500 in app.css)
 DEFAULT_THEME_COLOR = '#00af5e'.freeze
 CACHEBUST_DIGESTS = {} # rubocop:disable Style/MutableConstant -- a per-process cache, filled as it goes; a race only works a value out twice

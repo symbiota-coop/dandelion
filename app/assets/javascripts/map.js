@@ -11,15 +11,18 @@ window.DandelionMap = {
     disableDoubleClickZoom: false
   },
 
-  // Google Maps needs a plain colour, so resolve --color-orange-400 when a polygon is drawn
+  // A local group's area, drawn as a quiet line around it, over the hexagons of people (drawCells) so both still read.
+  // Google Maps needs a plain colour, so resolve --bs-black when a polygon is drawn: black stands out from the hexagons
+  // and the map
   get polygonStyle () {
-    const color = cssColor('var(--color-orange-400)')
+    const color = cssColor('var(--bs-black)')
     return {
       strokeColor: color,
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: color,
-      fillOpacity: 0.35
+      strokeOpacity: 0.9,
+      strokeWeight: 2.5,
+      fillOpacity: 0,
+      clickable: false,
+      zIndex: 10
     }
   },
 
@@ -134,31 +137,21 @@ window.DandelionMap = {
       const point = points[i];
       var modelConfig = this.models.find(model => model.name === point.model_name);
 
-      // A point with a count is how many people are in a place (/map.json), drawn like a cluster, with nothing to open
-      var pin;
-      if (point.count) {
-        pin = this.countCircle(point.count);
-      } else {
-        pin = document.createElement('div');
-        pin.className = 'map-marker';
-        pin.style.setProperty('--map-marker-color', modelConfig.color);
-        pin.innerHTML = '<i class="' + modelConfig.icon + '"></i>';
-      }
+      var pin = document.createElement('div');
+      pin.className = 'map-marker';
+      pin.style.setProperty('--map-marker-color', modelConfig.color);
+      pin.innerHTML = '<i class="' + modelConfig.icon + '"></i>';
 
       var marker = new google.maps.marker.AdvancedMarkerElement({
         position: { lat: point.lat, lng: point.lng },
         content: pin,
-        gmpClickable: !point.count,
-        zIndex: point.count ? 1000 + point.count : null
+        gmpClickable: true
       });
       marker.modelName = point.model_name;
       marker.pointId = point.id;
       marker.n = point.n;
-      marker.count = point.count || 1;
 
-      if (!point.count) {
-        this.addMarkerClickListener(marker, infowindow);
-      }
+      this.addMarkerClickListener(marker, infowindow);
 
       bounds.extend(marker.position);
 
@@ -219,20 +212,15 @@ window.DandelionMap = {
   },
 
   // A cluster is a .map-cluster circle (app.css) that turns from green to orange to red as it grows
-  countCircle: function (count) {
+  renderCluster: function (cluster) {
+    var count = cluster.count;
     var circle = document.createElement('div');
     circle.className = 'map-cluster ' + (count < 10 ? 'map-cluster-sm' : count < 100 ? 'map-cluster-md' : 'map-cluster-lg');
     circle.textContent = count;
-    return circle;
-  },
-
-  // A cluster counts what its markers stand for: a marker with a count is that many people
-  renderCluster: function (cluster) {
-    var count = cluster.markers.reduce(function (sum, marker) { return sum + (marker.count || 1); }, 0);
 
     return new google.maps.marker.AdvancedMarkerElement({
       position: cluster.position,
-      content: this.countCircle(count),
+      content: circle,
       gmpClickable: true,
       zIndex: 1000 + count
     });
@@ -257,9 +245,7 @@ window.DandelionMap = {
   },
 
   handleClusterClick: function (cluster, infowindow) {
-    // Markers with a count have nothing to open
-    var markers = cluster.markers.filter(function (marker) { return marker.pointId; });
-    if (markers.length === 0) return;
+    var markers = cluster.markers.slice();
     markers.sort(function (a, b) {
       return a.n - b.n;
     });
@@ -377,12 +363,55 @@ window.DandelionMap = {
     });
   },
 
+  // Maps of many people (/map.json) come as cells, each a hexagon of a grid with how many people are in it: draw each,
+  // darker the more people are in it, so it reads as an area, not a place, with the count on it once the hexagons are
+  // big enough to hold one
+  drawCells: function (cells, bounds) {
+    (window.mapCells || []).forEach(function (shape) { shape.setMap ? shape.setMap(null) : (shape.map = null); });
+    window.mapCells = [];
+    if (!cells || cells.length === 0) return;
+
+    var color = cssColor('var(--theme-500)');
+    var max = Math.max.apply(null, cells.map(function (cell) { return cell.count; }));
+    // Corners 0 and 3 are the hexagon's furthest apart east to west
+    var width = Math.abs(cells[0].corners[0][1] - cells[0].corners[3][1]);
+    var widthPixels = width * 256 * Math.pow(2, window.map.getZoom()) / 360;
+
+    cells.forEach(function (cell) {
+      var path = cell.corners.map(function (corner) { return { lat: corner[0], lng: corner[1] }; });
+      // Square roots spread the shades, so a handful of people still shows beside a crowd
+      window.mapCells.push(new google.maps.Polygon({
+        map: window.map,
+        paths: path,
+        clickable: false,
+        strokeColor: color,
+        strokeOpacity: 0.6,
+        strokeWeight: 0.5,
+        fillColor: color,
+        fillOpacity: 0.1 + (0.55 * Math.sqrt(cell.count / max))
+      }));
+      path.forEach(function (corner) { bounds.extend(corner); });
+
+      if (widthPixels >= 32) {
+        var label = document.createElement('div');
+        label.className = 'map-cell-count';
+        label.textContent = cell.count;
+        window.mapCells.push(new google.maps.marker.AdvancedMarkerElement({
+          map: window.map,
+          position: { lat: cell.lat, lng: cell.lng },
+          content: label
+        }));
+      }
+    });
+  },
+
   updateMapWithNewData: function (data, config, isFirstLoad) {
     var bounds = new google.maps.LatLngBounds();
     var markers = [];
     if (data.points && data.points.length > 0) {
       markers = this.createMarkers(data.points, window.mapInfoWindow, bounds);
     }
+    this.drawCells(data.cells, bounds);
 
     window.markerClusterer.clearMarkers(true);
     window.markerClusterer.addMarkers(markers);
@@ -394,7 +423,7 @@ window.DandelionMap = {
     }
 
     // Fit map to new points only on first load and if no specific bounds are configured
-    if (isFirstLoad && markers.length > 0 && !config.boundingBox && (!config.polygonPaths || config.polygonPaths.length === 0)) {
+    if (isFirstLoad && !bounds.isEmpty() && !config.boundingBox && (!config.polygonPaths || config.polygonPaths.length === 0)) {
       window.map.fitBounds(bounds);
     }
   }
