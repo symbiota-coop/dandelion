@@ -955,7 +955,7 @@ p.action a {
   background-color: var(--color-stripe) !important;
 }
 
-/* Payment method badges, named after the method in lib/payment_methods/event_payment_methods.rb */
+/* Payment method badges, named after the method in lib/payments/event_payment_method.rb */
 .badge-payment-coinbase { --payment-bg: var(--color-coinbase); }
 .badge-payment-mollie { --payment-bg: var(--color-mollie); }
 .badge-payment-paypal { --payment-bg: var(--color-paypal); }

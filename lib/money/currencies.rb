@@ -1,4 +1,4 @@
-require_relative 'tokens'
+require_relative 'chains_and_tokens'
 
 FIAT_CURRENCIES = %w[GBP EUR USD SEK DKK NOK CHF MXN CAD AUD NZD SGD PLN].freeze
 # Instant Bank Pay and Direct Debit via GoCardless are UK/Eurozone only.

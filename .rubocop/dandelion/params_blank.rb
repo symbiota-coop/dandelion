@@ -1,7 +1,7 @@
 module RuboCop
   module Cop
     module Dandelion
-      # `blanks_to_nils!` (lib/param_helpers.rb) makes blank params nil, so check `params[:x]`, not `.present?` or `.blank?`.
+      # `blanks_to_nils!` (app/helpers/param_helpers.rb) makes blank params nil, so check `params[:x]`, not `.present?` or `.blank?`.
       #
       # @example
       #   # bad

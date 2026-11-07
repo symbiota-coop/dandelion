@@ -1,4 +1,4 @@
-module ParamHelpers
+Dandelion::App.helpers do
 
   def fix_params!
     reject_mongo_operators!(params)
@@ -108,6 +108,3 @@ module ParamHelpers
 
 end
 
-class Tempfile  
-  attr_accessor :original_filename
-end

@@ -3,8 +3,6 @@ module Dandelion
     register Padrino::Rendering
     register Padrino::Helpers
     register WillPaginate::Sinatra
-    helpers ParamHelpers
-    helpers NavigationHelpers
 
     use Sentry::Rack::CaptureExceptions
 

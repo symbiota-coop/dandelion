@@ -1,4 +1,4 @@
-module NavigationHelpers
+Dandelion::App.helpers do
   def dropdown_nav(items,
                    container_class: 'btn-group',
                    container_id: '',
