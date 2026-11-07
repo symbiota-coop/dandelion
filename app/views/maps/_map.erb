@@ -1,6 +1,7 @@
 <% map_points = if defined?(points)
                   points.each_with_index.map do |point, n|
-                    { model_name: point.class.to_s, id: encrypt_map_id(point.class.to_s, point.id.to_s), lat: point.lat, lng: point.lng, n: n }
+                    lat, lng = map_point_lat_lng(point)
+                    { model_name: point.class.to_s, id: encrypt_map_id(point.class.to_s, point.id.to_s), lat: lat, lng: lng, n: n }
                   end
                 else
                   []

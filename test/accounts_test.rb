@@ -994,6 +994,29 @@ class AccountsTest < ActiveSupport::TestCase
     assert_nil other_browser.last_request.session[:account_id]
   end
 
+  test 'maps show accounts at about town level, whoever is looking' do
+    public_account = FactoryBot.create(:account, location_privacy: 'Public')
+    public_account.set(coordinates: [-3.68765, 50.43214])
+    private_account = FactoryBot.create(:account, location_privacy: 'Only me')
+    private_account.set(coordinates: [-3.12345, 50.98765])
+    map_points = lambda do
+      get '/map.json', west: -4, south: 50, east: -3, north: 51
+      JSON.parse(last_response.body)['points'].to_h { |point| [map_point_account_id(point), [point['lat'], point['lng']]] }
+    end
+
+    clear_cookies
+    points = map_points.call
+    assert_equal [50.4, -3.7], points[public_account.id.to_s]
+    assert_equal [51.0, -3.1], points[private_account.id.to_s]
+
+    env 'rack.session', { 'account_id' => private_account.id.to_s, 'session_token' => private_account.session_token! }
+    assert_equal [51.0, -3.1], map_points.call[private_account.id.to_s]
+  end
+
+  def map_point_account_id(point)
+    Dandelion::App.new!.decrypt_map_id(point['id'])[:id]
+  end
+
   test 'a session from before session tokens is kept until the account revokes its sessions' do
     account = FactoryBot.create(:account)
     clear_cookies

@@ -21,18 +21,34 @@ Dandelion::App.helpers do
     { model_name: parts[1], id: parts[2] }
   end
 
+  # Maps show accounts' locations rounded to a tenth of a degree (about 11 km north to south), about where their town
+  # is, so they still show how many people are in an area without pinpointing anyone
+  def account_map_coordinates(coordinates)
+    coordinates.map { |c| c.to_f.round(1) }
+  end
+
+  # [lat, lng] for a point on a map, with accounts' locations rounded as account_map_coordinates says
+  def map_point_lat_lng(point)
+    return [point.lat, point.lng] unless point.coordinates
+
+    coordinates = point.is_a?(Account) || point.is_a?(ActivityApplication) ? account_map_coordinates(point.coordinates) : point.coordinates
+    [coordinates[1], coordinates[0]]
+  end
+
   def map_json(points)
     box = [[params[:west].to_f, params[:south].to_f], [params[:east].to_f, params[:north].to_f]]
-    points = points.only(:coordinates).and(coordinates: { '$geoWithin' => { '$box' => box } })
+    points = points.and(coordinates: { '$geoWithin' => { '$box' => box } })
 
     points_count = points.count
 
     point_hashes = []
     if points_count <= MAP_POINTS_LIMIT
+      model_name = points.klass.to_s
+      accounts = points.klass == Account
       point_records = points.pluck(:id, :coordinates)
 
-      model_name = points.klass.to_s
       point_hashes = point_records.map.with_index do |(id, coordinates), n|
+        coordinates = account_map_coordinates(coordinates) if accounts
         {
           model_name: model_name,
           id: encrypt_map_id(model_name, id.to_s),
