@@ -8,6 +8,10 @@ CACHEBUST_DIGESTS = {} # rubocop:disable Style/MutableConstant -- a per-process 
 LIBRARY_CACHE = {} # rubocop:disable Style/MutableConstant -- a per-process cache, filled as it goes; a race only works a value out twice
 ADJECTIVES = %w[soulful regenerative metamodern participatory conscious transformative holistic ethical].freeze
 
+# Our files are UTF-8, whatever the host's locale: Ruby otherwise reads them in the locale's encoding, US-ASCII where
+# LANG isn't set, and Padrino no longer sets this. Email templates with a ✓ or £ would then fail to render
+Encoding.default_external = Encoding::UTF_8
+
 # Each test run gets its own database, which test_config.rb drops afterwards, and a free port, so runs at the
 # same time (in one checkout or several) can't wipe each other's data or clash on the port
 if RACK_ENV == 'test'
