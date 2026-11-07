@@ -33,7 +33,8 @@ class Account
     %w[name name_transliterated email username]
   end
 
-  # Its Atlas Search index maps name and username as autocomplete too, so searches match the start of a word in them (Searchable)
+  # Its Atlas Search index maps name and username as autocomplete too, so searches match the start of a name's words or of a username
+  # (Searchable): usernames like damp_resonance_8 are one token, so not their later words
   def self.autocomplete_fields
     %w[name username]
   end

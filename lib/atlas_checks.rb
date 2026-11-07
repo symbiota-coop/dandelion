@@ -1,6 +1,6 @@
 # The checks /stats/atlas runs on the features only Atlas has, which CI can't test as it runs on plain MongoDB (and dev
 # and the tests search with regex): each searchable model's Atlas Search index, and searches through Searchable that use
-# it, by whole word (phrase), by the start of a word (autocomplete) and with embeddings ($vectorSearch and $rankFusion).
+# it, by whole word (phrase), by the start of a field (autocomplete) and with embeddings ($vectorSearch and $rankFusion).
 # Each search is of a real record, narrowed to it by id, so it passes only if that record comes back
 module AtlasChecks
   Check = Struct.new(:group, :name, :ok, :detail, :ms, keyword_init: true)
@@ -55,10 +55,11 @@ module AtlasChecks
 
         found(model, record, word, autocomplete: nil)
       end
-      # Each field's own clause, so one field mapped wrongly can't pass on another's match
+      # Each field's own clause, so one field mapped wrongly can't pass on another's match. Its first word, as the start of
+      # a field is all autocomplete promises: usernames (damp_resonance_8) are one token, so later words don't match
       fields.each do |field|
-        checks << check(group, "Search by the start of a word in #{field}") do
-          record, word = sample(model, field)
+        checks << check(group, "Search by the start of #{field}") do
+          record, word = sample(model, field, first_word: true)
           raise "no record with a long enough word in #{field} to search for" unless record
 
           found(model, record, word[0, AUTOCOMPLETE_PREFIX], autocomplete: [field])
@@ -103,11 +104,17 @@ module AtlasChecks
       [index['status'] == 'READY' && index['queryable'], [index['status'], ('not queryable' unless index['queryable'])].compact.join(', ')]
     end
 
-    # A recent record whose field has a word long enough to search for by its start
-    def sample(model, field)
+    # A recent record whose field has a word long enough to search for by its start (with first_word, its first word)
+    def sample(model, field, first_word: false)
       model.and(field.to_sym.nin => [nil, '']).only(:_id, field).order('created_at desc').limit(SAMPLE_SIZE).each do |record|
-        words = record.send(field).to_s.split(/[^\p{L}]+/)
-        word = words.find { |w| w.match?(SAMPLE_WORD) && words.none? { |other| other.casecmp?(w[0, AUTOCOMPLETE_PREFIX]) } }
+        value = record.send(field).to_s
+        words = value.split(/[^\p{L}]+/).reject(&:empty?)
+        candidates = if first_word
+                       value.match?(/\A\p{L}/) ? words.first(1) : []
+                     else
+                       words
+                     end
+        word = candidates.find { |w| w.match?(SAMPLE_WORD) && words.none? { |other| other.casecmp?(w[0, AUTOCOMPLETE_PREFIX]) } }
         return [record, word] if word
       end
       nil
