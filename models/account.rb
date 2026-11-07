@@ -492,17 +492,6 @@ class Account
     notifications_as_notifiable.create! circle: self, type: 'created_profile'
   end
 
-  after_save do
-    if location_change
-      location_change.each do |l|
-        if l
-          accounts = Account.and(location: location)
-          accounts.update_all(number_at_this_location: accounts.count)
-        end
-      end
-    end
-  end
-
   def self.authenticate(email, password)
     return unless email.present? && (account = find_by(email: email.downcase.strip))
 

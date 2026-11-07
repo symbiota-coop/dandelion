@@ -30,7 +30,6 @@ module AccountValidation
       errors.add(:username, "can't look like an account id") if username_changed? && username && BSON::ObjectId.legal?(username)
       self.email = email.downcase.strip if email
       self.sign_ins_count = 0 unless sign_ins_count
-      self.number_at_this_location = 0 unless number_at_this_location
 
       if email_changed?
         e = EmailAddress.error(email)

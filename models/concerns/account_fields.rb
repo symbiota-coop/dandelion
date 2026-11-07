@@ -29,7 +29,6 @@ module AccountFields
     field :last_checked_notifications, type: Time
     field :last_checked_messages, type: Time
     field :location, type: String
-    field :number_at_this_location, type: Integer
     field :coordinates, type: Array
     field :default_currency, type: String
     field :organisation_ids_cache, type: Array

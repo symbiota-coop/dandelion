@@ -350,18 +350,6 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal 'Stockholm, Sweden', account.reload.location
   end
 
-  test 'picking a place on the map page saves it as the location' do
-    account = FactoryBot.create(:account, location: nil)
-    sign_in(account)
-    visit '/map'
-    execute_script FAKE_PLACES_JS
-
-    find_field('location').send_keys('Stockh')
-    find('.places-autocomplete li', text: 'Stockholm, Sweden').click
-    assert page.has_content?('Your profile location: Stockholm, Sweden')
-    assert_equal 'Stockholm, Sweden', account.reload.location
-  end
-
   # ═══════════════════════════════════════════════════════════════════════════
   # New Account Creation with Context
   # ═══════════════════════════════════════════════════════════════════════════
@@ -995,12 +983,13 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'maps show accounts at the centre of their tenth-of-a-degree cell, whoever is looking' do
+    organisation = FactoryBot.create(:organisation)
     public_account = FactoryBot.create(:account, location_privacy: 'Public')
-    public_account.set(coordinates: [-3.68765, 50.43214])
+    public_account.set(coordinates: [-3.68765, 50.43214], organisation_ids_public_cache: [organisation.id])
     private_account = FactoryBot.create(:account, location_privacy: 'Only me')
-    private_account.set(coordinates: [-3.12345, 50.98765])
+    private_account.set(coordinates: [-3.12345, 50.98765], organisation_ids_public_cache: [organisation.id])
     map_points = lambda do |west, south, east, north|
-      get '/map.json', west: west, south: south, east: east, north: north
+      get '/map.json', organisation_id: organisation.id, west: west, south: south, east: east, north: north
       response = JSON.parse(last_response.body)
       [response['pointsCount'], response['points'].to_h { |point| [map_point_account_id(point), [point['lat'], point['lng']]] }]
     end
@@ -1020,6 +1009,13 @@ class AccountsTest < ActiveSupport::TestCase
 
     env 'rack.session', { 'account_id' => private_account.id.to_s, 'session_token' => private_account.session_token! }
     assert_equal [50.95, -3.15], map_points.call(-4, 50, -3, 51)[1][private_account.id.to_s]
+  end
+
+  test 'there is no map of every account, only of an organisation, activity or local group' do
+    get '/map.json', west: -4, south: 50, east: -3, north: 51
+    assert_equal 404, last_response.status
+    get '/map'
+    assert_equal 404, last_response.status
   end
 
   test 'an account on the edge of a map cell is shown and found in the cell it starts' do

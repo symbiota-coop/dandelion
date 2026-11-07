@@ -494,14 +494,6 @@ Dandelion::App.controller do
     end
   end
 
-  post '/accounts/update_location' do
-    sign_in_required!
-    @account = current_account
-    @account.location = params[:location]
-    @account.save
-    redirect back
-  end
-
   post '/accounts/destroy' do
     sign_in_required!
     verification_required!(return_to: '/accounts/delete', notice: "Your account wasn't deleted: enter the code below, then delete it again.")

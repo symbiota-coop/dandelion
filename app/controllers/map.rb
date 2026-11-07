@@ -15,29 +15,21 @@ Dandelion::App.controller do
     partial :"points/#{decrypted[:model_name].underscore}", object: object
   end
 
-  get '/map', provides: %i[html json] do
-    @accounts = []
-
-    if params[:organisation_id]
-      @organisation = Organisation.find(params[:organisation_id]) || not_found
-      @accounts = Account.all
-      @accounts = @accounts.and(organisation_ids_public_cache: @organisation.id)
-    elsif params[:activity_id]
-      @activity = Activity.find(params[:activity_id]) || not_found
-      @accounts = Account.and(:id.in => @activity.activityships.and(hide_membership: false).pluck(:account_id))
-    elsif params[:local_group_id]
-      @local_group = LocalGroup.find(params[:local_group_id]) || not_found
-      @accounts = Account.and(:id.in => @local_group.local_groupships.and(hide_membership: false).pluck(:account_id))
-    else
-      @accounts = Account.all
-    end
-
-    case content_type
-    when :html
-      erb :'maps/map'
-    when :json
-      map_json(@accounts)
-    end
+  # The accounts in an organisation, activity or local group, for the maps on its pages
+  get '/map', provides: :json do
+    accounts = if params[:organisation_id]
+                 organisation = Organisation.find(params[:organisation_id]) || not_found
+                 Account.and(organisation_ids_public_cache: organisation.id)
+               elsif params[:activity_id]
+                 activity = Activity.find(params[:activity_id]) || not_found
+                 Account.and(:id.in => activity.activityships.and(hide_membership: false).pluck(:account_id))
+               elsif params[:local_group_id]
+                 local_group = LocalGroup.find(params[:local_group_id]) || not_found
+                 Account.and(:id.in => local_group.local_groupships.and(hide_membership: false).pluck(:account_id))
+               else
+                 not_found
+               end
+    map_json(accounts)
   end
 
   get '/map/trigger' do
