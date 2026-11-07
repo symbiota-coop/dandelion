@@ -15,9 +15,6 @@
           <%= partial :'accounts/square', locals: { account: account, content: ("Active #{time_ago_in_words account.last_active} ago" if account.last_active), size: :lg } %>
           <% } %>
         </div>
-        <style>
-          #member-pagination ul.pagination { justify-content: left }
-        </style>
         <div id="member-pagination">
           <%= will_paginate @members, param_name: 'members_page', page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
         </div>
