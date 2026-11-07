@@ -179,10 +179,6 @@ class Organisation
     "#{ENV['BASE_URI']}/o/#{slug}/stripe_webhook"
   end
 
-  def mailgun_webhook_url
-    "#{ENV['BASE_URI']}/o/#{slug}/mailgun_webhook"
-  end
-
   # Only the organisation's own key: Dandelion's (MAILGUN_WEBHOOK_SIGNING_KEY) signs events for every organisation, so
   # accepting it here would let an event signed for one organisation be replayed to another's webhook
   def mailgun_webhook_authentic?(signature)
@@ -251,14 +247,6 @@ class Organisation
 
   def stripe_connect?
     stripe_connect_json && !stripe_pk
-  end
-
-  def stripe_connect_only?
-    return false unless stripe_connect?
-
-    EventPaymentMethod.all.none? do |pm|
-      !pm.card && !pm.complimentary && pm.org_condition&.call(self)
-    end
   end
 
   def referral_revenue

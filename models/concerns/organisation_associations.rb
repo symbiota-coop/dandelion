@@ -58,10 +58,6 @@ module OrganisationAssociations
     Account.and(unsubscribed_organisation_ids_cache: id).pluck(:id)
   end
 
-  def unsubscribed_members
-    Account.and(unsubscribed_organisation_ids_cache: id)
-  end
-
   def news
     pmails.and(:recipient_kind.in => %w[everyone not_monthly_donors]).and(:sent_at.ne => nil).order('sent_at desc')
   end

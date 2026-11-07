@@ -77,14 +77,6 @@ Dandelion::App.helpers do
     %(<relative-time datetime="#{time.iso8601}" tense="past" threshold="P100Y">#{time}</relative-time>).html_safe
   end
 
-  def youtube_embed_url(url)
-    if url =~ %r{(?:youtube\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/\s]{11})}
-      "https://www.youtube.com/embed/#{Regexp.last_match(1)}"
-    else
-      url
-    end
-  end
-
   def money_symbol(currency)
     Money.new(0, currency).symbol
   rescue Money::Currency::UnknownCurrency

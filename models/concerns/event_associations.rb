@@ -134,10 +134,6 @@ module EventAssociations
     [organisation] + cohosts
   end
 
-  def unscoped_attendees
-    Account.and(:id.in => tickets.unscoped.pluck(:account_id))
-  end
-
   # The event's discussion is one chat in one post, made with its first comment
   def discussion_post
     posts.first

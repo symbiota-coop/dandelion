@@ -68,19 +68,11 @@ Dandelion::App.helpers do
     end
   end
 
-  def can_create_events_for_organisation_only!
-    kick!(redirect_url: "/o/#{@organisation.slug}") unless can_create_events_for_organisation?
-  end
-
   def organisation_monthly_donor_plus?(organisation = nil, account = current_account)
     organisation ||= @organisation
     cached_permission(:@organisation_monthly_donor_plus_cache, organisation, account) do
       Organisation.monthly_donor_plus?(organisation, account)
     end
-  end
-
-  def organisation_monthly_donors_plus_only!
-    kick! unless organisation_monthly_donor_plus?
   end
 
   def activity_admin?(activity = nil, account = current_account)
@@ -228,10 +220,6 @@ Dandelion::App.helpers do
     end
   end
 
-  def event_email_viewers_only!
-    kick! unless event_email_viewer?
-  end
-
   def event_lock_admin?(event = nil, account = current_account)
     event ||= @event
     cached_permission(:@event_lock_admin_cache, event, account) do
@@ -251,10 +239,6 @@ Dandelion::App.helpers do
     end
   end
 
-  def event_participants_only!
-    kick! unless event_participant?
-  end
-
   def order_email_viewer?(order = nil, account = current_account)
     order ||= @order
     cached_permission(:@order_email_viewer_cache, order, account) do
@@ -269,10 +253,6 @@ Dandelion::App.helpers do
     end
   end
 
-  def order_email_viewers_only!
-    kick! unless order_email_viewer?
-  end
-
   def ticket_email_viewer?(ticket = nil, account = current_account)
     ticket ||= @ticket
     cached_permission(:@ticket_email_viewer_cache, ticket, account) do
@@ -280,19 +260,11 @@ Dandelion::App.helpers do
     end
   end
 
-  def ticket_email_viewers_only!
-    kick! unless ticket_email_viewer?
-  end
-
   def donation_email_viewer?(donation = nil, account = current_account)
     donation ||= @donation
     cached_permission(:@donation_email_viewer_cache, donation, account) do
       Donation.email_viewer?(donation, account, order_email_viewer: (order_email_viewer?(donation.order, account) if donation&.order))
     end
-  end
-
-  def donation_email_viewers_only!
-    kick! unless donation_email_viewer?
   end
 
   def gathering_admin?(gathering = nil, account = current_account)
@@ -312,10 +284,6 @@ Dandelion::App.helpers do
       gathering = comment.commentable.gathering if comment && %w[Team Tactivity Mapplication].include?(comment.commentable_type)
       Comment.admin?(comment, account, gathering_admin: (gathering_admin?(gathering, account) if gathering))
     end
-  end
-
-  def comment_admins_only!
-    kick! unless comment_admin?
   end
 
   def commentable_viewer?(commentable = nil, account = current_account)

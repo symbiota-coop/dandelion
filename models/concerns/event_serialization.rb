@@ -6,10 +6,6 @@ module EventSerialization
       with_key_includes.map(&:public_data).to_json
     end
 
-    def to_public_xml
-      with_key_includes.map(&:public_data).to_xml(root: 'events')
-    end
-
     def to_public_markdown
       with_key_includes.map(&:public_data).to_markdown
     end
@@ -17,10 +13,6 @@ module EventSerialization
 
   def to_public_json
     public_data.to_json
-  end
-
-  def to_public_xml
-    public_data.to_xml(root: 'event')
   end
 
   def to_public_markdown

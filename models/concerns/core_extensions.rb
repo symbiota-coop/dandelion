@@ -12,9 +12,7 @@ module CoreExtensions
 
   # Field name patterns that suggest specific admin field types
   ADMIN_FIELD_PATTERNS = {
-    email: /\Aemail\z/,
-    url: /(\A|_)url\z|website/,
-    slug: /\Aslug\z/
+    url: /(\A|_)url\z|website/
   }.freeze
 
   included do

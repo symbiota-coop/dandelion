@@ -19,12 +19,6 @@ module StripeWebhooks
     webhooks
   end
 
-  def delete_stripe_webhook
-    opts = StripeOpts.call(api_key: stripe_sk)
-    webhook = stripe_webhooks.find { |w| w['url'] == stripe_webhook_url }
-    Stripe::WebhookEndpoint.delete(webhook.id, {}, opts) if webhook
-  end
-
   def create_stripe_webhook_if_necessary
     return unless Padrino.env == :production
 

@@ -75,7 +75,7 @@ $(function () {
       })
     })
 
-    $('input[type=text].slug, div.slugify input[type=text].shorturl').once('slug').each(function () {
+    $('div.slugify input[type=text].shorturl').once('slug').each(function () {
       const slug = $(this)
       const start_length = slug.val().length
       const pos = $.inArray(this, $('input', this.form)) - 1

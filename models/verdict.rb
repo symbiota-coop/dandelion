@@ -29,10 +29,6 @@ class Verdict
     mapplication.accept if mapplication.acceptable? && mapplication.meets_threshold
   end
 
-  def ed
-    "#{type[0..-2]}d"
-  end
-
   def self.types
     %w[proposer supporter]
   end

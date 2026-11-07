@@ -7,11 +7,6 @@ module SpeculativeRoutes
     @prefetch_routes ||= []
   end
 
-  def self.clear!
-    @prerender_routes = []
-    @prefetch_routes = []
-  end
-
   def self.script
     return unless prerender_routes.any? || prefetch_routes.any?
 

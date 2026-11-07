@@ -48,18 +48,4 @@ class Payment
     gathering.inc(processed_via_dandelion: amount, balance: amount)
     notifications.create! circle: circle, type: 'created_payment' unless gathering.hide_paid || gathering.options.any?(&:hide_members)
   end
-
-  def update_metadata
-    return unless payment_intent
-
-    opts = StripeOpts.call(api_key: gathering.stripe_sk)
-    pi = Stripe::PaymentIntent.retrieve(payment_intent, opts)
-    charge = Stripe::Charge.retrieve(pi.charges.first.id, opts)
-    Stripe::Charge.update(charge.id, { metadata: {
-                            de_gathering_id: gathering.id,
-                            de_account_id: account.id
-                          } }, opts)
-  rescue StandardError => e
-    ErrorReporting.capture_exception(e)
-  end
 end

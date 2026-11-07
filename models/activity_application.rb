@@ -90,10 +90,6 @@ class ActivityApplication
     self.and(status: 'Pending')
   end
 
-  def self.interview_arranged
-    self.and(status: 'Interview arranged')
-  end
-
   def self.accepted
     self.and(status: 'Accepted')
   end

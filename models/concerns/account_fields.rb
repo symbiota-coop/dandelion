@@ -92,10 +92,6 @@ module AccountFields
       }.merge(new_hints)
     end
 
-    def privacy_levels
-      ['Only me', 'People I follow', 'Public']
-    end
-
     def countries
       [''] + ISO3166::Country.all.sort
     end

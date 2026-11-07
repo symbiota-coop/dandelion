@@ -81,15 +81,6 @@ module Padrino
                                            label_class: label_class, div_class: div_class, required: r)
         end
 
-        def slug_block(fieldname, placeholder: nil, required: false, disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
-          content = text_field(fieldname,
-                               class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
-                                                        'is-invalid'
-                                                      end} slug", required: (r = required || model_required(fieldname)), disabled: disabled, placeholder: placeholder)
-          block_layout(fieldname, content, tip: tip, hint: hint, container_class: container_class,
-                                           label_class: label_class, div_class: div_class, required: r)
-        end
-
         def shorturl_block(fieldname, stem: nil, placeholder: nil, required: false, disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
           content = %(<span class="stem">#{stem}</span>) + text_field(fieldname,
                                                                       class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
@@ -163,52 +154,6 @@ module Padrino
           content << " #{selected_link}".html_safe
           block_layout(fieldname, content, tip: tip, hint: hint, container_class: container_class,
                                            label_class: label_class, div_class: div_class, required: r)
-        end
-
-        def radio_block(fieldname, options: model.send(fieldname.to_s.pluralize), checked: object.send(fieldname), required: false, disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
-          r = nil
-          content = ''
-          options = Hash[*options.map { |x| [x, x] }.flatten] if options.is_a? Array
-          options.each do |k, v|
-            content << %(
-              <div class="form-check">
-                <label class="form-check-label">
-            )
-            content << radio_button(fieldname,
-                                    class: "form-check-input #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
-                                                                 'is-invalid'
-                                                               end}", value: v, checked: (v == checked), required: (r = required || model_required(fieldname)), disabled: disabled)
-            content << %(
-                #{k}
-              </label>
-            </div>
-            )
-          end
-          block_layout(fieldname, content, tip: tip, hint: hint, container_class: container_class,
-                                           label_class: label_class, div_class: div_class, required: r)
-        end
-
-        def check_boxes_block(fieldname, options: model.send(fieldname.to_s.pluralize), checked: [], disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
-          content = ''
-          options = Hash[*options.map { |x| [x, x] }.flatten] if options.is_a? Array
-          options.each do |k, v|
-            content << %(
-              <div class="form-check">
-               <label class="form-check-label">
-            )
-            content << %(<input class="form-check-input" type="checkbox" name="#{model.to_s.underscore}[#{fieldname}][]" value="#{v}" #{if checked.include?(v)
-                                                                                                                                          'checked="checked"'
-                                                                                                                                        end} #{if disabled
-                                                                                                                                                 'disabled="disabled"'
-                                                                                                                                               end}>)
-            content << %(
-                #{k}
-              </label>
-            </div>
-            )
-          end
-          block_layout(fieldname, content, tip: tip, hint: hint, container_class: container_class,
-                                           label_class: label_class, div_class: div_class)
         end
 
         # Files and images
@@ -300,27 +245,6 @@ module Padrino
                                          label_class: label_class, div_class: div_class, required: r)
         end
 
-
-        def geopicker_block(fieldname, required: false, disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
-          content = ''
-          content << %(<div class="geopicker">)
-          content << @template.hidden_field_tag("#{model.to_s.underscore}[#{fieldname}][lat]",
-                                                class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
-                                                                         'is-invalid'
-                                                                       end}", required: (required || model_required(fieldname)), disabled: disabled, value: (if object.send(fieldname)
-                                                                                                                                                                   object.send(fieldname)[1]
-                                                                                                                                                             end))
-          content << ' '
-          content << @template.hidden_field_tag("#{model.to_s.underscore}[#{fieldname}][lng]",
-                                                class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
-                                                                         'is-invalid'
-                                                                       end}", required: (r = required || model_required(fieldname)), disabled: disabled, value: (if object.send(fieldname)
-                                                                                                                                                                   object.send(fieldname)[0]
-                                                                                                                                                                 end))
-          content << %(</div>)
-          block_layout(fieldname, content, tip: tip, hint: hint, container_class: container_class,
-                                           label_class: label_class, div_class: div_class, required: r)
-        end
 
 
         def submit_block(button_text: nil, destroy_url: nil, container_class: nil, div_class: nil, disabled: false)

@@ -28,10 +28,6 @@ class StripeTransaction
     Money.new(fee * 100, currency)
   end
 
-  def net_money
-    Money.new(net * 100, currency)
-  end
-
   def self.transfer(organisation, from: 1.week.ago, to: Date.today - 1)
     return if from >= to
 

@@ -95,12 +95,6 @@ module Almanac
     [entry[:date], entry[:festival]]
   end
 
-  def self.days_until_next_sabbat(date = Date.today)
-    sabbat_date, sabbat = next_sabbat(date)
-    today = date.is_a?(Date) ? date : date.to_date
-    [(sabbat_date - today).to_i, sabbat[:name]]
-  end
-
   # What the Wheel of the Year page shows: the festivals, in order, with their names and traditional dates; each one
   # from two years back to two years on in each hemisphere, with its solstice, equinox or midpoint (at), which the page
   # turns into dates in the viewer's timezone, and a cross-quarter day's traditional date (date)

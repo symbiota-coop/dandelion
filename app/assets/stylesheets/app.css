@@ -2352,13 +2352,10 @@ body .table > tfoot > tr > th {
 
 .ui-state-hover,
 .ui-widget-content .ui-state-hover,
-.ui-widget-header .ui-state-hover,
 .ui-state-focus,
 .ui-widget-content .ui-state-focus,
-.ui-widget-header .ui-state-focus,
 .ui-state-active,
-.ui-widget-content .ui-state-active,
-.ui-widget-header .ui-state-active {
+.ui-widget-content .ui-state-active {
   border: none;
   background: var(--bs-tertiary-bg);
   color: var(--bs-emphasis-color);
@@ -2383,11 +2380,7 @@ a.ui-menu-item-wrapper:hover {
 }
 
 .ui-state-active,
-.ui-widget-content .ui-state-active,
-.ui-widget-header .ui-state-active,
-a.ui-button:active,
-.ui-button:active,
-.ui-button.ui-state-active:hover {
+.ui-widget-content .ui-state-active {
   font-weight: inherit
 }
 
@@ -2738,7 +2731,6 @@ small.form-text {
 }
 
 .ui-widget,
-.regular,
 .introjs-tooltipReferenceLayer,
 .introjs-tooltipReferenceLayer *,
 .gm-style,

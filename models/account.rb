@@ -21,10 +21,6 @@ class Account
     :username
   end
 
-  def self.fu(username)
-    Account.find_by(username: username)
-  end
-
   def self.prewarmed_image_derivative_sizes
     %w[400x400#]
   end

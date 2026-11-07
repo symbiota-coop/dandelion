@@ -397,22 +397,6 @@ class Event
     dragonfly_attachments.each_value(&:destroy!)
   end
 
-  def carousel_name
-    return unless organisation && organisation.carousels
-
-    c = nil
-    organisation.carousels.order('o desc').each do |carousel|
-      next if carousel.name.downcase.include?('past events')
-
-      intersection = event_tag_ids & carousel.event_tag_ids
-      if intersection.any?
-        c = carousel.name
-        break
-      end
-    end
-    c
-  end
-
   def when_details(zone, with_zone: true)
     return unless start_time && end_time
 

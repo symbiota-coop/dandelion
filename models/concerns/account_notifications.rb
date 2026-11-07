@@ -102,18 +102,4 @@ module AccountNotifications
 
     batch_message.finalize if Padrino.env == :production
   end
-
-  def send_feedback_summary
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    account = self
-    batch_message.from ENV['CONTACT_EMAIL_FULL']
-    batch_message.subject 'New feedback summary from Dandelion'
-    batch_message.body_html EmailHelper.html(:feedback_summary, account: account)
-
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-
-    batch_message.finalize if Padrino.env == :production
-  end
 end

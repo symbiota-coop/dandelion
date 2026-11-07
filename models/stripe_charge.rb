@@ -103,14 +103,6 @@ class StripeCharge
     Money.new de_discounted_ticket_revenue * 100, currency
   end
 
-  def de_credit_applied_money
-    Money.new de_credit_applied * 100, currency
-  end
-
-  def de_fixed_discount_applied_money
-    Money.new de_fixed_discount_applied * 100, currency
-  end
-
   def amount_money
     Money.new amount, currency
   end
