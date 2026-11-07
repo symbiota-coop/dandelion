@@ -61,6 +61,7 @@ Dandelion::App.helpers do
     [coordinates[1], coordinates[0]]
   end
 
+  # A map's points in its box, as JSON, one each, with accounts at their cells' centres (account_map_coordinates)
   def map_json(points)
     west, south, east, north = %i[west south east north].map { |p| params[p].to_f }
     accounts = points.klass == Account
@@ -69,29 +70,37 @@ Dandelion::App.helpers do
              else
                points.and(coordinates: { '$geoWithin' => { '$box' => [[west, south], [east, north]] } })
              end
-
     points_count = points.count
 
     point_hashes = []
     if points_count <= MAP_POINTS_LIMIT
       model_name = points.klass.to_s
-      point_records = points.pluck(:id, :coordinates)
-
-      point_hashes = point_records.map.with_index do |(id, coordinates), n|
+      point_hashes = points.pluck(:id, :coordinates).map.with_index do |(id, coordinates), n|
         coordinates = account_map_coordinates(coordinates) if accounts
-        {
-          model_name: model_name,
-          id: encrypt_map_id(model_name, id.to_s),
-          lat: coordinates[1],
-          lng: coordinates[0],
-          n: n
-        }
+        { model_name: model_name, id: encrypt_map_id(model_name, id.to_s), lat: coordinates[1], lng: coordinates[0], n: n }
       end
     end
 
     {
       points: point_hashes,
       pointsCount: points_count
+    }.to_json
+  end
+
+  # A map of many accounts in its box, as JSON: one point for each cell they're in, at its centre, with how many are
+  # there, so a place many people share, like a town everyone gives as their location, still shows. No more than
+  # MAP_POINTS_LIMIT cells come back, the most crowded first
+  def account_cells_map_json(accounts)
+    west, south, east, north = %i[west south east north].map { |p| params[p].to_f }
+    cells = account_map_points_in_box(accounts, west, south, east, north).pluck(:coordinates)
+                                                                         .group_by { |coordinates| account_map_coordinates(coordinates) }
+    point_hashes = cells.map { |(lng, lat), in_cell| { model_name: 'Account', lat: lat, lng: lng, count: in_cell.length } }
+                        .max_by(MAP_POINTS_LIMIT) { |cell| cell[:count] }
+                        .each_with_index.map { |cell, n| cell.merge(n: n) }
+
+    {
+      points: point_hashes,
+      pointsCount: cells.length
     }.to_json
   end
 end

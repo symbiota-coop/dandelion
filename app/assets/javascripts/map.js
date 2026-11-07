@@ -134,21 +134,31 @@ window.DandelionMap = {
       const point = points[i];
       var modelConfig = this.models.find(model => model.name === point.model_name);
 
-      var pin = document.createElement('div');
-      pin.className = 'map-marker';
-      pin.style.setProperty('--map-marker-color', modelConfig.color);
-      pin.innerHTML = '<i class="' + modelConfig.icon + '"></i>';
+      // A point with a count is how many people are in a place (/map.json), drawn like a cluster, with nothing to open
+      var pin;
+      if (point.count) {
+        pin = this.countCircle(point.count);
+      } else {
+        pin = document.createElement('div');
+        pin.className = 'map-marker';
+        pin.style.setProperty('--map-marker-color', modelConfig.color);
+        pin.innerHTML = '<i class="' + modelConfig.icon + '"></i>';
+      }
 
       var marker = new google.maps.marker.AdvancedMarkerElement({
         position: { lat: point.lat, lng: point.lng },
         content: pin,
-        gmpClickable: true
+        gmpClickable: !point.count,
+        zIndex: point.count ? 1000 + point.count : null
       });
       marker.modelName = point.model_name;
       marker.pointId = point.id;
       marker.n = point.n;
+      marker.count = point.count || 1;
 
-      this.addMarkerClickListener(marker, infowindow);
+      if (!point.count) {
+        this.addMarkerClickListener(marker, infowindow);
+      }
 
       bounds.extend(marker.position);
 
@@ -209,15 +219,20 @@ window.DandelionMap = {
   },
 
   // A cluster is a .map-cluster circle (app.css) that turns from green to orange to red as it grows
-  renderCluster: function (cluster) {
-    var count = cluster.count;
+  countCircle: function (count) {
     var circle = document.createElement('div');
     circle.className = 'map-cluster ' + (count < 10 ? 'map-cluster-sm' : count < 100 ? 'map-cluster-md' : 'map-cluster-lg');
     circle.textContent = count;
+    return circle;
+  },
+
+  // A cluster counts what its markers stand for: a marker with a count is that many people
+  renderCluster: function (cluster) {
+    var count = cluster.markers.reduce(function (sum, marker) { return sum + (marker.count || 1); }, 0);
 
     return new google.maps.marker.AdvancedMarkerElement({
       position: cluster.position,
-      content: circle,
+      content: this.countCircle(count),
       gmpClickable: true,
       zIndex: 1000 + count
     });
@@ -242,7 +257,9 @@ window.DandelionMap = {
   },
 
   handleClusterClick: function (cluster, infowindow) {
-    var markers = cluster.markers.slice();
+    // Markers with a count have nothing to open
+    var markers = cluster.markers.filter(function (marker) { return marker.pointId; });
+    if (markers.length === 0) return;
     markers.sort(function (a, b) {
       return a.n - b.n;
     });

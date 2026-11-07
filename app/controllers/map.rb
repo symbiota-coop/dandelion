@@ -15,7 +15,7 @@ Dandelion::App.controller do
     partial :"points/#{decrypted[:model_name].underscore}", object: object
   end
 
-  # The accounts in an organisation, activity or local group, for the maps on its pages
+  # The accounts in an organisation, activity or local group, for the maps on its pages: how many are in each cell
   get '/map', provides: :json do
     accounts = if params[:organisation_id]
                  organisation = Organisation.find(params[:organisation_id]) || not_found
@@ -29,7 +29,7 @@ Dandelion::App.controller do
                else
                  not_found
                end
-    map_json(accounts)
+    account_cells_map_json(accounts)
   end
 
   get '/map/trigger' do

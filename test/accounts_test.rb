@@ -982,33 +982,32 @@ class AccountsTest < ActiveSupport::TestCase
     assert_nil other_browser.last_request.session[:account_id]
   end
 
-  test 'maps show accounts at the centre of their tenth-of-a-degree cell, whoever is looking' do
+  test 'maps of many accounts show how many are in each tenth-of-a-degree cell, at its centre, whoever is looking' do
     organisation = FactoryBot.create(:organisation)
-    public_account = FactoryBot.create(:account, location_privacy: 'Public')
-    public_account.set(coordinates: [-3.68765, 50.43214], organisation_ids_public_cache: [organisation.id])
-    private_account = FactoryBot.create(:account, location_privacy: 'Only me')
-    private_account.set(coordinates: [-3.12345, 50.98765], organisation_ids_public_cache: [organisation.id])
-    map_points = lambda do |west, south, east, north|
+    [[-3.68765, 50.43214, 'Public'], [-3.61234, 50.48765, 'Only me'], [-3.12345, 50.98765, 'Only me']].each do |lng, lat, privacy|
+      FactoryBot.create(:account, location_privacy: privacy).set(coordinates: [lng, lat], organisation_ids_public_cache: [organisation.id])
+    end
+    map_cells = lambda do |west, south, east, north|
       get '/map.json', organisation_id: organisation.id, west: west, south: south, east: east, north: north
       response = JSON.parse(last_response.body)
-      [response['pointsCount'], response['points'].to_h { |point| [map_point_account_id(point), [point['lat'], point['lng']]] }]
+      [response['pointsCount'], response['points'].map { |point| [point['lat'], point['lng'], point['count']] }.sort]
     end
 
     clear_cookies
-    count, points = map_points.call(-4, 50, -3, 51)
-    assert_equal 2, count
-    assert_equal [50.45, -3.65], points[public_account.id.to_s]
-    assert_equal [50.95, -3.15], points[private_account.id.to_s]
+    # Two accounts share a cell, so they're one point: no account's own place or id is sent
+    assert_equal [2, [[50.45, -3.65, 2], [50.95, -3.15, 1]]], map_cells.call(-4, 50, -3, 51)
+    refute_includes last_response.body, '"id"'
 
-    # A box around where the account is, but not its cell's centre, finds nothing, so narrowing boxes can't find it
-    assert_equal [0, {}], map_points.call(-3.69, 50.43, -3.68, 50.44)
-    # A box around where the map shows it finds it, so it doesn't vanish on zooming in
-    assert_equal [1, { public_account.id.to_s => [50.45, -3.65] }], map_points.call(-3.66, 50.44, -3.64, 50.46)
+    # A box around where the accounts are, but not their cell's centre, finds nothing, so narrowing boxes can't find them
+    assert_equal [0, []], map_cells.call(-3.69, 50.43, -3.68, 50.44)
+    # A box around where the map shows them finds them, so they don't vanish on zooming in
+    assert_equal [1, [[50.45, -3.65, 2]]], map_cells.call(-3.66, 50.44, -3.64, 50.46)
     # A box whose edges move within the cells finds the same
-    assert_equal [1, { public_account.id.to_s => [50.45, -3.65] }], map_points.call(-3.6999, 50.4001, -3.6001, 50.4999)
+    assert_equal [1, [[50.45, -3.65, 2]]], map_cells.call(-3.6999, 50.4001, -3.6001, 50.4999)
 
-    env 'rack.session', { 'account_id' => private_account.id.to_s, 'session_token' => private_account.session_token! }
-    assert_equal [50.95, -3.15], map_points.call(-4, 50, -3, 51)[1][private_account.id.to_s]
+    account = Account.find_by(location_privacy: 'Public')
+    env 'rack.session', { 'account_id' => account.id.to_s, 'session_token' => account.session_token! }
+    assert_equal [1, [[50.45, -3.65, 2]]], map_cells.call(-3.66, 50.44, -3.64, 50.46)
   end
 
   test 'there is no map of every account, only of an organisation, activity or local group' do
@@ -1025,10 +1024,6 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal [-3.65, 50.45], app.account_map_coordinates(account.coordinates)
     assert_equal 1, app.account_map_points_in_box(Account.all, -3.66, 50.44, -3.64, 50.46).count
     assert_equal 0, app.account_map_points_in_box(Account.all, -3.76, 50.34, -3.74, 50.36).count
-  end
-
-  def map_point_account_id(point)
-    Dandelion::App.new!.decrypt_map_id(point['id'])[:id]
   end
 
   test 'a session from before session tokens is kept until the account revokes its sessions' do
