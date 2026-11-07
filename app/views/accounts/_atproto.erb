@@ -33,7 +33,7 @@
                   </a>
                   &middot;
                   <a target="_blank" class="text-body-secondary" href="https://bsky.app/profile/<%= account.atproto_handle %>/post/<%= og['hash'] %>">
-                    <%= Time.at(og['timestamp']/1e3).to_date.to_s(:post) %>
+                    <%= Time.at(og['timestamp']/1e3).to_date.to_fs(:post) %>
                   </a>
                 </p>
               </div>

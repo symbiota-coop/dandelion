@@ -84,7 +84,7 @@
           <%= hidden_field_tag :'event_boost[currency]', value: @event_boost.currency %>
           <div class="mb-3">
             <label for="event_boost_start_time">Start at</label>
-            <%= text_field_tag :'event_boost[start_time]', value: (@event_boost.start_time&.to_s(:db)), class: 'form-control datetimepicker', id: 'event_boost_start_time', required: true %>
+            <%= text_field_tag :'event_boost[start_time]', value: (@event_boost.start_time&.to_fs(:db_local)), class: 'form-control datetimepicker', id: 'event_boost_start_time', required: true %>
             <small class="form-text text-body-secondary">Start time must be on the hour</small>
           </div>
 
@@ -139,9 +139,9 @@
             <% dc = row[:impression_count] %>
             <tr class="<%= 'text-body-secondary' if slot < Time.zone.now.beginning_of_hour %>">
               <td>
-                <%= slot.to_s(:date_no_double_zeros) %>
+                <%= slot.to_fs(:date_no_double_zeros) %>
                 <br>
-                <small class="text-body-secondary">to <%= (slot + 1.hour).to_s(:no_double_zeros) %></small>
+                <small class="text-body-secondary">to <%= (slot + 1.hour).to_fs(:no_double_zeros) %></small>
               </td>
               <td class="text-end"><%= ew.format %></td>
               <td class="text-end"><%= tw.format %></td>
@@ -187,10 +187,10 @@
       <% @event_boosts.each do |event_boost| %>
         <tr>
           <td>
-            <%= event_boost.start_time.to_s(:date_no_double_zeros) %>
+            <%= event_boost.start_time.to_fs(:date_no_double_zeros) %>
             <% if event_boost.end_time %>
               <br>
-              <small class="text-body-secondary">to <%= event_boost.end_time.to_s(:date_no_double_zeros) %></small>
+              <small class="text-body-secondary">to <%= event_boost.end_time.to_fs(:date_no_double_zeros) %></small>
             <% end %>
           </td>
           <td><%= event_boost.hours %></td>
