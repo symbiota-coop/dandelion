@@ -99,6 +99,8 @@
           <%= text_field_tag :name, class: 'form-control', style: 'width: 10em', placeholder: 'New slot' %>
         <% end %>
       </td>
+      <%# The rest of the row, its spaces' columns and New space's, so the stripe runs the width of the table %>
+      <td colspan="<%= timetable.spaces.count + 1 %>"></td>
     </tr>
   <% end %>
 </table>
