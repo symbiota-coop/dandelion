@@ -50,7 +50,7 @@
       </div>
     <% end %>
     <% if @gathering.photos.exists? || (gathering_admin? && !@membership) %>
-      <div class="my-3">
+      <div class="mb-3">
         <%= partial :'photos/photos', locals: { photoable: @gathering, add_photo_if: gathering_admin?, dimensions: '100x100#', label_when_empty: true } %>
       </div>
     <% end %>
