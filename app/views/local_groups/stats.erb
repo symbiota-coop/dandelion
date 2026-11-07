@@ -2,5 +2,5 @@
 
 <%= partial :stats, locals: { memberships: @local_group.local_groupships, accounts: @local_group.members } %>
 
-<h2>Locations</h2>
-<%= partial :'maps/map', locals: { url: "/map?local_group_id=#{@local_group.id}", polygonables: [@local_group] } %>
+<h2 class="mt-5">Locations</h2>
+<%= partial :'maps/map', locals: { url: "/map?local_group_id=#{@local_group.id}", polygonables: [@local_group], height: '80vh' } %>

@@ -2108,6 +2108,20 @@ ul.pagination {
   animation: spin 2s linear infinite;
 }
 
+/* Doughnut charts (_stats.erb) are as tall as they are wide, so in a wide column one would fill the screen: they stop at
+   24rem and sit centred */
+.chart-doughnut {
+  max-width: 24rem;
+  margin-inline: auto;
+}
+
+/* Bar charts (_chart.erb) fill their width at a fixed height, rather than half their width, which across a wide page
+   would fill the screen */
+.chart-bar {
+  position: relative;
+  height: 18rem;
+}
+
 /* ==========================================================================
    Switches
    ========================================================================== */

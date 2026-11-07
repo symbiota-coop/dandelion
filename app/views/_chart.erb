@@ -1,5 +1,5 @@
 <% if defined?(data) || countable.exists? %>
-  <div>
+  <div class="chart-bar">
     <canvas id="canvas-<%= r = SecureRandom.uuid %>"></canvas>
   </div>
   <%
@@ -91,6 +91,7 @@
           }
         },
         responsive: true,
+        maintainAspectRatio: false,
         scales: {
           x: {
             stacked: true

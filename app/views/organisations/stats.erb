@@ -2,5 +2,5 @@
 
 <%= partial :stats, locals: { memberships: @organisation.organisationships, accounts: @organisation.members } %>
 
-<h2>Locations</h2>
-<%= partial :'maps/map', locals: { url: "/map?organisation_id=#{@organisation.id}" } %>
+<h2 class="mt-5">Locations</h2>
+<%= partial :'maps/map', locals: { url: "/map?organisation_id=#{@organisation.id}", height: '80vh' } %>

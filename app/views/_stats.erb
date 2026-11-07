@@ -7,7 +7,7 @@
 oldest = accounts.and(:date_of_birth.ne => nil, :date_of_birth.gte => 99.years.ago).order('date_of_birth asc').first
 if youngest && oldest %>
 
-  <h2>Ages</h2>
+  <h2<% if defined?(memberships) %> class="mt-5"<% end %>>Ages</h2>
 
   <div class="row">
     <div class="col-lg-4">
@@ -38,7 +38,9 @@ if youngest && oldest %>
     </div>
     <div class="col-lg-8">
 
-      <canvas id="canvas-age" class="mb-3"></canvas>
+      <div class="chart-doughnut mb-3">
+        <canvas id="canvas-age"></canvas>
+      </div>
       <script>
         $(function() {
           var ctx = document.getElementById("canvas-age").getContext("2d");
@@ -64,7 +66,7 @@ if youngest && oldest %>
 
 <% end %>
 
-<h2>Genders</h2>
+<h2<% if defined?(memberships) || (youngest && oldest) %> class="mt-5"<% end %>>Genders</h2>
 
 <div class="row">
   <div class="col-lg-4">
@@ -99,7 +101,9 @@ if youngest && oldest %>
   </div>
   <div class="col-lg-8">
 
-    <canvas id="canvas-gender" class="mb-3"></canvas>
+    <div class="chart-doughnut mb-3">
+      <canvas id="canvas-gender"></canvas>
+    </div>
     <script>
       $(function() {
         var ctx = document.getElementById("canvas-gender").getContext("2d");
