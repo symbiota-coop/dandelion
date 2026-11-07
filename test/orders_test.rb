@@ -467,6 +467,29 @@ class OrdersTest < ActiveSupport::TestCase
     assert_equal [['fee_test', { amount: 160 }, nil]], fee_refunds
   end
 
+  test 'Remove and refund order refunds the rest of the application fee when the Stripe charge is all refunded already' do
+    create_event(prices: [10])
+    # A £10 order with a £2 donation to Dandelion, whose tickets' refunds (£10) left the fee with the platform. There's
+    # nothing of the charge to refund, so only the fee is refunded, and no one is emailed
+    order = create_paid_order(@event)
+    order.set(application_fee_amount: 2)
+    refund_params = []
+    fee_refunds = []
+    emails = nil
+    Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_test', amount: 1000, amount_refunded: 1000, application_fee: 'fee_test') do
+      Stripe::Refund.stub :create, proc { |params, _opts| refund_params << params } do
+        Stripe::ApplicationFee.stub :retrieve, api_object(id: 'fee_test', amount: 200, amount_refunded: 0) do
+          Stripe::ApplicationFee.stub :create_refund, proc { |id, params, opts| fee_refunds << [id, params, opts[:stripe_account]] } do
+            emails = recorded_emails { order.destroy }
+          end
+        end
+      end
+    end
+    assert_empty refund_params
+    assert_equal [['fee_test', { amount: 200 }, nil]], fee_refunds
+    assert_empty emails
+  end
+
   test 'failed refund does not email the buyer a confirmation' do
     covers 'events/refund-confirmation-email@e7eb67'
     create_event(prices: [10])

@@ -105,9 +105,13 @@ class EventPaymentMethod
 
       # Some or all of the charge may have been refunded already, by refunding its order's tickets one by one or in
       # Stripe's dashboard, and Stripe refuses to refund more than is left. So refund only what's left, and nothing
-      # (without an error) if that's nothing
+      # (without an error) if that's nothing. Those refunds can leave the application fee with the platform, so refund
+      # what's left of it even then
       unrefunded_cents = charge.amount - charge.amount_refunded
-      return if unrefunded_cents <= 0
+      if unrefunded_cents <= 0
+        refund_rest_of_application_fee(charge, opts) if refund_application_fee
+        return
+      end
 
       refund_cents = amount ? [(amount * 100).to_i, unrefunded_cents].min : unrefunded_cents
       params = { charge: charge.id }
