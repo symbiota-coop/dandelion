@@ -12,7 +12,7 @@ Dandelion::App.helpers do
         <td style="min-width: 8em">
           <strong>#{label}</strong>
           <div class="input-group my-1">
-            <span class="input-group-text">#{money_symbol(@event.currency)}</span>
+            <span class="input-group-text">#{ERB::Util.html_escape(money_symbol(@event.currency))}</span>
             #{input}
           </div>
         </td>

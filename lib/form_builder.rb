@@ -268,7 +268,7 @@ module Padrino
 
         def currency_block(fieldname, money_symbol: '$', placeholder: nil, required: false, disabled: false, tip: nil, hint: nil, container_class: 'mb-3', label_class: nil, div_class: nil)
           content = %(<div class="input-group">
-            <span class="input-group-text money-symbol">#{money_symbol}</span>) +
+            <span class="input-group-text money-symbol">#{ERB::Util.html_escape(money_symbol)}</span>) +
             number_field(fieldname,
               class: "form-control #{unless error_message_on(fieldname.to_s.gsub('_id', '')).blank?
                               'is-invalid'

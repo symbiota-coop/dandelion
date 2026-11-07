@@ -692,6 +692,16 @@ class EventPermissionsTest < ActiveSupport::TestCase
     assert_equal %w[activity_id image name remove_image tag_names update_activity_events update_tag_names], assigned.keys.sort
   end
 
+  test 'an unknown currency is escaped in the checkout total, not run as HTML' do
+    app = Dandelion::App.new!
+    app.instance_variable_set(:@event, Event.new(currency: '<img src=x onerror=alert(1)>'))
+
+    html = app.currency_input_row(label: 'Total', field_name: 'totalDisplay', field_id: 'totalDisplay', value: '0.00')
+
+    assert_includes html, '&lt;img src=x onerror=alert(1)&gt;'
+    refute_includes html, '<img'
+  end
+
   test 'atproto client is only returned for calendar event records' do
     create_event
     @organisation.set(atproto_handle: 'org.bsky.social', atproto_app_password: 'password', atproto_did: 'did:plc:org')
