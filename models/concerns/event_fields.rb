@@ -5,6 +5,8 @@ module EventFields
     include EmailFields
 
     attr_accessor :prevent_notifications, :duplicate, :update_activity_events, :prevent_order_refunds
+    # Set by code that already knows the event's coordinates (iCal GEO), so a new location doesn't look them up again
+    attr_accessor :coordinates_known
 
     field :name, type: String
     field :slug, type: String

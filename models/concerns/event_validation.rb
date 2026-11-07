@@ -165,7 +165,7 @@ module EventValidation
     after_validation do
       if location_changed?
         if location
-          geocode || (self.coordinates = nil)
+          geocode || (self.coordinates = nil) unless coordinates_known && coordinates
           if coordinates
             self.time_zone = begin
               Timezone.lookup(*coordinates.reverse)

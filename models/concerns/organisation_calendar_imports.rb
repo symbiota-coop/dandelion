@@ -225,10 +225,16 @@ module OrganisationCalendarImports
     location_text_is_http_url = location_text.present? && HttpUrl.valid?(location_text.strip)
 
     # Luma often puts the public event URL in LOCATION when the street address is gated ("Register to
-    # see address"); GEO still reflects the real venue. Reverse-geocode GEO for a city label when we can.
-    # Without GEO, URL-only LOCATION means online.
+    # see address"); GEO still reflects the real venue. Keep GEO as the event's coordinates, and label it with the
+    # city they're in. Without GEO, URL-only LOCATION means online.
+    import_coordinates = nil
     import_location = if luma_calendar_feed && location_text_is_http_url
-                        luma_ical_geo_lat_lon(ical_event).present? ? luma_location_label_from_ical_geo(ical_event) : 'Online'
+                        if (lat_lon = luma_ical_geo_lat_lon(ical_event))
+                          import_coordinates = lat_lon.reverse
+                          luma_location_label(event, import_coordinates)
+                        else
+                          'Online'
+                        end
                       else
                         location_text.present? ? location_text : 'Online'
                       end
@@ -255,6 +261,10 @@ module OrganisationCalendarImports
       currency: currency
     }.each do |field, value|
       event.send("#{field}=", value)
+    end
+    if import_coordinates
+      event.coordinates = import_coordinates
+      event.coordinates_known = true
     end
 
     if event.image.blank? && source_url && luma_event_page_url?(source_url)
@@ -392,12 +402,12 @@ module OrganisationCalendarImports
     [lat, lon]
   end
 
-  # GeoNames vendored list; otherwise "In person". (GeonamesCityLookup memoizes the loaded TSV.)
-  def luma_location_label_from_ical_geo(ical_event)
-    lat, lon = luma_ical_geo_lat_lon(ical_event)
-    return 'In person' unless lat && lon
+  # The city a gated Luma venue is in, from Google's reverse geocoding, or "In person". Looked up only when GEO has
+  # moved, so each sync doesn't look it up again
+  def luma_location_label(event, coordinates)
+    return event.location if event.persisted? && event.coordinates == coordinates && event.location.present? && event.location != 'Online'
 
-    city = GeonamesCityLookup.nearest_city_name(lat, lon)
+    city = Geocoder.search(coordinates.reverse).first&.city
     city.present? ? city : 'In person'
   rescue StandardError
     'In person'

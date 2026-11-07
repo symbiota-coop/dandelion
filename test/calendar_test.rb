@@ -325,8 +325,9 @@ class CalendarTest < ActiveSupport::TestCase
     assert_equal [LUMA_OG_IMAGE_URL], fetched_urls
   end
 
-  test 'Luma iCal reverse-geocodes GEO to a city when LOCATION is a gated Luma URL' do
-    GeonamesCityLookup.reset!
+  test 'Luma iCal keeps GEO as the coordinates and labels it with its city when LOCATION is a gated Luma URL' do
+    covers 'organisations/ical-gated-venue-city@68ec2c'
+    Geocoder::Lookup::Test.add_stub([52.495, 13.4475], [{ 'city' => 'Berlin' }])
 
     organisation = FactoryBot.create(:organisation, calendar_import_urls: LUMA_ICS_URL)
     luma_event_url = 'https://luma.com/event/evt-test'
@@ -352,7 +353,18 @@ class CalendarTest < ActiveSupport::TestCase
 
     event = organisation.events.find_by(calendar_import_feed_url: LUMA_ICS_URL)
     assert_equal 'Berlin', event.location
+    assert_equal [13.4475, 52.495], event.coordinates
     assert_equal [LUMA_OG_IMAGE_URL], fetched_urls
+
+    # A later sync with GEO unchanged doesn't look the city up again
+    Geocoder::Lookup::Test.add_stub([52.495, 13.4475], [{ 'city' => 'Somewhere else' }])
+    stub_faraday(LUMA_ICS_URL => { status: 200, body: LUMA_ICAL_LOCATION_URL_WITH_GEO }) do
+      organisation.sync_calendar_imports
+    end
+    assert_equal 'Berlin', event.reload.location
+    assert_equal [13.4475, 52.495], event.coordinates
+  ensure
+    Geocoder::Lookup::Test.delete_stub([52.495, 13.4475])
   end
 
   test 'Luma iCal keeps plain-text LOCATION when not a URL' do
