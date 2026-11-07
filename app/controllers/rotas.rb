@@ -113,41 +113,39 @@ Dandelion::App.controller do
     redirect "/g/#{params[:slug]}/rotas/#{params[:id]}"
   end
 
-  post '/roles/order' do
-    halt 400 unless params[:rota_id]
-    @rota = Rota.find(params[:rota_id]) || not_found
-    @gathering = @rota.gathering
+  post '/g/:slug/roles/order' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    @rota = @gathering.rotas.find(params[:rota_id]) || not_found
     params[:role_ids].each_with_index do |role_id, i|
       @rota.roles.find(role_id).set(o: i)
     end
     200
   end
 
-  post '/roles/create' do
-    halt 400 unless params[:rota_id]
-    @rota = Rota.find(params[:rota_id]) || not_found
-    @gathering = @rota.gathering
+  post '/g/:slug/roles/create' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    @rota = @gathering.rotas.find(params[:rota_id]) || not_found
     Role.create(name: params[:name], rota: @rota)
     200
   end
 
-  get '/roles/:id/edit' do
-    @role = Role.find(params[:id]) || not_found
-    @gathering = @role.rota.gathering
+  get '/g/:slug/roles/:id/edit' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    @role = @gathering.roles.find(params[:id]) || not_found
     request.xhr? ? partial(:'gatherings/modal_content', locals: { title: @role.name, form: :'rotas/role_form' }) : erb(:'rotas/role')
   end
 
-  post '/roles/:id/edit' do
-    @role = Role.find(params[:id]) || not_found
-    @gathering = @role.rota.gathering
+  post '/g/:slug/roles/:id/edit' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    @role = @gathering.roles.find(params[:id]) || not_found
     if @role.update_attributes(mass_assigning(params[:role], Role))
       redirect "/g/#{@gathering.slug}/rotas/#{@role.rota_id}"
     else
@@ -156,50 +154,48 @@ Dandelion::App.controller do
     end
   end
 
-  post '/roles/:id/destroy' do
-    @role = Role.find(params[:id]) || not_found
-    @gathering = @role.gathering
+  post '/g/:slug/roles/:id/destroy' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    @role = @gathering.roles.find(params[:id]) || not_found
     @role.destroy
     redirect "/g/#{@gathering.slug}/rotas/#{@role.rota_id}"
   end
 
-  post '/rslots/order' do
-    halt 400 unless params[:rota_id]
-    @rota = Rota.find(params[:rota_id]) || not_found
-    @gathering = @rota.gathering
+  post '/g/:slug/rslots/order' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    @rota = @gathering.rotas.find(params[:rota_id]) || not_found
     params[:rslot_ids].each_with_index do |rslot_id, i|
       @rota.rslots.find(rslot_id).set(o: i)
     end
     200
   end
 
-  post '/rslots/create' do
-    halt 400 unless params[:rota_id]
-    @rota = Rota.find(params[:rota_id]) || not_found
-    @gathering = @rota.gathering
+  post '/g/:slug/rslots/create' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    @rota = @gathering.rotas.find(params[:rota_id]) || not_found
     Rslot.create(name: params[:name], rota: @rota)
     200
   end
 
-  get '/rslots/:id/edit' do
-    @rslot = Rslot.find(params[:id]) || not_found
-    @gathering = @rslot.rota.gathering
+  get '/g/:slug/rslots/:id/edit' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    @rslot = @gathering.rslots.find(params[:id]) || not_found
     request.xhr? ? partial(:'gatherings/modal_content', locals: { title: @rslot.name, form: :'rotas/rslot_form' }) : erb(:'rotas/rslot')
   end
 
-  post '/rslots/:id/edit' do
-    @rslot = Rslot.find(params[:id]) || not_found
-    @gathering = @rslot.rota.gathering
+  post '/g/:slug/rslots/:id/edit' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    @rslot = @gathering.rslots.find(params[:id]) || not_found
     if @rslot.update_attributes(mass_assigning(params[:rslot], Rslot))
       redirect "/g/#{@gathering.slug}/rotas/#{@rslot.rota_id}"
     else
@@ -208,52 +204,40 @@ Dandelion::App.controller do
     end
   end
 
-  post '/rslots/:id/destroy' do
-    @rslot = Rslot.find(params[:id]) || not_found
-    @gathering = @rslot.gathering
+  post '/g/:slug/rslots/:id/destroy' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    @rslot = @gathering.rslots.find(params[:id]) || not_found
     @rslot.destroy
     redirect "/g/#{@gathering.slug}/rotas/#{@rslot.rota_id}"
   end
 
-  get '/rota/rslot/role/:rota_id/:rslot_id/:role_id' do
-    @rota = Rota.find(params[:rota_id]) || not_found
-    # Through the rota, whose gathering the membership check is for, so a slot and role from another gathering's rota
-    # can't show who's on its shift
-    @rslot = @rota.rslots.find(params[:rslot_id]) || not_found
-    @role = @rota.roles.find(params[:role_id]) || not_found
-    @gathering = @rota.gathering
+  post '/g/:slug/shifts/create' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    partial :'rotas/rota_rslot_role', locals: { rota: @rota, rslot: @rslot, role: @role, shift: @rota.shifts.includes(:account).find_by(rslot: @rslot, role: @role) }
-  end
-
-  post '/shifts/create' do
-    halt 400 unless params[:rota_id]
-    @rota = Rota.find(params[:rota_id]) || not_found
-    @gathering = @rota.gathering
-    confirmed_membership_required!
+    @rota = @gathering.rotas.find(params[:rota_id]) || not_found
     role = (@rota.roles.find(params[:role_id]) if params[:role_id]) || not_found
     rslot = (@rota.rslots.find(params[:rslot_id]) if params[:rslot_id]) || not_found
     Shift.create(account: (params[:na] ? nil : current_account), rota: @rota, rslot: rslot, role: role)
     200
   end
 
-  get '/shifts/:id/edit' do
-    @shift = Shift.find(params[:id]) || not_found
-    @gathering = @shift.rota.gathering
+  get '/g/:slug/shifts/:id/edit' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
+    @shift = @gathering.shifts.find(params[:id]) || not_found
     halt unless (@shift.account && (@shift.account_id == current_account.id)) || gathering_admin?
     request.xhr? ? partial(:'gatherings/modal_content', locals: { title: "#{@shift.account.name}'s #{@shift.rota.name} shift", form: :'rotas/shift_form' }) : erb(:'rotas/shift')
   end
 
-  post '/shifts/:id/edit' do
-    @shift = Shift.find(params[:id]) || not_found
-    @gathering = @shift.rota.gathering
+  post '/g/:slug/shifts/:id/edit' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
+    @shift = @gathering.shifts.find(params[:id]) || not_found
     halt unless (@shift.account && (@shift.account_id == current_account.id)) || gathering_admin?
     shift_params = (params[:shift] || {}).dup
     shift_params.delete(:account_id) unless gathering_admin?
@@ -265,11 +249,11 @@ Dandelion::App.controller do
     end
   end
 
-  post '/shifts/:id/destroy' do
-    @shift = Shift.find(params[:id]) || not_found
-    @gathering = @shift.rota.gathering
+  post '/g/:slug/shifts/:id/destroy' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
+    @shift = @gathering.shifts.find(params[:id]) || not_found
     halt unless (@shift.account && (@shift.account_id == current_account.id)) || gathering_admin?
     @shift.destroy
     request.xhr? ? 200 : redirect("/g/#{@gathering.slug}/rotas/#{@shift.rota_id}")

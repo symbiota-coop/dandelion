@@ -14,7 +14,7 @@
     <td>
       <strong>
         <% if gathering_admin? %>
-          <a href="/roles/<%= role.id %>/edit" data-open-in-modal>
+          <a href="/g/<%= @gathering.slug %>/roles/<%= role.id %>/edit" data-open-in-modal>
             <%= role.name %>
           </a>
         <% else %>
@@ -29,7 +29,7 @@
     <% } %>
     <% if gathering_admin? %>
       <td>
-        <% form_tag "/roles/create?rota_id=#{rota.id}", class: 'form-inline', style: 'display: inline' do %>
+        <% form_tag "/g/#{@gathering.slug}/roles/create?rota_id=#{rota.id}", class: 'form-inline', style: 'display: inline' do %>
           <%= text_field_tag :name, class: 'form-control', style: 'width: 10em', placeholder: 'New role' %>
         <% end %>
       </td>
@@ -40,7 +40,7 @@
     <td>
       <strong>
         <% if gathering_admin? %>
-          <a href="/rslots/<%= rslot.id %>/edit" data-open-in-modal>
+          <a href="/g/<%= @gathering.slug %>/rslots/<%= rslot.id %>/edit" data-open-in-modal>
             <%= rslot.name %>
           </a>
         <% else %>
@@ -65,7 +65,7 @@
   <% if gathering_admin? %>
     <tr>
       <td>
-        <% form_tag "/rslots/create?rota_id=#{rota.id}", class: 'form-inline', style: 'display: inline' do %>
+        <% form_tag "/g/#{@gathering.slug}/rslots/create?rota_id=#{rota.id}", class: 'form-inline', style: 'display: inline' do %>
           <%= text_field_tag :name, class: 'form-control', style: 'width: 10em', placeholder: 'New slot' %>
         <% end %>
       </td>

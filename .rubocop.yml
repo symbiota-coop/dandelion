@@ -112,6 +112,9 @@ Dandelion/RailsController:
 Dandelion/SlugLookup:
   Include:
     - app/controllers/**/*.rb
+Dandelion/GatheringScope:
+  Include:
+    - app/controllers/**/*.rb
 Dandelion/CapybaraHasNoAfterClick:
   Include:
     - test/**/*.rb

@@ -144,7 +144,7 @@
       </tr>
     </thead>
     <% memberships.each { |membership| %>
-    <tr data-pagelet-url="/membership_row/<%= membership.id %>">
+    <tr data-pagelet-url="/g/<%= @gathering.slug %>/membership_row/<%= membership.id %>">
       <%= partial :'gatherings/membership_row', locals: { membership: membership } %>
     </tr>
     <% } %>

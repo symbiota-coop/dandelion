@@ -76,9 +76,9 @@ Dandelion::App.controller do
     redirect "/g/#{@gathering.slug}/options"
   end
 
-  post '/optionships/create' do
-    @option = Option.find(params[:option_id]) || not_found
-    @gathering = @option.gathering
+  post '/g/:slug/optionships/create' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @option = @gathering.options.find(params[:option_id]) || not_found
     membership_required!
     # Admins add people to options that are by invitation, from /g/:slug/optionships/new
     halt 403 if @option.by_invitation
@@ -86,9 +86,9 @@ Dandelion::App.controller do
     200
   end
 
-  post '/optionships/:id/destroy' do
-    @optionship = Optionship.find(params[:id]) || not_found
-    @gathering = @optionship.option.gathering
+  post '/g/:slug/optionships/:id/destroy' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @optionship = @gathering.optionships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     halt unless (@optionship.account.id == current_account.id) || gathering_admin?
     @optionship.destroy

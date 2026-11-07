@@ -23,7 +23,7 @@
       </tr>
     </thead>
     <% @mapplications.order('created_at desc').each { |mapplication| %>
-    <tr data-pagelet-url="/mapplication_row/<%= mapplication.id %>">
+    <tr data-pagelet-url="/g/<%= @gathering.slug %>/mapplication_row/<%= mapplication.id %>">
       <%= partial :'mapplications/mapplication_row', locals: { mapplication: mapplication } %>
     </tr>
     <% } %>

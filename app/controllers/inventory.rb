@@ -60,7 +60,9 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @inventory_item = @gathering.inventory_items.find(params[:id]) || not_found
-    @inventory_item.set(responsible_id: params[:responsible_id])
+    # One of the gathering's members, or no one
+    responsible = (@gathering.members.find(params[:responsible_id]) || not_found if params[:responsible_id])
+    @inventory_item.set(responsible_id: responsible&.id)
     200
   end
 end

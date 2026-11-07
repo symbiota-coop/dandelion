@@ -69,7 +69,7 @@
         <% if membership.paid %>
           <a href="javascript:;" onclick="$(this).hide().next().show().find('input').focus()"><%= m membership.paid, @gathering.currency.to_s if membership.paid %></a>
         <% end %>
-        <% form_tag "/memberships/#{membership.id}/paid", style: ('display:none' if membership.paid) do %>
+        <% form_tag "/g/#{@gathering.slug}/memberships/#{membership.id}/paid", style: ('display:none' if membership.paid) do %>
           <div class="input-group">
             <span class="input-group-text"><%= money_symbol(@gathering.currency) %></span>
             <%= number_field_tag :paid, class: 'form-control', style: 'width: 6em', value: membership.paid, onblur: '$(this.form).submit()' %>
@@ -90,7 +90,7 @@
       <span data-bs-toggle="tooltip" title="<%= sprintf('%g', membership.shift_points) %>/<%= pluralize(membership.shift_points_required ? sprintf('%g', membership.shift_points_required) : '?', 'shift point') %>">
         <% if gathering_admin? %>
           <%= sprintf('%g', membership.shift_points) %>/<a href="javascript:;" onclick="$(this).hide().next().css('display', 'inline').find('input').focus()"><%= membership.shift_points_required ? sprintf('%g', membership.shift_points_required) : '?' %></a>
-          <% form_tag "/memberships/#{membership.id}/shift_points_required", class: 'form-inline', style: 'display:none' do %>
+          <% form_tag "/g/#{@gathering.slug}/memberships/#{membership.id}/shift_points_required", class: 'form-inline', style: 'display:none' do %>
             <%= number_field_tag :shift_points_required, class: 'form-control', style: 'width: 6em', min: 0, value: membership.shift_points_required, onblur: '$(this.form).submit()' %>
           <% end %>
         <% else %>
@@ -107,7 +107,7 @@
       <% if membership.smart_invitations_granted %>
         <%= membership.invitations_extended %>/<a href="javascript:;" onclick="$(this).hide().next().css('display', 'inline').find('input').focus()"><%= membership.smart_invitations_granted %></a>
       <% end %>
-      <% form_tag "/memberships/#{membership.id}/invitations_granted", class: 'form-inline', style: 'display:none' do %>
+      <% form_tag "/g/#{@gathering.slug}/memberships/#{membership.id}/invitations_granted", class: 'form-inline', style: 'display:none' do %>
         <%= number_field_tag :invitations_granted, class: 'form-control', style: 'width: 6em', min: 0, value: membership.smart_invitations_granted, onblur: '$(this.form).submit()' %>
       <% end %>
     <% else %>
@@ -120,15 +120,15 @@
     <% y = [] %>
     <% if membership.admin %>
       <% y << capture do %>
-        <a class="btn btn-outline-primary text-nowrap mb-1" data-method="post" href="/memberships/<%= membership.id %>/unadmin">Unadmin</a>
+        <a class="btn btn-outline-primary text-nowrap mb-1" data-method="post" href="/g/<%= @gathering.slug %>/memberships/<%= membership.id %>/unadmin">Unadmin</a>
       <% end %>
     <% else %>
       <% y << capture do %>
-        <a class="btn btn-outline-primary text-nowrap mb-1" data-method="post" href="/memberships/<%= membership.id %>/make_admin">Make admin</a>
+        <a class="btn btn-outline-primary text-nowrap mb-1" data-method="post" href="/g/<%= @gathering.slug %>/memberships/<%= membership.id %>/make_admin">Make admin</a>
       <% end %>
     <% end %>
     <% y << capture do %>
-      <a class="btn btn-outline-primary text-nowrap mb-1" data-method="post" data-confirm="Are you sure you want to remove this person from the gathering?" href="/memberships/<%= membership.id %>/remove">Remove</a>
+      <a class="btn btn-outline-primary text-nowrap mb-1" data-method="post" data-confirm="Are you sure you want to remove this person from the gathering?" href="/g/<%= @gathering.slug %>/memberships/<%= membership.id %>/remove">Remove</a>
     <% end %>
     <%== y.map(&:strip).join(' ') %>
   </td>

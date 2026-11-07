@@ -73,17 +73,17 @@ Dandelion::App.controller do
     redirect "/g/#{@gathering.slug}/teams"
   end
 
-  post '/teamships/create' do
-    @team = Team.find(params[:team_id]) || not_found
-    @gathering = @team.gathering
+  post '/g/:slug/teamships/create' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @team = @gathering.teams.find(params[:team_id]) || not_found
     confirmed_membership_required!
     Teamship.create(account: current_account, team: @team, gathering: @gathering)
     redirect back
   end
 
-  post '/teamships/:id/destroy' do
-    @teamship = Teamship.find(params[:id]) || not_found
-    @gathering = @teamship.team.gathering
+  post '/g/:slug/teamships/:id/destroy' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @teamship = @gathering.teamships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     halt unless (@teamship.account.id == current_account.id) || gathering_admin?
@@ -113,20 +113,20 @@ Dandelion::App.controller do
     redirect(@teamship ? "/teamships/#{@teamship.id}/unsubscribe" : "/g/#{@gathering.slug}/teams/#{@team.id}")
   end
 
-  get '/teamships/:id/subscribe' do
-    @teamship = Teamship.find(params[:id]) || not_found
+  get '/g/:slug/teamships/:id/subscribe' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @teamship = @gathering.teamships.find(params[:id]) || not_found
     @team = @teamship.team
-    @gathering = @teamship.team.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     halt unless (@teamship.account.id == current_account.id) || gathering_admin?
     partial :'teams/subscribe', locals: { teamship: @teamship }
   end
 
-  post '/teamships/:id/set_subscribe' do
-    @teamship = Teamship.find(params[:id]) || not_found
+  post '/g/:slug/teamships/:id/set_subscribe' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @teamship = @gathering.teamships.find(params[:id]) || not_found
     @team = @teamship.team
-    @gathering = @teamship.team.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     halt unless (@teamship.account.id == current_account.id) || gathering_admin?
@@ -139,10 +139,10 @@ Dandelion::App.controller do
     end
   end
 
-  get '/teamships/:id/unsubscribe' do
-    @teamship = Teamship.find(params[:id]) || not_found
+  get '/g/:slug/teamships/:id/unsubscribe' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @teamship = @gathering.teamships.find(params[:id]) || not_found
     @team = @teamship.team
-    @gathering = @teamship.team.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     halt unless (@teamship.account.id == current_account.id) || gathering_admin?

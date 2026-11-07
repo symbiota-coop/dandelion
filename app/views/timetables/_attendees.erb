@@ -15,7 +15,7 @@
   </span>
 <% end %>
 <% if interested %>
-  <a class="pagelet-trigger" title="No longer interested" data-method="post" href="/tactivities/<%= tactivity.id %>/unattend"><i class="bi bi-x-lg"></i></a>
+  <a class="pagelet-trigger" title="No longer interested" data-method="post" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>/unattend"><i class="bi bi-x-lg"></i></a>
 <% else %>
-  <a class="pagelet-trigger" title="Interested" data-method="post" href="/tactivities/<%= tactivity.id %>/attend"><i class="bi bi-hand-thumbs-up"></i></a>
+  <a class="pagelet-trigger" title="Interested" data-method="post" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>/attend"><i class="bi bi-hand-thumbs-up"></i></a>
 <% end %>

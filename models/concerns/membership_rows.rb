@@ -5,7 +5,7 @@ module MembershipRows
     # Loads a page of a gathering's members table (gatherings/_membership_row) with a query per collection, rather than
     # a dozen queries per row: each membership is handed its tickets, shifts, invitations, proposers and the viewer's
     # follow of its account, so the methods below read those. A membership loaded on its own (a row reloaded by
-    # /membership_row/:id) queries for them itself
+    # /g/:slug/membership_row/:id) queries for them itself
     def preload_rows(gathering, memberships, viewer:)
       memberships = memberships.includes(:account, :added_by, :mapplication, teamships: :team, optionships: :option).to_a
       account_ids = memberships.map(&:account_id)

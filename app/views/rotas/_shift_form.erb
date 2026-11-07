@@ -1,4 +1,4 @@
-<% form_for @shift, "/shifts/#{@shift.id}/edit" do |f| %>
+<% form_for @shift, "/g/#{@gathering.slug}/shifts/#{@shift.id}/edit" do |f| %>
 
   <div class="mb-3">
     <%= partial :'accounts/account', locals: { account: @shift.account } %>
@@ -16,6 +16,6 @@
 
   <%= f.select_block :rslot_id, options: @shift.rslot_ids %>
   <%= f.select_block :role_id, options: @shift.role_ids %>
-  <%= f.submit_block button_text: 'Update shift', destroy_url: "/shifts/#{@shift.id}/destroy" %>
+  <%= f.submit_block button_text: 'Update shift', destroy_url: "/g/#{@gathering.slug}/shifts/#{@shift.id}/destroy" %>
 
 <% end %>

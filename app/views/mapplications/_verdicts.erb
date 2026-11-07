@@ -5,11 +5,11 @@
     <% if noun == 'proposer' && @gathering.proposing_delay && (Time.now - mapplication.created_at) < @gathering.proposing_delay.hours %>
       &middot; <small>Proposers accepted in <%= distance_of_time_in_words((mapplication.created_at + (@gathering.proposing_delay * 60 * 60)), Time.now) %></small>
     <% elsif (verdict = current_account.verdicts.send(noun.pluralize).find_by(mapplication: mapplication)) %>
-      &middot; <a data-method="post" class="pagelet-trigger" href="/verdicts/<%= verdict.id %>/destroy"><%= "Un#{verb}" %></a>
+      &middot; <a data-method="post" class="pagelet-trigger" href="/g/<%= @gathering.slug %>/verdicts/<%= verdict.id %>/destroy"><%= "Un#{verb}" %></a>
     <% elsif !current_account.verdicts.find_by(mapplication: mapplication) %>
       &middot;
       <a href="javascript:;" onclick="$(this).hide().next().show().find('textarea').focus()"><%= verb.capitalize %></a>
-      <% form_for mapplication.verdicts.build(type: noun), "/mapplications/#{mapplication.id}/verdicts/create", style: 'display:none', class: 'my-2' do |f| %>
+      <% form_for mapplication.verdicts.build(type: noun), "/g/#{@gathering.slug}/mapplications/#{mapplication.id}/verdicts/create", style: 'display:none', class: 'my-2' do |f| %>
         <%= f.hidden_field :type %>
         <%= f.text_area_block :reason, container_class: 'mb-2', label_class: 'd-none', placeholder: "Explain your decision (#{@gathering.send("require_reason_#{noun}") ? 'required' : 'optional'})", required: @gathering.send("require_reason_#{noun}") %>
         <%= f.submit_block button_text: 'Submit' %>

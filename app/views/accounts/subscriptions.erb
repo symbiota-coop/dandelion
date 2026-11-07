@@ -126,7 +126,7 @@
               <% teamships.each { |teamship| team = teamship.team %>
               <li class="list-group-item subscription-row subscription-child" style="display: none">
                 <a href="/g/<%= gathering.slug %>/teams/<%= team.id %>"><%= team.name %></a>
-                <div data-pagelet-url="/teamships/<%= teamship.id %>/subscribe">
+                <div data-pagelet-url="/g/<%= teamship.gathering.slug %>/teamships/<%= teamship.id %>/subscribe">
                   <%= partial :'teams/subscribe', locals: { teamship: teamship } %>
                 </div>
               </li>

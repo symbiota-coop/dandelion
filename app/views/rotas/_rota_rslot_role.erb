@@ -4,10 +4,10 @@
     <%# Opens the shift's edit form in a modal, which has its own Delete %>
     <%= partial :'gatherings/avatar_menu', locals: {
           account: shift.account, names: params[:view] == 'names',
-          edit_url: ("/shifts/#{shift.id}/edit" if mine || gathering_admin?), edit_in_modal: true
+          edit_url: ("/g/#{@gathering.slug}/shifts/#{shift.id}/edit" if mine || gathering_admin?), edit_in_modal: true
         } %>
   <% elsif gathering_admin? %>
-    <a class="text-body-secondary" data-method="post" href="/shifts/<%= shift.id %>/destroy" data-bs-toggle="tooltip" title="Not needed: click to reopen" aria-label="Not needed: click to reopen">
+    <a class="text-body-secondary" data-method="post" href="/g/<%= @gathering.slug %>/shifts/<%= shift.id %>/destroy" data-bs-toggle="tooltip" title="Not needed: click to reopen" aria-label="Not needed: click to reopen">
       <i class="bi bi-slash-circle" aria-hidden="true"></i>
     </a>
   <% else %>
@@ -16,8 +16,8 @@
     </span>
   <% end %>
 <% else %>
-  <a class="pagelet-trigger btn btn-primary btn-sm mb-1" data-method="post" href="/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>" data-bs-toggle="tooltip" title="Sign up" aria-label="Sign up"><i class="bi bi-hand-index" aria-hidden="true"></i></a>
+  <a class="pagelet-trigger btn btn-primary btn-sm mb-1" data-method="post" href="/g/<%= @gathering.slug %>/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>" data-bs-toggle="tooltip" title="Sign up" aria-label="Sign up"><i class="bi bi-hand-index" aria-hidden="true"></i></a>
   <% if gathering_admin? %>
-    <a class="pagelet-trigger btn btn-outline-secondary btn-sm mb-1" data-method="post" href="/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>&na=true" data-bs-toggle="tooltip" title="Mark as not needed" aria-label="Mark as not needed"><i class="bi bi-slash-circle" aria-hidden="true"></i></a>
+    <a class="pagelet-trigger btn btn-outline-secondary btn-sm mb-1" data-method="post" href="/g/<%= @gathering.slug %>/shifts/create?rota_id=<%= rota.id %>&rslot_id=<%= rslot.id %>&role_id=<%= role.id %>&na=true" data-bs-toggle="tooltip" title="Mark as not needed" aria-label="Mark as not needed"><i class="bi bi-slash-circle" aria-hidden="true"></i></a>
   <% end %>
 <% end %>

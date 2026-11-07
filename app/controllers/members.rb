@@ -126,9 +126,9 @@ Dandelion::App.controller do
     redirect back
   end
 
-  post '/memberships/:id/make_admin' do
-    membership = Membership.find(params[:id]) || not_found
-    @gathering = membership.gathering
+  post '/g/:slug/memberships/:id/make_admin' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    membership = @gathering.memberships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     membership.admin = true
@@ -139,9 +139,9 @@ Dandelion::App.controller do
     redirect back
   end
 
-  post '/memberships/:id/unadmin' do
-    membership = Membership.find(params[:id]) || not_found
-    @gathering = membership.gathering
+  post '/g/:slug/memberships/:id/unadmin' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    membership = @gathering.memberships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     membership.admin = false
@@ -152,18 +152,18 @@ Dandelion::App.controller do
     redirect back
   end
 
-  post '/memberships/:id/remove' do
-    membership = Membership.find(params[:id]) || not_found
-    @gathering = membership.gathering
+  post '/g/:slug/memberships/:id/remove' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    membership = @gathering.memberships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     membership.destroy
     redirect back
   end
 
-  post '/memberships/:id/paid' do
-    membership = Membership.find(params[:id]) || not_found
-    @gathering = membership.gathering
+  post '/g/:slug/memberships/:id/paid' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    membership = @gathering.memberships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     membership.paid = params[:paid]
@@ -171,9 +171,9 @@ Dandelion::App.controller do
     200
   end
 
-  post '/memberships/:id/invitations_granted' do
-    membership = Membership.find(params[:id]) || not_found
-    @gathering = membership.gathering
+  post '/g/:slug/memberships/:id/invitations_granted' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    membership = @gathering.memberships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     membership.invitations_granted = params[:invitations_granted]
@@ -181,9 +181,9 @@ Dandelion::App.controller do
     200
   end
 
-  post '/memberships/:id/shift_points_required' do
-    membership = Membership.find(params[:id]) || not_found
-    @gathering = membership.gathering
+  post '/g/:slug/memberships/:id/shift_points_required' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    membership = @gathering.memberships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     membership.shift_points_required = params[:shift_points_required]
@@ -191,9 +191,9 @@ Dandelion::App.controller do
     200
   end
 
-  get '/membership_row/:id' do
-    membership = Membership.find(params[:id]) || not_found
-    @gathering = membership.gathering
+  get '/g/:slug/membership_row/:id' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    membership = @gathering.memberships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     partial :'gatherings/membership_row', locals: { membership: membership }

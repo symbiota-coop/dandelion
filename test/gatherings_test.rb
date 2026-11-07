@@ -91,9 +91,9 @@ class GatheringsTest < ActiveSupport::TestCase
     invitation_option = @gathering.options.create!(name: 'Cabin', type: 'Accommodation', account: @account, by_invitation: true)
 
     sign_in_with_rack(member)
-    post '/optionships/create', option_id: open_option.id
+    post "/g/#{@gathering.slug}/optionships/create", option_id: open_option.id
     assert last_response.ok?
-    post '/optionships/create', option_id: invitation_option.id
+    post "/g/#{@gathering.slug}/optionships/create", option_id: invitation_option.id
     assert_equal 403, last_response.status
 
     assert open_option.optionships.find_by(account: member)
@@ -106,7 +106,7 @@ class GatheringsTest < ActiveSupport::TestCase
     other_mapplication = @other_gathering.mapplications.create!(account: FactoryBot.create(:account), status: 'pending')
 
     sign_in_with_rack(@account)
-    post "/mapplications/#{mapplication.id}/verdicts/create", verdict: { type: 'proposer', mapplication_id: other_mapplication.id }
+    post "/g/#{@gathering.slug}/mapplications/#{mapplication.id}/verdicts/create", verdict: { type: 'proposer', mapplication_id: other_mapplication.id }
 
     assert mapplication.verdicts.find_by(account: @account)
     refute other_mapplication.verdicts.find_by(account: @account)
@@ -135,37 +135,39 @@ class GatheringsTest < ActiveSupport::TestCase
     other_role = Role.create!(name: 'Barista', rota: other_rota)
 
     sign_in_with_rack(@account)
-    post '/shifts/create', rota_id: rota.id, role_id: other_role.id, rslot_id: rslot.id
+    post "/g/#{@gathering.slug}/shifts/create", rota_id: rota.id, role_id: other_role.id, rslot_id: rslot.id
 
     assert_equal 404, last_response.status
     refute Shift.find_by(role: other_role)
     refute Shift.find_by(rslot: rslot)
   end
 
-  test "a rota cell only shows its own rota's shifts, not another gathering's" do
+  test "a gathering's rota routes only find its own rotas, roles, slots and shifts" do
     create_two_gatherings
     rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
-    role = Role.create!(name: 'Cook', rota: rota)
-    rslot = Rslot.create!(name: 'Morning', rota: rota)
-    cook = FactoryBot.create(:account, name: 'Kitchen Cook')
-    @gathering.memberships.create!(account: cook)
-    Shift.create!(account: cook, role: role, rslot: rslot, rota: rota)
     other_rota = @other_gathering.rotas.create!(name: 'Bar', account: @other_account)
     other_role = Role.create!(name: 'Barista', rota: other_rota)
     other_rslot = Rslot.create!(name: 'Evening', rota: other_rota)
     barista = FactoryBot.create(:account, name: 'Secret Barista')
     @other_gathering.memberships.create!(account: barista)
-    Shift.create!(account: barista, role: other_role, rslot: other_rslot, rota: other_rota)
+    other_shift = Shift.create!(account: barista, role: other_role, rslot: other_rslot, rota: other_rota)
 
+    # An admin of one gathering, asking through it for another gathering's records
     sign_in_with_rack(@account)
-    get "/rota/rslot/role/#{rota.id}/#{rslot.id}/#{role.id}", view: 'names'
-    assert last_response.ok?
-    assert_includes last_response.body, 'Kitchen Cook'
-
-    # The membership check is for the rota's gathering, so the other gathering's slot and role through it are not found
-    get "/rota/rslot/role/#{rota.id}/#{other_rslot.id}/#{other_role.id}", view: 'names'
+    get "/g/#{@gathering.slug}/shifts/#{other_shift.id}/edit"
     assert_equal 404, last_response.status
     refute_includes last_response.body, 'Secret Barista'
+    get "/g/#{@gathering.slug}/roles/#{other_role.id}/edit"
+    assert_equal 404, last_response.status
+    post "/g/#{@gathering.slug}/rslots/#{other_rslot.id}/destroy"
+    assert_equal 404, last_response.status
+    assert Rslot.find(other_rslot.id)
+    post "/g/#{@gathering.slug}/roles/create", rota_id: other_rota.id, name: 'Intruder'
+    assert_equal 404, last_response.status
+    refute other_rota.roles.find_by(name: 'Intruder')
+    # and through its own rota, its own
+    post "/g/#{@gathering.slug}/roles/create", rota_id: rota.id, name: 'Cook'
+    assert rota.roles.find_by(name: 'Cook')
   end
 
   test 'member cannot reassign their shift to another account' do
@@ -180,7 +182,7 @@ class GatheringsTest < ActiveSupport::TestCase
     shift = Shift.create!(account: member, role: role, rslot: rslot, rota: rota)
 
     sign_in_with_rack(member)
-    post "/shifts/#{shift.id}/edit", shift: { account_id: other_member.id }
+    post "/g/#{@gathering.slug}/shifts/#{shift.id}/edit", shift: { account_id: other_member.id }
 
     assert_equal member.id, shift.reload.account_id
     assert_equal member.id, shift.membership.account_id
@@ -429,14 +431,14 @@ class GatheringsTest < ActiveSupport::TestCase
     sign_in_with_rack(outsider)
     get "/g/#{@gathering.slug}/applications"
     assert last_response.redirect?
-    post "/mapplications/#{mapplication.id}/verdicts/create", verdict: { type: 'proposer' }
+    post "/g/#{@gathering.slug}/mapplications/#{mapplication.id}/verdicts/create", verdict: { type: 'proposer' }
     refute mapplication.verdicts.find_by(account: outsider)
 
     sign_in_with_rack(member)
     get "/g/#{@gathering.slug}/applications"
     assert last_response.ok?
     assert_includes last_response.body, 'Applicant Person'
-    post "/mapplications/#{mapplication.id}/verdicts/create", verdict: { type: 'proposer' }
+    post "/g/#{@gathering.slug}/mapplications/#{mapplication.id}/verdicts/create", verdict: { type: 'proposer' }
     assert mapplication.verdicts.proposers.find_by(account: member)
   end
 
@@ -515,12 +517,12 @@ class GatheringsTest < ActiveSupport::TestCase
     tier = @gathering.options.create!(name: 'Standard', type: 'Tier', capacity: 1, cost: 100, account: @account)
 
     sign_in_with_rack(member)
-    post '/optionships/create', option_id: tier.id
+    post "/g/#{@gathering.slug}/optionships/create", option_id: tier.id
     assert_equal 100, @gathering.memberships.find_by(account: member).requested_contribution
     assert @gathering.memberships.find_by(account: member).owes_contribution?
 
     sign_in_with_rack(@account)
-    post '/optionships/create', option_id: tier.id
+    post "/g/#{@gathering.slug}/optionships/create", option_id: tier.id
     refute tier.optionships.find_by(account: @account)
   end
 
@@ -538,11 +540,11 @@ class GatheringsTest < ActiveSupport::TestCase
     tactivity = timetable.tactivities.create!(name: 'Yoga', account: member)
 
     sign_in_with_rack(member)
-    post '/shifts/create', rota_id: rota.id, role_id: role.id, rslot_id: rslot.id
+    post "/g/#{@gathering.slug}/shifts/create", rota_id: rota.id, role_id: role.id, rslot_id: rslot.id
     assert Shift.find_by(account: member, role: role, rslot: rslot)
 
     sign_in_with_rack(@account)
-    post "/tactivities/#{tactivity.id}/schedule", tslot_id: tslot.id, space_id: space.id
+    post "/g/#{@gathering.slug}/tactivities/#{tactivity.id}/schedule", tslot_id: tslot.id, space_id: space.id
     tactivity.reload
     assert_equal tslot.id, tactivity.tslot_id
     assert_equal space.id, tactivity.space_id
@@ -563,12 +565,12 @@ class GatheringsTest < ActiveSupport::TestCase
     sign_in_with_rack(@account)
     get "/g/#{@gathering.slug}/members"
     assert last_response.ok?
-    row = last_response.body[/<tr data-pagelet-url="\/membership_row\/#{@gathering.memberships.find_by(account: member).id}">.*?<\/tr>/m]
+    row = last_response.body[/<tr data-pagelet-url="\/g\/#{@gathering.slug}\/membership_row\/#{@gathering.memberships.find_by(account: member).id}">.*?<\/tr>/m]
     assert_includes row, 'Member Person'
     assert_includes row, 'Early bird, Opening night'
     assert_includes row, 'Kitchen: Cook, Morning'
     assert_includes row, ERB::Util.h(@account.name) # proposed by
-    get "/membership_row/#{@gathering.memberships.find_by(account: member).id}"
+    get "/g/#{@gathering.slug}/membership_row/#{@gathering.memberships.find_by(account: member).id}"
     assert_includes last_response.body, 'Early bird, Opening night'
 
     get "/g/#{@gathering.slug}/timetables/#{timetable.id}"
@@ -665,9 +667,9 @@ class GatheringsTest < ActiveSupport::TestCase
     get "/g/#{@gathering.slug}/options"
     assert_includes last_response.body, 'Member Person'
 
-    get "/shifts/#{shift.id}/edit"
+    get "/g/#{@gathering.slug}/shifts/#{shift.id}/edit"
     assert last_response.ok?
-    post "/shifts/#{shift.id}/destroy"
+    post "/g/#{@gathering.slug}/shifts/#{shift.id}/destroy"
     refute Shift.find(shift.id)
 
     post "/g/#{@gathering.slug}/rotas/#{rota.id}/destroy"

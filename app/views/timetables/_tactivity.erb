@@ -10,7 +10,7 @@
       <a href="/u/<%= tactivity.account.username %>"><%= tactivity.account.name %></a>
     </span>
     <div>
-      <div class="d-inline-block" data-pagelet-url="/tactivities/<%= tactivity.id %>/attendees">
+      <div class="d-inline-block" data-pagelet-url="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>/attendees">
         <%= partial :'timetables/attendees', locals: { tactivity: tactivity, attendances: attendances } %>
       </div>
     </div>
@@ -21,9 +21,9 @@
       &middot;
     <% end %>
     <% if tactivity.space_id && (gathering_admin? || tactivity.timetable.scheduling_by_all) %>
-      <a class="pagelet-trigger" data-confirm="Are you sure you want to unschedule this activity?" title="Unschedule" data-method="post" href="/tactivities/<%= tactivity.id %>/unschedule"><i class="bi bi-calendar-minus"></i></a>
+      <a class="pagelet-trigger" data-confirm="Are you sure you want to unschedule this activity?" title="Unschedule" data-method="post" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>/unschedule"><i class="bi bi-calendar-minus"></i></a>
       &middot;
     <% end %>
-    <a title="Edit" href="/tactivities/<%= tactivity.id %>/edit"><i class="bi bi-pencil-fill"></i></a>
+    <a title="Edit" href="/g/<%= @gathering.slug %>/tactivities/<%= tactivity.id %>/edit"><i class="bi bi-pencil-fill"></i></a>
   </div>
 </div>

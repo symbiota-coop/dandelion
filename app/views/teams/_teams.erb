@@ -23,7 +23,7 @@
         <% y << capture do %>
           <%= partial :'gatherings/avatar_menu', locals: {
                 account: account, names: params[:view] == 'names',
-                remove_url: ("/teamships/#{teamship.id}/destroy" if mine || gathering_admin?),
+                remove_url: ("/g/#{@gathering.slug}/teamships/#{teamship.id}/destroy" if mine || gathering_admin?),
                 remove_confirm: (mine ? "Leave #{team.name}?" : "Remove this person from #{team.name}?")
               } %>
         <% end %>

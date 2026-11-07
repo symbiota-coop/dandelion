@@ -66,12 +66,12 @@
     </td>
     <td>
       <% if (optionship = @gathering.optionships.find_by(option: option, account: current_account)) %>
-        <a data-method="post" class="pagelet-trigger btn btn-outline-primary" href="/optionships/<%= optionship.id %>/destroy">Leave</a>
+        <a data-method="post" class="pagelet-trigger btn btn-outline-primary" href="/g/<%= @gathering.slug %>/optionships/<%= optionship.id %>/destroy">Leave</a>
       <% elsif !option.full? %>
         <% if option.by_invitation %>
           <span class="badge text-bg-secondary">By invitation</span>
         <% else %>
-          <a class="pagelet-trigger btn btn-primary" data-method="post" onclick="window.scrollTo(0, 0)" href="/optionships/create?option_id=<%= option.id %>">Join</a>
+          <a class="pagelet-trigger btn btn-primary" data-method="post" onclick="window.scrollTo(0, 0)" href="/g/<%= @gathering.slug %>/optionships/create?option_id=<%= option.id %>">Join</a>
         <% end %>
       <% end %>
     </td>
@@ -88,7 +88,7 @@
                   account: account, names: params[:view] == 'names',
                   # Admins edit it in a modal, which has its own Delete; the person themself can only leave
                   edit_url: ("/g/#{@gathering.slug}/optionships/#{optionship.id}/edit" if gathering_admin?), edit_in_modal: true,
-                  remove_url: ("/optionships/#{optionship.id}/destroy" if mine),
+                  remove_url: ("/g/#{@gathering.slug}/optionships/#{optionship.id}/destroy" if mine),
                   remove_confirm: (mine ? "Leave #{option.name}?" : "Remove this person from #{option.name}?")
                 } %>
           <% end %>

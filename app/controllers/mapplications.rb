@@ -11,9 +11,9 @@ Dandelion::App.controller do
     end
   end
 
-  get '/mapplication_row/:id' do
-    @mapplication = Mapplication.find(params[:id]) || not_found
-    @gathering = @mapplication.gathering
+  get '/g/:slug/mapplication_row/:id' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @mapplication = @gathering.mapplications.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     partial :'mapplications/mapplication_row', locals: { mapplication: @mapplication }
@@ -109,9 +109,9 @@ Dandelion::App.controller do
     erb :'mapplications/paused'
   end
 
-  post '/mapplications/:id/verdicts/create' do
-    @mapplication = Mapplication.find(params[:id]) || not_found
-    @gathering = @mapplication.gathering
+  post '/g/:slug/mapplications/:id/verdicts/create' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @mapplication = @gathering.mapplications.find(params[:id]) || not_found
     confirmed_membership_required!
     verdict = @mapplication.verdicts.build(mass_assigning(params[:verdict], Verdict))
     verdict.account = current_account
@@ -119,16 +119,17 @@ Dandelion::App.controller do
     200
   end
 
-  post '/verdicts/:id/destroy' do
-    @verdict = Verdict.find(params[:id]) || not_found
+  post '/g/:slug/verdicts/:id/destroy' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @verdict = @gathering.verdicts.find(params[:id]) || not_found
     halt unless @verdict.account.id == current_account.id
     @verdict.destroy
     200
   end
 
-  post '/mapplications/:id/process' do
-    @mapplication = Mapplication.find(params[:id]) || not_found
-    @gathering = @mapplication.gathering
+  post '/g/:slug/mapplications/:id/process' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @mapplication = @gathering.mapplications.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @mapplication.set(processed_by_id: current_account.id)
@@ -143,9 +144,9 @@ Dandelion::App.controller do
     redirect back
   end
 
-  post '/mapplications/:id/destroy' do
-    @mapplication = Mapplication.find(params[:id]) || not_found
-    @gathering = @mapplication.gathering
+  post '/g/:slug/mapplications/:id/destroy' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @mapplication = @gathering.mapplications.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @mapplication.destroy

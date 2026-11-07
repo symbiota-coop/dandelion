@@ -71,7 +71,7 @@
               <% end %>
             </a>
           <% end %>
-          <% form_tag "/teams/#{team.id}/budget", style: ('display:none' if team.budget) do %>
+          <% form_tag "/g/#{@gathering.slug}/teams/#{team.id}/budget", style: ('display:none' if team.budget) do %>
             <div class="input-group">
               <span class="input-group-text"><%= money_symbol(@gathering.currency) %></span>
               <%= number_field_tag :budget, class: 'form-control', style: 'width: 6em', value: team.budget, onblur: '$(this.form).submit()' %>
@@ -123,7 +123,7 @@
         </td>
         <td><a href="/u/<%= spend.account.username %>"><%= spend.account.name %></a></td>
         <td>
-          <% form_tag "/spends/#{spend.id}/reimbursed" do %>
+          <% form_tag "/g/#{@gathering.slug}/spends/#{spend.id}/reimbursed" do %>
             <div class="form-check form-switch mb-0">
               <%= check_box_tag :reimbursed, value: true, checked: spend.reimbursed, id: "spend-#{spend.id}-reimbursed", class: 'form-check-input', role: 'switch', 'aria-label': 'Reimbursed', onclick: '$(this.form).submit()' %>
             </div>

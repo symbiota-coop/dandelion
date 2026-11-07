@@ -16,8 +16,8 @@
   <%= partial :reorder, locals: {
         grid: 'timetable-grid',
         lists: [
-          { title: 'Spaces', url: '/spaces/order', owner: { timetable_id: @timetable.id.to_s }, ids_param: 'space_ids', items: @timetable.spaces.order('o asc').map { |space| [space.id, space.name] } },
-          { title: 'Slots', url: '/tslots/order', owner: { timetable_id: @timetable.id.to_s }, ids_param: 'tslot_ids', items: @timetable.tslots.order('o asc').map { |tslot| [tslot.id, tslot.name] } }
+          { title: 'Spaces', url: "/g/#{@gathering.slug}/spaces/order", owner: { timetable_id: @timetable.id.to_s }, ids_param: 'space_ids', items: @timetable.spaces.order('o asc').map { |space| [space.id, space.name] } },
+          { title: 'Slots', url: "/g/#{@gathering.slug}/tslots/order", owner: { timetable_id: @timetable.id.to_s }, ids_param: 'tslot_ids', items: @timetable.tslots.order('o asc').map { |tslot| [tslot.id, tslot.name] } }
         ]
       } %>
 <% end %>

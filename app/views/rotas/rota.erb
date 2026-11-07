@@ -17,8 +17,8 @@
   <%= partial :reorder, locals: {
         grid: 'rota-grid',
         lists: [
-          { title: 'Roles', url: '/roles/order', owner: { rota_id: @rota.id.to_s }, ids_param: 'role_ids', items: @rota.roles.order('o asc').map { |role| [role.id, role.name] } },
-          { title: 'Slots', url: '/rslots/order', owner: { rota_id: @rota.id.to_s }, ids_param: 'rslot_ids', items: @rota.rslots.order('o asc').map { |rslot| [rslot.id, rslot.name] } }
+          { title: 'Roles', url: "/g/#{@gathering.slug}/roles/order", owner: { rota_id: @rota.id.to_s }, ids_param: 'role_ids', items: @rota.roles.order('o asc').map { |role| [role.id, role.name] } },
+          { title: 'Slots', url: "/g/#{@gathering.slug}/rslots/order", owner: { rota_id: @rota.id.to_s }, ids_param: 'rslot_ids', items: @rota.rslots.order('o asc').map { |rslot| [rslot.id, rslot.name] } }
         ]
       } %>
 <% end %>

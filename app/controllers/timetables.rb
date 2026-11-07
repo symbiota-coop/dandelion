@@ -70,9 +70,9 @@ Dandelion::App.controller do
     redirect "/g/#{@gathering.slug}/timetables"
   end
 
-  post '/spaces/order' do
-    @timetable = Timetable.find(params[:timetable_id]) || not_found
-    @gathering = @timetable.gathering
+  post '/g/:slug/spaces/order' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     params[:space_ids].each_with_index do |space_id, i|
@@ -81,27 +81,27 @@ Dandelion::App.controller do
     200
   end
 
-  post '/spaces/create' do
-    @timetable = Timetable.find(params[:timetable_id]) || not_found
-    @gathering = @timetable.gathering
+  post '/g/:slug/spaces/create' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     Space.create(name: params[:name], timetable: @timetable)
     200
   end
 
-  post '/spaces/:id/destroy' do
-    @space = Space.find(params[:id]) || not_found
-    @gathering = @space.gathering
+  post '/g/:slug/spaces/:id/destroy' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @space = @gathering.spaces.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @space.destroy
     200
   end
 
-  post '/tslots/order' do
-    @timetable = Timetable.find(params[:timetable_id]) || not_found
-    @gathering = @timetable.gathering
+  post '/g/:slug/tslots/order' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     params[:tslot_ids].each_with_index do |tslot_id, i|
@@ -110,27 +110,27 @@ Dandelion::App.controller do
     200
   end
 
-  post '/tslots/create' do
-    @timetable = Timetable.find(params[:timetable_id]) || not_found
-    @gathering = @timetable.gathering
+  post '/g/:slug/tslots/create' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     Tslot.create(name: params[:name], timetable: @timetable)
     200
   end
 
-  post '/tslots/:id/destroy' do
-    @tslot = Tslot.find(params[:id]) || not_found
-    @gathering = @tslot.gathering
+  post '/g/:slug/tslots/:id/destroy' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @tslot = @gathering.tslots.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @tslot.destroy
     200
   end
 
-  post '/tactivities/create' do
-    @timetable = Timetable.find(params[:timetable_id]) || not_found
-    @gathering = @timetable.gathering
+  post '/g/:slug/tactivities/create' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @tactivity = Tactivity.new(mass_assigning(params[:tactivity], Tactivity))
@@ -153,17 +153,17 @@ Dandelion::App.controller do
     erb :'timetables/tactivity'
   end
 
-  get '/tactivities/:id/edit' do
-    @tactivity = Tactivity.find(params[:id]) || not_found
-    @gathering = @tactivity.gathering
+  get '/g/:slug/tactivities/:id/edit' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     erb :'timetables/tactivity_build'
   end
 
-  post '/tactivities/:id/edit' do
-    @tactivity = Tactivity.find(params[:id]) || not_found
-    @gathering = @tactivity.gathering
+  post '/g/:slug/tactivities/:id/edit' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     if @tactivity.update_attributes(mass_assigning(params[:tactivity], Tactivity))
@@ -174,18 +174,18 @@ Dandelion::App.controller do
     end
   end
 
-  post '/tactivities/:id/destroy' do
-    @tactivity = Tactivity.find(params[:id]) || not_found
-    @gathering = @tactivity.gathering
+  post '/g/:slug/tactivities/:id/destroy' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @tactivity.destroy
     redirect "/g/#{@gathering.slug}/timetables/#{@tactivity.timetable_id}"
   end
 
-  post '/tactivities/:id/schedule' do
-    @tactivity = Tactivity.find(params[:id]) || not_found
-    @gathering = @tactivity.gathering
+  post '/g/:slug/tactivities/:id/schedule' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
     halt unless gathering_admin? || @tactivity.timetable.scheduling_by_all
@@ -198,9 +198,9 @@ Dandelion::App.controller do
     200
   end
 
-  post '/tactivities/:id/unschedule' do
-    @tactivity = Tactivity.find(params[:id]) || not_found
-    @gathering = @tactivity.gathering
+  post '/g/:slug/tactivities/:id/unschedule' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
     halt unless gathering_admin? || @tactivity.timetable.scheduling_by_all
@@ -217,26 +217,26 @@ Dandelion::App.controller do
     end
   end
 
-  get '/tactivities/:id/attendees' do
-    @tactivity = Tactivity.find(params[:id]) || not_found
-    @gathering = @tactivity.gathering
+  get '/g/:slug/tactivities/:id/attendees' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     partial :'timetables/attendees', locals: { tactivity: @tactivity }
   end
 
-  post '/tactivities/:id/attend' do
-    @tactivity = Tactivity.find(params[:id]) || not_found
-    @gathering = @tactivity.gathering
+  post '/g/:slug/tactivities/:id/attend' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @tactivity.attendances.create account: current_account
     request.xhr? ? 200 : redirect(back)
   end
 
-  post '/tactivities/:id/unattend' do
-    @tactivity = Tactivity.find(params[:id]) || not_found
-    @gathering = @tactivity.gathering
+  post '/g/:slug/tactivities/:id/unattend' do
+    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @tactivity.attendances.find_by(account: current_account).try(:destroy)
