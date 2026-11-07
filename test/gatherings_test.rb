@@ -142,6 +142,32 @@ class GatheringsTest < ActiveSupport::TestCase
     refute Shift.find_by(rslot: rslot)
   end
 
+  test "a rota cell only shows its own rota's shifts, not another gathering's" do
+    create_two_gatherings
+    rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
+    role = Role.create!(name: 'Cook', rota: rota)
+    rslot = Rslot.create!(name: 'Morning', rota: rota)
+    cook = FactoryBot.create(:account, name: 'Kitchen Cook')
+    @gathering.memberships.create!(account: cook)
+    Shift.create!(account: cook, role: role, rslot: rslot, rota: rota)
+    other_rota = @other_gathering.rotas.create!(name: 'Bar', account: @other_account)
+    other_role = Role.create!(name: 'Barista', rota: other_rota)
+    other_rslot = Rslot.create!(name: 'Evening', rota: other_rota)
+    barista = FactoryBot.create(:account, name: 'Secret Barista')
+    @other_gathering.memberships.create!(account: barista)
+    Shift.create!(account: barista, role: other_role, rslot: other_rslot, rota: other_rota)
+
+    sign_in_with_rack(@account)
+    get "/rota/rslot/role/#{rota.id}/#{rslot.id}/#{role.id}", view: 'names'
+    assert last_response.ok?
+    assert_includes last_response.body, 'Kitchen Cook'
+
+    # The membership check is for the rota's gathering, so the other gathering's slot and role through it are not found
+    get "/rota/rslot/role/#{rota.id}/#{other_rslot.id}/#{other_role.id}", view: 'names'
+    assert_equal 404, last_response.status
+    refute_includes last_response.body, 'Secret Barista'
+  end
+
   test 'member cannot reassign their shift to another account' do
     create_gathering
     member = FactoryBot.create(:account)

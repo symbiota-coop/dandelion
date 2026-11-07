@@ -219,12 +219,14 @@ Dandelion::App.controller do
 
   get '/rota/rslot/role/:rota_id/:rslot_id/:role_id' do
     @rota = Rota.find(params[:rota_id]) || not_found
-    @rslot = Rslot.find(params[:rslot_id]) || not_found
-    @role = Role.find(params[:role_id]) || not_found
+    # Through the rota, whose gathering the membership check is for, so a slot and role from another gathering's rota
+    # can't show who's on its shift
+    @rslot = @rota.rslots.find(params[:rslot_id]) || not_found
+    @role = @rota.roles.find(params[:role_id]) || not_found
     @gathering = @rota.gathering
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
-    partial :'rotas/rota_rslot_role', locals: { rota: @rota, rslot: @rslot, role: @role, shift: Shift.includes(:account).find_by(rslot: @rslot, role: @role) }
+    partial :'rotas/rota_rslot_role', locals: { rota: @rota, rslot: @rslot, role: @role, shift: @rota.shifts.includes(:account).find_by(rslot: @rslot, role: @role) }
   end
 
   post '/shifts/create' do
