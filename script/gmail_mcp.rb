@@ -164,8 +164,10 @@ class Gmail
     if (plain = part(message['payload'], 'text/plain'))
       decode(plain)
     elsif (html = part(message['payload'], 'text/html'))
-      CGI.unescapeHTML(decode(html).gsub(%r{<(style|script)\b.*?</\1>}mi, '').gsub(%r{<br\s*/?>|</(p|div|tr|li|h\d)>}i, "\n").gsub(/<[^>]*>/, ''))
-         .gsub(/\n{3,}/, "\n\n").strip
+      # Any < or > left after the tags go (a stray one, or one a nested tag like <scr<script></script>ipt> leaves) is
+      # dropped too, as text's own are escaped as &lt; and &gt;
+      stripped = decode(html).gsub(%r{<(style|script)\b.*?</\1>}mi, '').gsub(%r{<br\s*/?>|</(p|div|tr|li|h\d)>}i, "\n").gsub(/<[^>]*>/, '')
+      CGI.unescapeHTML(stripped.gsub(/[<>]/, '')).gsub(/\n{3,}/, "\n\n").strip
     else
       ''
     end
