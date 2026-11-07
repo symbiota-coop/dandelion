@@ -10,6 +10,7 @@ module Dandelion
 
     # Via :sessions (not `use`) so the session sits inside Rack::Protection and its origin checks can drop it
     set :sessions, expire_after: 1.year.to_i, same_site: :lax, secure: Padrino.env == :production
+    use SessionCookieWrites
     use Rack::CrawlerDetect
     use Rack::Attack
     use Dragonfly::Middleware

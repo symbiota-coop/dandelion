@@ -725,6 +725,32 @@ class AccountsTest < ActiveSupport::TestCase
     assert_includes last_response.body, "That sign in code isn't valid any longer"
   end
 
+  test 'a GET sends the session cookie back only when it changes the session or is a page' do
+    account = FactoryBot.create(:account)
+    xhr = { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }
+    sign_in_with_rack(account)
+
+    # Sent back, these could arrive after a newer session and replace it
+    get '/', {}, xhr
+    assert last_response.ok?
+    assert_nil last_response.headers['set-cookie']
+    get '/stylesheets/app.css'
+    assert last_response.ok?
+    assert_nil last_response.headers['set-cookie']
+
+    # Pages still send it back, renewing its expiry
+    get '/'
+    assert last_response.ok?
+    assert last_response.headers['set-cookie']
+
+    # A background request that signs in changes the session, so it's sent back
+    other_account = FactoryBot.create(:account, email_confirmed: true)
+    clear_cookies
+    get '/', { sign_in_code: other_account.issue_sign_in_code! }, xhr
+    assert_equal other_account.id.to_s, last_request.session[:account_id]
+    assert last_response.headers['set-cookie']
+  end
+
   test 'asking for a sign in code again resends the code already sent' do
     account = FactoryBot.create(:account)
     code = account.issue_sign_in_code!

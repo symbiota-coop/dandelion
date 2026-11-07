@@ -307,6 +307,24 @@ class EventPermissionsTest < ActiveSupport::TestCase
     assert page.has_content? "don't have permission to create events for this organisation"
   end
 
+  test 'requests that started before a redirect, finishing after it, keep its flash message' do
+    org = FactoryBot.create(:organisation, contribution_not_required: true)
+    sign_in_with_rack(add_member(org))
+    get '/'
+    cookies_before = last_request.env['HTTP_COOKIE']
+
+    get "/events/new?organisation_id=#{org.id}"
+    assert last_response.redirect?
+    # The favicon and a pagelet, sent with the session from before the redirect
+    get '/images/logos/black-on-transparent-sq.png', {}, { 'HTTP_COOKIE' => cookies_before }
+    assert last_response.ok?
+    get '/', {}, { 'HTTP_COOKIE' => cookies_before, 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }
+    assert last_response.ok?
+
+    get '/events'
+    assert_includes last_response.body, 'permission to create events for this organisation'
+  end
+
   test 'org event manager can delete their own event' do
     covers 'organisations/table-delete-events@f21a92'
     org = FactoryBot.create(:organisation)
