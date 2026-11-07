@@ -1000,15 +1000,17 @@ class AccountsTest < ActiveSupport::TestCase
 
     clear_cookies
     # Two accounts share a hexagon, so they're one cell: no account's own place or id is sent
-    assert_equal [[far_lat, far_lng, 1], [centre_lat, centre_lng, 2]].sort, map_cells.call(-4, 50, 1, 52)
+    assert_equal [[centre_lat, centre_lng, 2]], map_cells.call(-0.2, 51.45, 0.1, 51.65)
     refute_includes last_response.body, '"id"'
+    assert_equal [[far_lat, far_lng, 1]], map_cells.call(-3.2, 50.9, -3.0, 51.05)
 
-    # A box around where an account is, but not its hexagon's centre, finds nothing, so narrowing boxes can't find it
+    # Any box in a hexagon finds the same, however small, so narrowing boxes can't find where an account is in it
     assert((centre_lng - hackney[0]).abs > 0.001 || (centre_lat - hackney[1]).abs > 0.001)
-    assert_equal [], map_cells.call(hackney[0] - 0.001, hackney[1] - 0.001, hackney[0] + 0.001, hackney[1] + 0.001)
-    # Boxes around where the map shows them find them, so they don't vanish on zooming in, wherever their edges are
+    assert_equal [[centre_lat, centre_lng, 2]], map_cells.call(hackney[0] - 0.001, hackney[1] - 0.001, hackney[0] + 0.001, hackney[1] + 0.001)
     assert_equal [[centre_lat, centre_lng, 2]], map_cells.call(centre_lng - 0.001, centre_lat - 0.001, centre_lng + 0.001, centre_lat + 0.001)
     assert_equal [[centre_lat, centre_lng, 2]], map_cells.call(centre_lng - 0.004, centre_lat - 0.0001, centre_lng + 0.0002, centre_lat + 0.003)
+    # and a box clear of it finds nothing
+    assert_equal [], map_cells.call(centre_lng + 0.05, centre_lat, centre_lng + 0.06, centre_lat + 0.01)
 
     account = Account.find_by(location_privacy: 'Public')
     env 'rack.session', { 'account_id' => account.id.to_s, 'session_token' => account.session_token! }
@@ -1017,19 +1019,46 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'a map with more occupied hexagons than it can show uses bigger ones, still counting everyone' do
     organisation = FactoryBot.create(:organisation)
-    # Its creator's account is in it, somewhere else
-    already = Account.and(organisation_ids_public_cache: organisation.id, :coordinates.ne => nil).count
-    # One account in each of MAP_POINTS_LIMIT + 1 hexagons side by side, a hexagon's width apart
+    # One account in each of MAP_POINTS_LIMIT + 1 hexagons side by side, a hexagon's width apart along the equator
     width = Math.sqrt(3) * ACCOUNT_MAP_HEX_SIZE
-    coordinates = (0..MAP_POINTS_LIMIT).map { |i| [-100 + (i * width), 0.001] }
-    Account.collection.insert_many(coordinates.map { |c| { coordinates: c, organisation_ids_public_cache: [organisation.id] } })
+    Account.collection.insert_many((0..MAP_POINTS_LIMIT).map { |i| { coordinates: [-100 + (i * width), 0.0001], organisation_ids_public_cache: [organisation.id] } })
 
-    get '/map.json', organisation_id: organisation.id, west: -180, south: -85, east: 180, north: 85
+    # A box along the line, small enough to start with the smallest hexagons
+    get '/map.json', organisation_id: organisation.id, west: -100 - (3 * width), south: -0.001, east: -100 + ((MAP_POINTS_LIMIT + 3) * width), north: 0.003
     cells = JSON.parse(last_response.body)['cells']
     assert_operator cells.length, :<=, MAP_POINTS_LIMIT
-    assert_equal(already + MAP_POINTS_LIMIT + 1, cells.sum { |cell| cell['count'] })
+    assert_equal(MAP_POINTS_LIMIT + 1, cells.sum { |cell| cell['count'] })
     # The hexagons are twice as wide
     assert_in_delta 2 * width, (cells.first['corners'][0][1] - cells.first['corners'][3][1]).abs, 0.000002
+  end
+
+  test 'a zoomed out map starts with bigger hexagons, still counting everyone' do
+    organisation = FactoryBot.create(:organisation)
+    already = Account.and(organisation_ids_public_cache: organisation.id, :coordinates.ne => nil).count
+    # Including some near the edges of the map, in hexagons whose centres are beyond them
+    coordinates = [[-0.0553, 51.545], [-3.12345, 50.98765], [13.4, 52.52], [-74.0, 40.7], [175, 0], [0, 77]]
+    Account.collection.insert_many(coordinates.map { |c| { coordinates: c, organisation_ids_public_cache: [organisation.id] } })
+
+    get '/map.json', organisation_id: organisation.id, west: -180, south: -78, east: 180, north: 78
+    cells = JSON.parse(last_response.body)['cells']
+    assert_equal(already + coordinates.length, cells.sum { |cell| cell['count'] })
+    # Hexagons a few degrees across, not a couple of kilometres
+    assert_operator (cells.first['corners'][0][1] - cells.first['corners'][3][1]).abs, :>, 100 * Math.sqrt(3) * ACCOUNT_MAP_HEX_SIZE
+  end
+
+  test 'zooming out keeps the accounts in a hexagon together, so it tells no more than zooming in' do
+    organisation = FactoryBot.create(:organisation)
+    app = Dandelion::App.new!
+    # Two accounts in one small hexagon, near its edge, where bigger hexagons' edges could pass between them
+    coordinates = [[0.1039, 0.0], [0.104, 0.0]]
+    assert_equal(*coordinates.map { |c| app.account_map_hex(*c, ACCOUNT_MAP_HEX_SIZE) })
+    Account.collection.insert_many(coordinates.map { |c| { coordinates: c, organisation_ids_public_cache: [organisation.id] } })
+
+    get '/map.json', organisation_id: organisation.id, west: -2, south: -1, east: 2, north: 1
+    cells = JSON.parse(last_response.body)['cells']
+    assert_equal([2], cells.map { |cell| cell['count'] })
+    # in a hexagon bigger than the smallest
+    assert_operator (cells.first['corners'][0][1] - cells.first['corners'][3][1]).abs, :>, Math.sqrt(3) * ACCOUNT_MAP_HEX_SIZE * 1.5
   end
 
   test 'there is no map of every account, only of an organisation, activity or local group' do

@@ -74,18 +74,34 @@ Dandelion::App.helpers do
     account_map_hex_point(account_map_hex(*coordinates, ACCOUNT_MAP_HEX_SIZE), ACCOUNT_MAP_HEX_SIZE)
   end
 
-  # The accounts a map's box shows, as [id, hexagon], with hexagons of the given size: those whose hexagon's centre is
-  # in the box. The query takes in everyone within a hexagon's reach of the box, then keeps those whose hexagon's centre
-  # is in it, so which accounts it finds and how many depend only on their hexagons: moving the box within a hexagon
-  # changes nothing, and an account shown in the box is always found by it
-  def account_map_hexes_in_box(accounts, west, south, east, north, size)
-    reach_south = account_map_mercator_lat(account_map_mercator_y(south) - size)
-    reach_north = account_map_mercator_lat(account_map_mercator_y(north) + size)
-    accounts.and(coordinates: { '$geoWithin' => { '$box' => [[west - size, reach_south], [east + size, reach_north]] } })
-            .pluck(:id, :coordinates).filter_map do |id, (lng, lat)|
-      hex = account_map_hex(lng, lat, size)
+  # The accounts within reach of a map's box, as [id, [lng, lat]]: all those that might be in a hexagon that reaches
+  # into it (account_map_hexes_in_box), reach being how far beyond the box, in the grid's units, that could be
+  def account_map_accounts_near_box(accounts, west, south, east, north, reach)
+    reach_south = account_map_mercator_lat(account_map_mercator_y(south) - reach)
+    reach_north = account_map_mercator_lat(account_map_mercator_y(north) + reach)
+    accounts.and(coordinates: { '$geoWithin' => { '$box' => [[west - reach, reach_south], [east + reach, reach_north]] } }).pluck(:id, :coordinates)
+  end
+
+  # How far beyond a map's box an account can be and still be in one of its hexagons of the given size: from the
+  # account to its smallest hexagon's centre, from there to its hexagon's centre, and from there to the box
+  def account_map_reach(size)
+    ACCOUNT_MAP_HEX_SIZE + (2 * size)
+  end
+
+  # The accounts a map's box shows, as [id, hexagon], with hexagons of the given size: those in hexagons that reach
+  # into the box, from accounts near it (account_map_accounts_near_box). A hexagon bigger than ACCOUNT_MAP_HEX_SIZE
+  # takes in the smallest hexagons whose centres are in it, not the accounts themselves, so a zoomed out map tells no
+  # more than the smallest hexagons do. Whether an account is found depends only on its hexagon and the box, so moving
+  # the box within a hexagon changes nothing, however small the box
+  def account_map_hexes_in_box(near, west, south, east, north, size)
+    near.filter_map do |id, (lng, lat)|
+      hex = account_map_hex(lng, lat, ACCOUNT_MAP_HEX_SIZE)
+      hex = account_map_hex(*account_map_hex_point(hex, ACCOUNT_MAP_HEX_SIZE), size) if size != ACCOUNT_MAP_HEX_SIZE
       centre_lng, centre_lat = account_map_hex_point(hex, size)
-      [id, hex] if centre_lng.between?(west, east) && centre_lat.between?(south, north)
+      centre_y = account_map_mercator_y(centre_lat)
+      # It reaches into the box if its centre is within its size of the box (taking in a little around its corners)
+      [id, hex] if centre_lng.between?(west - size, east + size) &&
+                   centre_y.between?(account_map_mercator_y(south) - size, account_map_mercator_y(north) + size)
     end
   end
 
@@ -104,7 +120,8 @@ Dandelion::App.helpers do
     point_hash = ->(id, (lng, lat), n) { { model_name: model_name, id: encrypt_map_id(model_name, id.to_s), lat: lat, lng: lng, n: n } }
 
     if points.klass == Account
-      found = account_map_hexes_in_box(points, west, south, east, north, ACCOUNT_MAP_HEX_SIZE)
+      near = account_map_accounts_near_box(points, west, south, east, north, account_map_reach(ACCOUNT_MAP_HEX_SIZE))
+      found = account_map_hexes_in_box(near, west, south, east, north, ACCOUNT_MAP_HEX_SIZE)
       points_count = found.length
       point_hashes = found.each_with_index.map { |(id, hex), n| point_hash.(id, account_map_hex_point(hex, ACCOUNT_MAP_HEX_SIZE), n) }
     else
@@ -122,18 +139,29 @@ Dandelion::App.helpers do
 
   # A map of many accounts in its box, as JSON: the hexagons they're in, each with its corners and how many are in it,
   # which map.js shades by how many, so a place many people share, like a town everyone gives as their location, reads
-  # as an area with a count, not a point. When there'd be more than MAP_POINTS_LIMIT hexagons, as a map zoomed out over a
-  # country might have, the grid's hexagons grow 2, 4, 8... times as wide until there aren't, so everyone is still
-  # counted and the map needn't say there are too many
+  # as an area with a count, not a point. Hexagons are ACCOUNT_MAP_HEX_SIZE, or 2, 4, 8... times it on a bigger map, so
+  # they look about the same size however far the map is zoomed out and the box holds no more than about
+  # MAP_POINTS_LIMIT / 2 of them; if more are occupied than MAP_POINTS_LIMIT, they grow again
   def account_cells_map_json(accounts)
     west, south, east, north = %i[west south east north].map { |p| params[p].to_f }
+    # A hexagon covers 3√3/2 size² of the grid, and the box its width times its height on the map
+    box_area = (east - west).abs * (account_map_mercator_y(north) - account_map_mercator_y(south)).abs
     size = ACCOUNT_MAP_HEX_SIZE
+    size *= 2 while size < 90 && box_area / (1.5 * Math.sqrt(3) * (size**2)) > MAP_POINTS_LIMIT / 2
+
+    # One query, taking in accounts within reach of hexagons up to twice as big, so they can grow once without another
+    reach = account_map_reach(size * 2)
+    near = account_map_accounts_near_box(accounts, west, south, east, north, reach)
     hexes = nil
     loop do
-      hexes = account_map_hexes_in_box(accounts, west, south, east, north, size).map(&:last).tally
+      hexes = account_map_hexes_in_box(near, west, south, east, north, size).map(&:last).tally
       break if hexes.length <= MAP_POINTS_LIMIT || size > 90
 
       size *= 2
+      next unless account_map_reach(size) > reach
+
+      reach = account_map_reach(size * 2)
+      near = account_map_accounts_near_box(accounts, west, south, east, north, reach)
     end
 
     {
