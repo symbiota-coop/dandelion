@@ -30,6 +30,8 @@ module AccountFields
     field :last_checked_messages, type: Time
     field :location, type: String
     field :coordinates, type: Array
+    # The smallest map hexagon coordinates is in (MapHexagons.key), for maps of many accounts to count by
+    field :map_hex, type: String
     field :default_currency, type: String
     field :organisation_ids_cache, type: Array
     field :organisation_ids_public_cache, type: Array

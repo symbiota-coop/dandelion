@@ -72,6 +72,10 @@ module AccountValidation
         end
       end
     end
+
+    before_save do
+      self.map_hex = MapHexagons.key(coordinates) if coordinates_changed? || (coordinates && !map_hex)
+    end
   end
 
   def look_up_coordinates_and_time_zone
@@ -89,7 +93,7 @@ module AccountValidation
   # organisations the account has joined, which found no coordinates to match when it joined them
   def geocode_location!
     look_up_coordinates_and_time_zone
-    set(coordinates: coordinates, time_zone: time_zone)
+    set(coordinates: coordinates, map_hex: MapHexagons.key(coordinates), time_zone: time_zone)
     organisationships.and(unsubscribed: false).each(&:associate_with_relevant_local_groups!)
   end
 end

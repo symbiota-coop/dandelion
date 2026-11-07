@@ -984,12 +984,15 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'maps of many accounts show how many are in each hexagon, whoever is looking' do
     organisation = FactoryBot.create(:organisation)
-    app = Dandelion::App.new!
     hackney = [-0.0553, 51.545]
-    centre_lng, centre_lat = app.account_map_coordinates(hackney)
-    far_lng, far_lat = app.account_map_coordinates([-3.12345, 50.98765])
+    centre_lng, centre_lat = MapHexagons.point(MapHexagons.hex(*hackney, MapHexagons::SIZE), MapHexagons::SIZE)
+    far_lng, far_lat = MapHexagons.point(MapHexagons.hex(-3.12345, 50.98765, MapHexagons::SIZE), MapHexagons::SIZE)
     [[hackney, 'Public'], [[centre_lng, centre_lat], 'Only me'], [[-3.12345, 50.98765], 'Only me']].each do |coordinates, privacy|
-      FactoryBot.create(:account, location_privacy: privacy).set(coordinates: coordinates, organisation_ids_public_cache: [organisation.id])
+      account = FactoryBot.create(:account, location_privacy: privacy)
+      # Saved, so it stores its hexagon (map_hex), which the map counts by
+      account.update_attribute(:coordinates, coordinates)
+      account.set(organisation_ids_public_cache: [organisation.id])
+      assert account.reload.map_hex
     end
     map_cells = lambda do |west, south, east, north|
       get '/map.json', organisation_id: organisation.id, west: west, south: south, east: east, north: north
@@ -1019,11 +1022,12 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'a map with more occupied hexagons than it can show uses bigger ones, still counting everyone' do
     organisation = FactoryBot.create(:organisation)
-    app = Dandelion::App.new!
-    # A tall, narrow map, with one account in each of MAP_POINTS_LIMIT + 1 rows of hexagons, up the meridian
-    rows = (0..MAP_POINTS_LIMIT).map { |i| [0.0001, app.account_map_mercator_lat((i + 0.1) * 1.5 * ACCOUNT_MAP_HEX_SIZE)] }
+    # A tall, narrow map, with one account in each of MAP_POINTS_LIMIT + 1 rows of hexagons, up the meridian. Put there
+    # directly, so they've no stored hexagon (map_hex), like accounts geocoded before they stored one, and are counted
+    # from their coordinates
+    rows = (0..MAP_POINTS_LIMIT).map { |i| [0.0001, MapHexagons.mercator_lat((i + 0.1) * 1.5 * MapHexagons::SIZE)] }
     Account.collection.insert_many(rows.map { |c| { coordinates: c, organisation_ids_public_cache: [organisation.id] } })
-    width = Math.sqrt(3) * ACCOUNT_MAP_HEX_SIZE
+    width = Math.sqrt(3) * MapHexagons::SIZE
 
     get '/map.json', organisation_id: organisation.id, west: -width * 4, south: -0.01, east: width * 4, north: rows.last[1] + 0.05
     cells = JSON.parse(last_response.body)['cells']
@@ -1042,12 +1046,12 @@ class AccountsTest < ActiveSupport::TestCase
       (corners[0][1] - corners[3][1]).abs
     end
 
-    # Never smaller than ACCOUNT_MAP_HEX_SIZE, and otherwise ACCOUNT_MAP_HEX_PIXELS to twice that wide on the map
-    assert_in_delta Math.sqrt(3) * ACCOUNT_MAP_HEX_SIZE, hexagon_width.call(0.1, 1000), 0.000002
+    # Never smaller than MapHexagons::SIZE, and otherwise MapHexagons::PIXELS to twice that wide on the map
+    assert_in_delta Math.sqrt(3) * MapHexagons::SIZE, hexagon_width.call(0.1, 1000), 0.000002
     [[1.0, 1000], [4.0, 1000], [30.0, 1000], [30.0, 375]].each do |map_width, pixels|
       on_screen = hexagon_width.call(map_width, pixels) / map_width * pixels
-      assert_operator on_screen, :>=, ACCOUNT_MAP_HEX_PIXELS
-      assert_operator on_screen, :<, 2 * ACCOUNT_MAP_HEX_PIXELS
+      assert_operator on_screen, :>=, MapHexagons::PIXELS
+      assert_operator on_screen, :<, 2 * MapHexagons::PIXELS
     end
   end
 
@@ -1062,22 +1066,21 @@ class AccountsTest < ActiveSupport::TestCase
     cells = JSON.parse(last_response.body)['cells']
     assert_equal(already + coordinates.length, cells.sum { |cell| cell['count'] })
     # Hexagons a few degrees across, not a couple of kilometres
-    assert_operator (cells.first['corners'][0][1] - cells.first['corners'][3][1]).abs, :>, 100 * Math.sqrt(3) * ACCOUNT_MAP_HEX_SIZE
+    assert_operator (cells.first['corners'][0][1] - cells.first['corners'][3][1]).abs, :>, 100 * Math.sqrt(3) * MapHexagons::SIZE
   end
 
   test 'zooming out keeps the accounts in a hexagon together, so it tells no more than zooming in' do
     organisation = FactoryBot.create(:organisation)
-    app = Dandelion::App.new!
     # Two accounts in one small hexagon, near its edge, where bigger hexagons' edges could pass between them
     coordinates = [[0.1039, 0.0], [0.104, 0.0]]
-    assert_equal(*coordinates.map { |c| app.account_map_hex(*c, ACCOUNT_MAP_HEX_SIZE) })
+    assert_equal(*coordinates.map { |c| MapHexagons.hex(*c, MapHexagons::SIZE) })
     Account.collection.insert_many(coordinates.map { |c| { coordinates: c, organisation_ids_public_cache: [organisation.id] } })
 
     get '/map.json', organisation_id: organisation.id, west: -2, south: -1, east: 2, north: 1
     cells = JSON.parse(last_response.body)['cells']
     assert_equal([2], cells.map { |cell| cell['count'] })
     # in a hexagon bigger than the smallest
-    assert_operator (cells.first['corners'][0][1] - cells.first['corners'][3][1]).abs, :>, Math.sqrt(3) * ACCOUNT_MAP_HEX_SIZE * 1.5
+    assert_operator (cells.first['corners'][0][1] - cells.first['corners'][3][1]).abs, :>, Math.sqrt(3) * MapHexagons::SIZE * 1.5
   end
 
   test 'there is no map of every account, only of an organisation, activity or local group' do
@@ -1088,13 +1091,24 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'maps that show each account show it at the centre of its hexagon' do
-    app = Dandelion::App.new!
     account = FactoryBot.create(:account)
     account.set(coordinates: [-0.0553, 51.545])
-    centre = app.account_map_coordinates(account.coordinates)
-    assert_operator Math.hypot(centre[0] + 0.0553, app.account_map_mercator_y(centre[1]) - app.account_map_mercator_y(51.545)), :<=, ACCOUNT_MAP_HEX_SIZE
-    assert_equal centre, app.account_map_coordinates(centre)
-    assert_equal centre.reverse, app.map_point_lat_lng(account)
+    hex = MapHexagons.hex(*account.coordinates, MapHexagons::SIZE)
+    centre = MapHexagons.point(hex, MapHexagons::SIZE)
+    assert_operator Math.hypot(centre[0] + 0.0553, MapHexagons.mercator_y(centre[1]) - MapHexagons.mercator_y(51.545)), :<=, MapHexagons::SIZE
+    assert_equal hex, MapHexagons.hex(*centre, MapHexagons::SIZE)
+    # map_point_lat_lng is a helper, which needs an app to call it on
+    assert_equal centre.reverse, Dandelion::App.new!.map_point_lat_lng(account)
+  end
+
+  test 'an account stores the map hexagon it is in, and changes it when its coordinates change' do
+    account = FactoryBot.create(:account)
+    account.update_attribute(:coordinates, [-0.0553, 51.545])
+    assert_equal MapHexagons.hex(-0.0553, 51.545, MapHexagons::SIZE).join(','), account.reload.map_hex
+    account.update_attribute(:coordinates, [-3.12345, 50.98765])
+    assert_equal MapHexagons.hex(-3.12345, 50.98765, MapHexagons::SIZE).join(','), account.reload.map_hex
+    account.update_attribute(:coordinates, nil)
+    assert_nil account.reload.map_hex
   end
 
   test 'a session from before session tokens is kept until the account revokes its sessions' do
