@@ -10,13 +10,60 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Resolves the review window once, and lists the models in OPENCODE_MODELS for the review job to run one each
+  setup:
+    runs-on: ubuntu-26.04
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      has_commits: ${{ steps.setup.outputs.has_commits }}
+      git_log_cmd: ${{ steps.setup.outputs.git_log_cmd }}
+      review_window: ${{ steps.setup.outputs.review_window }}
+      models: ${{ steps.models.outputs.models }}
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup
+        id: setup
+        uses: $/.github/actions/bug-review-setup
+
+      # Each model in OPENCODE_MODELS names its effort (its --variant) after a colon: opencode-go/<model>:<effort>
+      - name: List models
+        id: models
+        run: |
+          models=$(grep -E '^OPENCODE_MODELS=' .github/models.env | cut -d= -f2- | jq -R -c '
+            split(" ") | map(select(length > 0) | (capture("^(?<model>[^:]+):(?<effort>.+)$") // {model: ., effort: ""})
+              | {model, effort, name: (.model | sub("^[^/]*/"; ""))})
+          ')
+          if [ "$(jq length <<< "$models")" -eq 0 ]; then
+            echo "::error::OPENCODE_MODELS in .github/models.env lists no models."
+            exit 1
+          fi
+          if missing=$(jq -e -r 'map(select(.effort == "") | .model) | select(length > 0) | join(", ")' <<< "$models"); then
+            echo "::error::Each model in OPENCODE_MODELS needs an effort after a colon (<model>:<effort>), and these have none: $missing"
+            exit 1
+          fi
+          echo "models=$models" >> "$GITHUB_OUTPUT"
+
   bug-review:
+    needs: setup
+    if: needs.setup.outputs.has_commits == 'true'
+    name: bug-review (${{ matrix.model.name }}, ${{ matrix.model.effort }})
+    strategy:
+      # Each model's review stands alone, so one failing doesn't cancel the others
+      fail-fast: false
+      matrix:
+        model: ${{ fromJSON(needs.setup.outputs.models) }}
     runs-on: ubuntu-26.04
     # A review takes up to about half an hour, so one still going after an hour has hung: fail it then rather than
     # at GitHub's default of 6 hours
     timeout-minutes: 60
     permissions:
-      actions: read
       contents: read
       issues: write
 
@@ -26,29 +73,23 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Load models
-        run: grep -E "^[A-Z_]+=" .github/models.env >> "$GITHUB_ENV"
-
-      - name: Setup
-        id: setup
-        uses: $/.github/actions/bug-review-setup
-
+      # Issues are titled with the model, less its provider (e.g. [opencode gemini-4-argon]), so each model's issues
+      # can be told apart
       - name: Load prompt
-        if: steps.setup.outputs.has_commits == 'true'
         id: prompt
         uses: $/.github/actions/bug-review-prompt
         with:
-          title_prefix: '[opencode] '
-          git_log_cmd: ${{ steps.setup.outputs.git_log_cmd }}
-          review_window: ${{ steps.setup.outputs.review_window }}
+          title_prefix: '[opencode ${{ matrix.model.name }}] '
+          git_log_cmd: ${{ needs.setup.outputs.git_log_cmd }}
+          review_window: ${{ needs.setup.outputs.review_window }}
 
       - name: Install opencode
-        if: steps.setup.outputs.has_commits == 'true'
         run: npm install -g opencode-ai --before="$(date -u -d "7 days ago" +%F)" # zizmor: ignore[adhoc-packages] -- the latest release at least 7 days old (the cooldown), so new models work
 
       - name: Run bug review
-        if: steps.setup.outputs.has_commits == 'true'
         env:
+          OPENCODE_MODEL: ${{ matrix.model.model }}
+          OPENCODE_EFFORT: ${{ matrix.model.effort }}
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           OPENCODE_DISABLE_AUTOUPDATE: 'true'
           GH_TOKEN: ${{ github.token }}
@@ -108,7 +149,7 @@ jobs:
           fi
 
           {
-            echo "## opencode Report"
+            echo "## opencode Report ($OPENCODE_MODEL, $OPENCODE_EFFORT)"
             echo
 
             if [ -n "$final_result" ]; then
