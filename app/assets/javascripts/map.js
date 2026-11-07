@@ -337,7 +337,8 @@ window.DandelionMap = {
 
         var queryParams = $.deparam(window.location.search.substring(1));
 
-        var requestParams = jQuery.extend({}, urlParams, queryParams, q, { display: 'map' });
+        // The map's width in pixels, so maps of many people can size their hexagons to the screen
+        var requestParams = jQuery.extend({}, urlParams, queryParams, q, { display: 'map', width: Math.round($('#map-canvas').width()) });
         var jsonUrl = basePath + '.json?' + $.param(requestParams);
 
         clearTimeout(window.mapTimer);

@@ -5,6 +5,9 @@ MAP_POINTS_LIMIT = 1000
 # Maps show accounts at the centre of the hexagon they're in, this many degrees of longitude from its centre to a corner
 # (map_helper.rb)
 ACCOUNT_MAP_HEX_SIZE = 0.015
+# How wide hexagons on a map are on screen, at least, in pixels: up to twice this, as they grow a doubling at a time
+# (map_helper.rb)
+ACCOUNT_MAP_HEX_PIXELS = 80
 # The default theme colour, Dandelion's green (--color-green-500 in app.css)
 DEFAULT_THEME_COLOR = '#00af5e'.freeze
 CACHEBUST_DIGESTS = {} # rubocop:disable Style/MutableConstant -- a per-process cache, filled as it goes; a race only works a value out twice

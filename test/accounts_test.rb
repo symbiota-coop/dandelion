@@ -1019,17 +1019,36 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'a map with more occupied hexagons than it can show uses bigger ones, still counting everyone' do
     organisation = FactoryBot.create(:organisation)
-    # One account in each of MAP_POINTS_LIMIT + 1 hexagons side by side, a hexagon's width apart along the equator
+    app = Dandelion::App.new!
+    # A tall, narrow map, with one account in each of MAP_POINTS_LIMIT + 1 rows of hexagons, up the meridian
+    rows = (0..MAP_POINTS_LIMIT).map { |i| [0.0001, app.account_map_mercator_lat((i + 0.1) * 1.5 * ACCOUNT_MAP_HEX_SIZE)] }
+    Account.collection.insert_many(rows.map { |c| { coordinates: c, organisation_ids_public_cache: [organisation.id] } })
     width = Math.sqrt(3) * ACCOUNT_MAP_HEX_SIZE
-    Account.collection.insert_many((0..MAP_POINTS_LIMIT).map { |i| { coordinates: [-100 + (i * width), 0.0001], organisation_ids_public_cache: [organisation.id] } })
 
-    # A box along the line, small enough to start with the smallest hexagons
-    get '/map.json', organisation_id: organisation.id, west: -100 - (3 * width), south: -0.001, east: -100 + ((MAP_POINTS_LIMIT + 3) * width), north: 0.003
+    get '/map.json', organisation_id: organisation.id, west: -width * 4, south: -0.01, east: width * 4, north: rows.last[1] + 0.05
     cells = JSON.parse(last_response.body)['cells']
     assert_operator cells.length, :<=, MAP_POINTS_LIMIT
     assert_equal(MAP_POINTS_LIMIT + 1, cells.sum { |cell| cell['count'] })
-    # The hexagons are twice as wide
+    # The hexagons are twice as wide as a map that narrow starts with
     assert_in_delta 2 * width, (cells.first['corners'][0][1] - cells.first['corners'][3][1]).abs, 0.000002
+  end
+
+  test 'maps have hexagons about the same size on screen at every zoom' do
+    organisation = FactoryBot.create(:organisation)
+    Account.collection.insert_one({ coordinates: [-0.0553, 51.545], organisation_ids_public_cache: [organisation.id] })
+    hexagon_width = lambda do |map_width, pixels|
+      get '/map.json', organisation_id: organisation.id, west: -0.0553 - (map_width / 2.0), south: 51.4, east: -0.0553 + (map_width / 2.0), north: 51.7, width: pixels
+      corners = JSON.parse(last_response.body)['cells'].first['corners']
+      (corners[0][1] - corners[3][1]).abs
+    end
+
+    # Never smaller than ACCOUNT_MAP_HEX_SIZE, and otherwise ACCOUNT_MAP_HEX_PIXELS to twice that wide on the map
+    assert_in_delta Math.sqrt(3) * ACCOUNT_MAP_HEX_SIZE, hexagon_width.call(0.1, 1000), 0.000002
+    [[1.0, 1000], [4.0, 1000], [30.0, 1000], [30.0, 375]].each do |map_width, pixels|
+      on_screen = hexagon_width.call(map_width, pixels) / map_width * pixels
+      assert_operator on_screen, :>=, ACCOUNT_MAP_HEX_PIXELS
+      assert_operator on_screen, :<, 2 * ACCOUNT_MAP_HEX_PIXELS
+    end
   end
 
   test 'a zoomed out map starts with bigger hexagons, still counting everyone' do

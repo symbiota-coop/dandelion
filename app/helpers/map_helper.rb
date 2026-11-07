@@ -140,14 +140,14 @@ Dandelion::App.helpers do
   # A map of many accounts in its box, as JSON: the hexagons they're in, each with its corners and how many are in it,
   # which map.js shades by how many, so a place many people share, like a town everyone gives as their location, reads
   # as an area with a count, not a point. Hexagons are ACCOUNT_MAP_HEX_SIZE, or 2, 4, 8... times it on a bigger map, so
-  # they look about the same size however far the map is zoomed out and the box holds no more than about
-  # MAP_POINTS_LIMIT / 2 of them; if more are occupied than MAP_POINTS_LIMIT, they grow again
+  # they're ACCOUNT_MAP_HEX_PIXELS to twice that wide on screen (map.js sends the map's width in pixels) however far the
+  # map is zoomed out; if more are occupied than MAP_POINTS_LIMIT, as on a tall map, they grow again
   def account_cells_map_json(accounts)
     west, south, east, north = %i[west south east north].map { |p| params[p].to_f }
-    # A hexagon covers 3√3/2 size² of the grid, and the box its width times its height on the map
-    box_area = (east - west).abs * (account_map_mercator_y(north) - account_map_mercator_y(south)).abs
+    pixels_per_degree = (params[:width].to_i.positive? ? params[:width].to_i.clamp(1, 10_000) : 1000) / [(east - west).abs, 0.000001].max
+    # A hexagon is √3 size wide
     size = ACCOUNT_MAP_HEX_SIZE
-    size *= 2 while size < 90 && box_area / (1.5 * Math.sqrt(3) * (size**2)) > MAP_POINTS_LIMIT / 2
+    size *= 2 while size < 90 && Math.sqrt(3) * size * pixels_per_degree < ACCOUNT_MAP_HEX_PIXELS
 
     # One query, taking in accounts within reach of hexagons up to twice as big, so they can grow once without another
     reach = account_map_reach(size * 2)
