@@ -21,6 +21,9 @@ class EventBoostsTest < ActiveSupport::TestCase
         window.Stripe = function() { return { redirectToCheckout: function() { return Promise.resolve(); } }; };
       JS
       click_button 'Buy boost'
+      # The boost is saved by a background request: the form fades while it's in flight, and comes back once it's
+      # answered. Waiting here, inside the stub, also keeps the request from reaching the real Stripe
+      assert page.has_css?('#event-boost-form[style*="opacity: 1"]')
     end
 
     event_boost = @event.event_boosts.order('created_at desc').first
