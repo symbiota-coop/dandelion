@@ -982,6 +982,15 @@ class AccountsTest < ActiveSupport::TestCase
     assert_nil other_browser.last_request.session[:account_id]
   end
 
+  # Accounts at these coordinates in the organisation, put there directly, so they've no stored hexagon (map_hex), like
+  # accounts geocoded before they stored one. Each has its own email and username, which have unique indexes
+  def insert_map_accounts(coordinates, organisation)
+    Account.collection.insert_many(coordinates.map do |c|
+      token = SecureRandom.hex(8)
+      { coordinates: c, organisation_ids_public_cache: [organisation.id], email: "map-#{token}@example.com", username: "map-#{token}" }
+    end)
+  end
+
   test 'maps of many accounts show how many are in each hexagon, whoever is looking' do
     organisation = FactoryBot.create(:organisation)
     hackney = [-0.0553, 51.545]
@@ -1026,7 +1035,7 @@ class AccountsTest < ActiveSupport::TestCase
     # directly, so they've no stored hexagon (map_hex), like accounts geocoded before they stored one, and are counted
     # from their coordinates
     rows = (0..MAP_POINTS_LIMIT).map { |i| [0.0001, MapHexagons.mercator_lat((i + 0.1) * 1.5 * MapHexagons::SIZE)] }
-    Account.collection.insert_many(rows.map { |c| { coordinates: c, organisation_ids_public_cache: [organisation.id] } })
+    insert_map_accounts(rows, organisation)
     width = Math.sqrt(3) * MapHexagons::SIZE
 
     get '/map.json', organisation_id: organisation.id, west: -width * 4, south: -0.01, east: width * 4, north: rows.last[1] + 0.05
@@ -1039,7 +1048,7 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'maps have hexagons about the same size on screen at every zoom' do
     organisation = FactoryBot.create(:organisation)
-    Account.collection.insert_one({ coordinates: [-0.0553, 51.545], organisation_ids_public_cache: [organisation.id] })
+    insert_map_accounts([[-0.0553, 51.545]], organisation)
     hexagon_width = lambda do |map_width, pixels|
       get '/map.json', organisation_id: organisation.id, west: -0.0553 - (map_width / 2.0), south: 51.4, east: -0.0553 + (map_width / 2.0), north: 51.7, width: pixels
       corners = JSON.parse(last_response.body)['cells'].first['corners']
@@ -1060,7 +1069,7 @@ class AccountsTest < ActiveSupport::TestCase
     already = Account.and(organisation_ids_public_cache: organisation.id, :coordinates.ne => nil).count
     # Including some near the edges of the map, in hexagons whose centres are beyond them
     coordinates = [[-0.0553, 51.545], [-3.12345, 50.98765], [13.4, 52.52], [-74.0, 40.7], [175, 0], [0, 77]]
-    Account.collection.insert_many(coordinates.map { |c| { coordinates: c, organisation_ids_public_cache: [organisation.id] } })
+    insert_map_accounts(coordinates, organisation)
 
     get '/map.json', organisation_id: organisation.id, west: -180, south: -78, east: 180, north: 78
     cells = JSON.parse(last_response.body)['cells']
@@ -1074,7 +1083,7 @@ class AccountsTest < ActiveSupport::TestCase
     # Two accounts in one small hexagon, near its edge, where bigger hexagons' edges could pass between them
     coordinates = [[0.1039, 0.0], [0.104, 0.0]]
     assert_equal(*coordinates.map { |c| MapHexagons.hex(*c, MapHexagons::SIZE) })
-    Account.collection.insert_many(coordinates.map { |c| { coordinates: c, organisation_ids_public_cache: [organisation.id] } })
+    insert_map_accounts(coordinates, organisation)
 
     get '/map.json', organisation_id: organisation.id, west: -2, south: -1, east: 2, north: 1
     cells = JSON.parse(last_response.body)['cells']
