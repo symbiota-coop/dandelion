@@ -209,6 +209,20 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     assert_includes last_response.body, live_reviewer.name
   end
 
+  test 'site admins can list and respond to feedback on an event whose organisation was deleted' do
+    create_attended_event
+    feedback = create_feedback(account: @attendee)
+    @event.set(organisation_id: nil)
+
+    sign_in_with_rack(FactoryBot.create(:account, admin: true))
+    get '/stats/feedback'
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "The organiser's public response to this feedback"
+
+    get "/event_feedbacks/#{feedback.id}/response"
+    assert_equal 200, last_response.status
+  end
+
   test 'single feedback page shows the attendee email only to email viewers' do
     covers 'organisations/attendee-emails-admins-and-managers-only@10b712'
     create_attended_event
