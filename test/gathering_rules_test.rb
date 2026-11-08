@@ -1,7 +1,7 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
-# The rules of a gathering, seen in the browser: who can do what, when applications are accepted, how shifts and the
-# timetable fill up, what the newsfeed and exports show
+# A gathering's rules, seen in the browser: what people can't do or see, and the limits on who gets in and what fills up.
+# What each feature does is in gathering_features_test.rb
 class GatheringRulesTest < ActiveSupport::TestCase
   include Capybara::DSL
 
@@ -11,11 +11,6 @@ class GatheringRulesTest < ActiveSupport::TestCase
 
   def gathering_path(path = '')
     "/g/#{@gathering.slug}#{path}"
-  end
-
-  # A file the page would download, as text, fetched in the signed-in browser
-  def download(path)
-    page.evaluate_async_script('fetch(arguments[0]).then(r => r.text()).then(arguments[1])', path)
   end
 
   test 'members see no admin controls, and admin pages turn them away' do
@@ -123,75 +118,5 @@ class GatheringRulesTest < ActiveSupport::TestCase
     assert page.has_css? "img[alt='First Member']"
     assert page.has_no_css? "a[aria-label='Sign up']"
     assert_nil rota.shifts.find_by(account: second)
-  end
-
-  test 'an admin schedules an activity by dragging it into a slot, and unschedules it' do
-    create_gathering(privacy: 'open')
-    timetable = @gathering.timetables.create!(name: 'Workshops', account: @account)
-    space = timetable.spaces.create!(name: 'Barn')
-    tslot = timetable.tslots.create!(name: 'Saturday morning')
-    tactivity = timetable.tactivities.create!(name: 'Yoga', account: @account)
-    sign_in(@account)
-    visit gathering_path("/timetables/#{timetable.id}")
-
-    find(".tactivity[data-tactivity-id='#{tactivity.id}']").drag_to find(".tactivity-accept[data-tslot-id='#{tslot.id}'][data-space-id='#{space.id}']")
-    assert page.has_css? ".tactivity-accept[data-tslot-id='#{tslot.id}'] .tactivity[data-tactivity-id='#{tactivity.id}']"
-    assert_equal [tslot.id, space.id], [tactivity.reload.tslot_id, tactivity.space_id]
-
-    visit gathering_path("/timetables/#{timetable.id}")
-    click_link_and_confirm 'Unschedule'
-    assert page.has_content? 'Unscheduled'
-    assert_nil tactivity.reload.tslot_id
-  end
-
-  test "the gathering's newsfeed shows what members do" do
-    create_gathering(privacy: 'open')
-    team = @gathering.teams.create!(name: 'Kitchen', account: @account)
-    rota = @gathering.rotas.create!(name: 'Washing up', account: @account)
-    Role.create!(name: 'Washer', rota: rota)
-    Rslot.create!(name: 'Evening', rota: rota)
-    member = create_member
-    sign_in(member)
-    visit gathering_path("/teams/#{team.id}")
-    click_link 'Join'
-    assert page.has_link? 'Leave team'
-    visit gathering_path("/rotas/#{rota.id}")
-    find("a[aria-label='Sign up']").click
-    assert page.has_css? "img[alt='Member Person']"
-
-    sign_in(@account)
-    visit gathering_path
-    assert page.has_content? 'Member Person joined the Kitchen team'
-    assert page.has_content? 'Member Person signed up for a Washing up shift'
-    assert page.has_content? 'created the rota Washing up'
-  end
-
-  test 'members export the member list, and admins the rota, as CSV' do
-    create_gathering(privacy: 'open')
-    rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
-    role = Role.create!(name: 'Cook', rota: rota)
-    rslot = Rslot.create!(name: 'Morning', rota: rota)
-    member = create_member(email: 'member.person@example.com', phone: '+447700900123')
-    Shift.create!(account: member, role: role, rslot: rslot, rota: rota)
-
-    sign_in(member)
-    visit gathering_path('/members')
-    assert page.has_content? 'Member Person'
-    members = download(gathering_path('/members.csv'))
-    assert_includes members, 'Member Person'
-    assert_includes members, 'member.person@example.com'
-
-    sign_in(@account)
-    visit gathering_path("/rotas/#{rota.id}")
-    assert page.has_content? 'Kitchen'
-    shifts = CSV.parse(download(gathering_path("/rotas/#{rota.id}.csv")))
-    assert_equal ['', 'Cook'], shifts.first
-    assert_equal ['Morning', 'Member Person +447700900123'], shifts.last
-  end
-
-  # Links that remove something ask in a popover first, whose button is named after the link
-  def click_link_and_confirm(label)
-    click_link label
-    page.document.find('.popover').click_button label
   end
 end
