@@ -4,6 +4,7 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 # who gets in and what fills up, are in gathering_rules_test.rb
 class GatheringFeaturesTest < ActiveSupport::TestCase
   include Capybara::DSL
+  include Rack::Test::Methods
 
   def create_member(name: 'Member Person', **attrs)
     FactoryBot.create(:account, name: name, **attrs).tap { |account| @gathering.memberships.create!(account: account) }
@@ -428,5 +429,38 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     shifts = CSV.parse(download(gathering_path("/rotas/#{rota.id}.csv")))
     assert_equal ['', 'Cook'], shifts.first
     assert_equal ['Morning', 'Member Person +447700900123'], shifts.last
+  end
+
+  test 'choosing an option with a cost, and paying for it by card' do
+    create_gathering(privacy: 'open', stripe_pk: 'pk_test_gathering', stripe_sk: 'sk_test_gathering', stripe_endpoint_secret: 'whsec_test')
+    @gathering.options.create!(name: 'Camping', type: 'Tier', cost: 20, account: @account)
+    member = create_member
+    sign_in(member)
+    visit gathering_path('/options')
+    click_link 'Join'
+    assert page.has_content? 'You owe £20'
+
+    # Stripe.js would take them to stripe.com with the session: record which, on the page, instead
+    execute_script 'window.Stripe = function () { return { redirectToCheckout: function (options) { document.body.dataset.checkoutSession = options.sessionId } } }'
+    Stripe::Checkout::Session.stub(:create, api_object(id: 'cs_gathering', payment_intent: 'pi_gathering')) do
+      click_button 'Pay with card'
+      assert page.has_css? "body[data-checkout-session='cs_gathering']"
+    end
+    payment = @gathering.payments.find_by(session_id: 'cs_gathering')
+    assert_equal [20, 'GBP'], [payment.amount, payment.currency]
+    refute payment.payment_completed
+
+    # Stripe tells the gathering the checkout is paid
+    paid = Stripe::Event.construct_from({ id: 'evt_gathering', type: 'checkout.session.completed', data: { object: { id: 'cs_gathering', payment_status: 'paid' } } })
+    Stripe::Webhook.stub(:construct_event, paid) do
+      header 'Stripe-Signature', 'sig'
+      post gathering_path('/stripe_webhook')
+    end
+    assert payment.reload.payment_completed
+    assert_equal 20, @gathering.memberships.find_by(account: member).paid
+
+    visit gathering_path('/options')
+    assert page.has_content? 'Camping'
+    assert page.has_no_content? 'You owe'
   end
 end
