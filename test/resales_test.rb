@@ -1,6 +1,7 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class ResalesTest < ActiveSupport::TestCase
+  include Capybara::DSL
   include Rack::Test::Methods
 
   # Stands in for Mailgun::BatchMessage, keeping who an email would go to
@@ -50,8 +51,43 @@ class ResalesTest < ActiveSupport::TestCase
     assert_equal 0, ticket_type.remaining_including_made_available
   end
 
-  test 'a ticket can be put on resale only when the event allows resales' do
+  # A ticket the account holds, in an order of theirs, which is where the event page offers resale
+  def ticket_in_order(account, **ticket_attrs)
+    order = Order.create!(event: @event, account: account, value: 0, payment_completed: true, currency: @event.currency)
+    @event.ticket_types.first.tickets.create!(event: @event, order: order, account: account, payment_completed: true, price: 0, **ticket_attrs)
+  end
+
+  test 'a ticketholder marks a ticket for resale, and takes it off again' do
     covers 'events/resales-are-enabled-per-event@54eb5b', 'events/resale-at-any-time@182662', 'events/resale-can-be-removed@7f031e'
+    create_event(prices: [0], enable_resales: true)
+    account = FactoryBot.create(:account)
+    ticket = ticket_in_order(account)
+    sign_in(account)
+
+    visit "/e/#{@event.slug}"
+    click_link 'Mark for resale'
+    assert page.has_content? 'On resale'
+    assert ticket.reload.made_available_at
+
+    click_link 'Remove from resale'
+    assert page.has_link? 'Mark for resale'
+    assert_nil ticket.reload.made_available_at
+  end
+
+  test "a ticket isn't offered for resale when the event doesn't allow resales" do
+    covers 'events/resales-are-enabled-per-event@54eb5b'
+    create_event(prices: [0])
+    account = FactoryBot.create(:account)
+    ticket_in_order(account)
+    sign_in(account)
+
+    visit "/e/#{@event.slug}"
+    assert page.has_content? 'Your orders'
+    assert page.has_no_link? 'Mark for resale'
+  end
+
+  test 'a ticket can be put on resale only when the event allows resales, and comes off it whenever' do
+    covers 'events/resales-are-enabled-per-event@54eb5b', 'events/resale-can-be-removed@7f031e'
     create_event(prices: [0])
     account = FactoryBot.create(:account)
     ticket = @event.ticket_types.first.tickets.create!(event: @event, account: account, payment_completed: true, price: 0)
@@ -61,12 +97,9 @@ class ResalesTest < ActiveSupport::TestCase
     assert_equal 403, last_response.status
     assert_nil ticket.reload.made_available_at
 
-    @event.set(enable_resales: true)
-    post "/tickets/#{ticket.id}/toggle_resale"
-    assert ticket.reload.made_available_at
-
-    # Resales turned off later: the ticket can still come off resale, back into the counts
-    @event.set(enable_resales: false)
+    # Put on resale while the event allowed it, which later stopped: the page no longer offers Remove from resale, but the
+    # ticket can still come off resale, back into the counts
+    ticket.set(made_available_at: Time.now)
     post "/tickets/#{ticket.id}/toggle_resale"
     assert_nil ticket.reload.made_available_at
   end
@@ -185,18 +218,22 @@ class ResalesTest < ActiveSupport::TestCase
     @event.set(capacity: 1)
     ticket_type = @event.ticket_types.first
     account = FactoryBot.create(:account)
-    original = ticket_type.tickets.create!(event: @event, account: account, payment_completed: true, price: 0, made_available_at: Time.now)
+    original = ticket_in_order(account, made_available_at: Time.now)
     # Holds the place, unpaid
     hold = ticket_type.tickets.create!(event: @event, account: FactoryBot.create(:account), payment_completed: false, price: 10)
     refute hold.payment_completed
-    sign_in_with_rack(account)
+    sign_in(account)
 
-    post "/tickets/#{original.id}/toggle_resale"
+    visit "/e/#{@event.slug}"
+    click_link 'Remove from resale'
+    assert page.has_content? "Someone is buying this ticket's place, so it can't come off resale"
     assert original.reload.made_available_at
     assert_equal 1, Event.find(@event.id).ticket_counts[ticket_type.id]
 
     hold.destroy
-    post "/tickets/#{original.id}/toggle_resale"
+    visit "/e/#{@event.slug}"
+    click_link 'Remove from resale'
+    assert page.has_link? 'Mark for resale'
     assert_nil original.reload.made_available_at
   end
 
@@ -555,12 +592,14 @@ class ResalesTest < ActiveSupport::TestCase
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 1)
     account = FactoryBot.create(:account)
-    ticket = @event.ticket_types.first.tickets.create!(event: @event, account: account, payment_completed: true, price: 0)
+    ticket = ticket_in_order(account)
     Waitship.create!(event: @event, account: FactoryBot.create(:account))
     assert Event.find(@event.id).sold_out_cache
-    sign_in_with_rack(account)
+    sign_in(account)
 
-    post "/tickets/#{ticket.id}/toggle_resale"
+    visit "/e/#{@event.slug}"
+    click_link 'Mark for resale'
+    assert page.has_content? 'On resale'
     assert ticket.reload.made_available_at
     assert_equal 1, Delayed::Job.and(handler: /send_waitlist_tickets_available/).count
   end

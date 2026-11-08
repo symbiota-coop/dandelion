@@ -83,20 +83,31 @@ class GatheringsTest < ActiveSupport::TestCase
     refute other_option.optionships.find_by(account: @account)
   end
 
-  test 'members can join open options but not those by invitation' do
+  test 'members can join open options but are not offered those by invitation' do
     create_gathering
-    member = FactoryBot.create(:account)
-    @gathering.memberships.create!(account: member)
+    member = create_member
     open_option = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account)
+    @gathering.options.create!(name: 'Cabin', type: 'Accommodation', account: @account, by_invitation: true)
+
+    sign_in(member)
+    visit "/g/#{@gathering.slug}/options"
+    within(find('tr', text: 'Cabin')) do
+      assert page.has_content? 'By invitation'
+      assert page.has_no_link? 'Join'
+    end
+    within(find('tr', text: 'Tent')) { click_link 'Join' }
+    assert page.has_link? 'Leave'
+    assert open_option.optionships.find_by(account: member)
+  end
+
+  test 'members cannot join an option by invitation through its route' do
+    create_gathering
+    member = create_member
     invitation_option = @gathering.options.create!(name: 'Cabin', type: 'Accommodation', account: @account, by_invitation: true)
 
     sign_in_with_rack(member)
-    post "/g/#{@gathering.slug}/optionships/create", option_id: open_option.id
-    assert last_response.ok?
     post "/g/#{@gathering.slug}/optionships/create", option_id: invitation_option.id
     assert_equal 403, last_response.status
-
-    assert open_option.optionships.find_by(account: member)
     refute invitation_option.optionships.find_by(account: member)
   end
 
@@ -202,13 +213,28 @@ class GatheringsTest < ActiveSupport::TestCase
     assert_equal 0, free_option.reload.cost
   end
 
-  test 'admins can create paid options' do
+  test 'admins can create paid options, and members are not offered a cost' do
     create_gathering
+    member = create_member
 
-    sign_in_with_rack(@account)
-    post "/g/#{@gathering.slug}/options/new", option: { name: 'Cabin', type: 'Accommodation', cost: 100 }
-
+    sign_in(@account)
+    visit "/g/#{@gathering.slug}/options"
+    click_link 'Add an option'
+    within('#add-option') do
+      fill_in 'Name', with: 'Cabin'
+      fill_in 'Cost', with: '100'
+      click_button 'Create option'
+    end
+    assert page.has_content? 'Cabin'
     assert_equal 100, @gathering.options.find_by(name: 'Cabin').cost
+
+    sign_in(member)
+    visit "/g/#{@gathering.slug}/options"
+    click_link 'Add an option'
+    within('#add-option') do
+      assert page.has_content? 'Only admins can add paid options'
+      assert page.has_field? 'Cost', disabled: true
+    end
   end
 
   test 'admins edit an option in a modal from the options page' do
@@ -246,13 +272,18 @@ class GatheringsTest < ActiveSupport::TestCase
 
   test 'admin reassigning a spend updates its membership' do
     create_gathering
-    member = FactoryBot.create(:account)
+    member = FactoryBot.create(:account, name: 'Member Person')
     member_membership = @gathering.memberships.create!(account: member)
     team = @gathering.teams.find_by(name: 'General')
     spend = @gathering.spends.create!(item: 'Food', amount: 10, team: team, account: @account)
 
-    sign_in_with_rack(@account)
-    post "/g/#{@gathering.slug}/spends/#{spend.id}/edit", spend: { item: 'Food', amount: 10, team_id: team.id, account_id: member.id }
+    sign_in(@account)
+    visit "/g/#{@gathering.slug}/budget"
+    click_link 'Food'
+    select 'Member Person', from: 'Paid by'
+    click_button 'Update spend'
+    # Back on the budget, which shows who spent it
+    assert page.has_link? 'Member Person'
 
     spend.reload
     assert_equal member.id, spend.account_id
@@ -280,7 +311,11 @@ class GatheringsTest < ActiveSupport::TestCase
     @gathering.set(privacy: 'closed')
     victim = FactoryBot.create(:account)
 
-    post "/g/#{@gathering.slug}/apply", account: { name: 'Anyone', email: victim.email }
+    visit "/g/#{@gathering.slug}/apply"
+    fill_in 'Full name', with: 'Anyone'
+    fill_in 'Email', with: victim.email
+    click_button 'Apply'
+    assert page.has_current_path?("/g/#{@gathering.slug}/apply?applied=true")
 
     mapplication = @gathering.mapplications.find_by(account: victim)
     assert mapplication.submitted_signed_out
@@ -367,14 +402,15 @@ class GatheringsTest < ActiveSupport::TestCase
     covers 'gatherings/video-access-modes@f478bb', 'gatherings/access-modes@d37537'
     create_gathering(privacy: 'open')
     joiner = FactoryBot.create(:account)
-    sign_in_with_rack(joiner)
+    sign_in(joiner)
 
-    get "/g/#{@gathering.slug}"
-    assert_equal "http://example.org/g/#{@gathering.slug}/join", last_response.location
-    get "/g/#{@gathering.slug}/apply"
-    assert_equal "http://example.org/g/#{@gathering.slug}/join", last_response.location
+    visit "/g/#{@gathering.slug}"
+    assert page.has_current_path?("/g/#{@gathering.slug}/join", ignore_query: true)
+    visit "/g/#{@gathering.slug}/apply"
+    assert page.has_current_path?("/g/#{@gathering.slug}/join", ignore_query: true)
 
-    post "/g/#{@gathering.slug}/join"
+    click_button 'Join'
+    assert page.has_link? 'Leave gathering'
     assert @gathering.memberships.find_by(account: joiner)
   end
 
@@ -382,36 +418,40 @@ class GatheringsTest < ActiveSupport::TestCase
     covers 'gatherings/video-access-modes@f478bb', 'gatherings/video-application-questions@b04aab', 'gatherings/access-modes@d37537', 'gatherings/application-questions@2b6bb5'
     create_gathering(privacy: 'closed', application_questions: "Why do you want to come?\nWhat will you bring?")
     applicant = FactoryBot.create(:account)
-    sign_in_with_rack(applicant)
+    sign_in(applicant)
 
-    get "/g/#{@gathering.slug}"
-    assert_equal "http://example.org/g/#{@gathering.slug}/apply", last_response.location
-    get "/g/#{@gathering.slug}/apply"
-    assert last_response.ok?
-    assert_includes last_response.body, 'Why do you want to come?'
-    assert_includes last_response.body, 'What will you bring?'
+    visit "/g/#{@gathering.slug}"
+    assert page.has_current_path?("/g/#{@gathering.slug}/apply", ignore_query: true)
+    assert page.has_content? 'Why do you want to come?'
+    assert page.has_content? 'What will you bring?'
+    find('textarea[name="answers[0]"]').fill_in(with: 'To learn')
+    find('textarea[name="answers[1]"]').fill_in(with: 'Soup')
+    click_button 'Apply'
+    assert page.has_current_path?("/g/#{@gathering.slug}/apply?applied=true")
 
-    post "/g/#{@gathering.slug}/join"
-    refute @gathering.memberships.find_by(account: applicant)
-
-    post "/g/#{@gathering.slug}/apply", questions: { '0' => 'Why do you want to come?', '1' => 'What will you bring?' }, answers: { '0' => 'To learn', '1' => 'Soup' }
     mapplication = @gathering.mapplications.find_by(account: applicant)
     assert_equal 'pending', mapplication.status
     assert_equal [['Why do you want to come?', 'To learn'], ['What will you bring?', 'Soup']], mapplication.answers
     refute @gathering.memberships.find_by(account: applicant)
   end
 
-  test 'nobody can join or apply to an invitation-only gathering' do
+  test 'people cannot join a gathering that takes applications through the join route' do
+    covers 'gatherings/access-modes@d37537'
+    create_gathering(privacy: 'closed')
+    applicant = FactoryBot.create(:account)
+    sign_in_with_rack(applicant)
+
+    post "/g/#{@gathering.slug}/join"
+    refute @gathering.memberships.find_by(account: applicant)
+  end
+
+  test 'nobody can join or apply to an invitation-only gathering through its routes' do
     covers 'gatherings/video-access-modes@f478bb', 'gatherings/access-modes@d37537'
     create_gathering(privacy: 'secret')
     outsider = FactoryBot.create(:account)
     sign_in_with_rack(outsider)
 
-    get "/g/#{@gathering.slug}"
-    assert_equal 'http://example.org/', last_response.location
-    get "/g/#{@gathering.slug}/apply"
-    assert_equal 'http://example.org/', last_response.location
-
+    # Being sent away from its pages is in gathering_rules_test.rb
     post "/g/#{@gathering.slug}/join"
     post "/g/#{@gathering.slug}/apply"
     assert_equal 403, last_response.status
@@ -419,13 +459,26 @@ class GatheringsTest < ActiveSupport::TestCase
     refute @gathering.mapplications.find_by(account: outsider)
   end
 
-  test 'all members can see and vote on applications, but non-members cannot' do
+  test 'all members can see and propose applicants' do
     covers 'gatherings/video-propose@686842', 'gatherings/members-see-and-vote@d114df'
     create_gathering(privacy: 'closed', fixed_threshold: 2)
-    member = FactoryBot.create(:account)
-    @gathering.memberships.create!(account: member)
+    member = create_member
     applicant = FactoryBot.create(:account, name: 'Applicant Person')
     mapplication = @gathering.mapplications.create!(account: applicant, status: 'pending')
+
+    sign_in(member)
+    visit "/g/#{@gathering.slug}/applications"
+    assert page.has_content? 'Applicant Person'
+    click_link 'Propose'
+    click_button 'Submit'
+    assert page.has_link? 'Unpropose'
+    assert mapplication.verdicts.proposers.find_by(account: member)
+  end
+
+  test 'non-members cannot see or vote on applications' do
+    covers 'gatherings/members-see-and-vote@d114df'
+    create_gathering(privacy: 'closed', fixed_threshold: 2)
+    mapplication = @gathering.mapplications.create!(account: FactoryBot.create(:account), status: 'pending')
     outsider = FactoryBot.create(:account)
 
     sign_in_with_rack(outsider)
@@ -433,32 +486,26 @@ class GatheringsTest < ActiveSupport::TestCase
     assert last_response.redirect?
     post "/g/#{@gathering.slug}/mapplications/#{mapplication.id}/verdicts/create", verdict: { type: 'proposer' }
     refute mapplication.verdicts.find_by(account: outsider)
-
-    sign_in_with_rack(member)
-    get "/g/#{@gathering.slug}/applications"
-    assert last_response.ok?
-    assert_includes last_response.body, 'Applicant Person'
-    post "/g/#{@gathering.slug}/mapplications/#{mapplication.id}/verdicts/create", verdict: { type: 'proposer' }
-    assert mapplication.verdicts.proposers.find_by(account: member)
   end
 
   test 'applications can have proposers only, or proposers and supporters' do
     covers 'gatherings/video-propose@686842', 'gatherings/vote-types@ccfd7a'
     create_gathering(privacy: 'closed', fixed_threshold: 2)
-    mapplication = @gathering.mapplications.create!(account: FactoryBot.create(:account), status: 'pending')
-    sign_in_with_rack(@account)
+    mapplication = @gathering.mapplications.create!(account: FactoryBot.create(:account, name: 'Applicant Person'), status: 'pending')
+    sign_in(@account)
 
-    get "/g/#{@gathering.slug}/applications"
-    assert_includes last_response.body, '>Propose</a>'
-    refute_includes last_response.body, '>Support</a>'
+    visit "/g/#{@gathering.slug}/applications"
+    assert page.has_content? 'Applicant Person'
+    assert page.has_link? 'Propose'
+    assert page.has_no_link? 'Support'
     mapplication.verdicts.create!(account: @account, type: 'proposer')
     mapplication.verdicts.create!(account: create_member, type: 'supporter')
     refute mapplication.meets_threshold
 
     @gathering.update!(enable_supporters: true)
-    sign_in_with_rack(create_member)
-    get "/g/#{@gathering.slug}/applications"
-    assert_includes last_response.body, '>Support</a>'
+    sign_in(create_member)
+    visit "/g/#{@gathering.slug}/applications"
+    assert page.has_link? 'Support'
     assert mapplication.reload.meets_threshold
   end
 
@@ -478,17 +525,6 @@ class GatheringsTest < ActiveSupport::TestCase
     assert @gathering.memberships.find_by(account: mapplication.account)
   end
 
-  test 'with a magic number of 0, an application is accepted as soon as it is made' do
-    covers 'gatherings/magic-number@66775d'
-    create_gathering(privacy: 'closed', fixed_threshold: 0)
-    applicant = FactoryBot.create(:account)
-    sign_in_with_rack(applicant)
-
-    post "/g/#{@gathering.slug}/apply"
-    assert_equal 'accepted', @gathering.mapplications.find_by(account: applicant).status
-    assert @gathering.memberships.find_by(account: applicant)
-  end
-
   test 'the magic number can be the median of the numbers members suggest' do
     covers 'gatherings/median-magic-number@bbe05c'
     create_gathering(privacy: 'closed', fixed_threshold: 5, democratic_threshold: true)
@@ -496,9 +532,12 @@ class GatheringsTest < ActiveSupport::TestCase
     members = Array.new(2) { FactoryBot.create(:account) }
     members.each { |member| @gathering.memberships.create!(account: member) }
 
-    [[@account, 1], [members[0], 2], [members[1], 4]].each do |account, number|
-      sign_in_with_rack(account)
-      post "/g/#{@gathering.slug}/threshold", desired_threshold: number
+    # Each suggestion moves the median: 4, then of 4 and 1, 3, then of 4, 1 and 2, 2
+    [[members[1], 4, 4], [@account, 1, 3], [members[0], 2, 2]].each do |account, number, median|
+      sign_in(account)
+      visit "/g/#{@gathering.slug}/applications"
+      find_field('desired_threshold').fill_in(with: number).send_keys(:tab)
+      assert page.has_content? "Automatically accepting applications with #{median}"
     end
     assert_equal 2, @gathering.reload.threshold
 
@@ -514,40 +553,31 @@ class GatheringsTest < ActiveSupport::TestCase
     create_gathering
     member = FactoryBot.create(:account)
     @gathering.memberships.create!(account: member)
-    tier = @gathering.options.create!(name: 'Standard', type: 'Tier', capacity: 1, cost: 100, account: @account)
+    @gathering.options.create!(name: 'Standard', type: 'Tier', capacity: 1, cost: 100, account: @account)
 
-    sign_in_with_rack(member)
-    post "/g/#{@gathering.slug}/optionships/create", option_id: tier.id
+    sign_in(member)
+    visit "/g/#{@gathering.slug}/options"
+    click_link 'Join'
+    assert page.has_content? 'You owe £100'
     assert_equal 100, @gathering.memberships.find_by(account: member).requested_contribution
     assert @gathering.memberships.find_by(account: member).owes_contribution?
+
+    sign_in(@account)
+    visit "/g/#{@gathering.slug}/options"
+    within(find('tr', text: 'Standard')) do
+      assert page.has_content? 'Full'
+      assert page.has_no_link? 'Join'
+    end
+  end
+
+  test 'a full tier takes no one else through its route' do
+    create_gathering
+    tier = @gathering.options.create!(name: 'Standard', type: 'Tier', capacity: 1, cost: 100, account: @account)
+    tier.optionships.create!(account: create_member, gathering: @gathering)
 
     sign_in_with_rack(@account)
     post "/g/#{@gathering.slug}/optionships/create", option_id: tier.id
     refute tier.optionships.find_by(account: @account)
-  end
-
-  test 'members sign up to shifts and admins schedule activities onto the timetable' do
-    covers 'gatherings/video-schedule-activity@396032', 'gatherings/video-shift-signup@8c93ae'
-    create_gathering
-    member = FactoryBot.create(:account)
-    @gathering.memberships.create!(account: member)
-    rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
-    role = Role.create!(name: 'Cook', rota: rota)
-    rslot = Rslot.create!(name: 'Morning', rota: rota)
-    timetable = @gathering.timetables.create!(name: 'Workshops', account: @account)
-    tslot = timetable.tslots.create!(name: '10am')
-    space = timetable.spaces.create!(name: 'Dome')
-    tactivity = timetable.tactivities.create!(name: 'Yoga', account: member)
-
-    sign_in_with_rack(member)
-    post "/g/#{@gathering.slug}/shifts/create", rota_id: rota.id, role_id: role.id, rslot_id: rslot.id
-    assert Shift.find_by(account: member, role: role, rslot: rslot)
-
-    sign_in_with_rack(@account)
-    post "/g/#{@gathering.slug}/tactivities/#{tactivity.id}/schedule", tslot_id: tslot.id, space_id: space.id
-    tactivity.reload
-    assert_equal tslot.id, tactivity.tslot_id
-    assert_equal space.id, tactivity.space_id
   end
 
   test 'the members table and the timetable render their rows with the page' do
@@ -614,8 +644,13 @@ class GatheringsTest < ActiveSupport::TestCase
     option.optionships.create!(account: member, gathering: @gathering)
     Payment.create!(membership: membership, amount: 50, currency: 'GBP')
 
-    sign_in_with_rack(@account)
-    post "/g/#{@gathering.slug}/copy", gathering_id: @other_gathering.id
+    sign_in(@account)
+    visit "/g/#{@gathering.slug}"
+    click_link 'Copy'
+    find('select[name=gathering_id]').select @other_gathering.name
+    click_button 'Copy'
+    # Taken to the gathering copied into
+    assert page.has_current_path?("/g/#{@other_gathering.slug}", ignore_query: true)
     @other_gathering.reload
 
     new_timetable = @other_gathering.timetables.find_by(name: 'Workshops')

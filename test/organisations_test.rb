@@ -81,28 +81,61 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal 'refresh', @organisation.patreon_refresh_token
   end
 
-  test 'admins can record, update or clear a monthly donor by hand, but not one synced from Patreon' do
+  test 'admins can record, update or clear a monthly donor by hand on the followers page, but not one synced from Patreon' do
     covers 'organisations/monthly-donation-by-hand@ec117b'
     create_organisation(currency: 'GBP')
     donor = @organisation.organisationships.create!(account: FactoryBot.create(:account), sent_monthly_donation_welcome: true)
     @organisation.set(monthly_donors_count: 1)
     assert @organisation.monthly_donations_enabled?
-    sign_in_with_rack(@account)
+    donor_box = "[data-pagelet-url='/organisationships/#{donor.id}/monthly_donation']"
 
-    get "/organisationships/#{donor.id}/monthly_donation"
-    assert_includes last_response.body, "/organisationships/#{donor.id}/monthly_donation"
-
-    post "/organisationships/#{donor.id}/monthly_donation", amount: '10', currency: 'USD'
+    sign_in(@account)
+    visit "/o/#{@organisation.slug}/followers"
+    # The amount and currency each save as they change, and the box comes back with what was saved
+    find("#{donor_box} input[name='amount']").set('10')
+    assert page.has_css? "#{donor_box} input[name='amount'][value^='10']"
+    find("#{donor_box} select[name='currency']").find("option[value='USD']").select_option
+    assert page.has_css? "#{donor_box} select[name='currency'] option[value='USD'][selected]"
     assert_equal ['Other', 10.0, 'USD'], [donor.reload.monthly_donation_method, donor.monthly_donation_amount, donor.monthly_donation_currency]
 
-    post "/organisationships/#{donor.id}/monthly_donation", amount: '10'
+    find("#{donor_box} select[name='currency']").find("option[value='GBP']").select_option
+    assert page.has_css? "#{donor_box} select[name='currency'] option[value='GBP'][selected]"
     assert_equal 'GBP', donor.reload.monthly_donation_currency
     @organisation.set_counts
     assert_equal '£10', @organisation.reload.monthly_donations_count
 
-    post "/organisationships/#{donor.id}/monthly_donation", amount: ''
+    find("#{donor_box} input[name='amount']").set('')
+    assert page.has_css? "#{donor_box} input[name='amount']:not([value^='10'])"
     assert_equal [nil, nil], [donor.reload.monthly_donation_method, donor.monthly_donation_amount]
     refute donor.monthly_donor?
+
+    patron = @organisation.organisationships.create!(account: FactoryBot.create(:account), monthly_donation_method: 'Patreon',
+                                                     monthly_donation_amount: 8, monthly_donation_currency: 'USD', sent_monthly_donation_welcome: true)
+    visit "/o/#{@organisation.slug}/followers"
+    within("[data-pagelet-url='/organisationships/#{patron.id}/monthly_donation']") do
+      assert page.has_content? 'via Patreon'
+      assert page.has_no_field? 'amount'
+    end
+  end
+
+  test "a monthly donation recorded by hand without a currency the form offers takes the organisation's" do
+    create_organisation(currency: 'GBP')
+    donor = @organisation.organisationships.create!(account: FactoryBot.create(:account), sent_monthly_donation_welcome: true)
+    @organisation.set(monthly_donors_count: 1)
+    sign_in_with_rack(@account)
+
+    [{}, { currency: 'XYZ' }].each do |currency|
+      post "/organisationships/#{donor.id}/monthly_donation", amount: '10', **currency
+      assert_equal 200, last_response.status
+      assert_equal ['Other', 10.0, 'GBP'], [donor.reload.monthly_donation_method, donor.monthly_donation_amount, donor.monthly_donation_currency]
+    end
+  end
+
+  test 'a monthly donation synced from Patreon cannot be changed by hand' do
+    covers 'organisations/monthly-donation-by-hand@ec117b'
+    create_organisation(currency: 'GBP')
+    @organisation.set(monthly_donors_count: 1)
+    sign_in_with_rack(@account)
 
     patron = @organisation.organisationships.create!(account: FactoryBot.create(:account), monthly_donation_method: 'Patreon',
                                                      monthly_donation_amount: 8, monthly_donation_currency: 'USD', sent_monthly_donation_welcome: true)
@@ -469,21 +502,30 @@ class OrganisationsTest < ActiveSupport::TestCase
 
   test 'secret keys are masked in the edit form and kept when left blank' do
     create_organisation(mollie_api_key: 'test_molliekey1234')
-    sign_in_with_rack(@account)
+    sign_in(@account)
+    edit_mollie_api_key = lambda do
+      visit "/o/#{@organisation.slug}/edit"
+      click_link 'Payments'
+      find('#payment-mollie')
+    end
 
-    get "/o/#{@organisation.slug}/edit"
-    refute_includes last_response.body, 'test_molliekey1234'
-    assert_includes last_response.body, '••••1234'
-    assert_includes last_response.body, 'data-saved="true"'
-    assert_includes last_response.body, 'name="organisation[clear_secrets][]"'
-
-    post "/o/#{@organisation.slug}/edit", organisation: { mollie_api_key: '' }
+    mollie = edit_mollie_api_key.call
+    key = mollie.find_field('organisation_mollie_api_key')
+    assert_equal '', key.value
+    assert_equal '••••1234', key[:placeholder]
+    refute_includes page.html, 'test_molliekey1234'
+    click_button 'Update organisation'
+    assert page.has_content? 'The organisation was saved'
     assert_equal 'test_molliekey1234', @organisation.reload.mollie_api_key
 
-    post "/o/#{@organisation.slug}/edit", organisation: { mollie_api_key: 'test_newkey' }
+    edit_mollie_api_key.call.fill_in 'organisation_mollie_api_key', with: 'test_newkey'
+    click_button 'Update organisation'
+    assert page.has_content? 'The organisation was saved'
     assert_equal 'test_newkey', @organisation.reload.mollie_api_key
 
-    post "/o/#{@organisation.slug}/edit", organisation: { mollie_api_key: '', clear_secrets: ['mollie_api_key'] }
+    edit_mollie_api_key.call.find('label', text: 'Remove').click
+    click_button 'Update organisation'
+    assert page.has_content? 'The organisation was saved'
     assert_nil @organisation.reload.mollie_api_key
   end
 
@@ -613,22 +655,33 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal "The CSV couldn't be read (there's a problem on line 2)", ImportFromCsv.error("Name,Email\nBob,\"bob\"@example.com\n")
   end
 
-  test 'a new organisation takes the currency of where you are, or your own default currency' do
+  # Creates an organisation in the browser, landing on its Payments tab
+  def create_organisation_in_browser(name, slug)
+    visit '/o/new'
+    fill_in 'Organisation name', with: name
+    fill_in 'URL', with: slug
+    click_button 'Save and continue'
+    assert page.has_content? 'To accept payments, add details for Stripe or another payment processor.'
+  end
+
+  test 'a new organisation takes the currency of where you are, or your own default currency, and it can be changed in the Payments tab' do
     covers 'organisations/currency-defaults-to-local@019877'
     account = FactoryBot.create(:account)
-    sign_in_with_rack(account)
+    sign_in(account)
+    # Cloudflare's guess at the visitor's country
+    page.driver.headers = { 'CF-IPCountry' => 'SE' }
 
-    header 'CF-IPCountry', 'SE'
-    post '/o/new', organisation: { name: 'Stockholm Circle', slug: 'stockholm-circle' }
+    create_organisation_in_browser('Stockholm Circle', 'stockholm-circle')
     assert_equal 'SEK', Organisation.find_by(slug: 'stockholm-circle').currency
 
     account.set(default_currency: 'CAD')
-    post '/o/new', organisation: { name: 'Toronto Circle', slug: 'toronto-circle' }
+    create_organisation_in_browser('Toronto Circle', 'toronto-circle')
     assert_equal 'CAD', Organisation.find_by(slug: 'toronto-circle').currency
 
-    # And can be changed
-    post '/o/new', organisation: { name: 'Oslo Circle', slug: 'oslo-circle', currency: 'NOK' }
-    assert_equal 'NOK', Organisation.find_by(slug: 'oslo-circle').currency
+    find('#organisation_currency').find("option[value='NOK']").select_option
+    click_button 'Update organisation'
+    assert page.has_content? 'The organisation was saved'
+    assert_equal 'NOK', Organisation.find_by(slug: 'toronto-circle').currency
   end
 
   # GoCardless's API client, answering with these active subscriptions, each [subscription, customer]
@@ -746,15 +799,16 @@ class OrganisationsTest < ActiveSupport::TestCase
     enable_affiliate_credits
     referrer = FactoryBot.create(:account)
     @organisation.organisationships.create!(account: referrer)
-    book_via_affiliate_link(FactoryBot.create(:account), referrer, quantity: 10)
+    # Ten £10 tickets booked through their link: £10 of credit
+    @event.orders.create!(account: FactoryBot.create(:account), currency: 'GBP', value: 100, affiliate_type: 'Account', affiliate_id: referrer.id,
+                          payment_completed: true)
     create_event(as: :future_event, prices: [10], suggested_donation: 0)
 
-    sign_in_with_rack(referrer)
-    header 'Accept', 'application/json'
-    post "/e/#{@future_event.slug}/purchase",
-         ticketForm: { quantities: { @future_event.ticket_types.first.id.to_s => '1' } },
-         detailsForm: { payment_method: 'rsvp', account: { name: referrer.name, email: referrer.email } }
-    assert_equal 200, last_response.status, last_response.body
+    sign_in(referrer)
+    visit "/e/#{@future_event.slug}"
+    select 1, from: "quantities[#{@future_event.ticket_types.first.id}]"
+    click_button 'Use credit'
+    assert page.has_content? 'Thanks for booking'
     order = @future_event.orders.find_by(account: referrer)
     assert_equal 10, order.credit_applied
     assert order.payment_completed

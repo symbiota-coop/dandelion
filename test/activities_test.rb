@@ -2,7 +2,6 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class ActivitiesTest < ActiveSupport::TestCase
   include Capybara::DSL
-  include Rack::Test::Methods
 
   APPLICATION_QUESTIONS = "q1\nq2\nq3".freeze
 
@@ -130,11 +129,14 @@ class ActivitiesTest < ActiveSupport::TestCase
     assert_equal '2024-08-01', answers[q[6]]
   end
 
-  def apply_with_rack(applicant)
-    answers = APPLICATION_QUESTIONS.split("\n").each_index.to_h { |i| [i.to_s, "a#{i + 1}"] }
-    post "#{@activity.path}/apply", account: { name: applicant.name, email: applicant.email }, answers: answers
-    assert_equal 302, last_response.status
-    assert_includes last_response.location, 'applied=true'
+  # Applies to the activity as someone not signed in
+  def apply(applicant)
+    visit "#{@activity.path}/apply"
+    fill_in 'Full name', with: applicant.name
+    fill_in 'Email', with: applicant.email
+    fill_application_answers
+    click_button 'Apply'
+    assert page.has_content? 'Thanks for applying'
   end
 
   test 'organisers are emailed when people apply to an activity' do
@@ -143,7 +145,7 @@ class ActivitiesTest < ActiveSupport::TestCase
     Delayed::Job.delete_all
     applicant = FactoryBot.build_stubbed(:account)
 
-    apply_with_rack(applicant)
+    apply(applicant)
     assert_equal 1, @activity.activity_applications.count
 
     emails = []
@@ -158,14 +160,16 @@ class ActivitiesTest < ActiveSupport::TestCase
   test 'accepting an application makes the applicant a follower of the activity' do
     covers 'organisations/application-only-activities@7b2afe'
     create_activity_with_questions
-    apply_with_rack(FactoryBot.build_stubbed(:account))
+    apply(FactoryBot.build_stubbed(:account))
     application = @activity.activity_applications.first
     applicant = application.account
     assert_nil @activity.activityships.find_by(account: applicant)
 
-    sign_in_with_rack(@account)
-    post "#{@activity.path}/activity_applications/#{application.id}/set_status", status: 'Accepted'
-    assert_equal 200, last_response.status
+    sign_in(@account)
+    visit "#{@activity.path}/activity_applications/#{application.id}"
+    # The status saves as it's chosen, and comes back saying who set it
+    select 'Accepted', from: 'status'
+    assert page.has_content? "by #{@account.name}"
 
     assert_equal 'Accepted', application.reload.status
     assert @activity.activityships.find_by(account: applicant), 'The applicant should follow the activity'

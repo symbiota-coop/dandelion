@@ -17,6 +17,54 @@ class EventBookingsTest < ActiveSupport::TestCase
          }
   end
 
+  # Stripe.js would take the buyer to stripe.com with the session: record which, on the page, instead. Yields the
+  # params the checkout session is created with
+  def pay_by_card(button)
+    execute_script 'window.Stripe = function () { return { redirectToCheckout: function (options) { document.body.dataset.checkoutSession = options.sessionId } } }'
+    session = proc do |params, _opts|
+      yield params if block_given?
+      api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test')
+    end
+    Stripe::Checkout::Session.stub(:create, session) do
+      click_button button
+      assert page.has_css? "body[data-checkout-session='cs_test']"
+    end
+  end
+
+  # Were the page to ask the buyer to confirm, they'd go back to the form rather than book
+  def refuse_confirmations
+    execute_script 'window.confirm = function () { return false }'
+  end
+
+  # A ticket the account already holds, booked earlier
+  def book_ticket_for(account)
+    order = @event.orders.create!(account: account, currency: @event.currency, value: 0, payment_completed: true)
+    order.tickets.create!(event: @event, account: account, ticket_type: @event.ticket_types.first, price: 0, payment_completed: true)
+  end
+
+  test 'a hidden ticket type is offered, and booked, through its secret link' do
+    create_event(prices: [0])
+    hidden = @event.ticket_types.create!(name: 'Secret', price: 0, quantity: 10, hidden: true)
+
+    sign_in(FactoryBot.create(:account))
+    visit "/e/#{@event.slug}?ticket_type_id=#{hidden.token}"
+    assert page.has_content? 'Secret'
+    select 1, from: "quantities[#{hidden.id}]"
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
+    assert_equal 1, hidden.tickets.count
+
+    # A legacy ticket type, with no token, by its id
+    hidden.unset(:token)
+    sign_in(FactoryBot.create(:account))
+    visit "/e/#{@event.slug}?ticket_type_id=#{hidden.id}"
+    assert page.has_content? 'Secret'
+    select 1, from: "quantities[#{hidden.id}]"
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
+    assert_equal 2, hidden.tickets.count
+  end
+
   test 'hidden ticket types can only be bought with their secret link' do
     create_event(prices: [0])
     hidden = @event.ticket_types.create!(name: 'Secret', price: 0, quantity: 10, hidden: true)
@@ -34,19 +82,6 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 404, last_response.status
     assert_equal 0, hidden.tickets.count
     assert_equal 0, @event.orders.count
-
-    purchase.call(hidden.token)
-    assert_equal 200, last_response.status
-    assert_equal 1, hidden.tickets.count
-
-    hidden.unset(:token)
-    header 'Accept', 'application/json'
-    post "/e/#{@event.slug}/purchase",
-         confirmed_duplicate: '1',
-         ticketForm: { quantities: { hidden.id.to_s => '1' }, ticket_type_id: hidden.id.to_s },
-         detailsForm: { payment_method: 'rsvp', account: { name: buyer.name, email: buyer.email } }
-    assert_equal 200, last_response.status
-    assert_equal 2, hidden.tickets.count
   end
 
   test 'a purchase without any ticket chosen is refused' do
@@ -490,29 +525,16 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert Account.find_by(email: 'someone@gmial.com')
   end
 
-  test 'purchase asks to confirm an email that looks mistyped, unless it is the signed-in account' do
+  test "signed in, an email that looks mistyped is booked without asking, as it is the account's own" do
     create_event(prices: [0])
-    buyer = Account.new(name: 'Typo User', email: 'someone@gmial.com')
-
-    post_purchase(@event, buyer)
-    assert_equal 409, last_response.status
-    body = JSON.parse(last_response.body)
-    assert body['mistyped_email']
-    assert_equal 'You entered your email address as someone@gmial.com, which looks mistyped.', body['error']
-    assert_nil Account.find_by(email: 'someone@gmial.com')
-
-    header 'Accept', 'application/json'
-    post "/e/#{@event.slug}/purchase",
-         confirmed_email: '1',
-         ticketForm: { quantities: { @event.ticket_types.first.id.to_s => '1' } },
-         detailsForm: { payment_method: 'rsvp', account: { name: buyer.name, email: buyer.email } }
-    assert_equal 200, last_response.status
-
-    # Signed in, the email is the account's own
     signed_in = FactoryBot.create(:account, email: 'other@hotmail.con')
-    sign_in_with_rack(signed_in)
-    post_purchase(@event, signed_in)
-    assert_equal 200, last_response.status
+
+    sign_in(signed_in)
+    visit "/e/#{@event.slug}"
+    refuse_confirmations
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
+    assert @event.orders.find_by(account: signed_in)
   end
 
   test "the checkout form shows why a booking was refused, and books once it's fixed" do
@@ -545,14 +567,14 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 0, @event.orders.count
   end
 
-  test 'purchase is allowed when the event is locked and the buyer is an event admin' do
+  test 'an event admin books a locked event' do
     covers 'events/locked-events-admins-can-buy@145a18'
     create_full_event_hierarchy(event_options: { prices: [0], locked: true })
 
-    sign_in_with_rack(@account)
-    post_purchase(@event, @account)
-
-    assert_equal 200, last_response.status
+    sign_in(@account)
+    visit "/e/#{@event.slug}"
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
     assert @event.orders.find_by(account: @account)
   end
 
@@ -570,17 +592,27 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 0, @event.orders.count
   end
 
-  test 'purchase is allowed when monthly_donors_only and the buyer is a signed-in donor' do
+  test 'a signed-in monthly donor books an event only for monthly donors' do
     covers 'organisations/monthly-donors-only-events@571550'
     create_full_event_hierarchy(event_options: { prices: [0], monthly_donors_only: true })
     buyer = FactoryBot.create(:account)
     FactoryBot.create(:organisationship, organisation: @organisation, account: buyer, monthly_donation_method: 'Other', monthly_donation_amount: 1)
 
-    sign_in_with_rack(buyer)
-    post_purchase(@event, buyer)
-
-    assert_equal 200, last_response.status
+    sign_in(buyer)
+    visit "/e/#{@event.slug}"
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
     assert @event.orders.find_by(account: buyer)
+  end
+
+  test 'an event only for monthly donors offers no booking to someone signed in who is not one' do
+    covers 'organisations/monthly-donors-only-events@571550'
+    create_full_event_hierarchy(event_options: { prices: [0], monthly_donors_only: true })
+
+    sign_in(FactoryBot.create(:account))
+    visit "/e/#{@event.slug}"
+    assert page.has_content? 'You must be a monthly donor to'
+    assert page.has_no_button? 'RSVP'
   end
 
   test 'purchase is forbidden when the activity is closed and the buyer is not a member' do
@@ -598,27 +630,40 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 0, @event.orders.count
   end
 
-  test 'purchase is allowed when the activity is closed and the buyer is a signed-in member' do
+  test "a signed-in member of a closed activity books the activity's event" do
     covers 'events/application-gates-purchase@891514', 'organisations/application-only-activities@7b2afe'
     create_full_event_hierarchy(event_options: { prices: [0] })
     @activity.set(privacy: 'closed')
     buyer = FactoryBot.create(:account)
     @activity.activityships.create!(account: buyer)
 
-    sign_in_with_rack(buyer)
-    post_purchase(@event, buyer)
-
-    assert_equal 200, last_response.status
+    sign_in(buyer)
+    visit "/e/#{@event.slug}"
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
     assert @event.orders.find_by(account: buyer)
   end
 
-  test 'purchase remains allowed for an open unlocked event' do
+  test "a closed activity's event offers no booking to someone signed in who is not a member" do
+    covers 'events/application-gates-purchase@891514', 'organisations/application-only-activities@7b2afe'
+    create_full_event_hierarchy(event_options: { prices: [0] })
+    @activity.set(privacy: 'closed')
+
+    sign_in(FactoryBot.create(:account))
+    visit "/e/#{@event.slug}"
+    assert page.has_content? 'You must be a member of the'
+    assert page.has_no_button? 'RSVP'
+  end
+
+  test 'anyone books an open unlocked event' do
     create_full_event_hierarchy(event_options: { prices: [0] })
     buyer = FactoryBot.create(:account)
 
-    post_purchase(@event, buyer)
-
-    assert_equal 200, last_response.status
+    visit "/e/#{@event.slug}"
+    fill_in 'account_name', with: buyer.name
+    fill_in 'account_email', with: buyer.email
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
     assert @event.orders.find_by(account: buyer)
   end
 
@@ -706,27 +751,12 @@ class EventBookingsTest < ActiveSupport::TestCase
   test 'the Stripe payment page closes when the order stops holding its tickets' do
     create_event(prices: [10], suggested_donation: 0)
 
+    sign_in(FactoryBot.create(:account))
+    visit "/e/#{@event.slug}"
+    select 1, from: "quantities[#{@event.ticket_types.first.id}]"
     session_params = nil
-    Stripe::Checkout::Session.stub(:create, proc { |params, _opts|
-      session_params = params
-      api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test')
-    }) do
-      post_checkout
-    end
-    assert_equal 200, last_response.status
+    pay_by_card('Pay £10.00') { |params| session_params = params }
     assert_equal (@event.orders.first.created_at + Order::UNPAID_HOLD).to_i, session_params[:expires_at]
-  end
-
-  test 'purchase needs the terms accepted when the event asks' do
-    create_event(prices: [0], terms_and_conditions: 'Be kind', terms_and_conditions_check_box: true)
-
-    post_checkout(details_form: { payment_method: 'rsvp' })
-    assert_equal 400, last_response.status
-    assert_equal 'You must agree to the terms and conditions.', JSON.parse(last_response.body)['error']
-    assert_equal 0, @event.orders.count
-
-    post_checkout(details_form: { payment_method: 'rsvp', accepted_terms: '1' })
-    assert_equal 200, last_response.status
   end
 
   test "purchase checks answers and stores them with the event's own questions" do
@@ -809,21 +839,17 @@ class EventBookingsTest < ActiveSupport::TestCase
     create_event(prices: [0])
     buyer = FactoryBot.create(:account)
 
-    get "/e/#{@event.slug}", via: 'may-newsletter'
-    assert_match(/<input[^>]*name="[^"]*via[^"]*"[^>]*value="may-newsletter"|<input[^>]*value="may-newsletter"[^>]*name="[^"]*via/, last_response.body)
-
-    header 'Accept', 'application/json'
-    post "/e/#{@event.slug}/purchase",
-         ticketForm: { quantities: { @event.ticket_types.first.id.to_s => '1' } },
-         detailsForm: { payment_method: 'rsvp', account: { name: buyer.name, email: buyer.email, via: 'may-newsletter' } }
-    assert_equal 200, last_response.status
+    visit "/e/#{@event.slug}?via=may-newsletter"
+    fill_in 'account_name', with: buyer.name
+    fill_in 'account_email', with: buyer.email
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
     assert_equal 'may-newsletter', @event.orders.find_by(account: buyer).via
 
-    header 'Accept', 'text/html'
-    sign_in_with_rack(@account)
-    get "/e/#{@event.slug}/orders"
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, 'may-newsletter'
+    sign_in(@account)
+    visit "/e/#{@event.slug}/orders"
+    assert page.has_content? buyer.name
+    assert page.has_content? 'may-newsletter'
   end
 
   test 'with Stripe Connect, checkout donations go to Dandelion while the organisation is behind on its contribution' do
@@ -834,17 +860,13 @@ class EventBookingsTest < ActiveSupport::TestCase
     @organisation.set(stripe_pk: nil, stripe_sk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
     assert_equal 'dandelion', @event.reload.checkout_donation[:to]
 
-    get "/e/#{@event.slug}"
-    assert_includes last_response.body, 'Add a donation to Dandelion'
-
+    sign_in(FactoryBot.create(:account))
+    visit "/e/#{@event.slug}"
+    assert page.has_content? 'Add a donation to Dandelion'
+    select 1, from: "quantities[#{@event.ticket_types.first.id}]"
+    fill_in 'donation_amount', with: 3
     session_params = nil
-    Stripe::Checkout::Session.stub(:create, proc { |params, _opts|
-      session_params = params
-      api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test')
-    }) do
-      post_checkout(ticket_form: { donation_amount: '3' })
-    end
-    assert_equal 200, last_response.status
+    pay_by_card('Pay £13.00') { |params| session_params = params }
     order = @event.orders.last
     assert order.application_fee_paid_to_dandelion
     assert_equal 13, order.total
@@ -917,14 +939,18 @@ class EventBookingsTest < ActiveSupport::TestCase
     refute_includes last_response.body, 'id="donation_amount"'
   end
 
-  test 'purchase is allowed up to max_quantity_per_transaction' do
-    create_event(prices: [0])
-    @event.ticket_types.first.set(quantity: 10, max_quantity_per_transaction: 2)
+  test 'checkout offers, and books, up to max_quantity_per_transaction' do
+    create_event(prices: [0], always_show_full_ticket_form: true)
+    ticket_type = @event.ticket_types.first
+    ticket_type.set(quantity: 10, max_quantity_per_transaction: 2)
     buyer = FactoryBot.create(:account)
 
-    post_purchase(@event, buyer, quantity: 2)
-
-    assert_equal 200, last_response.status
+    sign_in(buyer)
+    visit "/e/#{@event.slug}"
+    assert page.has_select? "quantities[#{ticket_type.id}]", options: %w[0 1 2]
+    select 2, from: "quantities[#{ticket_type.id}]"
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
     assert_equal 2, @event.orders.find_by(account: buyer).tickets.count
   end
 
@@ -973,50 +999,55 @@ class EventBookingsTest < ActiveSupport::TestCase
   # Duplicate ticket warning
   # ═══════════════════════════════════════════════════════════════════════════
 
-  test 'purchase warns when the account already holds a ticket' do
+  test 'checkout asks before booking again for an account that already holds a ticket, and books nothing if they go back' do
     create_event(prices: [0])
     buyer = FactoryBot.create(:account)
+    book_ticket_for(buyer)
 
-    post_purchase(@event, buyer)
-    assert_equal 200, last_response.status
-
-    post_purchase(@event, buyer)
-    assert_equal 409, last_response.status
-    assert JSON.parse(last_response.body)['duplicate']
+    sign_in(buyer)
+    visit "/e/#{@event.slug}"
+    message = dismiss_confirm { click_button 'RSVP' }
+    assert_includes message, "A ticket to #{@event.name} has already been booked for #{buyer.email}."
+    assert page.has_button? 'RSVP'
     assert_equal 1, @event.orders.count
   end
 
-  test 'purchase proceeds when confirmed_duplicate is set' do
+  test 'checkout books another ticket once the account confirms it wants one' do
     create_event(prices: [0])
     buyer = FactoryBot.create(:account)
+    book_ticket_for(buyer)
 
-    post_purchase(@event, buyer)
-    post_purchase(@event, buyer, confirmed_duplicate: true)
-
-    assert_equal 200, last_response.status
+    sign_in(buyer)
+    visit "/e/#{@event.slug}"
+    message = accept_confirm { click_button 'RSVP' }
+    assert_includes message, 'has already been booked'
+    assert page.has_content? 'Thanks for booking'
     assert_equal 2, @event.orders.count
   end
 
-  test 'purchase warns when a ticket was already ordered for that email' do
+  test 'checkout asks before booking when a ticket was already ordered for that email' do
     create_event(prices: [0])
     buyer = FactoryBot.create(:account)
+    book_ticket_for(FactoryBot.create(:account)).set(email: buyer.email)
 
-    post_purchase(@event, FactoryBot.create(:account))
-    @event.tickets.last.set(email: buyer.email)
-
-    post_purchase(@event, buyer)
-    assert_equal 409, last_response.status
+    sign_in(buyer)
+    visit "/e/#{@event.slug}"
+    message = dismiss_confirm { click_button 'RSVP' }
+    assert_includes message, "has already been booked for #{buyer.email}"
+    assert_equal 1, @event.orders.count
   end
 
-  test "purchase does not warn when the account's earlier ticket was reassigned to someone else" do
+  test "checkout doesn't ask when the account's earlier ticket was reassigned to someone else" do
     create_event(prices: [0])
     buyer = FactoryBot.create(:account)
+    book_ticket_for(buyer).set(email: 'friend@example.com')
 
-    post_purchase(@event, buyer)
-    @event.tickets.last.set(email: 'friend@example.com')
-
-    post_purchase(@event, buyer)
-    assert_equal 200, last_response.status
+    sign_in(buyer)
+    visit "/e/#{@event.slug}"
+    refuse_confirmations
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
+    assert_equal 2, @event.orders.count
   end
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -1026,20 +1057,6 @@ class EventBookingsTest < ActiveSupport::TestCase
   def grant_credit(account, amount:)
     organisationship = @organisation.organisationships.find_or_create_by(account: account)
     organisationship.creditings.create!(account: @account, amount: amount, currency: @event.currency)
-  end
-
-  test 'purchase applies credit when the signed-in buyer is the order account' do
-    covers 'organisations/credit-applied-at-checkout@ebe0b1'
-    create_event(prices: [10], suggested_donation: 0)
-    buyer = FactoryBot.create(:account)
-    grant_credit(buyer, amount: 10)
-
-    sign_in_with_rack(buyer)
-    post_purchase(@event, buyer)
-
-    assert_equal 200, last_response.status
-    order = @event.orders.find_by(account: buyer)
-    assert_equal 10, order.credit_applied
   end
 
   test 'credit pays for tickets, not a donation to Dandelion' do
@@ -1060,22 +1077,8 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 0, order.donations.count
   end
 
-  test 'a donation to Dandelion is added to what credit leaves to pay' do
-    create_event(prices: [10])
-    @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
-    @buyer = FactoryBot.create(:account)
-    grant_credit(@buyer, amount: 5)
-    sign_in_with_rack(@buyer)
-
-    with_stubbed_stripe_session { post_checkout(ticket_form: { donation_amount: '1' }) }
-    assert_equal 200, last_response.status
-    order = @event.orders.find_by(account: @buyer)
-    assert_equal 5, order.credit_applied
-    assert_equal 6, order.total
-    assert_equal 1, order.donations.first.amount
-  end
-
   test 'checkout books tickets credit pays for, without a donation to Dandelion' do
+    covers 'organisations/credit-applied-at-checkout@ebe0b1'
     create_event(prices: [10])
     @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
     assert @event.reload.donations_to_dandelion?
@@ -1106,6 +1109,12 @@ class EventBookingsTest < ActiveSupport::TestCase
 
     fill_in 'donation_amount', with: (donation_amount = 2)
     assert page.has_button? "Pay £#{format('%.2f', 10 - 5 + donation_amount)}"
+    pay_by_card("Pay £#{format('%.2f', 10 - 5 + donation_amount)}")
+
+    order = @event.orders.find_by(account: @account)
+    assert_equal 5, order.credit_applied
+    assert_equal 7, order.total
+    assert_equal donation_amount, order.donations.first.amount
   end
 
   test 'checkout takes credit off the tickets, not a donation to Dandelion, when the tickets are free' do

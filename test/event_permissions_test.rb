@@ -14,6 +14,38 @@ class EventPermissionsTest < ActiveSupport::TestCase
     add_member(org, event_manager: true)
   end
 
+  # Picks an option in a lookup field, a select2 that searches as you type
+  def choose_in_lookup(select_id, search, option = search)
+    find("##{select_id} + .select2 .select2-selection").click
+    # select2 puts its search and results at the end of the page
+    find('.select2-search__field').send_keys(search)
+    find('.select2-results__option', text: option).click
+  end
+
+  def cohosts_box
+    "[data-pagelet-url='/e/#{@event.slug}/cohostships']"
+  end
+
+  # On the event's page, adds organisation as a co-host, then waits for the box to reload with its add control showing
+  # again
+  def add_cohost(organisation)
+    within(cohosts_box) { find('#add-organisation').click }
+    choose_in_lookup('cohostship_organisation_id', organisation.name)
+    within(cohosts_box) { click_button 'Add co-host' }
+    assert page.has_css? "#{cohosts_box} #add-organisation"
+  end
+
+  # On the event's page, removes organisation as a co-host, then waits for the box to reload with its remove control
+  # showing again, which it does while another co-host is left
+  def remove_cohost(organisation)
+    within(cohosts_box) do
+      find('#remove-organisation').click
+      select "#{organisation.name} (#{organisation.slug})", from: 'organisation_id'
+      click_button 'Remove co-host'
+    end
+    assert page.has_css? "#{cohosts_box} #remove-organisation"
+  end
+
   test 'organisations_for_creating_events includes org when account has event_manager on organisationship' do
     org = FactoryBot.create(:organisation)
     other = add_event_manager(org)
@@ -102,10 +134,11 @@ class EventPermissionsTest < ActiveSupport::TestCase
     create_event
     cohost = FactoryBot.create(:organisation)
 
-    sign_in_with_rack(@account)
-    post "/e/#{@event.slug}/cohostships/new", cohostship: { organisation_id: cohost.id }
+    sign_in(@account)
+    visit "/e/#{@event.slug}"
+    add_cohost(cohost)
 
-    assert last_response.redirect?
+    assert page.has_css? "#{cohosts_box} a", text: cohost.name
     assert @event.cohostships.find_by(organisation: cohost)
   end
 
@@ -113,10 +146,11 @@ class EventPermissionsTest < ActiveSupport::TestCase
     covers 'events/host-cannot-be-cohost@eb8558'
     create_event
 
-    sign_in_with_rack(@account)
-    post "/e/#{@event.slug}/cohostships/new", cohostship: { organisation_id: @organisation.id }
+    sign_in(@account)
+    visit "/e/#{@event.slug}"
+    add_cohost(@organisation)
 
-    assert last_response.redirect?
+    assert page.has_no_css? "#{cohosts_box} a", text: @organisation.name
     assert_nil @event.cohostships.find_by(organisation: @organisation)
     assert_empty @event.reload.cohosts_ids_cache || []
   end
@@ -138,10 +172,11 @@ class EventPermissionsTest < ActiveSupport::TestCase
     restricted = FactoryBot.create(:organisation, restrict_cohosting: true)
     restricted.organisationships.create!(account: @account, admin: true)
 
-    sign_in_with_rack(@account)
-    post "/e/#{@event.slug}/cohostships/new", cohostship: { organisation_id: restricted.id }
+    sign_in(@account)
+    visit "/e/#{@event.slug}"
+    add_cohost(restricted)
 
-    assert last_response.redirect?
+    assert page.has_css? "#{cohosts_box} a", text: restricted.name
     assert @event.cohostships.find_by(organisation: restricted)
   end
 
@@ -240,10 +275,11 @@ class EventPermissionsTest < ActiveSupport::TestCase
     manager = add_event_manager(@organisation)
     cohost = FactoryBot.create(:organisation)
 
-    sign_in_with_rack(manager)
-    post "/e/#{@event.slug}/cohostships/new", cohostship: { organisation_id: cohost.id }
+    sign_in(manager)
+    visit "/e/#{@event.slug}"
+    add_cohost(cohost)
 
-    assert last_response.redirect?
+    assert page.has_css? "#{cohosts_box} a", text: cohost.name
     assert @event.cohostships.find_by(organisation: cohost)
   end
 
@@ -254,12 +290,16 @@ class EventPermissionsTest < ActiveSupport::TestCase
     @activity.activityships.create!(account: activity_admin, admin: true, unsubscribed: false)
     cohost = FactoryBot.create(:organisation)
     @event.cohostships.create!(organisation: cohost)
+    staying = FactoryBot.create(:organisation)
+    @event.cohostships.create!(organisation: staying)
 
-    sign_in_with_rack(activity_admin)
-    post "/e/#{@event.slug}/cohostships/destroy", organisation_id: cohost.id
+    sign_in(activity_admin)
+    visit "/e/#{@event.slug}"
+    remove_cohost(cohost)
 
-    assert last_response.redirect?
+    assert page.has_no_css? "#{cohosts_box} a", text: cohost.name
     refute @event.cohostships.find_by(organisation: cohost)
+    assert @event.cohostships.find_by(organisation: staying)
   end
 
   test 'event_manager is email viewer when show_emails is false' do
@@ -478,9 +518,24 @@ class EventPermissionsTest < ActiveSupport::TestCase
       assert_equal 0, @event.profit_share_to_organiser
       assert_equal 0, @event.stripe_revenue_adjustment
     end
+  end
 
-    post "/e/#{@event.slug}/edit", event: { name: 'Still editable' }
-    assert last_response.redirect?
+  test 'event facilitators see the revenue share fields disabled, and can still save the event' do
+    create_organisation(stripe_client_id: 'ca_test')
+    create_event(prices: [0])
+    facilitator = FactoryBot.create(:account)
+    @event.event_facilitations.create!(account: facilitator)
+
+    sign_in(facilitator)
+    visit "/e/#{@event.slug}/edit"
+    click_link 'Revenue'
+    assert page.has_field? 'event_profit_share_to_organiser', disabled: true
+    assert page.has_field? 'event_revenue_sharer_id', disabled: true, visible: :all
+    click_link 'Basics'
+    fill_in 'Event title*', with: 'Still editable'
+    click_button 'Update event'
+
+    assert page.has_content? 'The event was saved'
     assert_equal 'Still editable', @event.reload.name
   end
 
@@ -526,9 +581,26 @@ class EventPermissionsTest < ActiveSupport::TestCase
     sign_in_with_rack(facilitator)
     post "/e/#{@event.slug}/cohostships/#{cohostship.id}", cohostship: { featured: '1' }
     refute cohostship.reload.featured
+  end
 
-    sign_in_with_rack(cohost.account)
-    post "/e/#{@event.slug}/cohostships/#{cohostship.id}", cohostship: { featured: '1' }
+  test "co-host admins can feature an event in their organisation's carousels, and other event admins aren't offered it" do
+    covers 'events/cohost-carousel-feature@022f35'
+    create_event
+    cohost = FactoryBot.create(:organisation)
+    cohostship = @event.cohostships.create!(organisation: cohost)
+    facilitator = FactoryBot.create(:account)
+    @event.event_facilitations.create!(account: facilitator)
+
+    sign_in(facilitator)
+    visit "/e/#{@event.slug}/cohosts"
+    assert page.has_link? cohost.name
+    assert page.has_no_field? 'cohostship_featured', visible: :all
+
+    sign_in(cohost.account)
+    visit "/e/#{@event.slug}/cohosts"
+    find('#cohostship_featured', visible: :all).click
+    # The box saves as soon as it's ticked, and the page comes back with it ticked
+    assert page.has_css? '#cohostship_featured[checked]', visible: :all
     assert cohostship.reload.featured
   end
 
@@ -536,20 +608,23 @@ class EventPermissionsTest < ActiveSupport::TestCase
     covers 'organisations/table-change-revenue-sharer@a04837'
     create_organisation(stripe_client_id: 'ca_test')
     create_event(prices: [0])
-    sharer = FactoryBot.create(:account)
+    sharer = FactoryBot.create(:account, name: 'Sasha Sharer', has_signed_in: true)
     sharer.organisationships.create!(
       organisation: @organisation,
       stripe_connect_json: { 'stripe_user_id' => 'acct_sharer' }.to_json
     )
 
-    sign_in_with_rack(@account)
-    post "/e/#{@event.slug}/edit", event: {
-      organiser_id: '',
-      revenue_sharer_id: sharer.id.to_s,
-      revenue_share_to_revenue_sharer: '100'
-    }
+    sign_in(@account)
+    visit "/e/#{@event.slug}/edit"
+    click_link 'Revenue'
+    choose_in_lookup('event_revenue_sharer_id', sharer.name)
+    fill_in 'event_revenue_share_to_revenue_sharer', with: '100'
+    # An event has an organiser or a revenue sharer, not both
+    click_link 'Basics'
+    find('#event_organiser_id + .select2 .select2-selection__clear').click
+    click_button 'Update event'
 
-    assert last_response.redirect?, last_response.body
+    assert page.has_content? 'The event was saved'
     @event.reload
     assert_equal sharer.id, @event.revenue_sharer_id
     assert_equal 100, @event.revenue_share_to_revenue_sharer
@@ -590,10 +665,14 @@ class EventPermissionsTest < ActiveSupport::TestCase
     covers 'organisations/table-feature-events-show-emails@6842a0'
     create_event(prices: [0], show_emails: false, featured: false)
 
-    sign_in_with_rack(@account)
-    post "/e/#{@event.slug}/edit", event: { show_emails: '1', featured: '1' }
+    sign_in(@account)
+    visit "/e/#{@event.slug}/edit"
+    find('label[for="event_featured"]').click
+    click_link 'Everything else'
+    find('label[for="event_show_emails"]').click
+    click_button 'Update event'
 
-    assert last_response.redirect?
+    assert page.has_content? 'The event was saved'
     @event.reload
     assert @event.show_emails
     assert @event.featured
@@ -815,15 +894,47 @@ class EventPermissionsTest < ActiveSupport::TestCase
     assert_equal 0, followership.creditings.count
     assert Organisation.admin?(@organisation, other_admin)
     assert Organisation.find(@organisation.id)
+  end
 
-    sign_in_with_rack(@account)
-    post "/o/#{@organisation.slug}/organisationships/unadmin", account_id: other_admin.id.to_s
+  test 'organisation admins can add and remove admins, grant event manager and give credit' do
+    covers 'organisations/table-manage-followers-credits-bans@7b2dbd', 'organisations/table-add-remove-organisation-admins@a0a094', 'organisations/table-grant-event-manager@4e7638'
+    create_organisation
+    follower = add_member(@organisation)
+    follower.set(name: 'Fern Follower', has_signed_in: true)
+    followership = @organisation.organisationships.find_by(account: follower)
+    other_admin = add_member(@organisation, admin: true)
+    admins_box = "[data-pagelet-url='/o/#{@organisation.slug}/organisationships/admins']"
+
+    sign_in(@account)
+    visit "/o/#{@organisation.slug}"
+    within(admins_box) do
+      find('.remove-role-toggle').click
+      select "#{other_admin.name} (#{other_admin.username})", from: 'account_id'
+      click_button 'Remove admin'
+    end
+    # Removing asks first, in a popover that hangs off the page
+    page.document.find('.popover').click_button 'Remove admin'
+    assert page.has_css? "#{admins_box} .add-role-toggle"
+    assert page.has_no_css? "#{admins_box} img[alt='#{other_admin.name}']"
     refute Organisation.admin?(@organisation, other_admin)
-    post "/o/#{@organisation.slug}/event_manager/#{followership.id}", event_manager: '1'
+
+    visit "/o/#{@organisation.slug}/followers"
+    find("#organisationship-event-manager-#{followership.id}").click
+    # The switch saves as it's flicked, and its box comes back with it on
+    assert page.has_css? "#organisationship-event-manager-#{followership.id}[checked]"
     assert followership.reload.event_manager
-    post "/organisationships/#{followership.id}/credit/plus", amount: '10'
+
+    visit "/organisationships/#{followership.id}/credit_balance"
+    find('.lead a', match: :first).click
+    find('#plus-credit input').send_keys('10', :enter)
+    assert page.has_css? '.lead .badge', text: '10'
     assert_equal 1, followership.creditings.count
-    post "/o/#{@organisation.slug}/organisationships/admin", organisationship: { account_id: follower.id.to_s }
+
+    visit "/o/#{@organisation.slug}"
+    within(admins_box) { find('.add-role-toggle').click }
+    choose_in_lookup('organisationship_account_id', follower.name)
+    within(admins_box) { click_button 'Add admin' }
+    assert page.has_css? "#{admins_box} img[alt='#{follower.name}']"
     assert followership.reload.admin
   end
 
@@ -848,32 +959,45 @@ class EventPermissionsTest < ActiveSupport::TestCase
   test 'event managers can feature events, change who can see emails and change the revenue sharer and profit shares' do
     covers 'organisations/table-feature-events-show-emails@6842a0', 'organisations/table-change-revenue-sharer@a04837'
     create_event(prices: [0], show_emails: false, featured: false)
+    # Revenue sharing, and its tab, comes with Stripe
+    @organisation.set(stripe_client_id: 'ca_test')
     manager = add_event_manager(@organisation)
     sharer = connected_account(@organisation)
+    sharer.set(name: 'Sasha Sharer', has_signed_in: true)
 
-    sign_in_with_rack(manager)
-    post "/e/#{@event.slug}/edit", event: { show_emails: '1', featured: '1', revenue_sharer_id: sharer.id.to_s, revenue_share_to_revenue_sharer: '50' }
+    sign_in(manager)
+    visit "/e/#{@event.slug}/edit"
+    find('label[for="event_featured"]').click
+    click_link 'Everything else'
+    find('label[for="event_show_emails"]').click
+    click_link 'Revenue'
+    choose_in_lookup('event_revenue_sharer_id', sharer.name)
+    fill_in 'event_revenue_share_to_revenue_sharer', with: '50'
+    click_button 'Update event'
 
-    assert last_response.redirect?, last_response.body
+    assert page.has_content? 'The event was saved'
     @event.reload
     assert @event.show_emails
     assert @event.featured
     assert_equal sharer.id, @event.revenue_sharer_id
     assert_equal 50, @event.revenue_share_to_revenue_sharer
 
-    post "/e/#{@event.slug}/edit", event: { revenue_sharer_id: '', profit_share_to_organiser: '10' }
-    assert last_response.redirect?, last_response.body
+    visit "/e/#{@event.slug}/edit"
+    click_link 'Revenue'
+    find('#event_revenue_sharer_id + .select2 .select2-selection__clear').click
+    fill_in 'event_profit_share_to_organiser', with: '10'
+    click_button 'Update event'
+    assert page.has_content? 'The event was saved'
     assert_equal 10, @event.reload.profit_share_to_organiser
   end
 
-  test 'event managers can publish a submitted event but its submitter and facilitators cannot' do
+  test "a submitted event's submitter and facilitators cannot publish it" do
     covers 'organisations/community-event-submissions@e06059', 'organisations/table-publish-submitted@1383ec'
     create_organisation(allow_event_submissions: true)
     submitter = add_member(@organisation)
     create_event(locked: true)
     @event.set(account_id: submitter.id)
     facilitator = add_facilitator(@event)
-    manager = add_event_manager(@organisation)
 
     [submitter, facilitator].each do |account|
       sign_in_with_rack(account)
@@ -881,25 +1005,58 @@ class EventPermissionsTest < ActiveSupport::TestCase
       assert last_response.redirect?, last_response.body
       assert @event.reload.locked?, 'a submitted event was published by an event admin'
     end
+  end
 
-    sign_in_with_rack(manager)
-    post "/e/#{@event.slug}/edit", event: { locked: '0' }
-    assert last_response.redirect?, last_response.body
+  test 'event managers are offered publishing a submitted event, and its submitter and facilitators are not' do
+    covers 'organisations/community-event-submissions@e06059', 'organisations/table-publish-submitted@1383ec'
+    create_organisation(allow_event_submissions: true)
+    submitter = add_member(@organisation)
+    create_event(locked: true, prices: [0])
+    @event.set(account_id: submitter.id)
+    facilitator = add_facilitator(@event)
+    manager = add_event_manager(@organisation)
+
+    [submitter, facilitator].each do |account|
+      sign_in(account)
+      visit "/e/#{@event.slug}/edit"
+      assert page.has_content? 'submitted for review'
+      assert page.has_no_css? 'label[for="event_locked"]'
+    end
+
+    sign_in(manager)
+    visit "/e/#{@event.slug}/edit"
+    find('label[for="event_locked"]').click
+    click_button 'Update event'
+    assert page.has_content? 'The event was saved'
     refute @event.reload.locked?
   end
 
   test 'any event admin can unlock a locked event unless the organisation takes event submissions' do
     covers 'organisations/table-unlock-locked@ec36f3'
-    create_event(locked: true)
+    create_event(locked: true, prices: [0])
     facilitator = add_facilitator(@event)
 
-    sign_in_with_rack(facilitator)
-    post "/e/#{@event.slug}/edit", event: { locked: '0' }
-    assert last_response.redirect?, last_response.body
+    sign_in(facilitator)
+    visit "/e/#{@event.slug}/edit"
+    find('label[for="event_locked"]').click
+    click_button 'Update event'
+    assert page.has_content? 'The event was saved'
     refute @event.reload.locked?
 
     @event.set(locked: true)
     @organisation.set(allow_event_submissions: true)
+    visit "/e/#{@event.slug}/edit"
+    assert page.has_content? 'submitted for review'
+    assert page.has_no_css? 'label[for="event_locked"]'
+  end
+
+  test 'event admins cannot unlock a locked event once the organisation takes event submissions' do
+    covers 'organisations/table-unlock-locked@ec36f3'
+    create_organisation(allow_event_submissions: true)
+    create_event(locked: true)
+    facilitator = add_facilitator(@event)
+
+    sign_in_with_rack(facilitator)
     post "/e/#{@event.slug}/edit", event: { locked: '0' }
     assert last_response.redirect?, last_response.body
     assert @event.reload.locked?
@@ -911,22 +1068,37 @@ class EventPermissionsTest < ActiveSupport::TestCase
     ticket = @event.tickets.create!(account: FactoryBot.create(:account), ticket_type: @event.ticket_types.first, payment_completed: true)
     facilitator = add_facilitator(@event)
     manager = add_event_manager(@organisation)
+    facilitators_box = "[data-pagelet-url='/e/#{@event.slug}/event_facilitations']"
 
-    [@account, manager, facilitator].each do |account|
-      sign_in_with_rack(account)
+    { 'organisation admin' => @account, 'event manager' => manager, 'facilitator' => facilitator }.each_with_index do |(role, account), i|
+      sign_in(account)
 
-      get "/pmails/new?event_id=#{@event.id}"
-      assert last_response.ok?, "mailer refused (#{last_response.status})"
+      visit "/pmails/new?event_id=#{@event.id}"
+      assert page.has_field?('pmail_subject'), "mailer refused a #{role}"
 
-      post "/e/#{@event.slug}/check_in/#{ticket.token}", checked_in: '1'
-      assert last_response.ok?, "check-in refused (#{last_response.status} #{last_response.location})"
+      visit "/e/#{@event.slug}/check_in_list"
+      find("#check-in-#{ticket.id}").click
+      # The switch saves as it's flicked, and its box comes back with it on
+      assert page.has_css?("#check-in-#{ticket.id}[checked]"), "check-in refused a #{role}"
       assert ticket.reload.checked_in
       ticket.set(checked_in: false)
 
-      other = FactoryBot.create(:account)
-      post "/e/#{@event.slug}/event_facilitations/new", event_facilitation: { account_id: other.id.to_s }
+      other = FactoryBot.create(:account, name: "Other Facilitator#{i}", has_signed_in: true)
+      visit "/e/#{@event.slug}"
+      within(facilitators_box) { find('.add-role-toggle').click }
+      choose_in_lookup('event_facilitation_account_id', other.name)
+      within(facilitators_box) { click_button 'Add event facilitator' }
+      assert page.has_css?("#{facilitators_box} img[alt='#{other.name}']"), "adding a facilitator refused a #{role}"
       assert @event.event_facilitations.find_by(account: other)
-      post "/e/#{@event.slug}/event_facilitations/destroy", account_id: other.id.to_s
+
+      within(facilitators_box) do
+        find('.remove-role-toggle').click
+        select "#{other.name} (#{other.username})", from: 'account_id'
+        click_button 'Remove event facilitator'
+      end
+      page.document.find('.popover').click_button 'Remove event facilitator'
+      assert page.has_css? "#{facilitators_box} .add-role-toggle"
+      assert page.has_no_css?("#{facilitators_box} img[alt='#{other.name}']"), "removing a facilitator refused a #{role}"
       refute @event.event_facilitations.find_by(account: other)
     end
   end
@@ -1074,14 +1246,17 @@ class EventPermissionsTest < ActiveSupport::TestCase
     local_group_admin = FactoryBot.create(:account)
     @local_group.local_groupships.create!(account: local_group_admin, admin: true, unsubscribed: false)
 
+    @event.cohostships.create!(organisation: FactoryBot.create(:organisation))
+
     [@account, manager, local_group_admin].each do |account|
       cohost = FactoryBot.create(:organisation)
       @event.cohostships.create!(organisation: cohost)
 
-      sign_in_with_rack(account)
-      post "/e/#{@event.slug}/cohostships/destroy", organisation_id: cohost.id.to_s
+      sign_in(account)
+      visit "/e/#{@event.slug}"
+      remove_cohost(cohost)
 
-      assert last_response.redirect?
+      assert page.has_no_css? "#{cohosts_box} a", text: cohost.name
       refute @event.cohostships.find_by(organisation: cohost), 'cohost was not removed'
     end
   end

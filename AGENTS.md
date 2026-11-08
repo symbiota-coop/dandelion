@@ -74,6 +74,16 @@ Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Chrom
 
 ## Tests
 
+Choose how a test reaches the app by who is on the other end of the request:
+
+- Nobody (permissions, pricing, validations, callbacks): call the models directly
+- A program (webhooks, MCP, Zapier, JSON, ICS and CSV, status codes, redirects and headers): Rack (`Rack::Test::Methods`: `get`, `post`, `last_response`, `sign_in_with_rack`)
+- Someone forging a request the UI can't make (another account's ids, `protected_attributes`, `$` operators, a route whose control is hidden from them): Rack
+- A person (what they see, click and fill in, and what happens next): the browser (Capybara with Cuprite: `visit`, `click_on`, `sign_in`). Submit a form by filling it in, not by posting its params by hand in Rack, which keeps passing when the form's fields change
+- A rule about what someone can't do gets both: a browser test that they aren't offered it, and a Rack test that the route refuses it anyway
+
+A test uses one or the other (`Dandelion/TestOneParadigm`): they don't share a session. A file includes `Rack::Test::Methods` and `Capybara::DSL` only if its tests use them (`Dandelion/TestUnusedParadigm`). A program's request in the middle of a person's flow, like Stripe's webhook after a checkout, is the exception, with a disable saying so. Older Rack tests that check what a server-rendered page says can stay; write new ones of those in the browser.
+
 You can use the following command structure to test a single file: `foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb`
 
 To run only certain tests in a file, add `-n /pattern/` (matches the method name, with spaces as underscores) e.g. `foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb -n /youtube_titles/`

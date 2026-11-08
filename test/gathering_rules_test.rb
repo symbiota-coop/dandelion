@@ -58,15 +58,19 @@ class GatheringRulesTest < ActiveSupport::TestCase
     create_gathering(privacy: 'secret')
     visit gathering_path
     assert page.has_current_path?('/', ignore_query: true)
+    visit gathering_path('/apply')
+    assert page.has_current_path?('/', ignore_query: true)
   end
 
   test 'an application is accepted straight away when no proposers are needed' do
+    covers 'gatherings/magic-number@66775d'
     create_gathering(privacy: 'closed', fixed_threshold: 0)
     applicant = FactoryBot.create(:account)
     sign_in(applicant)
     visit gathering_path('/apply')
     click_button 'Apply'
     assert page.has_current_path?(gathering_path('/apply?accepted=true'))
+    assert_equal 'accepted', @gathering.mapplications.find_by(account: applicant).status
     assert @gathering.memberships.find_by(account: applicant)
   end
 

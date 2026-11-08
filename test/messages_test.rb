@@ -1,6 +1,7 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class MessagesTest < ActiveSupport::TestCase
+  include Capybara::DSL
   include Rack::Test::Methods
 
   def create_messenger(**attrs)
@@ -166,17 +167,18 @@ class MessagesTest < ActiveSupport::TestCase
 
   test 'sending a message and opening the thread marks it read' do
     create_messaging_pair
-    sign_in_with_rack(@account)
-
-    post "/messages/#{@account1.username}/send", body: 'Hi there'
-    assert_equal 200, last_response.status
+    sign_in(@account)
+    visit "/messages/#{@account1.username}"
+    fill_in 'Type a message', with: 'Hi there'
+    find('button[aria-label="Send"]').click
+    assert find('.message-thread').has_content?('Hi there')
     message = Message.between(@account, @account1).first
     assert_equal 'Hi there', message.body
+    refute Message.read?(@account, @account1)
 
-    sign_in_with_rack(@account1)
-    get "/messages/#{@account.username}"
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, 'Hi there'
+    sign_in(@account1)
+    visit "/messages/#{@account.username}"
+    assert find('.message-thread').has_content?('Hi there')
     assert Message.read?(@account, @account1)
   end
 

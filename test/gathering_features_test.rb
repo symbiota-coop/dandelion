@@ -136,6 +136,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test 'creating a rota with roles and slots, and a member signing up for a shift' do
+    covers 'gatherings/video-shift-signup@8c93ae'
     create_gathering(privacy: 'open')
     member = create_member
     sign_in(@account)
@@ -368,6 +369,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test 'an admin schedules an activity by dragging it into a slot, and unschedules it' do
+    covers 'gatherings/video-schedule-activity@396032'
     create_gathering(privacy: 'open')
     timetable = @gathering.timetables.create!(name: 'Workshops', account: @account)
     space = timetable.spaces.create!(name: 'Barn')
@@ -454,7 +456,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     paid = Stripe::Event.construct_from({ id: 'evt_gathering', type: 'checkout.session.completed', data: { object: { id: 'cs_gathering', payment_status: 'paid' } } })
     Stripe::Webhook.stub(:construct_event, paid) do
       header 'Stripe-Signature', 'sig'
-      post gathering_path('/stripe_webhook')
+      post gathering_path('/stripe_webhook') # rubocop:disable Dandelion/TestOneParadigm -- Stripe's webhook, a program's request in the member's flow
     end
     assert payment.reload.payment_completed
     assert_equal 20, @gathering.memberships.find_by(account: member).paid

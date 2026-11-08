@@ -2,7 +2,6 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class EventDraftsTest < ActiveSupport::TestCase
   include Capybara::DSL
-  include Rack::Test::Methods
 
   def draft_event_payload(name: 'Rinpoche weekend', extra: {})
     {
@@ -26,38 +25,38 @@ class EventDraftsTest < ActiveSupport::TestCase
     )
   end
 
+  # The page autosaves the form as a draft every 10 seconds, so give it time for one
+  def wait_for_draft(&)
+    using_wait_time(30) { page.document.synchronize { raise Capybara::ExpectationNotMet, 'draft not saved yet' unless yield } }
+  end
+
   test 'draft save keeps ticket types and updates the same draft' do
     covers 'events/draft-autosave-restores-tickets@38928c'
     create_organisation
-    sign_in_with_rack(@account)
+    sign_in(@account)
+    visit "/events/new?organisation_id=#{@organisation.id}"
+    fill_in 'Event title*', with: 'Rinpoche weekend'
+    click_link 'Tickets'
+    click_link 'Add ticket type'
+    fill_in 'event_ticket_types_attributes_0_name', with: 'Friday Evening'
+    fill_in 'event_ticket_types_attributes_0_description', with: '7-9pm'
+    fill_in 'event_ticket_types_attributes_0_price_or_range', with: '30'
+    fill_in 'event_ticket_types_attributes_0_quantity', with: '15'
+    click_link 'Add ticket group'
+    fill_in 'event_ticket_groups_attributes_0_name', with: 'Non-Residential'
+    fill_in 'event_ticket_groups_attributes_0_capacity', with: '50'
 
-    post '/events/draft', {
-      event: draft_event_payload
-    }, { 'HTTP_REFERER' => "http://example.org/events/new?organisation_id=#{@organisation.id}" }
-
-    assert_equal 200, last_response.status, last_response.body
-    first = JSON.parse(last_response.body)
-    draft = @account.drafts.find(first['draft_id'])
-    assert draft
+    wait_for_draft { @account.drafts.exists? }
+    draft = @account.drafts.first
+    # The page takes the draft's id from the response, to update the same draft next time
+    assert page.has_current_path?(/draft_id=#{draft.id}/)
     json = JSON.parse(draft.json)
     assert_equal 'Friday Evening', json.dig('ticket_types_attributes', '0', 'name')
     assert_equal 'Non-Residential', json.dig('ticket_groups_attributes', '0', 'name')
 
-    post '/events/draft', {
-      draft_id: first['draft_id'],
-      event: draft_event_payload.merge(
-        ticket_types_attributes: {
-          '0' => { name: 'Saturday Full Day', description: '10am-4.30pm', price_or_range: '75', quantity: '5' }
-        }
-      )
-    }, { 'HTTP_REFERER' => "http://example.org/events/new?organisation_id=#{@organisation.id}&draft_id=#{first['draft_id']}" }
-
-    assert_equal 200, last_response.status, last_response.body
-    second = JSON.parse(last_response.body)
-    assert_equal first['draft_id'], second['draft_id']
+    fill_in 'event_ticket_types_attributes_0_name', with: 'Saturday Full Day'
+    wait_for_draft { JSON.parse(draft.reload.json).dig('ticket_types_attributes', '0', 'name') == 'Saturday Full Day' }
     assert_equal 1, @account.drafts.count
-    json = JSON.parse(@account.drafts.find(second['draft_id']).json)
-    assert_equal 'Saturday Full Day', json.dig('ticket_types_attributes', '0', 'name')
   end
 
   test 'reloading a draft restores ticket types and groups' do

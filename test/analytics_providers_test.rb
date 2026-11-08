@@ -1,6 +1,7 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class AnalyticsProvidersTest < ActiveSupport::TestCase
+  include Capybara::DSL
   include Rack::Test::Methods
 
   test 'registry lists providers and marketing cookies' do
@@ -93,11 +94,14 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
 
   test 'event edit with a conversion id but no label re-renders' do
     create_event
-    sign_in_with_rack(@account)
-    post "/e/#{@event.slug}/edit", event: { google_ads_conversion_id: '6782912626' }
-    refute last_response.redirect?
-    assert last_response.ok?
-    assert_includes last_response.body, 'There was an error saving the event.'
+    sign_in(@account)
+    visit "/e/#{@event.slug}/edit"
+    click_link 'Integrations'
+    fill_in 'Google Ads conversion ID', with: '6782912626'
+    click_button 'Update event'
+    assert page.has_content? 'There was an error saving the event.'
+    assert page.has_button? 'Update event'
+    assert_nil @event.reload.google_ads_conversion_id
   end
 
   test 'clears blank google ads fields' do
@@ -162,16 +166,17 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
     create_organisation
     refute AnalyticsProvider.object('plausible').enabled?(organisation: @organisation)
     refute AnalyticsProvider.object('simple_analytics').enabled?(organisation: @organisation)
-    sign_in_with_rack(@account)
-    post "/o/#{@organisation.slug}/edit", organisation: {
-      plausible_analytics_domain: 'soulrev.plausible.io',
-      simple_analytics_domain: 'soulrev.simpleanalytics.com',
-      facebook_pixel_id: '1234567890',
-      google_ads_conversion_id: 'AW-6782912626',
-      google_ads_conversion_label: 'Purchase',
-      google_ads_enhanced_conversions: '1'
-    }
-    follow_redirect! while last_response.redirect?
+    sign_in(@account)
+    visit "/o/#{@organisation.slug}/edit"
+    click_link 'Analytics'
+    fill_in 'Plausible Analytics domain', with: 'soulrev.plausible.io'
+    fill_in 'Simple Analytics domain', with: 'soulrev.simpleanalytics.com'
+    fill_in 'Facebook Pixel ID', with: '1234567890'
+    fill_in 'Google Ads conversion ID', with: 'AW-6782912626'
+    fill_in 'Google Ads conversion label', with: 'Purchase'
+    find('label[for="organisation_google_ads_enhanced_conversions"]').click
+    click_button 'Update organisation'
+    assert page.has_content? 'The organisation was saved'
     @organisation.reload
     assert_equal 'soulrev.plausible.io', @organisation.plausible_analytics_domain
     assert_equal 'soulrev.simpleanalytics.com', @organisation.simple_analytics_domain

@@ -1,7 +1,6 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class CalendarTest < ActiveSupport::TestCase
-  include Capybara::DSL
   include Rack::Test::Methods
 
   ICS_URL_1 = 'https://calendar.google.com/calendar/ical/one/basic.ics'.freeze

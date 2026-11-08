@@ -127,6 +127,12 @@ Dandelion/TestInstanceVariable:
 Dandelion/CapybaraCurrentPath:
   Include:
     - test/**/*_test.rb
+Dandelion/TestOneParadigm:
+  Include:
+    - test/**/*_test.rb
+Dandelion/TestUnusedParadigm:
+  Include:
+    - test/**/*_test.rb
 # The one place that uses Redcarpet, for everything else
 Dandelion/Redcarpet:
   Exclude:

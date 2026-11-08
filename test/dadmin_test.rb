@@ -1,6 +1,7 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class DadminTest < ActiveSupport::TestCase
+  include Capybara::DSL
   include Rack::Test::Methods
 
   def sign_in_as_admin
@@ -161,16 +162,25 @@ class DadminTest < ActiveSupport::TestCase
   end
 
   test 'records can be created, edited and deleted' do
-    sign_in_as_admin
-    post '/dadmin/new/EventTag', event_tag: { name: 'dadmin-tag' }
+    sign_in(FactoryBot.create(:account, admin: true))
+    visit '/dadmin/new/EventTag'
+    fill_in 'Name', with: 'dadmin-tag'
+    click_button 'Create event tag'
+    assert page.has_content? 'was created'
+    assert page.has_current_path?('/dadmin/index/EventTag')
     tag = EventTag.find_by(name: 'dadmin-tag')
     assert tag
-    assert last_response.redirect?
 
-    post "/dadmin/edit/EventTag/#{tag.id}", event_tag: { name: 'dadmin-tag-renamed' }
+    visit "/dadmin/edit/EventTag/#{tag.id}"
+    fill_in 'Name', with: 'dadmin-tag-renamed'
+    click_button 'Update event tag'
+    assert page.has_content? 'was updated'
     assert_equal 'dadmin-tag-renamed', tag.reload.name
 
-    post "/dadmin/destroy/EventTag/#{tag.id}"
+    click_link 'Delete'
+    # The popover hangs off the page, its button named after the link
+    page.document.find('.popover').click_button 'Delete'
+    assert page.has_content? 'was deleted'
     assert_nil EventTag.find(tag.id)
   end
 

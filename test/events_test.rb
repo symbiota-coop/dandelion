@@ -397,21 +397,50 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal 2, @event.reload.page_views_count
   end
 
+  # An attendee of the event, on its page with the discussion open
+  def visit_discussion_as_attendee
+    attendee = FactoryBot.create(:account)
+    @event.tickets.create!(account: attendee, ticket_type: @event.ticket_types.first, payment_completed: true)
+    sign_in(attendee)
+    visit "/e/#{@event.slug}"
+    click_button 'Discussion'
+    assert page.has_link?('Email notifications off')
+    attendee
+  end
+
   test 'email notifications for a discussion nobody has written in yet make its post' do
+    create_event(prices: [0])
+    attendee = visit_discussion_as_attendee
+    assert_nil @event.discussion_post
+
+    click_link 'Email notifications off'
+    assert page.has_link?('Email notifications on')
+    assert @event.discussion_post.subscriptions.and(account: attendee).exists?
+
+    click_link 'Email notifications on'
+    assert page.has_link?('Email notifications off')
+    assert_not @event.discussion_post.subscriptions.and(account: attendee).exists?
+  end
+
+  test 'the unsubscribe link in older discussion emails unsubscribes' do
     create_event(prices: [0])
     attendee = FactoryBot.create(:account)
     @event.tickets.create!(account: attendee, ticket_type: @event.ticket_types.first, payment_completed: true)
+    @event.discussion_post!(attendee).subscriptions.create!(account: attendee)
 
     get "/e/#{@event.slug}", link_token: attendee.link_token
-    assert_nil @event.discussion_post
-
-    post "/e/#{@event.slug}/subscribe_discussion"
-    assert last_response.ok?
-    assert @event.discussion_post.subscriptions.and(account: attendee).exists?
-
     get "/e/#{@event.slug}/unsubscribe_discussion"
     assert last_response.redirect?
     assert_not @event.discussion_post.subscriptions.and(account: attendee).exists?
+  end
+
+  test 'people who are not attendees are not shown the discussion' do
+    create_event(prices: [0])
+    sign_in(FactoryBot.create(:account))
+    visit "/e/#{@event.slug}"
+    assert page.has_content?(@event.name)
+    assert page.has_no_button?('Discussion')
+    assert page.has_no_link?('Email notifications off')
   end
 
   test 'only people who can see the discussion can subscribe to it' do
@@ -426,18 +455,28 @@ class EventsTest < ActiveSupport::TestCase
 
   test 'a discussion comment needs a body' do
     create_event(prices: [0])
-    attendee = FactoryBot.create(:account)
-    @event.tickets.create!(account: attendee, ticket_type: @event.ticket_types.first, payment_completed: true)
+    visit_discussion_as_attendee
 
-    get "/e/#{@event.slug}", link_token: attendee.link_token
-    post '/comment', comment: { commentable_type: 'Event', commentable_id: @event.id, body: ' ' }
+    fill_in 'comment_body', with: ' '
+    click_button 'Post'
+    # The discussion reloads once the comment is sent, with the box empty again
+    assert page.has_field?('comment_body', with: '')
     assert_not @event.comments.exists?
     assert_nil @event.discussion_post
 
-    post '/comment', comment: { commentable_type: 'Event', commentable_id: @event.id, body: 'Hello' }
-    comment = @event.comments.first
-    assert_equal 'Hello', comment.body
+    fill_in 'comment_body', with: 'Hello'
+    click_button 'Post'
+    assert page.has_css?('#chat .comment-body', text: 'Hello')
+    assert_equal ['Hello'], @event.comments.pluck(:body)
+  end
 
+  test 'a discussion comment cannot be edited to nothing' do
+    create_event(prices: [0])
+    attendee = FactoryBot.create(:account)
+    @event.tickets.create!(account: attendee, ticket_type: @event.ticket_types.first, payment_completed: true)
+    comment = @event.discussion_post!(attendee).comments.create!(account: attendee, commentable: @event, body: 'Hello')
+
+    get "/e/#{@event.slug}", link_token: attendee.link_token
     post "/comments/#{comment.id}/edit", body: ''
     assert_equal 400, last_response.status
     assert_equal 'Hello', comment.reload.body
@@ -1161,10 +1200,15 @@ class EventsTest < ActiveSupport::TestCase
   test 'a duplicated event starts locked' do
     covers 'events/duplicate-starts-locked@9b7b43'
     create_event(prices: [0], locked: false)
-    sign_in_with_rack(@account)
-    post "/e/#{@event.slug}/duplicate"
+    sign_in(@account)
+    visit "/e/#{@event.slug}/edit"
+    click_button @event.name
+    click_link 'Duplicate event'
+    # The popover hangs off the page
+    page.document.find('.popover').click_button 'Duplicate event'
+    assert page.has_content?("This is a duplicate of #{@event.name}")
     duplicate = Event.find_by(duplicated_from_id: @event.id)
-    assert_equal "/e/#{duplicate.slug}/edit", URI(last_response.location).path
+    assert page.has_current_path?("/e/#{duplicate.slug}/edit")
     assert duplicate.locked?
     refute @event.reload.locked?
   end

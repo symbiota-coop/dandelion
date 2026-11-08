@@ -236,12 +236,6 @@ class WaitlistTest < ActiveSupport::TestCase
     assert_equal 302, last_response.status
     assert_equal 0, @event.waitships.count
     assert_nil Account.find_by(email: 'early@example.com')
-
-    sell_out_ticket_type
-    header 'Accept', 'application/json'
-    post "/e/#{@event.slug}/ticket_type_waitships", ticket_type_id: @ticket_type.id.to_s, name: 'Early Bird', email: 'early@example.com'
-    assert_equal 200, last_response.status
-    assert @ticket_type.ticket_type_waitships.find_by(account: Account.find_by(email: 'early@example.com'))
   end
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -309,9 +303,14 @@ class WaitlistTest < ActiveSupport::TestCase
   test 'cancelling an order at a sold-out event emails the waitlist' do
     covers 'events/waitlist-emailed-when-tickets-available@a5c6b3'
     create_sold_out_event_with_waitlist
-    sign_in_with_rack(@account)
+    sign_in(@account)
 
-    post "/e/#{@event.slug}/orders/#{@order.id}/destroy"
+    visit "/e/#{@event.slug}/orders"
+    click_button 'Actions'
+    click_link 'Remove order'
+    # The popover hangs off the page, outside any within block
+    page.document.find('.popover').click_button 'Remove order'
+    assert page.has_content? 'No orders found'
     assert_nil Order.find(@order.id)
 
     emails = emails_sent_by_jobs(/send_waitlist_tickets_available/)

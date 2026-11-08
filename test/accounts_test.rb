@@ -36,6 +36,8 @@ class AccountsTest < ActiveSupport::TestCase
     fill_in 'Password', with: account.password
     click_button 'Sign in'
     assert page.has_content?('Signed in')
+    assert page.has_current_path?('/')
+    assert_equal 1, account.reload.sign_ins.count
   end
 
   test 'password callback rejects GET' do
@@ -48,16 +50,6 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal '/auth/failure', location.path
     assert_includes Rack::Utils.parse_query(location.query)['message'], 'invalid_request'
     assert_equal 0, account.reload.sign_ins.count
-  end
-
-  test 'password callback signs in via POST' do
-    account = FactoryBot.create(:account)
-
-    post '/auth/account/callback', email: account.email, password: account.password
-
-    assert last_response.redirect?
-    assert_equal '/', URI(last_response.location).path
-    assert_equal 1, account.reload.sign_ins.count
   end
 
   test 'generated avatars take the initials of the first and last names' do
@@ -233,31 +225,27 @@ class AccountsTest < ActiveSupport::TestCase
   test 'email confirmation link confirms the address with its button' do
     account = FactoryBot.create(:account, email_confirmed: false)
     account.generate_link_token!
-    token = account.link_token
 
-    get "/confirm_email/#{token}"
+    visit "/confirm_email/#{account.link_token}"
+    # Signed in as the account, whose email the page asks about
+    assert page.has_content?("Confirm that #{account.email} is your email address?")
     refute account.reload.email_confirmed
-    assert_equal account.id.to_s, last_request.session[:account_id]
-    assert_includes last_response.body, 'Confirm my email address'
 
-    post '/accounts/confirm_email'
-    follow_redirect! while last_response.redirect?
+    click_button 'Confirm my email address'
+    assert page.has_content?('Your email address was confirmed')
     assert account.reload.email_confirmed
-    assert_includes last_response.body, 'Your email address was confirmed'
   end
 
   test 'email confirmation link confirms an already signed-in account' do
     account = FactoryBot.create(:account, email_confirmed: false)
-    sign_in_with_rack(account)
+    sign_in(account)
     account.set(email_confirmed: false)
-    token = account.reload.link_token
 
-    get "/confirm_email/#{token}"
-    post '/accounts/confirm_email'
-    follow_redirect! while last_response.redirect?
+    visit "/confirm_email/#{account.reload.link_token}"
+    click_button 'Confirm my email address'
 
+    assert page.has_content?('Your email address was confirmed')
     assert account.reload.email_confirmed
-    assert_includes last_response.body, 'Your email address was confirmed'
   end
 
   test 'the confirmation button does nothing without the link' do
@@ -664,22 +652,53 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'connecting a provider while signed in waits for confirmation' do
     account = FactoryBot.create(:account)
-    sign_in_with_rack(account)
-    omniauth_callback_as(uid: 'google-uid-connect')
-    assert_includes last_response.body, '/accounts/providers/confirm'
+    sign_in(account)
+    visit_omniauth_as(uid: 'google-uid-connect')
+    assert page.has_content?('Connect the Google account')
     assert_empty account.reload.provider_links
 
-    post '/accounts/providers/confirm'
+    click_button 'Connect'
+    assert page.has_content?('Connected!')
     assert_equal ['google-uid-connect'], account.reload.provider_links.map(&:provider_uid)
   end
 
   test 'cancelling a provider connection links nothing' do
+    account = FactoryBot.create(:account)
+    sign_in(account)
+    visit_omniauth_as(uid: 'google-uid-cancel')
+    click_button 'Cancel'
+    assert page.has_current_path?('/accounts/providers')
+    assert page.has_link?('Connect', href: '/auth/google_oauth2')
+    assert_empty account.reload.provider_links
+  end
+
+  test 'confirming a provider connection after cancelling it links nothing' do
     account = FactoryBot.create(:account)
     sign_in_with_rack(account)
     omniauth_callback_as(uid: 'google-uid-cancel')
     post '/accounts/providers/cancel'
     post '/accounts/providers/confirm'
     assert_empty account.reload.provider_links
+  end
+
+  test 'connecting a provider asks a session that signed in with a password for a sign in code' do
+    account = FactoryBot.create(:account)
+    visit '/accounts/sign_in'
+    fill_in 'Email', with: account.email
+    fill_in 'Password', with: account.password
+    click_button 'Sign in'
+    assert page.has_content?('Signed in')
+
+    visit_omniauth_as(uid: 'google-uid-unverified')
+    assert page.has_content?('To connect Google, enter the code below, then connect it again.')
+    enter_sign_in_code(account)
+    assert page.has_current_path?('/accounts/providers')
+    assert_empty account.reload.provider_links
+
+    visit_omniauth_as(uid: 'google-uid-unverified')
+    click_button 'Connect'
+    assert page.has_content?('Connected!')
+    assert_equal ['google-uid-unverified'], account.reload.provider_links.map(&:provider_uid)
   end
 
   test 'connecting a provider needs a sign in code from the last hour' do
@@ -689,13 +708,6 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal '/accounts/sign_in_code', last_request.path
     post '/accounts/providers/confirm'
     assert_empty account.reload.provider_links
-
-    get '/', sign_in_code: account.issue_sign_in_code!
-    follow_redirect! while last_response.redirect?
-    assert_equal '/accounts/providers', last_request.path
-    omniauth_callback_as(uid: 'google-uid-unverified')
-    post '/accounts/providers/confirm'
-    assert_equal ['google-uid-unverified'], account.reload.provider_links.map(&:provider_uid)
   end
 
   test 'a sign in code works once' do
@@ -743,11 +755,16 @@ class AccountsTest < ActiveSupport::TestCase
     account = FactoryBot.create(:account)
     code = account.issue_sign_in_code!
 
-    clear_cookies
-    post '/accounts/sign_in_code', email: account.email
+    visit '/accounts/sign_in'
+    click_link 'Get a sign in code to your email'
+    fill_in 'sign-in-code-email', with: account.email
+    click_button 'Get code'
+    assert page.has_content?("A sign in code was sent to #{account.email}")
     assert_equal code, account.reload.issue_sign_in_code!
-    get '/', sign_in_code: code
-    assert_equal account.id.to_s, last_request.session[:account_id]
+
+    fill_in 'code', with: code
+    click_button 'Submit'
+    assert page.has_content?('Signed in with a sign in code')
   end
 
   test 'asking for a sign in code gives a new one once the last has little time left or was used' do
@@ -809,15 +826,23 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal crypted_password, account.crypted_password
   end
 
-  test 'changing the password needs the two passwords to match and to be long enough' do
+  test 'changing the password needs the two passwords to match' do
+    account = FactoryBot.create(:account)
+    crypted_password = account.crypted_password
+    sign_in(account)
+    visit '/accounts/password'
+    fill_in 'New password', with: 'a-new-password'
+    fill_in 'Confirm new password', with: 'a-different-password'
+    click_button 'Change password'
+    assert page.has_content?("The passwords didn't match.")
+    assert_equal crypted_password, account.reload.crypted_password
+  end
+
+  # The form's minlength stops a browser sending a short one
+  test 'changing the password needs it to be long enough' do
     account = FactoryBot.create(:account)
     crypted_password = account.crypted_password
     sign_in_with_rack(account)
-    get '/accounts/password'
-    assert last_response.ok?
-
-    post '/accounts/password', password: 'a-new-password', password_confirmation: 'a-different-password'
-    assert_includes last_response.body, "The passwords didn't match."
     post '/accounts/password', password: 'short', password_confirmation: 'short'
     assert_includes last_response.body, "Your password wasn't changed"
     assert_equal crypted_password, account.reload.crypted_password
@@ -825,19 +850,21 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'changing the email sends a confirmation email whose link still works' do
     account = FactoryBot.create(:account)
-    sign_in_with_rack(account)
+    sign_in(account)
     sent_tokens = []
     original = Account.instance_method(:send_confirmation_email)
     Account.define_method(:send_confirmation_email) { sent_tokens << link_token_for_email }
 
-    post '/accounts/edit', account: { name: account.name, email: 'new-address@example.com' }
+    visit '/accounts/edit'
+    fill_in 'Email', with: 'new-address@example.com'
+    click_button 'Save profile'
+    assert page.has_content?('Please click the link in the email we sent to confirm your new email address')
     assert_equal 'new-address@example.com', account.reload.email
     refute account.email_confirmed?
     assert_equal [account.link_token], sent_tokens
 
-    get "/confirm_email/#{sent_tokens.first}"
-    assert last_response.ok?
-    assert_includes last_response.body, 'Confirm my email address'
+    visit "/confirm_email/#{sent_tokens.first}"
+    assert page.has_button?('Confirm my email address')
   ensure
     Account.define_method(:send_confirmation_email, original)
   end
@@ -845,10 +872,12 @@ class AccountsTest < ActiveSupport::TestCase
   test 'a session from an email link can still edit the rest of the profile' do
     account = FactoryBot.create(:account)
     account.generate_link_token!
-    clear_cookies
-    get '/', link_token: account.link_token
+    visit "/?link_token=#{account.link_token}"
 
-    post '/accounts/edit', account: { name: 'A New Name', email: account.email }
+    visit '/accounts/edit'
+    fill_in 'Full name', with: 'A New Name'
+    click_button 'Save profile'
+    assert page.has_content?('Your account was updated successfully')
     assert_equal 'A New Name', account.reload.name
   end
 
@@ -885,10 +914,23 @@ class AccountsTest < ActiveSupport::TestCase
     post '/accounts/destroy', email: account.email
     assert_equal '/accounts/sign_in_code', URI(last_response.location).path
     assert Account.find(account.id)
+  end
 
-    get '/', sign_in_code: account.issue_sign_in_code!
-    assert_equal '/accounts/delete', URI(last_response.location).path
-    post '/accounts/destroy', email: account.email
+  test 'deleting the account from a session from an email link, after entering a sign in code' do
+    account = FactoryBot.create(:account)
+    account.set(email_confirmed: true)
+    account.generate_link_token!
+    visit "/accounts/edit?link_token=#{account.link_token}"
+    click_link 'Delete account'
+    assert page.has_content?('To delete your account, enter the code below.')
+    assert Account.find(account.id)
+
+    enter_sign_in_code(account)
+    assert page.has_current_path?('/accounts/delete')
+    # Labelled by aria-label, which Capybara doesn't match by default
+    fill_in 'email', with: account.email
+    click_button 'Delete account'
+    assert page.has_content?('Your account was deleted')
     assert_nil Account.find(account.id)
   end
 
@@ -904,11 +946,23 @@ class AccountsTest < ActiveSupport::TestCase
     post '/accounts/disconnect/google_oauth2'
     assert_equal '/accounts/sign_in_code', URI(last_response.location).path
     assert_equal ['Google'], account.reload.provider_links.map(&:provider)
+  end
 
-    get '/', sign_in_code: account.issue_sign_in_code!
-    assert_equal '/accounts/providers', URI(last_response.location).path
-    post '/accounts/disconnect/google_oauth2'
-    assert_equal '/accounts/providers', URI(last_response.location).path
+  test 'disconnecting a provider from a session from an email link, after entering a sign in code' do
+    account = FactoryBot.create(:account)
+    account.set(email_confirmed: true)
+    account.provider_links.create!(provider: 'Google', provider_uid: 'google-uid-disconnect', omniauth_hash: { 'uid' => 'google-uid-disconnect' })
+    account.generate_link_token!
+    visit "/accounts/providers?link_token=#{account.link_token}"
+    click_link 'Disconnect'
+    assert page.has_content?('Nothing was disconnected: enter the code below, then disconnect it again.')
+    assert_equal ['Google'], account.reload.provider_links.map(&:provider)
+
+    enter_sign_in_code(account)
+    assert page.has_current_path?('/accounts/providers')
+    click_link 'Disconnect'
+    assert page.has_content?('Disconnected!')
+    assert page.has_current_path?('/accounts/providers')
     assert_empty account.reload.provider_links
   end
 
@@ -916,70 +970,86 @@ class AccountsTest < ActiveSupport::TestCase
     account = FactoryBot.create(:account)
     api_key = account.api_key
     ics_key = account.ensure_ics_key!
-    sign_in_with_rack(account)
-    get '/accounts/api_key'
-    assert_includes last_response.body, ics_key
+    sign_in(account)
+    visit '/accounts/api_key'
+    assert page.has_field?('ics_key', with: ics_key)
 
-    post '/accounts/api_key'
-    follow_redirect!
-    assert_includes last_response.body, 'Your API key was replaced'
+    click_button_and_confirm 'Replace API key'
+    assert page.has_content?('Your API key was replaced')
     account.reload
     refute_equal api_key, account.api_key
     assert_nil Account.find_by(api_key: api_key)
     assert_equal ics_key, account.ics_key
-    assert_includes last_response.body, account.api_key
+    assert page.has_field?('api_key', with: account.api_key)
 
     api_key = account.api_key
-    post '/accounts/ics_key'
-    follow_redirect!
-    assert_includes last_response.body, 'Your calendar key was replaced'
+    click_button_and_confirm 'Replace calendar key'
+    assert page.has_content?('Your calendar key was replaced')
     account.reload
     refute_equal ics_key, account.ics_key
     assert_nil Account.find_by(ics_key: ics_key)
     assert_equal api_key, account.api_key
-    assert_includes last_response.body, account.ics_key
+    assert page.has_field?('ics_key', with: account.ics_key)
   end
 
   test 'changing the password signs out other sessions and ends the links already sent' do
     account = FactoryBot.create(:account)
+    # Signs in first, as signing in resets every browser
+    sign_in(account)
     account.generate_link_token!
     link = account.link_token
-    other_browser = Rack::Test::Session.new(app)
-    other_browser.get '/', link_token: link
-    other_browser.get '/accounts/edit'
-    assert other_browser.last_response.ok?
+    Capybara.using_session(:other_browser) do
+      visit "/?link_token=#{link}"
+      visit '/accounts/edit'
+      assert page.has_field?('Full name')
+    end
     link = account.reload.link_token # signing in made a new one
 
-    sign_in_with_rack(account)
-    post '/accounts/password', password: 'a-new-password', password_confirmation: 'a-new-password'
+    visit '/accounts/password'
+    fill_in 'New password', with: 'a-new-password'
+    fill_in 'Confirm new password', with: 'a-new-password'
+    click_button 'Change password'
+    assert page.has_content?('Your password was changed, and other browsers were signed out.')
     assert account.reload.password_matches?('a-new-password')
-    get '/accounts/edit'
-    assert last_response.ok?
+    visit '/accounts/edit'
+    assert page.has_field?('Full name')
 
-    other_browser.get '/accounts/edit'
-    assert other_browser.last_response.redirect?
-    assert_nil other_browser.last_request.session[:account_id]
-    other_browser.get '/', link_token: link
-    assert_nil other_browser.last_request.session[:account_id]
+    Capybara.using_session(:other_browser) do
+      visit '/accounts/edit'
+      assert page.has_current_path?('/accounts/new', ignore_query: true)
+      visit "/?link_token=#{link}"
+      assert page.has_content?("That sign in link isn't valid any longer")
+    end
   end
 
-  test 'signing out of other browsers keeps this one and needs a code' do
+  test 'a session from an email link needs a code to sign out other browsers' do
     account = FactoryBot.create(:account)
-    other_browser = Rack::Test::Session.new(app)
     account.generate_link_token!
-    other_browser.get '/', link_token: account.link_token
-    other_browser.post '/accounts/sign_out_other_browsers'
-    assert_equal '/accounts/sign_in_code', URI(other_browser.last_response.location).path
-
-    sign_in_with_rack(account)
+    clear_cookies
+    get '/', link_token: account.link_token
     post '/accounts/sign_out_other_browsers'
-    follow_redirect!
-    assert_includes last_response.body, 'Your other browsers were signed out.'
-    get '/accounts/edit'
-    assert last_response.ok?
-    other_browser.get '/accounts/edit'
-    assert other_browser.last_response.redirect?
-    assert_nil other_browser.last_request.session[:account_id]
+    assert_equal '/accounts/sign_in_code', URI(last_response.location).path
+  end
+
+  test 'signing out of other browsers keeps this one' do
+    account = FactoryBot.create(:account)
+    sign_in(account)
+    account.generate_link_token!
+    Capybara.using_session(:other_browser) do
+      visit "/?link_token=#{account.link_token}"
+      visit '/accounts/edit'
+      assert page.has_field?('Full name')
+    end
+
+    visit '/accounts/password'
+    click_button_and_confirm 'Sign out other browsers', button: 'Sign me out of other browsers'
+    assert page.has_content?('Your other browsers were signed out.')
+    visit '/accounts/edit'
+    assert page.has_field?('Full name')
+    Capybara.using_session(:other_browser) do
+      visit '/accounts/edit'
+      assert page.has_current_path?('/accounts/new', ignore_query: true)
+    end
   end
 
   # Accounts at these coordinates in the organisation, put there directly, so they've no stored hexagon (map_hex), like
@@ -1312,17 +1382,17 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'confirming the email with a code in the browser that signed up keeps its provider' do
-    start_omniauth_signup(email: 'ethan@example.com')
-    post '/accounts/new', account: { name: 'Ethan Example', email: 'ethan@example.com' }, omniauth_signup: '1'
+    sign_up_with_google(email: 'ethan@example.com')
     account = Account.find_by(email: 'ethan@example.com')
     crypted_password = account.crypted_password
 
-    get '/', sign_in_code: account.issue_sign_in_code!
+    visit "/?sign_in_code=#{account.issue_sign_in_code!}"
+    assert page.has_content?('Signed in with a sign in code')
     assert account.reload.email_confirmed
     refute account.provider_links.find_by(provider: 'Google').before_email_confirmed
     assert_equal crypted_password, account.crypted_password
-    get '/accounts/edit'
-    assert last_response.ok?
+    visit '/accounts/edit'
+    assert page.has_field?('Full name', with: 'Alice Example')
   end
 
   test 'confirming the email with the link elsewhere ends the provider of whoever signed up with it' do
@@ -1342,16 +1412,16 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'confirming the email with the link in the browser that signed up keeps its provider' do
-    start_omniauth_signup(email: 'linked-here@example.com')
-    post '/accounts/new', account: { name: 'Lena Here', email: 'linked-here@example.com' }, omniauth_signup: '1'
+    sign_up_with_google(email: 'linked-here@example.com')
     account = Account.find_by(email: 'linked-here@example.com')
 
-    get "/confirm_email/#{account.link_token_for_email}"
-    post '/accounts/confirm_email'
+    visit "/confirm_email/#{account.link_token_for_email}"
+    click_button 'Confirm my email address'
+    assert page.has_content?('Your email address was confirmed')
     assert account.reload.email_confirmed
     refute account.provider_links.find_by(provider: 'Google').before_email_confirmed
-    get '/accounts/edit'
-    assert last_response.ok?
+    visit '/accounts/edit'
+    assert page.has_field?('Full name', with: 'Alice Example')
   end
 
   test 'a session from a link that changes the email with a code and confirms it there keeps its password and providers' do
@@ -1359,20 +1429,29 @@ class AccountsTest < ActiveSupport::TestCase
     account.set(email_confirmed: true)
     account.provider_links.create!(provider: 'Google', provider_uid: 'google-uid-email-change', omniauth_hash: { 'uid' => 'google-uid-email-change' }, before_email_confirmed: false)
     crypted_password = account.crypted_password
-    get '/', link_token: account.link_token_for_email
+    visit "/?link_token=#{account.link_token_for_email}"
 
-    post '/accounts/edit', account: { name: account.name, email: 'changed-here@example.com' }
-    assert_equal '/accounts/sign_in_code', URI(last_response.location).path
-    get '/', sign_in_code: account.issue_sign_in_code!
-    post '/accounts/edit', account: { name: account.name, email: 'changed-here@example.com' }
+    visit '/accounts/edit'
+    fill_in 'Email', with: 'changed-here@example.com'
+    click_button 'Save profile'
+    assert page.has_content?('to change your email, enter the code below, then make the change again')
+    assert_equal account.email, account.reload.email
+    enter_sign_in_code(account)
+    assert page.has_current_path?('/accounts/edit')
+    fill_in 'Email', with: 'changed-here@example.com'
+    click_button 'Save profile'
+    assert page.has_content?('Please click the link in the email we sent to confirm your new email address')
     assert_equal 'changed-here@example.com', account.reload.email
 
-    get "/confirm_email/#{account.link_token}"
-    post '/accounts/confirm_email'
+    visit "/confirm_email/#{account.link_token}"
+    click_button 'Confirm my email address'
+    assert page.has_content?('Your email address was confirmed')
     assert account.reload.email_confirmed
     assert_equal crypted_password, account.crypted_password
     refute account.provider_links.find_by(provider: 'Google').before_email_confirmed
-    assert_equal account.session_token, last_request.session[:session_token]
+    # Still signed in, with the session token confirming gave it
+    visit '/accounts/edit'
+    assert page.has_field?('Email', with: 'changed-here@example.com')
   end
 
   test 'confirming the email elsewhere removes providers connected before it was tracked' do
@@ -1401,15 +1480,21 @@ class AccountsTest < ActiveSupport::TestCase
 
   test 'changing the email puts its providers on trial until the new address is confirmed' do
     account = FactoryBot.create(:account)
-    sign_in_with_rack(account)
+    sign_in(account)
     account.provider_links.create!(provider: 'Google', provider_uid: 'google-uid-before-change', omniauth_hash: { 'uid' => 'google-uid-before-change' }, before_email_confirmed: false)
-    post '/accounts/edit', account: { name: account.name, email: 'someone-elses@example.com' }
+    visit '/accounts/edit'
+    fill_in 'Email', with: 'someone-elses@example.com'
+    click_button 'Save profile'
+    assert page.has_content?('Please click the link in the email we sent to confirm your new email address')
     assert_equal 'someone-elses@example.com', account.reload.email
     refute account.email_confirmed
     assert account.provider_links.find_by(provider: 'Google').before_email_confirmed
 
-    owner_browser = Rack::Test::Session.new(app)
-    owner_browser.get '/', sign_in_code: account.issue_sign_in_code!
+    # The address's owner signs in with a code in their own browser
+    Capybara.using_session(:owner_browser) do
+      visit "/?sign_in_code=#{Account.find(account.id).issue_sign_in_code!}"
+      assert page.has_content?('Signed in with a sign in code')
+    end
     assert account.reload.email_confirmed
     assert_empty account.provider_links
   end
@@ -1456,29 +1541,27 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'signing up with Google under its verified Gmail address confirms the email' do
-    start_omniauth_signup(email: 'alice.example@gmail.com')
-    post '/accounts/new', account: { name: 'Alice Example', email: 'alice.example@gmail.com' }, omniauth_signup: '1'
+    sign_up_with_google(email: 'alice.example@gmail.com')
     account = Account.find_by(email: 'alice.example@gmail.com')
     assert account.email_confirmed
     refute account.provider_links.find_by(provider: 'Google').before_email_confirmed
   end
 
   test 'signing up with Google under another domain\'s address leaves the email unconfirmed' do
-    start_omniauth_signup
-    post '/accounts/new', account: { name: 'Alice Example', email: 'alice-oauth@example.com' }, omniauth_signup: '1'
+    sign_up_with_google
     account = Account.find_by(email: 'alice-oauth@example.com')
     refute account.email_confirmed
     assert account.provider_links.find_by(provider: 'Google').before_email_confirmed
   end
 
   test 'signing up with Google under its Gmail address but another email leaves the email unconfirmed' do
-    start_omniauth_signup(email: 'alice.example@gmail.com')
-    post '/accounts/new', account: { name: 'Alice Example', email: 'someone-else@gmail.com' }, omniauth_signup: '1'
+    sign_up_with_google(email: 'alice.example@gmail.com', signup_email: 'someone-else@gmail.com')
     account = Account.find_by(email: 'someone-else@gmail.com')
     refute account.email_confirmed
     assert account.provider_links.find_by(provider: 'Google').before_email_confirmed
   end
 
+  # The form after Google always says omniauth_signup, so only a hand-made request leaves it out
   test 'leftover omniauth session is not linked on a later signup' do
     start_omniauth_signup
     later = FactoryBot.build_stubbed(:account)
@@ -1489,14 +1572,23 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal 0, created.provider_links.count
   end
 
-  test 'abandoned omniauth session is not linked after a later visit to signup' do
+  test 'visiting signup again drops an abandoned omniauth session' do
     start_omniauth_signup
     get '/accounts/new'
     assert_nil last_request.session['omniauth.auth']
     refute_includes last_response.body, 'name="omniauth_signup"'
+  end
+
+  test 'abandoned omniauth session is not linked after a later visit to signup' do
+    visit_omniauth_as(uid: 'google-uid-1')
+    assert page.has_content?("isn't yet connected to a Dandelion account")
+    visit '/accounts/new'
+    assert page.has_button?('Sign up')
+    assert page.has_no_css?('input[name="omniauth_signup"]', visible: :all)
 
     later = FactoryBot.build_stubbed(:account)
-    post_new_account(later)
+    fill_signup_form(later)
+    assert page.has_content?('Welcome to Dandelion!')
 
     created = Account.find_by(email: later.email.downcase)
     assert created
@@ -1504,9 +1596,10 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'omniauth signup form links the provider' do
-    start_omniauth_signup
+    visit_omniauth_as(uid: 'google-uid-1')
     later = FactoryBot.build_stubbed(:account)
-    post_new_account(later, omniauth_signup: '1')
+    fill_signup_form(later)
+    assert page.has_content?('Welcome to Dandelion!')
 
     created = Account.find_by(email: later.email.downcase)
     assert created
@@ -1516,11 +1609,15 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'omniauth session is kept across failed signup validation' do
-    start_omniauth_signup
-    post_new_account(FactoryBot.build_stubbed(:account, name: '', email: ''), omniauth_signup: '1')
+    visit_omniauth_as(uid: 'google-uid-1')
+    # Past the browser's own checks, but not the account's
+    fill_in 'Full name', with: 'www.example.com'
+    click_button 'Sign up'
+    assert page.has_content?('Some errors prevented the account from being saved')
 
     later = FactoryBot.build_stubbed(:account)
-    post_new_account(later, omniauth_signup: '1')
+    fill_signup_form(later)
+    assert page.has_content?('Welcome to Dandelion!')
 
     created = Account.find_by(email: later.email.downcase)
     assert created
@@ -1667,6 +1764,40 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   private
+
+  # Comes back from Google, in the browser, as this Google account
+  def visit_omniauth_as(uid:, email: 'alice-oauth@example.com')
+    OmniAuth.config.test_mode = true
+    OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new(
+      provider: 'google_oauth2', uid: uid, info: { name: 'Alice Example', email: email }
+    )
+    visit '/auth/google_oauth2'
+  ensure
+    OmniAuth.config.test_mode = false
+    OmniAuth.config.mock_auth[:google_oauth2] = nil
+  end
+
+  # Signs up with Google, in the form it fills in, as Alice Example under signup_email (Google's email unless given)
+  def sign_up_with_google(email: 'alice-oauth@example.com', signup_email: nil)
+    visit_omniauth_as(uid: 'google-uid-1', email: email)
+    assert page.has_content?("isn't yet connected to a Dandelion account")
+    fill_in 'Email', with: signup_email if signup_email
+    click_button 'Sign up'
+    assert page.has_content?('Welcome to Dandelion!')
+  end
+
+  # On the page asking for the sign in code just emailed
+  def enter_sign_in_code(account)
+    fill_in 'code', with: Account.find(account.id).issue_sign_in_code!
+    click_button 'Submit'
+  end
+
+  # Buttons that ask first, in a popover whose button is named label
+  def click_button_and_confirm(label, button: label)
+    click_button button
+    # The popover hangs off the page
+    page.document.find('.popover').click_button label
+  end
 
   def siwe_template_from(response)
     assert response.ok?

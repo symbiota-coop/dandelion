@@ -14,10 +14,6 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     event.event_feedbacks.create!(account: account, rating: rating)
   end
 
-  def follow_redirects
-    follow_redirect! while last_response.redirect?
-  end
-
   # Stands in for Mailgun::BatchMessage, keeping who an email would go to
   class RecordedEmail
     attr_reader :recipients
@@ -278,19 +274,6 @@ class EventFeedbacksTest < ActiveSupport::TestCase
   # Submitting feedback
   # ═══════════════════════════════════════════════════════════════════════════
 
-  test 'an attendee can leave feedback' do
-    covers 'events/attendees-give-feedback@24ba67'
-    create_attended_event
-    sign_in_with_rack(@attendee)
-
-    post "/e/#{@event.slug}/give_feedback", event_feedback: { rating: 4 }
-    follow_redirects
-
-    assert_includes last_response.body, 'Thanks for your feedback!'
-    assert_equal 1, @event.event_feedbacks.count
-    assert_equal 4, @event.event_feedbacks.first.rating
-  end
-
   def visit_feedback_form
     create_attended_event
     sign_in(@attendee)
@@ -327,7 +310,14 @@ class EventFeedbacksTest < ActiveSupport::TestCase
 
     click_button 'Submit feedback'
     assert page.has_content?('Thanks for your feedback!')
+    assert_equal 1, @event.event_feedbacks.count
     assert_equal 4, @event.event_feedbacks.first.rating
+  end
+
+  def submit_rating(rating)
+    find("label[for=\"event_feedback_rating_#{rating}\"]").click
+    assert_rating(rating)
+    click_button 'Submit feedback'
   end
 
   test 'an attendee can choose a star rating with a tap' do
@@ -351,28 +341,22 @@ class EventFeedbacksTest < ActiveSupport::TestCase
   end
 
   test 'a second live submission is rejected and not thanked' do
-    create_attended_event
+    visit_feedback_form
     create_feedback(account: @attendee, rating: 3)
-    sign_in_with_rack(@attendee)
 
-    post "/e/#{@event.slug}/give_feedback", event_feedback: { rating: 1 }
-    follow_redirects
-
-    refute_includes last_response.body, 'Thanks for your feedback!'
-    assert_includes last_response.body, "You've already left feedback on that event"
+    submit_rating(1)
+    assert page.has_content?("You've already left feedback on that event")
+    assert page.has_no_content?('Thanks for your feedback!')
     assert_equal 1, @event.event_feedbacks.count
     assert_equal 1, EventFeedback.unscoped.and(event: @event, account: @attendee).count
   end
 
   test 'an attendee can leave new feedback after the first is deleted' do
-    create_attended_event
+    visit_feedback_form
     create_feedback(account: @attendee, rating: 3).destroy
-    sign_in_with_rack(@attendee)
 
-    post "/e/#{@event.slug}/give_feedback", event_feedback: { rating: 5 }
-    follow_redirects
-
-    assert_includes last_response.body, 'Thanks for your feedback!'
+    submit_rating(5)
+    assert page.has_content?('Thanks for your feedback!')
     assert_equal 1, @event.event_feedbacks.count
     assert_equal 5, @event.event_feedbacks.first.rating
     assert_equal 2, EventFeedback.unscoped.and(event: @event, account: @attendee).count
@@ -388,9 +372,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
   end
 
   test 'a failed save surfaces the error instead of thanking the attendee' do
-    create_attended_event
-    sign_in_with_rack(@attendee)
-    header 'HTTP_REFERER', "/e/#{@event.slug}/give_feedback"
+    visit_feedback_form
 
     original = EventFeedback.instance_method(:save)
     EventFeedback.define_method(:save) do |*_args|
@@ -398,10 +380,9 @@ class EventFeedbacksTest < ActiveSupport::TestCase
       false
     end
     begin
-      post "/e/#{@event.slug}/give_feedback", event_feedback: { rating: 2 }
-      follow_redirects
-      refute_includes last_response.body, 'Thanks for your feedback!'
-      assert_includes last_response.body, 'could not be saved'
+      submit_rating(2)
+      assert page.has_content?('could not be saved')
+      assert page.has_no_content?('Thanks for your feedback!')
       assert_equal 0, EventFeedback.unscoped.count
     ensure
       EventFeedback.define_method(:save, original)
@@ -463,17 +444,14 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     @event.ticket_types.first.tickets.create!(event: @event, order: order, account: attendee, payment_completed: true, price: 0)
     other_attendee = FactoryBot.create(:account)
     @event.ticket_types.first.tickets.create!(event: @event, account: other_attendee, payment_completed: true, price: 0)
-    sign_in_with_rack(@account)
+    sign_in(@account)
 
-    get "/e/#{@event.slug}/orders"
-    assert_equal 200, last_response.status
-    link = Capybara.string(last_response.body).find_link('Resend feedback email')
-    assert_equal "/e/#{@event.slug}/resend_feedback_email/#{attendee.id}", link[:href]
+    visit "/e/#{@event.slug}/orders"
+    assert page.has_link?('Resend feedback email', href: "/e/#{@event.slug}/resend_feedback_email/#{attendee.id}")
 
     Delayed::Job.delete_all
-    post link[:href]
-    follow_redirects
-    assert_includes last_response.body, 'The feedback email was resent.'
+    click_link 'Resend feedback email'
+    assert page.has_content?('The feedback email was resent.')
 
     emails = emails_sent_by_jobs(/send_feedback_requests/)
     assert_equal [[attendee.email]], emails.map(&:recipients)
@@ -505,19 +483,20 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     run_public_answer_jobs('"The teacher was kind and the room was too cold."')
     assert_equal [['How was it?', 'The teacher was kind and the room was too cold.']], feedback.reload.public_answers
 
-    sign_in_with_rack(@account)
-    get "/event_feedbacks/#{feedback.id}/public_answers/0"
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, 'The teacher was kind and the room was too cold.'
-    refute_includes last_response.body, 'Show an extract'
-
     # The feedback table shows each extract with the page, rather than loading it
-    get "/e/#{@event.slug}/feedback"
-    assert_includes last_response.body, 'The teacher was kind and the room was too cold.'
-
-    post "/event_feedbacks/#{feedback.id}/public_answers/0", public_answer: 'It was a wonderful day.'
-    assert_equal 200, last_response.status
-    assert_equal [['How was it?', 'It was a wonderful day.']], feedback.reload.public_answers
+    sign_in(@account)
+    visit "/e/#{@event.slug}/feedback"
+    extract = "[data-pagelet-url='/event_feedbacks/#{feedback.id}/public_answers/0']"
+    within(extract) do
+      assert page.has_field?('Public extract', with: 'The teacher was kind and the room was too cold.')
+      assert page.has_no_link?('Show an extract')
+      fill_in 'Public extract', with: 'It was a wonderful day.'
+      find('button[aria-label="Save extract"]').click
+    end
+    page.document.synchronize do
+      raise Capybara::ExpectationNotMet, 'extract not saved yet' unless feedback.reload.public_answers == [['How was it?', 'It was a wonderful day.']]
+    end
+    assert page.has_field?('Public extract', with: 'It was a wonderful day.')
   end
 
   test 'no extract is suggested when the answer has nothing to quote' do

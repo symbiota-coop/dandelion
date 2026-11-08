@@ -1,7 +1,26 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 class OrdersTest < ActiveSupport::TestCase
+  include Capybara::DSL
   include Rack::Test::Methods
+
+  # Links that remove something ask in a popover first, whose button is named after the link
+  def click_link_and_confirm(label)
+    click_link label
+    # The popover hangs off the page, outside any within block
+    page.document.find('.popover').click_button label
+  end
+
+  # Waits for something a request from the page does, such as a field that saves when it changes, to be done
+  def wait_until(message)
+    page.document.synchronize { raise Capybara::ExpectationNotMet, message unless yield }
+  end
+
+  # Changes a ticketholder field on the order's page, which saves it when it changes
+  def change_ticketholder_field(field, value)
+    fill_in field, with: value
+    find_field(field).send_keys(:tab)
+  end
 
   def create_complete_order
     create_event(prices: [0])
@@ -284,43 +303,53 @@ class OrdersTest < ActiveSupport::TestCase
     assert_nil @ticket.reload.name
   end
 
-  test 'ticketholder details of legacy tickets can be edited with the ticket mongo id' do
+  test 'ticketholder details of legacy tickets can be edited on the order page' do
     create_complete_order_with_ticket
     @ticket.unset(:token)
     @ticket.reload
     assert_equal @ticket.id.to_s, @ticket.public_id
 
-    post ticketholder_path(@order.token, 'name', ticket_ref: @ticket.id), name: 'Legacy Name'
-    assert_equal 200, last_response.status
-    assert_equal 'Legacy Name', @ticket.reload.name
+    visit "/e/#{@event.slug}?order_id=#{@order.token}&success=true"
+    assert page.has_content? 'Thanks for booking'
+    change_ticketholder_field 'name', 'Legacy Name'
+    wait_until('name not saved') { @ticket.reload.name == 'Legacy Name' }
   end
 
-  test 'ticketholder details can be edited with the order token' do
+  test 'ticketholder details can be edited on the order page' do
+    create_complete_order_with_ticket
+
+    visit "/e/#{@event.slug}?order_id=#{@order.token}&success=true"
+    assert page.has_content? 'Thanks for booking'
+    change_ticketholder_field 'name', 'New Name'
+    wait_until('name not saved') { @ticket.reload.name == 'New Name' }
+    change_ticketholder_field 'email', 'holder@example.com'
+    wait_until('email not saved') { @ticket.reload.email == 'holder@example.com' }
+  end
+
+  test 'ticketholder fields are served with the order token kept from referrers' do
     create_complete_order_with_ticket
 
     get ticketholder_path(@order.token, 'name')
     assert_equal 200, last_response.status
     assert_equal 'no-referrer', referrer_policy
-
-    post ticketholder_path(@order.token, 'name'), name: 'New Name'
-    assert_equal 200, last_response.status
-    assert_equal 'New Name', @ticket.reload.name
-
-    post ticketholder_path(@order.token, 'email'), email: 'holder@example.com', success: 1
-    assert_equal 200, last_response.status
-    assert_equal 'holder@example.com', @ticket.reload.email
   end
 
-  test 'ticketholder details of legacy orders can be edited with the order mongo id' do
+  test 'ticketholder fields of legacy orders are served by the order mongo id' do
     create_complete_order_with_ticket
     make_legacy_order
 
     get ticketholder_path(@order.id, 'name')
     assert_equal 200, last_response.status
+  end
 
-    post ticketholder_path(@order.id, 'name'), name: 'Legacy Name'
-    assert_equal 200, last_response.status
-    assert_equal 'Legacy Name', @ticket.reload.name
+  test 'ticketholder details of legacy orders can be edited on the order page, reached by the order mongo id' do
+    create_complete_order_with_ticket
+    make_legacy_order
+
+    visit "/e/#{@event.slug}?order_id=#{@order.id}&success=true"
+    assert page.has_content? 'Thanks for booking'
+    change_ticketholder_field 'name', 'Legacy Name'
+    wait_until('name not saved') { @ticket.reload.name == 'Legacy Name' }
   end
 
   test 'ticketholder details of tokenised orders cannot be edited with the order mongo id' do
@@ -690,17 +719,15 @@ class OrdersTest < ActiveSupport::TestCase
     covers 'events/attendees-cancel-free-rsvps@2edb4c'
     ticket = create_complimentary_ticket
     assert ticket.cancellable?
-    sign_in_with_rack(@attendee)
+    sign_in(@attendee)
 
-    get "/e/#{@event.slug}"
-    assert_includes last_response.body, "/tickets/#{ticket.id}/destroy"
+    visit "/e/#{@event.slug}"
+    assert page.has_link? 'Cancel RSVP', href: "/tickets/#{ticket.id}/destroy"
 
-    get "/tickets/#{ticket.id}/confirm_cancel"
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, "/tickets/#{ticket.id}/destroy"
-
-    post "/tickets/#{ticket.id}/destroy", from_confirm: '1'
-    assert_equal "http://example.org/e/#{@event.slug}", last_response.location
+    # As the Cancel your RSVP link in their ticket email does
+    visit "/tickets/#{ticket.id}/confirm_cancel"
+    click_button 'Yes, cancel my RSVP'
+    assert page.has_current_path? "/e/#{@event.slug}"
     assert_nil Ticket.find(ticket.id)
   end
 
@@ -736,14 +763,12 @@ class OrdersTest < ActiveSupport::TestCase
     @event.refresh_sold_out_cache_and_notify_waitlist
     Waitship.create!(event: @event, account: FactoryBot.create(:account))
     assert Event.find(@event.id).sold_out_cache
-    sign_in_with_rack(@attendee)
+    sign_in(@attendee)
 
-    get "/e/#{@event.slug}"
-    assert_includes last_response.body, "/orders/#{@order.id}/destroy"
-    get "/orders/#{@order.id}/confirm_cancel"
-    assert_equal 200, last_response.status
-    post "/orders/#{@order.id}/destroy", from_confirm: '1'
-    assert_equal "http://example.org/e/#{@event.slug}", last_response.location
+    visit "/e/#{@event.slug}"
+    assert page.has_content? 'Your orders'
+    click_link_and_confirm 'Cancel RSVP'
+    wait_until('order not cancelled') { queued_jobs(:send_rsvp_cancelled_email).exists? && queued_jobs(:send_waitlist_tickets_available).exists? }
     assert_nil Order.find(@order.id)
     assert_nil Ticket.find(@ticket.id)
 
@@ -755,9 +780,12 @@ class OrdersTest < ActiveSupport::TestCase
     covers 'events/cancellation-emails-and-waitlist@ddd281'
     Delayed::Job.delete_all
     ticket = create_complimentary_ticket
-    sign_in_with_rack(@attendee)
+    sign_in(@attendee)
 
-    post "/tickets/#{ticket.id}/destroy", from_confirm: '1'
+    visit "/e/#{@event.slug}"
+    assert page.has_content? 'Your tickets'
+    click_link_and_confirm 'Cancel RSVP'
+    wait_until('ticket not cancelled') { queued_jobs(:send_rsvp_cancelled_email).exists? }
     assert_nil Ticket.find(ticket.id)
     assert_equal [[@attendee.email]], emails_from_jobs(:send_rsvp_cancelled_email).map(&:recipients)
   end
@@ -775,12 +803,9 @@ class OrdersTest < ActiveSupport::TestCase
     assert_equal "/orders/#{@order.id}/confirm_cancel", cancel_url.path
 
     # Not signed in: the link's token signs them in
-    clear_cookies
-    get cancel_url.path, Rack::Utils.parse_query(cancel_url.query)
-    follow_redirect! while last_response.redirect?
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, "/orders/#{@order.id}/destroy"
-    post "/orders/#{@order.id}/destroy", from_confirm: '1'
+    visit cancel_url.request_uri
+    click_button 'Yes, cancel my RSVP'
+    assert page.has_current_path? "/e/#{@event.slug}"
     assert_nil Order.find(@order.id)
   end
 
@@ -840,25 +865,39 @@ class OrdersTest < ActiveSupport::TestCase
     assert_equal [[@attendee.email]], recorded_emails { @order.send_tickets_without_delay }.map(&:recipients)
 
     @ticket.set(email: nil)
-    post ticketholder_path(@order.token, 'email'), email: 'holder@example.com', success: 1
-    assert_equal 200, last_response.status
-    assert_equal 0, queued_jobs(:send_ticket).count
+    visit "/e/#{@event.slug}?order_id=#{@order.token}&success=true"
+    assert page.has_content? 'Thanks for booking'
+    change_ticketholder_field 'email', 'holder@example.com'
+    wait_until('email not saved') { @ticket.reload.email == 'holder@example.com' }
 
     @event.set(send_ticketholder_confirmation: true)
-    post ticketholder_path(@order.token, 'email'), email: 'friend@example.com', success: 1
-    assert_equal 200, last_response.status
+    visit "/e/#{@event.slug}?order_id=#{@order.token}&success=true"
+    assert page.has_content? 'receive the order confirmation'
+    change_ticketholder_field 'email', 'friend@example.com'
+    wait_until('order confirmation not sent') { queued_jobs(:send_ticket).exists? }
+    # Only for the second email, as the first was entered while the event didn't send it
     assert_equal [['friend@example.com']], emails_from_jobs(:send_ticket).map(&:recipients)
   end
 
-  test 'the original ticket PDF still works after the ticketholder changes' do
+  test 'the ticket keeps its token, which its PDF holds, when the ticketholder changes' do
     covers 'events/ticket-pdf-works-after-transfer@a22930'
     create_complete_order_with_ticket
     token = @ticket.public_id
 
-    post ticketholder_path(@order.token, 'name'), name: 'New Holder'
-    post ticketholder_path(@order.token, 'email'), email: 'newholder@example.com', success: 1
-    assert_equal 'newholder@example.com', @ticket.reload.email
+    visit "/e/#{@event.slug}?order_id=#{@order.token}&success=true"
+    assert page.has_content? 'Thanks for booking'
+    change_ticketholder_field 'name', 'New Holder'
+    wait_until('name not saved') { @ticket.reload.name == 'New Holder' }
+    change_ticketholder_field 'email', 'newholder@example.com'
+    wait_until('email not saved') { @ticket.reload.email == 'newholder@example.com' }
     assert_equal token, @ticket.public_id
+  end
+
+  test 'the original ticket PDF still checks in after the ticketholder changes' do
+    covers 'events/ticket-pdf-works-after-transfer@a22930'
+    create_complete_order_with_ticket
+    token = @ticket.public_id
+    @ticket.set(name: 'New Holder', email: 'newholder@example.com')
 
     secret = OpenSSL::HMAC.hexdigest('SHA256', ENV['CHECK_IN_SECRET'], "check_in:#{@event.id}")[0, 32]
     post "/e/#{@event.slug}/check_in/#{token}", checked_in: true, secret: secret
@@ -911,12 +950,15 @@ class OrdersTest < ActiveSupport::TestCase
     order.set(value: 15, application_fee_amount: 5, application_fee_paid_to_dandelion: true)
     order.tickets.create!(event: @event, account: order.account, ticket_type: @event.ticket_types.first, price: 10, payment_completed: true)
     order.donations.create!(account: order.account, event: @event, amount: 5)
-    sign_in_with_rack(@account)
+    sign_in(@account)
 
+    visit "/e/#{@event.slug}/orders"
     refund_params = []
     Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_test') do
       Stripe::Refund.stub :create, proc { |params, _opts| refund_params << params } do
-        post "/e/#{@event.slug}/orders/#{order.id}/refund_and_destroy"
+        click_button 'Actions'
+        click_link_and_confirm 'Remove and refund order'
+        assert page.has_content? 'No orders found'
       end
     end
     # No amount refunds the whole charge
@@ -931,11 +973,20 @@ class OrdersTest < ActiveSupport::TestCase
     other_order = create_paid_order(@event)
     ticket = other_order.tickets.create!(event: @event, account: other_order.account, ticket_type: @event.ticket_types.first, price: 10,
                                          payment_completed: true, payment_intent: other_order.payment_intent)
-    sign_in_with_rack(@account)
+    sign_in(@account)
 
     with_stubbed_stripe_refunds do |refunds|
-      post "/e/#{@event.slug}/orders/#{order.id}/destroy"
-      post "/e/#{@event.slug}/tickets/#{ticket.id}/destroy"
+      visit "/e/#{@event.slug}/orders"
+      within(:xpath, "//tr[.//a[@href='/e/#{@event.slug}/orders/#{order.id}/destroy']]") do
+        click_button 'Actions'
+        click_link_and_confirm 'Remove order'
+      end
+      assert page.has_content? 'Displaying 1 order'
+
+      visit "/e/#{@event.slug}/tickets"
+      click_button 'Actions'
+      click_link_and_confirm 'Remove ticket'
+      assert page.has_content? 'No tickets found'
       assert_empty refunds
     end
     assert_nil Order.find(order.id)
