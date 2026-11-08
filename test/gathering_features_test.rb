@@ -4,12 +4,6 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 class GatheringFeaturesTest < ActiveSupport::TestCase
   include Capybara::DSL
 
-  # A sign-in code works once, so signing someone in again needs a new one
-  def sign_in_again(account)
-    account.unset(:sign_in_code_nonce, :sign_in_code_expires_at, :sign_in_code_digest)
-    sign_in(account)
-  end
-
   def create_member(name: 'Member Person')
     FactoryBot.create(:account, name: name).tap { |account| @gathering.memberships.create!(account: account) }
   end
@@ -17,7 +11,8 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   # Links that remove something ask in a popover first, whose button is named after the link
   def click_link_and_confirm(label)
     click_link label
-    within('.popover') { click_button label }
+    # The popover hangs off the page, outside any within block
+    page.document.find('.popover').click_button label
   end
 
   def gathering_path(path = '')
@@ -60,7 +55,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     assert page.has_current_path?(gathering_path('/apply'), ignore_query: true)
     assert @gathering.mapplications.find_by(account: applicant)
 
-    sign_in_again(@account)
+    sign_in(@account)
     visit gathering_path('/applications')
     assert page.has_content? 'Keen Applicant'
     click_link 'Propose'
@@ -202,5 +197,166 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     find("select[aria-label='Responsible']").select 'Member Person'
     assert page.has_css? "select[aria-label='Responsible'] option[selected]", text: 'Member Person'
     assert_equal member.id, item.reload.responsible_id
+  end
+
+  test 'an admin removes a member' do
+    create_gathering(privacy: 'open')
+    member = create_member
+    sign_in(@account)
+    visit gathering_path('/members')
+    within("[data-pagelet-url='#{gathering_path("/membership_row/#{@gathering.memberships.find_by(account: member).id}")}']") do
+      click_link_and_confirm 'Remove'
+    end
+    assert page.has_content? 'Add member'
+    assert page.has_no_content? 'Member Person'
+    assert_nil @gathering.memberships.find_by(account: member)
+  end
+
+  test 'an admin deletes an application' do
+    create_gathering(privacy: 'closed')
+    @gathering.mapplications.create!(account: FactoryBot.create(:account, name: 'Keen Applicant'), status: 'pending')
+    sign_in(@account)
+    visit gathering_path('/applications')
+    click_link_and_confirm 'Delete'
+    assert page.has_content? 'Non-members can apply via'
+    assert page.has_no_content? 'Keen Applicant'
+    assert_equal 0, @gathering.mapplications.count
+  end
+
+  test 'editing and deleting an option' do
+    create_gathering(privacy: 'open')
+    @gathering.options.create!(name: 'Camping', type: 'Tier', account: @account)
+    sign_in(@account)
+    visit gathering_path('/options')
+    click_link 'Camping'
+    within('#modal') do
+      fill_in 'Name', with: 'Camping field'
+      click_button 'Update option'
+    end
+    assert page.has_link? 'Camping field'
+
+    click_link 'Camping field'
+    within('#modal') { click_link_and_confirm 'Delete' }
+    assert page.has_link? 'Add an option'
+    assert page.has_no_content? 'Camping field'
+    assert_equal 0, @gathering.options.count
+  end
+
+  test 'editing and deleting a team' do
+    create_gathering(privacy: 'open')
+    team = @gathering.teams.create!(name: 'Kitchen', account: @account)
+    sign_in(@account)
+    visit gathering_path("/teams/#{team.id}")
+    click_link 'Edit team'
+    fill_in 'Name', with: 'Kitchen crew'
+    click_button 'Update team'
+    assert page.has_content? 'Kitchen crew'
+
+    click_link 'Edit team'
+    click_link_and_confirm 'Delete'
+    assert page.has_content? 'General'
+    assert page.has_no_content? 'Kitchen crew'
+    assert_nil @gathering.teams.find_by(id: team.id)
+  end
+
+  test 'editing and deleting an expense' do
+    create_gathering(privacy: 'open')
+    @gathering.spends.create!(item: 'Vegetables', amount: 30, team: @gathering.teams.first, account: @account)
+    sign_in(@account)
+    visit gathering_path('/budget')
+    click_link 'Vegetables'
+    fill_in 'Item', with: 'Fruit and vegetables'
+    click_button 'Update spend'
+    assert page.has_link? 'Fruit and vegetables'
+
+    click_link 'Fruit and vegetables'
+    click_link_and_confirm 'Delete'
+    assert page.has_link? 'List expense'
+    assert page.has_no_content? 'Fruit and vegetables'
+    assert_equal 0, @gathering.spends.count
+  end
+
+  test "editing and deleting a rota and its roles and slots" do
+    create_gathering(privacy: 'open')
+    rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
+    Role.create!(name: 'Cook', rota: rota)
+    Rslot.create!(name: 'Morning', rota: rota)
+    sign_in(@account)
+    visit gathering_path("/rotas/#{rota.id}")
+
+    click_link 'Cook'
+    within('#modal') do
+      fill_in 'Name', with: 'Head cook'
+      click_button 'Update role'
+    end
+    assert page.has_link? 'Head cook'
+    click_link 'Morning'
+    within('#modal') do
+      fill_in 'Name', with: 'Early morning'
+      click_button 'Update slot'
+    end
+    assert page.has_link? 'Early morning'
+
+    click_link 'Head cook'
+    within('#modal') { click_link_and_confirm 'Delete' }
+    assert page.has_link? 'Early morning'
+    assert page.has_no_link? 'Head cook'
+    click_link 'Early morning'
+    within('#modal') { click_link_and_confirm 'Delete' }
+    assert page.has_link? 'Edit rota'
+    assert page.has_no_link? 'Early morning'
+
+    click_link 'Edit rota'
+    fill_in 'Name', with: 'Kitchen shifts'
+    click_button 'Update rota'
+    assert page.has_content? 'Kitchen shifts'
+    click_link 'Edit rota'
+    click_link_and_confirm 'Delete'
+    assert page.has_current_path?(gathering_path('/rotas'))
+    assert_equal 0, @gathering.rotas.count
+  end
+
+  test 'editing and deleting a timetable and its activities' do
+    create_gathering(privacy: 'open')
+    timetable = @gathering.timetables.create!(name: 'Workshops', account: @account)
+    timetable.tactivities.create!(name: 'Yoga', account: @account)
+    sign_in(@account)
+    visit gathering_path("/timetables/#{timetable.id}")
+
+    # The activity's Edit, not the timetable's
+    find("a[title='Edit']").click
+    fill_in 'Activity name', with: 'Morning yoga'
+    click_button 'Update activity'
+    assert page.has_content? 'Morning yoga'
+    find("a[title='Edit']").click
+    click_link_and_confirm 'Delete'
+    assert page.has_link? 'Edit timetable'
+    assert page.has_no_content? 'Morning yoga'
+
+    click_link 'Edit timetable'
+    fill_in 'Name', with: 'Weekend workshops'
+    click_button 'Update timetable'
+    assert page.has_content? 'Weekend workshops'
+    click_link 'Edit timetable'
+    click_link_and_confirm 'Delete'
+    assert page.has_current_path?(gathering_path('/timetables'))
+    assert_equal 0, @gathering.timetables.count
+  end
+
+  test 'editing and deleting an item' do
+    create_gathering(privacy: 'open')
+    @gathering.inventory_items.create!(name: 'Tent', team: @gathering.teams.first, account: @account)
+    sign_in(@account)
+    visit gathering_path('/inventory')
+    click_link 'Tent'
+    fill_in 'Item name', with: 'Big tent'
+    click_button 'Update inventory item'
+    assert page.has_link? 'Big tent'
+
+    click_link 'Big tent'
+    click_link_and_confirm 'Delete'
+    assert page.has_link? 'List item'
+    assert page.has_no_content? 'Big tent'
+    assert_equal 0, @gathering.inventory_items.count
   end
 end

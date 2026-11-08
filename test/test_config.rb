@@ -29,6 +29,9 @@ Capybara.register_driver :cuprite do |app|
   options[:window_size] = ENV['CREATE_VIDEO'] ? [1920, 1080] : [1280, 720]
   options[:headless] = true
   options[:browser_options] = {}
+  # Reduced motion turns off the view transitions between pages (app.css), which Chrome aborts with a page error when a
+  # click navigates again before the last one has finished, and the app's other transitions, so nothing waits on them
+  options[:browser_options]['force-prefers-reduced-motion'] = nil
   options[:browser_options]['no-sandbox'] = nil if Process.uid.zero? # Chromium won't start as root (e.g. cloud agent containers) otherwise
   options[:browser_options]['proxy-server'] = ENV['HTTPS_PROXY'] if ENV['HTTPS_PROXY'] # Chromium ignores HTTPS_PROXY, so CDN requests fail behind an agent proxy
   Capybara::Cuprite::Driver.new(app, options)
@@ -101,7 +104,8 @@ module ActiveSupport
     def sign_in(account, confirm: true)
       account.set(email_confirmed: true) if confirm
       Capybara.reset_sessions!
-      visit "/?sign_in_code=#{account.issue_sign_in_code!}"
+      # From a fresh copy: signing in uses the code up in the database, and the account in hand would offer it again
+      visit "/?sign_in_code=#{Account.find(account.id).issue_sign_in_code!}"
     end
 
     def app
@@ -111,7 +115,7 @@ module ActiveSupport
     def sign_in_with_rack(account, confirm: true)
       account.set(email_confirmed: true) if confirm
       clear_cookies
-      get '/', sign_in_code: account.issue_sign_in_code!
+      get '/', sign_in_code: Account.find(account.id).issue_sign_in_code!
       follow_redirect! while last_response.redirect?
     end
 
