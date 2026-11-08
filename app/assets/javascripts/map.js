@@ -373,14 +373,19 @@ window.DandelionMap = {
     if (!cells || cells.length === 0) return;
 
     var color = cssColor('var(--theme-500)');
-    var max = Math.max.apply(null, cells.map(function (cell) { return cell.count; }));
+    // Shade by where a count ranks among the map's different counts, not by its size, so the shades spread evenly over
+    // the hexagons: a city's thousands don't wash out the dozens and hundreds around it, and each step up in count is a
+    // step darker however big the step
+    var counts = cells.map(function (cell) { return cell.count; })
+      .filter(function (count, i, all) { return all.indexOf(count) === i; })
+      .sort(function (a, b) { return a - b; });
     // Corners 0 and 3 are the hexagon's furthest apart east to west
     var width = Math.abs(cells[0].corners[0][1] - cells[0].corners[3][1]);
     var widthPixels = width * 256 * Math.pow(2, window.map.getZoom()) / 360;
 
     cells.forEach(function (cell) {
       var path = cell.corners.map(function (corner) { return { lat: corner[0], lng: corner[1] }; });
-      // Square roots spread the shades, so a handful of people still shows beside a crowd
+      var shade = counts.length > 1 ? counts.indexOf(cell.count) / (counts.length - 1) : 1;
       window.mapCells.push(new google.maps.Polygon({
         map: window.map,
         paths: path,
@@ -389,7 +394,7 @@ window.DandelionMap = {
         strokeOpacity: 0.6,
         strokeWeight: 0.5,
         fillColor: color,
-        fillOpacity: 0.1 + (0.55 * Math.sqrt(cell.count / max))
+        fillOpacity: 0.1 + (0.55 * shade)
       }));
       path.forEach(function (corner) { bounds.extend(corner); });
 
