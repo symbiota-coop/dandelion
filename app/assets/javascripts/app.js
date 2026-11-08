@@ -82,16 +82,21 @@ $(function () {
   })
 
   // A link with data-open-in-modal opens its page in #modal: the route answers the background request with just the
-  // modal's contents (gatherings/_modal_content.erb), and the link's href stays a page of its own to fall back on
+  // modal's contents (gatherings/_modal_content.erb), and the link's href stays a page of its own to fall back on.
+  // Its edit form starts at its first field. Only these: other things #modal shows (an application, a profile) may
+  // have a form further down, like a discussion's, which shouldn't take the focus (and bring up a phone's keyboard)
   $(document).on('click', 'a[data-open-in-modal]', function (e) {
     e.preventDefault()
     $('#modal .modal-content').load($(this).attr('href'), function () {
-      $('#modal').modal('show')
+      const $modal = $('#modal')
+      const focusFirstField = function () {
+        $modal.find('form').find('input:visible, textarea:visible, select:visible').not('[type=hidden]').first().trigger('focus')
+      }
+      // Already open (a link inside the modal), it won't fire shown.bs.modal again
+      if ($modal.hasClass('show')) focusFirstField()
+      else $modal.one('shown.bs.modal', focusFirstField).modal('show')
       hideTooltips()
     })
-  })
-  $(document).on('shown.bs.modal', '#modal', function () {
-    $(this).find('form').find('input:visible, textarea:visible, select:visible').not('[type=hidden]').first().trigger('focus')
   })
 
   // Opening the notifications or messages dropdown (_nav_top.erb) marks them as checked: the unread dot (.with-label) goes,

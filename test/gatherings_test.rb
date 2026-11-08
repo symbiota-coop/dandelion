@@ -509,6 +509,27 @@ class GatheringsTest < ActiveSupport::TestCase
     assert mapplication.reload.meets_threshold
   end
 
+  test "an application opened in the modal doesn't focus its discussion form" do
+    create_gathering(privacy: 'closed')
+    mapplication = @gathering.mapplications.create!(account: FactoryBot.create(:account), status: 'pending')
+    sign_in(@account)
+    visit "/g/#{@gathering.slug}/applications"
+    find("a[onclick*='mapplications/#{mapplication.id}']").click
+    within('#modal') { assert page.has_field? 'Subject' }
+    # Bootstrap focuses the modal once it's shown, just before shown.bs.modal, which used to move it to Subject
+    assert page.has_css?('#modal:focus')
+  end
+
+  test 'an edit form opened in the modal starts at its first field' do
+    create_gathering(privacy: 'open')
+    rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
+    Rslot.create!(name: 'Morning', rota: rota)
+    sign_in(@account)
+    visit "/g/#{@gathering.slug}/rotas/#{rota.id}"
+    click_link 'Morning'
+    within('#modal') { assert page.has_css?('input[name="rslot[name]"]:focus') }
+  end
+
   test 'an application is accepted at the magic number of proposers plus supporters, with at least one proposer' do
     covers 'gatherings/video-magic-number@7fc314', 'gatherings/magic-number@66775d', 'gatherings/median-magic-number@bbe05c'
     create_gathering(privacy: 'closed', fixed_threshold: 2, enable_supporters: true)
