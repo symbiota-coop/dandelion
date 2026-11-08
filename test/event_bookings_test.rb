@@ -174,6 +174,14 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert page.has_button? "Pay £#{format('%.2f', selected_price + donation_amount)}"
   end
 
+  test 'an unknown currency is shown as text beside the price slider, not run as HTML' do
+    create_event(prices: ['10-100'], suggested_donation: 0)
+    @event.set(currency: '<img src=x onerror="window.pwned=1">')
+    visit "/e/#{@event.slug}?prices[#{@event.ticket_types.first.id}]=50"
+    assert page.has_css? '.ticket-type-price span', text: '<img src=x onerror="window.pwned=1">50'
+    assert_nil evaluate_script('window.pwned')
+  end
+
   test 'clicking disabled quantity select prompts to drag the slider' do
     create_event(prices: ['10-100'], suggested_donation: 0)
     visit "/e/#{@event.slug}"
