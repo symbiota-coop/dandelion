@@ -135,6 +135,8 @@ The design guide (`/design`, `app/views/design.erb`) shows the colours, type, sp
 
 Cooldown: never use a gem or JS package version released less than 7 days ago. This guards against supply-chain attacks on freshly published versions. If a version that was just released can't be found, that's why: wait until it's a week old rather than removing or shortening the cooldown.
 
+Each night `.github/workflows/package-updates.yml` runs `script/update_packages.rb`, which updates the gems, frontend packages and actions `/stats/packages` lists to their newest releases out of the cooldown, and opens (or refreshes) a pull request from the `package-updates` branch. To keep a package on a major version, add it to `HOLD` in the script (or give a gem a constraint in the Gemfile).
+
 - Gems: the Gemfile's source has `cooldown: 7`, so Bundler enforces it
 - GitHub Actions are pinned to a commit of a release at least 7 days old, with the release as a comment (zizmor's `unpinned-uses`), but for ruby/setup-ruby when the Gemfile's Ruby is newer than that release knows: then it's the first release that knows it. zizmor's, actionlint's and ShellCheck's own versions are in `script/lint`, and uv's in `.github/workflows/ruby.yml` and `script/agent-env/install.sh`
 - `rake bootstrap:build` runs `npm install` with `--before` set to 7 days ago

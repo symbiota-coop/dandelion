@@ -1,0 +1,72 @@
+name: Package Updates
+
+# Each night, updates what /stats/packages lists (script/update_packages.rb) and opens a pull request with the changes,
+# or updates the one already open, on the package-updates branch, which each run rebuilds from master.
+#
+# Auth: PACKAGE_UPDATES_TOKEN secret, a fine-grained PAT for this repo with Contents, Pull requests and Workflows: read
+# and write. Not the workflow's own token: that can't push changes to workflow files (the actions' pins), and its pushes
+# and pull requests don't start other workflows, so CI wouldn't run on the pull request
+
+concurrency:
+  group: package-updates
+  cancel-in-progress: false
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  update:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # No bundler-cache: it freezes the lockfile, which bundle lock --update changes
+      - name: Install Ruby
+        uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
+        with:
+          ruby-version: 4.0.9
+
+      - name: Update packages
+        run: ruby script/update_packages.rb > "$RUNNER_TEMP/summary.md"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Open or update the pull request
+        env:
+          GH_TOKEN: ${{ secrets.PACKAGE_UPDATES_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::Set the PACKAGE_UPDATES_TOKEN secret (see the top of this workflow)"
+            exit 1
+          fi
+          open=$(gh pr list --head package-updates --state open --json number --jq '.[0].number')
+          if git diff --quiet; then
+            echo 'Nothing to update'
+            if [ -n "$open" ]; then
+              gh pr close "$open" --delete-branch --comment 'Everything here is on master now, or no longer applies.'
+            fi
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898231+github-actions[bot]@users.noreply.github.com'
+          git checkout -B package-updates
+          git add Gemfile.lock frontend .github
+          git commit --quiet --file - <<'EOF'
+          Update packages to the newest releases out of the 7-day cooldown, from script/update_packages.rb (the package updates workflow)
+          EOF
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" package-updates
+          if [ -n "$open" ]; then
+            gh pr edit "$open" --body-file "$RUNNER_TEMP/summary.md"
+          else
+            gh pr create --base master --head package-updates --title 'Update packages' --body-file "$RUNNER_TEMP/summary.md"
+          fi
