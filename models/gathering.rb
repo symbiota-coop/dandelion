@@ -290,13 +290,6 @@ class Gathering
     selects = []
     checkboxes = []
 
-    selects << [:gender, 'Gender', [
-      [:women, 'Women', memberships.and(:account_id.in => members.and(:gender.in => ['Woman', 'Cis Woman']).pluck(:id))],
-      [:men, 'Men', memberships.and(:account_id.in => members.and(:gender.in => ['Man', 'Cis Man']).pluck(:id))],
-      [:other_genders, 'Other genders', memberships.and(:account_id.in => members.and(:gender.nin => ['Woman', 'Cis Woman', 'Man', 'Cis Man', nil]).pluck(:id))],
-      [:unknown_gender, 'Gender not listed', memberships.and(:account_id.in => members.and(gender: nil).pluck(:id))]
-    ]]
-
     selects << [:paid, 'Paid', [
       [:paid_something, 'Paid something', memberships.and(:paid.gt => 0)],
       [:paid_nothing, 'Paid nothing', memberships.and(paid: 0)]
@@ -340,6 +333,13 @@ class Gathering
         ]]
       end
     end
+
+    selects << [:gender, 'Gender', [
+      [:women, 'Women', memberships.and(:account_id.in => members.and(:gender.in => ['Woman', 'Cis Woman']).pluck(:id))],
+      [:men, 'Men', memberships.and(:account_id.in => members.and(:gender.in => ['Man', 'Cis Man']).pluck(:id))],
+      [:other_genders, 'Other genders', memberships.and(:account_id.in => members.and(:gender.nin => ['Woman', 'Cis Woman', 'Man', 'Cis Man', nil]).pluck(:id))],
+      [:unknown_gender, 'Gender not listed', memberships.and(:account_id.in => members.and(gender: nil).pluck(:id))]
+    ]]
 
     checkboxes << [:admin, 'Admins', memberships.and(admin: true)]
     checkboxes << [:threshold, 'Suggesting magic number', memberships.and(:desired_threshold.ne => nil)] if democratic_threshold
