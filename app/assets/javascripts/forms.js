@@ -17,9 +17,10 @@ $(function () {
     $(this).blur()
   })
 
-  // Grey a select while its chosen option is a disabled placeholder
+  // Grey a select while its chosen option is a placeholder: a disabled one, or one marked data-placeholder that can be
+  // chosen to clear a filter
   function styleSelectElement (select) {
-    $(select).css('color', $(select).find('option:selected').is(':disabled') ? 'var(--bs-secondary-color)' : '')
+    $(select).css('color', $(select).find('option:selected').is(':disabled, [data-placeholder]') ? 'var(--bs-secondary-color)' : '')
   }
 
   onContentLoaded(function () {

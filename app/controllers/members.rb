@@ -4,7 +4,10 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @memberships = @gathering.memberships
-    @gathering.check_box_scopes.select { |k, _t, _r| params[k] }.each do |_k, _t, r|
+    @member_filters = @gathering.member_filters
+    chosen = @member_filters[:selects].filter_map { |param, _label, options| options.find { |value, _l, _r| value.to_s == params[param] } }
+    chosen += @member_filters[:checkboxes].select { |param, _label, _r| params[param] }
+    chosen.each do |_value, _label, r|
       @memberships = @memberships.and(:id.in => r.pluck(:id))
     end
     @memberships = @memberships.and(:account_id.in => Account.search(params[:q], child_scope: @memberships, regex_search: true).pluck(:id)) if params[:q]

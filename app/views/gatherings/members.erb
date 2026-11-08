@@ -3,39 +3,39 @@
 <%= partial :'gatherings/joining_info' %>
 
 <div class="mb-3">
-  <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline' do %>
-    <div class="form-group">
-      <label>Search members</label>
-      <%= text_field_tag :q, class: 'form-control', value: params[:q] %>
-    </div>
-    <%= hidden_field_tag :display, value: params[:display] if params[:display] %>
-    <%= submit_tag 'Search', class: 'btn btn-primary me-2' %>
+  <div class="search border rounded mb-3">
+    <div class="search-body">
+      <% form_tag '', method: 'get', class: 'submitOnChange searchForm mb-3' do %>
+        <%= hidden_field_tag :display, value: params[:display] if params[:display] %>
+        <div class="row gx-2 align-items-end">
+          <div class="form-group col-12 col-sm-auto">
+            <%= text_field_tag :q, class: 'form-control', value: params[:q], placeholder: 'Search members', 'aria-label': 'Search members' %>
+          </div>
+          <% @member_filters[:selects].each do |param, label, options| %>
+            <div class="form-group col-12 col-sm-auto">
+              <%# The select names its filter until one is chosen, and choosing the name again clears it %>
+              <%= select_tag param, id: param, class: 'form-select', 'aria-label': label, selected: params[param], options: [[label, '', { 'data-placeholder': true }]] + options.map { |value, option_label, r| ["#{option_label} (#{r.count})", value] } %>
+            </div>
+          <% end %>
+          <% @member_filters[:checkboxes].each do |param, label, r| %>
+            <%= checkbox "#{label} #{r.count}", slug: param, form_group_class: 'col-auto' %>
+          <% end %>
+          <div class="form-group col-12 col-sm-auto">
+            <%= submit_tag 'Search', class: 'btn btn-primary' %>
+          </div>
+        </div>
+      <% end %>
 
-    <style>
-      @media (max-width: 575.98px) {
-        .searchForm .form-check { margin-top: 0 }
-      }
-    </style>
-    <div class="w-100 d-flex flex-wrap mt-3 mb-1">
-      <% @gathering.check_box_scopes.each_with_index { |el,i| k,t,r = *el %>
-      <div class="form-check form-check-inline ms-3 mb-2">
-        <%= check_box_tag k, value: true, checked: params[k], onclick: 'this.form.submit()', id: k, class: 'form-check-input' %>
-        <label class="form-check-label fw-medium" for="<%= k %>">
-          <%= t %>&nbsp;<strong><%= r.count %></strong>
-        </label>
+      <% display = params[:display].presence_in(%w[pictures dietary_requirements map]) || 'details' %>
+      <div class="mb-3">
+        <%= partial :view_as, locals: { view_options: [
+          { key: 'details', label: 'Details', icon: 'bi-list-task' },
+          { key: 'pictures', label: 'Pictures', icon: 'bi-person-square' },
+          { key: 'dietary_requirements', label: 'Dietary requirements', icon: 'bi-fork-knife' },
+          { key: 'map', label: 'Map', icon: 'bi-geo-alt-fill' }
+        ].map { |opt| opt.merge(active: opt[:key] == display) } } %>
       </div>
-      <% } %>
     </div>
-  <% end %>
-
-  <% display = params[:display].presence_in(%w[pictures dietary_requirements map]) || 'details' %>
-  <div class="mb-3">
-    <%= partial :view_as, locals: { view_options: [
-      { key: 'details', label: 'Details', icon: 'bi-list-task' },
-      { key: 'pictures', label: 'Pictures', icon: 'bi-person-square' },
-      { key: 'dietary_requirements', label: 'Dietary requirements', icon: 'bi-fork-knife' },
-      { key: 'map', label: 'Map', icon: 'bi-geo-alt-fill' }
-    ].map { |opt| opt.merge(active: opt[:key] == display) } } %>
   </div>
 
   <div class="row justify-content-between">

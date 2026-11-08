@@ -53,6 +53,30 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     refute membership.reload.admin
   end
 
+  test 'an admin filters the members list' do
+    covers 'gatherings/member-filters@f9ffca'
+    create_gathering(privacy: 'open')
+    create_member(name: 'Wendy Woman', gender: 'Woman')
+    create_member(name: 'Manfred Man', gender: 'Man')
+    sign_in(@account)
+    visit gathering_path('/members')
+    assert page.has_content? 'Manfred Man'
+
+    select 'Women (1)', from: 'gender'
+    assert page.has_select? 'gender', selected: 'Women (1)'
+    assert page.has_content? 'Wendy Woman'
+    assert page.has_no_content? 'Manfred Man'
+
+    check 'admin'
+    assert page.has_checked_field? 'admin'
+    assert page.has_no_content? 'Wendy Woman'
+
+    select 'Gender', from: 'gender'
+    assert page.has_select? 'gender', selected: 'Gender'
+    assert page.has_content? @account.name
+    assert page.has_no_content? 'Manfred Man'
+  end
+
   test 'applying, and an admin proposing and accepting the application' do
     create_gathering(privacy: 'closed')
     applicant = FactoryBot.create(:account, name: 'Keen Applicant')

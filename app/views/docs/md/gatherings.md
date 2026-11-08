@@ -72,6 +72,10 @@ It can also work to use both: you can sell tickets to an Event, and choose to au
 
 You can choose from three access modes: Anyone with the link can join, People must apply to join, and Invitation-only. <!-- claim: access-modes --> If you select People must apply to join, you will be able to define the questions people are asked on the application form. <!-- claim: application-questions -->
 
+## Members
+
+Filters on the members list combine: only members matching all of them are shown. <!-- claim: member-filters --> You can filter by gender, payment, shifts, teams and chosen options, and to admins.
+
 ## Applications
 
 Applications can be seen and voted on by all existing members. <!-- claim: members-see-and-vote --> You can choose to have just one vote type, Proposers, or two, Proposers and Supporters. <!-- claim: vote-types -->

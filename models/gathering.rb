@@ -283,49 +283,67 @@ class Gathering
     end
   end
 
-  def check_box_scopes
-    y = []
+  # The filters above the members list: a select per question whose answers rule each other out (gender, shifts...),
+  # each answer a [param value, label, memberships] triple, and a checkbox for each filter on its own. Filters combine
+  # with AND
+  def member_filters
+    selects = []
+    checkboxes = []
 
-    y << [:admin, 'Admins', memberships.and(admin: true)]
+    selects << [:gender, 'Gender', [
+      [:women, 'Women', memberships.and(:account_id.in => members.and(:gender.in => ['Woman', 'Cis Woman']).pluck(:id))],
+      [:men, 'Men', memberships.and(:account_id.in => members.and(:gender.in => ['Man', 'Cis Man']).pluck(:id))],
+      [:other_genders, 'Other genders', memberships.and(:account_id.in => members.and(:gender.nin => ['Woman', 'Cis Woman', 'Man', 'Cis Man', nil]).pluck(:id))],
+      [:unknown_gender, 'Gender not listed', memberships.and(:account_id.in => members.and(gender: nil).pluck(:id))]
+    ]]
 
-    y << [:women, 'Women', memberships.and(:account_id.in => members.and(:gender.in => ['Woman', 'Cis Woman']).pluck(:id))]
-    y << [:men, 'Men', memberships.and(:account_id.in => members.and(:gender.in => ['Man', 'Cis Man']).pluck(:id))]
-    y << [:other_genders, 'Other genders', memberships.and(:account_id.in => members.and(:gender.nin => ['Woman', 'Cis Woman', 'Man', 'Cis Man', nil]).pluck(:id))]
-    y << [:unknown_gender, 'Gender not listed', memberships.and(:account_id.in => members.and(gender: nil).pluck(:id))]
-
-    y << [:paid_something, 'Paid something', memberships.and(:paid.gt => 0)]
-    y << [:paid_nothing, 'Paid nothing', memberships.and(paid: 0)]
-    y << [:more_to_pay, 'More to pay', memberships.and('$expr' => { '$lt' => ['$paid', '$requested_contribution'] })]
-    y << [:no_more_to_pay, 'No more to pay', memberships.and('$expr' => { '$eq' => ['$paid', '$requested_contribution'] })]
-    y << [:overpaid, 'Overpaid', memberships.and('$expr' => { '$gt' => ['$paid', '$requested_contribution'] })]
-
-    y << [:invitations_granted, 'Custom number of invitations', memberships.and(:invitations_granted.ne => nil)]
+    selects << [:paid, 'Paid', [
+      [:paid_something, 'Paid something', memberships.and(:paid.gt => 0)],
+      [:paid_nothing, 'Paid nothing', memberships.and(paid: 0)]
+    ]]
+    selects << [:balance, 'Balance', [
+      [:more_to_pay, 'More to pay', memberships.and('$expr' => { '$lt' => ['$paid', '$requested_contribution'] })],
+      [:no_more_to_pay, 'No more to pay', memberships.and('$expr' => { '$eq' => ['$paid', '$requested_contribution'] })],
+      [:overpaid, 'Overpaid', memberships.and('$expr' => { '$gt' => ['$paid', '$requested_contribution'] })]
+    ]]
 
     if enable_rotas
-      y << [:with_shifts, 'With shifts', memberships.and(:account_id.in => shifts.pluck(:account_id))]
-      y << [:without_shifts, 'Without shifts', memberships.and(:account_id.nin => shifts.pluck(:account_id))]
+      shift_account_ids = shifts.pluck(:account_id)
+      selects << [:shifts, 'Shifts', [
+        [:with_shifts, 'With shifts', memberships.and(:account_id.in => shift_account_ids)],
+        [:without_shifts, 'Without shifts', memberships.and(:account_id.nin => shift_account_ids)]
+      ]]
       if enable_shift_worth
-        y << [:sufficient_points, 'Sufficient shift points', memberships.and(:id.in => memberships.select { |m| m.shift_points >= (m.shift_points_required || 0) }.pluck(:id))]
-        y << [:insufficient_points, 'Insufficient shift points', memberships.and(:id.in => memberships.select { |m| m.shift_points < (m.shift_points_required || 0) }.pluck(:id))]
+        selects << [:shift_points, 'Shift points', [
+          [:sufficient_points, 'Sufficient shift points', memberships.and(:id.in => memberships.select { |m| m.shift_points >= (m.shift_points_required || 0) }.pluck(:id))],
+          [:insufficient_points, 'Insufficient shift points', memberships.and(:id.in => memberships.select { |m| m.shift_points < (m.shift_points_required || 0) }.pluck(:id))]
+        ]]
       end
     end
 
     if enable_teams
-      y << [:with_teams, 'With teams', memberships.and(:account_id.in => teamships.and(:team_id.nin => teams.and(name: 'General').pluck(:id)).pluck(:account_id))]
-      y << [:without_teams, 'Without teams', memberships.and(:account_id.nin => teamships.and(:team_id.nin => teams.and(name: 'General').pluck(:id)).pluck(:account_id))]
+      team_account_ids = teamships.and(:team_id.nin => teams.and(name: 'General').pluck(:id)).pluck(:account_id)
+      selects << [:teams, 'Teams', [
+        [:with_teams, 'With teams', memberships.and(:account_id.in => team_account_ids)],
+        [:without_teams, 'Without teams', memberships.and(:account_id.nin => team_account_ids)]
+      ]]
     end
 
     if enable_contributions
       %w[Tier Accommodation Transport Food Extra].each do |o|
-        if optionships.and(:option_id.in => options.and(type: o).pluck(:id)).exists?
-          y << [:"with_#{o.downcase}", "With #{o.downcase}", memberships.and(:account_id.in => optionships.and(:option_id.in => options.and(type: o).pluck(:id)).pluck(:account_id))]
-          y << [:"without_#{o.downcase}", "Without #{o.downcase}", memberships.and(:account_id.nin => optionships.and(:option_id.in => options.and(type: o).pluck(:id)).pluck(:account_id))]
-        end
+        option_account_ids = optionships.and(:option_id.in => options.and(type: o).pluck(:id)).pluck(:account_id)
+        next if option_account_ids.empty?
+
+        selects << [:"#{o.downcase}", o, [
+          [:"with_#{o.downcase}", "With #{o.downcase}", memberships.and(:account_id.in => option_account_ids)],
+          [:"without_#{o.downcase}", "Without #{o.downcase}", memberships.and(:account_id.nin => option_account_ids)]
+        ]]
       end
     end
 
-    y << [:threshold, 'Suggesting magic number', memberships.and(:desired_threshold.ne => nil)] if democratic_threshold
+    checkboxes << [:admin, 'Admins', memberships.and(admin: true)]
+    checkboxes << [:threshold, 'Suggesting magic number', memberships.and(:desired_threshold.ne => nil)] if democratic_threshold
 
-    y
+    { selects: selects, checkboxes: checkboxes }
   end
 end
