@@ -375,6 +375,15 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal 'Ada', @account.firstname
   end
 
+  test 'rich text keeps only the allowed style properties' do
+    html = '<p style="position:fixed;z-index:9;background:url(https://attacker.example/x.png);color:red;text-align:center">x</p>' \
+           '<span style="width:10px;inset:0;background-color:blue">y</span>'
+    [Sanitize::Config::DANDELION, Sanitize::Config::IFRAMES].each do |config|
+      assert_equal '<p style="color:red;text-align:center">x</p><span style="width:10px;background-color:blue">y</span>',
+                   Sanitize.fragment(html, config)
+    end
+  end
+
   test 'rsvp button text is escaped on the event page' do
     create_event(prices: [0], rsvp_button_text: '<img src=x onerror=alert(1)>')
 

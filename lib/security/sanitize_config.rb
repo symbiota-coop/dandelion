@@ -16,7 +16,7 @@ Sanitize::Config::DANDELION = Sanitize::Config.merge(Sanitize::Config::RELAXED,
                                                        }
                                                      ),
                                                      css: {
-                                                       'properties' => %w[width text-align color background-color]
+                                                       properties: %w[width text-align color background-color]
                                                      },
                                                      protocols: Sanitize::Config::RELAXED[:protocols].merge(
                                                        {
