@@ -86,13 +86,14 @@ Dandelion::App.controller do
     200
   end
 
+  # Leaving an option (its pagelet), or an admin removing someone (the contribution form)
   post '/g/:slug/optionships/:id/destroy' do
     @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
     @optionship = @gathering.optionships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     halt unless (@optionship.account.id == current_account.id) || gathering_admin?
     @optionship.destroy
-    200
+    request.xhr? ? 200 : redirect("/g/#{@gathering.slug}/options")
   end
 
   post '/g/:slug/optionships/new' do
@@ -131,14 +132,5 @@ Dandelion::App.controller do
       flash.now[:error] = '<strong>Oops.</strong> Some errors prevented the optionship from being saved.'
       erb :'options/optionship'
     end
-  end
-
-  post '/g/:slug/optionships/:id/destroy' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
-    gathering_admins_only!
-    @optionship = @gathering.optionships.find(params[:id])
-    @optionship.destroy
-    redirect "/g/#{@gathering.slug}/options"
   end
 end

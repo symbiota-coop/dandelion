@@ -204,10 +204,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @membership = @gathering.memberships.find(params[:id]) || not_found
-    if request.xhr?
-      partial :'gatherings/membership_modal', locals: { membership: @membership }
-    else
-      erb :'gatherings/membership'
-    end
+    # It opens in a modal on the members page; visited directly, it goes to that page
+    request.xhr? ? partial(:'gatherings/membership_modal', locals: { membership: @membership }) : redirect("/g/#{@gathering.slug}/members")
   end
 end

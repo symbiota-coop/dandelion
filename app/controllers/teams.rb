@@ -110,7 +110,7 @@ Dandelion::App.controller do
     confirmed_membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
     @teamship = @team.teamships.find_by(account: current_account)
-    redirect(@teamship ? "/teamships/#{@teamship.id}/unsubscribe" : "/g/#{@gathering.slug}/teams/#{@team.id}")
+    redirect(@teamship ? "/g/#{@gathering.slug}/teamships/#{@teamship.id}/unsubscribe" : "/g/#{@gathering.slug}/teams/#{@team.id}")
   end
 
   get '/g/:slug/teamships/:id/subscribe' do

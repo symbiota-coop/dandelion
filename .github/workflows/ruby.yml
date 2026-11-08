@@ -115,6 +115,7 @@ jobs:
           - event_permissions
           - events
           - evergreen_events
+          - gathering_features
           - gatherings
           - how_to_create_a_gathering
           - how_to_create_an_event
