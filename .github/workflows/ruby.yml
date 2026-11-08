@@ -116,6 +116,7 @@ jobs:
           - events
           - evergreen_events
           - gathering_features
+          - gathering_rules
           - gatherings
           - how_to_create_a_gathering
           - how_to_create_an_event
