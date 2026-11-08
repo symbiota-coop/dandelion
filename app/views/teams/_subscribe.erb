@@ -1,5 +1,6 @@
+<% gathering = teamship.gathering %>
 <% if teamship.unsubscribed %>
-  <a class="pagelet-trigger btn btn-outline-primary mb-1" data-method="post" href="/g/<%= @gathering.slug %>/teamships/<%= teamship.id %>/set_subscribe?team_id=<%= teamship.team_id %>">Email notifications off</a>
+  <a class="pagelet-trigger btn btn-outline-primary mb-1" data-method="post" href="/g/<%= gathering.slug %>/teamships/<%= teamship.id %>/set_subscribe?team_id=<%= teamship.team_id %>">Email notifications off</a>
 <% else %>
-  <a class="pagelet-trigger btn btn-primary mb-1" href="/g/<%= @gathering.slug %>/teamships/<%= teamship.id %>/unsubscribe?team_id=<%= teamship.team_id %>">Email notifications on</a>
+  <a class="pagelet-trigger btn btn-primary mb-1" href="/g/<%= gathering.slug %>/teamships/<%= teamship.id %>/unsubscribe?team_id=<%= teamship.team_id %>">Email notifications on</a>
 <% end %>

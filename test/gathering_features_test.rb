@@ -117,6 +117,21 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     assert_nil team.teamships.find_by(account: member)
   end
 
+  test "a member turns a team's email notifications back on from their notification settings" do
+    create_gathering(privacy: 'open')
+    team = @gathering.teams.create!(name: 'Kitchen', account: @account)
+    member = create_member
+    teamship = team.teamships.create!(account: member, gathering: @gathering, unsubscribed: true)
+    sign_in(member)
+    visit '/accounts/subscriptions'
+    # Members are also in the gathering's General team
+    click_link '2 teams'
+    kitchen = find('.subscription-child', text: 'Kitchen')
+    kitchen.click_link 'Email notifications off'
+    assert kitchen.has_link? 'Email notifications on'
+    refute teamship.reload.unsubscribed
+  end
+
   test 'listing an expense and marking it reimbursed' do
     create_gathering(privacy: 'open')
     sign_in(@account)
