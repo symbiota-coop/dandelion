@@ -2250,7 +2250,7 @@ body .table > tfoot > tr > th {
   z-index: 1;
 }
 
-/* .table-sticky-fit sizes the name column to its longest line instead, such as a member's email, kept on one line */
+/* .table-sticky-fit sizes the name column to its longest line instead, such as a member's email (which .account-email cuts short) */
 .table-sticky-fit th:first-child,
 .table-sticky-fit td:first-child {
   width: 1px;
@@ -2258,9 +2258,6 @@ body .table > tfoot > tr > th {
   max-width: none;
 }
 
-.table-sticky-fit .account-email {
-  white-space: nowrap;
-}
 
 /* A shadow off the name column's right edge, over the columns scrolling under it. It's on a pseudo-element, as Bootstrap and DataTables paint stripes and hover as the cells' own inset box-shadow, and each cell is clipped at its top and bottom so the column reads as one */
 .table-sticky th:first-child,
@@ -3636,6 +3633,19 @@ td .tactivity-accept {
 .underline-dotted {
   text-decoration: underline dotted;
   text-underline-offset: 0.2em;
+}
+
+/* An account's email under its name (accounts/_account.erb): on one line, cut short with an ellipsis past 16em, in body
+   text with a copy cursor, as clicking copies it */
+.account-email {
+  display: block;
+  max-width: 16em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: inherit;
+  text-decoration: none;
+  cursor: copy;
 }
 
 /* The large photo at the top of a profile and an application: white-framed, so it shows on any background */

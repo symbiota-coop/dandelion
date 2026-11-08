@@ -32,6 +32,18 @@ $(function () {
     if (window.matchMedia('(min-width: 992px)').matches) e.preventDefault()
   })
 
+  // An account's email copies on click, its tooltip then saying so (accounts/_account.erb)
+  $(document).on('click', '.account-email', function (e) {
+    e.preventDefault()
+    navigator.clipboard.writeText($(this).text().trim())
+    const tooltip = bootstrap.Tooltip.getOrCreateInstance(this)
+    tooltip.setContent({ '.tooltip-inner': 'Copied!' })
+    tooltip.show()
+  })
+  $(document).on('hidden.bs.tooltip', '.account-email', function () {
+    bootstrap.Tooltip.getInstance(this)?.setContent({ '.tooltip-inner': $(this).attr('data-bs-original-title') })
+  })
+
   // A tooltip on a dropdown (_organisationship.erb) hides when its menu opens, and stays hidden while it's open
   $(document).on('show.bs.dropdown', function (e) {
     const tooltipEl = $(e.target).closest('[data-bs-toggle="tooltip"]')[0]

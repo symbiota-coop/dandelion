@@ -6,7 +6,7 @@
   <i data-bs-toggle="tooltip" title="Admin" class="bi bi-key-fill"></i>
 <% end %>
 <% if defined?(show_email) && show_email %>
-  <div class="small account-email">
-    <%= account.email %>
-  </div>
+  <%# Cut short with an ellipsis past a set width (app.css), the whole address in its tooltip. Clicking copies it (app.js).
+      The tooltip takes HTML, so the address is escaped once more for it %>
+  <a href="javascript:;" class="small account-email" data-bs-toggle="tooltip" title="<%= Rack::Utils.escape_html(account.email) %>"><%= account.email %></a>
 <% end %>
