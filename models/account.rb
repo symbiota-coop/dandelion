@@ -532,92 +532,78 @@ class Account
     "#{base}_#{n}"
   end
 
+  # Each organisation cache, and the list of organisation ids it should hold, worked out in check_organisation_cache_sync
+  ORGANISATION_CACHES = {
+    'organisation_ids_cache' => 'all',
+    'organisation_ids_public_cache' => 'public',
+    'subscribed_organisation_ids_cache' => 'subscribed',
+    'unsubscribed_organisation_ids_cache' => 'unsubscribed'
+  }.freeze
+
+  # Compares in the database and returns only the accounts out of sync, so nothing else is loaded: one pipeline for
+  # accounts with organisationships, another for those whose caches list organisations they have none with
   def self.check_organisation_cache_sync(fix: false)
-    out_of_sync = []
+    sorted = ->(path) { { '$sortArray' => { 'input' => { '$ifNull' => [path, []] }, 'sortBy' => 1 } } }
+    mismatched = ->(expected_path, current_path) { { '$ne' => [sorted.(expected_path), sorted.(current_path)] } }
 
-    # Single aggregation to compute expected caches for all accounts at once
-    expected_caches = Organisationship.collection.aggregate([
-                                                              {
-                                                                '$group' => {
-                                                                  '_id' => '$account_id',
-                                                                  'org_ids' => { '$push' => '$organisation_id' },
-                                                                  'public_ids' => {
-                                                                    '$push' => {
-                                                                      '$cond' => [{ '$ne' => ['$hide_membership', true] }, '$organisation_id', '$$REMOVE']
-                                                                    }
-                                                                  },
-                                                                  'subscribed_ids' => {
-                                                                    '$push' => {
-                                                                      '$cond' => [{ '$ne' => ['$unsubscribed', true] }, '$organisation_id', '$$REMOVE']
-                                                                    }
-                                                                  },
-                                                                  'unsubscribed_ids' => {
-                                                                    '$push' => {
-                                                                      '$cond' => [{ '$eq' => ['$unsubscribed', true] }, '$organisation_id', '$$REMOVE']
-                                                                    }
-                                                                  }
-                                                                }
-                                                              }
-                                                            ]).to_a.to_h { |doc| [doc['_id'], doc] }
+    with_organisationships = Organisationship.collection.aggregate([
+      # One per account and organisation, so duplicate rows are counted rather than listed twice
+      { '$group' => {
+        '_id' => { 'account_id' => '$account_id', 'organisation_id' => '$organisation_id' },
+        'rows' => { '$sum' => 1 },
+        'public' => { '$max' => { '$ne' => ['$hide_membership', true] } },
+        'subscribed' => { '$max' => { '$ne' => ['$unsubscribed', true] } },
+        'unsubscribed' => { '$max' => { '$eq' => ['$unsubscribed', true] } }
+      } },
+      { '$group' => {
+        '_id' => '$_id.account_id',
+        'all' => { '$push' => '$_id.organisation_id' },
+        'public' => { '$push' => { '$cond' => ['$public', '$_id.organisation_id', '$$REMOVE'] } },
+        'subscribed' => { '$push' => { '$cond' => ['$subscribed', '$_id.organisation_id', '$$REMOVE'] } },
+        'unsubscribed' => { '$push' => { '$cond' => ['$unsubscribed', '$_id.organisation_id', '$$REMOVE'] } },
+        'duplicates' => { '$push' => { '$cond' => [{ '$gt' => ['$rows', 1] }, { 'organisation_id' => '$_id.organisation_id', 'count' => '$rows' }, '$$REMOVE'] } }
+      } },
+      { '$lookup' => { 'from' => 'accounts', 'localField' => '_id', 'foreignField' => '_id', 'as' => 'account',
+                       'pipeline' => [{ '$project' => ORGANISATION_CACHES.keys.index_with(1) }] } },
+      { '$unwind' => '$account' },
+      { '$match' => { '$expr' => { '$or' => [
+        *ORGANISATION_CACHES.map { |field, list| mismatched.("$#{list}", "$account.#{field}") },
+        { '$gt' => [{ '$size' => '$duplicates' }, 0] }
+      ] } } }
+    ], allow_disk_use: true).map do |doc|
+      { id: doc['_id'], current: doc['account'], expected: doc.slice(*ORGANISATION_CACHES.values), duplicates: doc['duplicates'] }
+    end
 
-    # Get accounts that either have organisationships OR have stale cache fields
-    account_ids_with_caches = Account.and('$or' => [
-      { :organisation_ids_cache.ne => nil },
-      { :organisation_ids_public_cache.ne => nil },
-      { :subscribed_organisation_ids_cache.ne => nil },
-      { :unsubscribed_organisation_ids_cache.ne => nil }
-    ]).pluck(:id)
+    without_organisationships = Account.collection.aggregate([
+      { '$match' => { '$or' => ORGANISATION_CACHES.keys.map { |field| { "#{field}.0" => { '$exists' => true } } } } },
+      { '$project' => ORGANISATION_CACHES.keys.index_with(1) },
+      { '$lookup' => { 'from' => 'organisationships', 'localField' => '_id', 'foreignField' => 'account_id', 'as' => 'organisationships',
+                       'pipeline' => [{ '$limit' => 1 }, { '$project' => { '_id' => 1 } }] } },
+      { '$match' => { 'organisationships' => [] } }
+    ]).map { |doc| { id: doc['_id'], current: doc, expected: {}, duplicates: [] } }
 
-    relevant_account_ids = (expected_caches.keys + account_ids_with_caches).uniq
+    rows = with_organisationships + without_organisationships
+    accounts = Account.in(id: rows.pluck(:id)).index_by(&:id)
+    ids = ->(list) { Array(list).map(&:to_s).sort }
 
-    relevant_account_ids.each_slice(1000) do |batch_ids|
-      Account.in(id: batch_ids).each do |account|
-        expected = expected_caches[account.id] || {}
+    out_of_sync = rows.filter_map do |row|
+      account = accounts[row[:id]]
+      next unless account
 
-        raw_org_ids = (expected['org_ids'] || []).map(&:to_s)
-        expected_org_ids = raw_org_ids.uniq.sort
-        expected_public_ids = (expected['public_ids'] || []).map(&:to_s).uniq.sort
-        expected_subscribed_ids = (expected['subscribed_ids'] || []).map(&:to_s).uniq.sort
-        expected_unsubscribed_ids = (expected['unsubscribed_ids'] || []).map(&:to_s).uniq.sort
-
-        current_org_ids = (account.organisation_ids_cache || []).map(&:to_s).sort
-        current_public_ids = (account.organisation_ids_public_cache || []).map(&:to_s).sort
-        current_subscribed_ids = (account.subscribed_organisation_ids_cache || []).map(&:to_s).sort
-        current_unsubscribed_ids = (account.unsubscribed_organisation_ids_cache || []).map(&:to_s).sort
-
-        duplicates = raw_org_ids.tally.select { |_, count| count > 1 }.sort.map do |organisation_id, count|
-          { organisation_id: organisation_id, count: count }
-        end
-
-        mismatches = []
-        mismatches << 'organisation_ids_cache' if current_org_ids != expected_org_ids
-        mismatches << 'organisation_ids_public_cache' if current_public_ids != expected_public_ids
-        mismatches << 'subscribed_organisation_ids_cache' if current_subscribed_ids != expected_subscribed_ids
-        mismatches << 'unsubscribed_organisation_ids_cache' if current_unsubscribed_ids != expected_unsubscribed_ids
-        mismatches << 'duplicate_organisationships' if duplicates.any?
-
-        next if mismatches.empty?
-
-        details = {
-          organisation_ids_cache: { current: current_org_ids, expected: expected_org_ids },
-          organisation_ids_public_cache: { current: current_public_ids, expected: expected_public_ids },
-          subscribed_organisation_ids_cache: { current: current_subscribed_ids, expected: expected_subscribed_ids },
-          unsubscribed_organisation_ids_cache: { current: current_unsubscribed_ids, expected: expected_unsubscribed_ids }
-        }
-        if duplicates.any?
-          details[:duplicate_organisationships] = {
-            current: duplicates.map { |d| "#{d[:organisation_id]} (#{d[:count]} rows)" },
-            expected: duplicates.map { |d| "#{d[:organisation_id]} (1 row)" }
-          }
-        end
-
-        out_of_sync << {
-          account: account,
-          mismatches: mismatches,
-          duplicates: duplicates,
-          details: details
+      details = ORGANISATION_CACHES.to_h do |field, list|
+        [field.to_sym, { current: ids.(row[:current][field]), expected: ids.(row[:expected][list]) }]
+      end
+      mismatches = details.reject { |_, detail| detail[:current] == detail[:expected] }.keys.map(&:to_s)
+      duplicates = row[:duplicates].map { |d| { organisation_id: d['organisation_id'].to_s, count: d['count'] } }.sort_by { |d| d[:organisation_id] }
+      if duplicates.any?
+        mismatches << 'duplicate_organisationships'
+        details[:duplicate_organisationships] = {
+          current: duplicates.map { |d| "#{d[:organisation_id]} (#{d[:count]} rows)" },
+          expected: duplicates.map { |d| "#{d[:organisation_id]} (1 row)" }
         }
       end
+
+      { account: account, mismatches: mismatches, duplicates: duplicates, details: details }
     end
 
     if fix

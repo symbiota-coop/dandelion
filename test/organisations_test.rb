@@ -343,6 +343,38 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal 2, Organisationship.and(account: member, organisation: @organisation).count
   end
 
+  test 'organisation cache sync reports nothing when every cache matches its organisationships' do
+    create_organisation
+    member = FactoryBot.create(:account)
+    member.organisationships.create!(organisation: @organisation, skip_welcome: true)
+    member.organisationships.create!(organisation: FactoryBot.create(:organisation), unsubscribed: true, hide_membership: true, skip_welcome: true)
+
+    assert_empty Account.check_organisation_cache_sync
+  end
+
+  test 'organisation cache sync finds and repairs an organisation an account is cached in without a row for it' do
+    create_organisation
+    left = FactoryBot.create(:organisation)
+    member = FactoryBot.create(:account)
+    member.organisationships.create!(organisation: @organisation, skip_welcome: true)
+    member.add_to_set(organisation_ids_cache: left.id)
+    leaver = FactoryBot.create(:account)
+    leaver.set(organisation_ids_cache: [left.id], subscribed_organisation_ids_cache: [left.id])
+
+    out_of_sync = Account.check_organisation_cache_sync
+    assert_equal [leaver.id, member.id].sort, out_of_sync.map { |entry| entry[:account].id }.sort
+    entry = out_of_sync.find { |e| e[:account].id == member.id }
+    assert_equal ['organisation_ids_cache'], entry[:mismatches]
+    assert_equal({ current: [@organisation.id, left.id].map(&:to_s).sort, expected: [@organisation.id.to_s] }, entry[:details][:organisation_ids_cache])
+    assert_equal %w[organisation_ids_cache subscribed_organisation_ids_cache], out_of_sync.find { |e| e[:account].id == leaver.id }[:mismatches]
+
+    Account.check_organisation_cache_sync(fix: true)
+    assert_equal [@organisation.id], member.reload.organisation_ids_cache
+    assert_empty leaver.reload.organisation_ids_cache
+    assert_empty leaver.subscribed_organisation_ids_cache
+    assert_empty Account.check_organisation_cache_sync
+  end
+
   test "unfollowing an organisation takes it off all of the account's organisation caches" do
     create_organisation
     member = FactoryBot.create(:account)

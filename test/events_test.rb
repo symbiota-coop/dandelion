@@ -1191,6 +1191,30 @@ class EventsTest < ActiveSupport::TestCase
     assert_empty Event.check_hosts_cache_sync
   end
 
+  test 'cohosts cache sync finds and repairs a missing or extra co-host, and reports nothing once in sync' do
+    create_event
+    create_event(as: :other_event)
+    cohost = FactoryBot.create(:organisation)
+    gone = FactoryBot.create(:organisation)
+    @event.cohostships.create!(organisation: cohost)
+    @other_event.cohostships.create!(organisation: cohost)
+    assert_empty Event.check_cohosts_cache_sync
+
+    @event.set(cohosts_ids_cache: [])
+    @other_event.add_to_set(cohosts_ids_cache: gone.id)
+
+    out_of_sync = Event.check_cohosts_cache_sync
+    assert_equal [@event.id, @other_event.id].sort, out_of_sync.map { |entry| entry[:event].id }.sort
+    entry = out_of_sync.find { |e| e[:event].id == @event.id }
+    assert_equal({ current: [], expected: [cohost.id.to_s] }, entry.slice(:current, :expected))
+
+    Event.check_cohosts_cache_sync(fix: true)
+    assert_equal [cohost.id], @event.reload.cohosts_ids_cache
+    assert_equal [@organisation.id, cohost.id], @event.hosts_ids_cache
+    assert_equal [cohost.id], @other_event.reload.cohosts_ids_cache
+    assert_empty Event.check_cohosts_cache_sync
+  end
+
   test 'removing a tag or carouselship clears carousel ids' do
     create_event
     tag = FactoryBot.create(:event_tag)

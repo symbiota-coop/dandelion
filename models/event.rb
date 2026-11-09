@@ -579,59 +579,57 @@ class Event
     [organisation_id, *cohosts_ids].compact.uniq
   end
 
-  # Checks hosts_ids_cache against organisation_id and cohosts_ids_cache, so run check_cohosts_cache_sync first
+  # Checks hosts_ids_cache against organisation_id and cohosts_ids_cache, so run check_cohosts_cache_sync first.
+  # Compares in the database and loads only the events out of sync
   def self.check_hosts_cache_sync(fix: false)
-    out_of_sync = []
+    ids = Event.collection.aggregate([
+      { '$project' => {
+        'hosts_ids_cache' => 1,
+        'expected' => { '$setUnion' => [{ '$filter' => {
+          'input' => { '$concatArrays' => [['$organisation_id'], { '$ifNull' => ['$cohosts_ids_cache', []] }] },
+          'cond' => { '$ne' => ['$$this', nil] }
+        } }] }
+      } },
+      { '$match' => { '$expr' => { '$or' => [
+        { '$not' => [{ '$isArray' => '$hosts_ids_cache' }] },
+        { '$ne' => [sorted_ids('$hosts_ids_cache'), sorted_ids('$expected')] }
+      ] } } },
+      { '$project' => { '_id' => 1 } }
+    ]).map { |doc| doc['_id'] }
 
-    Event.unscoped.only(:name, :organisation_id, :cohosts_ids_cache, :hosts_ids_cache).each do |event|
+    Event.unscoped.in(id: ids).only(:name, :organisation_id, :cohosts_ids_cache, :hosts_ids_cache).map do |event|
       expected = event.hosts_ids_for(event.cohosts_ids_cache)
-      next if event.hosts_ids_cache && event.hosts_ids_cache.map(&:to_s).sort == expected.map(&:to_s).sort
-
-      out_of_sync << { event: event, current: (event.hosts_ids_cache || []).map(&:to_s), expected: expected.map(&:to_s) }
+      entry = { event: event, current: (event.hosts_ids_cache || []).map(&:to_s), expected: expected.map(&:to_s) }
       event.set(hosts_ids_cache: expected) if fix
+      entry
     end
-
-    out_of_sync
   end
 
+  # Compares in the database and loads only the events out of sync
   def self.check_cohosts_cache_sync(fix: false)
-    out_of_sync = []
+    rows = Event.collection.aggregate([
+      { '$project' => { 'cohosts_ids_cache' => 1 } },
+      { '$lookup' => { 'from' => 'cohostships', 'localField' => '_id', 'foreignField' => 'event_id', 'as' => 'cohostships',
+                       'pipeline' => [{ '$project' => { 'organisation_id' => 1 } }] } },
+      { '$project' => { 'current' => sorted_ids('$cohosts_ids_cache'), 'expected' => sorted_ids('$cohostships.organisation_id') } },
+      { '$match' => { '$expr' => { '$ne' => ['$current', '$expected'] } } }
+    ]).to_a
+    events = Event.unscoped.in(id: rows.pluck('_id')).index_by(&:id)
 
-    # Aggregate cohostships to compute expected cache for each event
-    expected_caches = Cohostship.collection.aggregate([
-                                                        {
-                                                          '$group' => {
-                                                            '_id' => '$event_id',
-                                                            'cohost_ids' => { '$push' => '$organisation_id' }
-                                                          }
-                                                        }
-                                                      ]).to_a.to_h { |doc| [doc['_id'], doc['cohost_ids']] }
+    rows.filter_map do |row|
+      next unless (event = events[row['_id']])
 
-    # Get events that either have cohostships OR have stale cache fields
-    event_ids_with_caches = Event.and(:cohosts_ids_cache.ne => nil).pluck(:id)
-
-    relevant_event_ids = (expected_caches.keys + event_ids_with_caches).uniq
-
-    relevant_event_ids.each_slice(1000) do |batch_ids|
-      Event.unscoped.in(id: batch_ids).each do |event|
-        expected_ids = (expected_caches[event.id] || []).map(&:to_s).sort
-        current_ids = (event.cohosts_ids_cache || []).map(&:to_s).sort
-
-        next if current_ids == expected_ids
-
-        out_of_sync << {
-          event: event,
-          current: current_ids,
-          expected: expected_ids
-        }
-
-        next unless fix
-
-        cohosts_ids = expected_ids.map { |id| BSON::ObjectId.from_string(id) }
+      if fix
+        cohosts_ids = row['expected']
         event.set(cohosts_ids_cache: cohosts_ids, hosts_ids_cache: event.hosts_ids_for(cohosts_ids))
       end
+      { event: event, current: row['current'].map(&:to_s).sort, expected: row['expected'].map(&:to_s).sort }
     end
-
-    out_of_sync
   end
+
+  # An aggregation expression for the ids at path, sorted, treating a missing or null field as none
+  def self.sorted_ids(path)
+    { '$sortArray' => { 'input' => { '$ifNull' => [path, []] }, 'sortBy' => 1 } }
+  end
+  private_class_method :sorted_ids
 end
