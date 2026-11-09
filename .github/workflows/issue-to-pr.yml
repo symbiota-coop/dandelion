@@ -74,6 +74,14 @@ jobs:
             echo "$key=$value" >> "$GITHUB_ENV"
           done
 
+      # The issue as its author opened it, from the event. Claude reads this file rather than fetching the issue, as
+      # anyone can comment on a public issue, and a comment made before Claude read it would reach it as instructions
+      - name: Save issue
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: printf '%s\n\n%s\n' "$ISSUE_TITLE" "$ISSUE_BODY" > "$RUNNER_TEMP/issue.md"
+
       - name: Load prompt
         id: prompt
         env:
@@ -81,6 +89,7 @@ jobs:
         run: |
           PROMPT=$(<.github/prompts/issue-to-pr.md)
           PROMPT=${PROMPT//ISSUE_NUMBER/$ISSUE_NUMBER}
+          PROMPT=${PROMPT//ISSUE_FILE/$RUNNER_TEMP/issue.md}
           {
             echo 'text<<EOF'
             echo "$PROMPT"
