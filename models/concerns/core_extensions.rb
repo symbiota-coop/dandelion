@@ -327,4 +327,46 @@ module CoreExtensions
       send("#{field}=", sanitized_value)
     end
   end
+
+  # Merging victim into this record (Account#merge, Membership#absorb_duplicate!): moves each of victim's has_many rows
+  # here, but for those this record already has one like, by a uniqueness validation on the foreign key: moving them
+  # would break the unique index behind it, so they stay with victim and go when it's destroyed. This record's row
+  # absorbs what it can from victim's first, if its model has absorb_duplicate!
+  def absorb_has_many!(victim)
+    victim.class.reflect_on_all_associations(:has_many).each do |association|
+      klass = association.klass
+      if association.options[:as]
+        type_key = "#{association.options[:as]}_type"
+        id_key = "#{association.options[:as]}_id"
+        klass.unscoped.and(type_key => victim.class.name, id_key => victim.id).update_all(id_key => id)
+        next
+      end
+
+      foreign_key = association.options[:inverse_of] ? "#{association.options[:inverse_of]}_id" : association.foreign_key.to_s
+      rows = victim.send(association.name)
+      rows.not_in(_id: absorb_duplicate_rows!(klass, foreign_key, rows)).update_all(foreign_key => id)
+    end
+  end
+
+  # The ids of rows that this record already has one like, by a uniqueness validation on foreign_key, after this
+  # record's row has absorbed each
+  def absorb_duplicate_rows!(klass, foreign_key, rows)
+    klass.validators.grep(Mongoid::Validatable::UniquenessValidator).flat_map do |validator|
+      fields = (validator.attributes + Array(validator.options[:scope])).map { |f| klass.relations[f.to_s]&.foreign_key&.to_s || f.to_s }
+      next [] unless fields.include?(foreign_key)
+
+      others = fields - [foreign_key]
+      own_rows = klass.and(foreign_key => id)
+      own_rows = own_rows.merge(validator.options[:conditions].call) if validator.options[:conditions]
+      own_row_ids = own_rows.pluck(:_id, *others).to_h { |row_id, *values| [values, row_id] }
+
+      rows.pluck(:_id, *others).filter_map do |row_id, *values|
+        next if validator.options[:allow_nil] && values.any?(&:nil?)
+        next unless (own_row_id = own_row_ids[values])
+
+        klass.find(own_row_id).absorb_duplicate!(klass.find(row_id)) if klass.method_defined?(:absorb_duplicate!)
+        row_id
+      end
+    end
+  end
 end

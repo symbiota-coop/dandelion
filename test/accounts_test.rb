@@ -656,6 +656,70 @@ class AccountsTest < ActiveSupport::TestCase
     assert_equal Money.new(5000, 'GBP'), surviving_organisationship.credit_granted
   end
 
+  test 'merging accounts that share an organisation, gathering and followee keeps one of each' do
+    # the unique indexes behind the uniqueness validations, as in production, which the test database may not have
+    [[Organisationship, { organisation_id: 1, account_id: 1 }], [Membership, { gathering_id: 1, account_id: 1 }],
+     [Activityship, { activity_id: 1, account_id: 1 }], [Follow, { follower_id: 1, followee_id: 1 }]].each do |model, key|
+      model.collection.indexes.create_one(key, unique: true)
+    end
+    survivor = FactoryBot.create(:account)
+    victim = FactoryBot.create(:account)
+    followee = FactoryBot.create(:account)
+    organisation = FactoryBot.create(:organisation)
+    activity = FactoryBot.create(:activity, organisation: organisation)
+    gathering = FactoryBot.create(:gathering, account: FactoryBot.create(:account))
+    team = gathering.teams.create!(name: 'Kitchen', account: gathering.account)
+
+    survivor_organisationship = survivor.organisationships.create!(organisation: organisation)
+    victim.organisationships.create!(organisation: organisation).set(admin: true)
+    survivor_activityship = activity.activityships.create!(account: survivor)
+    activity.activityships.create!(account: victim, admin: true, receive_feedback: true)
+    survivor_membership = gathering.memberships.create!(account: survivor)
+    survivor_membership.set(paid: 20)
+    victim_membership = gathering.memberships.create!(account: victim)
+    victim_membership.set(paid: 30, admin: true)
+    victim_teamship = team.teamships.create!(account: victim, gathering: gathering)
+    Follow.create!(follower: survivor, followee: followee)
+    Follow.create!(follower: victim, followee: followee)
+
+    survivor.merge(victim)
+
+    assert_nil Account.find(victim.id)
+    assert_equal [survivor_organisationship.id], organisation.organisationships.and(:account_id.in => [survivor.id, victim.id]).pluck(:id)
+    assert survivor_organisationship.reload.admin
+    assert_equal [survivor_activityship.id], activity.activityships.and(:account_id.in => [survivor.id, victim.id]).pluck(:id)
+    assert survivor_activityship.reload.admin
+    assert survivor_activityship.receive_feedback
+    assert_equal [survivor_membership.id], gathering.memberships.and(:account_id.in => [survivor.id, victim.id]).pluck(:id)
+    assert survivor_membership.reload.admin
+    assert_equal 50, survivor_membership.paid
+    victim_teamship = Teamship.find(victim_teamship.id)
+    assert_equal [survivor.id, survivor_membership.id], [victim_teamship.account_id, victim_teamship.membership_id]
+    assert_equal [survivor.id], Follow.and(followee: followee).pluck(:follower_id)
+  end
+
+  test 'merging accounts that both applied to a gathering keeps the accepted application and its membership' do
+    Mapplication.collection.indexes.create_one({ gathering_id: 1, account_id: 1 }, unique: true)
+    survivor = FactoryBot.create(:account)
+    victim = FactoryBot.create(:account)
+    voter = FactoryBot.create(:account)
+    gathering = FactoryBot.create(:gathering, account: FactoryBot.create(:account))
+
+    survivor_mapplication = gathering.mapplications.create!(account: survivor, status: 'pending')
+    victim_mapplication = gathering.mapplications.create!(account: victim, status: 'pending')
+    victim_mapplication.accept
+    gathering.memberships.create!(account: voter)
+    verdict = victim_mapplication.verdicts.create!(account: voter, type: 'supporter')
+
+    survivor.merge(victim)
+
+    assert_equal [survivor_mapplication.id], gathering.mapplications.and(:account_id.in => [survivor.id, victim.id]).pluck(:id)
+    assert_equal 'accepted', survivor_mapplication.reload.status
+    membership = gathering.memberships.find_by(account: survivor)
+    assert_equal survivor_mapplication.id, membership.mapplication_id
+    assert_equal survivor_mapplication.id, Verdict.find(verdict.id).mapplication_id
+  end
+
   test 'merging accounts keeps the survivor stripe connect when both memberships have it' do
     survivor = FactoryBot.create(:account)
     victim = FactoryBot.create(:account)

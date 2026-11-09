@@ -74,6 +74,14 @@ class Mapplication
     "#{account.name} - #{gathering.name}"
   end
 
+  # Merging accounts (Account#merge): the victim's application to the same gathering goes with the victim, so this one
+  # takes its acceptance, the memberships that point at it, and its verdicts and discussion
+  def absorb_duplicate!(victim)
+    set(status: 'accepted') if victim.status == 'accepted'
+    Membership.and(mapplication_id: victim.id).update_all(mapplication_id: id)
+    absorb_has_many!(victim)
+  end
+
   def self.statuses
     %w[pending accepted paused]
   end

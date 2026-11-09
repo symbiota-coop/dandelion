@@ -20,6 +20,12 @@ class LocalGroupship
     account.account_notification_cache&.refresh_local_group_ids!
   end
 
+  # Merging accounts (Account#merge): the victim's local groupship of the same local group goes with the victim
+  def absorb_duplicate!(victim)
+    set(admin: true) if victim.admin
+    set(receive_feedback: true) if victim.receive_feedback
+  end
+
   after_destroy do
     account.account_notification_cache&.refresh_local_group_ids!
   end

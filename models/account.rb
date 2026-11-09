@@ -311,33 +311,7 @@ class Account
   def merge(victim)
     return if id == victim.id
 
-    preferred_organisationship_ids = organisationships.pluck(:id)
-
-    # Transfer all has_many associations using reflection
-    self.class.reflect_on_all_associations(:has_many).each do |association|
-      foreign_key = association.foreign_key
-
-      # Handle associations with different naming patterns
-      if association.options[:inverse_of]
-        foreign_key = "#{association.options[:inverse_of]}_id"
-      elsif association.options[:as]
-        # For polymorphic associations
-        type_key = "#{association.options[:as]}_type"
-        id_key = "#{association.options[:as]}_id"
-
-        klass = association.klass
-        if klass.respond_to?(:unscoped)
-          klass.unscoped.and(type_key => victim.class.name, id_key => victim.id)
-               .update_all(id_key => id)
-        end
-        next
-      end
-
-      target_collection = victim.send(association.name)
-      target_collection.update_all(foreign_key => id) if target_collection.respond_to?(:update_all)
-    end
-
-    Organisationship.dedupe_duplicates!(account: self, preferred_ids: preferred_organisationship_ids)
+    absorb_has_many!(victim)
     rebuild_organisation_caches!
 
     # Reload so dependent: :destroy does not delete associations already transferred

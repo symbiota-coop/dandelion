@@ -137,6 +137,18 @@ class Membership
     set(requested_contribution: calculate_requested_contribution)
   end
 
+  # Merging accounts (Account#merge): the victim's membership of the same gathering goes with the victim, so this one
+  # takes its rows (shifts, attendances, payments...), which would go with it, and what it was granted and paid
+  def absorb_duplicate!(victim)
+    set(admin: true) if victim.admin
+    inc(paid: victim.paid) if victim.paid.to_i.positive?
+    set(mapplication_id: victim.mapplication_id) if victim.mapplication_id && !mapplication_id
+    # Its after_destroy destroys its mapplication, which may now be this one's
+    victim.set(mapplication_id: nil)
+    absorb_has_many!(victim)
+    update_requested_contribution
+  end
+
   def owes_contribution?
     requested_contribution.to_i.positive? && paid.to_i < requested_contribution
   end

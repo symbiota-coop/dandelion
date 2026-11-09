@@ -26,6 +26,12 @@ class Activityship
     account.account_notification_cache&.refresh_activity_ids!
   end
 
+  # Merging accounts (Account#merge): the victim's activityship of the same activity goes with the victim
+  def absorb_duplicate!(victim)
+    set(admin: true) if victim.admin
+    set(receive_feedback: true) if victim.receive_feedback
+  end
+
   def set_hide_membership_for_closed_activity
     self.hide_membership = true if activity&.privacy == 'closed'
   end
