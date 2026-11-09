@@ -399,6 +399,21 @@ class EventsTest < ActiveSupport::TestCase
     end
   end
 
+  test 'rich text keeps only the classes CKEditor and our own markup use' do
+    html = '<div class="position-fixed top-0 start-0 w-100 vh-100 bg-white z-3">x</div>' \
+           '<div class="offcanvas offcanvas-start show"><div class="offcanvas-body">y</div></div>' \
+           '<a class="btn btn-primary stretched-link" href="https://example.com">z</a>' \
+           '<figure class="image image-style-align-left"><img src="https://example.com/a.png"></figure>' \
+           '<p class="lead">l</p><pre><code class="language-ruby">c</code></pre>'
+    [Sanitize::Config::DANDELION, Sanitize::Config::IFRAMES].each do |config|
+      assert_equal '<div>x</div><div><div>y</div></div>' \
+                   '<a class="btn btn-primary" href="https://example.com">z</a>' \
+                   '<figure class="image image-style-align-left"><img src="https://example.com/a.png"></figure>' \
+                   '<p class="lead">l</p><pre><code class="language-ruby">c</code></pre>',
+                   Sanitize.fragment(html, config)
+    end
+  end
+
   test 'rsvp button text is escaped on the event page' do
     create_event(prices: [0], rsvp_button_text: '<img src=x onerror=alert(1)>')
 
