@@ -44,15 +44,17 @@ class Cohostship
     end
   end
 
+  # The event's caches change with $addToSet and $pull rather than by writing back arrays from the event in hand, which
+  # can be a copy loaded before another admin's change to its co-hosts, and writing back its arrays would undo that
   after_create do
-    cohosts_ids = ((event.cohosts_ids_cache || []) + [organisation.id]).uniq
-    event.set(cohosts_ids_cache: cohosts_ids, hosts_ids_cache: event.hosts_ids_for(cohosts_ids))
+    event.add_to_set(cohosts_ids_cache: organisation_id, hosts_ids_cache: organisation_id)
     event.sync_carousel_ids!
   end
 
   after_destroy do
-    cohosts_ids = (event.cohosts_ids_cache || []) - [organisation.id]
-    event.set(cohosts_ids_cache: cohosts_ids, hosts_ids_cache: event.hosts_ids_for(cohosts_ids))
+    event.pull(cohosts_ids_cache: organisation_id)
+    # An old co-hostship of the host's own organisation (no longer allowed) leaves it among the hosts
+    event.pull(hosts_ids_cache: organisation_id) unless organisation_id == event.organisation_id
     event.sync_carousel_ids! unless event.flagged_for_destroy?
   end
 

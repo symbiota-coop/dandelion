@@ -4,7 +4,8 @@ module EventCarouselIds
   def sync_carousel_ids!
     return if flagged_for_destroy?
 
-    org_ids = [organisation_id, *(cohosts_ids_cache || [])].compact
+    # Co-hosts from the cohostships, not cohosts_ids_cache, which an event loaded before another co-host was added lacks
+    org_ids = [organisation_id, *Cohostship.and(event_id: id).pluck(:organisation_id)].compact
     tag_ids = EventTagship.and(event_id: id).pluck(:event_tag_id)
     ids = if org_ids.any? && tag_ids.any?
             Carousel.and(:organisation_id.in => org_ids, :id.in => Carouselship.and(:event_tag_id.in => tag_ids).pluck(:carousel_id)).pluck(:id)

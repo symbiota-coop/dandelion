@@ -979,6 +979,50 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal [@organisation.id], @event.reload.hosts_ids_cache
   end
 
+  test "co-hosts added and removed through different copies of an event, as by two admins at once, don't undo each other" do
+    create_event
+    first = FactoryBot.create(:organisation)
+    second = FactoryBot.create(:organisation)
+    @event.cohostships.create!(organisation: first)
+    stale = Event.find(@event.id)
+
+    @event.cohostships.create!(organisation: second)
+    stale.cohostships.find_by(organisation: first).destroy
+
+    @event.reload
+    assert_equal [second.id], @event.cohosts_ids_cache
+    assert_equal [@organisation.id, second.id], @event.hosts_ids_cache
+  end
+
+  test "an event's carousels come from all its co-hosts, including one added through another copy of it" do
+    create_event
+    tag = FactoryBot.create(:event_tag)
+    tag_event(@event, tag)
+    first = FactoryBot.create(:organisation)
+    second = FactoryBot.create(:organisation)
+    carousel = FactoryBot.create(:carousel, organisation: first)
+    tag_carousel(carousel, tag)
+    stale = Event.find(@event.id)
+
+    @event.cohostships.create!(organisation: first)
+    stale.cohostships.create!(organisation: second)
+
+    assert_equal [carousel.id], @event.reload.carousel_ids
+  end
+
+  test "removing an old co-hostship of the host's own organisation keeps it among the event's hosts" do
+    create_event
+    # New ones are refused, but some were saved before that check
+    Cohostship.collection.insert_one(event_id: @event.id, organisation_id: @organisation.id)
+    @event.set(cohosts_ids_cache: [@organisation.id])
+
+    Cohostship.find_by(event_id: @event.id).destroy
+
+    @event.reload
+    assert_empty @event.cohosts_ids_cache
+    assert_equal [@organisation.id], @event.hosts_ids_cache
+  end
+
   test 'events_including_cohosted returns hosted and cohosted events but not deleted ones' do
     create_event
     create_event(as: :deleted_event)
