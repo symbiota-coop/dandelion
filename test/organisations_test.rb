@@ -358,6 +358,22 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_empty member.unsubscribed_organisation_ids_cache
   end
 
+  test 'hiding and showing a membership on the organisation page takes it off and puts it back on the public cache' do
+    create_organisation
+    member = FactoryBot.create(:account)
+    member.organisationships.create!(organisation: @organisation, skip_welcome: true)
+    sign_in(member)
+
+    visit "/o/#{@organisation.slug}"
+    click_on 'Showing on your profile'
+    assert page.has_link? 'Not showing on your profile'
+    assert_empty Account.find(member.id).organisation_ids_public_cache
+
+    click_on 'Not showing on your profile'
+    assert page.has_link? 'Showing on your profile'
+    assert_equal [@organisation.id], Account.find(member.id).organisation_ids_public_cache
+  end
+
   test 'destroying a duplicate organisationship keeps the organisation in the cache' do
     create_organisation
     member = FactoryBot.create(:account)

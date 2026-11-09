@@ -490,6 +490,31 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal false, @local_group.local_groupships.find_by(account: buyer).unsubscribed
   end
 
+  test "booking with the opt-in resubscribes to a co-host without a new co-host's membership undoing it" do
+    create_event(prices: [0], opt_in_organisation: true)
+    # The opt-in goes through the host, then the co-hosts in order: one the buyer unsubscribed from, then one they're new to
+    unsubscribed_cohost = FactoryBot.create(:organisation)
+    new_cohost = FactoryBot.create(:organisation)
+    @event.cohostships.create!(organisation: unsubscribed_cohost)
+    @event.cohostships.create!(organisation: new_cohost)
+    buyer = FactoryBot.create(:account)
+    unsubscribed_cohost.organisationships.create!(account: buyer, unsubscribed: true, skip_welcome: true)
+
+    sign_in(buyer)
+    visit "/e/#{@event.slug}"
+    assert page.has_content?("Signed in as #{buyer.name}")
+    find('label[for="account_opt_in_organisation"]').click
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
+
+    organisations = [@organisation, unsubscribed_cohost, new_cohost]
+    organisations.each { |organisation| assert_equal false, organisation.organisationships.find_by(account: buyer).unsubscribed }
+    buyer.reload
+    assert_equal organisations.map(&:id).sort, buyer.subscribed_organisation_ids_cache.sort
+    assert_empty buyer.unsubscribed_organisation_ids_cache
+    assert_equal organisations.map(&:id).sort, buyer.organisation_ids_cache.sort
+  end
+
   test 'a mistyped email domain is booked after confirming' do
     create_event(prices: [0])
 

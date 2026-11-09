@@ -109,13 +109,9 @@ class Organisationship
   end
 
   after_create do
-    account.set(organisation_ids_cache: ((account.organisation_ids_cache || []) + [organisation.id]).uniq)
-    if unsubscribed
-      account.set(unsubscribed_organisation_ids_cache: ((account.unsubscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
-    else
-      account.set(subscribed_organisation_ids_cache: ((account.subscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
-      associate_with_relevant_local_groups!
-    end
+    file_in_account_caches(add: [:organisation_ids_cache])
+    file_subscription_in_account_caches
+    associate_with_relevant_local_groups! unless unsubscribed
     account.account_notification_cache&.refresh_organisations_ids!
     send_welcome unless skip_welcome
   end
@@ -125,21 +121,36 @@ class Organisationship
   end
 
   after_save do
-    if hide_membership
-      account.set(organisation_ids_public_cache: (account.organisation_ids_public_cache || []) - [organisation.id])
-    else
-      account.set(organisation_ids_public_cache: ((account.organisation_ids_public_cache || []) + [organisation.id]).uniq)
-    end
-    if saved_change_to_unsubscribed?
-      if unsubscribed
-        account.set(subscribed_organisation_ids_cache: (account.subscribed_organisation_ids_cache || []) - [organisation.id])
-        account.set(unsubscribed_organisation_ids_cache: ((account.unsubscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
-      else
-        account.set(unsubscribed_organisation_ids_cache: (account.unsubscribed_organisation_ids_cache || []) - [organisation.id])
-        account.set(subscribed_organisation_ids_cache: ((account.subscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
-      end
-    end
+    file_visibility_in_account_caches
+    file_subscription_in_account_caches if saved_change_to_unsubscribed?
     send_monthly_donation_welcome if monthly_donation_method && !sent_monthly_donation_welcome
+  end
+
+  # Adds the organisation to some of the account's caches and takes it off others with $addToSet and $pull, rather than
+  # writing back whole arrays: the account in hand can be a copy loaded earlier in the request (Order's opt-in creates
+  # organisationships with the order's account, after resubscribing others through fresh copies), and writing back its
+  # arrays undid what those copies had done
+  def file_in_account_caches(add: [], remove: [])
+    account.pull(remove.index_with { organisation_id }) if remove.any?
+    account.add_to_set(add.index_with { organisation_id }) if add.any?
+  end
+
+  def file_subscription_in_account_caches
+    subscribed_cache = :subscribed_organisation_ids_cache
+    unsubscribed_cache = :unsubscribed_organisation_ids_cache
+    if unsubscribed
+      file_in_account_caches(add: [unsubscribed_cache], remove: [subscribed_cache])
+    else
+      file_in_account_caches(add: [subscribed_cache], remove: [unsubscribed_cache])
+    end
+  end
+
+  def file_visibility_in_account_caches
+    if hide_membership
+      file_in_account_caches(remove: [:organisation_ids_public_cache])
+    else
+      file_in_account_caches(add: [:organisation_ids_public_cache])
+    end
   end
 
   def welcome_email_content(body)
@@ -252,14 +263,8 @@ class Organisationship
     return if unsubscribed == value
 
     set(unsubscribed: value)
-    if value
-      account.set(subscribed_organisation_ids_cache: (account.subscribed_organisation_ids_cache || []) - [organisation.id])
-      account.set(unsubscribed_organisation_ids_cache: ((account.unsubscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
-    else
-      account.set(unsubscribed_organisation_ids_cache: (account.unsubscribed_organisation_ids_cache || []) - [organisation.id])
-      account.set(subscribed_organisation_ids_cache: ((account.subscribed_organisation_ids_cache || []) + [organisation.id]).uniq)
-      associate_with_relevant_local_groups!
-    end
+    file_subscription_in_account_caches
+    associate_with_relevant_local_groups! unless value
   end
 
   def organisation_tier
