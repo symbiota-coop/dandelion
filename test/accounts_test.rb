@@ -211,6 +211,31 @@ class AccountsTest < ActiveSupport::TestCase
     end
   end
 
+  test "leaving an organisation, activity, local group or gathering, or unfollowing someone, takes it off the notification cache's ids at once" do
+    organisation = FactoryBot.create(:organisation)
+    activity = FactoryBot.create(:activity, organisation: organisation, privacy: 'open')
+    local_group = FactoryBot.create(:local_group, organisation: organisation)
+    gathering = FactoryBot.create(:gathering, account: FactoryBot.create(:account))
+    followee = FactoryBot.create(:account)
+
+    # Each joins, then leaves as its controller does: found through the account, then destroyed
+    {
+      organisations_ids: [organisation, ->(a) { a.organisationships.create!(organisation: organisation, skip_welcome: true) }, ->(a) { a.organisationships.find_by(organisation: organisation) }],
+      activity_ids: [activity, ->(a) { a.activityships.create!(activity: activity) }, ->(a) { a.activityships.find_by(activity: activity) }],
+      local_group_ids: [local_group, ->(a) { a.local_groupships.create!(local_group: local_group) }, ->(a) { a.local_groupships.find_by(local_group: local_group) }],
+      gathering_ids: [gathering, ->(a) { gathering.memberships.create!(account: a) }, ->(a) { a.memberships.find_by(gathering: gathering) }],
+      account_ids: [followee, ->(a) { a.follows_as_follower.create!(followee: followee) }, ->(a) { a.follows_as_follower.find_by(followee: followee) }]
+    }.each do |field, (joined, join, find)|
+      account = FactoryBot.create(:account)
+      account.create_account_notification_cache
+      join.(account)
+      assert_includes AccountNotificationCache.find_by(account_id: account.id).send(field), joined.id, "#{field} after joining"
+
+      find.(account).destroy
+      assert_not_includes AccountNotificationCache.find_by(account_id: account.id).send(field), joined.id, "#{field} after leaving"
+    end
+  end
+
   test 'unsubscribe link unsubscribes from an account you follow' do
     account = FactoryBot.create(:account)
     followee = FactoryBot.create(:account)

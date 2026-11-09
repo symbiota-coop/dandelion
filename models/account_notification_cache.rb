@@ -15,8 +15,10 @@ class AccountNotificationCache
   field :expires_at, type: Time
 
 
+  # Each reads from the database (criteria, or has_many_through's ids), not an association's loaded copy, which still
+  # holds a join whose after_destroy is refreshing it
   REFRESH_FIELD_MAPPINGS = {
-    gathering_ids: ->(account) { account.memberships.pluck(:gathering_id) },
+    gathering_ids: ->(account) { account.memberships.criteria.pluck(:gathering_id) },
     account_ids: ->(account) { [account.id] + account.network_ids },
     activity_ids: ->(account) { account.activities_following_ids },
     local_group_ids: ->(account) { account.local_groups_following_ids },

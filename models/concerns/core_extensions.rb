@@ -288,7 +288,9 @@ module CoreExtensions
       collection_method = name
 
       define_method(ids_method) do
-        scope = send(through)
+        # From the database (criteria), not the association's loaded copy, which still holds a join destroyed in this
+        # request: so a join's after_destroy reads the ids without it. An unsaved record's joins are only in memory
+        scope = new_record? ? send(through) : send(through).criteria
         scope = scope.and(conditions) if conditions
         scope.pluck(fk)
       end
