@@ -89,9 +89,11 @@ namespace :late do
         Organisation.and(:gocardless_subscriptions => true, :gocardless_access_token.ne => nil).each(&:sync_with_gocardless)
         Organisation.and(:patreon_refresh_token.ne => nil).each(&:sync_with_patreon)
       end
-      Errand.step('set counts, update paid up status and stripe topup') do
+      Errand.step('set counts') do
+        puts "set counts: #{Organisation.set_counts} organisation(s) changed"
+      end
+      Errand.step('update paid up status and stripe topup') do
         Organisation.all.each do |organisation|
-          organisation.set_counts
           organisation.update_paid_up_without_delay
           organisation.stripe_topup if organisation.stripe_customer_id
         end

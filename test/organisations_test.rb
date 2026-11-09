@@ -329,6 +329,42 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert organisationship.unsubscribed
   end
 
+  test "set_counts counts every organisation's followers, subscribed accounts, monthly donors and donations at once" do
+    create_organisation(currency: 'GBP')
+    quiet = FactoryBot.create(:organisation)
+    follower = FactoryBot.create(:account)
+    @organisation.organisationships.create!(account: follower, skip_welcome: true)
+    @organisation.organisationships.create!(account: FactoryBot.create(:account), unsubscribed: true, skip_welcome: true)
+    globally_unsubscribed = FactoryBot.create(:account)
+    @organisation.organisationships.create!(account: globally_unsubscribed, skip_welcome: true)
+    globally_unsubscribed.set(unsubscribed: true)
+    # Counted once, as the cache holds the id twice
+    follower.set(subscribed_organisation_ids_cache: [@organisation.id, @organisation.id])
+    donor = FactoryBot.create(:account)
+    @organisation.organisationships.create!(account: donor, monthly_donation_method: 'Other', monthly_donation_amount: 10, monthly_donation_currency: 'GBP', skip_welcome: true)
+    # A second row of the same donor's, counted once among donors but adding to the total
+    insert_organisationship_without_callbacks(account: donor, organisation: @organisation, monthly_donation_method: 'Other', monthly_donation_amount: 5, monthly_donation_currency: 'GBP')
+    # A donor whose account has gone isn't counted among donors, though their donation is in the total
+    insert_organisationship_without_callbacks(account: FactoryBot.build(:account, id: BSON::ObjectId.new), organisation: @organisation, monthly_donation_method: 'Other', monthly_donation_amount: 3, monthly_donation_currency: 'GBP')
+    # A donor with no amount (which saving clears, but older rows have) counts as a donor, adding nothing to the total
+    insert_organisationship_without_callbacks(account: FactoryBot.create(:account), organisation: @organisation, monthly_donation_method: 'Other')
+    quiet.set(followers_count: 99, subscribed_accounts_count: 99, monthly_donors_count: 99, monthly_donations_count: '£99')
+
+    assert_equal Organisation.count, Organisation.set_counts
+
+    @organisation.reload
+    # Every row, the creator's included
+    assert_equal 8, @organisation.followers_count
+    # The creator, the follower and the donor: not the unsubscribed, nor rows inserted directly, which skip the caches
+    assert_equal 3, @organisation.subscribed_accounts_count
+    assert_equal 2, @organisation.monthly_donors_count
+    assert_equal '£18', @organisation.monthly_donations_count
+    quiet.reload
+    # Just its creator, and no donors
+    assert_equal [1, 1, 0, '0'], [quiet.followers_count, quiet.subscribed_accounts_count, quiet.monthly_donors_count, quiet.monthly_donations_count]
+    assert_equal 0, Organisation.set_counts, 'nothing changed, so nothing is written'
+  end
+
   test 'organisation cache sync reports duplicate organisationship rows' do
     create_organisation
     member = FactoryBot.create(:account)

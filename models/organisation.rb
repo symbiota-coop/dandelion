@@ -96,19 +96,64 @@ class Organisation
   end
 
   def set_counts
-    monthly_rows = organisationships.and(:monthly_donation_method.ne => nil).pluck(:monthly_donation_amount, :monthly_donation_currency)
-    monthly_donations_count = monthly_rows.map do |amount, currency|
+    Organisation.set_counts(Organisation.and(id: id))
+    reload
+  end
+
+  # The counts set_counts keeps
+  COUNT_FIELDS = %w[followers_count subscribed_accounts_count monthly_donors_count monthly_donations_count].freeze
+
+  # Recounts the followers, subscribed accounts, monthly donors and monthly donations total of the given organisations
+  # (all of them by default) with a query each across them all, rather than several per organisation, and writes only
+  # the counts that changed. The donations total is added up in Ruby, as it converts currencies at our exchange rates
+  def self.set_counts(organisations = Organisation.all)
+    current = organisations.pluck(:id, *COUNT_FIELDS).to_h { |id, *counts| [id, COUNT_FIELDS.zip(counts).to_h] }
+    ids = current.keys
+
+    followers = Organisationship.collection.aggregate([
+      { '$match' => { 'organisation_id' => { '$in' => ids } } },
+      { '$group' => { '_id' => '$organisation_id', 'count' => { '$sum' => 1 } } }
+    ]).to_h { |doc| [doc['_id'], doc['count']] }
+
+    subscribed = Account.collection.aggregate([
+      { '$match' => { 'subscribed_organisation_ids_cache' => { '$in' => ids }, 'unsubscribed' => false } },
+      # Once per account, as counting accounts by the cache would, should an id be in it twice
+      { '$project' => { 'organisation_id' => { '$setUnion' => ['$subscribed_organisation_ids_cache'] } } },
+      { '$unwind' => '$organisation_id' },
+      { '$match' => { 'organisation_id' => { '$in' => ids } } },
+      { '$group' => { '_id' => '$organisation_id', 'count' => { '$sum' => 1 } } }
+    ]).to_h { |doc| [doc['_id'], doc['count']] }
+
+    donor_rows = Organisationship.and(:organisation_id.in => ids, :monthly_donation_method.ne => nil)
+                                 .pluck(:organisation_id, :account_id, :monthly_donation_amount, :monthly_donation_currency)
+                                 .group_by(&:first)
+    # Donors whose accounts still exist, as monthly_donors finds them
+    donor_account_ids = Account.in(id: donor_rows.values.flatten(1).map(&:second).uniq).pluck(:id).to_set
+
+    operations = current.filter_map do |id, counts|
+      rows = donor_rows[id] || []
+      new_counts = {
+        'followers_count' => followers[id] || 0,
+        'subscribed_accounts_count' => subscribed[id] || 0,
+        'monthly_donors_count' => rows.map(&:second).uniq.count { |account_id| donor_account_ids.include?(account_id) },
+        'monthly_donations_count' => fields['monthly_donations_count'].mongoize(monthly_donations_total(rows.map { |row| row.last(2) }))
+      }
+      next if new_counts == counts
+
+      { update_one: { filter: { _id: id }, update: { '$set' => new_counts } } }
+    end
+    Organisation.collection.bulk_write(operations, ordered: false) if operations.any?
+    operations.size
+  end
+
+  # The total of monthly donations, from [amount, currency] pairs: formatted when above zero, otherwise as it comes
+  def self.monthly_donations_total(rows)
+    total = rows.map do |amount, currency|
       next Money.new(0, 'GBP') if amount.nil? || currency.blank?
 
       Money.new(amount * 100, currency)
     end.sum
-    monthly_donations_count = monthly_donations_count.format(no_cents: true) if monthly_donations_count > 0
-    set(
-      monthly_donations_count: monthly_donations_count,
-      monthly_donors_count: monthly_donors.count,
-      subscribed_accounts_count: subscribed_accounts.count,
-      followers_count: organisationships.count
-    )
+    total > 0 ? total.format(no_cents: true) : total
   end
 
   def self.spring_clean
