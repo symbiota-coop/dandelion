@@ -10,6 +10,10 @@ module AtlasChecks
   # A word to search for is at least this long, so the start of it searched for (AUTOCOMPLETE_PREFIX letters) isn't the
   # whole word, which a phrase would match without autocomplete
   SAMPLE_WORD = /\A\p{L}{6,}\z/
+  # A token as Atlas's standard analyzer (Unicode word breaks) sees one, roughly: letters, digits and underscores, kept
+  # together across an apostrophe, full stop or colon between them, so O'Sullivan is one token and Sullivan alone
+  # wouldn't match it. Only tokens that are a SAMPLE_WORD are searched for
+  SAMPLE_TOKEN = /[\p{L}\p{N}_]+(?:(?:#{Searchable::APOSTROPHE_CHAR_CLASS}|[.:])[\p{L}\p{N}_]+)*/
   AUTOCOMPLETE_PREFIX = 4
   # Records to look through for one with such a word
   SAMPLE_SIZE = 50
@@ -108,7 +112,8 @@ module AtlasChecks
     def sample(model, field, first_word: false)
       model.and(field.to_sym.nin => [nil, '']).only(:_id, field).order('created_at desc').limit(SAMPLE_SIZE).each do |record|
         value = record.send(field).to_s
-        words = value.split(/[^\p{L}]+/).reject(&:empty?)
+        # The start of a field only needs its leading letters (damp_resonance_8's damp...); a whole word, a whole token
+        words = first_word ? value.split(/[^\p{L}]+/).reject(&:empty?) : value.scan(SAMPLE_TOKEN)
         candidates = if first_word
                        value.match?(/\A\p{L}/) ? words.first(1) : []
                      else

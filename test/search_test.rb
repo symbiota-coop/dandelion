@@ -352,6 +352,13 @@ class SearchTest < ActiveSupport::TestCase
     assert_equal vector, vector_search[:queryVector]
   end
 
+  test "the whole-word check searches for a whole token as Atlas sees it, not part of one like O'Sullivan's Sullivan" do
+    older = FactoryBot.create(:account, name: 'Bartholomew Smith', created_at: 1.day.ago)
+    FactoryBot.create(:account, name: "Clare O'Sullivan")
+
+    assert_equal [older, 'Bartholomew'], AtlasChecks.send(:sample, Account, 'name')
+  end
+
   test 'the Atlas checks page checks each searchable model, and fails them on plain MongoDB' do
     assert_equal %w[Account Activity Event Gathering LocalGroup Organisation Pmail], AtlasChecks.searchable_models.map(&:name)
 
