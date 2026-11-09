@@ -11,7 +11,7 @@ Code map: controllers in `app/controllers`, views in `app/views`, CSS/JS in `app
 The rules that must never be broken, whatever the task. The section each names says why:
 
 - Never attempt to access ENV vars on Render
-- Never attempt to write to the production database, including with the MongoDB MCP's write tools (Cloud agents)
+- Never attempt to write to the production database, including with the MongoDB MCP's write tools (MCP servers)
 - Never skip the pre-commit hook with `--no-verify` (Linting)
 - Never stage or commit another session's changes: no `git add -A` or `git commit -a` (Committing)
 - Never attempt to run the full test suite (Tests)
@@ -26,7 +26,7 @@ Dandelion is built with many coding agents (Claude Code, Codex, Cursor, opencode
 - Memories: don't save what you learn to a tool's own memory (Claude Code's memory files, Cursor's or Codex's memories...), which only that tool reads, on one machine. If it's worth remembering, add it here
 - Rules: a rule that code can check gets a check (Linting), not just a line here, so it holds whichever agent wrote the code. The checks run where every agent passes: the pre-commit hook (Linting), as every agent commits with git, and CI. Don't rely on one tool's hooks or settings to enforce a rule
 - Setup: `script/agent-env/` installs and starts everything for any environment, and each tool's own config only calls it (Cloud agents)
-- MCP servers: defined once in `.mcp.json` and copied into each tool's format by `rake mcp:sync` (Cloud agents)
+- MCP servers: defined once in `.mcp.json` and copied into each tool's format by `rake mcp:sync` (MCP servers)
 - Shared checkouts: other sessions may be editing the same files, so commit only your own changes (Committing)
 - Automation: the daily bug reviews in `.github/workflows` run Claude, Codex, Cursor and opencode on the same prompt (`.github/prompts`, `.github/actions`), with their models in `.github/models.env` (opencode takes several, `OPENCODE_MODELS`, each with its own effort, and runs a review with each). When someone with write access opens an issue, Claude works on it and opens a pull request from `claude/issue-<number>` (`.github/workflows/issue-to-pr.yml`, with the prompt `.github/prompts/issue-to-pr.md`), or comments if there's nothing to change; the `no-pr` label skips it. Claude also drafts replies to users' emails, with the prompt `.github/prompts/user-query-replies.md`, its tool permissions beside it (only tools that read, as emails are untrusted) and a Gmail MCP server of its own, `script/gmail_mcp.rb`, which drafts but can't send. Its workflow runs from a private repo, because its logs hold emails and this repo's logs are public, so keep emails and query results out of anything this repo's workflows print
 
@@ -48,17 +48,16 @@ script/lint <files>
 - Scripts in templates share the page's globals, so a library or a function another file or template defines needs adding to `libraries` or `shared` in `eslint.config.mjs`
 - A rule that code can check gets a check: a cop, linter or config rule, or a test in `test/lint_test.rb`, with cases there (each cop's `@example`, good and bad, is tested as it stands). It doesn't boot the app: `bundle exec ruby -I test test/lint_test.rb`
 
-## Cloud agents (Cursor, Claude Code)
+## Running the app
 
-Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Chromium, MongoDB), `ruby.sh` (the Gemfile's Ruby, for images without it), `node.sh` (the Node in `.nvmrc`, which CI's setup-node also reads, for images without its major; installed at a prefix of its own rather than over the image's Node), `browser-path.sh` (prints the Chromium for `BROWSER_PATH`), `install.sh` (bundle install, npm ci for the linters and uv for zizmor, actionlint and ShellCheck, which only warn if they fail, `.env` files, the pre-commit hook), `start-services.sh` (starts MongoDB) and `start-web.sh` (starts Puma in the background, logging to `log/web.log`, for environments with no terminal to keep it in). A tool's own setup only calls these, plus anything that applies to that tool alone (Claude Code's proxy CA and `CLAUDE_ENV_FILE`).
-
-- Cursor: `.cursor/environment.json` and `.cursor/Dockerfile`. After boot, `start` forks Mongo; a `web` terminal keeps `foreman start -e .env web` running (Puma on port 3000, logs in that session). That terminal is a tmux session, so the Dockerfile installs tmux.
-- Claude Code on the web: a `SessionStart` hook in `.claude/settings.json` runs `.claude/remote-setup.sh`. Project MCP servers come from the committed `.mcp.json`, whose `${VAR}`s are filled from the cloud environment's variables (and from your shell locally). Other tools don't read it, so each has its own committed copy of the same servers, with secrets read from the environment rather than written in: `.cursor/mcp.json` (`${env:VAR}`), `.codex/config.toml` (`env_vars` and `bearer_token_env_var`; Codex only reads it in trusted projects) and `.opencode/opencode.json` (`{env:VAR}`). Only edit `.mcp.json`, then run `rake mcp:sync` to write the others. Variables in `.mcp.json` can't have defaults (`${VAR:-x}`), as the others can't express them. Cursor cloud agents don't read any repo MCP file; their MCP servers are set up in the Cursor dashboard
-- MongoDB MCP: `.mcp.json` runs `mongodb-atlas-mcp-remote`, a proxy to the Atlas Managed MCP Server (`https://mcp.mongodb.com`), with read-only access to production. The server lists write tools (`insert-many`, `update-many`, `delete-many`, `drop-*`, `atlas-create-*`); never call them
-- Browsing the app with Playwright (Claude Code on the web): Chromium ignores `HTTPS_PROXY`, so pass it or CDN assets (jQuery etc.) won't load and nothing works: `chromium.launch({ executablePath: process.env.BROWSER_PATH, args: ['--proxy-server=' + process.env.HTTPS_PROXY] })`. Don't use Playwright's `proxy` option: it sends localhost through the proxy too, which rejects it. The setup script trusts the proxy's CA in Chromium's NSS store (`~/.pki/nssdb`); never ignore certificate errors instead. Cuprite gets the proxy from `test/test_config.rb`
 - Run `foreman run bundle exec rake db:seed` to seed the database
-- Run `foreman start -e .env web` to start the web process if it is not already running. Both cloud agents start it on boot: Cursor in its `web` terminal, and Claude Code on the web in the background (`script/agent-env/start-web.sh`) with logs in `log/web.log`. Puma takes about 20 seconds to boot, so if port 3000 isn't answering yet, check the log or wait rather than starting a second copy
+- Run `foreman start -e .env web` to start the web process (Puma on port 3000) if it is not already running. In a cloud environment it starts on boot (Cloud agents)
 - Login with `SEED_ACCOUNT_EMAIL` and `SEED_ACCOUNT_PASSWORD` in `.env`
+
+## MCP servers
+
+- Project MCP servers come from the committed `.mcp.json`, which Claude Code reads, its `${VAR}`s filled from your shell. Other tools don't read it, so each has its own committed copy of the same servers, with secrets read from the environment rather than written in: `.cursor/mcp.json` (`${env:VAR}`), `.codex/config.toml` (`env_vars` and `bearer_token_env_var`; Codex only reads it in trusted projects) and `.opencode/opencode.json` (`{env:VAR}`). Only edit `.mcp.json`, then run `rake mcp:sync` to write the others. Variables in `.mcp.json` can't have defaults (`${VAR:-x}`), as the others can't express them
+- MongoDB MCP: `.mcp.json` runs `mongodb-atlas-mcp-remote`, a proxy to the Atlas Managed MCP Server (`https://mcp.mongodb.com`), with read-only access to production. The server lists write tools (`insert-many`, `update-many`, `delete-many`, `drop-*`, `atlas-create-*`); never call them
 
 ## Mongo
 
@@ -165,3 +164,15 @@ Each night `.github/workflows/package-updates.yml` runs `script/update_packages.
 - CDN files load with `cdn_tag` (`CdnTags`), whose `integrity` attribute makes the browser refuse a file that's changed since we chose it. After adding or bumping one (CI's lint job fails until you do), run `rake frontend:integrity`, which hashes each CDN file that has no hash yet into `frontend/integrity.json` and drops those nothing loads any more. It keeps the hashes it has rather than trusting the CDN again, and refuses to hash a version of an npm package released less than 7 days ago (the cooldown), as a hash pins whatever the version is. Load a file the package ships: jsDelivr minifies a `.min` file a package lacks on the fly, and the task refuses one, as that output can change
 
 Before adding a gem or a frontend package, check whether one we already have does the job: `Gemfile`, `frontend/package.json`.
+
+## Cloud agents (Cursor, Claude Code on the web)
+
+What differs in a cloud agent's environment.
+
+Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Chromium, MongoDB), `ruby.sh` (the Gemfile's Ruby, for images without it), `node.sh` (the Node in `.nvmrc`, which CI's setup-node also reads, for images without its major; installed at a prefix of its own rather than over the image's Node), `browser-path.sh` (prints the Chromium for `BROWSER_PATH`), `install.sh` (bundle install, npm ci for the linters and uv for zizmor, actionlint and ShellCheck, which only warn if they fail, `.env` files, the pre-commit hook), `start-services.sh` (starts MongoDB) and `start-web.sh` (starts Puma in the background, logging to `log/web.log`, for environments with no terminal to keep it in). A tool's own setup only calls these, plus anything that applies to that tool alone (Claude Code's proxy CA and `CLAUDE_ENV_FILE`).
+
+- Cursor: `.cursor/environment.json` and `.cursor/Dockerfile`. After boot, `start` forks Mongo; a `web` terminal keeps `foreman start -e .env web` running (Puma on port 3000, logs in that session). That terminal is a tmux session, so the Dockerfile installs tmux
+- Claude Code on the web: a `SessionStart` hook in `.claude/settings.json` runs `.claude/remote-setup.sh`
+- The web process: both cloud agents start it on boot: Cursor in its `web` terminal, and Claude Code on the web in the background (`script/agent-env/start-web.sh`) with logs in `log/web.log`. Puma takes about 20 seconds to boot, so if port 3000 isn't answering yet, check the log or wait rather than starting a second copy
+- MCP servers: Claude Code on the web fills `.mcp.json`'s `${VAR}`s from the cloud environment's variables. Cursor cloud agents don't read any repo MCP file; their MCP servers are set up in the Cursor dashboard
+- Browsing the app with Playwright (Claude Code on the web): Chromium ignores `HTTPS_PROXY`, so pass it or CDN assets (jQuery etc.) won't load and nothing works: `chromium.launch({ executablePath: process.env.BROWSER_PATH, args: ['--proxy-server=' + process.env.HTTPS_PROXY] })`. Don't use Playwright's `proxy` option: it sends localhost through the proxy too, which rejects it. The setup script trusts the proxy's CA in Chromium's NSS store (`~/.pki/nssdb`); never ignore certificate errors instead. Cuprite gets the proxy from `test/test_config.rb`
