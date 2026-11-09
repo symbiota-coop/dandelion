@@ -82,7 +82,9 @@ module ActiveSupport
     end
 
     teardown do
-      save_screenshot if !ENV['CI'] && respond_to?(:save_screenshot)
+      # Only once the test has used the page (Capybara's own flag, with no reader): a screenshot starts Chrome, which
+      # model and Rack tests otherwise never need, and which can't start in some agents' sandboxes (Codex's on macOS)
+      save_screenshot if !ENV['CI'] && respond_to?(:save_screenshot) && page.instance_variable_get(:@touched)
     end
 
     # The doc claims this test checks, as 'page/id@hash' (lib/doc_claims.rb): test/lint_test.rb reads them, so they do
