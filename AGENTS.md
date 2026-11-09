@@ -6,6 +6,18 @@ The ORM is Mongoid, not ActiveRecord.
 
 Code map: controllers in `app/controllers`, views in `app/views`, CSS/JS in `app/assets`; models in `models`, with shared model code in `models/concerns`; view helpers in `app/helpers`; other library code in `lib` (form builder, payments, mail, auth); boot and config in `config`; rake tasks in `tasks`; tests in `test`. Background jobs use delayed_job (`handle_asynchronously` or `.delay`), run by the `worker` process in `Procfile`.
 
+## Crucial restrictions
+
+The rules that must never be broken, whatever the task. The section each names says why:
+
+- Never attempt to access ENV vars on Render
+- Never attempt to write to the production database, including with the MongoDB MCP's write tools (Cloud agents)
+- Never skip the pre-commit hook with `--no-verify` (Linting)
+- Never stage or commit another session's changes: no `git add -A` or `git commit -a` (Committing)
+- Never attempt to run the full test suite (Tests)
+- Never edit built or vendored files: `ext/ckeditor.js`, `bootstrap5.css`, the jQuery UI builds (Build/vendored code)
+- Never use a gem or JS package version released less than 7 days ago (Dependencies)
+
 ## Many agents
 
 Dandelion is built with many coding agents (Claude Code, Codex, Cursor, opencode and others), on our own machines and in the cloud, and often several at once in the same checkout. It's set up so that any of them can work on it equally well, with nothing that only works for one:
@@ -35,11 +47,6 @@ script/lint <files>
 - Disable a check only where its rule genuinely doesn't apply, and say why (`test_every_disable_says_why`): `# rubocop:disable Dandelion/... -- reason`, `<%# erb_lint:disable DesignClasses: reason %>`, `// eslint-disable-next-line <rule> -- reason`, `/* stylelint-disable-line <rule> -- reason */` (or `<%# stylelint-disable-next-line <rule> -- reason %>` in a template), `# zizmor: ignore[<audit>] -- reason`, `# shellcheck disable=SC2086 # reason`, and for Herb the reason in an ERB comment on the line above. actionlint has no disable comments: add an `ignore` pattern to its config, saying why
 - Scripts in templates share the page's globals, so a library or a function another file or template defines needs adding to `libraries` or `shared` in `eslint.config.mjs`
 - A rule that code can check gets a check: a cop, linter or config rule, or a test in `test/lint_test.rb`, with cases there (each cop's `@example`, good and bad, is tested as it stands). It doesn't boot the app: `bundle exec ruby -I test test/lint_test.rb`
-
-## Crucial restrictions
-
-- Never attempt to access ENV vars on Render.
-- Never attempt to write to the production database.
 
 ## Cloud agents (Cursor, Claude Code)
 
@@ -157,12 +164,4 @@ Each night `.github/workflows/package-updates.yml` runs `script/update_packages.
 - iframe-resizer stays on 4 (4.4.5 is MIT): 5 and later are GPL-3.0, or a paid licence. The embed code in `app/views/docs/md/events.md` loads its parent script at the same version
 - CDN files load with `cdn_tag` (`CdnTags`), whose `integrity` attribute makes the browser refuse a file that's changed since we chose it. After adding or bumping one (CI's lint job fails until you do), run `rake frontend:integrity`, which hashes each CDN file that has no hash yet into `frontend/integrity.json` and drops those nothing loads any more. It keeps the hashes it has rather than trusting the CDN again, and refuses to hash a version of an npm package released less than 7 days ago (the cooldown), as a hash pins whatever the version is. Load a file the package ships: jsDelivr minifies a `.min` file a package lacks on the fly, and the task refuses one, as that output can change
 
-Ruby gems:
-
-@Gemfile
-
-Frontend dependencies:
-
-@app/views/layouts/_dependencies.erb
-@config/frontend_dependencies.rb
-@frontend/package.json
+Before adding a gem or a frontend package, check whether one we already have does the job: `Gemfile`, `frontend/package.json`.
