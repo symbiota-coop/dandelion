@@ -1,4 +1,25 @@
 Dandelion::App.helpers do
+  # The checks behind /stats/caches: each compares caches mirrored from other collections with what those collections
+  # say, and with fix rebuilds the ones out of sync. The hosts check reads cohosts_ids_cache, so it runs after the
+  # cohosts check. field is the event field an event check compares; an account check's entries name their own fields
+  def cache_checks(fix: false)
+    [
+      { name: 'Account organisation caches',
+        description: "Each account's organisation_ids_cache, organisation_ids_public_cache, subscribed_organisation_ids_cache and unsubscribed_organisation_ids_cache against its organisationships, and duplicate organisationships",
+        run: -> { Account.check_organisation_cache_sync(fix: fix) } },
+      { name: 'Event co-hosts', field: 'cohosts_ids_cache',
+        description: "Each event's cohosts_ids_cache against its cohostships",
+        run: -> { Event.check_cohosts_cache_sync(fix: fix) } },
+      { name: 'Event hosts', field: 'hosts_ids_cache',
+        description: "Each event's hosts_ids_cache against its organisation and cohosts_ids_cache",
+        run: -> { Event.check_hosts_cache_sync(fix: fix) } }
+    ].map do |check|
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      out_of_sync = check[:run].()
+      check.except(:run).merge(out_of_sync: out_of_sync, ms: ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).round)
+    end
+  end
+
   def commit_url(commit)
     "https://github.com/symbiota-coop/dandelion/commit/#{commit}"
   end

@@ -343,6 +343,44 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal 2, Organisationship.and(account: member, organisation: @organisation).count
   end
 
+  test 'an admin sees caches out of sync on /stats/caches and repairs them' do
+    create_organisation
+    member = FactoryBot.create(:account, name: 'Drifted Member')
+    member.organisationships.create!(organisation: @organisation, skip_welcome: true)
+    sign_in(FactoryBot.create(:account, admin: true))
+
+    visit '/stats/caches'
+    assert page.has_content? 'All in sync'
+    assert page.has_no_button? 'Repair'
+
+    member.set(subscribed_organisation_ids_cache: [])
+    visit '/stats/caches'
+    assert page.has_content? '1 record out of sync'
+    within('table') do
+      assert page.has_content? 'Drifted Member'
+      assert page.has_content? 'subscribed_organisation_ids_cache'
+    end
+
+    click_button 'Repair'
+    page.document.find('.popover').click_button 'Repair'
+    assert page.has_content? 'All in sync'
+    assert_equal [@organisation.id], member.reload.subscribed_organisation_ids_cache
+  end
+
+  test 'only admins can see /stats/caches or repair caches' do
+    create_organisation
+    member = FactoryBot.create(:account)
+    member.organisationships.create!(organisation: @organisation, skip_welcome: true)
+    member.set(subscribed_organisation_ids_cache: [])
+    sign_in_with_rack(member)
+
+    get '/stats/caches'
+    assert last_response.redirect?
+    post '/stats/caches/repair'
+    assert last_response.redirect?
+    assert_empty member.reload.subscribed_organisation_ids_cache
+  end
+
   test 'organisation cache sync reports nothing when every cache matches its organisationships' do
     create_organisation
     member = FactoryBot.create(:account)

@@ -1,0 +1,79 @@
+<h2>Caches</h2>
+<p class="text-body-secondary">
+  Fields that copy what other collections say, so pages and mailings can query them by index, checked against those collections. Code keeps them in step as the collections change; anything listed here has drifted from them. Repair rebuilds what's listed from the collections, and dedupes duplicate organisationships.
+</p>
+
+<% list = ->(ids) { ids.empty? ? '[]' : ids.join(', ') } %>
+<% out_of_sync = @checks.sum { |check| check[:out_of_sync].size } %>
+<div class="d-flex align-items-center gap-2 mb-3">
+  <span class="badge <%= out_of_sync.zero? ? 'text-bg-primary' : 'text-bg-danger' %>"><%= out_of_sync.zero? ? 'All in sync' : "#{pluralize(out_of_sync, 'record')} out of sync" %></span>
+  <% unless out_of_sync.zero? %>
+    <form method="post" action="/stats/caches/repair" class="d-inline">
+      <button type="submit" class="btn btn-primary btn-sm" data-confirm="Rebuild the caches of the <%= pluralize(out_of_sync, 'record') %> listed, and dedupe any duplicate organisationships?" data-confirm-label="Repair">Repair</button>
+    </form>
+  <% end %>
+</div>
+
+<% @checks.each do |check| %>
+  <div class="mb-5">
+    <h3 class="d-flex align-items-center gap-2">
+      <%= check[:name] %>
+      <% if check[:out_of_sync].empty? %>
+        <span class="badge text-bg-primary"><i class="bi bi-check-lg"></i> In sync</span>
+      <% else %>
+        <span class="badge text-bg-danger"><%= check[:out_of_sync].size %> out of sync</span>
+      <% end %>
+      <span class="text-body-secondary small fw-normal"><%= check[:ms] %> ms</span>
+    </h3>
+    <p class="text-body-secondary small"><%= check[:description] %></p>
+
+    <% if check[:out_of_sync].any? %>
+      <table class="table table-hr small">
+        <thead>
+          <tr>
+            <th><%= check[:out_of_sync].first[:account] ? 'Account' : 'Event' %></th>
+            <th>Field</th>
+            <th>Current</th>
+            <th>Expected</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% check[:out_of_sync].first(100).each do |entry| %>
+            <% if (account = entry[:account]) %>
+              <% entry[:mismatches].each_with_index do |field, i| %>
+                <tr>
+                  <% if i.zero? %>
+                    <td rowspan="<%= entry[:mismatches].size %>">
+                      <% if account.username %>
+                        <a href="/u/<%= account.username %>"><%= account.name || account.id %></a>
+                      <% else %>
+                        <%= account.name || account.id %>
+                      <% end %>
+                      <div class="text-body-secondary"><%= account.email %></div>
+                    </td>
+                  <% end %>
+                  <td><code><%= field %></code></td>
+                  <td><code><%= list.(entry[:details][field.to_sym][:current]) %></code></td>
+                  <td><code><%= list.(entry[:details][field.to_sym][:expected]) %></code></td>
+                </tr>
+              <% end %>
+            <% else %>
+              <tr>
+                <td>
+                  <a href="/e/<%= entry[:event].slug || entry[:event].id %>"><%= entry[:event].name || entry[:event].id %></a>
+                  <% if entry[:event].deleted? %><span class="badge text-bg-secondary">Deleted</span><% end %>
+                </td>
+                <td><code><%= check[:field] %></code></td>
+                <td><code><%= list.(entry[:current]) %></code></td>
+                <td><code><%= list.(entry[:expected]) %></code></td>
+              </tr>
+            <% end %>
+          <% end %>
+        </tbody>
+      </table>
+      <% if check[:out_of_sync].size > 100 %>
+        <p class="text-body-secondary small">and <%= check[:out_of_sync].size - 100 %> more</p>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

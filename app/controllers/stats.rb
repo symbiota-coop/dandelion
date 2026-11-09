@@ -83,6 +83,17 @@ Dandelion::App.controller do
     erb :'stats/atlas'
   end
 
+  get '/stats/caches' do
+    @checks = cache_checks
+    erb :'stats/caches'
+  end
+
+  post '/stats/caches/repair' do
+    checks = cache_checks(fix: true)
+    flash[:notice] = "Repaired #{checks.map { |check| "#{check[:name].downcase}: #{check[:out_of_sync].size}" }.join(', ')}"
+    redirect '/stats/caches'
+  end
+
   get '/stats/openrouter' do
     @generations = OpenRouterGeneration.order('created_at desc').paginate(page: params[:page], per_page: 50)
     erb :'stats/openrouter'

@@ -597,7 +597,7 @@ class Event
       { '$project' => { '_id' => 1 } }
     ]).map { |doc| doc['_id'] }
 
-    Event.unscoped.in(id: ids).only(:name, :organisation_id, :cohosts_ids_cache, :hosts_ids_cache).map do |event|
+    Event.unscoped.in(id: ids).only(:name, :slug, :deleted_at, :organisation_id, :cohosts_ids_cache, :hosts_ids_cache).map do |event|
       expected = event.hosts_ids_for(event.cohosts_ids_cache)
       entry = { event: event, current: (event.hosts_ids_cache || []).map(&:to_s), expected: expected.map(&:to_s) }
       event.set(hosts_ids_cache: expected) if fix
