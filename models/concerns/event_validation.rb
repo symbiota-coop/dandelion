@@ -122,6 +122,11 @@ module EventValidation
       errors.add(:feedback_hours_after, 'cannot be negative') if feedback_hours_after&.negative?
       errors.add(:feedback_hours_after, "cannot be more than #{Event::MAX_FEEDBACK_HOURS_AFTER}") if feedback_hours_after && feedback_hours_after > Event::MAX_FEEDBACK_HOURS_AFTER
 
+      # Category stewards and social media no longer take a share: only events from before keep one
+      if new_record?
+        self.profit_share_to_category_steward = 0
+        self.profit_share_to_social_media = 0
+      end
       Event.profit_share_roles.each do |role|
         send("profit_share_to_#{role}=", 0) if send("profit_share_to_#{role}").nil?
       end

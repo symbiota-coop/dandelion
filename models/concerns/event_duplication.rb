@@ -21,8 +21,6 @@ module EventDuplication
       revenue_share_to_revenue_sharer: revenue_share_to_revenue_sharer,
       profit_share_to_organiser: profit_share_to_organiser,
       profit_share_to_coordinator: profit_share_to_coordinator,
-      profit_share_to_category_steward: profit_share_to_category_steward,
-      profit_share_to_social_media: profit_share_to_social_media,
       hide_discussion: hide_discussion,
       hide_from_carousels: hide_from_carousels,
       hide_few_left: hide_few_left,

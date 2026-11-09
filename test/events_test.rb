@@ -278,6 +278,21 @@ class EventsTest < ActiveSupport::TestCase
     assert page.has_no_content?('duplicate of')
   end
 
+  test 'new events, duplicates included, give nothing to category stewards or social media' do
+    create_event(prices: [0])
+    @event.set(profit_share_to_category_steward: 10, profit_share_to_social_media: 5)
+    @event.reload
+    @event.save!
+    assert_equal [10, 5], [@event.reload.profit_share_to_category_steward, @event.profit_share_to_social_media], 'Events from before keep their shares'
+
+    duplicate = @event.duplicate!(@account)
+    assert_equal 0, duplicate.profit_share_to_category_steward
+    assert_equal 0, duplicate.profit_share_to_social_media
+
+    event = Event.create!(@event.attributes.slice('name', 'location', 'currency').merge(start_time: 1.week.from_now, end_time: 1.week.from_now + 1.hour, account: @account, organisation: @organisation, profit_share_to_category_steward: 10, profit_share_to_social_media: 5))
+    assert_equal [0, 0], [event.reload.profit_share_to_category_steward, event.profit_share_to_social_media]
+  end
+
   test 'ticket email strips event-handler attributes from editor HTML' do
     create_event(
       prices: [0],
