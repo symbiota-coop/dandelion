@@ -2212,6 +2212,12 @@ table.table.dataTable.table-hover > tbody > tr:hover > * {
   box-shadow: inset 0 0 0 9999px var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
 }
 
+/* A cell given its own .text-bg-* colour (like the event stats' Stripe column) keeps it on hover and stripes, which both paint over the cell as that inset shadow */
+.table > tbody > tr > [class*="text-bg-"],
+table.table.dataTable.table-hover > tbody > tr:hover > [class*="text-bg-"] {
+  box-shadow: none;
+}
+
 /* Bootstrap colours each cell itself, so a row's .text-body-secondary (past boost slots) only reaches its cells through the table's own colour variable */
 .table > tbody > tr.text-body-secondary > * {
   --bs-table-color-state: var(--bs-secondary-color);
