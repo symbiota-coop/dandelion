@@ -336,9 +336,12 @@
   margin-bottom: 0;
 }
 
-/* A location edition's facilitator, on its own: a card with the portrait beside the name and details, centred */
+/* A location edition's facilitator, on its own: a card with the portrait beside the name and details, centred. Sized
+   by width rather than flex-basis, which on small phones, where the row is a column, would set its height instead */
 .newspaper-features > :only-child {
-  flex: 0 1 36rem;
+  flex: none;
+  width: 100%;
+  max-width: 36rem;
   margin-inline: auto;
   display: grid;
   grid-template-columns: minmax(0, 10rem) minmax(0, 1fr);
