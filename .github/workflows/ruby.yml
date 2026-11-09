@@ -107,6 +107,7 @@ jobs:
           - calendar
           - dadmin
           - design
+          - errands
           - event_bookings
           - event_boosts
           - event_drafts
