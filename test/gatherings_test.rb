@@ -591,6 +591,23 @@ class GatheringsTest < ActiveSupport::TestCase
     end
   end
 
+  test 'leaving a tier stops requesting its cost' do
+    create_gathering
+    member = FactoryBot.create(:account)
+    @gathering.memberships.create!(account: member)
+    @gathering.options.create!(name: 'Standard', type: 'Tier', cost: 100, account: @account)
+
+    sign_in(member)
+    visit "/g/#{@gathering.slug}/options"
+    click_link 'Join'
+    assert page.has_content? 'You owe £100'
+    click_link 'Leave'
+    page.document.find('.popover').click_button 'Leave'
+    assert page.has_link? 'Join'
+    assert page.has_no_content? 'You owe'
+    assert_equal 0, @gathering.memberships.find_by(account: member).requested_contribution
+  end
+
   test 'a full tier takes no one else through its route' do
     create_gathering
     tier = @gathering.options.create!(name: 'Standard', type: 'Tier', capacity: 1, cost: 100, account: @account)
