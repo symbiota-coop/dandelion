@@ -53,12 +53,12 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'generated avatars take the initials of the first and last names' do
-    assert_equal 'SR', GeneratedAvatar.initials('Stephen Reid')
-    assert_equal 'JG', GeneratedAvatar.initials('Dr. Jane Mary Goodall')
-    assert_equal 'M', GeneratedAvatar.initials('madonna')
-    assert_equal 'ÉZ', GeneratedAvatar.initials('Émile Zola')
-    assert_nil GeneratedAvatar.initials('Ольга Петрова')
-    assert_nil GeneratedAvatar.initials(nil)
+    assert_equal 'SR', Account.avatar_initials('Stephen Reid')
+    assert_equal 'JG', Account.avatar_initials('Dr. Jane Mary Goodall')
+    assert_equal 'M', Account.avatar_initials('madonna')
+    assert_equal 'ÉZ', Account.avatar_initials('Émile Zola')
+    assert_nil Account.avatar_initials('Ольга Петрова')
+    assert_nil Account.avatar_initials(nil)
   end
 
   test 'accounts with no image fall back to their generated avatar' do
@@ -102,7 +102,7 @@ class AccountsTest < ActiveSupport::TestCase
         drawn = i
         'png'
       end
-      GeneratedAvatar.stub(:png, draw) { get path }
+      Account.stub(:avatar_png, draw) { get path }
       assert last_response.ok?, "expected #{path} to be served, got #{last_response.status}"
       assert_equal 'image/png', last_response.media_type
       assert_equal initials.to_s, drawn.to_s

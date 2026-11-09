@@ -13,6 +13,7 @@ class Account
   include FeedbackSummaries
   include AccountRecommendations
   include AccountAtproto
+  include AccountAvatar
   include AccountStripeSubscriptions
   include Geocoded
   include Searchable
@@ -351,35 +352,6 @@ class Account
     return false if blocked_from_messaging
 
     email_confirmed && (can_message || live_player?)
-  end
-
-  def image_thumb_or_gravatar_url
-    if image
-      begin
-        image.thumb('400x400#').url
-      rescue StandardError, Dragonfly::Shell::CommandFailed
-        gravatar_url
-      end
-    else
-      gravatar_url
-    end
-  end
-
-  def gravatar_url
-    # Addressable leaves the fallback's : and / alone, as views escape this URL again with u (so % would become %25)
-    Padrino.env == :development ? generated_avatar_path : "https://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(email.downcase)}?s=400&d=#{Addressable::URI.escape("#{ENV['BASE_URI']}#{generated_avatar_path}")}"
-  end
-
-  # For the <img> of an account's image or Gravatar: the generated avatar is a stencil (lib/generated_avatar.rb),
-  # which takes the theme colour from avatar-initials' background. Photos are opaque, so it doesn't show behind them
-  def avatar_class
-    'avatar-initials' unless image
-  end
-
-  # Unescaped (an accented initial stays as it is), as gravatar_url and the views escape it
-  def generated_avatar_path
-    initials = GeneratedAvatar.initials(name)
-    initials ? "/avatar/v2/#{initials}.png" : '/avatar/v2.png'
   end
 
   def unread_notifications?(notifications = network_notifications)

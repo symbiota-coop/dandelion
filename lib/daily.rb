@@ -5,7 +5,7 @@
 module Daily
   class GenerationFailed < StandardError; end
 
-  # How every story is written, in place of EventsSummary's general instructions: a short news story about a few of
+  # How every story is written, in place of EventSummaries' general instructions: a short news story about a few of
   # the events, rather than a summary that links them all
   STYLE = <<~TEXT.freeze
     Write it as a short newspaper story: 100 to 150 words of prose in one or two paragraphs, with no headline.
@@ -144,7 +144,7 @@ module Daily
         events = article[:events].call(date, events(location))
         next if events.empty?
 
-        summary = EventsSummary.generate("#{article[:prompt]}#{place}", events, use_feedback: article[:use_feedback], general_instructions: STYLE)
+        summary = Event.summarise("#{article[:prompt]}#{place}", events, use_feedback: article[:use_feedback], general_instructions: STYLE)
         { 'title' => article[:title], 'summary' => summary }
       end,
       'facilitator_id' => facilitator_id(location)

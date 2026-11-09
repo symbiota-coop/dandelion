@@ -20,13 +20,13 @@ Dandelion::App.controller do
   # browsers keep these for a year, so when the image changes, bump the version here and in Account#generated_avatar_path
   get '/avatar/v2', provides: :png do
     cache_control :public, max_age: 1.year.to_i
-    GeneratedAvatar.png
+    Account.avatar_png
   end
 
   get '/avatar/v2/:initials', provides: :png do
-    halt 404 unless params[:initials].match?(GeneratedAvatar::INITIALS)
+    halt 404 unless params[:initials].match?(AccountAvatar::INITIALS)
     cache_control :public, max_age: 1.year.to_i
-    GeneratedAvatar.png(params[:initials])
+    Account.avatar_png(params[:initials])
   end
 
   get '/youtube_thumb/:id' do

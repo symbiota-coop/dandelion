@@ -21,9 +21,9 @@
 <% end %>
 
 <%
-  sabbat_date, sabbat = Almanac.next_sabbat
+  sabbat_date, sabbat = next_sabbat
   sabbat_plain = sabbat_date == Date.today ? "Happy #{sabbat[:name]}!" : "#{distance_of_time_in_words(Date.today, sabbat_date)} until #{sabbat[:name]}"
-  almanac_tooltip = "#{Almanac.moon_name} · #{sabbat_plain}"
+  almanac_tooltip = "#{moon_name} · #{sabbat_plain}"
 %>
 <style>
   #docs-li { display: none }
@@ -42,7 +42,7 @@
   <% end %>
   <li class="nav-item d-none d-md-inline">
     <a href="/wheel-of-the-year.html" target="_blank" class="nav-link almanac-moon" title="<%= almanac_tooltip %>" data-bs-toggle="tooltip">
-      <%= Almanac.moon_icon %>
+      <%= moon_icon %>
     </a>
   </li>
   <% if current_account %>

@@ -4,7 +4,7 @@ Dandelion::App.helpers do
     return nil unless params[:near] && params[:near] != 'online'
     return nil unless %w[north south east west].all? { |p| params[p].nil? }
 
-    @bounding_box = GeocodeBounds.for(params[:near])
+    @bounding_box = Location.bounds_for(params[:near])
   end
 
   def encrypt_map_id(model_name, id)

@@ -20,6 +20,7 @@ class Event
   include EventAccessControl
   include EventAtproto
   include EventCarouselIds
+  include EventSummaries
   include Geocoded
   include Taggable
 
