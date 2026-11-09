@@ -349,7 +349,9 @@ class Account
   end
 
   def rebuild_organisation_caches!
-    rels = organisationships
+    # The collection, not the association: inside an organisationship's after_destroy, the association's loaded copy
+    # still holds the row being destroyed
+    rels = Organisationship.and(account_id: id)
     set(
       organisation_ids_cache: rels.pluck(:organisation_id).uniq,
       organisation_ids_public_cache: rels.and(:hide_membership.ne => true).pluck(:organisation_id).uniq,

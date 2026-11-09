@@ -343,6 +343,21 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal 2, Organisationship.and(account: member, organisation: @organisation).count
   end
 
+  test "unfollowing an organisation takes it off all of the account's organisation caches" do
+    create_organisation
+    member = FactoryBot.create(:account)
+    member.organisationships.create!(organisation: @organisation, skip_welcome: true)
+
+    # As unfollowing does (post '/o/:slug/organisationship')
+    member.organisationships.find_by(organisation: @organisation).destroy
+    member.reload
+
+    assert_empty member.organisation_ids_cache
+    assert_empty member.organisation_ids_public_cache
+    assert_empty member.subscribed_organisation_ids_cache
+    assert_empty member.unsubscribed_organisation_ids_cache
+  end
+
   test 'destroying a duplicate organisationship keeps the organisation in the cache' do
     create_organisation
     member = FactoryBot.create(:account)
