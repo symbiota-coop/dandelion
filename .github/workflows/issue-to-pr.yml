@@ -1,0 +1,98 @@
+name: Issue to PR (Claude)
+
+# When someone with write access to the repo opens an issue, Claude works on it and opens a pull request from
+# claude/issue-<number> (ruby.yml tests claude/** branches), or comments on the issue if there's nothing to change.
+# Add the no-pr label when opening an issue to skip it.
+#
+# Auth: CLAUDE_CODE_OAUTH_TOKEN secret (see .github/models.env). Claude pushes and opens the pull request with the
+# Claude GitHub App's token, which the action gets with the workflow's OIDC token (id-token: write), so the pull request
+# starts CI, as one opened with the workflow's own token wouldn't. The action also refuses actors without write access
+
+concurrency:
+  group: issue-to-pr-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+on:
+  issues:
+    types: [opened]
+
+permissions: {}
+
+jobs:
+  issue-to-pr:
+    # The issue is the prompt, so only issues from people who can already push run it
+    if: >-
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.issue.author_association) &&
+      !contains(github.event.issue.labels.*.name, 'no-pr')
+    runs-on: ubuntu-26.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      id-token: write
+    services:
+      mongodb:
+        image: mirror.gcr.io/library/mongo:8.2
+        ports:
+          - 27017:27017
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Load models
+        run: grep -E "^[A-Z_]+=" .github/models.env >> "$GITHUB_ENV"
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@de492cf36cbab201753d720ce4f4e336cd688c94 # v1.336.0
+        with:
+          ruby-version: 4.0.9
+          bundler-cache: true
+
+      - name: Install Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: 0.13.5
+          cache-dependency-glob: script/lint
+
+      # The linters, and the pre-commit hook that runs them on each commit
+      - name: Install linters
+        run: |
+          npm ci
+          git config core.hooksPath .githooks
+
+      - name: Load env from .env.test.example
+        run: |
+          echo "CI=true" >> "$GITHUB_ENV"
+          grep -v '^#' .env.test.example | grep -v '^$' | while IFS='=' read -r key value; do
+            echo "$key=$value" >> "$GITHUB_ENV"
+          done
+
+      - name: Load prompt
+        id: prompt
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          PROMPT=$(<.github/prompts/issue-to-pr.md)
+          PROMPT=${PROMPT//ISSUE_NUMBER/$ISSUE_NUMBER}
+          {
+            echo 'text<<EOF'
+            echo "$PROMPT"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: anthropics/claude-code-action@d535f5172dec02b204866b393d6b20b9b2aaf98d # v1.0.266
+        with:
+          display_report: true
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: |
+            --model ${{ env.CLAUDE_MODEL }}
+            --effort ${{ env.CLAUDE_EFFORT }}
+            --dangerously-skip-permissions
+          prompt: ${{ steps.prompt.outputs.text }}
