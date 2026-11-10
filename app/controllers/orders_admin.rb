@@ -186,7 +186,7 @@ Dandelion::App.controller do
     @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
     order = @event.orders.find(params[:order_id]) || not_found
-    order.destroy # calls order.refund
+    order.destroy # queues order.refund (Order#refund_later)
     redirect back
   end
 

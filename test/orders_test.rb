@@ -126,6 +126,19 @@ class OrdersTest < ActiveSupport::TestCase
     end
   end
 
+  # Destroying an order (or its event) queues its refund (Order#refund_later): this runs it, as the worker would
+  def destroy_and_refund(record)
+    record.destroy
+    run_refund_jobs
+  end
+
+  def run_refund_jobs
+    Delayed::Job.and(handler: /refund_destroyed/).each do |job|
+      job.invoke_job
+      job.destroy
+    end
+  end
+
   # Tokens and public order confirmation links
 
   test 'creating an order generates a secret token' do
@@ -406,7 +419,7 @@ class OrdersTest < ActiveSupport::TestCase
     create_event(prices: [10])
     order = create_paid_order(@event)
     with_stubbed_stripe_refunds do |refunds|
-      order.destroy
+      destroy_and_refund(order)
       assert_equal 1, refunds.size
     end
   end
@@ -416,7 +429,10 @@ class OrdersTest < ActiveSupport::TestCase
     create_event(prices: [10])
     create_paid_order(@event)
     with_stubbed_stripe_refunds do |refunds|
+      # Refunds take seconds each, so the event is deleted without waiting for them, and the worker makes them
       @event.destroy
+      assert_empty refunds
+      run_refund_jobs
       assert_equal 1, refunds.size
     end
   end
@@ -427,7 +443,7 @@ class OrdersTest < ActiveSupport::TestCase
     create_paid_order(@event)
     @event.prevent_order_refunds = true
     with_stubbed_stripe_refunds do |refunds|
-      @event.destroy
+      destroy_and_refund(@event)
       assert_empty refunds
     end
   end
@@ -439,7 +455,7 @@ class OrdersTest < ActiveSupport::TestCase
     captured = nil
     with_stubbed_stripe_refunds do
       order.stub :notify_of_refund, proc { |amount:| captured = amount } do
-        order.destroy
+        order.refund
       end
     end
     assert_equal 10, captured
@@ -456,7 +472,7 @@ class OrdersTest < ActiveSupport::TestCase
     Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_test', amount: 1000, amount_refunded: 400) do
       Stripe::Refund.stub :create, proc { |params, _opts| refund_params << params } do
         order.stub :notify_of_refund, proc { |amount:| notified_amount = amount } do
-          order.destroy
+          order.refund
         end
       end
     end
@@ -469,7 +485,7 @@ class OrdersTest < ActiveSupport::TestCase
     emails = nil
     Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_test', amount: 1000, amount_refunded: 1000) do
       Stripe::Refund.stub :create, proc { |params, _opts| refund_params << params } do
-        emails = recorded_emails { order.destroy }
+        emails = recorded_emails { destroy_and_refund(order) }
       end
     end
     assert_empty refund_params
@@ -488,7 +504,7 @@ class OrdersTest < ActiveSupport::TestCase
       Stripe::Refund.stub :create, proc { |_params, _opts| nil } do
         Stripe::ApplicationFee.stub :retrieve, api_object(id: 'fee_test', amount: 200, amount_refunded: 40) do
           Stripe::ApplicationFee.stub :create_refund, proc { |id, params, opts| fee_refunds << [id, params, opts[:stripe_account]] } do
-            order.stub(:notify_of_refund, proc { |amount:| amount }) { order.destroy }
+            order.stub(:notify_of_refund, proc { |amount:| amount }) { order.refund }
           end
         end
       end
@@ -509,7 +525,7 @@ class OrdersTest < ActiveSupport::TestCase
       Stripe::Refund.stub :create, proc { |params, _opts| refund_params << params } do
         Stripe::ApplicationFee.stub :retrieve, api_object(id: 'fee_test', amount: 200, amount_refunded: 0) do
           Stripe::ApplicationFee.stub :create_refund, proc { |id, params, opts| fee_refunds << [id, params, opts[:stripe_account]] } do
-            emails = recorded_emails { order.destroy }
+            emails = recorded_emails { destroy_and_refund(order) }
           end
         end
       end
@@ -530,7 +546,7 @@ class OrdersTest < ActiveSupport::TestCase
     } do
       order.stub :notify_of_refund, proc { notified = true } do
         order.stub :notify_of_failed_refund, proc {} do
-          order.destroy
+          order.refund
         end
       end
     end
@@ -575,7 +591,7 @@ class OrdersTest < ActiveSupport::TestCase
     payment_intent = stripe_payment_intent('ch_test')
     Stripe::PaymentIntent.stub :retrieve, payment_intent do
       Stripe::Refund.stub :create, proc { |_params, opts| captured_opts = opts } do
-        order.destroy
+        destroy_and_refund(order)
       end
     end
     assert_equal 'acct_connect', captured_opts[:stripe_account]
@@ -918,7 +934,7 @@ class OrdersTest < ActiveSupport::TestCase
 
     mollie_refunds = []
     Mollie::Payment::Refund.stub :create, proc { |params| mollie_refunds << params } do
-      create_order_paid_with(@event, mollie_payment_id: 'tr_mollie').destroy
+      destroy_and_refund(create_order_paid_with(@event, mollie_payment_id: 'tr_mollie'))
     end
     assert_equal [['tr_mollie', '10.00']], (mollie_refunds.map { |params| [params[:payment_id], params[:amount][:value]] })
 
@@ -926,7 +942,7 @@ class OrdersTest < ActiveSupport::TestCase
     paypal = Object.new
     paypal.define_singleton_method(:refund_capture) { |capture_id, amount:, currency:| paypal_refunds << [capture_id, amount, currency] }
     EventPaymentMethod::Paypal.stub :client_for, paypal do
-      create_order_paid_with(@event, paypal_capture_id: 'CAPTURE1').destroy
+      destroy_and_refund(create_order_paid_with(@event, paypal_capture_id: 'CAPTURE1'))
     end
     assert_equal [['CAPTURE1', 10, 'GBP']], paypal_refunds
 
@@ -937,7 +953,7 @@ class OrdersTest < ActiveSupport::TestCase
     refunds.define_singleton_method(:create) { |params:| gocardless_refunds << params }
     gocardless = Struct.new(:payments, :refunds).new(payments, refunds)
     GoCardlessPro::Client.stub :new, gocardless do
-      create_order_paid_with(@event, gocardless_payment_id: 'PM123').destroy
+      destroy_and_refund(create_order_paid_with(@event, gocardless_payment_id: 'PM123'))
     end
     assert_equal [['PM123', 1000]], (gocardless_refunds.map { |params| [params[:links][:payment], params[:amount]] })
   end
@@ -959,6 +975,7 @@ class OrdersTest < ActiveSupport::TestCase
         click_button 'Actions'
         click_link_and_confirm 'Remove and refund order'
         assert page.has_content? 'No orders found'
+        run_refund_jobs
       end
     end
     # No amount refunds the whole charge
@@ -1030,7 +1047,7 @@ class OrdersTest < ActiveSupport::TestCase
     emails = nil
     Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_test') do
       Stripe::Refund.stub :create, proc { raise Stripe::InvalidRequestError.new('Insufficient funds in Stripe account.', nil) } do
-        emails = recorded_emails { order.destroy }
+        emails = recorded_emails { destroy_and_refund(order) }
       end
     end
     email = emails.find { |e| e.recipients.include?(@account.email) }

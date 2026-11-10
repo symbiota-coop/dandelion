@@ -280,12 +280,31 @@ class Order
     end
   end
 
-  after_destroy :refund
-  def refund
+  # A refund takes seconds (Stripe's about 3), so the worker makes it: deleting an event refunds its orders one after
+  # another, which kept the page waiting for half a minute with 8 of them. Orders and events are soft-deleted, so the
+  # job can still load both. The prevent flags are only in memory, so they're checked here, before the job is queued
+  after_destroy :refund_later
+  def refund_later
     return if prevent_refund || event.try(:prevent_order_refunds)
-    return unless event && event.organisation && value && value.positive? && payment_completed && refundable?
+    return unless refund_due?
+
+    Order.delay.refund_destroyed(id.to_s)
+  end
+
+  def self.refund_destroyed(order_id)
+    Event.unscoped do
+      Order.unscoped.find(order_id)&.refund
+    end
+  end
+
+  def refund
+    return unless refund_due?
 
     refund_payment(refund_application_fee: application_fee_amount && application_fee_amount > 0)
+  end
+
+  def refund_due?
+    event && event.organisation && value && value.positive? && payment_completed && refundable?
   end
 
   def tickets_pdf
