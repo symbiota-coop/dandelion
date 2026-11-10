@@ -54,7 +54,11 @@ module Dandelion
       super
     end
     set :default_builder, 'BootstrapFormBuilder'
-    set :protection, except: :frame_options
+    # Rack::Protection drops the session of an unsafe request whose Origin or Referer it doesn't trust, so the route
+    # runs signed out. Browsers send Origin: null on a form POST from a page with Referrer-Policy: no-referrer (our
+    # order pages), so people were signed out by our own forms and POST links. A request the browser itself marks
+    # Sec-Fetch-Site: same-origin came from our own pages, whatever its Origin says, and no page can set that header
+    set :protection, except: :frame_options, allow_if: ->(env) { env['HTTP_SEC_FETCH_SITE'] == 'same-origin' }
 
     before do
       # Health checks hit the instance directly, so they must skip the BASE_URI redirect (and page views)

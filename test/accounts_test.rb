@@ -840,6 +840,27 @@ class AccountsTest < ActiveSupport::TestCase
     assert last_response.headers['set-cookie']
   end
 
+  test 'a POST from our own pages keeps the session, and a cross-site one runs signed out' do
+    account = FactoryBot.create(:account)
+    # Signed in, a ticket that isn't there is a 404; signed out, sign_in_required! sends you to sign up
+    path = "/tickets/#{BSON::ObjectId.new}/toggle_resale"
+
+    # A form on a page with Referrer-Policy: no-referrer, like an order page, posts with Origin: null
+    sign_in_with_rack(account)
+    post path, {}, { 'HTTP_ORIGIN' => 'null', 'HTTP_SEC_FETCH_SITE' => 'same-origin' }
+    assert last_response.not_found?
+
+    sign_in_with_rack(account)
+    post path, {}, { 'HTTP_ORIGIN' => 'https://elsewhere.example', 'HTTP_SEC_FETCH_SITE' => 'cross-site' }
+    assert last_response.redirect?
+    assert_equal '/accounts/new', URI(last_response.location).path
+
+    # Without Sec-Fetch-Site (an older browser), an Origin we can't match still drops the session
+    sign_in_with_rack(account)
+    post path, {}, { 'HTTP_ORIGIN' => 'null' }
+    assert_equal '/accounts/new', URI(last_response.location).path
+  end
+
   test 'asking for a sign in code again resends the code already sent' do
     account = FactoryBot.create(:account)
     code = account.issue_sign_in_code!
