@@ -2,7 +2,8 @@ module OrderFields
   extend ActiveSupport::Concern
 
   included do
-    attr_accessor :prevent_refund, :cohost
+    # refund_contacts: who Order.refund_destroyed emails if the refund fails, rather than the event's contacts now
+    attr_accessor :prevent_refund, :cohost, :refund_contacts
 
     field :value, type: Float
     field :original_description, type: String

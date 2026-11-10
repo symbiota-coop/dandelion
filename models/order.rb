@@ -282,18 +282,23 @@ class Order
 
   # A refund takes seconds (Stripe's about 3), so the worker makes it: deleting an event refunds its orders one after
   # another, which kept the page waiting for half a minute with 8 of them. Orders and events are soft-deleted, so the
-  # job can still load both. The prevent flags are only in memory, so they're checked here, before the job is queued
+  # job can still load both. The prevent flags are only in memory, so they're checked here, before the job is queued.
+  # So are the event's contacts, who are emailed if the refund fails: deleting an event hard-deletes its facilitations,
+  # which come after its orders in the event's associations, so they're still there when its orders are destroyed
   after_destroy :refund_later
   def refund_later
     return if prevent_refund || event.try(:prevent_order_refunds)
     return unless refund_due?
 
-    Order.delay.refund_destroyed(id.to_s)
+    Order.delay.refund_destroyed(id.to_s, event.contacts.map { |contact| contact.id.to_s })
   end
 
-  def self.refund_destroyed(order_id)
+  # contact_ids is nil for jobs queued before it was passed
+  def self.refund_destroyed(order_id, contact_ids = nil)
     Event.unscoped do
-      Order.unscoped.find(order_id)&.refund
+      order = Order.unscoped.find(order_id) or return
+      order.refund_contacts = Account.in(id: contact_ids).to_a if contact_ids
+      order.refund
     end
   end
 

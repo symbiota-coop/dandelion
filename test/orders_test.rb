@@ -1054,4 +1054,20 @@ class OrdersTest < ActiveSupport::TestCase
     assert email
     assert_includes email.html, 'Insufficient funds in Stripe account.'
   end
+
+  test 'a failed refund of a deleted event emails its facilitators, though their facilitations went with the event' do
+    covers 'events/refund-failure-email@176a81'
+    create_event(prices: [10])
+    facilitator = FactoryBot.create(:account)
+    @event.event_facilitations.create!(account: facilitator)
+    create_paid_order(@event)
+    emails = nil
+    Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_test') do
+      Stripe::Refund.stub :create, proc { raise Stripe::InvalidRequestError.new('Insufficient funds in Stripe account.', nil) } do
+        emails = recorded_emails { destroy_and_refund(@event) }
+      end
+    end
+    assert_empty EventFacilitation.and(event_id: @event.id)
+    assert(emails.any? { |e| e.recipients.include?(facilitator.email) })
+  end
 end

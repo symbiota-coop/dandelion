@@ -235,7 +235,7 @@ module OrderNotifications
     provider = order.refund_provider
     batch_message.body_html EmailHelper.html(:refund_failed_order, account: account, event: event, error: error, provider: provider)
 
-    (event.contacts + Account.and(admin: true)).uniq.each do |recipient|
+    ((refund_contacts || event.contacts) + Account.and(admin: true)).uniq.each do |recipient|
       batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
     end
 
