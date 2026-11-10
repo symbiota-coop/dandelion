@@ -1,6 +1,10 @@
 Dandelion::App.controller do
   get '/organisations/stripe_connect' do
-    @organisation = organisation_from_stripe_connect_oauth_state(params[:state]) || not_found
+    sign_in_required!
+    unless (@organisation = organisation_from_stripe_connect_oauth_state(params[:state]))
+      flash[:error] = 'Stripe connection failed security check. Please try again.'
+      redirect '/'
+    end
     organisation_admins_only!
     if params[:error]
       flash[:error] = params[:error_description] || 'Stripe connection was cancelled'

@@ -1,7 +1,7 @@
 Dandelion::App.helpers do
   def duplicate_event_prerequisites!
     organisation = @event.organisation
-    if Padrino.env == :production && !organisation.stripe_client_id && organisation.stripe_sk && !organisation.stripe_connect_json
+    if organisation.stripe_connect_migration_required?
       @organisation = organisation
       halt erb(:'events/stripe_connect')
     elsif organisation.contribution_reminder && !params[:contribution_skipped]

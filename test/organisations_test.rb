@@ -1111,4 +1111,110 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal 550, @organisation.organisation_contributions.find_by(payment_intent: 'pi_topup').amount
     assert_equal Money.new(0, 'GBP'), @organisation.contribution_remaining
   end
+
+  # The state in the organisation's Connect Stripe link on its Payments tab, as the signed-in account sees it
+  def stripe_connect_state_from_payments_tab
+    get "/o/#{@organisation.slug}/edit"
+    link = Nokogiri::HTML(last_response.body).at_css('a[href^="https://connect.stripe.com/oauth/authorize"]')
+    assert link, 'no Connect Stripe link on the Payments tab'
+    Rack::Utils.parse_query(URI(link['href']).query).fetch('state')
+  end
+
+  # Stripe's OAuth token exchange and account lookup, answering for acct_own and recording the codes exchanged, so no
+  # request reaches Stripe
+  def stub_stripe_connect(&)
+    exchanged = []
+    connection = Object.new
+    connection.define_singleton_method(:post) do |url, body|
+      exchanged << [url, body[:code]]
+      Struct.new(:success?, :body).new(true, { stripe_user_id: 'acct_own' }.to_json)
+    end
+    Faraday.stub(:new, ->(*) { connection }) do
+      Stripe::Account.stub(:retrieve, ->(id, _opts) { { id: id, business_profile: { name: 'Own Ltd' } } }, &)
+    end
+    exchanged
+  end
+
+  def stripe_connect_callback(state)
+    get '/organisations/stripe_connect', code: 'ac_code', state: state
+  end
+
+  test "an organisation admin's own Connect state connects the Stripe account they authorised" do
+    create_organisation(stripe_pk: nil, stripe_sk: nil)
+    sign_in_with_rack(@account)
+    state = stripe_connect_state_from_payments_tab
+
+    exchanged = stub_stripe_connect { stripe_connect_callback(state) }
+
+    assert_equal [['https://connect.stripe.com/oauth/token', 'ac_code']], exchanged
+    assert_equal 'acct_own', @organisation.reload.stripe_user_id
+    assert_equal 'Own Ltd', @organisation.stripe_account_name
+    assert_equal "/o/#{@organisation.slug}/edit", URI(last_response.location).path
+  end
+
+  test "a Connect state started by one account doesn't connect the organisation when another admin opens its callback" do
+    create_organisation(stripe_pk: nil, stripe_sk: nil)
+    other_admin = FactoryBot.create(:account)
+    other_admin.organisationships.create!(organisation: @organisation, admin: true)
+    assert Organisation.admin?(@organisation, other_admin)
+    sign_in_with_rack(other_admin)
+    state = stripe_connect_state_from_payments_tab
+
+    sign_in_with_rack(@account)
+    exchanged = stub_stripe_connect { stripe_connect_callback(state) }
+
+    assert_empty exchanged
+    assert_nil @organisation.reload.stripe_connect_json
+    follow_redirect!
+    assert_includes last_response.body, 'Stripe connection failed security check'
+  end
+
+  test 'a Connect state minted without an account, before states were bound to one, is refused' do
+    create_organisation(stripe_pk: nil, stripe_sk: nil)
+    state = TokenVerifier.generate("stripe_connect_org:#{@organisation.id}", expires_in: 15.minutes, purpose: 'stripe_connect')
+    sign_in_with_rack(@account)
+
+    exchanged = stub_stripe_connect { stripe_connect_callback(state) }
+
+    assert_empty exchanged
+    assert_nil @organisation.reload.stripe_connect_json
+  end
+
+  test 'only organisation admins are offered connecting Stripe when an organisation on API keys must connect before creating events' do
+    create_organisation(allow_event_submissions: true)
+    create_event
+    event_manager = FactoryBot.create(:account)
+    event_manager.organisationships.create!(organisation: @organisation, event_manager: true)
+    submitter = FactoryBot.create(:account)
+
+    Organisation.stub(:stripe_connect_migration?, true) do
+      assert @organisation.stripe_connect_migration_required?
+
+      [[submitter, "/events/new?organisation_id=#{@organisation.id}"],
+       [event_manager, "/events/new?organisation_id=#{@organisation.id}"],
+       [event_manager, "/e/#{@event.slug}/duplicate"]].each do |account, path|
+        sign_in(account)
+        visit path
+        assert page.has_content?("an admin of #{@organisation.name} needs to connect its Stripe account"), path
+        assert page.has_no_link?('Connect Stripe'), path
+        refute_includes page.html, 'connect.stripe.com', path
+      end
+
+      sign_in(@account)
+      visit "/events/new?organisation_id=#{@organisation.id}"
+      assert page.has_link?('Connect Stripe', href: %r{\Ahttps://connect\.stripe\.com/oauth/authorize})
+    end
+  end
+
+  test 'the Payments tab shows the Connect account checkouts use, and offers to disconnect it, when API keys are also set' do
+    create_organisation(stripe_connect_json: { stripe_user_id: 'acct_connected' }.to_json, stripe_account_json: { business_profile: { name: 'Connected Ltd' } }.to_json)
+    assert @organisation.stripe_sk
+    sign_in(@account)
+    visit "/o/#{@organisation.slug}/edit"
+    click_link 'Payments'
+
+    assert page.has_content?("Connected to Connected Ltd's Stripe account (id: acct_connected)")
+    assert page.has_link?('Disconnect')
+    assert page.has_no_content?('Using Stripe API keys (legacy)')
+  end
 end

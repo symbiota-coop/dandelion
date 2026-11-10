@@ -27,21 +27,19 @@ Dandelion::App.helpers do
     raise "Stripe OAuth token exchange failed with status #{response.status} (#{stripe_error || 'no error code'})"
   end
 
+  # The organisation a state was minted for, if the current account minted it. Both flows bind the state to the account
+  # that started them, so a state (or the callback URL carrying it) passed to someone else is refused, not completed with
+  # whichever Stripe account the person who started it authorised
   def organisation_from_stripe_connect_oauth_state(token, personal: false)
+    return unless current_account
+
     data = TokenVerifier.verify(token, purpose: STRIPE_CONNECT_OAUTH_STATE_PURPOSE)
     return unless data
 
-    if personal
-      prefix, org_id, account_id = data.split(':', 3)
-      return unless prefix == 'stripe_connect_personal' && account_id == current_account.id.to_s
+    prefix, org_id, account_id = data.split(':', 3)
+    return unless prefix == (personal ? 'stripe_connect_personal' : 'stripe_connect_org') && account_id == current_account.id.to_s
 
-      Organisation.find(org_id)
-    else
-      prefix, org_id = data.split(':', 2)
-      return unless prefix == 'stripe_connect_org'
-
-      Organisation.find(org_id)
-    end
+    Organisation.find(org_id)
   end
 
   private
@@ -51,10 +49,7 @@ Dandelion::App.helpers do
       expires_in: STRIPE_CONNECT_OAUTH_STATE_EXPIRES_IN,
       purpose: STRIPE_CONNECT_OAUTH_STATE_PURPOSE
     }
-    if personal
-      TokenVerifier.generate("stripe_connect_personal:#{organisation.id}:#{current_account.id}", **options)
-    else
-      TokenVerifier.generate("stripe_connect_org:#{organisation.id}", **options)
-    end
+    prefix = personal ? 'stripe_connect_personal' : 'stripe_connect_org'
+    TokenVerifier.generate("#{prefix}:#{organisation.id}:#{current_account.id}", **options)
   end
 end

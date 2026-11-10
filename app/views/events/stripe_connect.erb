@@ -2,10 +2,17 @@
 
 <h1 class="mt-3">We're changing how Dandelion connects to Stripe</h1>
 
-<p>
-  To continue, please click the button below to connect <%= @organisation.name %>'s Stripe account to Dandelion.
-</p>
+<% if organisation_admin?(@organisation) %>
+  <p>
+    To continue, please click the button below to connect <%= @organisation.name %>'s Stripe account to Dandelion.
+  </p>
 
-<p>
-  <a class="btn btn-outline-primary mb-1" href="<%= stripe_connect_oauth_url(organisation: @organisation, client_id: ENV['STRIPE_CLIENT_ID']) %>">Connect Stripe</a>
-</p>
+  <p>
+    <a class="btn btn-outline-primary mb-1" href="<%= stripe_connect_oauth_url(organisation: @organisation, client_id: ENV['STRIPE_CLIENT_ID']) %>">Connect Stripe</a>
+  </p>
+<% else %>
+  <p>
+    Before events can be created for <%= @organisation.name %>, an admin of <%= @organisation.name %> needs to connect its Stripe account to Dandelion.
+    Please ask one of them to do this from the Payments tab of the organisation's settings.
+  </p>
+<% end %>

@@ -294,6 +294,16 @@ class Organisation
     stripe_connect_json && !stripe_pk
   end
 
+  # In production, an organisation still on its own Stripe API keys must connect Stripe before creating or duplicating
+  # events (events/stripe_connect.erb). A class method, so tests can turn it on without pretending to be production
+  def self.stripe_connect_migration?
+    Padrino.env == :production
+  end
+
+  def stripe_connect_migration_required?
+    Organisation.stripe_connect_migration? && !stripe_client_id && stripe_sk && !stripe_connect_json
+  end
+
   def referral_revenue
     target_currency = REFERRAL_REWARD_THRESHOLD.currency
     to_target = lambda { |amount, currency|

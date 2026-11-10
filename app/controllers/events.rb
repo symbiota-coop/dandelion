@@ -84,7 +84,7 @@ Dandelion::App.controller do
       redirect '/events'
     end
 
-    if Padrino.env == :production && !@event.organisation.stripe_client_id && @event.organisation.stripe_sk && !@event.organisation.stripe_connect_json
+    if @event.organisation.stripe_connect_migration_required?
       @organisation = @event.organisation
       erb :'events/stripe_connect'
     elsif @event.organisation.contribution_reminder && !params[:contribution_skipped]
