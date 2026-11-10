@@ -32,20 +32,18 @@ jobs:
         id: setup
         uses: $/.github/actions/bug-review-setup
 
-      # Each model in OPENCODE_MODELS names its effort (its --variant) after a colon: opencode-go/<model>:<effort>
+      # A model in OPENCODE_MODELS can name its effort (its --variant) after a colon: opencode-go/<model>:<effort>.
+      # Models with no variants (`opencode models opencode-go --verbose`) name none, and run at their only level
       - name: List models
         id: models
         run: |
           models=$(grep -E '^OPENCODE_MODELS=' .github/models.env | cut -d= -f2- | jq -R -c '
             split(" ") | map(select(length > 0) | (capture("^(?<model>[^:]+):(?<effort>.+)$") // {model: ., effort: ""})
-              | {model, effort, name: (.model | sub("^[^/]*/"; ""))})
+              | {model, effort, name: (.model | sub("^[^/]*/"; ""))}
+              | .label = ([.name, .effort] | map(select(length > 0)) | join(", ")))
           ')
           if [ "$(jq length <<< "$models")" -eq 0 ]; then
             echo "::error::OPENCODE_MODELS in .github/models.env lists no models."
-            exit 1
-          fi
-          if missing=$(jq -e -r 'map(select(.effort == "") | .model) | select(length > 0) | join(", ")' <<< "$models"); then
-            echo "::error::Each model in OPENCODE_MODELS needs an effort after a colon (<model>:<effort>), and these have none: $missing"
             exit 1
           fi
           echo "models=$models" >> "$GITHUB_OUTPUT"
@@ -53,7 +51,7 @@ jobs:
   bug-review:
     needs: setup
     if: needs.setup.outputs.has_commits == 'true'
-    name: bug-review (${{ matrix.model.name }}, ${{ matrix.model.effort }})
+    name: bug-review (${{ matrix.model.label }})
     strategy:
       # Each model's review stands alone, so one failing doesn't cancel the others
       fail-fast: false
@@ -106,8 +104,12 @@ jobs:
           # retries run out), opencode logs it and then waits forever rather than exiting, until the job's timeout
           # cancels it hours later, so stop it there. (awk reads on to the end, so tee never writes to a closed pipe.)
           # The JSON events are kept for the summary, and shown in the log as a trace of what it's doing
+          variant=()
+          if [ -n "$OPENCODE_EFFORT" ]; then
+            variant=(--variant "$OPENCODE_EFFORT")
+          fi
           set +e
-          opencode run --auto --model "$OPENCODE_MODEL" --variant "$OPENCODE_EFFORT" \
+          opencode run --auto --model "$OPENCODE_MODEL" "${variant[@]}" \
             --format json \
             --print-logs --log-level WARN \
             "$PROMPT_TEXT" \
@@ -149,7 +151,7 @@ jobs:
           fi
 
           {
-            echo "## opencode Report ($OPENCODE_MODEL, $OPENCODE_EFFORT)"
+            echo "## opencode Report ($OPENCODE_MODEL${OPENCODE_EFFORT:+, $OPENCODE_EFFORT})"
             echo
 
             if [ -n "$final_result" ]; then
