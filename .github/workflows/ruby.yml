@@ -154,6 +154,11 @@ jobs:
           echo "$key=$value" >> "$GITHUB_ENV"
         done
 
+    # Production's Dragonfly runs ImageMagick, and images_test.rb checks our policy against it; the runner has none
+    - name: Install ImageMagick
+      if: matrix.test_file == 'images'
+      run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends imagemagick
+
     - name: Run test (${{ matrix.test_file }})
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
       with:
