@@ -4,33 +4,6 @@ class ResalesTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
 
-  # Stands in for Mailgun::BatchMessage, keeping who an email would go to
-  class RecordedEmail
-    attr_reader :recipients
-
-    def initialize
-      @recipients = []
-    end
-
-    def add_recipient(_type, email, _variables)
-      @recipients << email
-    end
-
-    def from(*); end
-    def subject(*); end
-    def body_html(*); end
-    def reply_to(*); end
-    def finalize; end
-  end
-
-  def recorded_email
-    email = RecordedEmail.new
-    Mailgun::BatchMessage.stub :new, email do
-      yield
-    end
-    email
-  end
-
   def complete_without_notifications(ticket)
     ticket.stub :send_resale_notification_to_previous_ticketholder, nil do
       ticket.stub :send_resale_notification_to_organiser, nil do

@@ -10,6 +10,7 @@ require 'minitest/autorun'
 require 'minitest/mock'
 require 'minitest/rg'
 require 'rack/test'
+require_relative 'test_helpers'
 
 Capybara.app = Padrino.application
 Capybara.server_port = ENV['PORT']
@@ -71,6 +72,8 @@ end
 
 module ActiveSupport
   class TestCase
+    include TestHelpers
+
     setup do
       puts "\n🧪 Running: #{name}"
       reset!

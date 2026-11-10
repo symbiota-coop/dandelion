@@ -67,38 +67,6 @@ class EventsTest < ActiveSupport::TestCase
     JSON.parse(last_response.body).map { |event| event['id'] }
   end
 
-  # Stands in for Mailgun::BatchMessage, keeping what an email would say
-  class RecordedEmail
-    attr_reader :recipients, :subject_line, :html
-
-    def initialize
-      @recipients = []
-    end
-
-    def add_recipient(_type, email, _variables)
-      @recipients << email
-    end
-
-    def subject(text)
-      @subject_line = text
-    end
-
-    def body_html(html)
-      @html = html
-    end
-
-    def from(*); end
-    def reply_to(*); end
-    def finalize; end
-  end
-
-  # The emails the block would send, one per Mailgun::BatchMessage it makes
-  def recorded_emails(&)
-    emails = []
-    Mailgun::BatchMessage.stub(:new, ->(*) { RecordedEmail.new.tap { |email| emails << email } }, &)
-    emails
-  end
-
   def xhr_get(path, params = {})
     get path, params, { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }
   end

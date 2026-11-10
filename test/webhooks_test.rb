@@ -94,13 +94,6 @@ class WebhooksTest < ActiveSupport::TestCase
          }
   end
 
-  def with_stubbed_stripe_session(session_id: 'cs_test', payment_intent: 'pi_test')
-    session = api_object(id: session_id, payment_intent: payment_intent, url: 'https://checkout.stripe.com/test')
-    Stripe::Checkout::Session.stub :create, session do
-      yield session
-    end
-  end
-
   test 'checkout.session.completed webhook restores a deleted checkout' do
     create_organisation(stripe_endpoint_secret: 'whsec_test')
     create_event(prices: [10])

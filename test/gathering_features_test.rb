@@ -6,21 +6,6 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
 
-  def create_member(name: 'Member Person', **attrs)
-    FactoryBot.create(:account, name: name, **attrs).tap { |account| @gathering.memberships.create!(account: account) }
-  end
-
-  # Links that remove something ask in a popover first, whose button is named after the link
-  def click_link_and_confirm(label)
-    click_link label
-    # The popover hangs off the page, outside any within block
-    page.document.find('.popover').click_button label
-  end
-
-  def gathering_path(path = '')
-    "/g/#{@gathering.slug}#{path}"
-  end
-
   # A file the page would download, as text, fetched in the signed-in browser
   def download(path)
     page.evaluate_async_script('fetch(arguments[0]).then(r => r.text()).then(arguments[1])', path)

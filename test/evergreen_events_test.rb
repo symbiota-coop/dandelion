@@ -14,29 +14,6 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     @order = @event.orders.create!(account: @attendee, currency: @event.currency, value: 0, payment_completed: true, original_description: 'Manual test order')
   end
 
-  # Stands in for Mailgun::BatchMessage, keeping what an email would say and attach
-  class RecordedEmail
-    attr_reader :html, :attachment_names
-
-    def initialize
-      @attachment_names = []
-    end
-
-    def add_attachment(_file, filename)
-      @attachment_names << filename
-    end
-
-    def body_html(html)
-      @html = html
-    end
-
-    def subject(*); end
-    def from(*); end
-    def reply_to(*); end
-    def add_recipient(*); end
-    def finalize; end
-  end
-
   # The confirmation email of an order of a ticket to the event
   def confirmation_email(event)
     order = event.orders.create!(account: @account, currency: event.currency, value: 0, payment_completed: true)

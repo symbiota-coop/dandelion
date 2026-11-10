@@ -4,10 +4,6 @@ class GatheringsTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
 
-  def create_member
-    FactoryBot.create(:account).tap { |account| @gathering.memberships.create!(account: account) }
-  end
-
   def create_two_gatherings
     create_gathering
     @other_account = FactoryBot.create(:account)

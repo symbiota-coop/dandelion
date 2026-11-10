@@ -14,34 +14,6 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     event.event_feedbacks.create!(account: account, rating: rating)
   end
 
-  # Stands in for Mailgun::BatchMessage, keeping who an email would go to
-  class RecordedEmail
-    attr_reader :recipients
-
-    def initialize
-      @recipients = []
-    end
-
-    def add_recipient(_type, email, _variables)
-      @recipients << email
-    end
-
-    def from(*); end
-    def subject(*); end
-    def body_html(*); end
-    def reply_to(*); end
-    def finalize; end
-  end
-
-  # Runs the queued jobs whose handler matches, returning the emails they would send
-  def emails_sent_by_jobs(handler)
-    emails = []
-    Mailgun::BatchMessage.stub :new, proc { RecordedEmail.new.tap { |email| emails << email } } do
-      Delayed::Job.and(handler: handler).each(&:invoke_job)
-    end
-    emails
-  end
-
   def feedback_entries
     Capybara.string(last_response.body).all('.feedback-entry')
   end

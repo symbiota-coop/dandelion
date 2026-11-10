@@ -4,13 +4,6 @@ class OrdersTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
 
-  # Links that remove something ask in a popover first, whose button is named after the link
-  def click_link_and_confirm(label)
-    click_link label
-    # The popover hangs off the page, outside any within block
-    page.document.find('.popover').click_button label
-  end
-
   # Waits for something a request from the page does, such as a field that saves when it changes, to be done
   def wait_until(message)
     page.document.synchronize { raise Capybara::ExpectationNotMet, message unless yield }
@@ -69,40 +62,6 @@ class OrdersTest < ActiveSupport::TestCase
         yield counts
       end
     end
-  end
-
-  # Stands in for Mailgun::BatchMessage, keeping who an email would go to, with their variables, and its body
-  class RecordedEmail
-    attr_reader :recipients, :variables, :html
-
-    def initialize
-      @recipients = []
-      @variables = {}
-    end
-
-    def add_recipient(_type, email, variables = {})
-      @recipients << email
-      @variables[email] = variables
-    end
-
-    def body_html(html)
-      @html = html
-    end
-
-    def from(*); end
-    def subject(*); end
-    def reply_to(*); end
-    def add_attachment(*); end
-    def finalize; end
-  end
-
-  # The emails sent while the block runs, one for each Mailgun::BatchMessage made
-  def recorded_emails
-    emails = []
-    Mailgun::BatchMessage.stub :new, proc { (emails << RecordedEmail.new).last } do
-      yield
-    end
-    emails
   end
 
   # The jobs queued to run a handle_asynchronously or .delay method

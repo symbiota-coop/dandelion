@@ -777,10 +777,6 @@ class EventBookingsTest < ActiveSupport::TestCase
          detailsForm: { payment_method: 'stripe', account: { name: @buyer.name, email: @buyer.email } }.merge(details_form)
   end
 
-  def with_stubbed_stripe_session(&)
-    Stripe::Checkout::Session.stub(:create, api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test'), &)
-  end
-
   test 'the Stripe payment page closes when the order stops holding its tickets' do
     create_event(prices: [10], suggested_donation: 0)
 

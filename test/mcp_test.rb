@@ -392,11 +392,6 @@ class McpTest < ActiveSupport::TestCase
     [rpc, (JSON.parse(tool_text(rpc)) unless rpc.dig('result', 'isError'))]
   end
 
-  def with_stubbed_stripe_session(&)
-    session = api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test')
-    Stripe::Checkout::Session.stub(:create, session, &)
-  end
-
   test 'create_checkout_tool books for the buyer given without an API key' do
     covers 'integrations/checkout-books-for-buyer-without-api-key@f7be6d', 'integrations/idempotency-retry-without-key-id-and-status@664443'
     create_event(prices: [0])

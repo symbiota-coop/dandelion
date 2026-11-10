@@ -12,25 +12,6 @@ class ActivitiesTest < ActiveSupport::TestCase
     end
   end
 
-  # Stands in for Mailgun::BatchMessage, keeping who an email would go to
-  class RecordedEmail
-    attr_reader :recipients
-
-    def initialize
-      @recipients = []
-    end
-
-    def add_recipient(_type, email, _variables)
-      @recipients << email
-    end
-
-    def from(*); end
-    def subject(*); end
-    def body_html(*); end
-    def reply_to(*); end
-    def finalize; end
-  end
-
   def create_activity_with_questions
     create_organisation
     @activity = FactoryBot.create(:activity, organisation: @organisation, application_questions: APPLICATION_QUESTIONS)

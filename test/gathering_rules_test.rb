@@ -5,14 +5,6 @@ require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 class GatheringRulesTest < ActiveSupport::TestCase
   include Capybara::DSL
 
-  def create_member(name: 'Member Person', **attrs)
-    FactoryBot.create(:account, name: name, **attrs).tap { |account| @gathering.memberships.create!(account: account) }
-  end
-
-  def gathering_path(path = '')
-    "/g/#{@gathering.slug}#{path}"
-  end
-
   test 'members see no admin controls, and admin pages turn them away' do
     create_gathering(privacy: 'open')
     rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)

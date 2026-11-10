@@ -4,34 +4,6 @@ class WaitlistTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
 
-  # Stands in for Mailgun::BatchMessage, keeping who an email would go to
-  class RecordedEmail
-    attr_reader :recipients
-
-    def initialize
-      @recipients = []
-    end
-
-    def add_recipient(_type, email, _variables)
-      @recipients << email
-    end
-
-    def from(*); end
-    def subject(*); end
-    def body_html(*); end
-    def reply_to(*); end
-    def finalize; end
-  end
-
-  # Runs the queued jobs whose handler matches, returning the emails they would send
-  def emails_sent_by_jobs(handler)
-    emails = []
-    Mailgun::BatchMessage.stub :new, proc { RecordedEmail.new.tap { |email| emails << email } } do
-      Delayed::Job.and(handler: handler).each(&:invoke_job)
-    end
-    emails
-  end
-
   def create_facilitated_event(**event_options)
     create_full_event_hierarchy(event_options: { prices: [10], send_order_notifications: true, **event_options })
     @facilitator = FactoryBot.create(:account)

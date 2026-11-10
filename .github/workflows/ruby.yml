@@ -101,6 +101,7 @@ jobs:
       # job of its own, which the tests had to wait for; test/lint_test.rb checks the list matches test/
       matrix:
         test_file:
+          - account_sign_ins
           - accounts
           - activities
           - analytics_providers
