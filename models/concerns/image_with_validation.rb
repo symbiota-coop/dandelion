@@ -15,6 +15,10 @@ module ImageWithValidation
           if attachment.size.to_i > MAX_IMAGE_BYTES
             @image_too_large = true
             attachment.assign(nil)
+          elsif !ImageSignature.allowed?(attachment)
+            # Before anything runs ImageMagick on it (image? and format run identify)
+            @image_format_not_allowed = true
+            attachment.assign(nil)
           elsif attachment.image?
             if attachment.format != 'jpeg'
               attachment.convert('-format jpeg')
@@ -106,6 +110,7 @@ module ImageWithValidation
 
   def validate_image_size
     errors.add(:image, 'must be smaller than 20 MB') if @image_too_large
+    errors.add(:image, "must be a #{ImageSignature::FORMATS} image") if @image_format_not_allowed
   end
 
   def validate_image_format

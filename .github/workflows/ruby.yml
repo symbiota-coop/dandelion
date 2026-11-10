@@ -121,6 +121,7 @@ jobs:
           - gatherings
           - how_to_create_a_gathering
           - how_to_create_an_event
+          - images
           - local_groups
           - mcp
           - messages

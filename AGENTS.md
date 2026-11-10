@@ -129,6 +129,7 @@ What the docs (`app/views/docs/md`) say the app does is checked by tests, throug
   - By field, it's still a denylist: a form can set any of the model's own fields unless it's in `protected_attributes`, which raise. So a new field that forms mustn't set (a cache, a flag only admins or code set) needs adding to `protected_attributes`. List only fields there: keys `form_attributes` already leaves out don't need it (a test in `event_permissions_test.rb` checks this)
   - A model that lists `permitted_attributes` (Account, EventBoost) uses that list instead of `form_attributes`, so it's an allowlist by field too; Account's includes the `attr_accessor`s `postcode` and `country`
 - `<%= %>` escapes by default (Padrino `SafeErubi`); look at `<%==`, `.html_safe` and `raw` for XSS
+- Uploads reach ImageMagick (through Dragonfly) only once `ImageSignature` has seen JPEG, PNG, GIF, WebP or HEIC bytes, and `config/dragonfly_config.rb` loads `config/imagemagick/policy.xml`, which denies SVG, MSL, TEXT, URL fetches and Ghostscript. Render's image ships no policy of its own. Anything new that hands a user's file to ImageMagick needs the same check first
 - `app/helpers/param_helpers.rb` strips Mongo `$` operators from form params (not from JSON request bodies)
 
 ## Build/vendored code

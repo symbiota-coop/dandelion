@@ -1,3 +1,7 @@
+# Our ImageMagick security policy (config/imagemagick/policy.xml), for every identify and convert Dragonfly runs, which
+# inherit this process's environment. Prepended, so it applies wherever the host keeps its own (Render's image has none)
+ENV['MAGICK_CONFIGURE_PATH'] = [File.expand_path('imagemagick', __dir__), ENV.fetch('MAGICK_CONFIGURE_PATH', nil)].compact.join(':')
+
 Dragonfly.app.configure do
   plugin :imagemagick
   url_format '/media/:job/:name'

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ImageMagick's security policy, loaded through MAGICK_CONFIGURE_PATH, which config/dragonfly_config.rb sets, so every
+  identify and convert Dragonfly runs reads it. Render's image ships no policy.xml, so without this ImageMagick will
+  read any format it knows.
+
+  Uploads only reach ImageMagick as JPEG, PNG, GIF, WebP or HEIC/AVIF (ImageSignature checks their first bytes), so
+  this is the backstop: it denies the formats that run scripts, read or fetch other files, or hand off to Ghostscript.
+  It's a denylist rather than deny-all-then-allow because ImageMagick 6 and 7 differ on whether a later allow can undo
+  an earlier deny, and every rule here holds in both.
+-->
+<policymap>
+  <!-- Reading a file named in another file's contents (@/path/to/list) -->
+  <policy domain="path" rights="none" pattern="@*" />
+
+  <!-- Ghostscript: PostScript, EPS, PDF, XPS -->
+  <policy domain="delegate" rights="none" pattern="gs" />
+  <policy domain="coder" rights="none" pattern="PS" />
+  <policy domain="coder" rights="none" pattern="PS2" />
+  <policy domain="coder" rights="none" pattern="PS3" />
+  <policy domain="coder" rights="none" pattern="EPS" />
+  <policy domain="coder" rights="none" pattern="EPSF" />
+  <policy domain="coder" rights="none" pattern="EPSI" />
+  <policy domain="coder" rights="none" pattern="EPI" />
+  <policy domain="coder" rights="none" pattern="EPT" />
+  <policy domain="coder" rights="none" pattern="PDF" />
+  <policy domain="coder" rights="none" pattern="PDFA" />
+  <policy domain="coder" rights="none" pattern="XPS" />
+
+  <!-- Formats that reference other files or URLs, run scripts, or draw text from a file -->
+  <policy domain="coder" rights="none" pattern="SVG" />
+  <policy domain="coder" rights="none" pattern="SVGZ" />
+  <policy domain="coder" rights="none" pattern="MSVG" />
+  <policy domain="coder" rights="none" pattern="RSVG" />
+  <policy domain="coder" rights="none" pattern="MVG" />
+  <policy domain="coder" rights="none" pattern="MSL" />
+  <policy domain="coder" rights="none" pattern="TEXT" />
+  <policy domain="coder" rights="none" pattern="TXT" />
+  <policy domain="coder" rights="none" pattern="LABEL" />
+  <policy domain="coder" rights="none" pattern="CAPTION" />
+  <policy domain="coder" rights="none" pattern="PANGO" />
+  <policy domain="coder" rights="none" pattern="URL" />
+  <policy domain="coder" rights="none" pattern="HTTP" />
+  <policy domain="coder" rights="none" pattern="HTTPS" />
+  <policy domain="coder" rights="none" pattern="FTP" />
+  <policy domain="coder" rights="none" pattern="EPHEMERAL" />
+  <policy domain="coder" rights="none" pattern="MPC" />
+  <policy domain="coder" rights="none" pattern="SHOW" />
+  <policy domain="coder" rights="none" pattern="WIN" />
+  <policy domain="coder" rights="none" pattern="X" />
+  <policy domain="coder" rights="none" pattern="PLT" />
+  <policy domain="coder" rights="none" pattern="HTML" />
+</policymap>
