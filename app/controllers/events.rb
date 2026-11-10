@@ -84,10 +84,7 @@ Dandelion::App.controller do
       redirect '/events'
     end
 
-    if @event.organisation.stripe_connect_migration_required?
-      @organisation = @event.organisation
-      erb :'events/stripe_connect'
-    elsif @event.organisation.contribution_reminder && !params[:contribution_skipped]
+    if @event.organisation.contribution_reminder && !params[:contribution_skipped]
       redirect "/o/#{@event.organisation.slug}/contribute?return_to=#{CGI.escape(request.fullpath)}"
     else
       @event.location = 'Online'

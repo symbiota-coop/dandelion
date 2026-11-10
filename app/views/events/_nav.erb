@@ -56,7 +56,7 @@
             (['Preview confirmation email', "/e/#{event.slug}/ticket_email"] if has_ticket_types),
             (['Preview reminder email', "/e/#{event.slug}/reminder_email"] if has_ticket_types && !event.evergreen?),
             (['Preview feedback request email', "/e/#{event.slug}/feedback_request_email"] if has_ticket_types && !event.evergreen?),
-            (['Stripe report', "/e/#{event.slug}/stripe_report"] if event_revenue_admin? && !event.organisation.stripe_client_id && (event.organisation.stripe_connect_json || event.organisation.stripe_sk)),
+            (['Stripe report', "/e/#{event.slug}/stripe_report"] if event_revenue_admin? && !event.organisation.stripe_client_id && event.organisation.stripe_connect_json),
             ['Audience stats', "/e/#{event.slug}/stats"],
             ([%(Check-in scanner), "/e/#{event.slug}/check_in"] if has_ticket_types || tickets_count.positive?),
             ['Mailer', "/e/#{event.slug}/pmails"]

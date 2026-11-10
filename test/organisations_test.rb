@@ -1180,41 +1180,13 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_nil @organisation.reload.stripe_connect_json
   end
 
-  test 'only organisation admins are offered connecting Stripe when an organisation on API keys must connect before creating events' do
-    create_organisation(allow_event_submissions: true)
-    create_event
-    event_manager = FactoryBot.create(:account)
-    event_manager.organisationships.create!(organisation: @organisation, event_manager: true)
-    submitter = FactoryBot.create(:account)
-
-    Organisation.stub(:stripe_connect_migration?, true) do
-      assert @organisation.stripe_connect_migration_required?
-
-      [[submitter, "/events/new?organisation_id=#{@organisation.id}"],
-       [event_manager, "/events/new?organisation_id=#{@organisation.id}"],
-       [event_manager, "/e/#{@event.slug}/duplicate"]].each do |account, path|
-        sign_in(account)
-        visit path
-        assert page.has_content?("an admin of #{@organisation.name} needs to connect its Stripe account"), path
-        assert page.has_no_link?('Connect Stripe'), path
-        refute_includes page.html, 'connect.stripe.com', path
-      end
-
-      sign_in(@account)
-      visit "/events/new?organisation_id=#{@organisation.id}"
-      assert page.has_link?('Connect Stripe', href: %r{\Ahttps://connect\.stripe\.com/oauth/authorize})
-    end
-  end
-
-  test 'the Payments tab shows the Connect account checkouts use, and offers to disconnect it, when API keys are also set' do
-    create_organisation(stripe_connect_json: { stripe_user_id: 'acct_connected' }.to_json, stripe_account_json: { business_profile: { name: 'Connected Ltd' } }.to_json)
-    assert @organisation.stripe_sk
+  test 'the Payments tab shows the connected Stripe account and offers to disconnect it' do
+    create_organisation(stripe_pk: nil, stripe_sk: nil, stripe_connect_json: { stripe_user_id: 'acct_connected' }.to_json, stripe_account_json: { business_profile: { name: 'Connected Ltd' } }.to_json)
     sign_in(@account)
     visit "/o/#{@organisation.slug}/edit"
     click_link 'Payments'
 
     assert page.has_content?("Connected to Connected Ltd's Stripe account (id: acct_connected)")
     assert page.has_link?('Disconnect')
-    assert page.has_no_content?('Using Stripe API keys (legacy)')
   end
 end

@@ -159,7 +159,7 @@ module EventAccounting
   # report rather than stored, so refunds made in Stripe's dashboard show. Each charge and the totals are in the
   # currency the organisation's Stripe account settles in (a refund is converted at its charge's exchange rate)
   def stripe_report
-    opts = StripeOpts.call(api_key: organisation.stripe_connect_json ? ENV['STRIPE_SK'] : organisation.stripe_sk, stripe_account: organisation.stripe_user_id)
+    opts = StripeOpts.call(api_key: ENV['STRIPE_SK'], stripe_account: organisation.stripe_user_id)
     charges = []
     Stripe::Charge.search({ query: "metadata['de_event_id']:'#{id}'", limit: 100, expand: ['data.balance_transaction'] }, opts).auto_paging_each do |charge|
       balance_transaction = charge.balance_transaction
@@ -170,7 +170,7 @@ module EventAccounting
       application_fee, fee = balance_transaction.fee_details.partition { |fee_detail| fee_detail.type == 'application_fee' }.map { |fee_details| fee_details.sum(&:amount) }
       # Refunding a whole order refunds its donation to Dandelion too. The charge doesn't say how much was refunded, so ask
       # for the application fee, which is Dandelion's, with Dandelion's own key
-      if application_fee.positive? && charge.amount_refunded.positive? && charge.application_fee && organisation.stripe_connect_json
+      if application_fee.positive? && charge.amount_refunded.positive? && charge.application_fee
         application_fee_refunded = Stripe::ApplicationFee.retrieve(charge.application_fee, opts.except(:stripe_account)).amount_refunded
         application_fee -= (application_fee_refunded * (balance_transaction.exchange_rate || 1)).round
       end

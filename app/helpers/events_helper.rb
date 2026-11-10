@@ -1,10 +1,7 @@
 Dandelion::App.helpers do
   def duplicate_event_prerequisites!
     organisation = @event.organisation
-    if organisation.stripe_connect_migration_required?
-      @organisation = organisation
-      halt erb(:'events/stripe_connect')
-    elsif organisation.contribution_reminder && !params[:contribution_skipped]
+    if organisation.contribution_reminder && !params[:contribution_skipped]
       redirect "/o/#{organisation.slug}/contribute?return_to=#{CGI.escape("/e/#{@event.slug}/duplicate")}"
     end
   end
