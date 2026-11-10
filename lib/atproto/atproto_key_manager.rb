@@ -23,16 +23,24 @@ class AtprotoKeyManager
       jwk.export.merge(use: 'sig', alg: 'ES256')
     end
 
+    def client_id
+      "#{ENV['BASE_URI']}/atproto/oauth-client-metadata.json"
+    end
+
+    def redirect_uri
+      "#{ENV['BASE_URI']}/auth/atproto/callback"
+    end
+
     def client_metadata
       base_uri = ENV['BASE_URI']
       {
-        client_id: "#{base_uri}/atproto/oauth-client-metadata.json",
+        client_id: client_id,
         application_type: 'web',
         client_name: ENV['APP_NAME'] || 'Dandelion',
         client_uri: base_uri,
         dpop_bound_access_tokens: true,
         grant_types: %w[authorization_code refresh_token],
-        redirect_uris: ["#{base_uri}/auth/atproto/callback"],
+        redirect_uris: [redirect_uri],
         response_types: ['code'],
         scope: 'atproto',
         token_endpoint_auth_method: 'private_key_jwt',

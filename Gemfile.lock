@@ -27,9 +27,6 @@ GEM
     anonymous_loader (0.1.5)
       version_gem (~> 1.1, >= 1.1.17)
     ast (2.4.3)
-    atproto_client (0.1.5)
-      jwt (>= 2.7)
-      openssl (>= 3.0)
     auth-sanitizer (0.2.5)
       version_gem (~> 1.1, >= 1.1.16)
     base58 (0.2.3)
@@ -274,12 +271,6 @@ GEM
       logger
       rack (>= 2.2.8)
       rack-protection (>= 2.2.0)
-    omniauth-atproto (0.1.4)
-      atproto_client (~> 0.1.4)
-      didkit
-      faraday
-      jwt (>= 2.7)
-      omniauth-oauth2 (~> 1.8)
     omniauth-google-oauth2 (1.2.3)
       jwt (>= 2.9.2, < 4)
       oauth2 (~> 2.0)
@@ -288,7 +279,6 @@ GEM
     omniauth-oauth2 (1.10.0)
       oauth2 (>= 2.0.2, < 3)
       omniauth (~> 2.3, >= 2.3.1)
-    openssl (4.0.2)
     ostruct (0.6.3)
     padrino (0.18.2)
       padrino-admin (= 0.18.2)
@@ -497,6 +487,7 @@ DEPENDENCIES
   crawler_detect
   cuprite
   delayed_job_mongoid
+  didkit
   dragonfly
   dragonfly-s3_data_store
   email_address
@@ -524,7 +515,6 @@ DEPENDENCIES
   mongoid
   mongoid_paranoia
   omniauth
-  omniauth-atproto
   omniauth-google-oauth2
   padrino
   prawn

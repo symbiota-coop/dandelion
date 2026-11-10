@@ -23,7 +23,6 @@ gem 'zstd-ruby'
 # Authentication
 gem 'bcrypt'
 gem 'omniauth'
-gem 'omniauth-atproto'
 gem 'omniauth-google-oauth2'
 gem 'siwe-rb', require: 'siwe'
 
@@ -42,6 +41,7 @@ group :test do
 end
 
 # Interacting with other websites
+gem 'didkit' # resolving Bluesky handles and DIDs, for signing in with Bluesky (lib/auth/atproto_oauth.rb)
 gem 'faraday'
 gem 'faraday-follow_redirects'
 gem 'faraday-retry'
