@@ -916,12 +916,8 @@ class WebhooksTest < ActiveSupport::TestCase
   # WhatsApp verification
   # ═══════════════════════════════════════════════════════════════════════════
 
-  def with_whatsapp_verify_token(value)
-    previous = ENV['WHATSAPP_VERIFY_TOKEN']
-    ENV['WHATSAPP_VERIFY_TOKEN'] = value
-    yield
-  ensure
-    ENV['WHATSAPP_VERIFY_TOKEN'] = previous
+  def with_whatsapp_verify_token(value, &)
+    with_env({ 'WHATSAPP_VERIFY_TOKEN' => value }, &)
   end
 
   test 'whatsapp verification is refused when no verify token is configured' do
@@ -978,12 +974,8 @@ class WebhooksTest < ActiveSupport::TestCase
     }
   end
 
-  def with_mailgun_signing_key(key)
-    previous = ENV['MAILGUN_WEBHOOK_SIGNING_KEY']
-    ENV['MAILGUN_WEBHOOK_SIGNING_KEY'] = key
-    yield
-  ensure
-    ENV['MAILGUN_WEBHOOK_SIGNING_KEY'] = previous
+  def with_mailgun_signing_key(key, &)
+    with_env({ 'MAILGUN_WEBHOOK_SIGNING_KEY' => key }, &)
   end
 
   test 'a reply to a comment email that Mailgun signed becomes a comment' do

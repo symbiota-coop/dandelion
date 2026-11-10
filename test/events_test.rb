@@ -1278,9 +1278,7 @@ class EventsTest < ActiveSupport::TestCase
     sign_in(@account)
     visit "/e/#{@event.slug}/edit"
     click_button @event.name
-    click_link 'Duplicate event'
-    # The popover hangs off the page
-    page.document.find('.popover').click_button 'Duplicate event'
+    click_link_and_confirm 'Duplicate event'
     assert page.has_content?("This is a duplicate of #{@event.name}")
     duplicate = Event.find_by(duplicated_from_id: @event.id)
     assert page.has_current_path?("/e/#{duplicate.slug}/edit")

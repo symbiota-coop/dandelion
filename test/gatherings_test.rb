@@ -597,8 +597,7 @@ class GatheringsTest < ActiveSupport::TestCase
     visit "/g/#{@gathering.slug}/options"
     click_link 'Join'
     assert page.has_content? 'You owe £100'
-    click_link 'Leave'
-    page.document.find('.popover').click_button 'Leave'
+    click_link_and_confirm 'Leave'
     assert page.has_link? 'Join'
     assert page.has_no_content? 'You owe'
     assert_equal 0, @gathering.memberships.find_by(account: member).requested_contribution

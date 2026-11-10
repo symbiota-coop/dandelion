@@ -35,6 +35,16 @@ class RecordedEmail
 end
 
 module TestHelpers
+  # Sets these ENV variables while the block runs, then puts back what they were (nil unsets one). .env.test has no
+  # Mailgun or recaptcha settings, for instance
+  def with_env(vars)
+    previous = vars.keys.to_h { |key| [key, ENV.fetch(key, nil)] }
+    vars.each { |key, value| ENV[key] = value }
+    yield
+  ensure
+    previous&.each { |key, value| ENV[key] = value }
+  end
+
   # Emails
 
   # The emails the block would send, one per Mailgun::BatchMessage it makes

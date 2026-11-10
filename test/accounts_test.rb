@@ -809,10 +809,8 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   # Configures recaptcha with a verifier that always fails, and returns the verify calls made
-  def with_recaptcha(skip_secret:, &)
+  def with_recaptcha(skip_secret:, &block)
     env = { 'RECAPTCHA_SECRET_KEY' => 'recaptcha-secret', 'RECAPTCHA_VERIFY_URL' => 'https://recaptcha.test/verify', 'RECAPTCHA_SKIP_SECRET' => skip_secret }
-    previous = env.keys.to_h { |key| [key, ENV[key]] }
-    env.each { |key, value| ENV[key] = value }
 
     # Real connections (Mailgun uses Faraday too), with only posts to the verify URL intercepted
     verify_url = env['RECAPTCHA_VERIFY_URL']
@@ -829,9 +827,7 @@ class AccountsTest < ActiveSupport::TestCase
       end
       connection
     end
-    Faraday.stub(:new, stubbed_new, &)
+    with_env(env) { Faraday.stub(:new, stubbed_new, &block) }
     verify_calls
-  ensure
-    previous.each { |key, value| ENV[key] = value }
   end
 end

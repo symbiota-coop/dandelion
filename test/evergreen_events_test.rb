@@ -18,9 +18,7 @@ class EvergreenEventsTest < ActiveSupport::TestCase
   def confirmation_email(event)
     order = event.orders.create!(account: @account, currency: event.currency, value: 0, payment_completed: true)
     event.tickets.create!(account: @account, order: order, ticket_type: event.ticket_types.first, payment_completed: true)
-    email = RecordedEmail.new
-    Mailgun::BatchMessage.stub(:new, email) { order.send_tickets_without_delay }
-    email
+    recorded_email { order.send_tickets_without_delay }
   end
 
   test 'creating an evergreen event without dates' do

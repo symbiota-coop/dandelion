@@ -1327,14 +1327,7 @@ class AccountSignInsTest < ActiveSupport::TestCase
 
   # Comes back from Google, in the browser, as this Google account
   def visit_omniauth_as(uid:, email: 'alice-oauth@example.com')
-    OmniAuth.config.test_mode = true
-    OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new(
-      provider: 'google_oauth2', uid: uid, info: { name: 'Alice Example', email: email }
-    )
-    visit '/auth/google_oauth2'
-  ensure
-    OmniAuth.config.test_mode = false
-    OmniAuth.config.mock_auth[:google_oauth2] = nil
+    as_google_account(uid: uid, email: email) { visit '/auth/google_oauth2' }
   end
 
   # Signs up with Google, in the form it fills in, as Alice Example under signup_email (Google's email unless given)
@@ -1350,13 +1343,6 @@ class AccountSignInsTest < ActiveSupport::TestCase
   def enter_sign_in_code(account)
     fill_in 'code', with: Account.find(account.id).issue_sign_in_code!
     click_button 'Submit'
-  end
-
-  # Buttons that ask first, in a popover whose button is named label
-  def click_button_and_confirm(label, button: label)
-    click_button button
-    # The popover hangs off the page
-    page.document.find('.popover').click_button label
   end
 
   def siwe_template_from(response)
@@ -1402,28 +1388,26 @@ class AccountSignInsTest < ActiveSupport::TestCase
     post '/auth/account/callback', email: account.email, password: account.password
   end
 
-  def omniauth_callback_as(uid:)
-    OmniAuth.config.test_mode = true
-    OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new(
-      provider: 'google_oauth2', uid: uid, info: { name: 'Alice Example', email: 'alice-oauth@example.com' }
-    )
-    get '/auth/google_oauth2'
-    follow_redirect! while last_response.redirect?
-  ensure
-    OmniAuth.config.test_mode = false
-    OmniAuth.config.mock_auth[:google_oauth2] = nil
+  # Comes back from Google, through Rack, as this Google account
+  def omniauth_callback_as(uid:, email: 'alice-oauth@example.com')
+    as_google_account(uid: uid, email: email) do
+      get '/auth/google_oauth2'
+      follow_redirect! while last_response.redirect?
+    end
   end
 
   def start_omniauth_signup(email: 'alice-oauth@example.com')
     clear_cookies
+    omniauth_callback_as(uid: 'google-uid-1', email: email)
+  end
+
+  # While the block runs, signing in with Google signs in as Alice Example, with this uid and email
+  def as_google_account(uid:, email:)
     OmniAuth.config.test_mode = true
     OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new(
-      provider: 'google_oauth2',
-      uid: 'google-uid-1',
-      info: { name: 'Alice Example', email: email }
+      provider: 'google_oauth2', uid: uid, info: { name: 'Alice Example', email: email }
     )
-    get '/auth/google_oauth2'
-    follow_redirect! while last_response.redirect?
+    yield
   ensure
     OmniAuth.config.test_mode = false
     OmniAuth.config.mock_auth[:google_oauth2] = nil

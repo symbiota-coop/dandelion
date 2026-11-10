@@ -177,9 +177,7 @@ class DadminTest < ActiveSupport::TestCase
     assert page.has_content? 'was updated'
     assert_equal 'dadmin-tag-renamed', tag.reload.name
 
-    click_link 'Delete'
-    # The popover hangs off the page, its button named after the link
-    page.document.find('.popover').click_button 'Delete'
+    click_link_and_confirm 'Delete'
     assert page.has_content? 'was deleted'
     assert_nil EventTag.find(tag.id)
   end

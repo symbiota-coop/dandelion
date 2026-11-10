@@ -279,9 +279,7 @@ class WaitlistTest < ActiveSupport::TestCase
 
     visit "/e/#{@event.slug}/orders"
     click_button 'Actions'
-    click_link 'Remove order'
-    # The popover hangs off the page, outside any within block
-    page.document.find('.popover').click_button 'Remove order'
+    click_link_and_confirm 'Remove order'
     assert page.has_content? 'No orders found'
     assert_nil Order.find(@order.id)
 

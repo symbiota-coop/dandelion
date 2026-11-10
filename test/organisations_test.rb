@@ -397,8 +397,7 @@ class OrganisationsTest < ActiveSupport::TestCase
       assert page.has_content? 'subscribed_organisation_ids_cache'
     end
 
-    click_button 'Repair'
-    page.document.find('.popover').click_button 'Repair'
+    click_button_and_confirm 'Repair'
     assert page.has_content? 'All in sync'
     assert_equal [@organisation.id], member.reload.subscribed_organisation_ids_cache
   end

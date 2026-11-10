@@ -883,10 +883,8 @@ class EventPermissionsTest < ActiveSupport::TestCase
     within(admins_box) do
       find('.remove-role-toggle').click
       select "#{other_admin.name} (#{other_admin.username})", from: 'account_id'
-      click_button 'Remove admin'
+      click_button_and_confirm 'Remove admin'
     end
-    # Removing asks first, in a popover that hangs off the page
-    page.document.find('.popover').click_button 'Remove admin'
     assert page.has_css? "#{admins_box} .add-role-toggle"
     assert page.has_no_css? "#{admins_box} img[alt='#{other_admin.name}']"
     refute Organisation.admin?(@organisation, other_admin)
@@ -1067,9 +1065,8 @@ class EventPermissionsTest < ActiveSupport::TestCase
       within(facilitators_box) do
         find('.remove-role-toggle').click
         select "#{other.name} (#{other.username})", from: 'account_id'
-        click_button 'Remove event facilitator'
+        click_button_and_confirm 'Remove event facilitator'
       end
-      page.document.find('.popover').click_button 'Remove event facilitator'
       assert page.has_css? "#{facilitators_box} .add-role-toggle"
       assert page.has_no_css?("#{facilitators_box} img[alt='#{other.name}']"), "removing a facilitator refused a #{role}"
       refute @event.event_facilitations.find_by(account: other)

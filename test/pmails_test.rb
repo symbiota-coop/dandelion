@@ -351,16 +351,6 @@ class PmailsTest < ActiveSupport::TestCase
     assert pmail.valid?, pmail.errors.full_messages.to_sentence
   end
 
-  # Sets these ENV variables while the block runs. .env.test has no Mailgun settings: production's free gift is for up to
-  # MAILGUN_FREE_SUBSCRIBER_LIMIT=1000 subscribers, sent from Dandelion's MAILGUN_PMAILS_HOST
-  def with_env(vars)
-    previous = vars.keys.to_h { |key| [key, ENV.fetch(key, nil)] }
-    vars.each { |key, value| ENV[key] = value }
-    yield
-  ensure
-    previous.each { |key, value| ENV[key] = value }
-  end
-
   def add_followers(organisation, count)
     Organisationship.collection.insert_many(Array.new(count) do
       { account_id: BSON::ObjectId.new, organisation_id: organisation.id, created_at: Time.now.utc, updated_at: Time.now.utc, unsubscribed: false }

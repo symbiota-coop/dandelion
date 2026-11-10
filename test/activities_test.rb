@@ -129,10 +129,7 @@ class ActivitiesTest < ActiveSupport::TestCase
     apply(applicant)
     assert_equal 1, @activity.activity_applications.count
 
-    emails = []
-    Mailgun::BatchMessage.stub :new, proc { RecordedEmail.new.tap { |email| emails << email } } do
-      Delayed::Job.and(handler: /ActivityApplication.*send_notification/m).each(&:invoke_job)
-    end
+    emails = emails_sent_by_jobs(/ActivityApplication.*send_notification/m)
     assert_equal 1, emails.length
     assert_includes emails.first.recipients, @account.email
     assert_equal @activity.admins.pluck(:email).sort, emails.first.recipients.sort

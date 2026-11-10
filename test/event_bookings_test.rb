@@ -759,7 +759,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 400, last_response.status
     assert_equal 0, @event.orders.count
 
-    Stripe::Checkout::Session.stub(:create, api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test')) do
+    with_stubbed_stripe_session do
       purchase.call('5')
     end
     assert_equal 200, last_response.status
