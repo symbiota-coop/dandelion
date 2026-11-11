@@ -129,6 +129,7 @@ jobs:
           - orders
           - organisations
           - pmails
+          - quotes
           - resales
           - search
           - ticket_types

@@ -44,7 +44,7 @@ discount_code_used_up = discount_code_problem == :used_up
         <%= hidden_field_tag :ticket_type_id, value: params[:ticket_type_id] %>
 
         <% if @concise_ticket_form %>
-          <%= hidden_field_tag :"quantities[#{free_ticket_type.id}]", value: 1, 'data-ticket-type-id': free_ticket_type.id, 'data-price': 0 %>
+          <%= hidden_field_tag :"quantities[#{free_ticket_type.id}]", value: 1, 'data-ticket-type-id': free_ticket_type.id %>
         <% else %>
           <table class="table">
 
@@ -71,7 +71,6 @@ discount_code_used_up = discount_code_problem == :used_up
             <%= partial :'purchase/suggested_donation' %>
 
             <%== currency_input_row(label: 'Total', field_name: 'totalDisplay', field_id: 'totalDisplay', value: '0.00') %>
-            <%= hidden_field_tag :total, id: 'total' %>
 
             <% if current_account && (organisationship = @event.organisation.organisationships.find_by(account: current_account)) && organisationship.credit_balance > 0 && FIAT_CURRENCIES.include?(@event.currency) %>
               <% show_balance = true %>
@@ -169,6 +168,8 @@ discount_code_used_up = discount_code_problem == :used_up
 
       <%= partial :'purchase/terms_and_conditions' %>
 
+      <%# Why the form's choices couldn't be priced (purchase.js), while the payment buttons wait for them to be %>
+      <div id="quote-error" class="alert alert-danger mb-3" style="display: none" role="alert"></div>
       <div id="purchase-alert" class="alert alert-danger mb-3" style="display: none" role="alert"></div>
       <div id="payment-link" class="alert alert-primary mb-3" style="display: none" role="status">
         Payment continues in a new tab. If it didn't open, <a target="_blank" rel="noopener">continue to payment</a>.

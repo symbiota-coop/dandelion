@@ -3085,6 +3085,17 @@ ul.map-event li {
   margin-bottom: 0;
 }
 
+/* The checkout form's totals fade back while the quote that replaces them is on its way (purchase.js) */
+#totalDisplay,
+#balance {
+  transition: opacity var(--transition-fast);
+}
+
+#totalDisplay[aria-busy='true'],
+#balance[aria-busy='true'] {
+  opacity: 0.5;
+}
+
 /* A ticket group's name heads its rows as plain text; the border above the first ticket type is its divider */
 #ticket-types td.ticket-group-heading {
   font-family: var(--header-font-family);

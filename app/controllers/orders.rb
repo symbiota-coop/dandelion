@@ -25,7 +25,11 @@ Dandelion::App.controller do
 
   post '/e/:slug/purchase', provides: :json do
     @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
-    OrderBuilder.new(**order_builder_args).call
+    builder = OrderBuilder.new(**order_builder_args)
+    result = JSON.parse(builder.call)
+    # Whether the order waits for a payment: without one (RSVPs, and tickets credit or a fixed discount paid for), the
+    # form goes straight to its confirmation
+    result.merge(payment_required: builder.quote.payment_required?).to_json
   rescue OrderBuilder::Duplicate => e
     halt 409, { duplicate: true, error: e.message }.to_json
   rescue OrderBuilder::EmailLooksMistyped => e
@@ -33,6 +37,33 @@ Dandelion::App.controller do
   rescue OrderBuilder::Error => e
     # Its message says what went wrong, for the buyer: the form shows it
     halt e.status, { error: e.message }.to_json
+  end
+
+  # What the checkout form's choices cost (Quote), which the form shows as the buyer chooses. It takes the ticket form's
+  # fields as the purchase does, and refuses what the purchase would refuse of them
+  post '/e/:slug/quote', provides: :json do
+    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    restriction = @event.booking_restriction(current_account)
+    raise OrderBuilder::NotAllowed.new(restriction) if restriction
+
+    ticket_form = params[:ticketForm].is_a?(Hash) ? params[:ticketForm] : {}
+    Quote.new(
+      event: @event,
+      quantities: ticket_form[:quantities],
+      prices: ticket_form[:prices],
+      # Signed in, the form books as the account, so with its credit and any monthly donor's discount
+      account: current_account,
+      credit: true,
+      # The code applied, rather than one typed into the box but not applied
+      discount_code: ticket_form[:applied_discount_code],
+      donation_amount: ticket_form[:donation_amount],
+      secret_ticket_type_id: ticket_form[:ticket_type_id]
+    ).validate!.to_json
+  rescue OrderBuilder::Error => e
+    halt e.status, { error: e.message }.to_json
+  rescue Money::Currency::UnknownCurrency, Money::Bank::UnknownRate
+    # An amount that can't be priced in the order's currency, which a booking would fail on too
+    halt 400, { error: OrderBuilder::Error.new.message }.to_json
   end
 
   get '/e/:slug/orders/:order_id/payment_completed', provides: :json do

@@ -41,8 +41,8 @@ class Order
     self.discount_code = nil if discount_code && !discount_code.applies_to?(event)
     self.discount_code = nil if discount_code&.exhausted?(excluding: self)
     self.percentage_discount = discount_code.percentage_discount if discount_code && discount_code.percentage_discount
-    if !percentage_discount && !event.no_discounts && (organisationship_for_discount = event.organisationship_for_discount(account))
-      self.percentage_discount_monthly_donor = organisationship_for_discount.monthly_donor_discount
+    if !percentage_discount && (monthly_donor_discount = event.monthly_donor_discount(account))
+      self.percentage_discount_monthly_donor = monthly_donor_discount
     end
     if cohost && !affiliate_type && !affiliate_id
       self.affiliate_type = 'Organisation'
@@ -226,36 +226,6 @@ class Order
     d = description_elements(include_donations: include_donations)
     text = event.organisation.use_event_slugs_in_order_descriptions ? "#{event.slug}, " : "#{event.name}, "
     text + "#{event.when_details(account.try(:time_zone))}#{" at #{event.location}" if event.location != 'Online'}#{": #{d.join(', ')}" unless d.empty?}"
-  end
-
-  def apply_credit
-    return unless (organisationship = event.organisation.organisationships.find_by(account: account))
-
-    begin
-      credit_balance = organisationship.credit_balance.exchange_to(currency)
-    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-      return
-    end
-    return unless credit_balance.positive?
-
-    current_total = discounted_ticket_revenue + donation_revenue
-    if credit_balance >= current_total
-      set(credit_applied: current_total.cents.to_f / 100)
-    elsif credit_balance < current_total
-      set(credit_applied: credit_balance.cents.to_f / 100)
-    end
-  end
-
-  def apply_fixed_discount
-    return unless discount_code && discount_code.fixed_discount
-
-    fixed_discount = discount_code.fixed_discount.exchange_to(currency)
-    current_total = discounted_ticket_revenue + donation_revenue - Money.new((credit_applied || 0) * 100, currency)
-    if fixed_discount >= current_total
-      set(fixed_discount_applied: current_total.cents.to_f / 100)
-    elsif fixed_discount < current_total
-      set(fixed_discount_applied: fixed_discount.cents.to_f / 100)
-    end
   end
 
   def update_destination_payment

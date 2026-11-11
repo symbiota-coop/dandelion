@@ -324,6 +324,11 @@ class Ticket
   end
 
   def calculate_discounted_price
+    Ticket.discounted_price(price, percentage_discount, percentage_discount_monthly_donor)
+  end
+
+  # A ticket's price less its order's percentage discounts, to the cent. Quote works out a booking's price with it too
+  def self.discounted_price(price, percentage_discount, percentage_discount_monthly_donor)
     return unless price
 
     p = price.to_f

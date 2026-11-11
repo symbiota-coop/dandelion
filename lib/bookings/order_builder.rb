@@ -4,8 +4,11 @@
 #
 # It checks everything the checkout form asks for, as a request needn't come from the form: who may book
 # (Event#booking_restriction, for the signed-in account), that each ticket type is still on sale, the terms, answers
-# to the event's questions, prices for range and pay-what-you-want tickets, the discount code and any donation.
-# Failures raise an OrderBuilder::Error, after destroying any order created.
+# to the event's questions, and, with Quote, prices for range and pay-what-you-want tickets, the discount code and any
+# donation. Failures raise an OrderBuilder::Error, after destroying any order created.
+#
+# The order's credit, fixed discount and donation are the Quote's, the one the checkout form showed the buyer. Its
+# tickets are priced as they're created (Ticket, Order), and the order is refused unless they come to the quote's.
 class OrderBuilder
   # Each error's message says what went wrong, for whoever is booking. The details of an unexpected error or a payment
   # provider's go to Sentry or the failed purchase email instead
@@ -120,6 +123,9 @@ class OrderBuilder
     end
   end
 
+  # The tickets came to a different price from the quote's: a bug, so reported, and nothing is charged
+  class QuoteMismatch < StandardError; end
+
   class Duplicate < Error
     def status
       409
@@ -141,7 +147,7 @@ class OrderBuilder
     end
   end
 
-  attr_reader :order, :account
+  attr_reader :order, :account, :quote
 
   # buyer: name, email, and optionally phone, postcode and country, of which only those the event asks for
   # (Event#checkout_buyer_fields) are used
@@ -160,7 +166,7 @@ class OrderBuilder
     @event = event
     @buyer = buyer
     # The checkout form sends no quantities when no ticket is chosen (blanks_to_nils)
-    @quantities = quantities || {}
+    @quantities = Quote.quantities_from(quantities)
     @prices = prices || {}
     @payment_method = payment_method.to_s
     @signed_in_account = signed_in_account
@@ -197,6 +203,8 @@ class OrderBuilder
     check_email unless @confirmed_email
     find_or_create_account
     check_duplicate unless @confirmed_duplicate
+    # Worked out now, before the order counts as a use of its discount code
+    @quote = build_quote(account: @account, credit: signed_in_as_buyer?).tap(&:total)
     create_order
     create_tickets
     @event.refresh_sold_out_cache_and_notify_waitlist
@@ -233,65 +241,14 @@ class OrderBuilder
     chosen = @quantities.select { |_ticket_type_id, quantity| quantity.to_i.positive? }
     raise NoTickets if chosen.empty?
 
-    # Keyed as quantities are. create_tickets refuses ids that aren't the event's
-    ticket_types = chosen.keys.filter_map do |ticket_type_id|
-      ticket_type = @event.ticket_types.find(ticket_type_id)
-      [ticket_type_id, ticket_type] if ticket_type
-    end
-    check_prices(ticket_types)
-    check_discount_code(ticket_types.map(&:last))
-    check_donation
+    # Ticket types, prices, the discount code and the donation, before an account is made
+    build_quote.validate!
   end
 
-  # Each range or pay-what-you-want ticket type needs a price, within its range: the checkout form only lets the buyer
-  # choose one once they've set it
-  def check_prices(ticket_types)
-    @ticket_prices = {}
-    problems = ticket_types.filter_map do |ticket_type_id, ticket_type|
-      next unless ticket_type.range || ticket_type.price.nil?
-
-      price = Float(@prices[ticket_type_id], exception: false)
-      if price.nil? || (ticket_type.range ? !price.between?(*ticket_type.range) : price.negative?)
-        bounds = if ticket_type.range
-                   "from #{format_money(ticket_type.range_min)} to #{format_money(ticket_type.range_max)}"
-                 else
-                   "#{format_money(0)} or more"
-                 end
-        "#{ticket_type.name} (#{bounds})"
-      else
-        @ticket_prices[ticket_type_id] = price
-        nil
-      end
-    end.uniq
-    raise PriceInvalid, "Choose a price per ticket for #{problems.join('; ')}." if problems.any?
-  end
-
-  # The code must be the event's and not used up, and apply to each ticket chosen: the checkout form only shows the
-  # ticket types it applies to once it's applied
-  def check_discount_code(ticket_types)
-    return if @discount_code.to_s.strip.empty?
-
-    discount_code, problem = @event.checkout_discount_code(@discount_code)
-    code = @discount_code.to_s.strip.upcase
-    raise DiscountCodeInvalid, "The discount code #{code} has been used up." if problem == :used_up
-    raise DiscountCodeInvalid, "The discount code #{code} is not valid for this event." unless discount_code
-    unless ticket_types.all? { |ticket_type| discount_code.applies_to_ticket_type?(ticket_type) }
-      raise DiscountCodeInvalid, "The discount code #{code} only applies to ticket types whose names include #{discount_code.filters.join(' or ')}."
-    end
-
-    @discount_code_id = discount_code.id
-  end
-
-  def check_donation
-    amount = @donation_amount.to_f
-    donation = @event.checkout_donation
-    raise DonationInvalid if amount.negative? || (amount.positive? && !donation)
-    # Donation's own validation only sees a donation that's made
-    raise DonationRequired.new(@event.minimum_donation, @event.currency) if donation_below_minimum?
-    # Unless the payment method drops it, as it does a donation to Dandelion when it can't take one
-    return unless donation && donation[:to] == 'dandelion' && donation[:minimum] && amount.positive? && !ignore_dandelion_donation?
-
-    raise DonationTooSmall.new(donation[:minimum], @event.currency) if amount < donation[:minimum]
+  def build_quote(account: nil, credit: false)
+    Quote.new(event: @event, quantities: @quantities, prices: @prices, account: account, credit: credit, discount_code: @discount_code,
+              donation_amount: @donation_amount, payment_method: @payment_method, secret_ticket_type_id: @secret_ticket_type_id,
+              default_dandelion_donation: @default_dandelion_donation)
   end
 
   # Only an email typed in: a signed-in buyer's is their account's
@@ -300,10 +257,6 @@ class OrderBuilder
     return if @signed_in_account && @signed_in_account.email.casecmp?(email)
 
     raise EmailLooksMistyped, email if EmailTypos.mistyped?(email)
-  end
-
-  def format_money(amount)
-    Money.new((amount * 100).round, @event.currency).format(no_cents_if_whole: true)
   end
 
   def find_or_create_account
@@ -332,10 +285,6 @@ class OrderBuilder
     messages.empty? ? AccountInvalid.new : AccountInvalid.new("#{messages.to_sentence}.")
   end
 
-  def donation_below_minimum?
-    @event.minimum_donation&.positive? && !@event.donations_to_dandelion? && @donation_amount.to_f < @event.minimum_donation
-  end
-
   def signed_in_as_buyer?
     @signed_in_account && @signed_in_account.id == @account.id
   end
@@ -356,14 +305,14 @@ class OrderBuilder
   end
 
   def ignore_dandelion_donation?
-    @event.donations_to_dandelion? && !payment_method_object&.platform_donations
+    @quote.ignore_dandelion_donation?
   end
 
   def create_order
     @order = Order.create!(
       event: @event,
       account: @account,
-      currency: payment_method_object&.order_currency_for(@event) || @event.currency,
+      currency: @quote.currency,
       organisation_revenue_share: @event.organisation_revenue_share,
       revenue_sharer: (@event.revenue_sharer_organisationship.account if @event.revenue_sharer_organisationship),
       opt_in_organisation: @opt_in_organisation,
@@ -374,7 +323,7 @@ class OrderBuilder
       cohost: @cohost,
       affiliate_type: @affiliate_type,
       affiliate_id: @affiliate_id,
-      discount_code_id: @discount_code_id,
+      discount_code_id: @quote.discount_code&.id,
       hear_about: @hear_about,
       via: @via,
       http_referrer: @http_referrer,
@@ -390,6 +339,8 @@ class OrderBuilder
   end
 
   def create_tickets
+    # The prices chosen for range and pay-what-you-want ticket types, which Quote has checked
+    prices = @quote.lines.to_h { |line| [line.key, line.chosen_price] }
     purchased = Hash.new(0)
     available = {}
     @quantities.each do |ticket_type_id, quantity|
@@ -417,8 +368,7 @@ class OrderBuilder
         @order.destroy
         raise NotEnoughTickets
       end
-      # check_prices has checked it
-      price = @ticket_prices[ticket_type_id] if ticket_type.range || ticket_type.price.nil?
+      price = prices[ticket_type_id] if ticket_type.range || ticket_type.price.nil?
       quantity.times do
         @order.tickets.create!(
           event: @event,
@@ -437,32 +387,28 @@ class OrderBuilder
     raise NoTickets
   end
 
+  # As the quote worked them out (Quote says in what order, and why)
   def apply_donation_and_discounts
-    if @event.donations_to_dandelion?
-      # A donation to Dandelion is our fee, not the organisation's revenue, so credit and fixed discounts pay only for
-      # the tickets: they're applied first, and the donation is added to what's left to pay
-      apply_credit_and_fixed_discount
-      # Without a donation_amount, the smallest donation to Dandelion, once what's left of the tickets' price is known
-      @donation_amount = @event.default_dandelion_donation(@order.total) if @default_dandelion_donation && @donation_amount.nil?
-      # Tickets that credit or a fixed discount paid for in full complete without a payment, which a donation to
-      # Dandelion needs
-      tickets_paid_for = @order.discounted_ticket_revenue.positive? && @order.total <= 0
-      create_donation unless tickets_paid_for
-    else
-      create_donation
-      apply_credit_and_fixed_discount
-    end
+    check_quote
+    @order.donations.create!(event: @event, account: @account, amount: @quote.donation) if @quote.donation
+    discounts = { credit_applied: @quote.credit_applied, fixed_discount_applied: @quote.fixed_discount_applied }.compact
+    @order.set(discounts) if discounts.any?
     @order.set(original_description: @order.description)
   end
 
-  def create_donation
-    @order.donations.create!(event: @event, account: @account, amount: @donation_amount) if @donation_amount.to_f > 0 && !ignore_dandelion_donation?
-  end
+  def check_quote
+    # Another order used up the code since the quote, so the order dropped it (Order's before_validation): refused as the
+    # quote would refuse it now, as a fixed discount would otherwise still be applied
+    if @quote.discount_code && @order.discount_code_id != @quote.discount_code.id
+      @order.destroy
+      raise DiscountCodeInvalid, "The discount code #{@quote.discount_code.code} has been used up."
+    end
 
-  def apply_credit_and_fixed_discount
-    # Credit belongs to the order account; only apply it if that account is signed in.
-    @order.apply_credit if signed_in_as_buyer?
-    @order.apply_fixed_discount
+    return if @order.discounted_ticket_revenue == @quote.discounted_ticket_revenue &&
+              @order.percentage_discount == @quote.percentage_discount &&
+              @order.percentage_discount_monthly_donor == @quote.percentage_discount_monthly_donor
+
+    raise QuoteMismatch, "Order #{@order.id}'s tickets came to #{@order.discounted_ticket_revenue.format}, not the quote's #{@quote.discounted_ticket_revenue.format}"
   end
 
   def process_payment

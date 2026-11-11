@@ -56,58 +56,82 @@ $(function () {
     }
   }).change()
 
-  function priceWithoutDonation () {
-    let p = 0
+  // What the form's choices cost: the server works it out (POST /e/:slug/quote, Quote) and the form shows it. A quote
+  // is asked for a moment after the last change, and only the latest one asked for is shown. Until it comes, the
+  // totals fade back and the payment buttons wait, so nothing is booked at a price the buyer hasn't seen. Without a
+  // quote for the choices as they are (it was refused, or couldn't be had), the buttons stay disabled, as they'd still
+  // show the last quote's amount
+  let quote = null
+  let quoteSequence = 0
+  let quoteTimer = null
+  let quotePending = false
+  let purchaseSubmitting = false
+  const QUOTE_RETRIES = 3
+  const QUOTE_RETRY_DELAY = 2000
 
-    $('select[name^=quantities]').each(function () {
-      p += (parseInt($(this).val()) * parseFloat($(this).attr('data-price') || 0))
-    })
-
-    if ($('#percentage_discount').length > 0 && $('#percentage_discount').val() !== '') { p = (p * (100 - parseInt($('#percentage_discount').val())) / 100) }
-
-    if ($('#discount').length > 0 && $('#discount').val() !== '') { p = (p * (100 - parseInt($('#discount').val())) / 100) }
-
-    return p
+  function syncPaymentButtonsDisabled () {
+    $('#details form button[data-payment-method]').prop('disabled', purchaseSubmitting || quotePending || !quote)
   }
 
-  function donation () {
-    if ($('#donation_amount').length > 0 && $('#donation_amount').val() !== '') { return parseFloat($('#donation_amount').val()) }
-    return 0
-  }
-
-  function price () {
-    if (ticketsPaidFor()) { return priceWithoutDonation() }
-    return priceWithoutDonation() + donation()
-  }
-
-  function credit () {
-    let c = 0
-
-    if ($('#credit').length > 0 && $('#credit').val() !== '') { c += parseFloat($('#credit').val()) }
-
-    return c
-  }
-
-  function fixedDiscount () {
-    let d = 0
-
-    if ($('#fixed-discount').length > 0 && $('#fixed-discount').val() !== '') { d += parseFloat($('#fixed-discount').val()) }
-
-    return d
-  }
-
-  // As OrderBuilder#apply_donation_and_discounts: a donation to Dandelion is our fee, so credit and fixed discounts pay
-  // only for the tickets, and tickets they pay for in full complete without a payment, so without the donation
-  function ticketsPaidFor () {
-    return !!config.donationsToDandelion && priceWithoutDonation() > 0 && (priceWithoutDonation() - credit() - fixedDiscount()) <= 0
-  }
-
-  function balance () {
-    if (config.donationsToDandelion) {
-      if (ticketsPaidFor()) { return 0 }
-      return Math.max(0, priceWithoutDonation() - credit() - fixedDiscount()) + donation()
+  function showQuoteError (message) {
+    const $error = $('#quote-error')
+    if (message) {
+      $error.text(message).show()
+    } else {
+      $error.hide()
     }
-    return Math.max(0, price() - credit() - fixedDiscount())
+  }
+
+  function setQuotePending (pending) {
+    quotePending = pending
+    $('#totalDisplay, #balance').attr('aria-busy', pending ? 'true' : null)
+    syncPaymentButtonsDisabled()
+  }
+
+  // attempt: how many times this quote has been retried after the request failed
+  function requestQuote (attempt) {
+    attempt = attempt || 0
+    clearTimeout(quoteTimer)
+    const sequence = ++quoteSequence
+    setQuotePending(true)
+    $.post('/e/' + config.eventSlug + '/quote', {
+      ticketForm: $('#ticket-types form').serializeObject()
+    }).done(function (data) {
+      if (sequence !== quoteSequence) { return }
+      quote = data
+      // A percent button's donation follows the tickets' price, so it's asked for again with the new donation
+      if (setDonationAmount()) {
+        requestQuote()
+        return
+      }
+      showQuoteError(null)
+      showQuote()
+      setQuotePending(false)
+    }).fail(function (xhr) {
+      if (sequence !== quoteSequence) { return }
+      quote = null
+      $('#totalDisplay, #balance').val('')
+      const json = xhr.responseJSON
+      if (xhr.status >= 400 && xhr.status < 500 && json && json.error) {
+        // The choices can't be booked as they are (a price outside its range, say), so the buyer changes them
+        showQuoteError(json.error)
+        setQuotePending(false)
+      } else if (attempt < QUOTE_RETRIES) {
+        // The request failed (the connection, or the server): it's tried again, and a change asks afresh
+        showQuoteError('Updating the price…')
+        quoteTimer = setTimeout(function () { requestQuote(attempt + 1) }, QUOTE_RETRY_DELAY)
+      } else {
+        showQuoteError("The price couldn't be updated. Check your connection and change your choices, or reload the page, to try again.")
+        setQuotePending(false)
+      }
+    })
+  }
+
+  function scheduleQuote () {
+    clearTimeout(quoteTimer)
+    quoteSequence++
+    setQuotePending(true)
+    quoteTimer = setTimeout(requestQuote, 250)
   }
 
   $donationAmount.focus(function () {
@@ -160,12 +184,12 @@ $(function () {
   $('#donation-percent-buttons button').click(function () {
     $('#donation-percent-buttons button').removeClass('active selected-percent')
     $(this).addClass('active selected-percent')
-    setTotal()
+    if (quote) { setDonationAmount() }
+    requestQuote()
   })
 
-  function updateDonationPercentButtons () {
-    const p = priceWithoutDonation()
-
+  // p: the tickets' price after percentage discounts, from the quote
+  function updateDonationPercentButtons (p) {
     // Event::DANDELION_DONATION_HIGHER_PRICE_UNITS
     const isHighPrice = config.dandelionDonationHigherPriceOver != null && p > config.dandelionDonationHigherPriceOver
 
@@ -180,29 +204,31 @@ $(function () {
     })
   }
 
+  // The selected percent button's donation, of the quote's tickets. Says whether it changed the donation
   function setDonationAmount () {
-    const p = priceWithoutDonation()
+    const p = quote.tickets
 
-    updateDonationPercentButtons()
+    updateDonationPercentButtons(p)
 
     const dp = $('#donation-percent-buttons button.selected-percent').data('active-percent')
+    if (typeof dp === 'undefined') { return false }
 
-    if (typeof dp !== 'undefined') {
-      const donationAmount = parseFloat(p * (dp / 100))
-      if (config.minimumApplicationFee && donationAmount < config.minimumApplicationFee) {
-        $('#donation-percent-buttons button').removeClass('active')
-        setDonationAmountValue(config.minimumApplicationFee)
-      } else {
-        $('#donation-percent-buttons button.selected-percent').addClass('active')
-        setDonationAmountValue(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
-      }
+    const previousValue = currentDonationAmountValue()
+    const donationAmount = parseFloat(p * (dp / 100))
+    if (config.minimumApplicationFee && donationAmount < config.minimumApplicationFee) {
+      $('#donation-percent-buttons button').removeClass('active')
+      setDonationAmountValue(config.minimumApplicationFee)
+    } else {
+      $('#donation-percent-buttons button.selected-percent').addClass('active')
+      setDonationAmountValue(donationAmount.toFixed(2).endsWith('00') ? donationAmount.toFixed(0) : donationAmount.toFixed(2))
     }
+    return currentDonationAmountValue() !== previousValue
   }
 
-  function setTotal () {
-    setDonationAmount()
-    const p = price()
-    const b = balance()
+  // Tickets and donation before credit and a fixed discount (Total), and what's left to pay (Balance)
+  function showQuote () {
+    const p = quote.subtotal
+    const b = quote.total
 
     $('#totalDisplay').val((+p).toFixed(2))
     $('#balance').val((+b).toFixed(2))
@@ -217,11 +243,10 @@ $(function () {
     if (p === 0) {
       $rsvp.show()
       $paid.hide()
-    } else if (b === 0) {
+    } else if (!quote.payment_required) {
       $rsvp.show().find('span').text('Use credit')
       $paid.hide()
-    } else if (b > 0) {
-      $('#balance').val((+b).toFixed(2))
+    } else {
       $firstPaidButton.removeClass('btn-outline-primary').addClass('btn-primary')
       $rsvp.hide()
       $paid.show()
@@ -232,10 +257,8 @@ $(function () {
     $('input[type=hidden][name=payment_method]').prop('disabled', true)
       .filter(function () { return this.value === method }).prop('disabled', false)
   }
-  $('select[name^=quantities], #donation_amount').change(function () {
-    setTotal()
-  })
-  setTotal()
+  $('select[name^=quantities], #donation_amount').change(scheduleQuote)
+  requestQuote()
 
   function syncQuantitySelectPointerEvents ($selects) {
     $selects.each(function () {
@@ -331,7 +354,6 @@ $(function () {
     $(this).attr('data-payment-method-clicked', true)
   })
 
-  let purchaseSubmitting = false
   // What the buyer has confirmed, embedded, by pressing again: booking again though they have a ticket, and an email
   // that looks mistyped. Both are for the email they confirmed them for
   let embeddedConfirmed = {}
@@ -340,7 +362,7 @@ $(function () {
   })
   $(window).on('pageshow', function () {
     purchaseSubmitting = false
-    $('#details form button[data-payment-method]').prop('disabled', false)
+    syncPaymentButtonsDisabled()
     $('#details form button[data-payment-method-clicked] i').hide()
   })
   $('#details form').submit(function () {
@@ -350,16 +372,11 @@ $(function () {
       $('#purchase-alert').hide()
     }
 
-    if (!$('input[type=hidden][name=payment_method][value=rsvp]').prop('disabled')) {
-      setTotal()
-    }
-
     // OrderBuilder checks the rest (tickets chosen, places left, answers, terms, the phone number's country code, an
     // email that looks mistyped), and the form shows what it says is wrong
 
     purchaseSubmitting = true
-    $('#details form button[data-payment-method]').prop('disabled', true)
-    $('#total').val($('#totalDisplay').val())
+    syncPaymentButtonsDisabled()
     $('#details form button[data-payment-method-clicked] i').show()
 
     let method = $('input[type=hidden][name=payment_method]:not(:disabled)').val()
@@ -367,7 +384,8 @@ $(function () {
     if (config.donationsToDandelion && !(config.platformDonationMethods || []).includes(method)) {
       ticketForm.donation_amount = ''
       ticketForm.donation_via_modal = '0'
-      if ((priceWithoutDonation() - credit() - fixedDiscount()) <= 0) {
+      // The order drops the donation, which can leave nothing to pay
+      if (quote && !quote.payment_required_without_donation) {
         method = 'rsvp'
         $('input[type=hidden][name=payment_method]').prop('disabled', true)
         $('input[type=hidden][name=payment_method][value=rsvp]').prop('disabled', false)
@@ -406,9 +424,9 @@ $(function () {
         confirmed_duplicate: confirmed.duplicate ? '1' : '',
         confirmed_email: confirmed.email ? '1' : ''
       }, function (data) {
-        // An order OrderBuilder completed without a payment (credit or a fixed discount paid for the tickets) comes back
-        // with only its id, as an RSVP's does
-        if (data && data.order_id && Object.keys(data).length === 1) {
+        // An order OrderBuilder completed without a payment (credit or a fixed discount paid for the tickets) is
+        // confirmed, as an RSVP is
+        if (data && data.payment_required === false) {
           closePaymentWindow()
           handlers.rsvp(data)
           return
@@ -420,7 +438,7 @@ $(function () {
         closePaymentWindow()
         const enableForm = function () {
           purchaseSubmitting = false
-          $('#details form button[data-payment-method]').prop('disabled', false)
+          syncPaymentButtonsDisabled()
           $('#details form button[data-payment-method-clicked] i').hide()
         }
         // Something to confirm before booking: embedded, by pressing again, as confirm() can't be used there
@@ -433,7 +451,7 @@ $(function () {
             showPurchaseAlert(json.error + ' Press the button again to ' + again + '.')
           } else if (confirm(json.error + ' Press OK to ' + again + ', or Cancel to go back.')) {
             purchaseSubmitting = true
-            $('#details form button[data-payment-method]').prop('disabled', true)
+            syncPaymentButtonsDisabled()
             $('#details form button[data-payment-method-clicked] i').show()
             postPurchase(Object.assign({}, confirmed, { [confirmation]: true }))
           } else if (confirmation === 'email') {

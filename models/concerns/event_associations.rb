@@ -96,6 +96,14 @@ module EventAssociations
     organisationship
   end
 
+  # The percentage a monthly donor's order takes off, unless the event has no discounts. Orders take it unless their
+  # discount code takes a percentage off (Order, Quote)
+  def monthly_donor_discount(account)
+    return if no_discounts
+
+    organisationship_for_discount(account)&.monthly_donor_discount
+  end
+
   def revenue_sharer_organisationship
     organisation.organisationships.find_by(:account => revenue_sharer, :stripe_connect_json.ne => nil) if organisation && revenue_sharer
   end
