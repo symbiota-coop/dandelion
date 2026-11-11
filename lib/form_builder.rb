@@ -25,14 +25,6 @@ module Padrino
           input_block(fieldname, 'form-control', **block_options) { |attrs| url_field(fieldname, placeholder: placeholder, **attrs) }
         end
 
-        # A field for setting a new password: new-password stops browsers filling in the saved one, which would change
-        # nothing but re-hash it at full BCrypt cost (about 350 ms) on every save
-        def password_block(fieldname, placeholder: nil, **block_options)
-          input_block(fieldname, 'form-control', **block_options) do |attrs|
-            password_field(fieldname, autocomplete: 'new-password', placeholder: placeholder, **attrs)
-          end
-        end
-
         # Never sends a saved secret back to the browser: the field starts empty with the last 4 characters as a placeholder,
         # mass_assigning keeps the saved value when it's left blank, and Remove clears it. A saved secret is never required
         def secret_block(fieldname, required: false, disabled: false, hint: nil, container_class: 'mb-3', **layout)

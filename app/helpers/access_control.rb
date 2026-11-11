@@ -68,13 +68,6 @@ Dandelion::App.helpers do
     end
   end
 
-  def organisation_monthly_donor_plus?(organisation = nil, account = current_account)
-    organisation ||= @organisation
-    cached_permission(:@organisation_monthly_donor_plus_cache, organisation, account) do
-      Organisation.monthly_donor_plus?(organisation, account)
-    end
-  end
-
   def activity_admin?(activity = nil, account = current_account)
     activity ||= @activity
     cached_permission(:@activity_admin_cache, activity, account) do

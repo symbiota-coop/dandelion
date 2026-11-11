@@ -24,9 +24,5 @@ module OrganisationAccessControl
       Activityship.and(account: account, admin: true, :activity_id.in => organisation.activities.pluck(:id)).exists? ||
         LocalGroupship.and(account: account, admin: true, :local_group_id.in => organisation.local_groups.pluck(:id)).exists?
     end
-
-    def monthly_donor_plus?(organisation, account)
-      account && organisation && (Organisation.admin?(organisation, account) || organisation.organisationships.find_by(:account => account, :monthly_donation_method.ne => nil))
-    end
   end
 end
