@@ -1,7 +1,6 @@
 Dandelion::App.controller do
   get '/g/:slug/budget' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @spend = Spend.new
     if request.xhr?
@@ -13,7 +12,6 @@ Dandelion::App.controller do
 
   post '/g/:slug/spends/new' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @spend = @gathering.spends.new(mass_assigning(params[:spend], Spend))
     @spend.account = current_account unless gathering_admin?
@@ -26,7 +24,6 @@ Dandelion::App.controller do
 
   get '/g/:slug/spends/:id/edit' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @spend = @gathering.spends.find(params[:id]) || not_found
     erb :'budget/build'
@@ -34,7 +31,6 @@ Dandelion::App.controller do
 
   post '/g/:slug/spends/:id/edit' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @spend = @gathering.spends.find(params[:id]) || not_found
     spend_params = (params[:spend] || {}).dup
@@ -48,7 +44,6 @@ Dandelion::App.controller do
 
   post '/g/:slug/spends/:id/destroy' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @spend = @gathering.spends.find(params[:id]) || not_found
     @spend.destroy
@@ -58,7 +53,6 @@ Dandelion::App.controller do
   post '/g/:slug/spends/:id/reimbursed' do
     @gathering = gathering_from_params || not_found
     @spend = @gathering.spends.find(params[:id]) || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @spend.set(reimbursed: params[:reimbursed])
     200
@@ -67,7 +61,6 @@ Dandelion::App.controller do
   post '/g/:slug/teams/:id/budget' do
     @gathering = gathering_from_params || not_found
     @team = @gathering.teams.find(params[:id]) || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team.set(budget: params[:budget])
     200
@@ -75,7 +68,6 @@ Dandelion::App.controller do
 
   get '/g/:slug/payments' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     erb :'budget/payments'
   end

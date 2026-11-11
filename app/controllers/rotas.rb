@@ -23,7 +23,6 @@ Dandelion::App.controller do
 
   get '/g/:slug/rotas' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     redirect "/g/#{@gathering.slug}/rotas/#{@gathering.rotas.first.id}" if @gathering.rotas.count == 1
     erb :'rotas/rotas'
@@ -31,7 +30,6 @@ Dandelion::App.controller do
 
   get '/g/:slug/rotas/:id', provides: [:html, :csv] do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @rota = @gathering.rotas.find(params[:id]) || not_found
 
@@ -215,7 +213,6 @@ Dandelion::App.controller do
 
   post '/g/:slug/shifts/create' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @rota = @gathering.rotas.find(params[:rota_id]) || not_found
     role = (@rota.roles.find(params[:role_id]) if params[:role_id]) || not_found

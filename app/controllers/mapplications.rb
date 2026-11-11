@@ -1,7 +1,6 @@
 Dandelion::App.controller do
   get '/g/:slug/mapplications/:id' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @mapplication = @gathering.mapplications.find(params[:id]) || not_found
     if request.xhr?
@@ -14,7 +13,6 @@ Dandelion::App.controller do
   get '/g/:slug/mapplication_row/:id' do
     @gathering = gathering_from_params || not_found
     @mapplication = @gathering.mapplications.find(params[:id]) || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     partial :'mapplications/mapplication_row', locals: { mapplication: @mapplication }
   end
@@ -78,7 +76,6 @@ Dandelion::App.controller do
 
   get '/g/:slug/applications' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @mapplications = @gathering.mapplications.pending
     @mapplications = @mapplications.and(:account_id.in => Account.search(params[:q], child_scope: @mapplications, regex_search: true).pluck(:id)) if params[:q]
@@ -87,14 +84,12 @@ Dandelion::App.controller do
 
   get '/g/:slug/threshold' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     partial :'mapplications/threshold'
   end
 
   post '/g/:slug/threshold' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @membership.desired_threshold = params[:desired_threshold]
     @membership.save!
@@ -103,7 +98,6 @@ Dandelion::App.controller do
 
   get '/g/:slug/applications/paused' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @mapplications = @gathering.mapplications.paused
     erb :'mapplications/paused'

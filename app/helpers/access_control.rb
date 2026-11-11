@@ -331,9 +331,17 @@ Dandelion::App.helpers do
     site_admins && gathering && request.get? && admin?(account)
   end
 
+  # The account's membership of the gathering, kept in @membership when it's the viewer's of @gathering, so a route that
+  # checks membership needn't look it up again
+  def find_membership(gathering, account)
+    membership = gathering.memberships.find_by(account: account) if account && gathering
+    @membership = membership if gathering && gathering == @gathering && account == current_account
+    membership
+  end
+
   def membership_required!(gathering = nil, account = current_account, site_admins: true)
     gathering ||= @gathering
-    return if account && gathering && gathering.memberships.find_by(account: account)
+    return if find_membership(gathering, account)
     return if site_admin_browsing_gathering?(gathering, account, site_admins: site_admins)
 
     kick!(
@@ -344,7 +352,8 @@ Dandelion::App.helpers do
 
   def confirmed_membership_required!(gathering = nil, account = current_account, site_admins: true)
     gathering ||= @gathering
-    return if account && gathering && (membership = gathering.memberships.find_by(account: account)) && membership.confirmed?
+    membership = find_membership(gathering, account)
+    return if membership&.confirmed?
     return if !membership && site_admin_browsing_gathering?(gathering, account, site_admins: site_admins)
 
     kick!(

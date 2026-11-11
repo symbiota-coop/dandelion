@@ -1,7 +1,6 @@
 Dandelion::App.controller do
   post '/g/:slug/options/new' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
     params[:option].delete(:cost) if params[:option] && !gathering_admin?
     @option = @gathering.options.build(mass_assigning(params[:option], Option))
@@ -28,7 +27,6 @@ Dandelion::App.controller do
 
   get '/g/:slug/options' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
     if request.xhr?
       partial :'options/options'
@@ -39,7 +37,6 @@ Dandelion::App.controller do
 
   get '/g/:slug/options/:id' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
     @option = @gathering.options.find(params[:id]) || not_found
     partial :'options/option_modal'

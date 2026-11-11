@@ -27,7 +27,6 @@ Dandelion::App.controller do
 
   post '/g/:slug/pay', provides: :json do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
 
     pm = GatheringPaymentMethod.object(params[:payment_method].to_s)
@@ -39,7 +38,6 @@ Dandelion::App.controller do
 
   get '/g/:slug/payments/:payment_id', provides: :json do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
     @payment = @gathering.payments.find(params[:payment_id])
     @gathering.check_evm_account if @payment.evm_secret && @gathering.evm_address

@@ -1,7 +1,6 @@
 Dandelion::App.controller do
   get '/g/:slug/teams/new' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team = Team.new
     erb :'teams/build'
@@ -9,7 +8,6 @@ Dandelion::App.controller do
 
   post '/g/:slug/teams/new' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team = @gathering.teams.build(mass_assigning(params[:team], Team))
     @team.account = current_account
@@ -23,7 +21,6 @@ Dandelion::App.controller do
 
   get '/g/:slug/teams' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     if request.xhr?
       partial :'teams/teams'
@@ -34,7 +31,6 @@ Dandelion::App.controller do
 
   get '/g/:slug/teams/:id' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
     if request.xhr?
@@ -46,7 +42,6 @@ Dandelion::App.controller do
 
   get '/g/:slug/teams/:id/edit' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
     erb :'teams/build'
@@ -54,7 +49,6 @@ Dandelion::App.controller do
 
   post '/g/:slug/teams/:id/edit' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
     if @team.update_attributes(mass_assigning(params[:team], Team))
@@ -66,7 +60,6 @@ Dandelion::App.controller do
 
   post '/g/:slug/teams/:id/destroy' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
     @team.destroy
@@ -84,7 +77,6 @@ Dandelion::App.controller do
   post '/g/:slug/teamships/:id/destroy' do
     @gathering = gathering_from_params || not_found
     @teamship = @gathering.teamships.find(params[:id]) || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     halt unless (@teamship.account.id == current_account.id) || gathering_admin?
     @teamship.destroy
@@ -106,7 +98,6 @@ Dandelion::App.controller do
 
   get '/g/:slug/teams/:id/unsubscribe' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
     @teamship = @team.teamships.find_by(account: current_account)
@@ -117,7 +108,6 @@ Dandelion::App.controller do
     @gathering = gathering_from_params || not_found
     @teamship = @gathering.teamships.find(params[:id]) || not_found
     @team = @teamship.team
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     halt unless (@teamship.account.id == current_account.id) || gathering_admin?
     partial :'teams/subscribe', locals: { teamship: @teamship }
@@ -127,7 +117,6 @@ Dandelion::App.controller do
     @gathering = gathering_from_params || not_found
     @teamship = @gathering.teamships.find(params[:id]) || not_found
     @team = @teamship.team
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     halt unless (@teamship.account.id == current_account.id) || gathering_admin?
     @teamship.set(unsubscribed: false)
@@ -143,7 +132,6 @@ Dandelion::App.controller do
     @gathering = gathering_from_params || not_found
     @teamship = @gathering.teamships.find(params[:id]) || not_found
     @team = @teamship.team
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     halt unless (@teamship.account.id == current_account.id) || gathering_admin?
     @teamship.set(unsubscribed: true)

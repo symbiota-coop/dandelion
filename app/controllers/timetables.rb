@@ -23,7 +23,6 @@ Dandelion::App.controller do
 
   get '/g/:slug/timetables' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     erb :'timetables/timetables'
   end
@@ -131,7 +130,6 @@ Dandelion::App.controller do
   post '/g/:slug/tactivities/create' do
     @gathering = gathering_from_params || not_found
     @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @tactivity = Tactivity.new(mass_assigning(params[:tactivity], Tactivity))
     @tactivity.timetable = @timetable
@@ -156,7 +154,6 @@ Dandelion::App.controller do
   get '/g/:slug/tactivities/:id/edit' do
     @gathering = gathering_from_params || not_found
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     erb :'timetables/tactivity_build'
   end
@@ -164,7 +161,6 @@ Dandelion::App.controller do
   post '/g/:slug/tactivities/:id/edit' do
     @gathering = gathering_from_params || not_found
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     if @tactivity.update_attributes(mass_assigning(params[:tactivity], Tactivity))
       redirect "/g/#{@gathering.slug}/timetables/#{@tactivity.timetable_id}"
@@ -220,7 +216,6 @@ Dandelion::App.controller do
   get '/g/:slug/tactivities/:id/attendees' do
     @gathering = gathering_from_params || not_found
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     partial :'timetables/attendees', locals: { tactivity: @tactivity }
   end
@@ -228,7 +223,6 @@ Dandelion::App.controller do
   post '/g/:slug/tactivities/:id/attend' do
     @gathering = gathering_from_params || not_found
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @tactivity.attendances.create account: current_account
     request.xhr? ? 200 : redirect(back)
@@ -237,7 +231,6 @@ Dandelion::App.controller do
   post '/g/:slug/tactivities/:id/unattend' do
     @gathering = gathering_from_params || not_found
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @tactivity.attendances.find_by(account: current_account).try(:destroy)
     request.xhr? ? 200 : redirect(back)

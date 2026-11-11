@@ -1,7 +1,6 @@
 Dandelion::App.controller do
   get '/g/:slug/members', provides: %i[html csv] do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @memberships = @gathering.memberships
     @member_filters = @gathering.member_filters
@@ -94,7 +93,6 @@ Dandelion::App.controller do
 
   post '/g/:slug/leave' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
     flash[:notice] = "You left #{@gathering.name}"
     @membership.destroy
@@ -189,14 +187,12 @@ Dandelion::App.controller do
   get '/g/:slug/membership_row/:id' do
     @gathering = gathering_from_params || not_found
     membership = @gathering.memberships.find(params[:id]) || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     partial :'gatherings/membership_row', locals: { membership: membership }
   end
 
   get '/g/:slug/memberships/:id' do
     @gathering = gathering_from_params || not_found
-    @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @membership = @gathering.memberships.find(params[:id]) || not_found
     # It opens in a modal on the members page; visited directly, it goes to that page
