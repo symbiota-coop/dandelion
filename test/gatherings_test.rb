@@ -776,4 +776,29 @@ class GatheringsTest < ActiveSupport::TestCase
     member = Account.find_by(email: 'new.member@example.com')
     assert @gathering.memberships.find_by(account: member, added_by: @account)
   end
+
+  test "members can't change or remove another member's shift, teamship or optionship, nor can anyone signed out" do
+    create_gathering
+    member = create_member
+    other = create_member(name: 'Other Person')
+    rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
+    shift = Shift.create!(account: other, role: Role.create!(name: 'Cook', rota: rota), rslot: Rslot.create!(name: 'Morning', rota: rota), rota: rota)
+    team = @gathering.teams.create!(name: 'Garden', account: @account)
+    teamship = team.teamships.create!(account: other, gathering: @gathering)
+    optionship = Optionship.create!(account: other, option: @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account), gathering: @gathering)
+
+    sign_in_with_rack(member)
+    post "/g/#{@gathering.slug}/shifts/#{shift.id}/destroy"
+    assert_equal 403, last_response.status
+    post "/g/#{@gathering.slug}/teamships/#{teamship.id}/destroy"
+    assert_equal 403, last_response.status
+    post "/g/#{@gathering.slug}/optionships/#{optionship.id}/destroy"
+    assert_equal 403, last_response.status
+    assert [Shift.find(shift.id), Teamship.find(teamship.id), Optionship.find(optionship.id)].all?
+
+    clear_cookies
+    post "/g/#{@gathering.slug}/optionships/#{optionship.id}/destroy"
+    assert_equal 403, last_response.status
+    assert Optionship.find(optionship.id)
+  end
 end

@@ -226,7 +226,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
     @shift = @gathering.shifts.find(params[:id]) || not_found
-    halt unless (@shift.account && (@shift.account_id == current_account.id)) || gathering_admin?
+    own_or_gathering_admins_only!(@shift)
     request.xhr? ? partial(:'gatherings/modal_content', locals: { title: "#{@shift.account.name}'s #{@shift.rota.name} shift", form: :'rotas/shift_form' }) : erb(:'rotas/shift')
   end
 
@@ -235,7 +235,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
     @shift = @gathering.shifts.find(params[:id]) || not_found
-    halt unless (@shift.account && (@shift.account_id == current_account.id)) || gathering_admin?
+    own_or_gathering_admins_only!(@shift)
     shift_params = (params[:shift] || {}).dup
     shift_params.delete(:account_id) unless gathering_admin?
     if @shift.update_attributes(mass_assigning(shift_params, Shift))
@@ -251,7 +251,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
     @shift = @gathering.shifts.find(params[:id]) || not_found
-    halt unless (@shift.account && (@shift.account_id == current_account.id)) || gathering_admin?
+    own_or_gathering_admins_only!(@shift)
     @shift.destroy
     request.xhr? ? 200 : redirect("/g/#{@gathering.slug}/rotas/#{@shift.rota_id}")
   end

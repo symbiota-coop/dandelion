@@ -58,7 +58,7 @@ Dandelion::App.controller do
 
   post '/g/:slug/join' do
     @gathering = gathering_from_params || not_found
-    halt unless @gathering.privacy == 'open'
+    halt 403 unless @gathering.privacy == 'open'
 
     if current_account
       @account = current_account

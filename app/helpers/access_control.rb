@@ -271,6 +271,12 @@ Dandelion::App.helpers do
     kick!(redirect_url: "/g/#{@gathering.slug}") unless gathering_admin?
   end
 
+  # For a gathering record that's someone's own (a shift, teamship or optionship): refuses anyone but them and the
+  # gathering's admins
+  def own_or_gathering_admins_only!(record)
+    halt 403 unless (current_account && record.account_id == current_account.id) || gathering_admin?
+  end
+
   def comment_admin?(comment = nil, account = current_account)
     comment ||= @comment
     cached_permission(:@comment_admin_cache, comment, account) do

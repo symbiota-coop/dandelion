@@ -116,7 +116,7 @@ Dandelion::App.controller do
   post '/g/:slug/verdicts/:id/destroy' do
     @gathering = gathering_from_params || not_found
     @verdict = @gathering.verdicts.find(params[:id]) || not_found
-    halt unless @verdict.account.id == current_account.id
+    halt 403 unless current_account && @verdict.account_id == current_account.id
     @verdict.destroy
     200
   end

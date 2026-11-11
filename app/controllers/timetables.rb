@@ -184,7 +184,7 @@ Dandelion::App.controller do
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
-    halt unless gathering_admin? || @tactivity.timetable.scheduling_by_all
+    halt 403 unless gathering_admin? || @tactivity.timetable.scheduling_by_all
     @tactivity.tslot_id = params[:tslot_id]
     @tactivity.space_id = params[:space_id]
     @tactivity.scheduled_by = current_account
@@ -199,7 +199,7 @@ Dandelion::App.controller do
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
-    halt unless gathering_admin? || @tactivity.timetable.scheduling_by_all
+    halt 403 unless gathering_admin? || @tactivity.timetable.scheduling_by_all
     @tactivity.tslot_id = nil
     @tactivity.space_id = nil
     @tactivity.scheduled_by = current_account

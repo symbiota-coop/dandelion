@@ -88,7 +88,7 @@ Dandelion::App.controller do
     @gathering = gathering_from_params || not_found
     @optionship = @gathering.optionships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
-    halt unless (@optionship.account.id == current_account.id) || gathering_admin?
+    own_or_gathering_admins_only!(@optionship)
     @optionship.destroy
     request.xhr? ? 200 : redirect("/g/#{@gathering.slug}/options")
   end
