@@ -72,21 +72,7 @@ Dandelion::App.controller do
   get '/o/:organisation_slug/a/:slug/events/stats' do
     @activity = activity_from_params || not_found
     activity_admins_only!
-    @from = params[:from] ? parse_date(params[:from]) : Date.today
-    @to = params[:to] ? parse_date(params[:to]) : nil
-    @start_or_end = (params[:start_or_end] == 'end' ? 'end' : 'start')
-    @events = @activity.events.without_heavy_fields
-    @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order("#{@start_or_end}_time asc")
-    @events = apply_event_stats_date_filter(@events, from: @from, to: @to, start_or_end: @start_or_end, include_evergreen: params[:evergreen])
-    @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]
-    @events = @events.and(coordinator_id: nil) if params[:no_coordinator]
-    @events = @events.and(:id.nin => EventFacilitation.pluck(:event_id)) if params[:no_facilitators]
-    unless params[:online] && params[:in_person]
-      @events = @events.online if params[:online]
-      @events = @events.in_person if params[:in_person]
-    end
-    @events = filter_events_by_search_and_tags(@events)
-    event_stats_page(@activity.organisation)
+    subgroup_event_stats_page(@activity)
   end
 
   get '/o/:organisation_slug/a/:slug/edit' do
@@ -103,7 +89,7 @@ Dandelion::App.controller do
       redirect @activity.path
     else
       @edit_path = "/o/#{params[:organisation_slug]}/a/#{params[:slug]}/edit" # Use the original slugs for the form action, not the (possibly invalid) in-memory ones
-      flash.now[:error] = 'There was an error saving the activity.'
+      flash.now[:error] = 'There was an error saving the activity'
       erb :'activities/build'
     end
   end
@@ -192,19 +178,8 @@ Dandelion::App.controller do
   post '/o/:organisation_slug/a/:slug/activityship' do
     sign_in_required!
     @activity = activity_from_params || not_found
-    if (activityship = current_account.activityships.find_by(activity: @activity)) || @activity.privacy == 'open'
-      case params[:f]
-      when 'not_following'
-        activityship = current_account.activityships.find_by(activity: @activity)
-        activityship.destroy if activityship && !activityship.admin?
-      when 'follow_without_subscribing'
-        activityship = current_account.activityships.find_by(activity: @activity) || current_account.activityships.create(activity: @activity)
-        activityship.set(unsubscribed: true)
-      when 'follow_and_subscribe'
-        activityship = current_account.activityships.find_by(activity: @activity) || current_account.activityships.create(activity: @activity)
-        activityship.set(unsubscribed: false)
-      end
-    end
+    # Only open activities can be joined without an admin
+    set_own_subgroupship(@activity, :activityships, params[:f]) if @activity.activityships.find_by(account: current_account) || @activity.privacy == 'open'
     request.xhr? ? 200 : redirect(@activity.path)
   end
 
@@ -227,32 +202,19 @@ Dandelion::App.controller do
   get '/o/:organisation_slug/a/:slug/followers', provides: %i[html csv] do
     @activity = activity_from_params || not_found
     activity_admins_only!
-    @activityships = @activity.activityships.includes(:account).order('created_at desc')
-    @activityships = @activityships.and(:account_id.in => Account.search(params[:q], child_scope: @activityships).pluck(:id)) if params[:q]
-    @activityships = @activityships.and(unsubscribed: false, :account_id.nin => @activity.organisation.mailer_unsubscribed_member_ids) if params[:subscribed_to_mailer]
     case content_type
     when :html
-      @activityships = @activityships.paginate(page: params[:page], per_page: 25)
+      @activityships = subgroup_followers(@activity, :activityships).paginate(page: params[:page], per_page: 25)
       erb :'activities/followers'
     when :csv
-      @activity.send_followers_csv(current_account, :activityships)
-      flash[:notice] = 'You will receive the CSV via email shortly.'
-      redirect back
+      send_subgroup_followers_csv(@activity, :activityships)
     end
   end
 
   post '/o/:organisation_slug/a/:slug/followers' do
     @activity = activity_from_params || not_found
     activity_admins_only!
-    halt 400 unless params[:csv].is_a?(Tempfile)
-    csv = ImportFromCsv.read(params[:csv])
-    if (error = ImportFromCsv.error(csv))
-      flash[:error] = error
-    else
-      @activity.import_from_csv(csv, :activityships)
-      flash[:notice] = 'The followers will be added shortly. Refresh the page to check progress.'
-    end
-    redirect "#{@activity.path}/followers"
+    import_subgroup_followers(@activity, :activityships)
   end
 
   post '/activityships/:id/destroy' do

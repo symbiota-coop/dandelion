@@ -44,21 +44,7 @@ Dandelion::App.controller do
   get '/o/:organisation_slug/lg/:slug/events/stats' do
     @local_group = local_group_from_params || not_found
     local_group_admins_only!
-    @from = params[:from] ? parse_date(params[:from]) : Date.today
-    @to = params[:to] ? parse_date(params[:to]) : nil
-    @start_or_end = (params[:start_or_end] == 'end' ? 'end' : 'start')
-    @events = @local_group.events.without_heavy_fields
-    @events = params[:order] == 'created_at' ? @events.order('created_at desc') : @events.order("#{@start_or_end}_time asc")
-    @events = apply_event_stats_date_filter(@events, from: @from, to: @to, start_or_end: @start_or_end, include_evergreen: params[:evergreen])
-    @events = @events.and(coordinator_id: params[:coordinator_id]) if params[:coordinator_id]
-    @events = @events.and(coordinator_id: nil) if params[:no_coordinator]
-    @events = @events.and(:id.nin => EventFacilitation.pluck(:event_id)) if params[:no_facilitators]
-    unless params[:online] && params[:in_person]
-      @events = @events.online if params[:online]
-      @events = @events.in_person if params[:in_person]
-    end
-    @events = filter_events_by_search_and_tags(@events)
-    event_stats_page(@local_group.organisation)
+    subgroup_event_stats_page(@local_group)
   end
 
   get '/o/:organisation_slug/lg/:slug/edit' do
@@ -163,17 +149,7 @@ Dandelion::App.controller do
   post '/o/:organisation_slug/lg/:slug/local_groupship' do
     sign_in_required!
     @local_group = local_group_from_params || not_found
-    case params[:f]
-    when 'not_following'
-      local_groupship = current_account.local_groupships.find_by(local_group: @local_group)
-      local_groupship.destroy if local_groupship && !local_groupship.admin?
-    when 'follow_without_subscribing'
-      local_groupship = current_account.local_groupships.find_by(local_group: @local_group) || current_account.local_groupships.create(local_group: @local_group)
-      local_groupship.set(unsubscribed: true)
-    when 'follow_and_subscribe'
-      local_groupship = current_account.local_groupships.find_by(local_group: @local_group) || current_account.local_groupships.create(local_group: @local_group)
-      local_groupship.set(unsubscribed: false)
-    end
+    set_own_subgroupship(@local_group, :local_groupships, params[:f])
     request.xhr? ? 200 : redirect(@local_group.path)
   end
 
@@ -196,32 +172,19 @@ Dandelion::App.controller do
   get '/o/:organisation_slug/lg/:slug/followers', provides: %i[html csv] do
     @local_group = local_group_from_params || not_found
     local_group_admins_only!
-    @local_groupships = @local_group.local_groupships.includes(:account).order('created_at desc')
-    @local_groupships = @local_groupships.and(:account_id.in => Account.search(params[:q], child_scope: @local_groupships).pluck(:id)) if params[:q]
-    @local_groupships = @local_groupships.and(unsubscribed: false, :account_id.nin => @local_group.organisation.mailer_unsubscribed_member_ids) if params[:subscribed_to_mailer]
     case content_type
     when :html
-      @local_groupships = @local_groupships.paginate(page: params[:page], per_page: 25)
+      @local_groupships = subgroup_followers(@local_group, :local_groupships).paginate(page: params[:page], per_page: 25)
       erb :'local_groups/followers'
     when :csv
-      @local_group.send_followers_csv(current_account, :local_groupships)
-      flash[:notice] = 'You will receive the CSV via email shortly.'
-      redirect back
+      send_subgroup_followers_csv(@local_group, :local_groupships)
     end
   end
 
   post '/o/:organisation_slug/lg/:slug/followers' do
     @local_group = local_group_from_params || not_found
     local_group_admins_only!
-    halt 400 unless params[:csv].is_a?(Tempfile)
-    csv = ImportFromCsv.read(params[:csv])
-    if (error = ImportFromCsv.error(csv))
-      flash[:error] = error
-    else
-      @local_group.import_from_csv(csv, :local_groupships)
-      flash[:notice] = 'The followers will be added shortly. Refresh the page to check progress.'
-    end
-    redirect "#{@local_group.path}/followers"
+    import_subgroup_followers(@local_group, :local_groupships)
   end
 
   post '/local_groupships/:id/destroy' do
