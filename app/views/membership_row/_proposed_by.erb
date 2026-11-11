@@ -1,0 +1,3 @@
+<td>
+  <%= membership.proposed_by.map(&:name).to_sentence(last_word_connector: ' and ') if membership.proposed_by %>
+</td>

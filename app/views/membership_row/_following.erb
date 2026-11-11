@@ -1,0 +1,4 @@
+<% account = membership.account %>
+<td>
+  <%= partial :'accounts/buttons', locals: { account: account, btn_class: 'btn-sm', follow: membership.viewer_follow } %>
+</td>

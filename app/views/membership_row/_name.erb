@@ -1,0 +1,11 @@
+<% account = membership.account %>
+<td>
+  <%= partial :'accounts/account', object: account, locals: { membership: membership, show_email: viewable?(account, :email) } %>
+  <div>
+    <% membership.teamships.each { |teamship| next if teamship.team.name == 'General' %>
+    <a href="/g/<%= @gathering.slug %>/teams/<%= teamship.team_id %>">
+      <span class="badge text-bg-primary mb-1"><%= teamship.team.name %></span>
+    </a>
+  <% } %>
+</div>
+</td>

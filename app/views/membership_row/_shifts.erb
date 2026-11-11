@@ -1,0 +1,18 @@
+<td>
+
+  <%= partial :'rotas/shift_summary', locals: { membership: membership, shifts: membership.shifts_list } %>
+
+  <% if @gathering.enable_shift_worth %>
+    <span data-bs-toggle="tooltip" title="<%= sprintf('%g', membership.shift_points) %>/<%= pluralize(membership.shift_points_required ? sprintf('%g', membership.shift_points_required) : '?', 'shift point') %>">
+      <% if gathering_admin? %>
+        <%= sprintf('%g', membership.shift_points) %>/<a href="javascript:;" onclick="$(this).hide().next().css('display', 'inline').find('input').focus()"><%= membership.shift_points_required ? sprintf('%g', membership.shift_points_required) : '?' %></a>
+        <% form_tag "/g/#{@gathering.slug}/memberships/#{membership.id}/shift_points_required", class: 'form-inline', style: 'display:none' do %>
+          <%= number_field_tag :shift_points_required, class: 'form-control', style: 'width: 6em', min: 0, value: membership.shift_points_required, onblur: '$(this.form).submit()' %>
+        <% end %>
+      <% else %>
+        <%= sprintf('%g', membership.shift_points) %>/<%= membership.shift_points_required ? sprintf('%g', membership.shift_points_required) : '?' %>
+      <% end %>
+    </span>
+  <% end %>
+
+</td>

@@ -1,0 +1,16 @@
+<td class="small">
+  <% y = [] %>
+  <% if membership.admin %>
+    <% y << capture do %>
+      <a class="btn btn-outline-primary text-nowrap mb-1" data-method="post" href="/g/<%= @gathering.slug %>/memberships/<%= membership.id %>/unadmin">Unadmin</a>
+    <% end %>
+  <% else %>
+    <% y << capture do %>
+      <a class="btn btn-outline-primary text-nowrap mb-1" data-method="post" href="/g/<%= @gathering.slug %>/memberships/<%= membership.id %>/make_admin">Make admin</a>
+    <% end %>
+  <% end %>
+  <% y << capture do %>
+    <a class="btn btn-outline-primary text-nowrap mb-1" data-method="post" data-confirm="Are you sure you want to remove this person from the gathering?" href="/g/<%= @gathering.slug %>/memberships/<%= membership.id %>/remove">Remove</a>
+  <% end %>
+  <%== y.map(&:strip).join(' ') %>
+</td>

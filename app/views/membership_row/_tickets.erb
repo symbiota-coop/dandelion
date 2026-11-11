@@ -1,0 +1,5 @@
+<td>
+  <% membership.event_tickets.each { |event, ticket| %>
+  <a href="/e/<%= event.slug %>/tickets" class="badge text-bg-primary text-decoration-none"><i class="bi bi-ticket-detailed-fill"></i> <%= (ticket.ticket_type.name + ', ') if ticket.ticket_type %><%= event.name %></a>
+  <% } %>
+</td>

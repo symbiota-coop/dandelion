@@ -115,31 +115,8 @@
   <table class="table table-striped table-sticky table-sticky-fit">
     <thead>
       <tr>
-        <th style="width: 1px">Name</th>
-        <th>Following</th>
-        <th>Proposed by</th>
-        <th>Accepted at</th>
-        <% if @gathering.democratic_threshold %>
-          <th>Suggested magic number</th>
-        <% end %>
-        <% if @gathering.any_events? %>
-          <th>Tickets</th>
-        <% end %>
-        <% if @gathering.enable_contributions %>
-          <th>Choices</th>
-          <% if gathering_admin? || !@gathering.hide_paid %>
-            <th>Requested contribution</th>
-            <th>Paid</th>
-          <% end %>
-        <% end %>
-        <% if @gathering.rotas_shown? %>
-          <th>Shifts</th>
-        <% end %>
-        <% if gathering_admin? || !@gathering.hide_invitations %>
-          <th>Invitations</th>
-        <% end %>
-        <% if gathering_admin? %>
-          <th></th>
+        <% membership_columns.each do |column| %>
+          <%= content_tag :th, column[:header], column[:th] %>
         <% end %>
       </tr>
     </thead>
@@ -149,34 +126,8 @@
     </tr>
     <% } %>
     <tr>
-      <th style="width: 1px"></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <% if @gathering.democratic_threshold %>
-        <th></th>
-      <% end %>
-      <% if @gathering.any_events? %>
-        <th></th>
-      <% end %>
-      <% if @gathering.enable_contributions %>
-        <th></th>
-        <% if gathering_admin? || !@gathering.hide_paid %>
-          <th></th>
-          <th>
-            <%= m @gathering.memberships.pluck(:paid).compact.sum, @gathering.currency %>
-            (<%= m @gathering.processed_via_dandelion, @gathering.currency %> processed via Dandelion)
-          </th>
-        <% end %>
-      <% end %>
-      <% if @gathering.rotas_shown? %>
-        <th></th>
-      <% end %>
-      <% if gathering_admin? || !@gathering.hide_invitations %>
-        <th></th>
-      <% end %>
-      <% if gathering_admin? %>
-        <th></th>
+      <% membership_columns.each do |column| %>
+        <%= content_tag :th, column[:footer]&.call, column[:th] %>
       <% end %>
     </tr>
   </table>
