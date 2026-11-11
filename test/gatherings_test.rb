@@ -764,4 +764,16 @@ class GatheringsTest < ActiveSupport::TestCase
     assert last_response.redirect?
     refute @gathering.memberships.find_by(account: site_admin)
   end
+
+  test 'admins add a member by email, making an account for an email that has none' do
+    create_gathering
+    sign_in(@account)
+    visit gathering_path('/members')
+    click_link 'Add member'
+    fill_in 'Email', with: 'new.member@example.com'
+    click_button 'Add member'
+    assert page.has_content? 'new.member'
+    member = Account.find_by(email: 'new.member@example.com')
+    assert @gathering.memberships.find_by(account: member, added_by: @account)
+  end
 end

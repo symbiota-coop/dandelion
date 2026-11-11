@@ -1188,4 +1188,23 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert page.has_content?("Connected to Connected Ltd's Stripe account (id: acct_connected)")
     assert page.has_link?('Disconnect')
   end
+
+  test 'admins add a follower by email, making an account for an email that has none, and are told if they already follow' do
+    create_organisation
+    sign_in(@account)
+    visit "/o/#{@organisation.slug}/followers"
+    click_link 'Add a follower'
+    fill_in 'Email', with: 'new.follower@example.com'
+    click_button 'Add follower'
+    assert page.has_content? 'new.follower'
+    follower = Account.find_by(email: 'new.follower@example.com')
+    assert_equal 'new.follower', follower.name
+    assert @organisation.organisationships.find_by(account: follower)
+
+    click_link 'Add a follower'
+    fill_in 'Email', with: ' New.Follower@example.com '
+    click_button 'Add follower'
+    assert page.has_content? 'That person is already following the organisation'
+    assert_equal 1, Account.and(email: 'new.follower@example.com').count
+  end
 end

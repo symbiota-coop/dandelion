@@ -111,18 +111,7 @@ Dandelion::App.controller do
       redirect back
     end
 
-    unless params[:email]
-      flash[:error] = 'Please provide an email address'
-      redirect back
-    end
-
-    unless (@account = Account.find_by(email: params[:email].downcase.strip))
-      @account = Account.new(name: params[:email].split('@').first, email: params[:email], password: Account.generate_password)
-      unless @account.save
-        flash[:error] = '<strong>Oops.</strong> Some errors prevented the account from being saved.'
-        redirect back
-      end
-    end
+    @account = account_from_email_param!
 
     if @gathering.memberships.find_by(account: @account)
       flash[:warning] = 'That person is already a member of the gathering'

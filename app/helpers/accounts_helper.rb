@@ -48,6 +48,24 @@ Dandelion::App.helpers do
     end
   end
 
+  # For adding someone by email (a follower, a gathering member): the account with params[:email], made if there's none.
+  # Redirects back if there's no email or the account can't be made
+  def account_from_email_param!
+    unless params[:email]
+      flash[:error] = 'Please provide an email address'
+      redirect back
+    end
+
+    account = Account.find_by(email: params[:email].downcase.strip)
+    return account if account
+
+    account = Account.new(name: params[:email].split('@').first, email: params[:email], password: Account.generate_password)
+    return account if account.save
+
+    flash[:error] = '<strong>Oops.</strong> Some errors prevented the account from being saved.'
+    redirect back
+  end
+
   def load_context
     if params[:organisation_id]
       @organisation = Organisation.find(params[:organisation_id])

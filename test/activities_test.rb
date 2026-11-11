@@ -152,4 +152,17 @@ class ActivitiesTest < ActiveSupport::TestCase
     assert_equal 'Accepted', application.reload.status
     assert @activity.activityships.find_by(account: applicant), 'The applicant should follow the activity'
   end
+
+  test 'admins add someone who already has an account as a follower of an activity by their email' do
+    create_organisation
+    activity = FactoryBot.create(:activity, organisation: @organisation)
+    person = FactoryBot.create(:account)
+    sign_in(@account)
+    visit "#{activity.path}/followers"
+    click_link 'Add a follower'
+    fill_in 'Email', with: person.email.upcase
+    click_button 'Add follower'
+    assert page.has_content? person.name
+    assert activity.activityships.find_by(account: person)
+  end
 end
