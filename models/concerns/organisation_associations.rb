@@ -58,6 +58,12 @@ module OrganisationAssociations
     Account.and(unsubscribed_organisation_ids_cache: id).pluck(:id)
   end
 
+  # Followers who get none of the organisation's mailings, nor its activities' or local groups': unsubscribed from
+  # everything, or from the organisation. The followers lists' Subscribed to mailer filter leaves them out
+  def mailer_unsubscribed_member_ids
+    Account.and(organisation_ids_cache: id).and(:$or => [{ unsubscribed: true }, { unsubscribed_organisation_ids_cache: id }]).pluck(:id)
+  end
+
   def news
     pmails.and(:recipient_kind.in => %w[everyone not_monthly_donors]).and(:sent_at.ne => nil).order('sent_at desc')
   end

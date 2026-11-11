@@ -165,4 +165,22 @@ class ActivitiesTest < ActiveSupport::TestCase
     assert page.has_content? person.name
     assert activity.activityships.find_by(account: person)
   end
+
+  test "the followers list's Subscribed to mailer filter leaves out those unsubscribed from the activity, the organisation or everything" do
+    create_organisation
+    activity = FactoryBot.create(:activity, organisation: @organisation)
+    subscribed, from_activity, from_organisation, from_everything = Array.new(4) { FactoryBot.create(:account) }
+    [subscribed, from_activity, from_organisation, from_everything].each do |account|
+      @organisation.organisationships.create!(account: account, unsubscribed: account == from_organisation)
+      activity.activityships.create!(account: account, unsubscribed: account == from_activity)
+    end
+    from_everything.set(unsubscribed: true)
+
+    sign_in(@account)
+    visit "#{activity.path}/followers"
+    check 'Subscribed to mailer'
+    assert page.has_current_path?(/subscribed_to_mailer/)
+    assert page.has_content? subscribed.name
+    [from_activity, from_organisation, from_everything].each { |account| assert page.has_no_content? account.name }
+  end
 end

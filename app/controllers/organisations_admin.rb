@@ -202,12 +202,7 @@ Dandelion::App.controller do
     when *Organisationship.monthly_donation_methods.compact_blank then @organisationships = @organisationships.and(monthly_donation_method: params[:monthly_donor])
     end
     @organisationships = @organisationships.and(:stripe_connect_json.ne => nil) if params[:connected_to_stripe]
-    if params[:subscribed_to_mailer]
-      # Filter to org-subscribed, then exclude globally unsubscribed
-      @organisationships = @organisationships.and(unsubscribed: false)
-      excluded_ids = Account.and(organisation_ids_cache: @organisation.id, unsubscribed: true).pluck(:id)
-      @organisationships = @organisationships.and(:account_id.nin => excluded_ids) if excluded_ids.any?
-    end
+    @organisationships = @organisationships.and(unsubscribed: false, :account_id.nin => @organisation.mailer_unsubscribed_member_ids) if params[:subscribed_to_mailer]
     @organisationships = @organisationships.and(event_manager: true) if params[:event_manager]
     @organisationships = @organisationships.and(admin: true) if params[:admin]
     case content_type
