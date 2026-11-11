@@ -16,21 +16,7 @@ class Waitship
   end
 
   def send_notification
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    waitship = self
-    event = waitship.event
-    account = waitship.account
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "New waitlist registration for #{event.name}"
-    batch_message.body_html EmailHelper.html(:waitlist, account: account, event: event)
-
-    event.event_facilitators.each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(:waitlist, to: event.event_facilitators, subject: "New waitlist registration for #{event.name}", locals: { account: account, event: event })
   end
   handle_asynchronously :send_notification
 end

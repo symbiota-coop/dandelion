@@ -53,22 +53,14 @@ class Message
   def send_email
     return unless !messengee.unsubscribed? && !messengee.unsubscribed_messages?
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    message = self
-    messenger = message.messenger
-    messengee = message.messengee
-    batch_message.from "#{messenger.name} <#{ENV['NOTIFICATIONS_EMAIL']}>"
-    batch_message.reply_to "#{messenger.name} <#{messenger.email}>"
-    batch_message.subject "[Dandelion] Message from #{messenger.name}"
-    batch_message.body_html EmailHelper.html(:message, messenger: messenger, message: message)
-
-    [messengee].each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :message,
+      to: messengee,
+      subject: "[Dandelion] Message from #{messenger.name}",
+      locals: { messenger: messenger, message: self },
+      from: "#{messenger.name} <#{ENV['NOTIFICATIONS_EMAIL']}>",
+      reply_to: "#{messenger.name} <#{messenger.email}>"
+    )
   end
   handle_asynchronously :send_email
 

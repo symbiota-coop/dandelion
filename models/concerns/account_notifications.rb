@@ -6,100 +6,72 @@ module AccountNotifications
     handle_asynchronously :send_first_event_email
   end
 
+  # What an email greets someone by: %recipient.firstname%
+  def greeting_name
+    firstname || 'there'
+  end
+
+  # The recipient variables most emails send: %recipient.firstname%, the token their links sign in with, and the id
+  def mail_variables
+    { 'firstname' => greeting_name, 'token' => link_token_for_email, 'id' => id.to_s }
+  end
+
+  # This account as Mailer.deliver's to:, with any variables of the email's own
+  def mail_recipient(extra_variables = {})
+    [email, mail_variables.merge(extra_variables)]
+  end
+
   def send_first_event_email
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
     account = self
-    batch_message.from ENV['FOUNDER_EMAIL_FULL']
-    batch_message.reply_to ENV['FOUNDER_EMAIL']
-    batch_message.subject 'Congratulations on listing your first event on Dandelion!'
-    batch_message.body_text EmailHelper.render(:first_event)
-
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there' })
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      to: [account.email, { 'firstname' => account.greeting_name }],
+      from: ENV['FOUNDER_EMAIL_FULL'],
+      reply_to: ENV['FOUNDER_EMAIL'],
+      subject: 'Congratulations on listing your first event on Dandelion!',
+      text: EmailHelper.render(:first_event)
+    )
     account.set(sent_first_event_email: Time.now)
   end
 
   def send_sign_in_code
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, EmailHelper.mailgun_host(email, ENV['MAILGUN_NOTIFICATIONS_HOST']))
-
     account = self
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject 'Sign in code for Dandelion'
-    batch_message.body_html EmailHelper.html(:sign_in_code)
-
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.issue_sign_in_code!, 'id' => account.id.to_s })
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :sign_in_code,
+      to: [account.email, { 'firstname' => account.greeting_name, 'token' => account.issue_sign_in_code!, 'id' => account.id.to_s }],
+      subject: 'Sign in code for Dandelion',
+      microsoft_workaround: true
+    )
   end
 
   def send_confirmation_email
     return if skip_confirmation_email
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, EmailHelper.mailgun_host(email, ENV['MAILGUN_NOTIFICATIONS_HOST']))
-
     account = self
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject 'Confirm your email address'
-    batch_message.body_html EmailHelper.html(:confirm_email)
-
-    batch_message.add_recipient(:to, account.email, {
-                                  'firstname' => account.firstname || 'there',
-                                  'token' => account.link_token_for_email,
-                                  'id' => account.id.to_s,
-                                  'confirm_or_activate' => (account.has_signed_in? ? 'Click here to confirm your email address:' : "If you'd like to activate your account, click the link below:")
-                                })
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :confirm_email,
+      to: account.mail_recipient('confirm_or_activate' => (account.has_signed_in? ? 'Click here to confirm your email address:' : "If you'd like to activate your account, click the link below:")),
+      subject: 'Confirm your email address',
+      microsoft_workaround: true
+    )
   end
 
   def send_activation_notification
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    account = self
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "You've activated your Dandelion account"
-    batch_message.body_html EmailHelper.html(:activation_notification)
-
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(:activation_notification, to: self, subject: "You've activated your Dandelion account")
   end
 
   def send_stripe_subscription_created_notification(subscription)
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    account = self
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "[Account] #{account.name} created a subscription of #{subscription.plan.amount / 100} #{subscription.plan.currency.upcase} per month"
-    batch_message.body_text "Account: #{ENV['BASE_URI']}/u/#{account.username}"
-
-    Account.and(admin: true).each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      to: Account.and(admin: true),
+      subject: "[Account] #{name} created a subscription of #{subscription.plan.amount / 100} #{subscription.plan.currency.upcase} per month",
+      text: "Account: #{ENV['BASE_URI']}/u/#{username}"
+    )
   end
 
   def send_stripe_subscription_deleted_notification(subscription)
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    account = self
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "[Account] #{account.name} deleted a subscription of #{subscription.plan.amount / 100} #{subscription.plan.currency.upcase} per month"
-    batch_message.body_text "Account: #{ENV['BASE_URI']}/u/#{account.username}"
-
-    Account.and(admin: true).each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      to: Account.and(admin: true),
+      subject: "[Account] #{name} deleted a subscription of #{subscription.plan.amount / 100} #{subscription.plan.currency.upcase} per month",
+      text: "Account: #{ENV['BASE_URI']}/u/#{username}"
+    )
   end
 end

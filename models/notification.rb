@@ -47,20 +47,12 @@ class Notification
   def send_email
     return unless Notification.mailable_types.include?(type)
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    notification = self
-    circle = self.circle
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "[#{circle.name}] #{Nokogiri::HTML(notification.sentence).text}"
-    batch_message.body_html EmailHelper.html(:notification, notification: notification, circle: circle)
-
-    circle.discussers.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :notification,
+      to: circle.discussers,
+      subject: "[#{circle.name}] #{Nokogiri::HTML(sentence).text}",
+      locals: { notification: self, circle: circle }
+    )
   end
   handle_asynchronously :send_email
 

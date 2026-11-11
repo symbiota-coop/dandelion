@@ -124,6 +124,7 @@ jobs:
           - how_to_create_an_event
           - images
           - local_groups
+          - mailer
           - mcp
           - messages
           - orders

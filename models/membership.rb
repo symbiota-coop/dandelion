@@ -62,9 +62,6 @@ class Membership
 
   after_create :send_email
   def send_email
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
     account = self.account
     gathering = self.gathering
 
@@ -74,13 +71,7 @@ class Membership
                         %(<a href="#{ENV['BASE_URI']}/accounts/edit?link_token=%recipient.token%&slug=#{gathering.slug}">Click here to finish setting up your account and get involved with the co-creation!</a>)
                       end
 
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "You're now a member of #{gathering.name}"
-    batch_message.body_html gathering.welcome_email_html(sign_in_details)
-
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(to: account, subject: "You're now a member of #{gathering.name}", html: gathering.welcome_email_html(sign_in_details))
   end
   handle_asynchronously :send_email
 

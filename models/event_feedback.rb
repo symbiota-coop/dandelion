@@ -99,20 +99,12 @@ class EventFeedback
   def send_feedback
     return unless event
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    event_feedback = self
-    event = event_feedback.event
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "#{event_feedback.rating.times.each.map { '★' }.join if event_feedback.rating} #{event.name}/#{event_feedback.anonymous? ? 'Anonymous' : event_feedback.account.name}"
-    batch_message.body_html EmailHelper.html(:event_feedback, event_feedback: event_feedback, event: event)
-
-    event.accounts_receiving_feedback.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :event_feedback,
+      to: event.accounts_receiving_feedback,
+      subject: "#{rating.times.each.map { '★' }.join if rating} #{event.name}/#{anonymous? ? 'Anonymous' : account.name}",
+      locals: { event_feedback: self, event: event }
+    )
   end
   handle_asynchronously :send_feedback
 
@@ -120,37 +112,23 @@ class EventFeedback
     return if anonymous
     return unless response
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    event_feedback = self
-    event = event_feedback.event
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.reply_to(event.email || event.organisation.try(:reply_to))
-    batch_message.subject "#{event.organisation.name} responded to your feedback on #{event.name}"
-    batch_message.body_html EmailHelper.html(:event_feedback_response, event_feedback: event_feedback, event: event)
-
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :event_feedback_response,
+      to: account,
+      subject: "#{event.organisation.name} responded to your feedback on #{event.name}",
+      locals: { event_feedback: self, event: event },
+      reply_to: event.email || event.organisation.try(:reply_to)
+    )
   end
   handle_asynchronously :send_response
 
   def send_destroy_notification(destroyed_by)
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    event_feedback = self
-    event = event_feedback.event
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "#{destroyed_by.name} deleted feedback for #{event.name}"
-    batch_message.body_html EmailHelper.html(:event_feedback_destroyed, event_feedback: event_feedback, event: event, destroyed_by: destroyed_by)
-
-    event.accounts_receiving_feedback.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :event_feedback_destroyed,
+      to: event.accounts_receiving_feedback,
+      subject: "#{destroyed_by.name} deleted feedback for #{event.name}",
+      locals: { event_feedback: self, event: event, destroyed_by: destroyed_by }
+    )
   end
   handle_asynchronously :send_destroy_notification
 

@@ -268,23 +268,16 @@ module Dandelion
 
       halt 400 if revenue < Organisation::REFERRAL_REWARD_THRESHOLD || @organisation.reward_claimer_id.present?
 
-      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-      batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-      batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-      batch_message.subject "[Reward claim] #{current_account.name} for #{@organisation.name}"
-      batch_message.body_text [
-        "Reward claimer: #{ENV['BASE_URI']}/u/#{current_account.username}",
-        "Referrer: #{@organisation.referrer ? "#{ENV['BASE_URI']}/u/#{@organisation.referrer.username}" : '—'}",
-        "Organisation: #{ENV['BASE_URI']}/o/#{@organisation.slug}",
-        "Total revenue: #{m(revenue, 'EUR')}"
-      ].join("\n")
-
-      Account.and(admin: true).each do |account|
-        batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-      end
-
-      batch_message.finalize if Padrino.env == :production
+      Mailer.deliver(
+        to: Account.and(admin: true),
+        subject: "[Reward claim] #{current_account.name} for #{@organisation.name}",
+        text: [
+          "Reward claimer: #{ENV['BASE_URI']}/u/#{current_account.username}",
+          "Referrer: #{@organisation.referrer ? "#{ENV['BASE_URI']}/u/#{@organisation.referrer.username}" : '—'}",
+          "Organisation: #{ENV['BASE_URI']}/o/#{@organisation.slug}",
+          "Total revenue: #{m(revenue, 'EUR')}"
+        ].join("\n")
+      )
 
       @organisation.set(reward_claimer_id: current_account.id)
 

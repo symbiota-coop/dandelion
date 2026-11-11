@@ -177,17 +177,13 @@ class Organisationship
     return if sent_welcome && !force
     return unless organisation.welcome_from && organisation.welcome_subject
 
-    mg_client = Mailgun::Client.new organisation.mailgun_api_key, (organisation.mailgun_region == 'EU' ? 'api.eu.mailgun.net' : 'api.mailgun.net')
-    batch_message = Mailgun::BatchMessage.new(mg_client, organisation.mailgun_domain)
-
-    account = self.account
-    batch_message.from organisation.welcome_from
-    batch_message.subject organisation.welcome_subject
-    batch_message.body_html EmailHelper.html(content: welcome_email_content(organisation.welcome_body))
-
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'id' => account.id.to_s })
-
-    batch_message.finalize if organisation.mailgun_api_key
+    Mailer.deliver(
+      to: [account.email, { 'firstname' => account.greeting_name, 'id' => account.id.to_s }],
+      subject: organisation.welcome_subject,
+      content: welcome_email_content(organisation.welcome_body),
+      via: organisation,
+      from: organisation.welcome_from
+    )
     set(sent_welcome: true)
   end
 
@@ -215,17 +211,13 @@ class Organisationship
     return if sent_monthly_donation_welcome && !force
     return unless organisation.monthly_donation_welcome_from && organisation.monthly_donation_welcome_subject
 
-    mg_client = Mailgun::Client.new organisation.mailgun_api_key, (organisation.mailgun_region == 'EU' ? 'api.eu.mailgun.net' : 'api.mailgun.net')
-    batch_message = Mailgun::BatchMessage.new(mg_client, organisation.mailgun_domain)
-
-    account = self.account
-    batch_message.from organisation.monthly_donation_welcome_from
-    batch_message.subject organisation.monthly_donation_welcome_subject
-    batch_message.body_html EmailHelper.html(content: welcome_email_content(monthly_donation_welcome_body))
-
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'id' => account.id.to_s, 'username' => account.username })
-
-    batch_message.finalize if organisation.mailgun_api_key
+    Mailer.deliver(
+      to: [account.email, { 'firstname' => account.greeting_name, 'id' => account.id.to_s, 'username' => account.username }],
+      subject: organisation.monthly_donation_welcome_subject,
+      content: welcome_email_content(monthly_donation_welcome_body),
+      via: organisation,
+      from: organisation.monthly_donation_welcome_from
+    )
     set(sent_monthly_donation_welcome: true)
   end
 

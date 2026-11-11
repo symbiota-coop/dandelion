@@ -133,6 +133,10 @@ Dandelion/TestOneParadigm:
 Dandelion/TestUnusedParadigm:
   Include:
     - test/**/*_test.rb
+# Mailer and the Mailgun stats in lib/mail use Mailgun themselves, for everything else
+Dandelion/MailgunDirect:
+  Exclude:
+    - lib/mail/**/*.rb
 # The one place that uses Redcarpet, for everything else
 Dandelion/Redcarpet:
   Exclude:

@@ -205,22 +205,17 @@ class Comment
     return if body.nil?
     return if sent_at
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_POSTS_HOST'])
-
-    comment = self
-    batch_message.from "Dandelion <#{comment.post_id}@#{ENV['MAILGUN_POSTS_HOST']}>"
-    batch_message.subject comment.email_subject
-    batch_message.body_html EmailHelper.html(:comment, comment: comment)
-
     accounts = Account.publicly_visible
     accounts = accounts.and(unsubscribed: false) unless force
     accounts = accounts.and(:id.in => post.subscriptions.pluck(:account_id))
-    accounts.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :comment,
+      to: accounts,
+      subject: email_subject,
+      locals: { comment: self },
+      stream: :posts,
+      from: "Dandelion <#{post_id}@#{ENV['MAILGUN_POSTS_HOST']}>"
+    )
     set(sent_at: Time.now)
   end
   handle_asynchronously :send_comment

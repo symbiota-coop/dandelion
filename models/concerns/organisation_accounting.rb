@@ -109,18 +109,7 @@ module OrganisationAccounting
   end
 
   def send_insufficient_funds_topup_notification
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "#{name}: top-up failed due to insufficient funds"
-    batch_message.body_html EmailHelper.html(:insufficient_funds_topup, organisation: self)
-
-    admins.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(:insufficient_funds_topup, to: admins, subject: "#{name}: top-up failed due to insufficient funds", locals: { organisation: self })
   end
   handle_asynchronously :send_insufficient_funds_topup_notification
 end

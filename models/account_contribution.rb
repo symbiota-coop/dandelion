@@ -44,23 +44,15 @@ class AccountContribution
   validates_presence_of :amount, :currency
 
   def send_notification
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    subject = if account
-                "[Account] #{account.name} made a contribution of #{amount} #{currency}"
-              else
-                "[Guest] A contribution of #{amount} #{currency} was made"
-              end
-    batch_message.subject subject
-    batch_message.body_text body_text
-
-    Account.and(admin: true).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      to: Account.and(admin: true),
+      subject: if account
+                 "[Account] #{account.name} made a contribution of #{amount} #{currency}"
+               else
+                 "[Guest] A contribution of #{amount} #{currency} was made"
+               end,
+      text: body_text
+    )
   end
   handle_asynchronously :send_notification
 end

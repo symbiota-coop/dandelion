@@ -78,7 +78,7 @@ module PmailMailgun
     credentials = mailgun_credentials
     return nil unless credentials[:api_key] && credentials[:domain]
 
-    mg_client = Mailgun::Client.new credentials[:api_key], credentials[:api_host]
+    mg_client = Mailgun::Client.new credentials[:api_key], credentials[:api_host] # rubocop:disable Dandelion/MailgunDirect -- reads a newsletter's stats, sends nothing
     tags = Mailgun::Tags.new(mg_client)
 
     begin

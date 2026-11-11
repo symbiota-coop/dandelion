@@ -91,6 +91,10 @@ class LintTest < Minitest::Test
         "test 'x' do\n  @a ||= 1\nend" => 1, "it 'x' do\n  @a = 1\nend" => 0, "def setup_a\n  @a = 1\nend\ntest 'x' do\n  @a = 2\nend" => 0
       },
       'Dandelion/MongoidIndex' => { 'index slug: 1' => 1, 'index' => 0, 'events.index(1)' => 0 },
+      'Dandelion/MailgunDirect' => {
+        'Mailgun::Client.new(key, region)' => 1, '::Mailgun::BatchMessage.new(client, host)' => 1, 'Mailgun::Tags.new(client)' => 0,
+        'Mailgun::BatchMessage.stub(:new, email) { x }' => 0, 'Mailer.deliver(:csv, to: account, subject: "x")' => 0
+      },
       'Dandelion/Redcarpet' => { '::Redcarpet::Render::HTML.new' => 1, 'Redcarpet' => 1, 'Foo::Redcarpet' => 0, 'MarkdownRenderer.render(x)' => 0 },
       'Dandelion/SlugLookup' => {
         'Gathering.find_by(slug: params[:gathering_slug], x: 1)' => 1, 'Event&.find(params[:event_slug])' => 1, 'Event.find(params[:event_id])' => 0,
@@ -132,6 +136,12 @@ class LintTest < Minitest::Test
     names = models.map { |path| File.basename(path, '.rb').split('_').map(&:capitalize).join }
     assert_equal names.sort, RuboCop::Cop::Dandelion::GatheringScope::MODELS.sort,
                  'MODELS in .rubocop/dandelion/gathering_scope.rb should be the models that belong to a gathering'
+  end
+
+  def test_mailgun_is_used_directly_only_in_lib_mail
+    cop = RuboCop::Cop::Registry.global.find_by_cop_name('Dandelion/MailgunDirect')
+    assert_empty cop_offenses(cop, 'Mailgun::Client.new(key, region)', 'lib/mail/mailer.rb')
+    assert_equal 1, cop_offenses(cop, 'Mailgun::Client.new(key, region)', 'models/x.rb').size
   end
 
   def test_redcarpet_is_allowed_only_in_markdown_renderer

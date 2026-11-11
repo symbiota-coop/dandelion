@@ -348,23 +348,7 @@ class Organisation
       end
     end
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject 'Dandelion CSV export'
-    batch_message.body_html EmailHelper.html(:csv)
-
-    file = Tempfile.new
-    file.write(csv)
-    file.rewind
-    batch_message.add_attachment(file.path, 'followers.csv')
-
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-
-    batch_message.finalize if Padrino.env == :production
-    file.close
-    file.unlink
+    Mailer.deliver(:csv, to: account, subject: 'Dandelion CSV export', attachments: { 'followers.csv' => csv })
   end
   handle_asynchronously :send_followers_csv
 end

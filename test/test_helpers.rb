@@ -2,14 +2,15 @@
 # stays in that file
 
 # Stands in for Mailgun::BatchMessage, keeping what an email would say: its recipients and their recipient variables,
-# subject, HTML and attachments' filenames
+# subject, HTML or text, sender, reply-to and attachments' filenames, and whether it was sent (finalized?)
 class RecordedEmail
-  attr_reader :recipients, :variables, :subject_line, :html, :attachment_names
+  attr_reader :recipients, :variables, :subject_line, :html, :text, :attachment_names, :sender, :reply_to_address
 
   def initialize
     @recipients = []
     @variables = {}
     @attachment_names = []
+    @finalized = false
   end
 
   def add_recipient(_type, email, variables = {})
@@ -25,13 +26,28 @@ class RecordedEmail
     @html = html
   end
 
+  def body_text(text)
+    @text = text
+  end
+
   def add_attachment(_file, filename = nil)
     @attachment_names << filename
   end
 
-  def from(*); end
-  def reply_to(*); end
-  def finalize; end
+  def from(address)
+    @sender = address
+  end
+
+  def reply_to(address)
+    @reply_to_address = address
+  end
+
+  def finalize
+    @finalized = true
+    nil
+  end
+
+  def finalized? = @finalized
 end
 
 module TestHelpers

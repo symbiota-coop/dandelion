@@ -41,41 +41,25 @@ class ActivityApplication
 
   after_create :send_notification
   def send_notification
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    activity_application = self
-    activity = activity_application.activity
-    account = activity_application.account
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "Application to #{activity.name}"
-    batch_message.body_html EmailHelper.html(:activity_application, account: account, activity: activity, activity_application: activity_application)
-
-    activity.admins.each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :activity_application,
+      to: activity.admins,
+      subject: "Application to #{activity.name}",
+      locals: { account: account, activity: activity, activity_application: self }
+    )
   end
   handle_asynchronously :send_notification
 
   def accept
     activity.activityships.create account: account
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    activity_application = self
-    activity = activity_application.activity
-    account = activity_application.account
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.reply_to activity.email if activity.email
-    batch_message.subject "You've been accepted to #{activity.name}"
-    batch_message.body_html EmailHelper.html(:accepted, activity: activity)
-
-    batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :accepted,
+      to: account,
+      subject: "You've been accepted to #{activity.name}",
+      locals: { activity: activity },
+      **({ reply_to: activity.email } if activity.email)
+    )
   end
 
   def self.statuses

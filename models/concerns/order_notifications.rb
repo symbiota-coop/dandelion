@@ -15,141 +15,70 @@ module OrderNotifications
       return unless event&.organisation
       return if recipients.blank?
 
-      mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-      first_email = recipients.first['email']
-      batch_message = Mailgun::BatchMessage.new(mg_client, EmailHelper.mailgun_host(first_email, ENV['MAILGUN_TICKETS_HOST']))
-
       header_image_url, from_email = Order.new(event: event).sender_info
-      batch_message.subject "Your RSVP to #{event.name} has been cancelled"
-      batch_message.from from_email
-      batch_message.reply_to(event.email || event.organisation.reply_to)
-      batch_message.body_html EmailHelper.html(:rsvp_cancelled, event: event, header_image_url: header_image_url)
-
-      recipients.each do |recipient|
-        vars = { 'firstname' => recipient['firstname'] || 'there' }
-        vars['token'] = recipient['token'] if recipient['token']
-        vars['id'] = recipient['id'] if recipient['id']
-        batch_message.add_recipient(:to, recipient['email'], vars)
-      end
-
-      batch_message.finalize if Padrino.env == :production
+      Mailer.deliver(
+        :rsvp_cancelled,
+        to: recipients.map do |recipient|
+          vars = { 'firstname' => recipient['firstname'] || 'there' }
+          vars['token'] = recipient['token'] if recipient['token']
+          vars['id'] = recipient['id'] if recipient['id']
+          [recipient['email'], vars]
+        end,
+        subject: "Your RSVP to #{event.name} has been cancelled",
+        locals: { event: event, header_image_url: header_image_url },
+        stream: :tickets,
+        microsoft_workaround: true,
+        from: from_email,
+        reply_to: event.email || event.organisation.reply_to
+      )
     end
   end
 
   def send_notification
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
     order = self
     event = order.event
-    account = order.account
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "New order for #{event.name}"
-    batch_message.body_html EmailHelper.html(:order, account: account, order: order, event: event)
-
-    event.event_facilitators.each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
-  end
-
-  def sender_info
-    if event.organisation.send_ticket_emails_from_organisation && event.organisation.image
-      [event.organisation.image.url, "#{event.organisation.name} <#{ENV['TICKETS_EMAIL']}>"]
-    else
-      [nil, ENV['TICKETS_EMAIL_FULL']]
-    end
+    Mailer.deliver(:order, to: event.event_facilitators, subject: "New order for #{event.name}", locals: { account: order.account, order: order, event: event })
   end
 
   def send_tickets
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, EmailHelper.mailgun_host(account.email, ENV['MAILGUN_TICKETS_HOST']))
-
     order = self
     event = order.event
     header_image_url, from_email = sender_info
 
     account = order.account
 
-    batch_message.subject(
-      EmailFields.replace_magic_tags(
+    attachments = []
+    attachments << ["#{tickets.count == 1 ? 'ticket' : 'tickets'}-#{event.name.parameterize}-#{order.id}.pdf", order.tickets_pdf.render] unless event.no_tickets_pdf
+    attachments << ["donation-receipt-#{order.id}.pdf", order.donation_receipt_pdf.render] if donation_receipt?
+    unless event.evergreen?
+      if event.event_sessions.empty?
+        attachments << ["event-#{event.name.parameterize}-#{order.id}.ics", event.ical(order: order).to_ical]
+      else
+        event.event_sessions.each do |event_session|
+          attachments << ["event-session-#{event_session.name.parameterize}-#{order.id}.ics", event_session.ical(order: order).to_ical]
+        end
+      end
+    end
+
+    message_ids = Mailer.deliver(
+      :tickets,
+      to: [account.email, { 'token' => account.link_token_for_email, 'id' => account.id.to_s }],
+      subject: EmailFields.replace_magic_tags(
         (event.recording? ? event.recording_email_title : event.ticket_email_title) || (event.recording? ? event.organisation.recording_email_title : event.organisation.ticket_email_title),
         event: event,
         account: account,
         orders: [order],
         plain_text: true
-      )
+      ),
+      locals: { event: event, order: order, account: account, tickets_table: EmailHelper.render(:_tickets_table, event: event, account: account), header_image_url: header_image_url },
+      stream: :tickets,
+      microsoft_workaround: true,
+      from: from_email,
+      reply_to: event.email || event.organisation.reply_to,
+      attachments: attachments,
+      send_when: :configured
     )
-
-    batch_message.from from_email
-    batch_message.reply_to(event.email || event.organisation.reply_to)
-
-    tickets_table = EmailHelper.render(:_tickets_table, event: event, account: account)
-    batch_message.body_html EmailHelper.html(:tickets, event: event, order: order, account: account, tickets_table: tickets_table, header_image_url: header_image_url)
-
-    tickets_pdf_file = nil
-    tickets_pdf_filename = nil
-    unless event.no_tickets_pdf
-      tickets_pdf_filename = "#{tickets.count == 1 ? 'ticket' : 'tickets'}-#{event.name.parameterize}-#{order.id}.pdf"
-      tickets_pdf_file = File.new(tickets_pdf_filename, 'w+')
-      tickets_pdf_file.write order.tickets_pdf.render
-      tickets_pdf_file.rewind
-      batch_message.add_attachment tickets_pdf_file, tickets_pdf_filename
-    end
-
-    donation_receipt_file = nil
-    donation_receipt_filename = nil
-    if donation_receipt?
-      donation_receipt_filename = "donation-receipt-#{order.id}.pdf"
-      donation_receipt_file = File.new(donation_receipt_filename, 'w+')
-      donation_receipt_file.write order.donation_receipt_pdf.render
-      donation_receipt_file.rewind
-      batch_message.add_attachment donation_receipt_file, donation_receipt_filename
-    end
-
-    ics_files = []
-    unless event.evergreen?
-      if event.event_sessions.empty?
-        cal = event.ical(order: order)
-        ics_filename = "event-#{event.name.parameterize}-#{order.id}.ics"
-        ics_file = File.new(ics_filename, 'w+')
-        ics_file.write cal.to_ical
-        ics_file.rewind
-        batch_message.add_attachment ics_file, ics_filename
-        ics_files << [ics_file, ics_filename]
-      else
-        event.event_sessions.each do |event_session|
-          cal = event_session.ical(order: order)
-          ics_filename = "event-session-#{event_session.name.parameterize}-#{order.id}.ics"
-          ics_file = File.new(ics_filename, 'w+')
-          ics_file.write cal.to_ical
-          ics_file.rewind
-          batch_message.add_attachment ics_file, ics_filename
-          ics_files << [ics_file, ics_filename]
-        end
-      end
-    end
-
-    batch_message.add_recipient(:to, account.email, { 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-
-    if ENV['MAILGUN_API_KEY']
-      message_ids = batch_message.finalize
-      set(message_ids: message_ids)
-    end
-
-    if tickets_pdf_file && tickets_pdf_filename
-      tickets_pdf_file.close
-      File.delete(tickets_pdf_filename)
-    end
-    if donation_receipt_file && donation_receipt_filename
-      donation_receipt_file.close
-      File.delete(donation_receipt_filename)
-    end
-    ics_files.each do |f, fn|
-      f.close
-      File.delete(fn)
-    end
+    set(message_ids: message_ids) if message_ids
 
     # Send Signal message if account has phone number, as its own job: Signal can take seconds to send
     send_signal_order_link if account&.phone.present?
@@ -171,7 +100,7 @@ module OrderNotifications
     if account&.email.present?
       recipients << {
         'email' => account.email,
-        'firstname' => account.firstname || 'there',
+        'firstname' => account.greeting_name,
         'token' => account.link_token_for_email,
         'id' => account.id.to_s
       }
@@ -206,39 +135,22 @@ module OrderNotifications
   end
 
   def notify_of_failed_purchase(error, provider: nil, help: nil)
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    order = self
-    event = order.event
-    account = order.account
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "#{provider || 'Payment'} error on #{event.name}"
-    batch_message.body_html EmailHelper.html(:purchase_failed, account: account, event: event, error: error, provider: provider, help: help)
-
-    (event.organisation.admins_receiving_feedback + Account.and(admin: true)).uniq.each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    event = self.event
+    Mailer.deliver(
+      :purchase_failed,
+      to: (event.organisation.admins_receiving_feedback + Account.and(admin: true)).uniq,
+      subject: "#{provider || 'Payment'} error on #{event.name}",
+      locals: { account: account, event: event, error: error, provider: provider, help: help }
+    )
   end
 
   def notify_of_failed_refund(error)
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    order = self
-    event = order.event
-    account = order.account
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "Refund failed: #{account.name} in #{event.name}"
-    provider = order.refund_provider
-    batch_message.body_html EmailHelper.html(:refund_failed_order, account: account, event: event, error: error, provider: provider)
-
-    ((refund_contacts || event.contacts) + Account.and(admin: true)).uniq.each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    event = self.event
+    Mailer.deliver(
+      :refund_failed_order,
+      to: ((refund_contacts || event.contacts) + Account.and(admin: true)).uniq,
+      subject: "Refund failed: #{account.name} in #{event.name}",
+      locals: { account: account, event: event, error: error, provider: refund_provider }
+    )
   end
 end

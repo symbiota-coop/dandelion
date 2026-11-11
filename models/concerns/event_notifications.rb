@@ -13,45 +13,17 @@ module EventNotifications
   def send_public_submission_notification
     return unless organisation
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    event = self
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "New event submission: #{name}"
-    batch_message.body_html EmailHelper.html(:event_submission, event: event, account: account)
-
-    organisation.admins.each do |admin|
-      batch_message.add_recipient(:to, admin.email, { 'firstname' => admin.firstname || 'there', 'token' => admin.link_token_for_email, 'id' => admin.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(:event_submission, to: organisation.admins, subject: "New event submission: #{name}", locals: { event: self, account: account })
   end
 
   def send_destroy_notification(destroyed_by)
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    event = self
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "#{destroyed_by.name} deleted the event #{event.name}"
-    batch_message.body_html EmailHelper.html(:event_destroyed, destroyed_by: destroyed_by, event: event)
-
-    accounts_receiving_feedback.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(:event_destroyed, to: accounts_receiving_feedback, subject: "#{destroyed_by.name} deleted the event #{name}", locals: { destroyed_by: destroyed_by, event: self })
   end
 
   def send_reminders(account_id)
     return if evergreen?
     return unless organisation
     return unless reminder_hours_before
-
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_with_cancel = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-    batch_without_cancel = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
 
     event = self
 
@@ -63,17 +35,9 @@ module EventNotifications
     )
 
     tickets_table = EmailHelper.render(:_tickets_table, event: event)
-    batch_with_cancel.body_html EmailHelper.html(:reminder, event: event, tickets_table: tickets_table, include_cancel_rsvp: true)
-    batch_without_cancel.body_html EmailHelper.html(:reminder, event: event, tickets_table: tickets_table, include_cancel_rsvp: false)
 
-    [batch_with_cancel, batch_without_cancel].each do |batch_message|
-      batch_message.from ENV['REMINDERS_EMAIL_FULL']
-      batch_message.reply_to(event.email || event.organisation.try(:reply_to))
-      batch_message.subject reminder_subject
-    end
-
-    recipients_with_cancel = 0
-    recipients_without_cancel = 0
+    recipients_with_cancel = []
+    recipients_without_cancel = []
 
     (account_id == :all ? attendees.and(unsubscribed: false).and(unsubscribed_reminders: false) : attendees.and(unsubscribed: false).and(unsubscribed_reminders: false).and(id: account_id)).each do |account|
       attendee_orders = event.orders.complete.and(account: account).to_a
@@ -91,17 +55,21 @@ module EventNotifications
       if cancellable_order || cancellable_ticket
         cancel_rsvp_path = cancellable_order ? "/orders/#{cancellable_order.id}" : "/tickets/#{cancellable_ticket.id}"
         cancel_rsvp_url = "#{ENV['BASE_URI']}#{cancel_rsvp_path}/confirm_cancel?link_token=#{recipient_vars['token']}"
-        batch_with_cancel.add_recipient(:to, account.email, recipient_vars.merge('cancel_rsvp_url' => cancel_rsvp_url))
-        recipients_with_cancel += 1
+        recipients_with_cancel << [account.email, recipient_vars.merge('cancel_rsvp_url' => cancel_rsvp_url)]
       else
-        batch_without_cancel.add_recipient(:to, account.email, recipient_vars)
-        recipients_without_cancel += 1
+        recipients_without_cancel << [account.email, recipient_vars]
       end
     end
 
-    if Padrino.env == :production
-      batch_with_cancel.finalize if recipients_with_cancel.positive?
-      batch_without_cancel.finalize if recipients_without_cancel.positive?
+    { true => recipients_with_cancel, false => recipients_without_cancel }.each do |include_cancel_rsvp, recipients|
+      Mailer.deliver(
+        :reminder,
+        to: recipients,
+        subject: reminder_subject,
+        locals: { event: event, tickets_table: tickets_table, include_cancel_rsvp: include_cancel_rsvp },
+        from: ENV['REMINDERS_EMAIL_FULL'],
+        reply_to: event.email || event.organisation.try(:reply_to)
+      )
     end
     set(sent_reminders_at: Time.now) if account_id == :all
   end
@@ -133,24 +101,18 @@ module EventNotifications
     return if evergreen?
     return unless organisation
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
     event = self
-
-    batch_message.from ENV['REMINDERS_EMAIL_FULL']
-    batch_message.reply_to(event.email || event.organisation.try(:reply_to))
-    batch_message.subject "#{event.name} is next week"
-
-    tickets_table = EmailHelper.render(:_tickets_table, event: event)
-    batch_message.body_html EmailHelper.html(:reminder_starred, event: event, tickets_table: tickets_table)
-
-    (account_id == :all ? starrers.and(unsubscribed: false).and(unsubscribed_reminders: false) : starrers.and(unsubscribed: false).and(unsubscribed_reminders: false).and(id: account_id)).each do |account|
-      when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ')
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s, 'when_parts_0' => when_parts[0], 'when_parts_1' => when_parts[1..].join(', ') })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :reminder_starred,
+      to: (account_id == :all ? starrers.and(unsubscribed: false).and(unsubscribed_reminders: false) : starrers.and(unsubscribed: false).and(unsubscribed_reminders: false).and(id: account_id)).map do |account|
+        when_parts = event.when_details(account.try(:time_zone), with_zone: true).split(', ')
+        account.mail_recipient('when_parts_0' => when_parts[0], 'when_parts_1' => when_parts[1..].join(', '))
+      end,
+      subject: "#{event.name} is next week",
+      locals: { event: event, tickets_table: EmailHelper.render(:_tickets_table, event: event) },
+      from: ENV['REMINDERS_EMAIL_FULL'],
+      reply_to: event.email || event.organisation.try(:reply_to)
+    )
     set(sent_star_reminders_at: Time.now) if account_id == :all
   end
 
@@ -173,35 +135,26 @@ module EventNotifications
       return
     end
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
     event = self
-    batch_message.from ENV['FEEDBACK_EMAIL_FULL']
-    batch_message.reply_to(event.email || event.organisation.try(:reply_to))
-    batch_message.subject(
-      EmailFields.replace_magic_tags(
+    recipients = account_id == :all ? attendees.and(unsubscribed: false).and(unsubscribed_feedback: false) : attendees.and(unsubscribed: false).and(unsubscribed_feedback: false).and(id: account_id)
+    recipients = recipients.map do |account|
+      [account.email, EmailFields.recipient_variables(event: event, account: account).merge('feedback_token' => account.feedback_token_for(event))]
+    end
+
+    puts "#{log_prefix}: sending to #{recipients.count} recipient(s)"
+    Mailer.deliver(
+      :feedback,
+      to: recipients,
+      subject: EmailFields.replace_magic_tags(
         event.feedback_email_title || event.organisation.feedback_email_title,
         event: event,
         recipient_variables: true,
         plain_text: true
-      )
+      ),
+      locals: { event: event },
+      from: ENV['FEEDBACK_EMAIL_FULL'],
+      reply_to: event.email || event.organisation.try(:reply_to)
     )
-    batch_message.body_html EmailHelper.html(:feedback, event: event)
-
-    recipients = account_id == :all ? attendees.and(unsubscribed: false).and(unsubscribed_feedback: false) : attendees.and(unsubscribed: false).and(unsubscribed_feedback: false).and(id: account_id)
-    recipient_count = 0
-    recipients.each do |account|
-      batch_message.add_recipient(:to, account.email,
-                                  EmailFields.recipient_variables(
-                                    event: event,
-                                    account: account
-                                  ).merge('feedback_token' => account.feedback_token_for(event)))
-      recipient_count += 1
-    end
-
-    puts "#{log_prefix}: sending to #{recipient_count} recipient(s)"
-    batch_message.finalize if Padrino.env == :production
     set(sent_feedback_requests_at: Time.now) if account_id == :all
     puts "#{log_prefix}: done sent_feedback_requests_at=#{sent_feedback_requests_at}"
   end
@@ -211,20 +164,13 @@ module EventNotifications
     return unless tickets_available?
     return if waitships.empty?
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    event = self
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.reply_to(event.email || event.organisation.try(:reply_to))
-    batch_message.subject "Tickets now available for #{event.name}"
-    batch_message.body_html EmailHelper.html(:waitlist_tickets_available, event: event)
-
-    waiters.and(unsubscribed: false).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :waitlist_tickets_available,
+      to: waiters.and(unsubscribed: false),
+      subject: "Tickets now available for #{name}",
+      locals: { event: self },
+      reply_to: email || organisation.try(:reply_to)
+    )
   end
 
   def send_ticket_type_waitlist_tickets_available(ticket_type_id)
@@ -236,19 +182,12 @@ module EventNotifications
     return unless ticket_type.tickets_available?
     return if ticket_type.ticket_type_waitships.empty?
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    event = self
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.reply_to(event.email || event.organisation.try(:reply_to))
-    batch_message.subject "Tickets now available for #{ticket_type.name} at #{event.name}"
-    batch_message.body_html EmailHelper.html(:waitlist_tickets_available, event: event, ticket_type: ticket_type)
-
-    Account.and(:id.in => ticket_type.ticket_type_waitships.pluck(:account_id).compact, unsubscribed: false).each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :waitlist_tickets_available,
+      to: Account.and(:id.in => ticket_type.ticket_type_waitships.pluck(:account_id).compact, unsubscribed: false),
+      subject: "Tickets now available for #{ticket_type.name} at #{name}",
+      locals: { event: self, ticket_type: ticket_type },
+      reply_to: email || organisation.try(:reply_to)
+    )
   end
 end

@@ -159,31 +159,20 @@ class EventBoost
   def send_admin_notification
     return unless payment_completed?
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    event_boost = self
-    event = self.event
-    account = self.account
-
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "[Event boost] #{account.name} boosted #{event.name}"
-    batch_message.body_text [
-      "Event: #{event.name}",
-      "Account: #{account.name}",
-      "Start time: #{event_boost.start_time.iso8601}",
-      "Currency: #{event_boost.currency}",
-      "Hours: #{event_boost.hours}",
-      "Hourly amount: #{event_boost.hourly_amount} #{event_boost.currency}",
-      "Total amount: #{event_boost.total_amount} #{event_boost.currency}",
-      "Boosts URL: #{ENV['BASE_URI']}/e/#{event.slug}/boosts"
-    ].join("\n")
-
-    Account.and(admin: true).each do |admin_account|
-      batch_message.add_recipient(:to, admin_account.email, { 'firstname' => admin_account.firstname || 'there', 'token' => admin_account.link_token_for_email, 'id' => admin_account.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      to: Account.and(admin: true),
+      subject: "[Event boost] #{account.name} boosted #{event.name}",
+      text: [
+        "Event: #{event.name}",
+        "Account: #{account.name}",
+        "Start time: #{start_time.iso8601}",
+        "Currency: #{currency}",
+        "Hours: #{hours}",
+        "Hourly amount: #{hourly_amount} #{currency}",
+        "Total amount: #{total_amount} #{currency}",
+        "Boosts URL: #{ENV['BASE_URI']}/e/#{event.slug}/boosts"
+      ].join("\n")
+    )
   end
   handle_asynchronously :send_admin_notification
 

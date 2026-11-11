@@ -334,7 +334,7 @@ class EventsTest < ActiveSupport::TestCase
     texts = ['%recipient.firstname%%', '%recipient.firstname%%recipient.lastname%', '%%recipient.lastname%%', '%recipient.username%recipient%recipient.fullname%%']
     ['%recipient.token', '% recipient.token%', 'Ada recipient.token', 'Ada .token%'].each do |name|
       account = FactoryBot.create(:account, name: name)
-      batch_message = Mailgun::BatchMessage.new(Mailgun::Client.new('key'), 'example.com')
+      batch_message = Mailgun::BatchMessage.new(Mailgun::Client.new('key'), 'example.com') # rubocop:disable Dandelion/MailgunDirect -- tests EmailHelper::RecipientVariables on a real BatchMessage, which sends nothing
       batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname, 'lastname' => account.lastname, 'fullname' => account.name, 'username' => nil, 'token' => 'SECRET' })
       variables = batch_message.recipient_variables[account.email]
 

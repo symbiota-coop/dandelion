@@ -196,37 +196,23 @@ module OrganisationMonthlyDonations
   end
 
   def send_new_monthly_donor_notification(organisationship)
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    organisation = self
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "New monthly donor for #{organisation.name}: #{organisationship.account.name}"
-    batch_message.body_html EmailHelper.html(:new_monthly_donor, organisationship: organisationship, organisation: organisation)
-
-    admins_receiving_feedback.each do |account|
-      batch_message.add_recipient(:to, account.email, { 'firstname' => account.firstname || 'there', 'token' => account.link_token_for_email, 'id' => account.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :new_monthly_donor,
+      to: admins_receiving_feedback,
+      subject: "New monthly donor for #{name}: #{organisationship.account.name}",
+      locals: { organisationship: organisationship, organisation: self }
+    )
   end
 
   def send_finished_monthly_donor_notification(organisationship)
     account = organisationship.account
     return unless account
 
-    mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
-    batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_NOTIFICATIONS_HOST'])
-
-    organisation = self
-    batch_message.from ENV['NOTIFICATIONS_EMAIL_FULL']
-    batch_message.subject "Monthly donation ended for #{organisation.name}: #{account.name}"
-    batch_message.body_html EmailHelper.html(:finished_monthly_donor, organisationship: organisationship, organisation: organisation)
-
-    admins_receiving_feedback.each do |recipient|
-      batch_message.add_recipient(:to, recipient.email, { 'firstname' => recipient.firstname || 'there', 'token' => recipient.link_token_for_email, 'id' => recipient.id.to_s })
-    end
-
-    batch_message.finalize if Padrino.env == :production
+    Mailer.deliver(
+      :finished_monthly_donor,
+      to: admins_receiving_feedback,
+      subject: "Monthly donation ended for #{name}: #{account.name}",
+      locals: { organisationship: organisationship, organisation: self }
+    )
   end
 end

@@ -275,6 +275,7 @@ class Pmail
     set(message_ids: message_ids)
   end
 
+  # rubocop:disable Dandelion/MailgunDirect -- newsletters pick their Mailgun account, domain and sender three ways, tag each send, check what the organisation's account has already sent, and can optimise delivery time
   def send_batch_message(test_to: nil, check_already_sent: false)
     pmail_links.destroy_all
     mailgun_sto = nil
@@ -373,6 +374,7 @@ class Pmail
 
     result
   end
+  # rubocop:enable Dandelion/MailgunDirect
 
   def send_signal_messages(account_ids)
     return unless signal_configured?
