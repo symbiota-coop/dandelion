@@ -747,6 +747,18 @@ class EventPermissionsTest < ActiveSupport::TestCase
     assert @event.errors[:fixed_contribution_gbp].any?
   end
 
+  test 'event admins cannot stop checkout donations going to Dandelion' do
+    create_event(prices: [0])
+    sign_in_with_rack(@account)
+
+    [:new, :edit].each do |action|
+      path = action == :new ? '/events/new' : "/e/#{@event.slug}/edit"
+      error = assert_raises(RuntimeError) { post path, event: { donations_to_organisation: '1' } }
+      assert_match(/are protected/, error.message)
+    end
+    refute @event.reload.donations_to_organisation?
+  end
+
   test 'atproto_uri is protected from mass assignment' do
     assert_includes Event.protected_attributes, 'atproto_uri'
   end
