@@ -35,8 +35,11 @@ Dandelion::App.controller do
             membership.requested_contribution,
             membership.paid
           ]
-          @gathering.joining_questions_a.each { |q| row << membership.answers.to_h[q] } if membership.answers
-          @gathering.application_questions_a.each { |q| row << membership.mapplication.answers.to_h[q] } if membership.mapplication && membership.mapplication.answers
+          # Every question gets a cell, answered or not, so a member without joining answers doesn't shift their application answers under the joining questions
+          joining_answers = membership.answers.to_h
+          application_answers = membership.mapplication&.answers.to_h
+          row += @gathering.joining_questions_a.map { |q| joining_answers[q] }
+          row += @gathering.application_questions_a.map { |q| application_answers[q] }
           csv << row
         end
       end

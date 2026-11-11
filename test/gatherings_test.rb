@@ -644,6 +644,20 @@ class GatheringsTest < ActiveSupport::TestCase
     assert_equal @account.name, member_row['proposed_by']
   end
 
+  test "the members CSV keeps each answer under its own question when a member has no joining answers" do
+    create_gathering
+    @gathering.update!(joining_questions: 'Why join?', application_questions: 'Why apply?')
+    member = FactoryBot.create(:account, name: 'Applicant Person')
+    mapplication = @gathering.mapplications.create!(account: member, status: 'pending', answers: [['Why apply?', 'To help']])
+    @gathering.memberships.create!(account: member, added_by: @account, mapplication: mapplication)
+
+    sign_in_with_rack(@account)
+    get "/g/#{@gathering.slug}/members.csv"
+    member_row = CSV.parse(last_response.body, headers: true).find { |csv_row| csv_row['name'] == 'Applicant Person' }
+    assert_nil member_row['Why join?']
+    assert_equal 'To help', member_row['Why apply?']
+  end
+
   test 'each of the six features can be enabled or disabled' do
     covers 'gatherings/optional-features@9dfad8'
     features = { contributions: 'options', teams: 'teams', timetables: 'timetables/new', rotas: 'rotas/new', inventory: 'inventory', budget: 'budget' }
