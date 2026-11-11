@@ -125,6 +125,15 @@ class LintTest < Minitest::Test
     assert_empty cop_offenses(cop, 'Shift.find(params[:id])', 'lib/x.rb')
   end
 
+  # Dandelion/GatheringScope lists the models to find through their gathering by hand, so a new model that belongs to a
+  # gathering is added there, or a route could find another gathering's by id
+  def test_gathering_scope_lists_every_model_that_belongs_to_a_gathering
+    models = Dir[File.join(ROOT, 'models/*.rb')].select { |path| File.read(path, encoding: 'UTF-8').match?(/^\s*belongs_to\w* :gathering\b/) }
+    names = models.map { |path| File.basename(path, '.rb').split('_').map(&:capitalize).join }
+    assert_equal names.sort, RuboCop::Cop::Dandelion::GatheringScope::MODELS.sort,
+                 'MODELS in .rubocop/dandelion/gathering_scope.rb should be the models that belong to a gathering'
+  end
+
   def test_redcarpet_is_allowed_only_in_markdown_renderer
     cop = RuboCop::Cop::Registry.global.find_by_cop_name('Dandelion/Redcarpet')
     assert_empty cop_offenses(cop, 'Redcarpet::Markdown.new(x)', 'lib/markdown_renderer.rb')

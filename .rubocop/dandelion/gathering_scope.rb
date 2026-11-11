@@ -17,6 +17,7 @@ module RuboCop
       #   @shift = @gathering.shifts.find_by(id: params[:shift_id])
       class GatheringScope < Base
         MSG = "Find a gathering's %<model>s through the gathering, under /g/:slug (`@gathering.%<association>s.find(...)`).".freeze
+        # The models that belong to a gathering: test/lint_test.rb checks it against the models themselves
         MODELS = %w[
           Attendance InventoryItem Mapplication Membership Option Optionship Payment Role Rota Rslot Shift Space Spend
           Tactivity Team Teamship Timetable Tslot Verdict
