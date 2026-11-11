@@ -52,6 +52,15 @@ module Asn
     detail['success'] && detail['result']['rules']&.find { |r| r['id'] == ENV['CLOUDFLARE_ASN_RULE_ID'] }
   end
 
+  # Replaces the ASN rule's expression, keeping its action and description, and returns Cloudflare's response
+  def self.update_rule!(rule, expression)
+    conn.patch("/client/v4/zones/#{ENV['CLOUDFLARE_ZONE_ID']}/rulesets/#{ENV['CLOUDFLARE_RULESET_ID']}/rules/#{ENV['CLOUDFLARE_ASN_RULE_ID']}") do |req|
+      req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
+      req.headers['Content-Type'] = 'application/json'
+      req.body = { expression: expression, action: rule['action'], description: rule['description'] }.to_json
+    end.body
+  end
+
   def self.blocked_asns(rule)
     rule ? rule['expression'].scan(/ip\.src\.asnum eq (\d+)/).flatten : []
   end
@@ -222,11 +231,7 @@ module Asn
     return true if current.include?(asn.to_s)
 
     new_expression = "#{rule['expression']} or (ip.src.asnum eq #{asn})"
-    conn.patch("/client/v4/zones/#{ENV['CLOUDFLARE_ZONE_ID']}/rulesets/#{ENV['CLOUDFLARE_RULESET_ID']}/rules/#{ENV['CLOUDFLARE_ASN_RULE_ID']}") do |req|
-      req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
-      req.headers['Content-Type'] = 'application/json'
-      req.body = { expression: new_expression, action: rule['action'], description: rule['description'] }.to_json
-    end
+    update_rule!(rule, new_expression)
     true
   end
 
@@ -238,11 +243,7 @@ module Asn
     return if remaining.empty?
 
     new_expression = remaining.map { |a| "(ip.src.asnum eq #{a})" }.join(' or ')
-    conn.patch("/client/v4/zones/#{ENV['CLOUDFLARE_ZONE_ID']}/rulesets/#{ENV['CLOUDFLARE_RULESET_ID']}/rules/#{ENV['CLOUDFLARE_ASN_RULE_ID']}") do |req|
-      req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
-      req.headers['Content-Type'] = 'application/json'
-      req.body = { expression: new_expression, action: rule['action'], description: rule['description'] }.to_json
-    end
+    update_rule!(rule, new_expression)
     true
   end
 
@@ -309,11 +310,7 @@ module Asn
     if new_expression == rule['expression']
       puts '[ASN autoblock] rule unchanged (new ASNs already in rule)'
     else
-      response = conn.patch("/client/v4/zones/#{ENV['CLOUDFLARE_ZONE_ID']}/rulesets/#{ENV['CLOUDFLARE_RULESET_ID']}/rules/#{ENV['CLOUDFLARE_ASN_RULE_ID']}") do |req|
-        req.headers['Authorization'] = "Bearer #{ENV['CLOUDFLARE_API_KEY']}"
-        req.headers['Content-Type'] = 'application/json'
-        req.body = { expression: new_expression, action: rule['action'], description: rule['description'] }.to_json
-      end.body
+      response = update_rule!(rule, new_expression)
 
       raise "failed to update Cloudflare rule: #{response.dig('errors')}" unless response['success']
 
