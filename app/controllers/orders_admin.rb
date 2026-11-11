@@ -63,27 +63,7 @@ Dandelion::App.controller do
   get '/e/:slug/tickets', provides: %i[html csv pdf] do
     @event = Event.unscoped.find_by_slug_or_id(slug: params[:slug]) || not_found
     event_admins_only!
-    @tickets = if params[:ticket_type_id]
-                 tt = @event.ticket_types.find(params[:ticket_type_id]) || not_found
-                 tt.tickets.includes(:account, :ticket_type, :order)
-               elsif params[:ticket_group_id]
-                 tg = @event.ticket_groups.find(params[:ticket_group_id]) || not_found
-                 tg.tickets.includes(:account, :ticket_type, :order)
-               else
-                 @event.tickets.includes(:account, :ticket_type, :order)
-               end
-    @tickets =  @tickets.discounted if params[:discounted]
-    @tickets =  @tickets.deleted if params[:deleted]
-    @tickets =  @tickets.complete if params[:complete]
-    @tickets =  @tickets.incomplete if params[:incomplete]
-    if params[:q]
-      @tickets = @tickets.and(:id.in =>
-        @tickets.and(id_string: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
-        @tickets.and(token: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
-        @tickets.and(name: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
-        @tickets.and(email: /#{Regexp.escape(params[:q])}/i).pluck(:id) +
-        @tickets.and(:account_id.in => Account.search(params[:q], child_scope: @tickets, regex_search: true).pluck(:id)).pluck(:id))
-    end
+    @tickets = event_tickets_from_params(:account, :ticket_type, :order)
     case content_type
     when :html
       if request.xhr?

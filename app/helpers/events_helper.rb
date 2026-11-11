@@ -274,4 +274,26 @@ Dandelion::App.helpers do
     html.search('script').remove
     td.children.text.split("\n").reject(&:blank?).map(&:strip).join(', ')
   end
+
+  # The event's tickets the tickets and check-in lists show: those of params[:ticket_type_id] or params[:ticket_group_id]
+  # if given, filtered by the list's checkboxes and searched by params[:q] (id, token, name, email or account)
+  def event_tickets_from_params(*includes)
+    tickets = if params[:ticket_type_id]
+                (@event.ticket_types.find(params[:ticket_type_id]) || not_found).tickets
+              elsif params[:ticket_group_id]
+                (@event.ticket_groups.find(params[:ticket_group_id]) || not_found).tickets
+              else
+                @event.tickets
+              end.includes(*includes)
+    tickets = tickets.discounted if params[:discounted]
+    tickets = tickets.deleted if params[:deleted]
+    tickets = tickets.complete if params[:complete]
+    tickets = tickets.incomplete if params[:incomplete]
+    return tickets unless params[:q]
+
+    q = /#{Regexp.escape(params[:q])}/i
+    tickets.and(:id.in =>
+      tickets.and(:$or => [{ id_string: q }, { token: q }, { name: q }, { email: q }]).pluck(:id) +
+      tickets.and(:account_id.in => Account.search(params[:q], child_scope: tickets, regex_search: true).pluck(:id)).pluck(:id))
+  end
 end
