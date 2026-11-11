@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/g/:slug/inventory' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @inventory_item = @gathering.inventory_items.build(mass_assigning(params[:inventory_item], InventoryItem))
@@ -12,7 +12,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/inventory_items/new' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @inventory_item = @gathering.inventory_items.build(mass_assigning(params[:inventory_item], InventoryItem))
@@ -26,7 +26,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/inventory_items/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @inventory_item = @gathering.inventory_items.find(params[:id]) || not_found
@@ -34,7 +34,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/inventory_items/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @inventory_item = @gathering.inventory_items.find(params[:id]) || not_found
@@ -47,7 +47,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/inventory_items/:id/destroy' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @inventory_item = @gathering.inventory_items.find(params[:id]) || not_found
@@ -56,7 +56,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/inventory_items/:id/provided' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @inventory_item = @gathering.inventory_items.find(params[:id]) || not_found

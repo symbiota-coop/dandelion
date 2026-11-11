@@ -206,6 +206,10 @@ Dandelion::App.helpers do
     Organisation.find_by_slug_or_id(slug: params[:organisation_slug])&.local_groups&.find_by_slug_or_id(slug: params[:slug])
   end
 
+  def gathering_from_params
+    Gathering.find_by_slug_or_id(slug: params[:slug])
+  end
+
   def event_from_params
     Event.find_by_slug_or_id(
       slug: params[:event_slug] || params[:slug],

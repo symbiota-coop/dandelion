@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/g/:slug/timetables/new' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @timetable = @gathering.timetables.build
@@ -8,7 +8,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/timetables/new' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @timetable = @gathering.timetables.build(mass_assigning(params[:timetable], Timetable))
@@ -22,14 +22,14 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/timetables' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     erb :'timetables/timetables'
   end
 
   get '/g/:slug/timetables/:id' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     @timetable = @gathering.timetables.find(params[:id]) || not_found
     confirmed_membership_required!
@@ -41,7 +41,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/timetables/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @timetable = @gathering.timetables.find(params[:id]) || not_found
@@ -49,7 +49,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/timetables/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @timetable = @gathering.timetables.find(params[:id]) || not_found
@@ -62,7 +62,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/timetables/:id/destroy' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @timetable = @gathering.timetables.find(params[:id]) || not_found
@@ -71,7 +71,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/spaces/order' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
@@ -82,7 +82,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/spaces/create' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
@@ -91,7 +91,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/spaces/:id/destroy' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @space = @gathering.spaces.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
@@ -100,7 +100,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/tslots/order' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
@@ -111,7 +111,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/tslots/create' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
@@ -120,7 +120,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/tslots/:id/destroy' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @tslot = @gathering.tslots.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
@@ -129,7 +129,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/tactivities/create' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
@@ -145,7 +145,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/tactivities/:id' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @timetable = @tactivity.timetable
@@ -154,7 +154,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/tactivities/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
@@ -162,7 +162,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/tactivities/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
@@ -175,7 +175,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/tactivities/:id/destroy' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
@@ -184,7 +184,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/tactivities/:id/schedule' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
@@ -199,7 +199,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/tactivities/:id/unschedule' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
@@ -218,7 +218,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/tactivities/:id/attendees' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
@@ -226,7 +226,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/tactivities/:id/attend' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
@@ -235,7 +235,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/tactivities/:id/unattend' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!

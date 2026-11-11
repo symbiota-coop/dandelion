@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   post '/g/:slug/options/new' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
     params[:option].delete(:cost) if params[:option] && !gathering_admin?
@@ -27,7 +27,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/options' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
     if request.xhr?
@@ -38,7 +38,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/options/:id' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
     @option = @gathering.options.find(params[:id]) || not_found
@@ -46,7 +46,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/options/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     @option = @gathering.options.find(params[:id]) || not_found
     @option.cost > 0 ? gathering_admins_only! : membership_required!
@@ -54,7 +54,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/options/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     @option = @gathering.options.find(params[:id]) || not_found
     @option.cost > 0 ? gathering_admins_only! : membership_required!
@@ -68,7 +68,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/options/:id/destroy' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @option = @gathering.options.find(params[:id]) || not_found
@@ -77,7 +77,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/optionships/create' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @option = @gathering.options.find(params[:option_id]) || not_found
     membership_required!
     # Admins add people to options that are by invitation, from /g/:slug/optionships/new
@@ -88,7 +88,7 @@ Dandelion::App.controller do
 
   # Leaving an option (its pagelet), or an admin removing someone (the contribution form)
   post '/g/:slug/optionships/:id/destroy' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @optionship = @gathering.optionships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     halt unless (@optionship.account.id == current_account.id) || gathering_admin?
@@ -97,7 +97,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/optionships/new' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @optionship = @gathering.optionships.build(mass_assigning(params[:optionship], Optionship))
@@ -110,7 +110,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/optionships/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @optionship = @gathering.optionships.find(params[:id]) || not_found
@@ -122,7 +122,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/optionships/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @optionship = @gathering.optionships.find(params[:id])

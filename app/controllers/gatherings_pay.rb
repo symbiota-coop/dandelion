@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   post '/g/:slug/stripe_webhook' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     payload = request.body.read
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
     begin
@@ -26,7 +26,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/pay', provides: :json do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
 
@@ -38,7 +38,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/payments/:payment_id', provides: :json do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     membership_required!
     @payment = @gathering.payments.find(params[:payment_id])

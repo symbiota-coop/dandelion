@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/g/:slug/rotas/new' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rota = @gathering.rotas.build
@@ -8,7 +8,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/rotas/new' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rota = @gathering.rotas.build(mass_assigning(params[:rota], Rota))
@@ -22,7 +22,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/rotas' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     redirect "/g/#{@gathering.slug}/rotas/#{@gathering.rotas.first.id}" if @gathering.rotas.count == 1
@@ -30,7 +30,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/rotas/:id', provides: [:html, :csv] do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @rota = @gathering.rotas.find(params[:id]) || not_found
@@ -62,7 +62,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/rotas/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rota = @gathering.rotas.find(params[:id]) || not_found
@@ -70,7 +70,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/rotas/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rota = @gathering.rotas.find(params[:id]) || not_found
@@ -83,7 +83,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/rotas/:id/destroy' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rota = @gathering.rotas.find(params[:id]) || not_found
@@ -92,7 +92,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/rotas/:id/create_shift' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rota = @gathering.rotas.find(params[:id]) || not_found
@@ -100,7 +100,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/rotas/:id/create_shift' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rota = @gathering.rotas.find(params[:id]) || not_found
@@ -114,7 +114,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/roles/order' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rota = @gathering.rotas.find(params[:rota_id]) || not_found
@@ -125,7 +125,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/roles/create' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rota = @gathering.rotas.find(params[:rota_id]) || not_found
@@ -134,7 +134,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/roles/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @role = @gathering.roles.find(params[:id]) || not_found
@@ -142,7 +142,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/roles/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @role = @gathering.roles.find(params[:id]) || not_found
@@ -155,7 +155,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/roles/:id/destroy' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @role = @gathering.roles.find(params[:id]) || not_found
@@ -164,7 +164,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/rslots/order' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rota = @gathering.rotas.find(params[:rota_id]) || not_found
@@ -175,7 +175,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/rslots/create' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rota = @gathering.rotas.find(params[:rota_id]) || not_found
@@ -184,7 +184,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/rslots/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rslot = @gathering.rslots.find(params[:id]) || not_found
@@ -192,7 +192,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/rslots/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rslot = @gathering.rslots.find(params[:id]) || not_found
@@ -205,7 +205,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/rslots/:id/destroy' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rslot = @gathering.rslots.find(params[:id]) || not_found
@@ -214,7 +214,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/shifts/create' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required!
     @rota = @gathering.rotas.find(params[:rota_id]) || not_found
@@ -225,7 +225,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/shifts/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
     @shift = @gathering.shifts.find(params[:id]) || not_found
@@ -234,7 +234,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/shifts/:id/edit' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
     @shift = @gathering.shifts.find(params[:id]) || not_found
@@ -250,7 +250,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/shifts/:id/destroy' do
-    @gathering = Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     confirmed_membership_required! unless gathering_admin?
     @shift = @gathering.shifts.find(params[:id]) || not_found
