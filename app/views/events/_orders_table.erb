@@ -233,29 +233,7 @@
     </td>
     <% if @event %>
       <td>
-        <% if order.account %>
-          <% if (event_feedback = event_feedbacks_by_account[order.account_id]) && !event_feedback.anonymous %>
-            <a href="/event_feedbacks/<%= event_feedback.id %>">
-              <% if event_feedback.rating %>
-                <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
-              <% else %>
-                <%= event_feedback.id %>
-              <% end %>
-            </a>
-          <% elsif order.event.started? %>
-            <% if order.account.unsubscribed || order.account.unsubscribed_feedback %>
-              <span class="text-body-secondary">Unsubscribed from feedback emails</span>
-            <% else %>
-              <a data-method="post" href="/e/<%= order.event.slug %>/resend_feedback_email/<%= order.account_id %>">
-                <% if order.event.finished? %>
-                  Resend feedback email
-                <% elsif order.event.started? %>
-                  Send feedback email
-                <% end %>
-              </a>
-            <% end %>
-          <% end %>
-        <% end %>
+        <%= partial :'events/feedback_cell', locals: { account: order.account, event: order.event, event_feedbacks_by_account: event_feedbacks_by_account } %>
       </td>
     <% end %>
     <td nowrap>

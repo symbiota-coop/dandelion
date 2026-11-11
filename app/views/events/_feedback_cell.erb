@@ -1,0 +1,18 @@
+<%# A ticket's or order's account's feedback on the event in the tickets and orders tables, or a link to send them the feedback email once the event has started %>
+<% if account %>
+  <% if (event_feedback = event_feedbacks_by_account[account.id]) && !event_feedback.anonymous %>
+    <a href="/event_feedbacks/<%= event_feedback.id %>">
+      <% if event_feedback.rating %>
+        <% event_feedback.rating.times do %><i class="bi bi-star-fill"></i><% end %>
+      <% else %>
+        <%= event_feedback.id %>
+      <% end %>
+    </a>
+  <% elsif event.started? %>
+    <% if account.unsubscribed || account.unsubscribed_feedback %>
+      <span class="text-body-secondary">Unsubscribed from feedback emails</span>
+    <% else %>
+      <a data-method="post" href="/e/<%= event.slug %>/resend_feedback_email/<%= account.id %>"><%= event.finished? ? 'Resend feedback email' : 'Send feedback email' %></a>
+    <% end %>
+  <% end %>
+<% end %>
