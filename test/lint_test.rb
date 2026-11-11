@@ -712,8 +712,13 @@ class LintTest < Minitest::Test
     skip 'needs uv installed' unless ENV['PATH'].split(File::PATH_SEPARATOR).any? { |dir| File.executable?(File.join(dir, 'uvx')) }
     Dir.mktmpdir do |dir|
       # A workflow in a copy of the checkout's script/ and actionlint config, as script/lint runs from its parent, made
-      # a git repository, where actionlint looks for its config
-      Open3.capture2e('git', 'init', '-q', dir)
+      # a git repository, where actionlint looks for its config. Git exports GIT_DIR and others to hooks, so in the
+      # pre-commit hook git init would reinitialise the checkout's own repository (setting core.bare in its config) and
+      # actionlint would look there: both run without them
+      no_git_env = ENV.keys.grep(/\AGIT_/).to_h { |key| [key, nil] }
+      _, status = Open3.capture2e(no_git_env, 'git', 'init', '-q', dir)
+      assert status.success?
+      assert File.directory?(File.join(dir, '.git'))
       FileUtils.mkdir_p(File.join(dir, '.github/workflows'))
       FileUtils.cp_r(File.join(ROOT, 'script'), dir)
       FileUtils.cp(File.join(ROOT, '.github/actionlint.yaml'), File.join(dir, '.github'))
@@ -727,7 +732,7 @@ class LintTest < Minitest::Test
               - uses: $/.github/actions/ours
               - run: echo ${{ github.event.nope.x }} >> $GITHUB_ENV
       YAML
-      output, status = Open3.capture2e('script/lint', '--only', 'actionlint', '.github/workflows/bad.yml', chdir: dir)
+      output, status = Open3.capture2e(no_git_env, 'script/lint', '--only', 'actionlint', '.github/workflows/bad.yml', chdir: dir)
       output = output.force_encoding('UTF-8') # actionlint underlines with ^~~
       refute status.success?, output
       assert_match(/SC2086/, output) # ShellCheck, on the run: script
