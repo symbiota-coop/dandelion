@@ -1,16 +1,5 @@
-<% if @organisation %>
-  <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
-  <% organisation = @organisation %>
-<% elsif @activity %>
-  <%= partial :'activities/nav', locals: { activity: @activity } %>
-  <% organisation = @activity.organisation %>
-<% elsif @local_group %>
-  <%= partial :'local_groups/nav', locals: { local_group: @local_group } %>
-  <% organisation = @local_group.organisation %>
-<% elsif @event %>
-  <%= partial :'events/nav', locals: { event: @event } %>
-  <% organisation = @event.organisation %>
-<% end %>
+<%= context_nav %>
+<% organisation = @organisation || context_record&.last&.organisation %>
 
 <style>
   #pmail_body { height: 30rem; }
@@ -41,15 +30,7 @@
 
   <div style="max-width: 45rem; margin: 0 auto;">
 
-    <% if @organisation %>
-      <%= hidden_field_tag :organisation_id, value: @organisation.id %>
-    <% elsif @activity %>
-      <%= hidden_field_tag :activity_id, value: @activity.id %>
-    <% elsif @local_group %>
-      <%= hidden_field_tag :local_group_id, value: @local_group.id %>
-    <% elsif @event %>
-      <%= hidden_field_tag :event_id, value: @event.id %>
-    <% end %>
+    <%= context_id_field %>
 
     <%= partial :'pmails/to_options', locals: { f: f, organisation: organisation } %>
     <%= partial :'pmails/exclude', locals: { f: f, organisation: organisation } %>

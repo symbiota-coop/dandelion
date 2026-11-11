@@ -1,12 +1,4 @@
-<% if @organisation %>
-  <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
-<% elsif @activity %>
-  <%= partial :'activities/nav', locals: { activity: @activity } %>
-<% elsif @local_group %>
-  <%= partial :'local_groups/nav', locals: { local_group: @local_group } %>
-<% elsif @event %>
-  <%= partial :'events/nav', locals: { event: @event } %>
-<% end %>
+<%= context_nav %>
 <% if Padrino.env == :test || @event || @_organisation.mailgun_enabled? %>
   <a href="/pmails/new?<%= @scope %>" class="btn btn-primary"><i class="bi bi-pencil-fill"></i> New message</a>
 <% elsif !@_organisation.mailgun_api_key %>

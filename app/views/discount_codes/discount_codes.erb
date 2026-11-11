@@ -1,12 +1,4 @@
-<% if @organisation %>
-  <%= partial :'organisations/nav', locals: { organisation: @organisation } %>
-<% elsif @activity %>
-  <%= partial :'activities/nav', locals: { activity: @activity } %>
-<% elsif @local_group %>
-  <%= partial :'local_groups/nav', locals: { local_group: @local_group } %>
-<% elsif @event %>
-  <%= partial :'events/nav', locals: { event: @event } %>
-<% end %>
+<%= context_nav %>
 <div class="my-2">
   <a class="btn btn-primary" href="/discount_codes/new?<%= @scope %>"><i class="bi bi-plus-lg"></i> Create a discount code</a>
 </div>

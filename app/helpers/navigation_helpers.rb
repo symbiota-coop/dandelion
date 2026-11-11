@@ -85,4 +85,26 @@ Dandelion::App.helpers do
   def mobile_modal_title(html)
     ERB::Util.html_escape(CGI.unescapeHTML(Sanitize.fragment(html)).squish)
   end
+
+  # The organisation, activity, local group or event a page shared between them is for (load_context sets which), and
+  # its kind, for pages like discount codes and mailers
+  def context_record
+    if @organisation then [:organisation, @organisation]
+    elsif @activity then [:activity, @activity]
+    elsif @local_group then [:local_group, @local_group]
+    elsif @event then [:event, @event]
+    end
+  end
+
+  # The context's nav
+  def context_nav
+    kind, record = context_record
+    partial :"#{kind.to_s.pluralize}/nav", locals: { kind => record } if kind
+  end
+
+  # A hidden field naming the context, so a form's request has the same context as the page
+  def context_id_field
+    kind, record = context_record
+    hidden_field_tag :"#{kind}_id", value: record.id if kind
+  end
 end
