@@ -1,0 +1,19 @@
+<%# A ticket's account in the tickets and check-in lists, with the name and email the ticket was ordered for, if it has them %>
+<% if ticket.account %>
+  <%= partial :'accounts/account', locals: { account: ticket.account, show_email: ticket_email_viewer?(ticket) } %>
+  <% if ticket.name || (ticket.email && ticket_email_viewer?(ticket)) %>
+    <div class="mt-1">
+      ordered for
+      <% if ticket.name %>
+        <br>
+        <strong><%= ticket.name %></strong>
+      <% end %>
+      <% if ticket.email && ticket_email_viewer?(ticket) %>
+        <br>
+        <small><%= ticket.email %></small>
+      <% end %>
+    </div>
+  <% end %>
+<% else %>
+  <em class="text-body-secondary">(deleted account)</em>
+<% end %>

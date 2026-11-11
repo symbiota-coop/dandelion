@@ -27,24 +27,7 @@
   <% @tickets.each { |ticket| %>
   <tr>
     <td>
-      <% if ticket.account %>
-        <%= partial :'accounts/account', locals: { account: ticket.account, show_email: ticket_email_viewer?(ticket) } %>
-        <% if ticket.name || (ticket.email && ticket_email_viewer?(ticket)) %>
-          <div class="mt-1">
-            ordered for
-            <% if ticket.name %>
-              <br>
-              <strong><%= ticket.name %></strong>
-            <% end %>
-            <% if ticket.email && ticket_email_viewer?(ticket) %>
-              <br>
-              <small><%= ticket.email %></small>
-            <% end %>
-          </div>
-        <% end %>
-      <% else %>
-        <em class="text-body-secondary">(deleted account)</em>
-      <% end %>
+      <%= partial :'events/ticket_holder', locals: { ticket: ticket } %>
     </td>
     <td>
       <%= ticket.ticket_type.try(:name) %>
