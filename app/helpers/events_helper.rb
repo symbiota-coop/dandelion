@@ -171,54 +171,96 @@ Dandelion::App.helpers do
     params[:table] ? partial(:'events/event_stats', locals: { events: @events, organisation: organisation }) : erb(:'events/event_stats')
   end
 
-  # The stats table's rows (events/event_stats_row)
+  # The stats table's and CSV's columns, in order. Each is a cell partial (event_stats_row/) with its header and the
+  # attributes of its th. table: false or csv: false leaves one out of the table or the CSV, a csv: block gives a
+  # column's CSV text in place of its cell's, and revenue_admin: true columns are blank for events whose revenue the
+  # viewer can't see
+  def event_stats_columns(organisation)
+    money = { 'data-money' => true }
+    columns = [
+      { name: 'name', csv: lambda(&:name) },
+      { name: 'buttons', header: '', th: { 'data-orderable' => 'false' }, csv: false },
+      { name: 'date', th: { style: 'min-width: 12.5em', 'data-col-name' => 'date' } },
+      { name: 'coordinator' },
+      { name: 'organiser', table: organisation.stripe_client_id.present? },
+      { name: 'facilitators' },
+      { name: 'tags' },
+      { name: 'activity' },
+      { name: 'local_group' },
+      { name: 'facebook_event' },
+      { name: 'views' },
+      { name: 'tickets_sold', th: { 'data-sum' => true } },
+      { name: 'checked_in' },
+      { name: 'ticket_revenue', th: money },
+      { name: 'donations', th: money }
+    ]
+    if organisation.stripe_client_id
+      columns += [
+        { name: 'ticket_revenue_to_revenue_sharer' },
+        { name: 'ticket_revenue_to_organisation' },
+        { name: 'revenue_reported_by_dandelion', header: 'Revenue reported by Dandelion' },
+        { name: 'revenue_reported_by_stripe', header: 'Revenue reported by Stripe' },
+        { name: 'stripe_fees' }
+      ].map { |column| column.merge(th: money) }
+      columns += [
+        { name: 'profit' },
+        { name: 'profit_less_donations_before_allocations', header: 'Profit less donations, before allocations' }
+      ].map { |column| column.merge(th: money, revenue_admin: true) }
+      # Allocated to a role = profit * profit_share_<role>
+      columns += Event.profit_share_roles.map do |role|
+        th = %w[category_steward social_media].include?(role) ? money.merge('data-hide-if-zero' => true) : money
+        { name: "allocated_to_#{role}", partial: 'allocated_to_role', locals: { role: role }, th: th, revenue_admin: true }
+      end
+      columns += [
+        { name: 'profit_less_donations_after_allocations', header: 'Profit less donations, after allocations' },
+        { name: 'profit_including_donations_after_allocations', header: 'Profit including donations, after allocations' }
+      ].map { |column| column.merge(th: money, revenue_admin: true) }
+      columns += Event.profit_share_roles.map do |role|
+        { name: "remaining_to_#{role}", csv: ->(event) { m(event.send("remaining_to_#{role}").abs, event.currency) }, table: false, revenue_admin: true }
+      end
+      columns << { name: 'remaining_to_be_paid', th: money, revenue_admin: true }
+    end
+    columns << { name: 'feedback' }
+    columns.map { |column| { header: column[:name].humanize, partial: column[:name], locals: {}, th: {}, table: true, csv: true }.merge(column) }
+  end
+
+  def event_stats_table_columns(organisation)
+    event_stats_columns(organisation).select { |column| column[:table] }
+  end
+
+  def event_stats_cell(column, event, organisation, revenue_admin)
+    return '<td></td>' if column[:revenue_admin] && !revenue_admin
+
+    partial(:"event_stats_row/#{column[:partial]}", locals: { event: event, organisation: organisation, **column[:locals] })
+  end
+
+  def event_stats_csv_cell(column, event, organisation, revenue_admin)
+    return '' if column[:revenue_admin] && !revenue_admin
+    return column[:csv].call(event) if column[:csv].respond_to?(:call)
+
+    extract_csv_cell_text(event_stats_cell(column, event, organisation, revenue_admin))
+  end
+
+  # The stats table's rows
   def event_stats_rows(events, organisation)
+    columns = event_stats_table_columns(organisation)
     with_stats_events(events) do |stats_events|
-      stats_events.map { |event| partial(:'events/event_stats_row', locals: { event: event, organisation: organisation, event_revenue_admin: event_revenue_admin?(event) }) }
+      stats_events.map do |event|
+        revenue_admin = event_revenue_admin?(event)
+        columns.map { |column| event_stats_cell(column, event, organisation, revenue_admin) }.join.html_safe
+      end
     end
   end
 
   # The CSV's cells are the text of the stats table's cells (event_stats_row/), or their data-csv attribute
   def build_events_stats_csv(events, organisation)
+    columns = event_stats_columns(organisation).select { |column| column[:csv] }
     CSV.generate do |csv|
-      headers = ['name']
-      headers_basic = %w[date coordinator organiser facilitators tags activity local_group facebook_event views tickets_sold checked_in ticket_revenue donations]
-      headers += headers_basic
-
-      if organisation.stripe_client_id
-        headers_stripe_client_id = %w[ticket_revenue_to_revenue_sharer ticket_revenue_to_organisation revenue_reported_by_dandelion revenue_reported_by_stripe stripe_fees]
-        headers += headers_stripe_client_id
-        headers += %w[profit profit_less_donations_before_allocations]
-        Event.profit_share_roles.each { |role| headers << "allocated_to_#{role}" }
-        headers += %w[profit_less_donations_after_allocations profit_including_donations_after_allocations]
-        Event.profit_share_roles.each { |role| headers << "remaining_to_#{role}" }
-        headers << 'remaining_to_be_paid'
-      end
-      headers << 'feedback'
-      csv << headers
-
+      csv << columns.pluck(:name)
       with_stats_events(events) do |stats_events|
         stats_events.each do |event|
-          cell = ->(name, **locals) { partial(:"event_stats_row/#{name}", locals: { event: event, organisation: organisation, **locals }) }
-          row = [event.name]
-          row += headers_basic.map { |h| cell.call(h) }
-
-          if organisation.stripe_client_id
-            row += headers_stripe_client_id.map { |h| cell.call(h) }
-            if event_revenue_admin?(event)
-              row += [cell.call(:profit), cell.call(:profit_less_donations_before_allocations)]
-              Event.profit_share_roles.each { |role| row << cell.call(:allocated_to_role, role: role) }
-              row += [cell.call(:profit_less_donations_after_allocations), cell.call(:profit_including_donations_after_allocations)]
-              Event.profit_share_roles.each { |role| row << m(event.send("remaining_to_#{role}").abs, event.currency) }
-              row << cell.call(:remaining_to_be_paid)
-            else
-              row += Array.new(13, '')
-            end
-          end
-
-          row << cell.call(:feedback)
-          row.map! { |c| extract_csv_cell_text(c) }
-          csv << row
+          revenue_admin = event_revenue_admin?(event)
+          csv << columns.map { |column| event_stats_csv_cell(column, event, organisation, revenue_admin) }
         end
       end
     end
