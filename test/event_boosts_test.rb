@@ -17,13 +17,11 @@ class EventBoostsTest < ActiveSupport::TestCase
 
     stripe_session = api_object(id: 'cs_complete_me', payment_intent: 'pi_test')
     Stripe::Checkout::Session.stub :create, stripe_session do
-      page.execute_script(<<~JS)
-        window.Stripe = function() { return { redirectToCheckout: function() { return Promise.resolve(); } }; };
-      JS
+      record_stripe_redirect
       click_button 'Buy boost'
-      # The boost is saved by a background request: the form fades while it's in flight, and comes back once it's
-      # answered. Waiting here, inside the stub, also keeps the request from reaching the real Stripe
-      assert page.has_css?('#event-boost-form[style*="opacity: 1"]')
+      # The boost is saved by a background request. Waiting for its answer here, inside the stub, also keeps the
+      # request from reaching the real Stripe
+      assert has_checkout_session?('cs_complete_me')
     end
 
     event_boost = @event.event_boosts.order('created_at desc').first

@@ -17,17 +17,16 @@ class EventBookingsTest < ActiveSupport::TestCase
          }
   end
 
-  # Stripe.js would take the buyer to stripe.com with the session: record which, on the page, instead. Yields the
-  # params the checkout session is created with
+  # Pays by card with button, as far as Stripe Checkout. Yields the params the checkout session is created with
   def pay_by_card(button)
-    execute_script 'window.Stripe = function () { return { redirectToCheckout: function (options) { document.body.dataset.checkoutSession = options.sessionId } } }'
+    record_stripe_redirect
     session = proc do |params, _opts|
       yield params if block_given?
       api_object(id: 'cs_test', payment_intent: 'pi_test', url: 'https://checkout.stripe.com/test')
     end
     Stripe::Checkout::Session.stub(:create, session) do
       click_button button
-      assert page.has_css? "body[data-checkout-session='cs_test']"
+      assert has_checkout_session?('cs_test')
     end
   end
 

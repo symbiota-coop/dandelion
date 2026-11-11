@@ -74,6 +74,16 @@ module TestHelpers
     Stripe::Checkout::Session.stub(:create, session) { yield session }
   end
 
+  # Stripe.js would take the buyer to stripe.com with the session: record which on the page instead, for
+  # has_checkout_session? to check
+  def record_stripe_redirect
+    execute_script 'window.Stripe = function () { return { redirectToCheckout: function (options) { document.body.dataset.checkoutSession = options.sessionId } } }'
+  end
+
+  def has_checkout_session?(session_id)
+    page.has_css? "body[data-checkout-session='#{session_id}']"
+  end
+
   # Gatherings
 
   # A new account, a member of @gathering

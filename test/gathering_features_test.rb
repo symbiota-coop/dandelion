@@ -466,11 +466,10 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     click_link 'Join'
     assert page.has_content? 'You owe £20'
 
-    # Stripe.js would take them to stripe.com with the session: record which, on the page, instead
-    execute_script 'window.Stripe = function () { return { redirectToCheckout: function (options) { document.body.dataset.checkoutSession = options.sessionId } } }'
+    record_stripe_redirect
     Stripe::Checkout::Session.stub(:create, api_object(id: 'cs_gathering', payment_intent: 'pi_gathering')) do
       click_button 'Pay with card'
-      assert page.has_css? "body[data-checkout-session='cs_gathering']"
+      assert has_checkout_session?('cs_gathering')
     end
     payment = @gathering.payments.find_by(session_id: 'cs_gathering')
     assert_equal [20, 'GBP'], [payment.amount, payment.currency]
