@@ -174,15 +174,7 @@ Dandelion::App.controller do
     sign_in_code_required!
     @account = current_account
     @account.default_currency ||= visitor_currency
-    if params[:organisation_id]
-      @organisation = Organisation.find(params[:organisation_id])
-    elsif params[:activity_id]
-      @activity = Activity.find(params[:activity_id])
-    elsif params[:local_group_id]
-      @local_group = LocalGroup.find(params[:local_group_id])
-    elsif params[:event_id]
-      @event = Event.find(params[:event_id])
-    end
+    load_context
     erb :'accounts/edit'
   end
 
@@ -294,15 +286,7 @@ Dandelion::App.controller do
   post '/accounts/edit' do
     sign_in_required!
     @account = current_account
-    if params[:organisation_id]
-      @organisation = Organisation.find(params[:organisation_id])
-    elsif params[:activity_id]
-      @activity = Activity.find(params[:activity_id])
-    elsif params[:local_group_id]
-      @local_group = LocalGroup.find(params[:local_group_id])
-    elsif params[:event_id]
-      @event = Event.find(params[:event_id])
-    end
+    load_context
 
     account_params = params[:account]
     if account_params.is_a?(Hash)
