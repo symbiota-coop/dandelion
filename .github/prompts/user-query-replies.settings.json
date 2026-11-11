@@ -4,9 +4,6 @@
       "Read",
       "Glob",
       "Grep",
-      "Bash(git log:*)",
-      "Bash(git show:*)",
-      "Bash(git blame:*)",
       "mcp__gmail__list_threads",
       "mcp__gmail__get_thread",
       "mcp__gmail__create_draft",
@@ -33,6 +30,7 @@
       "mcp__mailgun__get-v3-domain-unsubscribes-address"
     ],
     "deny": [
+      "Bash",
       "Edit",
       "Write",
       "NotebookEdit",
