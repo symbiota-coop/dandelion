@@ -2,6 +2,7 @@ class Event
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  include WhenDetails
   include SlugLookup
 
   extend Dragonfly::Model
@@ -396,38 +397,6 @@ class Event
 
   def destroy_dragonfly_attachments!
     dragonfly_attachments.each_value(&:destroy!)
-  end
-
-  def when_details(zone, with_zone: true)
-    return unless start_time && end_time
-
-    zone ||= time_zone_or_default
-    zone = time_zone if time_zone && location != 'Online'
-    zone = zone.name unless zone.is_a?(String)
-    start_time = self.start_time.in_time_zone(zone)
-    end_time = self.end_time.in_time_zone(zone)
-    z = "#{start_time.strftime('%Z')} (UTC #{start_time.formatted_offset})"
-    if start_time.to_date == end_time.to_date
-      "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_fs(:no_double_zeros)} #{z if with_zone}"
-    else
-      "#{start_time.to_date}, #{start_time.to_fs(:no_double_zeros)} – #{end_time.to_date}, #{end_time.to_fs(:no_double_zeros)} #{z if with_zone}"
-    end
-  end
-
-  def concise_when_details(zone, with_zone: false)
-    return unless start_time && end_time
-
-    zone ||= time_zone_or_default
-    zone = time_zone if time_zone && location != 'Online'
-    zone = zone.name unless zone.is_a?(String)
-    start_time = self.start_time.in_time_zone(zone)
-    end_time = self.end_time.in_time_zone(zone)
-    z = "#{start_time.strftime('%Z')} (UTC #{start_time.formatted_offset})"
-    if start_time.to_date == end_time.to_date
-      start_time.to_date
-    else
-      "#{start_time.to_date} – #{end_time.to_date}#{" #{z}" if with_zone}"
-    end
   end
 
   def admin_list_hash
