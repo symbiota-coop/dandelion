@@ -80,6 +80,20 @@ class MailerTest < ActiveSupport::TestCase
     assert_equal 'reply@example.com', email.reply_to_address
   end
 
+  test 'From and Reply-To, which carry organiser text, cannot open a recipient token' do
+    # Mailgun fills variables into both headers (tested Nov 2026): an event's contact email of
+    # %recipient.token%@attacker.example would send each buyer's token there when they reply
+    email = Mailgun::BatchMessage.new(Mailgun::Client.new('key'), 'example.com') # rubocop:disable Dandelion/MailgunDirect -- tests EmailHelper::RecipientVariables on a real BatchMessage, which sends nothing
+    delivery(email: email, to: ['someone@example.com', { 'firstname' => 'Ada', 'token' => 'SECRET' }],
+             from: 'Org %recipient.token% <tickets@example.com>', reply_to: '%recipient.token%@attacker.example')
+    variables = email.recipient_variables['someone@example.com']
+
+    [Array(email.message[:from]).last, email.message['h:reply-to']].each do |header|
+      assert_includes header, 'recipient.token'
+      refute_includes EmailFields.replace_recipient_variables(header, variables), 'SECRET'
+    end
+  end
+
   test 'the Microsoft workaround sends to Microsoft addresses from its own domain, only where asked and only when it is on' do
     on = { 'MICROSOFT_EMAIL_WORKAROUND' => '1' }
 

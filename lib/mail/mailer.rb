@@ -1,5 +1,5 @@
 # Every email Dandelion sends goes through Mailer.deliver (Dandelion/MailgunDirect), which builds the one
-# Mailgun::BatchMessage, so EmailHelper::RecipientVariables makes every subject and recipient variable safe:
+# Mailgun::BatchMessage, so EmailHelper::RecipientVariables makes every subject, From, Reply-To and recipient variable safe:
 #
 #   Mailer.deliver(:order, to: event.event_facilitators, subject: "New order for #{event.name}", locals: { order:, event:, account: })
 #

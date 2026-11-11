@@ -59,8 +59,11 @@ module EmailHelper
     value.to_s.gsub(/\u200C?%\u200C?/, "\u200C%\u200C")
   end
 
-  # Every sender's Mailgun recipient variables and subject pass through here. Subjects interpolate names and
-  # organiser text, and no subject needs a non-public variable
+  # Every sender's Mailgun recipient variables, subject, From and Reply-To pass through here. Subjects interpolate
+  # names and organiser text, and no subject needs a non-public variable. Mailgun fills variables into From and
+  # Reply-To too (tested Nov 2026), which carry organiser text (an organisation's name, an event's contact email,
+  # an organisation's reply address): a Reply-To of %recipient.token%@their.domain would send each recipient's
+  # token to whoever runs that domain when they reply
   module RecipientVariables
     def add_recipient(recipient_type, address, variables = nil)
       variables = variables.transform_values { |value| value.is_a?(String) ? EmailHelper.recipient_value(value) : value } if variables.is_a?(Hash)
@@ -69,6 +72,14 @@ module EmailHelper
 
     def subject(subj = nil)
       super(subj && EmailHelper.untrusted(subj))
+    end
+
+    def from(address, vars = nil)
+      super(address && EmailHelper.untrusted(address), vars)
+    end
+
+    def reply_to(address, variables = nil)
+      super(address && EmailHelper.untrusted(address), variables)
     end
   end
   Mailgun::BatchMessage.prepend(RecipientVariables)
