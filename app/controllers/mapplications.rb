@@ -17,7 +17,7 @@ Dandelion::App.controller do
     partial :'mapplications/mapplication_row', locals: { mapplication: @mapplication }
   end
 
-  get '/g/:slug/apply' do
+  get '/g/:slug/apply' do # rubocop:disable Dandelion/GatheringPermission -- applying is for people who aren't members yet
     @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     redirect '/' if @gathering.privacy == 'secret'

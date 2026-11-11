@@ -55,7 +55,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/g/:slug', prerender: true do
+  get '/g/:slug', prerender: true do # rubocop:disable Dandelion/GatheringPermission -- it checks itself: members and admins see the page, and anyone else is sent to join or apply
     @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     if @membership || gathering_admin?

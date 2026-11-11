@@ -104,6 +104,11 @@ class LintTest < Minitest::Test
         'Shift.find(params[:id])' => 1, 'Membership&.find(params[:membership][:id])' => 1, 'Team.find_by(id: params[:team_id], x: 1)' => 1,
         '@gathering.shifts.find(params[:id])' => 0, 'Shift.find(id)' => 0, 'Event.find(params[:id])' => 0, 'Gathering.find_by_slug_or_id(slug: params[:slug])' => 0
       },
+      'Dandelion/GatheringPermission' => {
+        "get '/g/:slug/x' do\n  erb :x\nend" => 1, "post '/g/:slug/x' do\nend" => 1, "post '/g/:slug/x' do\n  halt unless y\n  z\nend" => 1,
+        "post '/g/:slug/x' do\n  halt 403 unless y\n  z\nend" => 0, "get '/g/:slug/x' do\n  membership_required!\n  erb :x\nend" => 0,
+        "get '/events/:slug' do\n  erb :x\nend" => 0, "get '/g/new' do\n  erb :x\nend" => 0
+      },
       'Dandelion/RailsController' => {
         'params[:event].permit(:name)' => 1, 'skip_before_action :x' => 1, 'pdf.render' => 0, 'EmailHelper.render(:x)' => 0,
         'require "x"' => 0, 'x.respond_to?(:y)' => 0, 'event.permit(:x)' => 0
@@ -117,6 +122,11 @@ class LintTest < Minitest::Test
   def test_rails_controller_only_checks_controllers
     cop = RuboCop::Cop::Registry.global.find_by_cop_name('Dandelion/RailsController')
     assert_empty cop_offenses(cop, 'render :show', 'app/helpers/x.rb')
+  end
+
+  def test_gathering_permission_only_checks_controllers
+    cop = RuboCop::Cop::Registry.global.find_by_cop_name('Dandelion/GatheringPermission')
+    assert_empty cop_offenses(cop, "get '/g/:slug/x' do\n  erb :x\nend", 'lib/x.rb')
   end
 
   def test_slug_lookup_only_checks_controllers

@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  post '/g/:slug/stripe_webhook' do
+  post '/g/:slug/stripe_webhook' do # rubocop:disable Dandelion/GatheringPermission -- Stripe calls it, and it checks the event's signature
     @gathering = gathering_from_params || not_found
     payload = request.body.read
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']

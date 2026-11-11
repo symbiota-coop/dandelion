@@ -45,7 +45,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/g/:slug/join' do
+  get '/g/:slug/join' do # rubocop:disable Dandelion/GatheringPermission -- joining is for people who aren't members yet
     @gathering = gathering_from_params || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     redirect "/g/#{@gathering.slug}/apply" unless @gathering.privacy == 'open'
