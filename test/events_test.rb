@@ -1457,6 +1457,30 @@ class EventsTest < ActiveSupport::TestCase
     refute_includes body, 'Upcoming event'
   end
 
+  test 'URLs that name an event, organisation, activity, local group or account by id redirect to its slug URL' do
+    create_full_event_hierarchy
+    {
+      "/events/#{@event.id}" => "/e/#{@event.slug}",
+      "/events/#{@event.id}/edit?tab=tickets" => "/e/#{@event.slug}/edit?tab=tickets",
+      "/organisations/#{@organisation.id}/events" => "/o/#{@organisation.slug}/events",
+      "/activities/#{@activity.id}" => @activity.path,
+      "/local_groups/#{@local_group.id}/edit" => "#{@local_group.path}/edit",
+      "/accounts/#{@account.id}" => "/u/#{@account.username}"
+    }.each do |id_url, slug_url|
+      get id_url
+      assert_equal 307, last_response.status, id_url
+      assert_equal "http://example.org#{slug_url}", last_response.location
+    end
+
+    # A 307 keeps the method and body, so a form still posting to the old URL reaches the new one
+    post "/events/#{@event.id}/edit", event: { name: 'Renamed' }
+    assert_equal 307, last_response.status
+    assert_equal "http://example.org/e/#{@event.slug}/edit", last_response.location
+
+    get "/events/#{BSON::ObjectId.new}"
+    assert_equal 404, last_response.status
+  end
+
   test 'ticket_form_only limits the event page to the ticket form' do
     covers 'events/embed-ticket-form-only@7366b1'
     create_event(prices: [0], description: '<p>A description only the full event page shows</p>')

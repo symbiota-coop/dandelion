@@ -3,7 +3,8 @@ module RuboCop
     module Dandelion
       # URLs name organisations, gatherings, events, activities and local groups by slug, and accounts by username:
       # find them with `find_by_slug_or_id`, which also takes the id in older links. Ids from forms and query strings
-      # (`params[:organisation_id]`) are fine.
+      # (`params[:organisation_id]`) are fine. A route for an old URL that named one by id (/events/:id/...) redirects
+      # with `redirect_to_slug_url`, which finds it by that id itself.
       #
       # @example
       #   # bad
@@ -15,8 +16,9 @@ module RuboCop
       #   @event = Event.find_by_slug_or_id(slug: params[:slug])
       #   @activity = activity_from_params
       #   @organisation = Organisation.find(params[:organisation_id])
+      #   redirect_to_slug_url(Event.unscoped, '/events') { |event| "/e/#{event.slug}" }
       class SlugLookup < Base
-        MSG = 'Find %<model>s from a URL with `find_by_slug_or_id`.'
+        MSG = 'Find %<model>s from a URL with `find_by_slug_or_id` (or redirect an old id URL with `redirect_to_slug_url`).'
         MODELS = %w[Event Organisation Gathering Activity LocalGroup Account].freeze
         RESTRICT_ON_SEND = %i[find find_by].freeze
 

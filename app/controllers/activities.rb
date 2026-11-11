@@ -26,14 +26,12 @@ Dandelion::App.controller do
   # Activity URLs named activities by id before they used slugs: /activities/:id/... is now
   # /o/:organisation_slug/a/:slug/...
   get '/activities/:id' do
-    activity = Activity.find(params[:id]) || not_found # rubocop:disable Dandelion/SlugLookup -- redirects the old id URL
-    redirect_to_slug_url "/activities/#{params[:id]}", activity.path
+    redirect_to_slug_url(Activity, '/activities', &:path)
   end
 
   %i[get post].each do |verb|
     send(verb, '/activities/:id/*') do
-      activity = Activity.find(params[:id]) || not_found # rubocop:disable Dandelion/SlugLookup -- redirects the old id URL
-      redirect_to_slug_url "/activities/#{params[:id]}", activity.path
+      redirect_to_slug_url(Activity, '/activities', &:path)
     end
   end
 
