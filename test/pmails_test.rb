@@ -358,7 +358,7 @@ class PmailsTest < ActiveSupport::TestCase
   end
 
   test 'the free gift is one email a month for up to 1000 subscribers, beyond which a Mailgun account is needed, and event attendees can always be emailed' do
-    covers 'organisations/free-gift-email@02e4c6', 'mailer/free-gift-limit@c4bc26'
+    covers 'organisations/free-gift-email@d1a3d1', 'mailer/free-gift-limit@fac05c'
     with_env('MAILGUN_FREE_SUBSCRIBER_LIMIT' => '1000') do
       create_event
       # With its creator, 1000
@@ -398,7 +398,7 @@ class PmailsTest < ActiveSupport::TestCase
   end
 
   test 'followers who unsubscribed count towards the free gift limit' do
-    covers 'organisations/free-gift-email@02e4c6', 'mailer/free-gift-limit@c4bc26'
+    covers 'organisations/free-gift-email@d1a3d1', 'mailer/free-gift-limit@fac05c'
     with_env('MAILGUN_FREE_SUBSCRIBER_LIMIT' => '1000') do
       create_event
       # With its creator, 1000
@@ -409,6 +409,27 @@ class PmailsTest < ActiveSupport::TestCase
       Organisationship.collection.insert_one(account_id: BSON::ObjectId.new, organisation_id: @organisation.id, created_at: Time.now.utc,
                                              updated_at: Time.now.utc, unsubscribed: true)
       refute pmail.reload.sendable?
+    end
+  end
+
+  test "the free gift counts the people mailed, so an activity's imported members beyond the limit need a Mailgun account" do
+    covers 'organisations/free-gift-email@d1a3d1', 'mailer/free-gift-limit@fac05c'
+    with_env('MAILGUN_FREE_SUBSCRIBER_LIMIT' => '3') do
+      create_event
+      activity = FactoryBot.create(:activity, organisation: @organisation)
+      # With its creator, 3, none of them following the organisation
+      activity.import_from_csv_without_delay("name,email\nA,a@#{ENV['DOMAIN']}\nB,b@#{ENV['DOMAIN']}\n", :activityships)
+      pmail = FactoryBot.create(:pmail, organisation: @organisation, mailable: activity, recipient_kind: 'activity')
+      assert_equal 1, @organisation.organisationships.count
+      assert_equal 3, pmail.send_count
+      assert pmail.sendable?
+
+      activity.import_from_csv_without_delay("name,email\nC,c@#{ENV['DOMAIN']}\n", :activityships)
+      assert_equal 1, @organisation.organisationships.count
+      assert_equal 4, pmail.send_count
+      refute pmail.sendable?
+      assert_nil pmail.send_batch_message
+      refute pmail.reload.gift?
     end
   end
 

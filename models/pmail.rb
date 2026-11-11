@@ -204,7 +204,13 @@ class Pmail
   end
 
   def sendable?
-    mailable.is_a?(Event) || organisation.mailgun_api_key || organisation.free_mailgun?
+    mailable.is_a?(Event) || organisation.mailgun_api_key || free_gift?
+  end
+
+  # The free gift counts the people this mail goes to as well as the organisation's followers,
+  # as an activity's, local group's or tag's members needn't follow the organisation (an activity's CSV import adds none)
+  def free_gift?(sending: false)
+    organisation.free_mailgun?(excluding_pmail: (self if sending)) && send_count <= ENV['MAILGUN_FREE_SUBSCRIBER_LIMIT'].to_i
   end
 
   def event_tickets_with_email
@@ -322,13 +328,15 @@ class Pmail
           puts recipients.count
         end
       end
-    elsif organisation.free_mailgun?(excluding_pmail: self)
+    elsif free_gift?(sending: true)
       mg_client = Mailgun::Client.new ENV['MAILGUN_API_KEY'], ENV['MAILGUN_REGION']
       batch_message = Mailgun::BatchMessage.new(mg_client, ENV['MAILGUN_PMAILS_HOST'])
 
       batch_message.from from_name ? "#{from_name} <mailer@#{ENV['MAILGUN_PMAILS_HOST']}>" : "mailer@#{ENV['MAILGUN_PMAILS_HOST']}"
       batch_message.reply_to from
       set(gift: true)
+    else
+      return
     end
 
     batch_message.subject(test_to ? "#{subject} [test sent #{Time.now}]" : subject)

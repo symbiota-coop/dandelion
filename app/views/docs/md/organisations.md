@@ -65,7 +65,7 @@ You can also set these on an individual event; if both organisation and event va
 
 ## Mailgun
 
-We offer a free gift of 1 email per month to organisations with up to 1000 followers (counting any who've unsubscribed). Beyond that, you'll need to link a paid [Mailgun](https://www.mailgun.com/) account. (You can always email attendees of events even without linking a Mailgun account.) <!-- claim: free-gift-email -->
+We offer a free gift of 1 email per month to up to 1000 people, from organisations with up to 1000 followers (counting any who've unsubscribed). Beyond that, you'll need to link a paid [Mailgun](https://www.mailgun.com/) account. (You can always email attendees of events even without linking a Mailgun account.) <!-- claim: free-gift-email -->
 
 After sending a free gift email, open and click rates appear on the sent message page under Mailer. Organisations with their own Mailgun account also get a link through to Mailgun analytics. <!-- claim: free-gift-email-analytics -->
 

@@ -13,7 +13,7 @@
 
 ## Emailing your organisation
 
-We offer a free gift of 1 email per month to organisations with up to 1000 followers (counting any who've unsubscribed). <!-- claim: free-gift-limit -->
+We offer a free gift of 1 email per month to up to 1000 people, from organisations with up to 1000 followers (counting any who've unsubscribed). <!-- claim: free-gift-limit -->
 
 - Click the organisation dropdown, select Mailer, and click 'New message'
 - Change the 'To' field to 'Everyone' or another option
