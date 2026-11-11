@@ -801,4 +801,20 @@ class GatheringsTest < ActiveSupport::TestCase
     assert_equal 403, last_response.status
     assert Optionship.find(optionship.id)
   end
+
+  test "unsubscribing a teamship from a team's emails clears its member's subscriptions to the team's posts, not the admin's" do
+    create_gathering
+    member = create_member
+    team = @gathering.teams.create!(name: 'Garden', account: @account)
+    team.teamships.create!(account: @account, gathering: @gathering)
+    teamship = team.teamships.create!(account: member, gathering: @gathering)
+    post = team.posts.create!(subject: 'Planting', account: @account)
+    [@account, member].each { |account| post.subscriptions.find_or_create_by!(account: account) }
+
+    sign_in_with_rack(@account)
+    get "/g/#{@gathering.slug}/teamships/#{teamship.id}/unsubscribe"
+    assert teamship.reload.unsubscribed
+    refute post.subscriptions.find_by(account: member)
+    assert post.subscriptions.find_by(account: @account)
+  end
 end

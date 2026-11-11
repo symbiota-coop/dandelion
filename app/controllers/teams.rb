@@ -135,7 +135,7 @@ Dandelion::App.controller do
     confirmed_membership_required!
     own_or_gathering_admins_only!(@teamship)
     @teamship.set(unsubscribed: true)
-    @team.subscriptions.and(account: current_account).destroy_all
+    @team.subscriptions.and(account: @teamship.account).destroy_all
     if request.xhr?
       200
     else
