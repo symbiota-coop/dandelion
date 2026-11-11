@@ -235,63 +235,27 @@ module EventAccounting
   end
 
   def credit_applied
-    @credit_applied ||= begin
-      r = Money.new(0, currency)
-      orders_for_accounting.each { |order| r += Money.new((order.credit_applied || 0) * 100, order.currency) }
-      r
-    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-      Money.new(0, ENV['DEFAULT_CURRENCY'])
-    end
+    @credit_applied ||= orders_total(:credit_applied)
   end
 
   def credit_on_behalf_of_organisation
-    @credit_on_behalf_of_organisation ||= begin
-      r = Money.new(0, currency)
-      orders_for_accounting.each { |order| r += Money.new((order.credit_on_behalf_of_organisation || 0) * 100, order.currency) }
-      r
-    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-      Money.new(0, ENV['DEFAULT_CURRENCY'])
-    end
+    @credit_on_behalf_of_organisation ||= orders_total(:credit_on_behalf_of_organisation)
   end
 
   def credit_on_behalf_of_revenue_sharer
-    @credit_on_behalf_of_revenue_sharer ||= begin
-      r = Money.new(0, currency)
-      orders_for_accounting.each { |order| r += Money.new((order.credit_on_behalf_of_revenue_sharer || 0) * 100, order.currency) }
-      r
-    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-      Money.new(0, ENV['DEFAULT_CURRENCY'])
-    end
+    @credit_on_behalf_of_revenue_sharer ||= orders_total(:credit_on_behalf_of_revenue_sharer)
   end
 
   def fixed_discounts_applied
-    @fixed_discounts_applied ||= begin
-      r = Money.new(0, currency)
-      orders_for_accounting.each { |order| r += Money.new((order.fixed_discount_applied || 0) * 100, order.currency) }
-      r
-    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-      Money.new(0, ENV['DEFAULT_CURRENCY'])
-    end
+    @fixed_discounts_applied ||= orders_total(:fixed_discount_applied)
   end
 
   def fixed_discounts_on_behalf_of_organisation
-    @fixed_discounts_on_behalf_of_organisation ||= begin
-      r = Money.new(0, currency)
-      orders_for_accounting.each { |order| r += Money.new((order.fixed_discount_on_behalf_of_organisation || 0) * 100, order.currency) }
-      r
-    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-      Money.new(0, ENV['DEFAULT_CURRENCY'])
-    end
+    @fixed_discounts_on_behalf_of_organisation ||= orders_total(:fixed_discount_on_behalf_of_organisation)
   end
 
   def fixed_discounts_on_behalf_of_revenue_sharer
-    @fixed_discounts_on_behalf_of_revenue_sharer ||= begin
-      r = Money.new(0, currency)
-      orders_for_accounting.each { |order| r += Money.new((order.fixed_discount_on_behalf_of_revenue_sharer || 0) * 100, order.currency) }
-      r
-    rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
-      Money.new(0, ENV['DEFAULT_CURRENCY'])
-    end
+    @fixed_discounts_on_behalf_of_revenue_sharer ||= orders_total(:fixed_discount_on_behalf_of_revenue_sharer)
   end
 
   def discounted_ticket_revenue
@@ -370,5 +334,15 @@ module EventAccounting
 
   def ticket_revenue_to_revenue_sharer
     revenue_sharer_discounted_ticket_revenue(skip_transferred: true) - credit_on_behalf_of_revenue_sharer - fixed_discounts_on_behalf_of_revenue_sharer
+  end
+
+  private
+
+  # The sum of field over the orders accounted for, in the event's currency, or nothing in the default currency if
+  # an order's currency can't be converted
+  def orders_total(field)
+    orders_for_accounting.sum(Money.new(0, currency)) { |order| Money.new((order.send(field) || 0) * 100, order.currency) }
+  rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
+    Money.new(0, ENV['DEFAULT_CURRENCY'])
   end
 end
