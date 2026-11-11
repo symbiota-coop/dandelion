@@ -31,6 +31,11 @@ class Comment
 
   dragonfly_accessor :file
 
+  # Whether the attached file is shown as an image rather than a link, going by its extension
+  def file_image?
+    file && %w[png jpg gif jpeg].any? { |x| file.url.split('/').last.downcase.end_with?(".#{x}") }
+  end
+
   has_many :comment_reactions, dependent: :destroy
   has_many :voptions, dependent: :destroy
   has_many :read_receipts, dependent: :destroy

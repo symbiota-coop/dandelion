@@ -14,7 +14,7 @@
   <p><%= comment.body_with_additions %></p>
   <% if comment.file %>
     <p>
-      <% if %w{png jpg gif jpeg}.any? { |x| comment.file.url.split('/').last.downcase.ends_with? ".#{x}" } %>
+      <% if comment.file_image? %>
         <img alt="Attached image" style="max-width: 100%;" src="<%= comment.file.url %>">
       <% else %>
         <a href="<%= comment.file.url %>"><%= comment.file.url.split('/').last %></a>
@@ -27,7 +27,7 @@
   <p><%= comment.body_with_additions %></p>
   <% if comment.file %>
     <p>
-      <% if %w{png jpg gif jpeg}.any? { |x| comment.file.url.split('/').last.downcase.ends_with? ".#{x}" } %>
+      <% if comment.file_image? %>
         <img alt="Attached image" style="max-width: 100%;" src="<%= comment.file.url %>">
       <% else %>
         <a href="<%= comment.file.url %>"><%= comment.file.url.split('/').last %></a>
