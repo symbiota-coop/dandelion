@@ -5,6 +5,11 @@
 #
 #   ruby script/update_packages.rb > summary.md
 #
+# Or only some of them, by name (gems, frontend, actions), as the workflow runs gems and frontend in one job and actions
+# in another: updating gems runs their code (bundle install, then rake), so it gets no token that can write
+#
+#   ruby script/update_packages.rb gems frontend > summary.md
+#
 # - Gems: bundle lock --update, which keeps to the Gemfile's constraints and its source's cooldown, then bundle install
 # - Frontend: each package in frontend/package.json, once each file the app loads from it is at the new version on
 #   jsDelivr (and is the package's own file, not jsDelivr's minified copy), then rake frontend:integrity hashes them
@@ -163,12 +168,19 @@ def table(title, rows)
   puts
 end
 
-gems = update_gems
-frontend, skipped = update_frontend
-actions = update_actions
+SECTIONS = %w[gems frontend actions].freeze
+sections = ARGV.empty? ? SECTIONS : ARGV
+abort "Unknown sections: #{(sections - SECTIONS).join(', ')} (choose from #{SECTIONS.join(', ')})" if (sections - SECTIONS).any?
 
-puts 'Updates what /stats/packages lists to the newest release out of the 7-day cooldown, from `script/update_packages.rb`.', ''
-puts 'Major versions can break things: check their changelogs. To keep a package on its major, add it to `HOLD` in the script (or, for a gem, give it a constraint in the Gemfile).', ''
+gems = sections.include?('gems') ? update_gems : []
+frontend, skipped = sections.include?('frontend') ? update_frontend : [[], []]
+actions = sections.include?('actions') ? update_actions : []
+
+# The introduction, once, from the run that updates gems (the first, in the workflow)
+if sections.include?('gems')
+  puts 'Updates what /stats/packages lists to the newest release out of the 7-day cooldown, from `script/update_packages.rb`.', ''
+  puts 'Major versions can break things: check their changelogs. To keep a package on its major, add it to `HOLD` in the script (or, for a gem, give it a constraint in the Gemfile).', ''
+end
 table('Gems', gems)
 table('Frontend', frontend)
 table('GitHub Actions', actions)
@@ -177,4 +189,3 @@ if skipped.any?
   skipped.each { |name, to, reason| puts "- #{name} #{to}: #{reason}" }
   puts
 end
-puts 'Nothing to update.' if [gems, frontend, actions].all?(&:empty?)

@@ -6,6 +6,12 @@ name: Package Updates
 # Auth: PACKAGE_UPDATES_TOKEN secret, a fine-grained PAT for this repo with Contents, Pull requests and Workflows: read
 # and write. Not the workflow's own token: that can't push changes to workflow files (the actions' pins), and its pushes
 # and pull requests don't start other workflows, so CI wouldn't run on the pull request
+#
+# Two jobs, as updating gems runs their code (bundle install builds native extensions, then rake loads them): new code we
+# haven't reviewed. The update job runs it with a read-only token and no secrets, and hands on only a patch to
+# Gemfile.lock and frontend. The publish job, on a fresh runner that runs no gem code, checks the patch touches only those
+# files, applies it, updates the actions' pins itself, and only then has PACKAGE_UPDATES_TOKEN. In one job, a gem could
+# have left a git hook, a git config or a gh on the PATH for the token's step to run, and pushed a workflow of its own
 
 concurrency:
   group: package-updates
@@ -36,8 +42,64 @@ jobs:
         with:
           ruby-version: 4.0.9
 
-      - name: Update packages
-        run: ruby script/update_packages.rb > "$RUNNER_TEMP/summary.md"
+      - name: Update gems and frontend packages
+        run: |
+          mkdir "$RUNNER_TEMP/updates"
+          ruby script/update_packages.rb gems frontend > "$RUNNER_TEMP/updates/summary.md"
+          git diff -- Gemfile.lock frontend > "$RUNNER_TEMP/updates/packages.patch"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: updates
+          path: ${{ runner.temp }}/updates
+          retention-days: 1
+
+  publish:
+    needs: update
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Only Ruby, for script/update_packages.rb's standard library: no bundle install, so no gem code runs here
+      - name: Install Ruby
+        uses: ruby/setup-ruby@de492cf36cbab201753d720ce4f4e336cd688c94 # v1.336.0
+        with:
+          ruby-version: 4.0.9
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: updates
+          path: ${{ runner.temp }}/updates
+
+      # The update job ran gem code, so its patch is untrusted: it may change only the files it updates, in place (no new,
+      # deleted, renamed or symlinked files, nor mode changes, which --summary lists)
+      - name: Apply the gem and frontend updates
+        run: |
+          patch="$RUNNER_TEMP/updates/packages.patch"
+          if [ -s "$patch" ]; then
+            unexpected=$(git apply --numstat "$patch" | cut -f3 | grep -vxE 'Gemfile\.lock|frontend/package\.json|frontend/integrity\.json' || true)
+            if [ -n "$unexpected" ]; then
+              echo "::error::The patch changes files it shouldn't: $unexpected"
+              exit 1
+            fi
+            if [ -n "$(git apply --summary "$patch")" ]; then
+              echo '::error::The patch adds, deletes, renames or changes the mode of a file'
+              exit 1
+            fi
+            git apply "$patch"
+          fi
+          cp "$RUNNER_TEMP/updates/summary.md" "$RUNNER_TEMP/summary.md"
+
+      - name: Update the actions' pins
+        run: ruby script/update_packages.rb actions >> "$RUNNER_TEMP/summary.md"
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
