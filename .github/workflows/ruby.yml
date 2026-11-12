@@ -114,7 +114,7 @@ jobs:
           - group: accounts
             files: accounts/accounts accounts/sign_ins accounts/email_confirmation accounts/provider_sign_ins
           - group: calendar
-            files: events/calendar events/evergreen events/listings events/boosts
+            files: events/calendar events/evergreen events/listings events/boosts messages/comments
           - group: event_bookings
             files: bookings/bookings bookings/rules events/opencollective
           - group: event_permissions
