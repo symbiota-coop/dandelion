@@ -162,9 +162,12 @@ jobs:
       if: matrix.test_file == 'images'
       run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends imagemagick
 
+    # A failing test is retried on its own (TEST_ATTEMPTS in test/test_config.rb), so the file runs again only when it
+    # hangs past the timeout, which those retries can't catch
     - name: Run test (${{ matrix.test_file }})
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
       with:
         timeout_minutes: 10
-        max_attempts: 3
+        max_attempts: 2
+        retry_on: timeout
         command: bundle exec rake test:${{ matrix.test_file }}

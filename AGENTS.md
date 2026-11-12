@@ -96,7 +96,7 @@ To run only certain tests in a file, add `-n /pattern/` (matches the method name
 
 Each test run gets its own database (`dandelion_test_<pid>`, dropped when the run ends) and a free port, set in `config/boot.rb`, so runs can go at the same time, in one checkout or several. To run several files at once, start each in its own process, e.g. `printf '%s\n' accounts events | xargs -P 2 -I{} sh -c 'foreman run -e .env.test bundle exec ruby -I test test/{}_test.rb > tmp/{}.log 2>&1'`; each browser run starts its own Chrome, so keep to 3 or 4 at once. Test files take minutes, so if your tool can run commands in the background, start test runs there and keep working until they finish. Each run saves its screenshots to `capybara/<pid>/`, kept for an hour after the run ends.
 
-CI runs each test file as its own job, listed in `.github/workflows/ruby.yml`: add a new test file there.
+CI runs each test file as its own job, listed in `.github/workflows/ruby.yml`: add a new test file there. In CI a failing test runs up to 3 times before it counts as failed (`TEST_ATTEMPTS` in `test/test_config.rb`), and one that passes on a later attempt gets a Flaky test warning on the run's summary; locally each test runs once. The file itself runs again only if it times out.
 
 Never attempt to run the full test suite. Your default posture should be to run only added/modified tests and any other clearly relevant tests, unless the change is substantial, in which case it may be appropriate to run whole files.
 

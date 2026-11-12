@@ -74,6 +74,27 @@ module ActiveSupport
   class TestCase
     include TestHelpers
 
+    # In CI a failing test runs again, up to TEST_ATTEMPTS times in all, before it counts as failed: browser tests can
+    # fail on timing alone. Each attempt is a fresh instance, and setup's reset! empties the database first. A test that
+    # passes on a later attempt gets a warning on the run's summary, so flaky tests stay visible. Locally a test runs
+    # once, so a real failure shows at once rather than after three runs
+    TEST_ATTEMPTS = ENV['CI'] ? 3 : 1
+
+    # Minitest's own hook for how one test runs (Minitest::Runnable.run)
+    def self.run(klass, method_name, reporter)
+      reporter.prerecord klass, method_name
+      result = nil
+      (1..TEST_ATTEMPTS).each do |attempt|
+        result = klass.new(method_name).run
+        if result.passed? || result.skipped?
+          puts "::warning title=Flaky test::#{klass}##{method_name} passed on attempt #{attempt} of #{TEST_ATTEMPTS}" if attempt > 1
+          break
+        end
+        puts "\n🔁 #{klass}##{method_name} failed on attempt #{attempt} of #{TEST_ATTEMPTS}: #{result.failure.message.lines.first}" if attempt < TEST_ATTEMPTS
+      end
+      reporter.record result
+    end
+
     setup do
       puts "\n🧪 Running: #{name}"
       reset!
