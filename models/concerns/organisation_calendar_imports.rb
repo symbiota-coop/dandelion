@@ -144,6 +144,8 @@ module OrganisationCalendarImports
     raise OrganisationCalendarImports::ConfigurationError, 'iCal feed did not return a VCALENDAR payload' unless Organisation.valid_calendar_body?(response.body)
 
     calendars = Icalendar::Calendar.parse(response.body)
+    # A body the parser can't read gives no calendars, which would otherwise remove all the feed's events
+    raise OrganisationCalendarImports::ConfigurationError, 'iCal feed could not be read' if calendars.empty?
     calendar_name = Organisation.calendar_name_from_parsed_calendars(calendars)
 
     @initial_calendar_import = !events.and(calendar_import_feed_url: normalized_feed_url).exists?

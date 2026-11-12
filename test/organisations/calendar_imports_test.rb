@@ -250,7 +250,9 @@ class OrganisationsCalendarImportsTest < ActiveSupport::TestCase
 
     [
       "BEGIN:VCALENDAR\nBEGIN:VEVENT\nUID:broken\nDTSTART:not-a-date\nSUMMARY:Broken\nEND:VEVENT\nEND:VCALENDAR\n",
-      "BEGIN:VCALENDAR\nBEGIN:VEVENT\nUID:bad-zone\nSUMMARY:Bad zone\nDTSTART;TZID=Nowhere/Atlantis:2027\nEND:VEVENT\nEND:VCALENDAR\n"
+      "BEGIN:VCALENDAR\nBEGIN:VEVENT\nUID:bad-zone\nSUMMARY:Bad zone\nDTSTART;TZID=Nowhere/Atlantis:2027\nEND:VEVENT\nEND:VCALENDAR\n",
+      "\xFF\xFE garbage BEGIN:VCALENDAR END:VCALENDAR".b,
+      '<html><body>Calendars start with BEGIN:VCALENDAR and finish with END:VCALENDAR</body></html>'
     ].each do |body|
       result = import(@organisation, body)
 
