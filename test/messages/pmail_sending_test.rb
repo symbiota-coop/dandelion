@@ -233,6 +233,29 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
     assert_equal 0, send_pmail_jobs.count
   end
 
+  test "a mail is saved to the organisation in the URL, whatever organisation or recipients the form names" do
+    create_organisation
+    other_organisation = FactoryBot.create(:organisation)
+    other_activity = FactoryBot.create(:activity, organisation: other_organisation)
+    sign_in_with_rack(@account)
+
+    post "/pmails/new?organisation_id=#{@organisation.id}", pmail: {
+      from: "Admin <admin@#{ENV['DOMAIN']}>", subject: 'Forged', body: 'Hi', to_option: 'everyone',
+      organisation_id: other_organisation.id, mailable_type: 'Activity', mailable_id: other_activity.id
+    }
+
+    pmail = Pmail.find_by(subject: 'Forged')
+    assert_equal @organisation, pmail.organisation
+    assert_equal 'everyone', pmail.recipient_kind
+    assert_nil pmail.mailable
+
+    # Nor can it name another organisation's activity as its recipients
+    post edit_path(pmail), pmail: { to_option: "activity:#{other_activity.id}" }
+    assert last_response.ok?
+    assert_equal 'everyone', pmail.reload.recipient_kind
+    assert_nil pmail.mailable
+  end
+
   test "an activity's admin can mail its members, but not the organisation's followers, another activity's members or the organisation's own mails" do
     create_organisation
     activity = FactoryBot.create(:activity, organisation: @organisation)

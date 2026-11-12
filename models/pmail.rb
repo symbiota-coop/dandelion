@@ -178,6 +178,9 @@ class Pmail
   end
 
   def to
+    # Without its activity, local group, tag or event (an invalid To), no one, so the form can show the error
+    return Account.and(:id.in => []) unless organisation_wide_recipients? || mailable
+
     t = case recipient_kind
         when 'everyone' then organisation.subscribed_members
         when 'monthly_donors' then organisation.subscribed_monthly_donors
@@ -218,7 +221,7 @@ class Pmail
     tickets = if recipient_kind == 'ticket_group'
                 ticket_group ? ticket_group.tickets : Ticket.and(:id.in => [])
               else
-                mailable.tickets
+                mailable ? mailable.tickets : Ticket.and(:id.in => [])
               end
     tickets.complete.and(:email.ne => nil)
   end
