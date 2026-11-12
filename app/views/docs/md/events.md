@@ -251,6 +251,8 @@ Click the dropdown for your event (/activity/local group/organisation), and sele
 
 To create a discount code, click the dropdown for your event (or organisation, activity or local group if you want the discount code to apply across several events), and select 'Discount codes'.
 
+A code with a maximum number of uses is used up once that many paid orders, or unpaid orders still within the hour they're held for while the buyer pays, have it. An order that's never paid stops counting after that hour. <!-- claim: discount-code-uses -->
+
 ## Waitlists
 
 If your event sells out, a waitlist will be activated automatically. <!-- claim: waitlist-on-sell-out --> You can view people on the waitlist by selecting Waitlist in the event dropdown.

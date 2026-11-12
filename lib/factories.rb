@@ -158,7 +158,7 @@ FactoryBot.define do
 
   factory :discount_code do
     trait :for_event do
-      association :codable, factory: :event
+      association :codeable, factory: :event
     end
   end
 
