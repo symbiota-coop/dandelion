@@ -32,16 +32,30 @@ class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
     end
   end
 
-  def paypal_order_json(id, status:, capture_id: nil, amount: nil)
+  def paypal_order_json(id, status:, capture_id: nil, amount: nil, capture_amount: nil)
     {
       id: id,
       status: status,
       links: [{ rel: 'payer-action', href: "https://www.sandbox.paypal.com/checkoutnow?token=#{id}" }],
       purchase_units: [{
         amount: amount,
-        payments: { captures: capture_id ? [{ id: capture_id, status: 'COMPLETED' }] : [] }
+        payments: { captures: capture_id ? [{ id: capture_id, status: 'COMPLETED', amount: capture_amount }.compact] : [] }
       }.compact]
     }.to_json
+  end
+
+  # Completes order from a PayPal order PayPal says it captured capture_amount for, returning what was reported
+  def complete_with_capture_amount(order, capture_amount)
+    stubs = lambda do |stub, _requests|
+      stub.get("/v2/checkout/orders/#{order.paypal_order_id}") do
+        [200, JSON_HEADERS, paypal_order_json(order.paypal_order_id, status: 'COMPLETED', capture_id: 'CAPTURE', capture_amount: capture_amount)]
+      end
+    end
+    reported = []
+    ErrorReporting.stub(:capture_exception, ->(e, context: nil, **) { reported << [e, context] }) do
+      with_paypal_api(stubs) { EventPaymentMethod::Paypal.complete_if_paid(order) }
+    end
+    reported
   end
 
   def requests_to(requests, method, path)
@@ -286,6 +300,45 @@ class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
       assert_equal 2, gets
       assert_equal completes, order.reload.payment_completed?
     end
+  end
+
+  test 'a capture for the order total in its currency completes the order and reports nothing' do
+    create_paypal_organisation
+    create_event(prices: [10], currency: 'EUR')
+    order = create_incomplete_order(@event, paypal_order_id: "PAYPAL-#{SecureRandom.hex(4)}")
+
+    reported = complete_with_capture_amount(order, { currency_code: 'EUR', value: '10.00' })
+
+    assert order.reload.payment_completed?
+    assert_empty reported
+  end
+
+  test 'a capture for a different amount or in a different currency still completes the order, and is reported once' do
+    create_paypal_organisation
+    create_event(prices: [23.33], currency: 'EUR')
+    [[{ currency_code: 'EUR', value: '2.33' }, '2.33', 'EUR'], [{ currency_code: 'USD', value: '23.33' }, '23.33', 'USD']].each do |capture_amount, actual_amount, actual_currency|
+      order = create_incomplete_order(@event, paypal_order_id: "PAYPAL-#{SecureRandom.hex(4)}")
+
+      reported = complete_with_capture_amount(order, capture_amount)
+
+      assert order.reload.payment_completed?
+      assert_equal 'CAPTURE', order.paypal_capture_id
+      error, context = reported.sole
+      assert_kind_of EventPaymentMethod::Paypal::AmountMismatch, error
+      assert_equal({ order_id: order.id.to_s, paypal_order_id: order.paypal_order_id, expected_amount: '23.33', expected_currency: 'EUR',
+                     actual_amount: actual_amount, actual_currency: actual_currency }, context)
+      # Completed, so checking again reports nothing more
+      assert_empty complete_with_capture_amount(order, capture_amount)
+    end
+  end
+
+  test 'a capture for an amount PayPal gives without decimals matches the order total' do
+    create_paypal_organisation
+    create_event(prices: [10], currency: 'EUR')
+    order = create_incomplete_order(@event, paypal_order_id: "PAYPAL-#{SecureRandom.hex(4)}")
+
+    assert_empty complete_with_capture_amount(order, { currency_code: 'EUR', value: '10' })
+    assert order.reload.payment_completed?
   end
 
   test 'a capture refused for the organisation credentials is raised and completes nothing' do
