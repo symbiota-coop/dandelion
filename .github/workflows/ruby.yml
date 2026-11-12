@@ -116,7 +116,7 @@ jobs:
           - group: calendar
             files: events/calendar events/evergreen events/listings events/boosts messages/comments integrations/atproto_events
           - group: event_bookings
-            files: bookings/bookings bookings/rules events/opencollective
+            files: bookings/bookings bookings/rules events/opencollective events/feedback_permissions
           - group: event_permissions
             files: events/permissions events/cohost_permissions
           - group: events
