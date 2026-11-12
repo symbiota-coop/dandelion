@@ -2,14 +2,16 @@
 # stays in that file, and one the files on a subject share goes in a module here named for what it holds
 
 # Stands in for Mailgun::BatchMessage, keeping what an email would say: its recipients and their recipient variables,
-# subject, HTML or text, sender, reply-to and attachments' filenames, and whether it was sent (finalized?)
+# subject, HTML or text, sender, reply-to, attachments' filenames, tags and headers, and whether it was sent (finalized?)
 class RecordedEmail
-  attr_reader :recipients, :variables, :subject_line, :html, :text, :attachment_names, :sender, :reply_to_address
+  attr_reader :recipients, :variables, :subject_line, :html, :text, :attachment_names, :sender, :reply_to_address, :tags, :headers
 
   def initialize
     @recipients = []
     @variables = {}
     @attachment_names = []
+    @tags = []
+    @headers = {}
     @finalized = false
   end
 
@@ -40,6 +42,14 @@ class RecordedEmail
 
   def reply_to(address)
     @reply_to_address = address
+  end
+
+  def add_tag(tag)
+    @tags << tag.to_s
+  end
+
+  def header(name, value)
+    @headers[name] = value
   end
 
   def finalize
