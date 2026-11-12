@@ -318,6 +318,32 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
     assert_equal 0, send_pmail_jobs.count
   end
 
+  test 'sending queues the mail once, and it goes to its recipients once' do
+    create_organisation
+    link_mailgun
+    follower = follower_of(@organisation)
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: 'everyone')
+    sign_in_with_rack(@account)
+
+    emails = recorded_emails { post edit_path(pmail), pmail: { subject: 'Hello' }, send: 1 }
+    assert_empty emails
+    assert last_response.redirect?
+    assert pmail.reload.requested_send_at
+    assert_equal 1, send_pmail_jobs.count
+
+    # Sending again, from a second tab or a double click, neither queues it again nor cancels the queued send
+    post edit_path(pmail), pmail: { subject: 'Hello' }, send: 1
+    assert_equal 1, send_pmail_jobs.count
+
+    emails = emails_sent_by_jobs(/method_name: :send_pmail$/)
+    assert_equal 1, emails.count
+    assert_equal [@account.email, follower.email].sort, emails.first.recipients.sort
+
+    # Once sent, it isn't sent again
+    pmail.set(sent_at: Time.now)
+    assert_empty(recorded_emails { pmail.send_pmail })
+  end
+
   test 'a mail can be scheduled to send later, and rescheduled, only through its own Mailgun account and not to event attendees' do
     create_event
     link_mailgun

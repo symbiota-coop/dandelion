@@ -92,6 +92,12 @@ Dandelion::App.controller do
         flash[:notice] = 'Test sent.'
         redirect "/pmails/#{@pmail.id}/edit?#{@scope}"
       elsif params[:send] || params[:send_later]
+        # Once queued, sending again (a second tab, a double click) mustn't cancel the queued send
+        if @pmail.requested_send_at
+          flash[:notice] = nil
+          flash[:error] = 'This mail has already been sent.'
+          redirect "/pmails/#{@pmail.id}/edit?#{@scope}"
+        end
         @pmail.delayed_jobs.destroy_all
         if params[:send] && !@pmail.requested_send_at
           @pmail.set(will_send_at: nil)
