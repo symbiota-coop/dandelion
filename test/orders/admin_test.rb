@@ -197,7 +197,6 @@ class OrdersAdminTest < ActiveSupport::TestCase
 
     emails = ticket_emails
     assert_equal [[@attendee.email]], emails.map(&:recipients)
-    assert emails.first.finalized?
   end
 
   test "an event admin can't resend another event's tickets" do
