@@ -12,7 +12,7 @@
   <span class="badge <%= orphaned.empty? ? 'text-bg-primary' : 'text-bg-danger' %>"><%= orphaned.empty? ? 'Every collection has a model' : "#{pluralize(orphaned.size, 'collection')} without a model" %></span>
 </p>
 
-<table class="table table-hr">
+<table id="collections-table" class="table table-hr">
   <thead>
     <tr>
       <th>Collection</th>
@@ -27,15 +27,21 @@
     <% @collections.each do |collection| %>
       <tr>
         <td>
-          <a href="/stats/indexes#<%= collection[:name] %>"><code><%= collection[:name] %></code></a>
+          <a href="/stats/indexes?collection=<%= collection[:name] %>"><code><%= collection[:name] %></code></a>
           <% unless collection[:model] %><span class="badge text-bg-danger">No model</span><% end %>
         </td>
-        <td class="text-end"><%= ActiveSupport::NumberHelper.number_to_delimited(collection[:count]) %></td>
-        <td class="text-end"><%= human_size.(collection[:size]) %></td>
-        <td class="text-end"><%= human_size.(collection[:storage_size]) %></td>
-        <td class="text-end"><%= human_size.(collection[:index_size]) %></td>
-        <td class="text-end"><%= human_size.(collection[:avg_obj_size]) %></td>
+        <td class="text-end" data-order="<%= collection[:count] %>"><%= ActiveSupport::NumberHelper.number_to_delimited(collection[:count]) %></td>
+        <td class="text-end" data-order="<%= collection[:size] %>"><%= human_size.(collection[:size]) %></td>
+        <td class="text-end" data-order="<%= collection[:storage_size] %>"><%= human_size.(collection[:storage_size]) %></td>
+        <td class="text-end" data-order="<%= collection[:index_size] %>"><%= human_size.(collection[:index_size]) %></td>
+        <td class="text-end" data-order="<%= collection[:avg_obj_size] %>"><%= human_size.(collection[:avg_obj_size]) %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<script>
+  $(function () {
+    $('#collections-table').DataTable({ paging: false, info: false, order: [[3, 'desc']] })
+  })
+</script>

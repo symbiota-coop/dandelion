@@ -44,7 +44,7 @@ Dandelion::App.helpers do
 
   # Every index for /stats/indexes (or a collection's), with its size and how often queries have used it since the
   # server last started ($indexStats). TTL indexes are used by MongoDB's TTL monitor rather than by queries, so they're
-  # never unused. keep says why an index can't be dropped from the page, if it can't
+  # never unused. keep says why an index mustn't be dropped, if it mustn't
   def index_stats(only_collection = nil)
     db = Mongoid.default_client.database
     names = only_collection ? [only_collection] & db.collection_names : db.collection_names.reject { |name| name.start_with?('system.') }.sort
@@ -63,7 +63,7 @@ Dandelion::App.helpers do
     end
   end
 
-  # Why an index mustn't be dropped from /stats/indexes: code hints it, or it's the only plain index starting with the
+  # Why an index mustn't be dropped: code hints it, or it's the only plain index starting with the
   # fields of a $type-filtered one, which the planner can't use for plain queries on those fields
   def index_keep_reason(collection_name, index, indexes)
     return 'Hinted by code' if hinted_indexes.any? do |hinted|

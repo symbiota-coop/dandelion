@@ -1,66 +1,60 @@
 <% human_size = ->(bytes) { ActiveSupport::NumberHelper.number_to_human_size(bytes) } %>
 <h2>Indexes</h2>
 <p class="text-body-secondary">
-  Every index, with how many times queries have used it since the server last restarted (<code>$indexStats</code>, counted on the node that answers). An index no query has used costs space and slows writes, but check it over a long enough time before dropping it, and never drop the plain index beside a <code>$type</code>-filtered unique one. Drop is offered only for unused indexes, and not for those code hints or the plain index beside a filtered one. TTL indexes are used by MongoDB's TTL monitor rather than by queries, so they never count as unused.
+  Every index, with how many times queries have used it since the server last restarted (<code>$indexStats</code>, counted on the node that answers). An index no query has used costs space and slows writes, but check it over a long enough time before dropping it, from the console: a unique index refuses duplicates on write, which doesn't count as a use, and those marked to keep would break queries without them. TTL indexes are used by MongoDB's TTL monitor rather than by queries, so they never count as unused.
 </p>
 
 <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
+  <% if params[:collection] %><%= hidden_field_tag :collection, value: params[:collection] %><% end %>
   <%= checkbox 'Unused only', slug: 'unused' %>
   <%= checkbox 'TTL only', slug: 'ttl' %>
 <% end %>
 
 <% unused = @indexes.select { |index| index[:unused] } %>
 <p>
+  <% if params[:collection] %><span class="badge text-bg-dark"><code class="text-reset"><%= params[:collection] %></code> <a class="text-reset" href="/stats/indexes">×</a></span><% end %>
   <span class="badge text-bg-dark"><%= pluralize(@indexes.size, 'index') %></span>
   <span class="badge <%= unused.empty? ? 'text-bg-primary' : 'text-bg-danger' %>"><%= unused.empty? ? 'None unused' : "#{pluralize(unused.size, 'unused index')}, #{human_size.(unused.sum { |index| index[:size] })}" %></span>
 </p>
 
-<table class="table table-hr small">
+<table id="indexes-table" class="table table-hr small">
   <thead>
     <tr>
+      <th>Collection</th>
       <th>Index</th>
       <th>Key</th>
       <th>Options</th>
       <th class="text-end">Size</th>
       <th class="text-end">Uses</th>
       <th>Since</th>
-      <th></th>
+      <th>Keep</th>
     </tr>
   </thead>
-  <% @indexes.group_by { |index| index[:collection] }.each do |collection, indexes| %>
-    <tbody>
-      <tr id="<%= collection %>">
-        <th colspan="7"><code><%= collection %></code></th>
+  <tbody>
+    <% @indexes.each do |index| %>
+      <tr>
+        <td><code><%= index[:collection] %></code></td>
+        <td>
+          <code><%= index[:name] %></code>
+          <% if index[:unused] %><span class="badge text-bg-danger">Unused</span><% end %>
+        </td>
+        <td><code><%= index[:key].to_json %></code></td>
+        <td>
+          <% if index[:unique] %><span class="badge text-bg-secondary">Unique</span><% end %>
+          <% if index[:ttl] %><span class="badge text-bg-secondary">TTL: <%= ttl_duration(index[:ttl]) %></span><% end %>
+          <% if index[:partial] %><code><%= index[:partial].to_json %></code><% end %>
+        </td>
+        <td class="text-end" data-order="<%= index[:size] %>"><%= human_size.(index[:size]) %></td>
+        <td class="text-end" data-order="<%= index[:ops] %>"><%= ActiveSupport::NumberHelper.number_to_delimited(index[:ops]) %></td>
+        <td><%= index[:since]&.strftime('%Y-%m-%d %H:%M') %></td>
+        <td><% if index[:keep] %><span class="badge text-bg-secondary"><%= index[:keep] %></span><% end %></td>
       </tr>
-      <% indexes.each do |index| %>
-        <tr>
-          <td>
-            <code><%= index[:name] %></code>
-            <% if index[:unused] %><span class="badge text-bg-danger">Unused</span><% end %>
-          </td>
-          <td><code><%= index[:key].to_json %></code></td>
-          <td>
-            <% if index[:unique] %><span class="badge text-bg-secondary">Unique</span><% end %>
-            <% if index[:ttl] %><span class="badge text-bg-secondary">TTL: <%= ttl_duration(index[:ttl]) %></span><% end %>
-            <% if index[:partial] %><code><%= index[:partial].to_json %></code><% end %>
-          </td>
-          <td class="text-end"><%= human_size.(index[:size]) %></td>
-          <td class="text-end"><%= ActiveSupport::NumberHelper.number_to_delimited(index[:ops]) %></td>
-          <td><%= index[:since]&.strftime('%Y-%m-%d %H:%M') %></td>
-          <td class="text-end">
-            <% if index[:keep] %>
-              <span class="badge text-bg-secondary"><%= index[:keep] %></span>
-            <% elsif index[:unused] %>
-              <form method="post" action="/stats/indexes/drop" class="d-inline">
-                <%= hidden_field_tag :collection, value: index[:collection] %>
-                <%= hidden_field_tag :name, value: index[:name] %>
-                <% if params[:unused] %><%= hidden_field_tag :unused, value: 1 %><% end %>
-                <button type="submit" class="btn btn-danger btn-sm" data-confirm="Drop <%= index[:name] %> from <%= index[:collection] %>? Recreating it means building it again on the whole collection." data-confirm-label="Drop">Drop</button>
-              </form>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  <% end %>
+    <% end %>
+  </tbody>
 </table>
+
+<script>
+  $(function () {
+    $('#indexes-table').DataTable({ paging: false, order: [[0, 'asc'], [1, 'asc']] })
+  })
+</script>
