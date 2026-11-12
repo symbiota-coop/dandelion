@@ -20,6 +20,78 @@ Dandelion::App.helpers do
     end
   end
 
+  # The database's collections for /stats/collections, largest on disk first, each saying whether a Mongoid model
+  # (ours or a gem's, like delayed_job's) uses it
+  def collection_stats
+    db = Mongoid.default_client.database
+    model_collections = ObjectSpace.each_object(Class).select do |c|
+      c.name.present? && c.include?(Mongoid::Document) && !c.name.start_with?('Mongoid::') && !c.embedded?
+    end.to_set { |model| model.collection.name }
+
+    db.collection_names.reject { |name| name.start_with?('system.') }.map do |name|
+      stats = db.command(collStats: name).first
+      { name: name, count: stats['count'] || 0, size: stats['size'] || 0, storage_size: stats['storageSize'] || 0,
+        index_size: stats['totalIndexSize'] || 0, avg_obj_size: stats['avgObjSize'] || 0, model: model_collections.include?(name) }
+    end.sort_by { |c| -c[:storage_size] }
+  end
+
+  # Indexes code names in a hint, which fails if the index is gone, by collection and name or key
+  def hinted_indexes
+    [{ collection: Event.collection.name, name: Event::HOSTS_INDEX },
+     { collection: Trace.collection.name, key: Trace::SUMMARY_INDEX.stringify_keys },
+     { collection: Trace.collection.name, key: Trace::RELEASES_INDEX.stringify_keys }]
+  end
+
+  # Every index for /stats/indexes (or a collection's), with its size and how often queries have used it since the
+  # server last started ($indexStats). TTL indexes are used by MongoDB's TTL monitor rather than by queries, so they're
+  # never unused. keep says why an index can't be dropped from the page, if it can't
+  def index_stats(only_collection = nil)
+    db = Mongoid.default_client.database
+    names = only_collection ? [only_collection] & db.collection_names : db.collection_names.reject { |name| name.start_with?('system.') }.sort
+    names.flat_map do |name|
+      collection = db[name]
+      sizes = db.command(collStats: name).first['indexSizes'] || {}
+      usage = collection.aggregate([{ '$indexStats' => {} }]).to_a.to_h { |s| [s['name'], s['accesses']] }
+      indexes = collection.indexes.to_a
+      indexes.map do |index|
+        accesses = usage[index['name']] || {}
+        ttl = index['expireAfterSeconds']
+        { collection: name, name: index['name'], key: index['key'], unique: index['unique'], partial: index['partialFilterExpression'],
+          ttl: ttl, size: sizes[index['name']] || 0, ops: accesses['ops'] || 0, since: accesses['since'],
+          unused: (accesses['ops'] || 0).zero? && index['name'] != '_id_' && ttl.nil?, keep: index_keep_reason(name, index, indexes) }
+      end
+    end
+  end
+
+  # Why an index mustn't be dropped from /stats/indexes: code hints it, or it's the only plain index starting with the
+  # fields of a $type-filtered one, which the planner can't use for plain queries on those fields
+  def index_keep_reason(collection_name, index, indexes)
+    return 'Hinted by code' if hinted_indexes.any? do |hinted|
+      hinted[:collection] == collection_name && (hinted[:name] == index['name'] || hinted[:key] == index['key'].to_h)
+    end
+    return if index['partialFilterExpression']
+
+    plain = indexes.reject { |other| other['partialFilterExpression'] }
+    starts_with = ->(candidate, fields) { candidate['key'].keys.first(fields.size) == fields }
+    'Beside a filtered index' if indexes.any? do |filtered|
+      fields = filtered['key'].keys
+      filtered['partialFilterExpression'] && starts_with.(index, fields) && plain.one? { |other| starts_with.(other, fields) }
+    end
+  end
+
+  # How long a TTL index keeps documents, from its expireAfterSeconds
+  def ttl_duration(seconds)
+    if seconds.zero?
+      'at field value'
+    elsif seconds < 1.day
+      pluralize(seconds / 1.hour, 'hour')
+    elsif seconds < 30.days
+      pluralize(seconds / 1.day, 'day')
+    else
+      "#{pluralize(seconds / 30.days, 'month')} (~#{seconds / 1.day} days)"
+    end
+  end
+
   def commit_url(commit)
     "https://github.com/symbiota-coop/dandelion/commit/#{commit}"
   end

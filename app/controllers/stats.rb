@@ -94,6 +94,27 @@ Dandelion::App.controller do
     redirect '/stats/caches'
   end
 
+  get '/stats/collections' do
+    @collections = collection_stats
+    erb :'stats/collections'
+  end
+
+  get '/stats/indexes' do
+    @indexes = index_stats
+    @indexes = @indexes.select { |index| index[:unused] } if params[:unused]
+    erb :'stats/indexes'
+  end
+
+  # Drops an index the page lists as unused, checked again here, unless it's one the page says to keep
+  post '/stats/indexes/drop' do
+    index = index_stats(params[:collection]).find { |i| i[:name] == params[:name] }
+    halt 400 unless index && index[:unused] && !index[:keep]
+
+    Mongoid.default_client[index[:collection]].indexes.drop_one(index[:name])
+    flash[:notice] = "Dropped #{index[:name]} from #{index[:collection]}, freeing about #{ActiveSupport::NumberHelper.number_to_human_size(index[:size])}"
+    redirect "/stats/indexes#{'?unused=1' if params[:unused]}"
+  end
+
   get '/stats/openrouter' do
     @generations = OpenRouterGeneration.order('created_at desc').paginate(page: params[:page], per_page: 50)
     erb :'stats/openrouter'

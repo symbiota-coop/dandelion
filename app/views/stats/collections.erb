@@ -1,0 +1,41 @@
+<% human_size = ->(bytes) { ActiveSupport::NumberHelper.number_to_human_size(bytes) } %>
+<h2>Collections</h2>
+<p class="text-body-secondary">
+  The database's collections, largest on disk first. A collection no model uses is left over from one that's gone, and can be dropped once nothing needs its data.
+</p>
+
+<% orphaned = @collections.reject { |c| c[:model] } %>
+<p>
+  <span class="badge text-bg-dark"><%= pluralize(@collections.size, 'collection') %></span>
+  <span class="badge text-bg-dark"><%= human_size.(@collections.sum { |c| c[:storage_size] }) %> on disk</span>
+  <span class="badge text-bg-dark"><%= human_size.(@collections.sum { |c| c[:index_size] }) %> of indexes</span>
+  <span class="badge <%= orphaned.empty? ? 'text-bg-primary' : 'text-bg-danger' %>"><%= orphaned.empty? ? 'Every collection has a model' : "#{pluralize(orphaned.size, 'collection')} without a model" %></span>
+</p>
+
+<table class="table table-hr">
+  <thead>
+    <tr>
+      <th>Collection</th>
+      <th class="text-end">Documents</th>
+      <th class="text-end">Data</th>
+      <th class="text-end">Storage</th>
+      <th class="text-end">Indexes</th>
+      <th class="text-end">Average document</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @collections.each do |collection| %>
+      <tr>
+        <td>
+          <a href="/stats/indexes#<%= collection[:name] %>"><code><%= collection[:name] %></code></a>
+          <% unless collection[:model] %><span class="badge text-bg-danger">No model</span><% end %>
+        </td>
+        <td class="text-end"><%= ActiveSupport::NumberHelper.number_to_delimited(collection[:count]) %></td>
+        <td class="text-end"><%= human_size.(collection[:size]) %></td>
+        <td class="text-end"><%= human_size.(collection[:storage_size]) %></td>
+        <td class="text-end"><%= human_size.(collection[:index_size]) %></td>
+        <td class="text-end"><%= human_size.(collection[:avg_obj_size]) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
