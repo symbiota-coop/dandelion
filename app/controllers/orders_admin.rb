@@ -182,14 +182,14 @@ Dandelion::App.controller do
   post '/e/:slug/orders/:order_id/restore_and_complete' do
     @event = event_from_params
     event_admins_only!
-    @event.orders.deleted.find(params[:order_id]).restore_and_complete
+    (@event.orders.deleted.find(params[:order_id]) || not_found).restore_and_complete
     redirect back
   end
 
   post '/e/:slug/tickets/:ticket_id/restore' do
     @event = event_from_params
     event_admins_only!
-    @event.tickets.deleted.find(params[:ticket_id]).restore
+    (@event.tickets.deleted.find(params[:ticket_id]) || not_found).restore
     redirect back
   end
 

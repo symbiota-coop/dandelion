@@ -74,9 +74,14 @@ Dandelion::App.controller do
   post '/organisations/stripe_connect_webhook' do
     payload = request.body.read
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
-    event = Stripe::Webhook.construct_event(
-      payload, sig_header, ENV['STRIPE_ENDPOINT_SECRET_CONNECT']
-    )
+    begin
+      event = Stripe::Webhook.construct_event(
+        payload, sig_header, ENV['STRIPE_ENDPOINT_SECRET_CONNECT']
+      )
+    rescue Stripe::SignatureVerificationError, JSON::ParserError => e # as /o/:slug/stripe_webhook does
+      ErrorReporting.capture_exception(e)
+      halt 200
+    end
 
     if (session = StripeCheckout.paid_session(event))
       @order = Order.find_by(session_id: session.id, payment_completed: false)

@@ -4,7 +4,13 @@ on:
   # Claude Code's branches too, so its work is tested before it reaches master
   push:
     branches: [ master, 'claude/**' ]
+  # Run workflow with coverage ticked (or `gh workflow run Ruby -f coverage=true`) measures test coverage too
   workflow_dispatch:
+    inputs:
+      coverage:
+        description: Measure test coverage
+        type: boolean
+        default: false
   pull_request:
     branches: [ master ]
 
@@ -108,7 +114,7 @@ jobs:
           - group: accounts
             files: accounts/accounts accounts/sign_ins accounts/email_confirmation accounts/provider_sign_ins
           - group: calendar
-            files: events/calendar events/evergreen events/listings
+            files: events/calendar events/evergreen events/listings events/boosts
           - group: event_bookings
             files: bookings/bookings bookings/rules events/opencollective
           - group: event_permissions
@@ -118,7 +124,7 @@ jobs:
           - group: gathering_features
             files: gatherings/features gatherings/rules
           - group: gatherings
-            files: gatherings/gatherings
+            files: gatherings/gatherings gatherings/members
           - group: general
             files: dadmin design images search errands
           - group: integrations
@@ -126,13 +132,13 @@ jobs:
           - group: messages
             files: messages/messages messages/pmails messages/mailer events/feedbacks events/discussions
           - group: orders
-            files: orders/orders orders/tokens bookings/resales events/boosts
+            files: orders/orders orders/tokens orders/admin bookings/resales
           - group: organisations
             files: organisations/organisations organisations/caches organisations/followers organisations/local_groups organisations/activities
           - group: payments
-            files: payments/gocardless payments/mollie payments/paypal orders/refunds bookings/donations organisations/payments
+            files: payments/gocardless payments/mollie payments/paypal payments/stripe_connect payments/stripe_row_splitter payments/monthly_contributions orders/refunds bookings/donations organisations/payments
           - group: ticket_types
-            files: bookings/ticket_types bookings/quotes bookings/waitlist
+            files: bookings/ticket_types bookings/quotes bookings/waitlist bookings/discount_codes
           - group: tours
             files: tours/tour tours/how_to_create_an_event tours/how_to_create_a_gathering
     steps:
@@ -165,7 +171,8 @@ jobs:
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
       env:
         TEST_FILES: ${{ matrix.files }}
-        COVERAGE: 1 # test/test_coverage.rb
+        # Coverage (test/test_coverage.rb) only when asked for, as it slows the groups and changes slowly
+        COVERAGE: ${{ inputs.coverage && '1' || '' }}
       with:
         timeout_minutes: 10
         max_attempts: 2
@@ -173,7 +180,7 @@ jobs:
         command: bundle exec rake test:files
 
     - name: Upload coverage
-      if: ${{ !cancelled() }}
+      if: ${{ !cancelled() && inputs.coverage }}
       uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
         name: coverage-${{ matrix.group }}
@@ -185,7 +192,7 @@ jobs:
   # in its coverage artifact
   coverage:
     needs: test
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && inputs.coverage }}
     runs-on: ubuntu-26.04
     steps:
     - name: Git checkout
