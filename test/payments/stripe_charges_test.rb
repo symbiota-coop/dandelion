@@ -4,6 +4,7 @@ require_relative '../test_config'
 # StripeTransaction.transfer, then each charge's balance and fees from its transactions), and what an event's money
 # reports read from them: its revenue, fees, donations and ticket revenue as Stripe has them
 class PaymentsStripeChargesTest < ActiveSupport::TestCase
+  include Capybara::DSL
 
   # A list of Stripe charges over pages: auto_paging_each yields them all, though data holds only the first page
   def stripe_pages(*pages)
@@ -316,5 +317,19 @@ class PaymentsStripeChargesTest < ActiveSupport::TestCase
                  [event.stripe_revenue, event.stripe_fees, event.stripe_donations, event.stripe_ticket_revenue, event.stripe_ticket_revenue_to_organisation,
                   event.stripe_ticket_revenue_to_revenue_sharer].map(&:format)
     assert_equal [[paid], [transferred]], event.stripe_charges_by_transfer
+  end
+
+  test 'an event admin sees a charge with no description among the event’s Stripe charges' do
+    create_event(prices: [30], currency: 'GBP')
+    charge('ch_described', description: "#{@event.name}: 1 ticket", balance_float: 30)
+    # Charges made or edited in Stripe's dashboard can have none
+    charge('ch_undescribed', description: nil, balance_float: 30, created: Time.utc(2026, 11, 4))
+
+    sign_in(@account)
+    visit "/e/#{@event.slug}/stripe_charges"
+    assert page.has_css?('#stripe-charges tbody tr', count: 2)
+    # Charge ID, description
+    rows = all('#stripe-charges tbody tr').map { |row| row.all('td').map { |cell| cell.text.squish }.values_at(1, 2) }
+    assert_equal [['ch_described', '1 ticket'], ['ch_undescribed', '']], rows
   end
 end

@@ -36,7 +36,7 @@
       <%= stripe_charge.id %>
     </td>
     <td>
-      <%= stripe_charge.description.split(':').last %>
+      <%= stripe_charge.description.to_s.split(':').last %>
     </td>
     <td>
       <%= m stripe_charge.amount/100.0, stripe_charge.currency %>
