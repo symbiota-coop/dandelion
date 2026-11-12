@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/g/:slug/inventory' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @inventory_item = @gathering.inventory_items.build(mass_assigning(params[:inventory_item], InventoryItem))
     if request.xhr?
@@ -11,7 +11,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/inventory_items/new' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @inventory_item = @gathering.inventory_items.build(mass_assigning(params[:inventory_item], InventoryItem))
     @inventory_item.account = current_account
@@ -24,14 +24,14 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/inventory_items/:id/edit' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @inventory_item = @gathering.inventory_items.find(params[:id]) || not_found
     erb :'inventory/build'
   end
 
   post '/g/:slug/inventory_items/:id/edit' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @inventory_item = @gathering.inventory_items.find(params[:id]) || not_found
     if @inventory_item.update_attributes(mass_assigning(params[:inventory_item], InventoryItem))
@@ -43,7 +43,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/inventory_items/:id/destroy' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @inventory_item = @gathering.inventory_items.find(params[:id]) || not_found
     @inventory_item.destroy
@@ -51,7 +51,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/inventory_items/:id/provided' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @inventory_item = @gathering.inventory_items.find(params[:id]) || not_found
     # One of the gathering's members, or no one

@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/e/:slug/boosts' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
 
     @event_boosts = @event.event_boosts.and(:payment_completed => true).order('created_at desc')
@@ -31,7 +31,7 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/boosts', provides: :json do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
 
     @event_boost = @event.event_boosts.new(

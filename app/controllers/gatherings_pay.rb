@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   post '/g/:slug/stripe_webhook' do # rubocop:disable Dandelion/GatheringPermission -- Stripe calls it, and it checks the event's signature
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     payload = request.body.read
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
     begin
@@ -26,7 +26,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/pay', provides: :json do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     membership_required!
 
     pm = GatheringPaymentMethod.object(params[:payment_method].to_s)
@@ -37,7 +37,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/payments/:payment_id', provides: :json do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     membership_required!
     @payment = @gathering.payments.find(params[:payment_id])
     @gathering.check_evm_account if @payment.evm_secret && @gathering.evm_address

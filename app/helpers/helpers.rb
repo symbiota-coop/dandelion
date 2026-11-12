@@ -191,30 +191,40 @@ Dandelion::App.helpers do
     redirect request.url.sub("#{id_prefix}/#{params[:id]}", yield(record)), 307
   end
 
+  # The record a route's URL names by slug (/o/:slug, /o/:organisation_slug/a/:slug, /e/:event_slug/...), or a 404.
+  # They read only the URL's slugs, never params[:id], which in /o/:slug/carousels/:id names another record
   def organisation_from_params
-    Organisation.find_by_slug_or_id(
-      slug: params[:organisation_slug] || params[:slug],
-      id: params[:organisation_id] || params[:id]
-    )
+    Organisation.find_by_slug_or_id(slug: params[:organisation_slug] || params[:slug]) || not_found
   end
 
   def activity_from_params
-    Organisation.find_by_slug_or_id(slug: params[:organisation_slug])&.activities&.find_by_slug_or_id(slug: params[:slug])
+    organisation_from_params.activities.find_by_slug_or_id(slug: params[:slug]) || not_found
   end
 
   def local_group_from_params
-    Organisation.find_by_slug_or_id(slug: params[:organisation_slug])&.local_groups&.find_by_slug_or_id(slug: params[:slug])
+    organisation_from_params.local_groups.find_by_slug_or_id(slug: params[:slug]) || not_found
   end
 
   def gathering_from_params
-    Gathering.find_by_slug_or_id(slug: params[:slug])
+    Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
   end
 
-  def event_from_params
-    Event.find_by_slug_or_id(
-      slug: params[:event_slug] || params[:slug],
-      id: params[:event_id] || params[:id]
-    )
+  # Event.unscoped for routes that also reach deleted events
+  def event_from_params(events = Event)
+    events.find_by_slug_or_id(slug: params[:event_slug] || params[:slug]) || not_found
+  end
+
+  def account_from_params
+    Account.find_by_slug_or_id(slug: params[:username]) || not_found
+  end
+
+  # Zapier names the organisation or event in its query string, by slug or id (docs/md/integrations.md)
+  def zapier_organisation
+    Organisation.find_by_slug_or_id(slug: params[:organisation_slug] || params[:slug], id: params[:organisation_id] || params[:id]) || not_found
+  end
+
+  def zapier_event
+    Event.find_by_slug_or_id(slug: params[:event_slug] || params[:slug], id: params[:event_id] || params[:id]) || not_found
   end
 
   # The query string's params, to carry over to another view of the same list: not the route's own (slug), which the

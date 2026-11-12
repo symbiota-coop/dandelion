@@ -1,12 +1,12 @@
 Dandelion::App.controller do
   get '/o/:slug/atproto/connect' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     organisation_admins_only!
     erb :'organisations/atproto_connect'
   end
 
   post '/o/:slug/atproto/connect' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     organisation_admins_only!
 
     @organisation.atproto_handle = params[:atproto_handle]&.strip&.delete_prefix('@')
@@ -24,7 +24,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/atproto/disconnect' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     organisation_admins_only!
     @organisation.disconnect_atproto!
     flash[:notice] = 'Disconnected from Bluesky/ATProto'

@@ -8,18 +8,18 @@ module RuboCop
       # @example
       #   # bad
       #   get '/g/:slug/rotas' do
-      #     @gathering = gathering_from_params || not_found
+      #     @gathering = gathering_from_params
       #     erb :'rotas/rotas'
       #   end
       #
       #   # good
       #   get '/g/:slug/rotas' do
-      #     @gathering = gathering_from_params || not_found
+      #     @gathering = gathering_from_params
       #     confirmed_membership_required!
       #     erb :'rotas/rotas'
       #   end
       #   post '/g/:slug/shifts/:id/destroy' do
-      #     @gathering = gathering_from_params || not_found
+      #     @gathering = gathering_from_params
       #     @shift = @gathering.shifts.find(params[:id]) || not_found
       #     own_or_gathering_admins_only!(@shift)
       #     @shift.destroy

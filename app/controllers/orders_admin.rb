@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/o/:slug/orders', provides: %i[html csv] do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     organisation_admins_only!
     @from = params[:from] ? parse_date(params[:from]) : nil
     @to = params[:to] ? parse_date(params[:to]) : nil
@@ -19,7 +19,7 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/orders', provides: %i[html csv pdf] do
-    @event = Event.unscoped.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params(Event.unscoped)
     event_admins_only!
     @orders = @event.orders.includes(:account, :revenue_sharer, :discount_code)
     @orders =  @orders.discounted if params[:discounted]
@@ -61,7 +61,7 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/tickets', provides: %i[html csv pdf] do
-    @event = Event.unscoped.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params(Event.unscoped)
     event_admins_only!
     @tickets = event_tickets_from_params(:account, :ticket_type, :order)
     case content_type
@@ -156,14 +156,14 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/orders/clear_answers' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @event.orders.unscoped.update_all(answers: nil)
     redirect back
   end
 
   post '/e/:slug/orders/:order_id/refund_and_destroy' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     order = @event.orders.find(params[:order_id]) || not_found
     order.destroy # queues order.refund (Order#refund_later)
@@ -171,7 +171,7 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/orders/:order_id/destroy' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     order = @event.orders.find(params[:order_id]) || not_found
     order.prevent_refund = true
@@ -180,14 +180,14 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/orders/:order_id/restore_and_complete' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @event.orders.deleted.find(params[:order_id]).restore_and_complete
     redirect back
   end
 
   post '/e/:slug/tickets/:ticket_id/restore' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @event.tickets.deleted.find(params[:ticket_id]).restore
     redirect back
@@ -257,7 +257,7 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/tickets/:ticket_id/refund_and_destroy' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     ticket = @event.tickets.find(params[:ticket_id]) || not_found
     ticket.refund
@@ -266,7 +266,7 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/tickets/:ticket_id/destroy' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     ticket = @event.tickets.find(params[:ticket_id]) || not_found
     ticket.destroy

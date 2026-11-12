@@ -1,13 +1,13 @@
 Dandelion::App.controller do
   get '/e/:slug/edit' do
-    @event = Event.unscoped.without(:voyage_embedding).find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params(Event.unscoped.without(:voyage_embedding))
     kick! unless @event.organisation
     event_admins_only!
     erb :'events_build/build'
   end
 
   post '/e/:slug/edit' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     kick! unless @event.organisation
     event_admins_only!
     @event.last_saved_by = current_account
@@ -28,13 +28,13 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/delete' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     erb :'events/delete'
   end
 
   post '/e/:slug/destroy' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     can_delete_event_only!
     @event.prevent_order_refunds = true if params[:no_refunds]
     @event.send_destroy_notification(current_account)
@@ -44,13 +44,13 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/progress' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     partial :'events/progress', locals: { event: @event, full_width: params[:full_width] }
   end
 
   get '/e/:slug/linked_image' do
-    @event = Event.unscoped.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params(Event.unscoped)
     @organisation = Organisation.find(params[:organisation_id]) || not_found
     event_admins_or_revenue_admins_only!
     image_source = @event.image_source(@organisation) || not_found
@@ -58,14 +58,14 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/duplicate' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     duplicate_event_prerequisites!
     erb :'events/duplicate'
   end
 
   post '/e/:slug/duplicate' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     duplicate_event_prerequisites!
     duplicated_event = @event.duplicate!(current_account)
@@ -73,13 +73,13 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/ticket_email' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     erb :'events/ticket_email'
   end
 
   get '/e/:slug/ticket_email_preview' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     email_html_csp!
     order = @event.orders.new
@@ -95,13 +95,13 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/reminder_email' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     erb :'events/reminder_email'
   end
 
   get '/e/:slug/reminder_email_preview' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     email_html_csp!
 
@@ -119,13 +119,13 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/feedback_request_email' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     erb :'events/feedback_request_email'
   end
 
   get '/e/:slug/feedback_request_email_preview' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     email_html_csp!
     EmailHelper.html(:feedback, event: @event) do |content|
@@ -141,7 +141,7 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/create_ticket' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
 
     account_hash = { name: params[:ticket][:name], email: params[:ticket][:email] }
@@ -166,7 +166,7 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/stripe_charges' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @stripe_charges = @event.stripe_charges.includes(:account, order: %i[account event]).and(:balance_transaction.ne => nil)
     @stripe_charges = @stripe_charges.and(:account_id.in => Account.search(params[:q], child_scope: @stripe_charges, regex_search: true).pluck(:id)) if params[:q]
@@ -179,7 +179,7 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/donations' do
-    @event = Event.unscoped.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params(Event.unscoped)
     event_admins_only!
     @donations = @event.donations.includes(:account, :order)
     @donations = @donations.and(:account_id.in => Account.search(params[:q], child_scope: @donations, regex_search: true).pluck(:id)) if params[:q]
@@ -187,13 +187,13 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/stats' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     erb :'events/stats'
   end
 
   get '/e/:slug/stripe_report' do
-    @event = Event.unscoped.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params(Event.unscoped)
     event_revenue_admins_only!
     not_found if @event.organisation.stripe_client_id || !@event.organisation.stripe_connect_json
     begin
@@ -206,7 +206,7 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/waitlist' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @waitships = @event.waitships.includes(:account)
     @waitships = @waitships.and(:account_id.in => Account.search(params[:q], child_scope: @waitships, regex_search: true).pluck(:id)) if params[:q]
@@ -214,7 +214,7 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/ticket_type_waitlists' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @ticket_type_waitships = TicketTypeWaitship.and(:ticket_type_id.in => @event.ticket_type_ids).includes(:account, :ticket_type)
     @ticket_type_waitships = @ticket_type_waitships.and(ticket_type_id: params[:ticket_type_id]) if params[:ticket_type_id]
@@ -224,39 +224,39 @@ Dandelion::App.controller do
 
   # The add/remove boxes on an event's page are pagelets, which reload from these after each add or remove
   get '/e/:slug/event_facilitations' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     partial :'events/facilitators_box'
   end
 
   get '/e/:slug/cohostships' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     partial :'events/cohosts_box'
   end
 
   get '/e/:slug/event_sessions' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     partial :'events/sessions_box'
   end
 
   post '/e/:slug/event_facilitations/new' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @event.event_facilitations.create(account_id: params[:event_facilitation][:account_id])
     redirect back
   end
 
   post '/e/:slug/event_facilitations/destroy' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @event.event_facilitations.find_by(account_id: params[:account_id]).try(:destroy)
     redirect back
   end
 
   get '/e/:slug/pmails' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     @_organisation = @event.organisation
     event_admins_only!
     @pmails = @event.pmails_as_mailable.includes(:account).order('created_at desc').paginate(page: params[:page])
@@ -265,7 +265,7 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/cohostships/new' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     kick!(redirect_url: "/e/#{@event.slug}") unless event_cohost_adder?
     if params[:cohostship] && params[:cohostship][:organisation_id]
@@ -277,7 +277,7 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/cohostships/destroy' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     kick!(redirect_url: "/e/#{@event.slug}") unless event_cohost_remover?
     @event.cohostships.find_by(organisation_id: params[:organisation_id]).try(:destroy)
@@ -285,13 +285,13 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/cohosts' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     erb :'events/cohosts'
   end
 
   post '/e/:slug/cohostships/:cohostship_id' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @cohostship = @event.cohostships.find(params[:cohostship_id]) || not_found
     # Featuring places the event in the cohost organisation's carousels
@@ -305,26 +305,26 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/ticket_types' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     erb :'events/ticket_types'
   end
 
   get '/e/:slug/notes' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     partial :'events/notes'
   end
 
   post '/e/:slug/notes' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @event.set(notes: params[:notes])
     200
   end
 
   post '/e/:slug/resend_feedback_email/:account_id' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @event.send_feedback_requests(params[:account_id])
     flash[:notice] = 'The feedback email was resent.'
@@ -332,7 +332,7 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/resend_all_feedback_emails' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @event.send_feedback_requests(:all, true)
     flash[:notice] = 'Feedback emails are being sent to all eligible attendees.'
@@ -340,7 +340,7 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/discount_codes' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @discount_codes = @event.discount_codes
     @scope = "event_id=#{@event.id}"
@@ -348,34 +348,34 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/event_sessions/new' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @event.event_sessions.create(mass_assigning(params[:event_session], EventSession))
     redirect back
   end
 
   post '/e/:slug/event_sessions/destroy' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @event.event_sessions.find(params[:event_session_id]).try(:destroy)
     redirect back
   end
 
   get '/e/:slug/hide_from_homepage' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     partial :'events/hide_from_homepage', locals: { event: @event, block_edit: params[:block_edit] }
   end
 
   post '/e/:slug/do_hide_from_homepage' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @event.set(hidden_from_homepage: true)
     200
   end
 
   post '/e/:slug/unhide_from_homepage' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @event.set(hidden_from_homepage: false)
     200

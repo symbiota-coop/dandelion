@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/o/:slug/events/lookup', provides: :json do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     organisation_admins_only!
     @events = @organisation.events_including_cohosted.order('start_time desc')
     @events = @events.and(:id.in => Event.search(params[:q], @events).pluck(:id)) if params[:q]
@@ -16,14 +16,14 @@ Dandelion::App.controller do
     # A pagelet: the organisation page loads it, and pagelets.js loads its pagination links, both by XHR.
     # Crawlers follow those links directly, so turn them away before doing any work
     halt 400 unless request.xhr?
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     @events = @organisation.events_including_cohosted.hinted(Event::HOSTS_INDEX).publicly_visible.future_current_evergreen.without_heavy_fields.with_key_includes
     @events = @events.and(monthly_donors_only: true) if params[:members_events]
     partial :'organisations/events_block'
   end
 
   get '/o/:slug/events', provides: %i[html ics json] do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     @events = @organisation.events_including_cohosted.hinted(Event::HOSTS_INDEX).publicly_visible
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
@@ -117,7 +117,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/events/stats', provides: %i[html csv] do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     organisation_admins_or_event_managers_only!
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil

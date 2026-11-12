@@ -36,25 +36,25 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/lg/:slug', prerender: true do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     @title = @local_group.name
     erb :'local_groups/local_group'
   end
 
   get '/o/:organisation_slug/lg/:slug/events/stats' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     subgroup_event_stats_page(@local_group)
   end
 
   get '/o/:organisation_slug/lg/:slug/edit' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     erb :'local_groups/build'
   end
 
   post '/o/:organisation_slug/lg/:slug/edit' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     if @local_group.update_attributes(mass_assigning(params[:local_group], LocalGroup))
       flash[:notice] = 'The local group was saved.'
@@ -67,13 +67,13 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/lg/:slug/stats' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     erb :'local_groups/stats'
   end
 
   post '/o/:organisation_slug/lg/:slug/add_follower' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
 
     @account = account_from_email_param!
@@ -88,7 +88,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:organisation_slug/lg/:slug/receive_feedback/:f' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found
     @local_groupship.set(receive_feedback: params[:f].to_i == 1)
@@ -97,13 +97,13 @@ Dandelion::App.controller do
 
   # The admins box on a local group's page is a pagelet, which reloads from this after each add or remove
   get '/o/:organisation_slug/lg/:slug/local_groupships/admins' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     partial :'local_groups/admins_box'
   end
 
   post '/o/:organisation_slug/lg/:slug/local_groupships/admin' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find_by(account_id: params[:local_groupship][:account_id]) || @local_group.local_groupships.create(account_id: params[:local_groupship][:account_id])
     @local_groupship.set(admin: true)
@@ -111,7 +111,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:organisation_slug/lg/:slug/local_groupships/unadmin' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find_by(account_id: params[:account_id]) || not_found
     @local_groupship.set(admin: false)
@@ -119,7 +119,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:organisation_slug/lg/:slug/destroy' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     @local_group.destroy
     redirect "/o/#{@local_group.organisation.slug}/local_groups"
@@ -127,13 +127,13 @@ Dandelion::App.controller do
 
   get '/o/:organisation_slug/lg/:slug/unsubscribe' do
     sign_in_required!
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     erb :'local_groups/unsubscribe'
   end
 
   post '/o/:organisation_slug/lg/:slug/unsubscribe' do
     sign_in_required!
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     @local_groupship = current_account.local_groupships.find_by(local_group: @local_group) || current_account.local_groupships.create(local_group: @local_group)
     @local_groupship.set(unsubscribed: true)
     flash[:notice] = "You were unsubscribed from #{@local_group.name}."
@@ -142,20 +142,20 @@ Dandelion::App.controller do
 
   get '/o/:organisation_slug/lg/:slug/local_groupship' do
     sign_in_required!
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @local_group, resourceship_name: 'local_groupship', resource_path: @local_group.path, membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }) : redirect(@local_group.path)
   end
 
   post '/o/:organisation_slug/lg/:slug/local_groupship' do
     sign_in_required!
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     set_own_subgroupship(@local_group, :local_groupships, params[:f])
     request.xhr? ? 200 : redirect(@local_group.path)
   end
 
   post '/o/:organisation_slug/lg/:slug/hide_membership' do
     sign_in_required!
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found
     @local_groupship.set(hide_membership: true)
     redirect back
@@ -163,14 +163,14 @@ Dandelion::App.controller do
 
   post '/o/:organisation_slug/lg/:slug/show_membership' do
     sign_in_required!
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found
     @local_groupship.set(hide_membership: false)
     redirect back
   end
 
   get '/o/:organisation_slug/lg/:slug/followers', provides: %i[html csv] do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     case content_type
     when :html
@@ -182,7 +182,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:organisation_slug/lg/:slug/followers' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     import_subgroup_followers(@local_group, :local_groupships)
   end
@@ -196,7 +196,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/lg/:slug/pmails' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     @_organisation = @local_group.organisation
     local_group_admins_only!
     @pmails = @local_group.pmails_including_events.order('created_at desc').paginate(page: params[:page])
@@ -205,14 +205,14 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/lg/:slug/subscribed/:local_groupship_id' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find(params[:local_groupship_id]) || not_found
     partial :'local_groups/subscribed', locals: { local_groupship: @local_groupship }
   end
 
   post '/o/:organisation_slug/lg/:slug/subscribed/:local_groupship_id' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     @local_groupship = @local_group.local_groupships.find(params[:local_groupship_id]) || not_found
     @local_groupship.set(unsubscribed: !params[:subscribed])
@@ -220,7 +220,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/lg/:slug/discount_codes' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     @discount_codes = @local_group.discount_codes
     @scope = "local_group_id=#{@local_group.id}"

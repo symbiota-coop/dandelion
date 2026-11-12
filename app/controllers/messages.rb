@@ -17,7 +17,7 @@ Dandelion::App.controller do
   end
 
   get '/messages/:username' do
-    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
+    @account = account_from_params
     if @account.id == current_account.id
       flash[:notice] = "You can't message yourself"
       redirect '/messages'
@@ -32,12 +32,12 @@ Dandelion::App.controller do
   end
 
   get '/messages/:username/send' do
-    @account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
+    @account = account_from_params
     partial :'messages/send'
   end
 
   post '/messages/:username/send' do
-    messengee = Account.find_by_slug_or_id(slug: params[:username]) || not_found
+    messengee = account_from_params
     message = Message.new(body: params[:body], messenger: current_account, messengee: messengee)
     if message.save
       200

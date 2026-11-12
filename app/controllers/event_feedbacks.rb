@@ -1,27 +1,27 @@
 Dandelion::App.controller do
   get '/o/:slug/feedback' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     organisation_admins_only!
     @event_feedbacks = @organisation.event_feedbacks.includes(:account, event: :organisation)
     erb :'organisations/event_feedbacks'
   end
 
   get '/o/:organisation_slug/a/:slug/feedback' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     @event_feedbacks = @activity.event_feedbacks.includes(:account, event: :organisation)
     erb :'activities/event_feedbacks'
   end
 
   get '/o/:organisation_slug/lg/:slug/feedback' do
-    @local_group = local_group_from_params || not_found
+    @local_group = local_group_from_params
     local_group_admins_only!
     @event_feedbacks = @local_group.event_feedbacks.includes(:account, event: :organisation)
     erb :'local_groups/event_feedbacks'
   end
 
   get '/e/:slug/feedback_report' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     event_feedbacks_with_answers = @event.event_feedbacks.and(:answers.ne => nil)
     halt 404 unless event_feedbacks_with_answers.exists?
@@ -30,7 +30,7 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/feedback', provides: %i[html csv] do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     event_admins_only!
     @event_feedbacks = @event.event_feedbacks.includes(:account, event: :organisation)
     case content_type
@@ -80,7 +80,7 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/give_feedback' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     @preview = @event.valid_feedback_preview_token?(params[:token])
     resolve_feedback_account! unless @preview
     @title = "Feedback on #{@event.name}#{" for #{@account.name}" if params[:email]}"
@@ -89,7 +89,7 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/give_feedback' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     halt 403 if @event.valid_feedback_preview_token?(params[:token])
     resolve_feedback_account!
     @title = "Feedback on #{@event.name}"

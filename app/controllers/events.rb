@@ -256,7 +256,7 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/ticket_type_waitships', provides: :json do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
 
     validate_recaptcha(json: true)
 
@@ -268,7 +268,7 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/waitship/new' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
 
     validate_recaptcha
 
@@ -282,7 +282,7 @@ Dandelion::App.controller do
   # Email notifications for the discussion, before anyone has written in it: makes its post to subscribe to
   post '/e/:slug/subscribe_discussion' do
     sign_in_required!
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     @commentable = @event
     commentable_viewers_only!
     @event.discussion_post!(current_account).subscriptions.find_or_create_by(account: current_account)
@@ -292,7 +292,7 @@ Dandelion::App.controller do
   # Discussion emails sent before 2026-10-15 link here to unsubscribe
   get '/e/:slug/unsubscribe_discussion' do
     sign_in_required!
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     @event.discussion_post&.subscriptions&.and(account: current_account)&.destroy_all
     flash[:notice] = "You unsubscribed from the discussion of #{@event.name}"
     redirect "/e/#{@event.slug}"
@@ -300,27 +300,27 @@ Dandelion::App.controller do
 
   get '/e/:slug/star' do
     sign_in_required!
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     @event_star = @event.event_stars.find_by(account: current_account)
     partial :'events/star', locals: { event: @event, event_star: @event_star, block_edit: params[:block_edit] }
   end
 
   get '/e/:slug/block_controls' do
     sign_in_required!
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     partial :'events/block_controls', locals: { event: @event, event_star: @event.event_stars.find_by(account: current_account) }
   end
 
   post '/e/:slug/do_star' do
     sign_in_required!
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     @event.event_stars.create(account: current_account)
     200
   end
 
   post '/e/:slug/unstar' do
     sign_in_required!
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     @event_star = @event.event_stars.find_by(account: current_account)
     @event_star.try(:destroy)
     200

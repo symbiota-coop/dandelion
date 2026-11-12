@@ -98,7 +98,10 @@ class LintTest < Minitest::Test
       'Dandelion/Redcarpet' => { '::Redcarpet::Render::HTML.new' => 1, 'Redcarpet' => 1, 'Foo::Redcarpet' => 0, 'MarkdownRenderer.render(x)' => 0 },
       'Dandelion/SlugLookup' => {
         'Gathering.find_by(slug: params[:gathering_slug], x: 1)' => 1, 'Event&.find(params[:event_slug])' => 1, 'Event.find(params[:event_id])' => 0,
-        'organisation.activities.find(params[:id])' => 0, 'Order.find(params[:id])' => 0, 'Event.find(id)' => 0, 'Event.find_by(slug: slug)' => 0
+        'organisation.activities.find(params[:id])' => 0, 'Order.find(params[:id])' => 0, 'Event.find(id)' => 0, 'Event.find_by(slug: slug)' => 0,
+        'Organisation.find_by_slug_or_id(slug: params[:organisation_slug]) || not_found' => 1, 'Account.find_by_slug_or_id(slug: params[:username]) || not_found' => 1,
+        'Organisation.find_by_slug_or_id(slug: params[:slug])' => 0, 'Event.find_by_slug_or_id(slug: params[:cohost]) || not_found' => 0,
+        'activity_from_params || not_found' => 1, 'x || not_found' => 0
       },
       'Dandelion/GatheringScope' => {
         'Shift.find(params[:id])' => 1, 'Membership&.find(params[:membership][:id])' => 1, 'Team.find_by(id: params[:team_id], x: 1)' => 1,

@@ -56,7 +56,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug', prerender: true do # rubocop:disable Dandelion/GatheringPermission -- it checks itself: members and admins see the page, and anyone else is sent to join or apply
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     @membership = @gathering.memberships.find_by(account: current_account)
     if @membership || gathering_admin?
       if request.xhr?
@@ -79,20 +79,20 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/todos' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     membership_required!
     partial :'gatherings/todos'
   end
 
   get '/g/:slug/edit' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     erb :'gatherings/build'
   end
 
   post '/g/:slug/edit' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     if @gathering.update_attributes(mass_assigning(params[:gathering], Gathering))
@@ -106,7 +106,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/destroy' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @gathering.destroy
@@ -115,41 +115,41 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/subscribe' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!(site_admins: false)
     partial :'gatherings/subscribe', locals: { membership: @membership }
   end
 
   post '/g/:slug/set_subscribe' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @membership.set(unsubscribed: false)
     request.xhr? ? 200 : redirect('/accounts/subscriptions')
   end
 
   get '/g/:slug/unsubscribe' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!(site_admins: false)
     @membership.set(unsubscribed: true)
     request.xhr? ? 200 : redirect('/accounts/subscriptions')
   end
 
   post '/g/:slug/show_in_sidebar' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @membership.set(hide_from_sidebar: false)
     redirect "/g/#{@gathering.slug}"
   end
 
   post '/g/:slug/hide_from_sidebar' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @membership.set(hide_from_sidebar: true)
     redirect "/g/#{@gathering.slug}"
   end
 
   get '/g/:slug/copy' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @destination_memberships = current_account.memberships.and(admin: true).and(:gathering_id.ne => @gathering.id)
     if @destination_memberships.empty?
@@ -161,7 +161,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/copy' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
 
     destination_membership = current_account.memberships.and(admin: true).and(:gathering_id.ne => @gathering.id).find_by(gathering_id: params[:gathering_id])

@@ -32,7 +32,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/activities', provides: %i[html json] do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     @activities = @organisation.activities.order('name asc')
     @activities = @activities.and(:id.in => Activity.search(params[:q], @activities).pluck(:id)) if params[:q]
     @activities = @activities.and(id: params[:id]) if params[:id]
@@ -54,7 +54,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/local_groups', provides: %i[html json] do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     @local_groups = @organisation.local_groups.order('name asc')
     @local_groups = @local_groups.and(:id.in => LocalGroup.search(params[:q], @local_groups).pluck(:id)) if params[:q]
     @local_groups = @local_groups.and(id: params[:id]) if params[:id]
@@ -73,7 +73,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/news' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     @pmails = @organisation.news
     if request.xhr?
       partial :'organisations/news'
@@ -83,19 +83,19 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/news/latest' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     @pmails = @organisation.news
     redirect "/pmails/#{@pmails.first.public_id}"
   end
 
   get '/o/:slug/subscribe' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     @skip_minimal_head = true
     partial :'accounts/minimal_subscribe', layout: 'minimal'
   end
 
   get '/invite/:username' do
-    account = Account.find_by_slug_or_id(slug: params[:username]) || not_found
+    account = account_from_params
     session[:organisation_referrer_id] = account.id.to_s
     redirect '/o/new'
   end
@@ -132,13 +132,13 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug', prerender: true do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     @title = @organisation.name
     erb :'organisations/organisation'
   end
 
   get '/o/:slug/carousels/:id' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     if params[:id] == 'featured'
       partial :'events/carousel', locals: { title: 'Featured', events: @organisation.featured_events, hide_featured_title: params[:hide_featured_title], skip_margin: true }
     else
@@ -149,7 +149,7 @@ Dandelion::App.controller do
 
   get '/o/:slug/organisationship' do
     sign_in_required!
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     if request.xhr?
       partial :'organisations/organisationship', locals: { organisation: @organisation, membership_toggle: params[:membership_toggle], create_event: params[:create_event], btn_class: params[:btn_class] }
     else
@@ -159,7 +159,7 @@ Dandelion::App.controller do
 
   post '/o/:slug/organisationship' do
     sign_in_required!
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     case params[:f]
     when 'not_following'
       organisationship = current_account.organisationships.find_by(organisation: @organisation)
@@ -175,13 +175,13 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/unsubscribe' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     @account = current_account || Account.from_organisation_unsubscribe_token(@organisation, params[:token]) || sign_in_required!
     erb :'organisations/unsubscribe'
   end
 
   post '/o/:slug/unsubscribe' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     @account = current_account || Account.from_organisation_unsubscribe_token(@organisation, params[:token]) || sign_in_required!
     @organisationship = @account.organisationships.find_by(organisation: @organisation) || @account.organisationships.create(organisation: @organisation)
     @organisationship.set_unsubscribed!(true)
@@ -195,23 +195,23 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/subscribed_accounts_count' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     @organisation.subscribed_accounts_count.to_s
   end
 
   get '/o/:slug/monthly_donors_count' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     @organisation.monthly_donors_count.to_s
   end
 
   get '/o/:slug/monthly_donations_count' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     @organisation.monthly_donations_count.to_s
   end
 
   post '/o/:slug/show_membership/:f' do
     sign_in_required!
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     @organisationship = @organisation.organisationships.find_by(account: current_account) || not_found
     @organisationship.set(hide_membership: params[:f].to_i == 0)
     @organisationship.file_visibility_in_account_caches
@@ -219,7 +219,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/show_feedback' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @organisation = organisation_from_params
     if request.xhr? || params[:minimal]
       partial :'event_feedbacks/event_feedbacks', locals: { event_feedbacks: @organisation.public_event_feedbacks }, layout: (params[:minimal] ? 'minimal' : false)
     else

@@ -24,7 +24,7 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/purchase', provides: :json do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     builder = OrderBuilder.new(**order_builder_args)
     result = JSON.parse(builder.call)
     # Whether the order waits for a payment: without one (RSVPs, and tickets credit or a fixed discount paid for), the
@@ -42,7 +42,7 @@ Dandelion::App.controller do
   # What the checkout form's choices cost (Quote), which the form shows as the buyer chooses. It takes the ticket form's
   # fields as the purchase does, and refuses what the purchase would refuse of them
   post '/e/:slug/quote', provides: :json do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     restriction = @event.booking_restriction(current_account)
     raise OrderBuilder::NotAllowed.new(restriction) if restriction
 
@@ -67,7 +67,7 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/orders/:order_id/payment_completed', provides: :json do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     @order = @event.orders.find_by_id_or_token(params[:order_id]) || not_found
     @event.organisation.check_evm_account if @order.evm_secret && @event.organisation.evm_address
     @event.check_oc_event if @order.oc_secret && @event.oc_slug
@@ -83,7 +83,7 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/orders/:order_id/ticketholders/:ticket_id/name' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
     headers['Referrer-Policy'] = 'no-referrer'
@@ -91,7 +91,7 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/orders/:order_id/ticketholders/:ticket_id/name' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
     headers['Referrer-Policy'] = 'no-referrer'
@@ -100,7 +100,7 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/orders/:order_id/ticketholders/:ticket_id/email' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
     headers['Referrer-Policy'] = 'no-referrer'
@@ -108,7 +108,7 @@ Dandelion::App.controller do
   end
 
   post '/e/:slug/orders/:order_id/ticketholders/:ticket_id/email' do
-    @event = Event.find_by_slug_or_id(slug: params[:slug]) || not_found
+    @event = event_from_params
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
     headers['Referrer-Policy'] = 'no-referrer'

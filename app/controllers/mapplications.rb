@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/g/:slug/mapplications/:id' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @mapplication = @gathering.mapplications.find(params[:id]) || not_found
     if request.xhr?
@@ -11,14 +11,14 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/mapplication_row/:id' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     @mapplication = @gathering.mapplications.find(params[:id]) || not_found
     confirmed_membership_required!
     partial :'mapplications/mapplication_row', locals: { mapplication: @mapplication }
   end
 
   get '/g/:slug/apply' do # rubocop:disable Dandelion/GatheringPermission -- applying is for people who aren't members yet
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     @membership = @gathering.memberships.find_by(account: current_account)
     redirect '/' if @gathering.privacy == 'secret'
     redirect "/g/#{@gathering.slug}/join" if @gathering.privacy == 'open'
@@ -30,7 +30,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/apply' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     halt 403 if @gathering.privacy == 'secret'
 
     if current_account
@@ -75,7 +75,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/applications' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @mapplications = @gathering.mapplications.pending
     @mapplications = @mapplications.and(:account_id.in => Account.search(params[:q], child_scope: @mapplications, regex_search: true).pluck(:id)) if params[:q]
@@ -83,13 +83,13 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/threshold' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     partial :'mapplications/threshold'
   end
 
   post '/g/:slug/threshold' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @membership.desired_threshold = params[:desired_threshold]
     @membership.save!
@@ -97,14 +97,14 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/applications/paused' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @mapplications = @gathering.mapplications.paused
     erb :'mapplications/paused'
   end
 
   post '/g/:slug/mapplications/:id/verdicts/create' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     @mapplication = @gathering.mapplications.find(params[:id]) || not_found
     confirmed_membership_required!
     verdict = @mapplication.verdicts.build(mass_assigning(params[:verdict], Verdict))
@@ -114,7 +114,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/verdicts/:id/destroy' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     @verdict = @gathering.verdicts.find(params[:id]) || not_found
     halt 403 unless current_account && @verdict.account_id == current_account.id
     @verdict.destroy
@@ -122,7 +122,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/mapplications/:id/process' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     @mapplication = @gathering.mapplications.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
@@ -139,7 +139,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/mapplications/:id/destroy' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     @mapplication = @gathering.mapplications.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!

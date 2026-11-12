@@ -36,7 +36,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/a/:slug', prerender: true do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     @title = @activity.name
     kick!(redirect_url: "/o/#{@activity.organisation.slug}") if @activity.locked? && !activity_admin?
     @activityship = @activity.activityships.find_by(account: current_account) if current_account
@@ -44,7 +44,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:organisation_slug/a/:slug/feedback_summary' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     if !admin? && @activity.feedback_summary_last_refreshed_at && @activity.feedback_summary_last_refreshed_at > 24.hours.ago
       flash[:error] = 'Feedback summary can only be refreshed once per day'
@@ -55,13 +55,13 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/a/:slug/feedback_summary' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     @organisation = @activity.organisation
     partial :'event_feedbacks/feedback_summary', locals: { contents_only: true }
   end
 
   post '/o/:organisation_slug/a/:slug/feedback_summary/delete' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     @activity.set(feedback_summary: nil)
     @activity.set(feedback_summary_last_refreshed_at: Time.now)
@@ -70,19 +70,19 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/a/:slug/events/stats' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     subgroup_event_stats_page(@activity)
   end
 
   get '/o/:organisation_slug/a/:slug/edit' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     erb :'activities/build'
   end
 
   post '/o/:organisation_slug/a/:slug/edit' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     if @activity.update_attributes(mass_assigning(params[:activity], Activity))
       flash[:notice] = 'The activity was saved.'
@@ -95,13 +95,13 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/a/:slug/stats' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     erb :'activities/stats'
   end
 
   post '/o/:organisation_slug/a/:slug/add_follower' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
 
     @account = account_from_email_param!
@@ -116,7 +116,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:organisation_slug/a/:slug/receive_feedback/:f' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     @activityship = @activity.activityships.find_by(account: current_account) || not_found
     @activityship.set(receive_feedback: params[:f].to_i == 1)
@@ -125,13 +125,13 @@ Dandelion::App.controller do
 
   # The admins box on an activity's page is a pagelet, which reloads from this after each add or remove
   get '/o/:organisation_slug/a/:slug/activityships/admins' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     partial :'activities/admins_box'
   end
 
   post '/o/:organisation_slug/a/:slug/activityships/admin' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     @activityship = @activity.activityships.find_by(account_id: params[:activityship][:account_id]) || @activity.activityships.create(account_id: params[:activityship][:account_id])
     @activityship.set(admin: true)
@@ -139,7 +139,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:organisation_slug/a/:slug/activityships/unadmin' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     @activityship = @activity.activityships.find_by(account_id: params[:account_id]) || not_found
     @activityship.set(admin: false)
@@ -147,7 +147,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:organisation_slug/a/:slug/destroy' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     @activity.destroy
     redirect "/o/#{@activity.organisation.slug}/activities"
@@ -155,13 +155,13 @@ Dandelion::App.controller do
 
   get '/o/:organisation_slug/a/:slug/unsubscribe' do
     sign_in_required!
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     erb :'activities/unsubscribe'
   end
 
   post '/o/:organisation_slug/a/:slug/unsubscribe' do
     sign_in_required!
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     if (@activityship = current_account.activityships.find_by(activity: @activity))
       @activityship.set(unsubscribed: true)
     end
@@ -171,13 +171,13 @@ Dandelion::App.controller do
 
   get '/o/:organisation_slug/a/:slug/activityship' do
     sign_in_required!
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @activity, resourceship_name: 'activityship', resource_path: @activity.path, membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }) : redirect(@activity.path)
   end
 
   post '/o/:organisation_slug/a/:slug/activityship' do
     sign_in_required!
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     # Only open activities can be joined without an admin
     set_own_subgroupship(@activity, :activityships, params[:f]) if @activity.activityships.find_by(account: current_account) || @activity.privacy == 'open'
     request.xhr? ? 200 : redirect(@activity.path)
@@ -185,7 +185,7 @@ Dandelion::App.controller do
 
   post '/o/:organisation_slug/a/:slug/hide_membership' do
     sign_in_required!
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     @activityship = @activity.activityships.find_by(account: current_account) || not_found
     @activityship.set(hide_membership: true)
     redirect back
@@ -193,14 +193,14 @@ Dandelion::App.controller do
 
   post '/o/:organisation_slug/a/:slug/show_membership' do
     sign_in_required!
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     @activityship = @activity.activityships.find_by(account: current_account) || not_found
     @activityship.set(hide_membership: false)
     redirect back
   end
 
   get '/o/:organisation_slug/a/:slug/followers', provides: %i[html csv] do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     case content_type
     when :html
@@ -212,7 +212,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:organisation_slug/a/:slug/followers' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     import_subgroup_followers(@activity, :activityships)
   end
@@ -226,7 +226,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/a/:slug/show_feedback' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     @organisation = @activity.organisation
     if request.xhr? || params[:minimal]
       partial :'event_feedbacks/event_feedbacks', locals: { event_feedbacks: @activity.public_event_feedbacks.includes(:account, event: :organisation) }, layout: (params[:minimal] ? 'minimal' : false)
@@ -236,7 +236,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/a/:slug/pmails' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     @_organisation = @activity.organisation
     activity_admins_only!
     @pmails = @activity.pmails_including_events.order('created_at desc').paginate(page: params[:page])
@@ -245,14 +245,14 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/a/:slug/subscribed/:activityship_id' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     @activityship = @activity.activityships.find(params[:activityship_id]) || not_found
     partial :'activities/subscribed', locals: { activityship: @activityship }
   end
 
   post '/o/:organisation_slug/a/:slug/subscribed/:activityship_id' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     @activityship = @activity.activityships.find(params[:activityship_id]) || not_found
     @activityship.set(unsubscribed: !params[:subscribed])
@@ -260,7 +260,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/a/:slug/discount_codes' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     @discount_codes = @activity.discount_codes
     @scope = "activity_id=#{@activity.id}"
@@ -268,7 +268,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:organisation_slug/a/:slug/application_questions' do
-    @activity = activity_from_params || not_found
+    @activity = activity_from_params
     activity_admins_only!
     %w[hide_image hide_location hide_date_of_birth hide_gender].each do |field|
       @activity[field] = %w[1 true on].include?(params[field].to_s) if params.key?(field)

@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   get '/g/:slug/budget' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @spend = Spend.new
     if request.xhr?
@@ -11,7 +11,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/spends/new' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @spend = @gathering.spends.new(mass_assigning(params[:spend], Spend))
     @spend.account = current_account unless gathering_admin?
@@ -23,14 +23,14 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/spends/:id/edit' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @spend = @gathering.spends.find(params[:id]) || not_found
     erb :'budget/build'
   end
 
   post '/g/:slug/spends/:id/edit' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @spend = @gathering.spends.find(params[:id]) || not_found
     spend_params = (params[:spend] || {}).dup
@@ -43,7 +43,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/spends/:id/destroy' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     @spend = @gathering.spends.find(params[:id]) || not_found
     @spend.destroy
@@ -51,7 +51,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/spends/:id/reimbursed' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     @spend = @gathering.spends.find(params[:id]) || not_found
     confirmed_membership_required!
     @spend.set(reimbursed: params[:reimbursed])
@@ -59,7 +59,7 @@ Dandelion::App.controller do
   end
 
   post '/g/:slug/teams/:id/budget' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     @team = @gathering.teams.find(params[:id]) || not_found
     confirmed_membership_required!
     @team.set(budget: params[:budget])
@@ -67,7 +67,7 @@ Dandelion::App.controller do
   end
 
   get '/g/:slug/payments' do
-    @gathering = gathering_from_params || not_found
+    @gathering = gathering_from_params
     confirmed_membership_required!
     erb :'budget/payments'
   end

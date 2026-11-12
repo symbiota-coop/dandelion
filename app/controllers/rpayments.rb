@@ -1,6 +1,6 @@
 Dandelion::App.controller do
   before do
-    @event = Event.find_by_slug_or_id(slug: params[:event_slug]) || not_found
+    @event = event_from_params
     @organisation = @event.organisation
     organisation_admins_only!
   end
