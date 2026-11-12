@@ -26,8 +26,8 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
     end
   end
 
-  # The queued jobs that would email order's tickets. Jobs outlast each test's records, so they're matched by the
-  # order's (random) session id and the method each calls (the records a job carries can mention send_tickets too)
+  # The queued jobs that would email order's tickets, matched by the order's session id and the method each calls, as
+  # the records a job carries can mention send_tickets too
   def send_tickets_jobs(order)
     Delayed::Job.all.select do |job|
       job.handler.match?(/^method_name: :send_tickets(_without_delay)?$/) && job.handler.include?("session_id: #{order.session_id}\n")
@@ -133,8 +133,9 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
     { 'stripe_user_id' => 'acct_connected' }.to_json
   end
 
-  test 'an organisation admin disconnects the organisation from Stripe' do
+  test 'an organisation admin disconnects the organisation from Stripe, forgetting its account' do
     create_organisation(stripe_connect_json: connect_json)
+    @organisation.set(stripe_account_json: { 'id' => 'acct_connect' }.to_json)
     sign_in_with_rack(@account)
 
     post '/organisations/stripe_disconnect', organisation_id: @organisation.id
@@ -142,6 +143,7 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
     assert_equal 302, last_response.status
     assert_equal "/o/#{@organisation.slug}/edit", URI(last_response.location).path
     assert_nil @organisation.reload.stripe_connect_json
+    assert_nil @organisation.stripe_account_json
   end
 
   test 'someone who is not an admin of the organisation cannot disconnect it from Stripe' do
@@ -169,7 +171,8 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
   test 'a member disconnects their own Stripe account from an organisation and no one else\'s' do
     create_organisation
     member = FactoryBot.create(:account)
-    own = @organisation.organisationships.create!(account: member, stripe_connect_json: connect_json)
+    own = @organisation.organisationships.create!(account: member, stripe_connect_json: connect_json,
+                                                  stripe_account_json: { 'id' => 'acct_member' }.to_json)
     admins = @organisation.organisationships.find_by(account: @account)
     admins.set(stripe_connect_json: connect_json)
     sign_in_with_rack(member)
@@ -179,6 +182,7 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
     assert_equal 302, last_response.status
     assert_equal "/o/#{@organisation.slug}", URI(last_response.location).path
     assert_nil own.reload.stripe_connect_json
+    assert_nil own.stripe_account_json
     assert_equal connect_json, admins.reload.stripe_connect_json
   end
 

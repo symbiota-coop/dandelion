@@ -30,7 +30,7 @@ Dandelion::App.controller do
   post '/organisations/stripe_disconnect' do
     @organisation = Organisation.find(params[:organisation_id]) || not_found
     organisation_admins_only!
-    @organisation.set(stripe_connect_json: nil)
+    @organisation.set(stripe_connect_json: nil, stripe_account_json: nil)
     redirect "/o/#{@organisation.slug}/edit#tab-payments"
   end
 
@@ -67,7 +67,7 @@ Dandelion::App.controller do
     sign_in_required!
     @organisation = organisation_from_params
     @organisationship = current_account.organisationships.find_by(organisation: @organisation) || not_found
-    @organisationship.set(stripe_connect_json: nil)
+    @organisationship.set(stripe_connect_json: nil, stripe_account_json: nil)
     redirect "/o/#{@organisation.slug}"
   end
 
