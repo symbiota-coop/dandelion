@@ -112,7 +112,7 @@ jobs:
       matrix:
         include:
           - group: accounts
-            files: accounts/accounts accounts/sign_ins accounts/email_confirmation accounts/provider_sign_ins
+            files: accounts/accounts accounts/sign_ins accounts/email_confirmation accounts/provider_sign_ins accounts/privacy
           - group: calendar
             files: events/calendar events/evergreen events/listings events/boosts messages/comments
           - group: event_bookings
