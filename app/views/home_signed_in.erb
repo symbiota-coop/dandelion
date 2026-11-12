@@ -29,7 +29,7 @@
   <div class="col-lg-4">
     <div class="sticky-under-header">
       <%= partial :'events/awesome', locals: { my_upcoming: my_upcoming } %>
-      <% if current_account.following.and(:hidden => false, :date_of_birth.ne => nil).exists? %>
+      <% if current_account.following.age_shown_to_others.and(:hidden => false, :date_of_birth.ne => nil).exists? %>
         <div class="card mt-3">
           <h3 class="card-header chill">Upcoming birthdays</h3>
           <div class="card-body">

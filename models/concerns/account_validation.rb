@@ -46,6 +46,7 @@ module AccountValidation
       %w[email phone location].each do |p|
         send("#{p}_privacy=", 'People I follow') unless send("#{p}_privacy")
       end
+      self.date_of_birth_privacy ||= 'Only me' # as Account.default_privacy_level, set so the account's choice is stored
 
       errors.add(:bio, 'cannot contain links yet as an anti-spam measure, use Dandelion for a while first!') if !live_player? && (bio =~ %r{https?://})
 

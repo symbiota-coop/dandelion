@@ -429,7 +429,8 @@ class CalendarTest < ActiveSupport::TestCase
 
   test 'ics key grants access to birthdays ics but not birthdays html' do
     account = FactoryBot.create(:account)
-    followee = FactoryBot.create(:account, date_of_birth: Date.new(1990, 1, 1))
+    # Public, as age is otherwise shown only to the account
+    followee = FactoryBot.create(:account, date_of_birth: Date.new(1990, 1, 1), date_of_birth_privacy: 'Public')
     Follow.create!(follower: account, followee: followee)
 
     get "/birthdays.ics?ics_key=#{account.ics_key}"

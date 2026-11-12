@@ -96,7 +96,7 @@ class Account
 
   def self.ids_by_next_birthday
     today = Date.today
-    self.and(:hidden => false, :date_of_birth.ne => nil).pluck(:id, :date_of_birth)
+    age_shown_to_others.and(:hidden => false, :date_of_birth.ne => nil).pluck(:id, :date_of_birth)
         .sort_by { |_, dob| (((dob.month * 100) + dob.day) - ((today.month * 100) + today.day)) % (12 * 100) }
         .map { |id, _| id }
   end

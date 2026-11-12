@@ -18,9 +18,47 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
     find(:xpath, "//table//tr[td[1][normalize-space()='#{label}']]")
   end
 
-  test 'email, phone and location start visible only to the people an account follows' do
+  test 'email, phone and location start visible only to the people an account follows, and age only to the account' do
     account = FactoryBot.create(:account)
     assert_equal ['People I follow'] * 3, [account.email_privacy, account.phone_privacy, account.location_privacy]
+    assert_equal 'Only me', account.date_of_birth_privacy
+  end
+
+  test "an account that never set its age's privacy shows its age only to itself, and isn't in others' birthdays" do
+    # As an account from before age was hidden by default: no date of birth privacy stored
+    account = profiled_account(name: 'Una Unset')
+    account.unset(:date_of_birth_privacy)
+    public_account = profiled_account(name: 'Pat Public', date_of_birth_privacy: 'Public')
+    viewer = FactoryBot.create(:account)
+    [account, public_account].each do |followee|
+      Follow.create!(follower: viewer, followee: followee)
+      Follow.create!(follower: followee, followee: viewer) # follows back, so even 'People I follow' would show it
+    end
+
+    [nil, viewer].each do |signed_in|
+      signed_in ? sign_in(signed_in) : Capybara.reset_sessions!
+      visit "/u/#{account.username}"
+      assert page.has_content?('Una Unset')
+      assert page.has_no_xpath?("//table//tr[td[1][normalize-space()='Age']]")
+      visit "/u/#{public_account.username}"
+      assert profile_row('Age').has_content?(public_account.age.to_s)
+    end
+
+    visit '/birthdays'
+    assert page.has_content?('Pat Public')
+    assert page.has_no_content?('Una Unset')
+    visit '/'
+    within(:xpath, "//div[contains(@class, 'card')][h3[normalize-space()='Upcoming birthdays']]") do # the newsfeed beside it says who followed whom
+      assert page.has_content?('Pat Public')
+      assert page.has_no_content?('Una Unset')
+    end
+
+    sign_in(account)
+    visit "/u/#{account.username}"
+    within(profile_row('Age')) do
+      assert page.has_content?(account.age.to_s)
+      assert page.has_link?('Only me')
+    end
   end
 
   test "each field on a profile shows only to those its privacy lets see it: everyone, the people the account follows, or just them, and to admins" do
@@ -326,13 +364,15 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
     end
   end
 
-  test "the birthdays feed has only the birthdays of public profiles the account may see, as the birthdays page does" do
+  test "the birthdays feed has only the birthdays of public profiles the account may see, as the birthdays page does, and none whose age privacy was never set" do
     account = FactoryBot.create(:account)
-    shown = { 'Pat Public' => {}, 'Fran Follows Back' => { date_of_birth_privacy: 'People I follow' } }
+    # Age is shown only to the account unless it chooses otherwise, so Pat chooses Public
+    shown = { 'Pat Public' => { date_of_birth_privacy: 'Public' }, 'Fran Follows Back' => { date_of_birth_privacy: 'People I follow' } }
     hidden = { 'Olly Only Me' => { date_of_birth_privacy: 'Only me' }, 'Nat Not Following Back' => { date_of_birth_privacy: 'People I follow' },
-               'Hal Hidden' => { hidden: true } }
+               'Hal Hidden' => { hidden: true, date_of_birth_privacy: 'Public' }, 'Dee Default' => {} }
     shown.merge(hidden).each do |name, attrs|
       followee = FactoryBot.create(:account, name: name, has_signed_in: true, date_of_birth: Date.new(1990, 6, 15), **attrs)
+      followee.unset(:date_of_birth_privacy) if attrs.empty? # as an account from before age was hidden by default
       Follow.create!(follower: account, followee: followee)
       Follow.create!(follower: followee, followee: account) if name == 'Fran Follows Back'
     end

@@ -1,15 +1,13 @@
 Dandelion::App.helpers do
   def viewable?(account, privacyable, viewer: current_account, viewer_in_network: nil)
-    account.respond_to?(privacyable) &&
-      account.send(privacyable) &&
-      (viewer || !Account.sensitive?(privacyable)) &&
-      (
-        (viewer && viewer.admin?) ||
-        account.send("#{privacyable}_privacy").nil? ||
-        (account.send("#{privacyable}_privacy") == 'Public') ||
-        (account.send("#{privacyable}_privacy") == 'People I follow' && (viewer_in_network || (viewer && (viewer.id == account.id || account.network.find(viewer.id))))) ||
-        (account.send("#{privacyable}_privacy") == 'Only me' && viewer && viewer.id == account.id)
-      )
+    return false unless account.respond_to?(privacyable) && account.send(privacyable) && (viewer || !Account.sensitive?(privacyable))
+    return true if viewer && viewer.admin?
+
+    case account.privacy_level(privacyable)
+    when 'Public' then true
+    when 'People I follow' then viewer_in_network || (viewer && (viewer.id == account.id || account.network.find(viewer.id)))
+    when 'Only me' then viewer && viewer.id == account.id
+    end
   end
 
   # A private profile (Account#private?) is visible only to its own account, and so are the lists on it

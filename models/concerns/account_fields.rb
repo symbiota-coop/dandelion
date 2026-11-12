@@ -101,9 +101,21 @@ module AccountFields
       %w[email location phone website date_of_birth gender bio last_active organisations local_groups activities gatherings following followers]
     end
 
-    # Who sees a privacyable field (viewable?): a field with none set is public
+    # Who sees a privacyable field (viewable?)
     def privacy_levels
       ['Only me', 'People I follow', 'Public']
+    end
+
+    # The level a privacyable field with none set has (Account#privacy_level): a date of birth is shown only to its
+    # account, as the sign up form promises, and the rest are public
+    def default_privacy_level(privacyable)
+      privacyable.to_s == 'date_of_birth' ? 'Only me' : 'Public'
+    end
+
+    # Accounts whose age others may see, for lists of birthdays: an account with no date of birth privacy set shows it
+    # only to itself (default_privacy_level)
+    def age_shown_to_others
+      self.and(:date_of_birth_privacy.in => privacy_levels - ['Only me'])
     end
 
     def genders
@@ -130,5 +142,11 @@ module AccountFields
   Trans Woman
   Two Spirit).split("\n").map(&:strip)
     end
+  end
+
+  # Who sees a privacyable field: the level the account chose, or the field's default if it chose none. Everything that
+  # shows a field, or what its level is, goes through this (viewable?, accounts/_privacyable)
+  def privacy_level(privacyable)
+    send("#{privacyable}_privacy") || self.class.default_privacy_level(privacyable)
   end
 end

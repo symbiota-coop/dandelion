@@ -1343,7 +1343,7 @@
           <div class="card-body">
             <div class="mb-3">
               <% [['Maya Okoro', 'maya', 0], ['Jonas Berg', 'jonas', 1], ['Amara Nwosu', 'amara', 6]].each do |name, photo, days| %>
-                <%= partial :'accounts/birthday', locals: { account: design_sample_account(name, photo, date_of_birth: Date.today + days - 30.years) } %>
+                <%= partial :'accounts/birthday', locals: { account: design_sample_account(name, photo, date_of_birth: Date.today + days - 30.years, date_of_birth_privacy: 'Public') } %>
               <% end %>
             </div>
             <a href="#components">All birthdays &rarr;</a>
