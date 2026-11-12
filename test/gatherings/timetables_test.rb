@@ -124,6 +124,23 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
     assert_nil other_tactivity.tslot_id
   end
 
+  test "an activity can't be scheduled into another timetable's slot, or a slot that's taken" do
+    create_gathering(privacy: 'open')
+    create_timetable
+    other_timetable = @gathering.timetables.create!(name: 'Talks', account: @account)
+    other_tslot = other_timetable.tslots.create!(name: 'Sunday')
+    other_space = other_timetable.spaces.create!(name: 'Hall')
+    taken = @timetable.tactivities.create!(name: 'Dance', account: @account, tslot: @tslot, space: @space)
+
+    sign_in_with_rack(@account)
+    post gathering_path("/tactivities/#{@tactivity.id}/schedule"), tslot_id: other_tslot.id, space_id: other_space.id
+    assert_equal 422, last_response.status
+    post gathering_path("/tactivities/#{@tactivity.id}/schedule"), tslot_id: @tslot.id, space_id: @space.id
+    assert_equal 422, last_response.status
+    assert_nil @tactivity.reload.tslot_id
+    assert_equal [@tslot.id, @space.id], [taken.reload.tslot_id, taken.space_id]
+  end
+
   test 'members schedule and unschedule activities only when the timetable lets all members schedule' do
     create_gathering(privacy: 'open')
     create_timetable

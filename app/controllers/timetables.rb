@@ -194,7 +194,8 @@ Dandelion::App.controller do
     @tactivity.tslot_id = params[:tslot_id]
     @tactivity.space_id = params[:space_id]
     @tactivity.scheduled_by = current_account
-    @tactivity.save!
+    # A slot that's taken, or another timetable's
+    halt 422 unless @tactivity.save
     @tactivity.notifications.and(:type.in => %w[scheduled_tactivity unscheduled_tactivity]).destroy_all
     @tactivity.notifications.create! circle: @gathering, type: 'scheduled_tactivity' if @tactivity.timetable.scheduling_by_all
     200
