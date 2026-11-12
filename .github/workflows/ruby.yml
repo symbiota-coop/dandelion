@@ -132,7 +132,7 @@ jobs:
           - group: messages
             files: messages/messages messages/pmails messages/mailer events/feedbacks events/discussions messages/pmail_sending
           - group: orders
-            files: orders/orders orders/tokens orders/admin bookings/resales
+            files: orders/orders orders/tokens orders/admin bookings/resales integrations/asn_blocking
           - group: organisations
             files: organisations/organisations organisations/caches organisations/followers organisations/local_groups organisations/activities organisations/calendar_imports
           - group: payments
