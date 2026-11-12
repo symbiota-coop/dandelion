@@ -295,4 +295,27 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
     assert_includes last_response.body, 'Remove'
     assert_includes last_response.body, 'Refresh'
   end
+
+  test "the lists on a private profile are visible only to its own account" do
+    account = profiled_account(hidden: true)
+    Follow.create!(follower: account, followee: FactoryBot.create(:account, name: 'Fern Followee'))
+    Follow.create!(follower: FactoryBot.create(:account, name: 'Felix Follower'), followee: account)
+    account.organisationships.create!(organisation: FactoryBot.create(:organisation, name: 'Secret Society'))
+    lists = %w[following followers organisations]
+
+    [FactoryBot.create(:account), FactoryBot.create(:account, admin: true)].each do |viewer|
+      sign_in_with_rack(viewer)
+      lists.each do |list|
+        get "/u/#{account.username}/#{list}", {}, XHR
+        assert_equal 403, last_response.status, list
+      end
+    end
+
+    sign_in_with_rack(account)
+    lists.zip(['Fern Followee', 'Felix Follower', 'Secret Society']).each do |list, name|
+      get "/u/#{account.username}/#{list}", {}, XHR
+      assert last_response.ok?, list
+      assert_includes last_response.body, name
+    end
+  end
 end

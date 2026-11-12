@@ -424,41 +424,41 @@ Dandelion::App.controller do
 
   get '/u/:username/following' do
     @account = account_from_params
-    kick! unless viewable?(@account, :following)
+    kick! unless profile_viewable?(@account) && viewable?(@account, :following)
     partial :'accounts/following', locals: { accounts: @account.following, starred: @account.following_starred }
   end
 
   get '/u/:username/organisations' do
     @account = account_from_params
-    kick! unless viewable?(@account, :organisations)
+    kick! unless profile_viewable?(@account) && viewable?(@account, :organisations)
     organisations = Organisation.and(:id.in => @account.organisationships.and(hide_membership: false).pluck(:organisation_id))
     partial :'organisations/blocks', locals: { organisations: organisations }
   end
 
   get '/u/:username/local_groups' do
     @account = account_from_params
-    kick! unless viewable?(@account, :local_groups)
+    kick! unless profile_viewable?(@account) && viewable?(@account, :local_groups)
     local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(hide_membership: false).pluck(:local_group_id))
     partial :'local_groups/blocks', locals: { local_groups: local_groups }
   end
 
   get '/u/:username/activities' do
     @account = account_from_params
-    kick! unless viewable?(@account, :activities)
+    kick! unless profile_viewable?(@account) && viewable?(@account, :activities)
     activities = Activity.and(:id.in => @account.activityships.and(hide_membership: false).pluck(:activity_id))
     partial :'activities/blocks', locals: { activities: activities }
   end
 
   get '/u/:username/gatherings' do
     @account = account_from_params
-    kick! unless viewable?(@account, :gatherings)
+    kick! unless profile_viewable?(@account) && viewable?(@account, :gatherings)
     gatherings = Gathering.and(:id.in => @account.memberships.pluck(:gathering_id)).and(listed: true).and(:privacy.ne => 'secret')
     partial :'gatherings/blocks', locals: { gatherings: gatherings }
   end
 
   get '/u/:username/followers' do
     @account = account_from_params
-    kick! unless viewable?(@account, :followers)
+    kick! unless profile_viewable?(@account) && viewable?(@account, :followers)
     partial :'accounts/following', locals: { accounts: @account.followers }
   end
 

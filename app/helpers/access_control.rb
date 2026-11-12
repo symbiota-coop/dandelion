@@ -12,6 +12,11 @@ Dandelion::App.helpers do
       )
   end
 
+  # A private profile (Account#private?) is visible only to its own account, and so are the lists on it
+  def profile_viewable?(account)
+    !account.private? || (current_account && current_account.id == account.id)
+  end
+
   def kick!(notice: "You don't have access to that page", redirect_url: nil, notice_type: :error)
     if request.xhr?
       halt 403
