@@ -308,6 +308,18 @@ class MessagesCommentsTest < ActiveSupport::TestCase
     assert_equal 0, @comment.voptions.first.votes.count
   end
 
+  test 'voting for an option again, as from a second tab, keeps the one vote' do
+    team_thread
+    tuesday = @comment.voptions.create!(account: @member, text: 'Tuesday')
+    sign_in_with_rack(@member)
+
+    2.times do
+      xhr :post, "/voptions/#{tuesday.id}/vote", vote: true
+      assert last_response.ok?
+    end
+    assert_equal [@member.id], tuesday.votes.pluck(:account_id)
+  end
+
   test "taking back a vote leaves other people's" do
     team_thread
     tuesday = @comment.voptions.create!(account: @member, text: 'Tuesday')

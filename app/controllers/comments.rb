@@ -199,7 +199,7 @@ Dandelion::App.controller do
     @commentable = @voption.comment.commentable
     commentable_viewers_only!
     if params[:vote]
-      @voption.votes.create!(account: current_account)
+      @voption.votes.find_or_create_by!(account: current_account)
     else
       @voption.votes.find_by(account: current_account).try(:destroy)
     end
