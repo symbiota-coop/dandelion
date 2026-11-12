@@ -136,7 +136,7 @@ jobs:
           - group: organisations
             files: organisations/organisations organisations/caches organisations/followers organisations/local_groups organisations/activities
           - group: payments
-            files: payments/gocardless payments/mollie payments/paypal payments/stripe_connect payments/stripe_row_splitter payments/monthly_contributions orders/refunds bookings/donations organisations/payments
+            files: payments/gocardless payments/mollie payments/paypal payments/stripe_connect payments/stripe_row_splitter payments/monthly_contributions orders/refunds bookings/donations organisations/payments payments/paypal_checkout
           - group: ticket_types
             files: bookings/ticket_types bookings/quotes bookings/waitlist bookings/discount_codes
           - group: tours
