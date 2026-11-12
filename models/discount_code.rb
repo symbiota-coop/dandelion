@@ -55,17 +55,10 @@ class DiscountCode
     !filter || filters.any? { |term| ticket_type.name.to_s.downcase.include?(term) }
   end
 
-  # The orders that use up the code: paid ones, and unpaid ones still within Order::UNPAID_HOLD, so two buyers can't both
-  # take its last use while paying. An unpaid order past the hold is abandoned (its Stripe session has expired, and the
-  # hourly errands delete it), so it no longer counts; if it's paid after all, completing restores it and it counts again
-  def uses
-    orders.any_of({ payment_completed: true }, { :created_at.gte => Order::UNPAID_HOLD.ago })
-  end
-
   def exhausted?(excluding: nil)
     return false unless maximum_uses
 
-    used = uses
+    used = orders
     used = used.and(:id.ne => excluding.id) if excluding&.persisted?
     used.count >= maximum_uses
   end

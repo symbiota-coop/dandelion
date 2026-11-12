@@ -256,11 +256,9 @@ class BookingsDiscountCodesTest < ActiveSupport::TestCase
   end
 
   test "a code is used up once it has as many orders as its maximum uses, not counting the order it's on" do
-    covers 'events/discount-code-uses@22c702'
     create_event
     discount_code = @event.discount_codes.create!(code: 'TWICE', percentage_discount: 10, maximum_uses: 2)
     unlimited = @event.discount_codes.create!(code: 'ALWAYS', percentage_discount: 10)
-    # One paid, one still being paid for
     first = @event.orders.create!(account: FactoryBot.create(:account), currency: 'GBP', discount_code: discount_code)
     first.payment_completed!
     assert !discount_code.exhausted?
@@ -281,33 +279,6 @@ class BookingsDiscountCodesTest < ActiveSupport::TestCase
 
     3.times { @event.orders.create!(account: FactoryBot.create(:account), currency: 'GBP', discount_code: unlimited) }
     assert !unlimited.exhausted?
-  end
-
-  test "an order that's never paid stops using up a code once its hold is over, and counts again if it's paid after all" do
-    covers 'events/discount-code-uses@22c702'
-    discount_code = FactoryBot.create(:discount_code, :for_event, code: 'ONCE', percentage_discount: 10, maximum_uses: 1)
-    event = discount_code.codeable
-    assert_kind_of Event, event
-    abandoned = event.orders.create!(account: FactoryBot.create(:account), currency: 'GBP', discount_code: discount_code)
-    assert discount_code.exhausted?
-    assert_equal [nil, :used_up], event.checkout_discount_code('ONCE')
-
-    # Past the hold, before the hourly errands delete it, it no longer counts
-    abandoned.set(created_at: (Order::UNPAID_HOLD + 1.minute).ago)
-    assert !discount_code.exhausted?
-    assert_equal [discount_code, nil], event.checkout_discount_code('once')
-    # nor once they have
-    abandoned.destroy
-    assert !discount_code.exhausted?
-    next_order = event.orders.create!(account: FactoryBot.create(:account), currency: 'GBP', discount_code: discount_code)
-    assert_equal discount_code, next_order.discount_code
-    assert discount_code.exhausted?
-
-    # A late payment restores the abandoned order with its code, and it counts again
-    abandoned = Order.deleted.find(abandoned.id)
-    abandoned.restore_and_complete
-    assert_equal discount_code, abandoned.reload.discount_code
-    assert discount_code.exhausted?(excluding: next_order)
   end
 
   test 'a paid order goes on using up a code however long ago it was made' do

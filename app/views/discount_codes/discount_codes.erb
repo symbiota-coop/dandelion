@@ -29,7 +29,7 @@
       <% end %>
     </td>
     <td>
-      <%= discount_code.uses.count %><% if discount_code.maximum_uses %> / <%= discount_code.maximum_uses %><% end %>
+      <%= discount_code.orders.count %><% if discount_code.maximum_uses %> / <%= discount_code.maximum_uses %><% end %>
       <% if discount_code.exhausted? %>
         <br>
         <span class="badge text-bg-danger">Used up</span>
