@@ -189,6 +189,7 @@ Dandelion::App.controller do
     @comment = Comment.find(params[:comment_id]) || not_found
     @commentable = @comment.commentable
     commentable_viewers_only!
+    halt 403 unless @comment.account_id == current_account.id
     @comment.voptions.create!(account: current_account, text: params[:text])
     200
   end
@@ -209,9 +210,9 @@ Dandelion::App.controller do
   post '/voptions/:id/destroy' do
     sign_in_required!
     @voption = Voption.find(params[:id]) || not_found
-    halt 403 unless @voption.account.id == current_account.id
     @commentable = @voption.comment.commentable
     commentable_viewers_only!
+    halt 403 unless @voption.removable_by?(current_account)
     @voption.destroy
     200
   end

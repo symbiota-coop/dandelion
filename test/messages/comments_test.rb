@@ -331,19 +331,55 @@ class MessagesCommentsTest < ActiveSupport::TestCase
     assert_equal [@member.id], tuesday.votes.pluck(:account_id)
   end
 
-  test 'only the person who added a poll option can remove it' do
+  test "only a comment's author adds options to its poll" do
     team_thread
-    tuesday = @comment.voptions.create!(account: @member, text: 'Tuesday')
-
     sign_in_with_rack(create_member(name: 'Other Member'))
-    xhr :post, "/voptions/#{tuesday.id}/destroy"
+    xhr :post, '/voptions/create', comment_id: @comment.id, text: 'Never'
     assert_refused
-    assert Voption.find(tuesday.id)
+    assert_equal 0, @comment.voptions.count
 
     sign_in_with_rack(@member)
-    xhr :post, "/voptions/#{tuesday.id}/destroy"
+    xhr :post, '/voptions/create', comment_id: @comment.id, text: 'Tuesday'
     assert last_response.ok?
-    assert_nil Voption.find(tuesday.id)
+    assert_equal [['Tuesday', @member.id]], @comment.voptions.pluck(:text, :account_id)
+  end
+
+  test "a poll option is removed by the person who added it, the comment's author or a site admin, and no one else" do
+    team_thread
+    adder = create_member(name: 'Option Adder')
+    options = %w[Tuesday Wednesday Thursday].map { |text| @comment.voptions.create!(account: adder, text: text) }
+
+    sign_in_with_rack(create_member(name: 'Other Member'))
+    xhr :post, "/voptions/#{options[0].id}/destroy"
+    assert_refused
+    assert Voption.find(options[0].id)
+
+    [adder, @member, create_member(name: 'Site Admin', admin: true)].zip(options).each do |account, option|
+      sign_in_with_rack(account)
+      xhr :post, "/voptions/#{option.id}/destroy"
+      assert last_response.ok?, account.name
+      assert_nil Voption.find(option.id), account.name
+    end
+  end
+
+  test "a poll option's remove button shows to the person who added it, the comment's author and site admins" do
+    team_thread
+    adder = create_member(name: 'Option Adder')
+    @comment.voptions.create!(account: adder, text: 'Tuesday')
+    poll = "[data-pagelet-url='/comments/#{@comment.id}/voptions']"
+    remove = "#{poll} a[href$='/destroy']"
+
+    [[adder, true], [@member, true], [create_member(name: 'Site Admin', admin: true), true],
+     [create_member(name: 'Other Member'), false]].each do |account, shown|
+      sign_in(account)
+      visit gathering_path("/teams/#{@team.id}")
+      assert page.has_field?('Tuesday'), account.name
+      if shown
+        assert page.has_css?(remove), account.name
+      else
+        assert page.has_no_css?(remove), account.name
+      end
+    end
   end
 
   # Files
