@@ -24,9 +24,9 @@ Dandelion::App.helpers do
   # (ours or a gem's, like delayed_job's) uses it
   def collection_stats
     db = Mongoid.default_client.database
-    model_collections = ObjectSpace.each_object(Class).select do |c|
-      c.name.present? && c.include?(Mongoid::Document) && !c.name.start_with?('Mongoid::') && !c.embedded?
-    end.to_set { |model| model.collection.name }
+    # Mongoid.models rather than every class in ObjectSpace, some of which (RubyGems' Gem::Molinillo::DependencyGraph::Log)
+    # break on include?
+    model_collections = Mongoid.models.reject(&:embedded?).to_set { |model| model.collection.name }
 
     db.collection_names.reject { |name| name.start_with?('system.') }.map do |name|
       stats = db.command(collStats: name).first
