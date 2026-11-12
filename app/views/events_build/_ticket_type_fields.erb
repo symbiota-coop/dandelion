@@ -39,10 +39,11 @@
   <div class="col-12 col-lg">
     <div class="input-group">
       <span class="input-group-text">Slots</span>
-      <% slots_tooltip = 'How many places each of these tickets takes from the event and ticket group capacity. Use 0 for add-ons like meals, or 2 for a couples ticket. Default: 1' %>
-      <% slots_options = { class: 'form-control', min: 0, step: 1, 'data-bs-toggle': 'tooltip', title: slots_tooltip } %>
-      <% slots_options[:value] = 1 unless form %>
-      <%= form_or_tag_field(form, :number_field, :slots, **slots_options) %>
+      <% slots_tooltip = 'How many places each of these tickets takes from the event and ticket group capacity' %>
+      <% slots = form ? form.object.slots : 1 %>
+      <% slots_other = TicketType::SLOTS_CHOICES.none? { |_, value| value == slots } %>
+      <%= select_tag nil, options: TicketType::SLOTS_CHOICES + [['Other…', 'other']], value: slots_other ? 'other' : slots, class: 'form-select slots-choice', 'aria-label': 'Slots', 'data-bs-toggle': 'tooltip', title: slots_tooltip %>
+      <%= form_or_tag_field(form, :number_field, :slots, value: slots, class: 'form-control slots-other', min: 0, step: 1, 'aria-label': 'Number of slots', style: ('display: none' unless slots_other)) %>
     </div>
   </div>
 </div>

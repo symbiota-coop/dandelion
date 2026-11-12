@@ -140,6 +140,38 @@ class EventsTest < ActiveSupport::TestCase
     assert page.has_content? name
   end
 
+  test 'ticket type slots are chosen from standard, add-on and couple' do
+    create_event(prices: [0])
+    ticket_type = @event.ticket_types.first
+    sign_in(@account)
+    visit "/e/#{@event.slug}/edit"
+    click_link 'Tickets'
+    assert page.has_css? 'select.slots-choice option[selected]', text: 'Standard: 1 place'
+    assert page.has_no_field? 'event_ticket_types_attributes_0_slots'
+    find('select.slots-choice').select 'Add-on: no places (not counted towards capacity)'
+    click_button 'Update event'
+    assert page.has_content? 'The event was saved'
+    assert_equal 0, ticket_type.reload.slots
+  end
+
+  test 'other ticket type slots are typed in' do
+    create_event(prices: [0])
+    ticket_type = @event.ticket_types.first
+    sign_in(@account)
+    visit "/e/#{@event.slug}/edit"
+    click_link 'Tickets'
+    find('select.slots-choice').select 'Other…'
+    fill_in 'event_ticket_types_attributes_0_slots', with: 4
+    click_button 'Update event'
+    assert page.has_content? 'The event was saved'
+    assert_equal 4, ticket_type.reload.slots
+
+    visit "/e/#{@event.slug}/edit"
+    click_link 'Tickets'
+    assert page.has_css? 'select.slots-choice option[selected]', text: 'Other…'
+    assert page.has_field? 'event_ticket_types_attributes_0_slots', with: '4'
+  end
+
   test 'public event submission creates draft and notifies admins' do
     covers 'organisations/who-becomes-event-admin@459b2f', 'organisations/community-event-submissions@e06059'
     Delayed::Job.delete_all if defined?(Delayed::Job)

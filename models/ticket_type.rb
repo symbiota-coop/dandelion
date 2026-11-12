@@ -21,6 +21,10 @@ class TicketType
   field :sold_out_cache, type: Mongoid::Boolean
   field :slots, type: Integer, default: 1
 
+  # The event form offers these, with Other for any other number. Each one says what it does to capacity, and they
+  # start with a word, so a stray keystroke on the select can't land on 0 or 2
+  SLOTS_CHOICES = [['Standard: 1 place', 1], ['Add-on: no places (not counted towards capacity)', 0], ['Couple: 2 places', 2]].freeze
+
   # e.g. "For followers only [=Leader*1.1:15]"
   QUANTITY_FORMULA = /
     \s*

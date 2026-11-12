@@ -21,6 +21,16 @@ $(function () {
     }
   }
 
+  // Slots: the select picks 1, 0 or 2; Other shows the number field beside it, which is what's submitted
+  $(document).on('change', '.slots-choice', function () {
+    const $number = $(this).siblings('.slots-other')
+    if (this.value === 'other') {
+      $number.show().trigger('focus').trigger('select')
+    } else {
+      $number.hide().val(this.value)
+    }
+  })
+
   function fieldPresent (value) {
     return value !== undefined && value !== null && value !== ''
   }
