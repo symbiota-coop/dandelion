@@ -105,8 +105,10 @@ Dandelion::App.controller do
     @activity = activity_from_params
     activity_admins_only!
     @activity_application = @activity.activity_applications.find(params[:activity_application_id]) || not_found
+    halt 400 unless ActivityApplication.statuses.include?(params[:status])
+    newly_accepted = params[:status] == 'Accepted' && !@activity_application.accepted?
     @activity_application.status = params[:status]
-    @activity_application.accept if @activity_application.status == 'Accepted'
+    @activity_application.accept if newly_accepted
     @activity_application.statused_by = current_account
     @activity_application.statused_at = Time.now
     @activity_application.save

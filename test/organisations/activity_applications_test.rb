@@ -194,19 +194,66 @@ class OrganisationsActivityApplicationsTest < ActiveSupport::TestCase
     assert_nil other_activity.activityships.find_by(account: applicant)
   end
 
-  test 'an admin can set a status through Rack, and setting it again keeps one follower' do
+  test 'an admin can set a status through Rack, and accepting again sends no second email and keeps one follower' do
     create_closed_activity
     applicant = FactoryBot.create(:account)
     application = application_by(applicant)
     sign_in_with_rack(@account)
+    path = "#{@activity.path}/activity_applications/#{application.id}/set_status"
 
-    get "#{@activity.path}/activity_applications/#{application.id}/set_status"
+    get path
     assert last_response.ok?
-    post "#{@activity.path}/activity_applications/#{application.id}/set_status", status: 'Accepted'
+    emails = recorded_emails { post path, status: 'Accepted' }
     assert last_response.ok?
-    post "#{@activity.path}/activity_applications/#{application.id}/set_status", status: 'Accepted'
+    assert_equal 1, emails.length
+    assert_equal [applicant.email], emails.first.recipients
+
+    emails = recorded_emails { post path, status: 'Accepted' }
     assert last_response.ok?
+    assert_empty emails
+    assert_equal 'Accepted', application.reload.status
     assert_equal 1, @activity.activityships.and(account: applicant).count
+  end
+
+  test 'moving an application from another status to Accepted emails the applicant once' do
+    create_closed_activity
+    applicant = FactoryBot.create(:account)
+    application = application_by(applicant)
+    sign_in_with_rack(@account)
+    path = "#{@activity.path}/activity_applications/#{application.id}/set_status"
+
+    emails = recorded_emails { post path, status: 'On hold' }
+    assert last_response.ok?
+    assert_empty emails
+    assert_equal 'On hold', application.reload.status
+
+    emails = recorded_emails { post path, status: 'Accepted' }
+    assert last_response.ok?
+    assert_equal 1, emails.length
+    assert_equal "You've been accepted to #{@activity.name}", emails.first.subject_line
+    assert_equal 1, @activity.activityships.and(account: applicant).count
+  end
+
+  test 'an admin setting a status that is not one of the statuses is refused, and nothing changes' do
+    create_closed_activity
+    applicant = FactoryBot.create(:account)
+    application = application_by(applicant)
+    sign_in_with_rack(@account)
+    path = "#{@activity.path}/activity_applications/#{application.id}/set_status"
+
+    emails = recorded_emails do
+      ['Hired', 'accepted', ''].each do |status|
+        post path, status: status
+        assert_equal 400, last_response.status, status.inspect
+      end
+      post path
+      assert_equal 400, last_response.status
+    end
+    assert_empty emails
+    application.reload
+    assert_equal 'Pending', application.status
+    assert_nil application.statused_by
+    assert_nil @activity.activityships.find_by(account: applicant)
   end
 
   test "the latest application page needs signing in, and shows only the signed-in person's own" do
