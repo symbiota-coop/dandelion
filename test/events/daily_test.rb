@@ -253,6 +253,22 @@ class EventsDailyTest < ActiveSupport::TestCase
     assert_nil Daily.facilitator_id(online)
   end
 
+  test "someone who hid their profile is never facilitator of the day, nor shown as one once they've hidden it" do
+    public_event('Sound Bath', noon(Date.today + 1))
+    facilitator = create_facilitator(@event, name: 'Fay Cilitator')
+    create_facilitator(@event, name: 'Hidden Facilitator', hidden: true)
+
+    10.times { assert_equal facilitator.id.to_s, Daily.facilitator_id }
+
+    stash_edition(Date.today, facilitator_id: facilitator.id.to_s)
+    facilitator.set(hidden: true)
+    get '/daily'
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'Facilitator of the day'
+    refute_includes last_response.body, 'Fay Cilitator'
+    refute_includes last_response.body, "/u/#{facilitator.username}"
+  end
+
   # The page
 
   test 'the page shows the latest edition by default, its stories linking their events, with arrows between editions' do

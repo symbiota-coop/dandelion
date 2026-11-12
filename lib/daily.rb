@@ -151,8 +151,8 @@ module Daily
     }
   end
 
-  # A facilitator with a photo and plenty of feedback who's facilitated in the last year: for a location, at one of
-  # its events, or none
+  # A facilitator with a photo and plenty of feedback who's facilitated in the last year and hasn't hidden their
+  # profile: for a location, at one of its events, or none
   def self.facilitator_id(location = nil)
     account = if Padrino.env == :development
                 Account.first
@@ -161,6 +161,7 @@ module Daily
                 facilitations = facilitations.and(:event_id.in => location.area_events.and(:start_time.gt => 1.year.ago).pluck(:id)) if location
                 Account.and(
                   :has_image => true,
+                  :hidden => false,
                   :event_feedbacks_as_facilitator_count.gte => 20,
                   :id.in => facilitations.pluck(:account_id).map(&:to_s).uniq
                 ).sample
