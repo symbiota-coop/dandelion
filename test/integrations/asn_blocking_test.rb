@@ -274,6 +274,22 @@ class IntegrationsAsnBlockingTest < ActiveSupport::TestCase
     end
   end
 
+  test "an ASN that isn't a number is refused, so it can't add a clause to the rule" do
+    sign_in_with_rack(FactoryBot.create(:account, admin: true))
+    with_cloudflare(rule_answer: rule('64500', '64501')) do |calls|
+      ['1) or (true', 'AS64502', '64502 ', '-1'].each do |asn|
+        post "/stats/asns/block/#{ERB::Util.url_encode(asn)}"
+        assert_equal 400, last_response.status, asn
+        post "/stats/asns/unblock/#{ERB::Util.url_encode(asn)}"
+        assert_equal 400, last_response.status, asn
+        post "/stats/asns/legit/#{ERB::Util.url_encode(asn)}"
+        assert_equal 400, last_response.status, asn
+      end
+      assert_empty calls[:patches]
+      assert_empty Asn.legit_asns
+    end
+  end
+
   test 'a site admin marks an ASN legit and unmarks it' do
     sign_in_with_rack(FactoryBot.create(:account, admin: true))
     post '/stats/asns/legit/64500'

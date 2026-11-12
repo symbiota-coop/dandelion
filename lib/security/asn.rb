@@ -223,7 +223,14 @@ module Asn
     { countries: countries, names: names }
   end
 
+  # An ASN is a number: anything else would add its own clause to the rule's expression (e.g. 1) or (true)
+  def self.asn?(asn)
+    asn.to_s.match?(/\A\d+\z/)
+  end
+
   def self.block!(asn)
+    return unless asn?(asn)
+
     rule = fetch_rule
     return unless rule
 
@@ -236,6 +243,8 @@ module Asn
   end
 
   def self.unblock!(asn)
+    return unless asn?(asn)
+
     rule = fetch_rule
     return unless rule
 

@@ -271,6 +271,7 @@ Dandelion::App.controller do
   end
 
   post '/stats/asns/legit/:asn' do
+    halt 400 unless Asn.asn?(params[:asn])
     stash = Stash.find_or_create_by(key: 'legit_asns') { |s| s.value = '' }
     legit = stash.value.to_s.split(',').map(&:strip).reject(&:empty?)
     if legit.include?(params[:asn])
