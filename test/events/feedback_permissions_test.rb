@@ -341,6 +341,20 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
     assert_empty emails_sent_by_jobs(/send_response/)
   end
 
+  test "feedback that may not be quoted publicly can't be given a public extract" do
+    covers 'events/no-extract-control-not-public@82dbfb'
+    feedback = create_feedback(publicly_visible: false)
+    sign_in_with_rack(@account)
+    get "/event_feedbacks/#{feedback.id}/public_answers/0"
+    assert_equal 403, last_response.status
+    post "/event_feedbacks/#{feedback.id}/public_answers/0", public_answer: 'Private thoughts here'
+    assert_equal 403, last_response.status
+    assert_nil feedback.reload.public_answers
+
+    get "/o/#{@organisation.slug}/show_feedback", minimal: 1
+    refute_includes last_response.body, 'Private thoughts here'
+  end
+
   test "only the organisation's admins can delete feedback, and only site admins delete it for good" do
     feedback = create_feedback
     [@attendee, create_facilitator].each do |account|

@@ -135,6 +135,7 @@ Dandelion::App.controller do
     @event_feedback = EventFeedback.find(params[:id]) || not_found
     @event = @event_feedback.event
     event_admins_only!
+    halt 403 unless @event_feedback.publicly_visible?
     partial :'event_feedbacks/public', locals: { event_feedback: @event_feedback, i: params[:i].to_i }
   end
 
@@ -142,6 +143,8 @@ Dandelion::App.controller do
     @event_feedback = EventFeedback.find(params[:id]) || not_found
     @event = @event_feedback.event
     event_admins_only!
+    # Its author didn't allow their written answers to be quoted publicly
+    halt 403 unless @event_feedback.publicly_visible?
     @event_feedback.public_answers ||= @event_feedback.answers.map { |q, _a| [q, ''] }
     @event_feedback.public_answers[params[:i].to_i][1] = params[:public_answer]
     @event_feedback.save
