@@ -172,6 +172,13 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
     get '/accounts/privacyable/phone', account_id: other.id.to_s
     assert_includes last_response.body, 'bi-globe-europe-africa'
 
+    # Only the levels the menu offers: none would make the field public
+    [{}, { level: 'Nobody' }].each do |params|
+      post '/accounts/set_privacyable/email', params
+      assert_equal 400, last_response.status
+    end
+    assert_equal 'People I follow', account.reload.email_privacy
+
     # Only privacy fields: p names one of Account.privacyables
     post '/accounts/set_privacyable/admin', level: 'Public'
     assert_equal 403, last_response.status

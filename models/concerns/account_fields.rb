@@ -101,6 +101,11 @@ module AccountFields
       %w[email location phone website date_of_birth gender bio last_active organisations local_groups activities gatherings following followers]
     end
 
+    # Who sees a privacyable field (viewable?): a field with none set is public
+    def privacy_levels
+      ['Only me', 'People I follow', 'Public']
+    end
+
     def genders
       [''] + %(Woman
   Man

@@ -337,6 +337,7 @@ Dandelion::App.controller do
     sign_in_required!
     @account = current_account
     halt 403 unless Account.privacyables.include?(params[:p])
+    halt 400 unless Account.privacy_levels.include?(params[:level]) # none would make the field public
     current_account.set("#{params[:p]}_privacy": params[:level])
     200
   end
