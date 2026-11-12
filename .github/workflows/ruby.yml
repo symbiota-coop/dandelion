@@ -128,7 +128,7 @@ jobs:
           - group: general
             files: dadmin design images search errands organisations/activity_applications
           - group: integrations
-            files: integrations/mcp integrations/mcp_checkout integrations/zapier integrations/webhooks integrations/analytics_providers
+            files: integrations/mcp integrations/mcp_checkout integrations/zapier integrations/webhooks integrations/analytics_providers events/admin_reports events/my_events
           - group: messages
             files: messages/messages messages/pmails messages/mailer events/feedbacks events/discussions messages/pmail_sending
           - group: orders
