@@ -483,4 +483,15 @@ class IntegrationsAtprotoEventsTest < ActiveSupport::TestCase
     end
     assert_equal [], other_client.calls
   end
+
+  test "the organisation's edit form can't set its Bluesky handle or app password, which only connecting checks and sets" do
+    connected_organisation
+    sign_in_with_rack(@account)
+    [{ atproto_handle: 'someone-else.test' }, { atproto_app_password: 'forged-password' }].each do |organisation_params|
+      error = assert_raises(RuntimeError) { post "/o/#{@organisation.slug}/edit", organisation: organisation_params.merge(name: 'Renamed') }
+      assert_match(/are protected/, error.message)
+    end
+    @organisation.reload
+    assert_equal ['organisation.test', 'organisation-password'], [@organisation.atproto_handle, @organisation.atproto_app_password]
+  end
 end
