@@ -1,7 +1,9 @@
 require_relative '../test_config'
+require_relative '../helpers/calendar_import_helpers'
 
 class CalendarTest < ActiveSupport::TestCase
   include Rack::Test::Methods
+  include CalendarImportHelpers
 
   ICS_URL_1 = 'https://calendar.google.com/calendar/ical/one/basic.ics'.freeze
   ICS_URL_2 = 'https://calendar.google.com/calendar/ical/two/basic.ics'.freeze
@@ -100,33 +102,6 @@ class CalendarTest < ActiveSupport::TestCase
     END:VEVENT
     END:VCALENDAR
   ICAL
-
-  def stub_faraday(responses)
-    responder = lambda do |url, *_args|
-      url = url.to_s
-      response = responses.fetch(url) { raise "Unexpected Faraday.get for #{url}" }
-      Struct.new(:status, :body, :headers) do
-        def success?
-          status.between?(200, 299)
-        end
-      end.new(response[:status], response[:body], response[:headers] || {})
-    end
-
-    connection_builder = lambda do |*args, **kwargs, &block|
-      Faraday::Connection.new(*args, **kwargs) do |f|
-        block&.call(f)
-        f.adapter :test do |stub|
-          responses.each do |url, spec|
-            stub.get(url) { [spec[:status], spec[:headers] || {}, spec[:body]] }
-          end
-        end
-      end
-    end
-
-    Faraday.stub(:get, responder) do
-      Faraday.stub(:new, connection_builder) { yield }
-    end
-  end
 
   def stub_dragonfly_fetch_url(responses, fetched_urls: nil)
     fetcher = lambda do |url, *_args, **_kwargs, &_block|
