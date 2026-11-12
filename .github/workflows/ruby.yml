@@ -165,8 +165,52 @@ jobs:
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
       env:
         TEST_FILES: ${{ matrix.files }}
+        COVERAGE: 1 # test/test_coverage.rb
       with:
         timeout_minutes: 10
         max_attempts: 2
         retry_on: timeout
         command: bundle exec rake test:files
+
+    - name: Upload coverage
+      if: ${{ !cancelled() }}
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      with:
+        name: coverage-${{ matrix.group }}
+        path: coverage/.resultset.json
+        include-hidden-files: true
+        retention-days: 1
+
+  # The test groups' coverage in one report: its totals and least-covered files in the run's summary, and the whole report
+  # in its coverage artifact
+  coverage:
+    needs: test
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-26.04
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - name: Install Ruby
+      uses: ruby/setup-ruby@de492cf36cbab201753d720ce4f4e336cd688c94 # v1.336.0
+      with:
+        ruby-version: 4.0.9
+        bundler-cache: true
+
+    - name: Download the groups' coverage
+      uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+      with:
+        pattern: coverage-*
+        path: coverage-groups
+
+    - name: Collate coverage
+      run: bundle exec rake test:coverage
+
+    - name: Upload the coverage report
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      with:
+        name: coverage
+        path: coverage
+        retention-days: 14

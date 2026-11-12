@@ -23,6 +23,7 @@ _map_old.erb
 .bundle
 .config
 coverage
+coverage-groups
 InstalledFiles
 lib/bundler/man
 pkg

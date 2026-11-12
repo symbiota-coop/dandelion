@@ -21,3 +21,24 @@ desc 'Run application test suite'
 Rake::TestTask.new(:test) do |test|
   test.pattern = 'test/**/*_test.rb'
 end
+
+# Collates the coverage CI's test groups recorded (COVERAGE, test/test_coverage.rb), downloaded into coverage-groups/, into
+# one report in coverage/, and writes its totals and least-covered files to GitHub's job summary when there is one
+desc 'Collate test coverage from coverage-groups/*/.resultset.json'
+task 'test:coverage' do
+  require 'simplecov'
+  require_relative 'test_coverage'
+  SimpleCov.collate(Dir['coverage-groups/*/.resultset.json'], &TestCoverage::CONFIG)
+  result = SimpleCov.result
+  summary = ["## Test coverage: #{result.covered_percent.round(1)}% of lines\n", '| Group | Lines | Covered |',
+             '|---|--:|--:|']
+  result.groups.each do |name, files|
+    summary << "| #{name} | #{files.lines_of_code} | #{files.covered_percent.round(1)}% |"
+  end
+  summary += ["\n### Most uncovered lines\n", '| File | Uncovered lines | Covered |', '|---|--:|--:|']
+  result.files.sort_by { |f| -f.missed_lines.count }.first(30).each do |f|
+    summary << "| #{f.project_filename.delete_prefix('/')} | #{f.missed_lines.count} | #{f.covered_percent.round(1)}% |"
+  end
+  puts summary
+  File.write(ENV['GITHUB_STEP_SUMMARY'], "#{summary.join("\n")}\n", mode: 'a') if ENV['GITHUB_STEP_SUMMARY']
+end

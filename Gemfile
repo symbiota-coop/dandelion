@@ -38,6 +38,7 @@ group :test do
   gem 'minitest-mock'
   gem 'minitest-rg'
   gem 'ruby-openai' # for the how-to videos' narration
+  gem 'simplecov', require: false # COVERAGE=1 (test/test_coverage.rb)
 end
 
 # Interacting with other websites

@@ -1,4 +1,5 @@
 $VERBOSE = nil
+require_relative 'test_coverage'
 require File.expand_path('../config/boot', __dir__)
 raise "Refusing to run tests outside test environment. Current Padrino.env=#{Padrino.env.inspect}. Run with `env -u BUNDLE_PATH foreman run -e .env.test bundle exec ruby -I test test/$1_test.rb`" unless Padrino.env == :test
 
