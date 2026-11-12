@@ -130,7 +130,7 @@ jobs:
           - group: integrations
             files: integrations/mcp integrations/mcp_checkout integrations/zapier integrations/webhooks integrations/analytics_providers events/admin_reports events/my_events
           - group: messages
-            files: messages/messages messages/pmails messages/mailer events/feedbacks events/discussions messages/pmail_sending
+            files: messages/messages messages/pmails messages/mailer events/feedbacks events/discussions messages/pmail_sending events/daily
           - group: orders
             files: orders/orders orders/tokens orders/admin bookings/resales integrations/asn_blocking
           - group: organisations
