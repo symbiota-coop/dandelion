@@ -124,6 +124,7 @@ module ActiveSupport
         # Paranoia models scope delete_all to non-deleted rows; purge soft-deleted rows too
         (model.respond_to?(:unscoped) ? model.unscoped : model).delete_all
       end
+      Delayed::Job.delete_all # not an app model, so a test's queued jobs would count in the next
     end
 
     # Rack::Test's app

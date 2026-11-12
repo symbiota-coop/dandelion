@@ -12,13 +12,8 @@ class OrdersAdminTest < ActiveSupport::TestCase
   # Queued Order#send_tickets jobs: other jobs' handlers can mention orders and tickets anywhere in the records they carry
   SEND_TICKETS_JOB = /Mongoid:Order\n.*method_name: :send_tickets_without_delay/m
 
-  # Jobs aren't cleared between tests, so only this test's count
-  setup do
-    @earlier_job_ids = Delayed::Job.pluck(:id)
-  end
-
   def send_tickets_jobs
-    Delayed::Job.and(handler: SEND_TICKETS_JOB, :id.nin => @earlier_job_ids)
+    Delayed::Job.and(handler: SEND_TICKETS_JOB)
   end
 
   # The emails the Order#send_tickets jobs this test queued would send, running them
