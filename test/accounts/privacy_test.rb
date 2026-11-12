@@ -26,7 +26,7 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
   test "each field on a profile shows only to those its privacy lets see it: everyone, the people the account follows, or just them, and to admins" do
     account = profiled_account
     account.set(email_privacy: 'Only me', phone_privacy: 'Public', website_privacy: 'People I follow', gender_privacy: 'Only me',
-                location_privacy: 'People I follow', date_of_birth_privacy: 'Only me')
+                location_privacy: 'People I follow', date_of_birth_privacy: 'Only me', bio: 'I grow dandelions', bio_privacy: 'People I follow')
     followee = FactoryBot.create(:account)
     Follow.create!(follower: account, followee: followee)
     follower = FactoryBot.create(:account) # follows the account, which doesn't follow them back
@@ -38,6 +38,7 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
     assert page.has_content?('Robin Profile')
     assert profile_row('Phone').has_content?('+447700900123')
     %w[Email Website Gender Location Age].each { |label| assert page.has_no_xpath?("//table//tr[td[1][normalize-space()='#{label}']]") }
+    assert page.has_no_content?('I grow dandelions')
 
     sign_in(follower)
     visit "/u/#{account.username}"
@@ -45,11 +46,13 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
     assert page.has_no_content?('robin.example.com')
     assert page.has_no_content?('Stockholm')
     assert page.has_no_content?(account.email)
+    assert page.has_no_content?('I grow dandelions')
 
     sign_in(followee)
     visit "/u/#{account.username}"
     assert page.has_content?('robin.example.com')
     assert page.has_content?('Stockholm')
+    assert page.has_content?('I grow dandelions')
     assert page.has_no_content?(account.email)
     assert page.has_no_content?('Genderqueer')
 
@@ -64,7 +67,8 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
 
   test "a field hidden from someone isn't in the profile page or its modal at all" do
     account = profiled_account
-    account.set(email_privacy: 'Only me', phone_privacy: 'People I follow', gender_privacy: 'Only me', last_active: 1.day.ago, last_active_privacy: 'Only me')
+    account.set(email_privacy: 'Only me', phone_privacy: 'People I follow', gender_privacy: 'Only me', last_active: 1.day.ago, last_active_privacy: 'Only me',
+                bio: 'I grow dandelions', bio_privacy: 'Only me')
     stranger = FactoryBot.create(:account)
 
     [nil, stranger].each do |viewer|
@@ -73,7 +77,7 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
         get "/u/#{account.username}", {}, headers
         assert last_response.ok?
         assert_includes last_response.body, 'Robin Profile'
-        [account.email, '+447700900123', 'Genderqueer', 'Last active'].each { |value| refute_includes last_response.body, value }
+        [account.email, '+447700900123', 'Genderqueer', 'Last active', 'I grow dandelions'].each { |value| refute_includes last_response.body, value }
       end
     end
   end

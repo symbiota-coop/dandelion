@@ -37,7 +37,7 @@ var temp = $('<input>');
       <%= partial :'accounts/table', locals: { account: account, modal: defined?(modal) && modal } %>
     </div>
     <% unless defined?(modal) %>
-      <% if account.bio %>
+      <% if viewable?(account, :bio) %>
         <div class="row justify-content-between g-0">
           <div class="col wysiwyg links-blank readable">
             <%== Sanitize.fragment(Rinku.auto_link(account.bio), Sanitize::Config::DANDELION) %>
