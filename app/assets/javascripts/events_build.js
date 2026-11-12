@@ -31,6 +31,23 @@ $(function () {
     }
   })
 
+  // The other way round, for rows filled in by script (a restored draft): pick the choice matching the number, or Other
+  function syncSlotsChoice ($scope) {
+    $scope.find('.slots-choice').each(function () {
+      const $choice = $(this)
+      const $number = $choice.siblings('.slots-other')
+      const value = String($number.val()).trim()
+      const matches = $choice.find('option').filter(function () { return this.value === value && value !== 'other' })
+      if (matches.length) {
+        $choice.val(value)
+        $number.hide()
+      } else {
+        $choice.val('other')
+        $number.show()
+      }
+    })
+  }
+
   function fieldPresent (value) {
     return value !== undefined && value !== null && value !== ''
   }
@@ -110,6 +127,7 @@ $(function () {
       }
     })
 
+    syncSlotsChoice($row)
     $row.appendTo($container)
 
     if (typeof $.currencySymbol !== 'undefined') {

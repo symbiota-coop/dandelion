@@ -131,4 +131,36 @@ class EventDraftsTest < ActiveSupport::TestCase
     assert_equal 1, created.ticket_groups.count
     assert_equal 'Non-Residential', created.ticket_groups.first.name
   end
+
+  test 'a restored draft shows its ticket type slots and creates the event with them' do
+    create_organisation
+    event = FactoryBot.build_stubbed(:event)
+    draft = create_event_draft(name: event.name)
+    draft.update!(json: draft_event_payload(name: event.name).deep_merge(ticket_types_attributes: { '0' => { slots: '0' } }).to_json)
+    sign_in(@account)
+    visit "/events/new?organisation_id=#{@organisation.id}&draft_id=#{draft.id}"
+    click_link 'Tickets'
+    assert page.has_css? 'select.slots-choice'
+    assert_equal '0', find('select.slots-choice').value
+    assert page.has_no_field? 'event_ticket_types_attributes_0_slots'
+
+    execute_script %{$('#event_start_time').val('#{event.start_time.to_fs(:db_local)}')}
+    execute_script %{$('#event_end_time').val('#{event.end_time.to_fs(:db_local)}')}
+    click_link 'Everything else'
+    click_button 'Create event'
+    assert page.has_content? event.name
+    assert_equal 0, Event.find_by(name: event.name).ticket_types.first.slots
+  end
+
+  test 'a restored draft with other ticket type slots shows the number' do
+    create_organisation
+    draft = create_event_draft
+    draft.update!(json: draft_event_payload.deep_merge(ticket_types_attributes: { '0' => { slots: '4' } }).to_json)
+    sign_in(@account)
+    visit "/events/new?organisation_id=#{@organisation.id}&draft_id=#{draft.id}"
+    click_link 'Tickets'
+    assert page.has_css? 'select.slots-choice'
+    assert_equal 'other', find('select.slots-choice').value
+    assert page.has_field? 'event_ticket_types_attributes_0_slots', with: '4'
+  end
 end
