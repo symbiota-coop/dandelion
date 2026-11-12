@@ -243,6 +243,24 @@ class OrganisationsCalendarImportsTest < ActiveSupport::TestCase
     end
   end
 
+  test "feeds and Luma's event pages are fetched with timeouts, so a slow one gives up rather than stalling the sync" do
+    create_organisation(calendar_import_urls: LUMA_FEED_URL)
+    page_url = 'https://luma.com/event/evt-abc'
+    request_options = {}
+
+    stub_faraday({ LUMA_FEED_URL => { status: 200, body: ical(vevent(uid: 'evt-abc@events.lu.ma', dtstart: '20270501T180000Z', summary: 'Luma event', location: 'Berlin')) },
+                   page_url => { status: 200, body: '<html><head></head></html>' } },
+                 request_options: request_options) do
+      @organisation.sync_calendar_imports
+    end
+
+    assert_equal [LUMA_FEED_URL, page_url], request_options.keys
+    request_options.each do |url, options|
+      assert_equal OrganisationCalendarImports::FETCH_OPEN_TIMEOUT, options.open_timeout, url
+      assert_equal OrganisationCalendarImports::FETCH_TIMEOUT, options.timeout, url
+    end
+  end
+
   test 'a malformed feed is reported without touching its events' do
     create_organisation(calendar_import_urls: FEED_URL)
     import(@organisation, ical(meetup))

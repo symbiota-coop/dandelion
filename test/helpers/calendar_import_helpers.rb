@@ -2,8 +2,9 @@
 module CalendarImportHelpers
   # responses: { url => { status:, body:, headers: } }, or { url => exception } to raise it instead. Faraday.get (the
   # feed) and connections from Faraday.new (Luma's event pages) both answer from it, failing on any other URL. Each URL
-  # requested is pushed to requested_urls. The responses can be given without braces, as keywords
-  def stub_faraday(responses = {}, requested_urls: nil, **more_responses)
+  # requested is pushed to requested_urls, and its request options (timeouts...) go in request_options by URL. The
+  # responses can be given without braces, as keywords
+  def stub_faraday(responses = {}, requested_urls: nil, request_options: nil, **more_responses)
     responses = responses.merge(more_responses.transform_keys(&:to_s))
     response_class = Struct.new(:status, :body, :headers) do
       def success?
@@ -11,9 +12,14 @@ module CalendarImportHelpers
       end
     end
 
-    responder = lambda do |url, *_args|
+    responder = lambda do |url, *_args, &block|
       url = url.to_s
       requested_urls&.push(url)
+      request = Faraday::Connection.new.build_request(:get) do |req|
+        req.url(url)
+        block&.call(req)
+      end
+      request_options&.store(url, request.options)
       response = responses.fetch(url) { raise "Unexpected Faraday.get for #{url}" }
       raise response if response.is_a?(Exception)
 
@@ -25,8 +31,9 @@ module CalendarImportHelpers
         block&.call(f)
         f.adapter :test do |stub|
           responses.each do |url, spec|
-            stub.get(url) do
+            stub.get(url) do |env|
               requested_urls&.push(url)
+              request_options&.store(url, env.request)
               raise spec if spec.is_a?(Exception)
 
               [spec[:status], spec[:headers] || {}, spec[:body]]

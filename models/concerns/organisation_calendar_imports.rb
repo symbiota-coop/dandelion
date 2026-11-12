@@ -23,6 +23,10 @@ module OrganisationCalendarImports
   # In-person: strip "Address:" … + "Hosted by …". Online: keep "Get up-to-date information at: …", strip only trailing "Hosted by …".
   LUMA_DESCRIPTION_ADDRESS_FOOTER = /\n{1,2}Address:\s*\r?\n[\s\S]*?\r?\nHosted by .+$/m
   LUMA_DESCRIPTION_HOSTED_BY_AFTER_ONLINE_LINK = /\n{1,2}Hosted by .+$/m
+  # Seconds to connect to, and then to wait on, a feed or Luma page, so a slow one can't stall the hourly sync (the
+  # adapter's defaults are a minute each)
+  FETCH_OPEN_TIMEOUT = 10
+  FETCH_TIMEOUT = 30
 
   class_methods do
     def normalize_feed_url(feed_url)
@@ -139,7 +143,10 @@ module OrganisationCalendarImports
   def sync_calendar_import_feed(feed_url)
     normalized_feed_url = Organisation.normalize_feed_url(feed_url)
 
-    response = Faraday.get(normalized_feed_url)
+    response = Faraday.get(normalized_feed_url) do |req|
+      req.options.open_timeout = FETCH_OPEN_TIMEOUT
+      req.options.timeout = FETCH_TIMEOUT
+    end
     raise OrganisationCalendarImports::ConfigurationError, "iCal feed returned #{response.status}" unless response.success?
     raise OrganisationCalendarImports::ConfigurationError, 'iCal feed did not return a VCALENDAR payload' unless Organisation.valid_calendar_body?(response.body)
 
@@ -272,7 +279,7 @@ module OrganisationCalendarImports
 
     if event.image.blank? && source_url && luma_event_page_url?(source_url)
       begin
-        response = (@luma_og_html_faraday ||= Faraday.new do |f|
+        response = (@luma_og_html_faraday ||= Faraday.new(request: { open_timeout: FETCH_OPEN_TIMEOUT, timeout: FETCH_TIMEOUT }) do |f|
           f.response :follow_redirects, limit: 5, callback: lambda { |_response_env, new_request_env|
             raise OrganisationCalendarImports::ConfigurationError, 'Unexpected redirect host' unless luma_event_page_url?(new_request_env[:url].to_s)
           }
