@@ -32,18 +32,6 @@ elsif @organisation
     to_options << ["People who aren't monthly donors", 'not_monthly_donors']
     to_options << %w[Facilitators facilitators]
 
-    activity_tags = @organisation.activity_tags
-    activity_tag_options = (if activity_tags.count.positive?
-                              activity_tags.order('name asc').map do |activity_tag|
-                                [
-                                  ["Activity tag: #{activity_tag.name}", "activity_tag:#{activity_tag.id}"]
-                                ]
-                              end.sum([])
-                            else
-                              []
-                            end)
-    to_options += activity_tag_options
-
   end
 
   activities = organisation_admin? ? @organisation.activities : @organisation.activities.and(:id.in => current_account.activityships.and(admin: true).pluck(:activity_id))

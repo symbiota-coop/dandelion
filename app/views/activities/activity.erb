@@ -10,11 +10,6 @@
       <h1>
         <%= @activity.name %>
       </h1>
-      <% if activity_admin? %>
-        <div class="mb-2">
-          <%= partial :'activities/tag_labels', locals: { activity: @activity } %>
-        </div>
-      <% end %>
       <% if current_account %>
         <div class="mb-2">
           <div class="d-inline-block mb-1" data-pagelet-url="<%= @activity.path %>/activityship?membership_toggle=1">

@@ -10,9 +10,6 @@ class Activity
   include SendFollowersCsv
   include ImageWithValidation
   include Searchable
-  include Taggable
-
-  taggable tagships: :activity_tagships, tag: :activity_tag
 
   def self.prewarmed_image_derivative_sizes
     %w[200x200 400x400 500x500#]
@@ -103,7 +100,6 @@ class Activity
     Pmail.and(:id.in => pmails_as_mailable.pluck(:id) + Pmail.and(:mailable_type => 'Event', :mailable_id.in => events.pluck(:id)).pluck(:id))
   end
 
-  has_many_through :activity_tags, through: :activity_tagships
 
   with_options class_name: 'Account' do
     has_many_through :members, through: :activityships
@@ -132,7 +128,6 @@ class Activity
     EventTag.and(:id.in => EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id))
   end
 
-  has_many :activity_tagships, dependent: :destroy
 
   validates_presence_of :name, :slug
   validates_uniqueness_of :slug, scope: :organisation_id

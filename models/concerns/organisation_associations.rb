@@ -111,10 +111,6 @@ module OrganisationAssociations
     EventTag.and(:id.in => EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id))
   end
 
-  def activity_tags
-    ActivityTag.and(:id.in => ActivityTagship.and(:activity_id.in => activities.pluck(:id)).pluck(:activity_tag_id))
-  end
-
   def members
     Account.and(organisation_ids_cache: id)
   end

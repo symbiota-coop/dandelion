@@ -11,6 +11,11 @@ class Pmail
   belongs_to_without_parent_validation :organisation
   belongs_to_without_parent_validation :account
   belongs_to_without_parent_validation :mailable, polymorphic: true, optional: true
+  # Mails once sent to an activity tag, since removed, keep that mailable_type, which no class answers to: they have none
+  alias mailable_of_any_type mailable
+  def mailable
+    mailable_of_any_type unless mailable_type == 'ActivityTag'
+  end
   belongs_to_without_parent_validation :event, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending an event
   belongs_to_without_parent_validation :activity, optional: true, inverse_of: :pmails_as_exclusion # Exclude people attending upcoming events in an activity
   belongs_to_without_parent_validation :local_group, optional: true, inverse_of: :pmails_as_exclusion # Exclude people in a local group
@@ -67,7 +72,7 @@ class Pmail
   end
 
   def recipients_admin?(account)
-    if organisation_wide_recipients? || !mailable || mailable.is_a?(ActivityTag)
+    if organisation_wide_recipients? || !mailable
       Organisation.admin?(organisation, account)
     else
       mailable.class.admin?(mailable, account)
@@ -81,7 +86,7 @@ class Pmail
   has_many :pmail_links, dependent: :destroy
 
   def self.mailable_types
-    %w[Activity ActivityTag LocalGroup Event]
+    %w[Activity LocalGroup Event]
   end
 
   def self.search_fields
@@ -127,8 +132,6 @@ class Pmail
       return unless id
     when 'activity'
       self.mailable = organisation&.activities&.find(id)
-    when 'activity_tag'
-      self.mailable = organisation&.activity_tags&.find(id)
     when 'local_group'
       self.mailable = organisation&.local_groups&.find(id)
     when 'event', 'waitlist', 'all_ticket_type_waitlists'
@@ -167,7 +170,6 @@ class Pmail
     when 'not_monthly_donors' then "not a monthly donor of #{organisation.name}"
     when 'facilitators' then "a facilitator at #{organisation.name}"
     when 'activity' then "following #{organisation.name}'s activity #{mailable.name}"
-    when 'activity_tag' then "following a relevant activity at #{organisation.name}"
     when 'local_group' then "following #{organisation.name}'s local group #{mailable.name}"
     when 'ticket_group' then ticket_group ? "in the #{ticket_group.name} ticket group for #{event_name}" : "in a ticket group for #{event_name}"
     when 'ticket_type_waitlist' then ticket_type ? "on the #{ticket_type.name} waitlist for #{event_name}" : "on a ticket type waitlist for #{event_name}"
@@ -190,7 +192,6 @@ class Pmail
         when 'ticket_type_waitlist' then ticket_type ? mailable.ticket_type_waiters(ticket_type_id: ticket_type_id) : Account.and(:id.in => [])
         when 'all_ticket_type_waitlists' then mailable.ticket_type_waiters
         when 'waitlist' then mailable.waiters
-        when 'activity_tag' then mailable.subscribed_members(organisation)
         when 'activity', 'local_group', 'event' then mailable.subscribed_members
         end
     t = t.and(:id.nin => event.attendee_ids) if event

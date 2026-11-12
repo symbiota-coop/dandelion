@@ -269,7 +269,7 @@ Dandelion::App.controller do
       @pmails = @pmails.and(recipient_kind: params[:to])
     when 'waitlist'
       @pmails = @pmails.and(:recipient_kind.in => Pmail.waitlist_recipient_kinds)
-    when 'activity', 'activity_tag', 'local_group', 'event'
+    when 'activity', 'local_group', 'event'
       @pmails = @pmails.and(mailable_type: params[:to].camelize)
     end
     @scope = "organisation_id=#{@organisation.id}"
