@@ -318,4 +318,21 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
       assert_includes last_response.body, name
     end
   end
+
+  test "the birthdays feed has only the birthdays of public profiles the account may see, as the birthdays page does" do
+    account = FactoryBot.create(:account)
+    shown = { 'Pat Public' => {}, 'Fran Follows Back' => { date_of_birth_privacy: 'People I follow' } }
+    hidden = { 'Olly Only Me' => { date_of_birth_privacy: 'Only me' }, 'Nat Not Following Back' => { date_of_birth_privacy: 'People I follow' },
+               'Hal Hidden' => { hidden: true } }
+    shown.merge(hidden).each do |name, attrs|
+      followee = FactoryBot.create(:account, name: name, has_signed_in: true, date_of_birth: Date.new(1990, 6, 15), **attrs)
+      Follow.create!(follower: account, followee: followee)
+      Follow.create!(follower: followee, followee: account) if name == 'Fran Follows Back'
+    end
+
+    get '/birthdays.ics', ics_key: account.ensure_ics_key!
+    assert last_response.ok?
+    shown.each_key { |name| assert_includes last_response.body, "#{name}'s" }
+    hidden.each_key { |name| refute_includes last_response.body, name }
+  end
 end

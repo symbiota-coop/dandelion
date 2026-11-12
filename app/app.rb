@@ -232,8 +232,9 @@ module Dandelion
       when :ics
         cal = Icalendar::Calendar.new
         cal.append_custom_property('X-WR-CALNAME', 'Birthdays')
-        current_account.following.each do |account|
-          next unless account.date_of_birth
+        # As the page does: not private profiles (Account.ids_by_next_birthday), nor birthdays hidden from this account
+        current_account.following.and(hidden: false).each do |account|
+          next unless viewable?(account, :date_of_birth)
 
           cal.event do |e|
             e.summary = "#{account.name}'s #{(account.age + 1).ordinalize} birthday"
