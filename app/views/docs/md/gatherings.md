@@ -76,6 +76,8 @@ You can choose from three access modes: Anyone with the link can join, People mu
 
 Filters on the members list combine: only members matching all of them are shown. <!-- claim: member-filters --> You can filter by gender, payment, shifts, teams and chosen options, and to admins.
 
+A gathering always keeps at least one admin: its only admin can't leave the gathering, be unadmined or be removed until someone else has been made an admin. <!-- claim: only-admin-stays -->
+
 ## Applications
 
 Applications can be seen and voted on by all existing members. <!-- claim: members-see-and-vote --> You can choose to have just one vote type, Proposers, or two, Proposers and Supporters. <!-- claim: vote-types -->

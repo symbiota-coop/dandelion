@@ -1,7 +1,7 @@
 require_relative '../test_config'
 
 # A gathering's members: what its admins set on a membership (admin, paid, invitations, shift points), adding members,
-# seeing a member's answers and leaving, and who may do each
+# seeing a member's answers and leaving (though not by a gathering's only admin), and who may do each
 class GatheringMembersTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
@@ -137,6 +137,121 @@ class GatheringMembersTest < ActiveSupport::TestCase
     assert_equal 500, targets.first.paid
     assert_equal 10, targets.first.invitations_granted
     assert_in_delta 0.0, targets.first.shift_points_required
+  end
+
+  test "the gathering's only admin isn't offered leaving, unadmining or removing themselves until there's another admin" do
+    covers 'gatherings/only-admin-stays@432957'
+    create_gathering(privacy: 'open')
+    member = create_member
+    sign_in(@account)
+    visit gathering_path
+    assert page.has_button? 'Leave gathering', disabled: true
+    assert page.has_no_link? 'Leave gathering'
+
+    visit gathering_path('/members')
+    own_row = membership_row(membership_of(@account))
+    assert own_row.has_content? 'Only admin'
+    assert own_row.has_no_link? 'Unadmin'
+    assert own_row.has_no_link? 'Remove'
+
+    membership_row(membership_of(member)).click_link 'Make admin'
+    assert membership_row(membership_of(member)).has_link? 'Unadmin'
+    assert membership_row(membership_of(@account)).has_link? 'Unadmin'
+    assert membership_row(membership_of(@account)).has_link? 'Remove'
+
+    visit gathering_path
+    click_link_and_confirm 'Leave gathering'
+    assert page.has_content? "You left #{@gathering.name}"
+    assert_nil membership_of(@account)
+    assert membership_of(member).admin
+  end
+
+  test "the gathering's only admin can't leave, unadmin themselves or be removed, by them or a site admin" do
+    covers 'gatherings/only-admin-stays@432957'
+    create_gathering(privacy: 'open')
+    member = create_member
+    own = membership_of(@account)
+    site_admin = FactoryBot.create(:account, admin: true)
+
+    sign_in_with_rack(@account)
+    post gathering_path('/leave')
+    assert last_response.redirect?
+    follow_redirect!
+    assert_includes last_response.body, 'the only admin of'
+    assert own.reload
+    post gathering_path("/memberships/#{own.id}/unadmin")
+    assert last_response.redirect?
+    post gathering_path("/memberships/#{own.id}/remove")
+    assert last_response.redirect?
+    assert own.reload.admin
+    refute own.notifications.find_by(type: 'unadmined')
+
+    sign_in_with_rack(site_admin)
+    post gathering_path("/memberships/#{own.id}/unadmin")
+    post gathering_path("/memberships/#{own.id}/remove")
+    assert own.reload.admin
+    # A site admin browsing has no membership to leave
+    post gathering_path('/leave')
+    assert last_response.redirect?
+    assert own.reload
+
+    # With a second admin, the first can go
+    membership_of(member).set(admin: true)
+    sign_in_with_rack(@account)
+    post gathering_path("/memberships/#{own.id}/unadmin")
+    refute own.reload.admin
+    post gathering_path("/memberships/#{membership_of(member).id}/remove")
+    assert membership_of(member), 'the only admin left stays'
+  end
+
+  test "a value the members table can't take is refused, says why and saves nothing" do
+    create_gathering(privacy: 'open', enable_shift_worth: true)
+    @gathering.rotas.create!(name: 'Kitchen', account: @account)
+    membership = membership_of(create_member)
+    sign_in(@account)
+    visit gathering_path('/members')
+
+    invitations = cell_posting_to(membership_row(membership), '/invitations_granted')
+    invitations.click_link '0'
+    invitations.fill_in 'invitations_granted', with: '-1'
+    invitations.find_field('invitations_granted').send_keys(:tab)
+    assert invitations.has_css? '.invalid-feedback', text: 'Invitations granted must be greater than or equal to 0'
+    assert_nil membership.reload.invitations_granted
+
+    # Corrected, it saves
+    invitations.fill_in 'invitations_granted', with: '2'
+    invitations.find_field('invitations_granted').send_keys(:tab)
+    assert cell_posting_to(membership_row(membership), '/invitations_granted').has_link? '2'
+    assert_equal 2, membership.reload.invitations_granted
+  end
+
+  test 'what a member paid, their invitations and shift points must be numbers of 0 or more, and whole where they count money or people' do
+    create_gathering(privacy: 'open')
+    membership = membership_of(create_member)
+    membership.set(paid: 10, invitations_granted: 2, shift_points_required: 1.5)
+    sign_in_with_rack(@account)
+    refused = {
+      'paid' => ['-5', '2.5', 'lots'],
+      'invitations_granted' => ['-1', '1.5', 'some'],
+      'shift_points_required' => ['-0.5', 'many', '1e400']
+    }
+    refused.each do |field, values|
+      values.each do |value|
+        post gathering_path("/memberships/#{membership.id}/#{field}"), field => value
+        assert_equal 422, last_response.status, "#{field}: #{value}"
+        assert_match(/#{field.humanize}/i, last_response.body)
+      end
+    end
+    membership.reload
+    assert_equal [10, 2, 1.5], [membership.paid, membership.invitations_granted, membership.shift_points_required]
+
+    # Blank clears invitations and shift points back to unset, and paid to nothing
+    refused.each_key do |field|
+      post gathering_path("/memberships/#{membership.id}/#{field}"), field => ''
+      assert last_response.ok?, field
+    end
+    membership.reload
+    assert_equal [0, nil, nil], [membership.paid, membership.invitations_granted, membership.shift_points_required]
   end
 
   test "members see another member's answers to the joining questions" do

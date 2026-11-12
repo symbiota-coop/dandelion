@@ -21,13 +21,18 @@ class Membership
     field b.to_sym, type: Boolean
   end
 
-
   validates_uniqueness_of :account, scope: :gathering
+  # Whole numbers of the gathering's currency, and of people; a blank invitations_granted falls back to the gathering's
+  validates :paid, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :invitations_granted, numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
+  # Shifts can be worth fractions of a point; blank means not set yet
+  validates :shift_points_required, numericality: { greater_than_or_equal_to: 0, less_than: Float::INFINITY, allow_nil: true }
 
   before_validation do
     errors.add(:gathering, 'is full') if new_record? && gathering.member_limit && (gathering.memberships(true).count >= gathering.member_limit)
     self.desired_threshold = 0 if desired_threshold && (desired_threshold < 0)
-    self.paid = 0 if paid.nil?
+    # Only when nothing was given: a value that isn't a number (also nil once cast) is left for the validation to refuse
+    self.paid = 0 if paid_before_type_cast.nil?
     self.requested_contribution = 0 if requested_contribution.nil?
   end
 
@@ -58,6 +63,11 @@ class Membership
 
   def circle
     gathering
+  end
+
+  # A gathering keeps at least one admin of its own, so its only admin can't leave, be removed or be unadmined
+  def only_admin?
+    admin? && !gathering.memberships.and(admin: true, :id.ne => id).exists?
   end
 
   after_create :send_email

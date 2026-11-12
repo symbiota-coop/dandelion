@@ -93,7 +93,12 @@ Dandelion::App.controller do
 
   post '/g/:slug/leave' do
     @gathering = gathering_from_params
-    membership_required!
+    # A site admin browsing has no membership to leave
+    membership_required!(site_admins: false)
+    if @membership.only_admin?
+      flash[:error] = "You're the only admin of #{@gathering.name}: make someone else an admin before you leave"
+      redirect "/g/#{@gathering.slug}"
+    end
     flash[:notice] = "You left #{@gathering.name}"
     @membership.destroy
     redirect '/'
@@ -137,6 +142,10 @@ Dandelion::App.controller do
     membership = @gathering.memberships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    if membership.only_admin?
+      flash[:error] = 'The gathering needs another admin before its only admin can be unadmined'
+      redirect back
+    end
     membership.admin = false
     membership.admin_status_changed_by = current_account
     membership.save!
@@ -150,6 +159,10 @@ Dandelion::App.controller do
     membership = @gathering.memberships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    if membership.only_admin?
+      flash[:error] = 'The gathering needs another admin before its only admin can be removed'
+      redirect back
+    end
     membership.destroy
     redirect back
   end
@@ -159,8 +172,9 @@ Dandelion::App.controller do
     membership = @gathering.memberships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    # A blank (nil) value clears the field; a refused one is reported, for the members table to show by the field
     membership.paid = params[:paid]
-    membership.save
+    halt 422, membership.errors.full_messages.to_sentence unless membership.save
     200
   end
 
@@ -169,8 +183,9 @@ Dandelion::App.controller do
     membership = @gathering.memberships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    # A blank (nil) value clears the field; a refused one is reported, for the members table to show by the field
     membership.invitations_granted = params[:invitations_granted]
-    membership.save
+    halt 422, membership.errors.full_messages.to_sentence unless membership.save
     200
   end
 
@@ -179,8 +194,9 @@ Dandelion::App.controller do
     membership = @gathering.memberships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
+    # A blank (nil) value clears the field; a refused one is reported, for the members table to show by the field
     membership.shift_points_required = params[:shift_points_required]
-    membership.save
+    halt 422, membership.errors.full_messages.to_sentence unless membership.save
     200
   end
 

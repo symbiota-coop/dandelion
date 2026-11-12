@@ -131,6 +131,14 @@ $(function () {
     })
   }
 
+  // A save the server refused (a 422, its body saying why) shows by the form's field, which stays open to correct
+  function showFormError ($form, message) {
+    $form.find('.pagelet-form-error').remove()
+    const $field = $form.find('input:visible, select:visible, textarea:visible').last()
+    $field.addClass('is-invalid')
+    $('<div class="invalid-feedback pagelet-form-error"></div>').text(message).insertAfter($field)
+  }
+
   function postLoad (pagelet) {
     setPageletLoaded(pagelet)
     hideTooltips()
@@ -160,8 +168,9 @@ $(function () {
     $form.data('submitting', true)
     $.post($form.attr('action'), $form.serialize(), function () {
       reloadPagelet(pagelet, function () { postLoad(pagelet) })
-    }).fail(function () {
+    }).fail(function (xhr) {
       setPageletLoaded(pagelet)
+      if (xhr.status === 422 && xhr.responseText) showFormError($form, xhr.responseText)
     }).always(function () {
       $form.removeData('submitting')
     })

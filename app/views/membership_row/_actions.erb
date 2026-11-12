@@ -1,6 +1,12 @@
 <td class="small">
   <% y = [] %>
-  <% if membership.admin %>
+  <%# The gathering's only admin can't be unadmined or removed until there's another %>
+  <% only_admin = membership.only_admin? %>
+  <% if only_admin %>
+    <% y << capture do %>
+      <span class="text-nowrap" data-bs-toggle="tooltip" title="Make someone else an admin before unadmining or removing them">Only admin</span>
+    <% end %>
+  <% elsif membership.admin %>
     <% y << capture do %>
       <a class="btn btn-outline-primary text-nowrap mb-1" data-method="post" href="/g/<%= @gathering.slug %>/memberships/<%= membership.id %>/unadmin">Unadmin</a>
     <% end %>
@@ -9,8 +15,10 @@
       <a class="btn btn-outline-primary text-nowrap mb-1" data-method="post" href="/g/<%= @gathering.slug %>/memberships/<%= membership.id %>/make_admin">Make admin</a>
     <% end %>
   <% end %>
-  <% y << capture do %>
-    <a class="btn btn-outline-primary text-nowrap mb-1" data-method="post" data-confirm="Are you sure you want to remove this person from the gathering?" href="/g/<%= @gathering.slug %>/memberships/<%= membership.id %>/remove">Remove</a>
+  <% unless only_admin %>
+    <% y << capture do %>
+      <a class="btn btn-outline-primary text-nowrap mb-1" data-method="post" data-confirm="Are you sure you want to remove this person from the gathering?" href="/g/<%= @gathering.slug %>/memberships/<%= membership.id %>/remove">Remove</a>
+    <% end %>
   <% end %>
   <%== y.map(&:strip).join(' ') %>
 </td>
