@@ -122,7 +122,7 @@ Dandelion::App.controller do
     @gathering = gathering_from_params
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
-    @optionship = @gathering.optionships.find(params[:id])
+    @optionship = @gathering.optionships.find(params[:id]) || not_found
     if @optionship.update_attributes(mass_assigning(params[:optionship], Optionship))
       redirect "/g/#{@gathering.slug}/options"
     else

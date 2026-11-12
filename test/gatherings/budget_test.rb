@@ -221,4 +221,19 @@ class GatheringBudgetTest < ActiveSupport::TestCase
     assert_equal [5, 0], [tent.reload.capacity, tent.cost]
   end
 
+  test "a gathering's option routes don't find another gathering's optionships" do
+    create_gathering(privacy: 'open')
+    create_other_gathering
+    other_option = @other_gathering.options.create!(name: 'Secret yurt', type: 'Accommodation', account: @other_account)
+    other_optionship = other_option.optionships.create!(account: @other_account, gathering: @other_gathering)
+    tent = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account)
+
+    sign_in_with_rack(@account)
+    get gathering_path("/optionships/#{other_optionship.id}/edit")
+    assert_equal 404, last_response.status
+    refute_includes last_response.body, 'Secret yurt'
+    post gathering_path("/optionships/#{other_optionship.id}/edit"), optionship: { option_id: tent.id }
+    assert_equal 404, last_response.status
+    assert_equal other_option.id, other_optionship.reload.option_id
+  end
 end
