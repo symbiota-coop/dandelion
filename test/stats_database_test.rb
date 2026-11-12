@@ -4,6 +4,12 @@ class StatsDatabaseTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
 
+  # reset! empties only the app's models, so each test starts this collection afresh: an index an earlier test's
+  # queries used would count as used, and offer no Drop
+  setup do
+    Mongoid.default_client[:leftover_things].drop
+  end
+
   test 'an admin sees each collection, and flags one no model uses' do
     Mongoid.default_client[:leftover_things].insert_one(name: 'x')
     sign_in(FactoryBot.create(:account, admin: true))
