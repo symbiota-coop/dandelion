@@ -20,7 +20,7 @@
 <% if @event.calendar_import_feed_url.present? || @event.calendar_import_source_url.present? || @event.calendar_import_uid.present? %>
   <div class="alert alert-warning">
     <p class="mb-0">
-      This event is synced from an external iCal feed<% if @event.calendar_import_source_url.present? %> to <a target="_blank" href="<%= @event.calendar_import_source_url %>">the source event</a><% end %>. Changes will be overwritten the next time the organisation syncs.
+      This event is synced from an external iCal feed<% if HttpUrl.valid?(@event.calendar_import_source_url) %> to <a target="_blank" href="<%= @event.calendar_import_source_url %>">the source event</a><% end %>. Changes will be overwritten the next time the organisation syncs.
     </p>
   </div>
 <% end %>

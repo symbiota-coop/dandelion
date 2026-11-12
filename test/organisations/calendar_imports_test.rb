@@ -281,6 +281,21 @@ class OrganisationsCalendarImportsTest < ActiveSupport::TestCase
     event = @organisation.events.find_by(calendar_import_uid: 'meetup-1')
     assert_equal 'Party', event.name
     assert_nil event.purchase_url
+    assert_nil event.calendar_import_source_url
+  end
+
+  test "a feed's link to its source event can't run script on the event's edit page" do
+    create_organisation(calendar_import_urls: FEED_URL)
+    import(@organisation, ical(meetup))
+    event = @organisation.events.find_by(calendar_import_uid: 'meetup-1')
+    # As an import from before links were checked would have left it
+    event.set(calendar_import_source_url: 'javascript:window.calendarImportXss=1')
+    sign_in(@account)
+
+    visit "/e/#{event.slug}/edit"
+
+    assert page.has_content?('This event is synced from an external iCal feed')
+    assert page.has_no_link?('the source event')
   end
 
   test "scripts in an imported event's description don't run on its page" do

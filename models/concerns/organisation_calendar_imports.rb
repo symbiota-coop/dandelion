@@ -189,7 +189,8 @@ module OrganisationCalendarImports
     uid = property_text(ical_event.uid)
     uid = nil if uid.blank?
 
-    source_url = url if url.present?
+    # Only http(s): the edit page links to it, so a javascript: URL from the feed would run there
+    source_url = url if HttpUrl.valid?(url)
     source_url ||= location_text if luma_event_page_url?(location_text)
     # In-person Luma events often omit URL and put the venue in LOCATION; UID still points at the event page.
     if luma_calendar_feed && source_url.blank?
