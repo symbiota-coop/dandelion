@@ -397,11 +397,24 @@ class LintTest < Minitest::Test
     assert_empty missing, "Say why after the rule (-- reason, or Linter: reason for erb_lint, or in an ERB comment on the line above for Herb)"
   end
 
-  # CI lists its test jobs (one per test file) rather than finding them, so each test file needs to be there
+  def ci_test_groups
+    YAML.load_file(File.join(ROOT, '.github/workflows/ruby.yml'))['jobs']['test']['strategy']['matrix']['include']
+  end
+
+  # CI lists its test jobs, each a group of test files, rather than finding them, so each test file needs to be in one
   def test_ci_runs_every_test_file
-    listed = YAML.load_file(File.join(ROOT, '.github/workflows/ruby.yml'))['jobs']['test']['strategy']['matrix']['test_file']
+    listed = ci_test_groups.flat_map { |group| group['files'].split }
     files = Dir[File.join(ROOT, 'test/*_test.rb')].map { |f| File.basename(f, '_test.rb') } - ['lint']
-    assert_equal files.sort, listed.sort, 'List each test file in .github/workflows/ruby.yml, once'
+    assert_equal files.sort, listed.sort, 'Put each test file in one group in .github/workflows/ruby.yml, once'
+  end
+
+  # GitHub's Free plan runs 20 jobs at once across the organisation, and a push to master also starts the lint job,
+  # CodeQL's 3 and Sentry release's 1. More test groups than this leaves some queued until others finish, as a second wave
+  MAX_CI_TEST_GROUPS = 15
+
+  def test_ci_test_groups_fit_in_one_wave_of_jobs
+    assert_operator ci_test_groups.length, :<=, MAX_CI_TEST_GROUPS,
+                    "Only #{MAX_CI_TEST_GROUPS} CI test jobs fit in one wave: add a new test file to an existing group in .github/workflows/ruby.yml, one that runs quickly, rather than a group of its own"
   end
 
   # AGENTS.md: only edit .mcp.json, then run rake mcp:sync to write the copies other tools read

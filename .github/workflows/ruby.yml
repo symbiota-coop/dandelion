@@ -89,6 +89,7 @@ jobs:
       run: script/lint --all --only lint_test
 
   test:
+    name: test (${{ matrix.group }})
     runs-on: ubuntu-26.04
     services:
       mongodb:
@@ -97,47 +98,40 @@ jobs:
           - 27017:27017
     strategy:
       fail-fast: false
-      # One job per test file (test/*_test.rb, but lint_test.rb, which the lint job runs), listed here rather than found by a
-      # job of its own, which the tests had to wait for; test/lint_test.rb checks the list matches test/
+      # Each job runs a group of test files (test/*_test.rb, but lint_test.rb, which the lint job runs) in one process.
+      # GitHub's Free plan runs 20 jobs at once across the organisation, and a push also starts lint, CodeQL's 3 and
+      # Sentry release, so the groups are at most 15 and all start together; each is balanced to about two minutes.
+      # test/lint_test.rb checks each test file is in one group, and the number of groups
       matrix:
-        test_file:
-          - account_sign_ins
-          - accounts
-          - activities
-          - analytics_providers
-          - calendar
-          - dadmin
-          - design
-          - errands
-          - event_bookings
-          - event_boosts
-          - event_drafts
-          - event_feedbacks
-          - event_opencollective
-          - event_permissions
-          - events
-          - evergreen_events
-          - gathering_features
-          - gathering_rules
-          - gatherings
-          - how_to_create_a_gathering
-          - how_to_create_an_event
-          - images
-          - local_groups
-          - mailer
-          - mcp
-          - messages
-          - orders
-          - organisations
-          - pmails
-          - quotes
-          - resales
-          - search
-          - ticket_types
-          - tour
-          - waitlist
-          - webhooks
-          - zapier
+        include:
+          - group: accounts
+            files: accounts account_sign_ins
+          - group: calendar
+            files: calendar evergreen_events
+          - group: event_bookings
+            files: event_bookings event_opencollective
+          - group: event_permissions
+            files: event_permissions
+          - group: events
+            files: events event_drafts
+          - group: gathering_features
+            files: gathering_features gathering_rules
+          - group: gatherings
+            files: gatherings
+          - group: general
+            files: dadmin design images search errands
+          - group: integrations
+            files: mcp zapier webhooks analytics_providers
+          - group: messages
+            files: messages pmails mailer event_feedbacks
+          - group: orders
+            files: orders resales event_boosts
+          - group: organisations
+            files: organisations local_groups activities
+          - group: ticket_types
+            files: ticket_types quotes waitlist
+          - group: tours
+            files: tour how_to_create_an_event how_to_create_a_gathering
     steps:
     - name: Git checkout
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -159,15 +153,17 @@ jobs:
 
     # Production's Dragonfly runs ImageMagick, and images_test.rb checks our policy against it; the runner has none
     - name: Install ImageMagick
-      if: matrix.test_file == 'images'
+      if: contains(format(' {0} ', matrix.files), ' images ')
       run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends imagemagick
 
-    # A failing test is retried on its own (TEST_ATTEMPTS in test/test_config.rb), so the file runs again only when it
+    # A failing test is retried on its own (TEST_ATTEMPTS in test/test_config.rb), so the group runs again only when it
     # hangs past the timeout, which those retries can't catch
-    - name: Run test (${{ matrix.test_file }})
+    - name: Run tests (${{ matrix.files }})
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
+      env:
+        TEST_FILES: ${{ matrix.files }}
       with:
         timeout_minutes: 10
         max_attempts: 2
         retry_on: timeout
-        command: bundle exec rake test:${{ matrix.test_file }}
+        command: bundle exec rake test:files
