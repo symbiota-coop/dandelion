@@ -14,6 +14,20 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
                                 gender: 'Genderqueer', location: 'Stockholm', date_of_birth: Date.new(1990, 6, 15), **attrs)
   end
 
+  # An event the facilitator ran alone, without an activity, with a review from someone with a public profile. They run
+  # its organisation, as its sole admin is made an event's facilitator
+  def facilitated_event_with_feedback(facilitator)
+    organisation = FactoryBot.create(:organisation, name: 'Meadow Collective', account: facilitator)
+    event = FactoryBot.create(:event, organisation: organisation, prices: [0])
+    assert_equal [facilitator.id], event.event_facilitations.pluck(:account_id)
+    reviewer = FactoryBot.create(:account, name: 'Rae Reviewer', has_signed_in: true)
+    event.tickets.create!(account: reviewer, ticket_type: event.ticket_types.first, payment_completed: true)
+    event.event_feedbacks.create!(account: reviewer, rating: 5)
+    event
+  end
+
+  FEEDBACK_PAGES = %w[show_feedback feedback feedback_summary events].freeze
+
   def profile_row(label)
     find(:xpath, "//table//tr[td[1][normalize-space()='#{label}']]")
   end
@@ -381,5 +395,60 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
     assert last_response.ok?
     shown.each_key { |name| assert_includes last_response.body, "#{name}'s" }
     hidden.each_key { |name| refute_includes last_response.body, name }
+  end
+
+  test "the feedback on a facilitator who hid their profile, and its embeds, are refused to others but not to them" do
+    facilitator = profiled_account(name: 'Hana Hidden', hidden: true, feedback_summary: 'Wonderfully clear facilitator')
+    facilitated_event_with_feedback(facilitator)
+
+    [nil, FactoryBot.create(:account), FactoryBot.create(:account, admin: true)].each do |viewer|
+      viewer ? sign_in_with_rack(viewer) : clear_cookies
+      FEEDBACK_PAGES.each do |page|
+        get "/u/#{facilitator.username}/#{page}", {}, XHR
+        assert_equal 403, last_response.status, page
+        get "/u/#{facilitator.username}/#{page}", minimal: 1
+        assert last_response.redirect?, page
+      end
+    end
+
+    sign_in_with_rack(facilitator)
+    get "/u/#{facilitator.username}/show_feedback", {}, XHR
+    assert_includes last_response.body, 'Rae Reviewer'
+    get "/u/#{facilitator.username}/feedback", minimal: 1
+    assert_includes last_response.body, 'Rae Reviewer'
+    get "/u/#{facilitator.username}/feedback_summary", {}, XHR
+    assert_includes last_response.body, 'Wonderfully clear facilitator'
+    get "/u/#{facilitator.username}/events", minimal: 1
+    assert last_response.ok?
+  end
+
+  test "an event page doesn't offer the feedback on a facilitator who hid their profile" do
+    facilitator = profiled_account(name: 'Hana Hidden', hidden: true)
+    event = facilitated_event_with_feedback(facilitator)
+
+    visit "/e/#{event.slug}"
+    assert page.has_content?('Feedback on Meadow Collective events')
+    assert page.has_no_content?("Feedback on Hana Hidden's events")
+
+    facilitator.set(hidden: false)
+    visit "/e/#{event.slug}"
+    assert page.has_content?("Feedback on Hana Hidden's events")
+    assert page.has_content?('Rae Reviewer')
+  end
+
+  test "the feedback on a facilitator who never signed in stays public, with its embeds" do
+    facilitator = FactoryBot.create(:account, name: 'Nev Never Signed In', feedback_summary: 'Wonderfully clear facilitator')
+    assert facilitator.private?
+    refute facilitator.hidden?
+    facilitated_event_with_feedback(facilitator)
+
+    get "/u/#{facilitator.username}/show_feedback", {}, XHR
+    assert_includes last_response.body, 'Rae Reviewer'
+    get "/u/#{facilitator.username}/feedback", minimal: 1
+    assert_includes last_response.body, 'Rae Reviewer'
+    get "/u/#{facilitator.username}/feedback_summary", {}, XHR
+    assert_includes last_response.body, 'Wonderfully clear facilitator'
+    get "/u/#{facilitator.username}/events", minimal: 1
+    assert last_response.ok?
   end
 end

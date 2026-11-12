@@ -8,7 +8,7 @@
     <h3 class="card-header chill">Feedback on <%= @event.activity.name %> events</h3>
     <div class="card-body pt-2" data-pagelet-url="<%= @event.activity.path %>/show_feedback"></div>
   </div>
-<% elsif @event.event_facilitations.count == 1 && (account = @event.event_facilitators.first).public_event_feedbacks_as_facilitator.exists? %>
+<% elsif @event.event_facilitations.count == 1 && profile_not_hidden?(account = @event.event_facilitators.first) && account.public_event_feedbacks_as_facilitator.exists? %>
   <div class="card mt-3" id="feedback">
     <h3 class="card-header chill">Feedback on <%= account.name %>'s events</h3>
     <div class="card-body pt-2" data-pagelet-url="/u/<%= account.username %>/show_feedback"></div>

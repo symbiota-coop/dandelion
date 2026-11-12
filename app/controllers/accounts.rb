@@ -377,6 +377,7 @@ Dandelion::App.controller do
 
   get '/u/:username/feedback_summary' do
     @account = account_from_params
+    kick! unless profile_not_hidden?(@account)
     partial :'event_feedbacks/feedback_summary', locals: { contents_only: true }
   end
 
@@ -493,6 +494,7 @@ Dandelion::App.controller do
 
   get '/u/:username/show_feedback' do
     @account = account_from_params
+    kick! unless profile_not_hidden?(@account)
     partial :'event_feedbacks/event_feedbacks', locals: { event_feedbacks: @account.public_event_feedbacks_as_facilitator }
   end
 
@@ -500,11 +502,13 @@ Dandelion::App.controller do
 
   get '/u/:username/feedback' do
     @account = account_from_params
+    kick! unless profile_not_hidden?(@account)
     erb :'accounts/feedback', layout: (params[:minimal] ? 'minimal' : nil)
   end
 
   get '/u/:username/events' do
     @account = account_from_params
+    kick! unless profile_not_hidden?(@account)
     events = Event.and(:id.in => EventFacilitation.and(:account_id.in => [@account.id] + @account.following_starred.pluck(:id)).pluck(:event_id)).live.publicly_visible.future.and(hidden_from_homepage: false).with_key_includes
     partial :'events/blocks', locals: { events: events }, layout: 'minimal'
   end

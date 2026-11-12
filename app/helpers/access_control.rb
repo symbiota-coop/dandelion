@@ -12,7 +12,17 @@ Dandelion::App.helpers do
 
   # A private profile (Account#private?) is visible only to its own account, and so are the lists on it
   def profile_viewable?(account)
-    !account.private? || (current_account && current_account.id == account.id)
+    !account.private? || own_account?(account)
+  end
+
+  # What an account shows even before it signs in, like its feedback as a facilitator and the embeds of it, is refused
+  # only when the account chose to hide its profile (hidden), not when it counts as private for never having signed in
+  def profile_not_hidden?(account)
+    !account.hidden? || own_account?(account)
+  end
+
+  def own_account?(account)
+    current_account && current_account.id == account.id
   end
 
   def kick!(notice: "You don't have access to that page", redirect_url: nil, notice_type: :error)
