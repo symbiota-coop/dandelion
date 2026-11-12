@@ -189,6 +189,27 @@ class GatheringBudgetTest < ActiveSupport::TestCase
     assert_equal 100, membership.reload.requested_contribution
   end
 
+  test "a member can't be moved into an option that's full, but stays in a full one when it's saved again" do
+    create_gathering(privacy: 'open')
+    member = create_member
+    other = create_member(name: 'Other Person')
+    tent = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account)
+    cabin = @gathering.options.create!(name: 'Cabin', type: 'Accommodation', capacity: 1, account: @account)
+    cabin.optionships.create!(account: other, gathering: @gathering)
+    optionship = tent.optionships.create!(account: member, gathering: @gathering)
+    full_optionship = cabin.optionships.find_by(account: other)
+
+    sign_in_with_rack(@account)
+    post gathering_path("/optionships/#{optionship.id}/edit"), optionship: { option_id: cabin.id }
+    assert last_response.ok?
+    assert_includes last_response.body, 'is full'
+    assert_equal tent.id, optionship.reload.option_id
+
+    post gathering_path("/optionships/#{full_optionship.id}/edit"), optionship: { option_id: cabin.id }
+    assert last_response.redirect?
+    assert_equal cabin.id, full_optionship.reload.option_id
+  end
+
   test "only the gathering's admins edit its members' options, and paid options themselves" do
     create_gathering(privacy: 'open')
     member = create_member

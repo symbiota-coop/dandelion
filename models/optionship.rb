@@ -16,7 +16,8 @@ class Optionship
 
   before_validation do
     self.membership = gathering.memberships.find_by(account: account) if gathering && account && membership&.account_id != account_id
-    errors.add(:option, 'is full') if option && option.capacity && (option.optionships.count == option.capacity)
+    # Only someone joining it fills it: one of its members, saved again, keeps their place
+    errors.add(:option, 'is full') if option && option.capacity && (new_record? || option_id_changed?) && (option.optionships.count >= option.capacity)
   end
 
   validates_same_parent :option, via: :gathering
