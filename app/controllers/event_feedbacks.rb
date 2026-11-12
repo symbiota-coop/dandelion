@@ -51,6 +51,7 @@ Dandelion::App.controller do
   end
 
   get '/event_feedbacks/feedback', provides: :txt do
+    sign_in_required!
     current_account.event_feedbacks_as_facilitator.joined
   end
 

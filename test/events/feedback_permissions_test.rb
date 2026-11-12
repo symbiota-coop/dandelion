@@ -286,6 +286,8 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
 
     get '/event_feedbacks/report'
     assert last_response.redirect?
+    get '/event_feedbacks/feedback.txt'
+    assert last_response.redirect?
 
     sign_in_with_rack(stranger)
     get '/event_feedbacks/feedback.txt'
