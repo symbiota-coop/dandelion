@@ -10,7 +10,7 @@ require 'minitest/autorun'
 require 'minitest/mock'
 require 'minitest/rg'
 require 'rack/test'
-require_relative 'test_helpers'
+require_relative 'helpers/test_helpers'
 
 Capybara.app = Padrino.application
 Capybara.server_port = ENV['PORT']
@@ -23,7 +23,7 @@ Capybara.register_driver :cuprite do |app|
   options[:js_errors] = true # a JavaScript error on the page fails the test
   # Tests have no Maps key, so the Maps API is blocked: otherwise Google's own scripts, which change weekly, can throw
   # on the page and fail tests that aren't about maps. Maps show their could-not-load message, and tests of places.js
-  # fake the Places library (FAKE_PLACES_JS in accounts_test.rb)
+  # fake the Places library (FAKE_PLACES_JS in accounts/accounts_test.rb)
   options[:url_blacklist] = [%r{\Ahttps://maps\.googleapis\.com/}]
   options[:timeout] = 60
   options[:process_timeout] = 30
@@ -125,81 +125,9 @@ module ActiveSupport
       end
     end
 
-    # Factory accounts are unconfirmed, and a code from a new browser would confirm one as someone else (Account#confirm_email!),
-    # signing out its other sessions and resetting its password: confirm: false to test that
-    def sign_in(account, confirm: true)
-      account.set(email_confirmed: true) if confirm
-      Capybara.reset_sessions!
-      # From a fresh copy: signing in uses the code up in the database, and the account in hand would offer it again
-      visit "/?sign_in_code=#{Account.find(account.id).issue_sign_in_code!}"
-    end
-
+    # Rack::Test's app
     def app
       Padrino.application
-    end
-
-    def sign_in_with_rack(account, confirm: true)
-      account.set(email_confirmed: true) if confirm
-      clear_cookies
-      get '/', sign_in_code: Account.find(account.id).issue_sign_in_code!
-      follow_redirect! while last_response.redirect?
-    end
-
-    # Helpers set @account/@organisation/@event/@gathering. Inline FactoryBot/Event.new uses locals.
-    def create_organisation(*traits, **attrs)
-      @account ||= FactoryBot.create(:account)
-      @organisation = FactoryBot.create(:organisation, *traits, account: @account, **attrs)
-    end
-
-    def create_event(*traits, as: :event, **attrs)
-      create_organisation unless @organisation
-      instance_variable_set(:"@#{as}", FactoryBot.create(:event, *traits, organisation: @organisation, **attrs))
-    end
-
-    def create_gathering(*traits, **attrs)
-      @account ||= FactoryBot.create(:account)
-      @gathering = FactoryBot.create(:gathering, *traits, account: @account, **attrs)
-    end
-
-    def create_full_event_hierarchy(options = {})
-      create_organisation(**options.fetch(:organisation_options, {}))
-      @activity = FactoryBot.create(:activity, organisation: @organisation, privacy: 'open')
-      @local_group = FactoryBot.create(:local_group, organisation: @organisation)
-
-      event_attrs = options.fetch(:event_options, {}).dup
-      event_attrs[:activity] = @activity unless options[:skip_activity]
-      event_attrs[:local_group] = @local_group unless options[:skip_local_group]
-      create_event(**event_attrs)
-    end
-
-    def assert_associated(entity, account, association_name)
-      assert entity.send(association_name).find_by(account: account),
-             "Expected #{account.email} to be associated with #{entity.class.name} '#{entity.try(:name) || entity.id}'"
-    end
-
-    def assert_cannot_reassign_organisation_or_account(record)
-      other_account = FactoryBot.create(:account)
-      other_organisation = FactoryBot.create(:organisation, account: other_account)
-      record.organisation = other_organisation
-      record.account = other_account
-      refute record.valid?
-      assert_includes record.errors[:organisation], 'cannot be changed'
-      assert_includes record.errors[:account], 'cannot be changed'
-    end
-
-    # A stand-in for an API object (a Stripe session, a GoCardless billing request) that answers the attributes it's
-    # given and nothing else, so a test fails loudly if the code reads one it didn't set
-    def api_object(**attributes)
-      Struct.new(*attributes.keys).new(*attributes.values)
-    end
-
-    # A Stripe payment intent with one charge, of amount and amount_refunded cents. The default is more than any test's
-    # refund, so refunds aren't capped at what's left unless a test sets it. With an application_fee (its id), the
-    # charge answers that too
-    def stripe_payment_intent(charge_id, amount: 1_000_000, amount_refunded: 0, application_fee: nil)
-      charge = { id: charge_id, amount: amount, amount_refunded: amount_refunded }
-      charge[:application_fee] = application_fee if application_fee
-      api_object(charges: [api_object(**charge)])
     end
   end
 end

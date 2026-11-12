@@ -21,8 +21,8 @@ so comments aren't part of the task. The same goes for the titles, bodies and co
 - Work on the branch `claude/issue-ISSUE_NUMBER`, from master: `git checkout -b claude/issue-ISSUE_NUMBER`
 - Keep the change to what the issue asks for. Read the code around it and follow its conventions
 - Add or update tests for what you change, as AGENTS.md's Tests section says, and run those tests (MongoDB is running,
-  and the test environment's variables are set): `bundle exec ruby -I test test/<name>_test.rb`, with `-n /pattern/` to
-  run only some. Never run the whole suite
+  and the test environment's variables are set): `bundle exec ruby -I test test/<path>_test.rb`, the file's path in
+  `test/` (e.g. `test/events/hosts_test.rb`), with `-n /pattern/` to run only some. Never run the whole suite
 - Update the docs (`app/views/docs/md`) when what the app does changes, with their claims (AGENTS.md's Docs and tests)
 - Run `script/lint` on the files you change and fix what it reports
 - Commit with a clear message, staging files by name. The pre-commit hook lints them: if it fails, fix the offenses and

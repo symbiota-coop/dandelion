@@ -407,7 +407,7 @@ class LintTest < Minitest::Test
   # CI lists its test jobs, each a group of test files, rather than finding them, so each test file needs to be in one
   def test_ci_runs_every_test_file
     listed = ci_test_groups.flat_map { |group| group['files'].split }
-    files = Dir[File.join(ROOT, 'test/*_test.rb')].map { |f| File.basename(f, '_test.rb') } - ['lint']
+    files = Dir[File.join(ROOT, 'test/**/*_test.rb')].map { |f| f.delete_prefix(File.join(ROOT, 'test/')).delete_suffix('_test.rb') } - ['lint']
     assert_equal files.sort, listed.sort, 'Put each test file in one group in .github/workflows/ruby.yml, once'
   end
 
@@ -488,9 +488,9 @@ class LintTest < Minitest::Test
     assert_empty duplicates, 'Give each claim on a page its own id'
     claims = claims.to_h { |c| [c[:ref], c] }
 
-    covers = Dir[File.join(ROOT, 'test/*_test.rb')].flat_map do |path|
+    covers = Dir[File.join(ROOT, 'test/**/*_test.rb')].flat_map do |path|
       File.readlines(path, encoding: 'UTF-8').each_with_index.flat_map do |line, index|
-        line[/\A\s*covers ('.+)/, 1].to_s.scan(/'([^']*)'/).flatten.map { |ref| [ref, "test/#{File.basename(path)}:#{index + 1}"] }
+        line[/\A\s*covers ('.+)/, 1].to_s.scan(/'([^']*)'/).flatten.map { |ref| [ref, "#{path.delete_prefix("#{ROOT}/")}:#{index + 1}"] }
       end
     end
     problems = covers.filter_map do |ref, at|

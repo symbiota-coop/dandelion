@@ -98,40 +98,43 @@ jobs:
           - 27017:27017
     strategy:
       fail-fast: false
-      # Each job runs a group of test files (test/*_test.rb, but lint_test.rb, which the lint job runs) in one process.
+      # Each job runs a group of test files (test/**/*_test.rb, named by their path in test/, but lint_test.rb, which the
+      # lint job runs) in one process.
       # GitHub's Free plan runs 20 jobs at once across the organisation, and a push also starts lint, CodeQL's 3 and
       # Sentry release, so the groups are at most 15 and all start together; each is balanced to about two minutes.
       # test/lint_test.rb checks each test file is in one group, and the number of groups
       matrix:
         include:
           - group: accounts
-            files: accounts account_sign_ins
+            files: accounts/accounts accounts/sign_ins accounts/email_confirmation accounts/provider_sign_ins
           - group: calendar
-            files: calendar evergreen_events
+            files: events/calendar events/evergreen events/listings
           - group: event_bookings
-            files: event_bookings event_opencollective
+            files: bookings/bookings bookings/rules events/opencollective
           - group: event_permissions
-            files: event_permissions
+            files: events/permissions events/cohost_permissions
           - group: events
-            files: events event_drafts
+            files: events/events events/drafts events/content_safety events/hosts
           - group: gathering_features
-            files: gathering_features gathering_rules
+            files: gatherings/features gatherings/rules
           - group: gatherings
-            files: gatherings
+            files: gatherings/gatherings
           - group: general
             files: dadmin design images search errands
           - group: integrations
-            files: mcp zapier webhooks analytics_providers
+            files: integrations/mcp integrations/mcp_checkout integrations/zapier integrations/webhooks integrations/analytics_providers
           - group: messages
-            files: messages pmails mailer event_feedbacks
+            files: messages/messages messages/pmails messages/mailer events/feedbacks events/discussions
           - group: orders
-            files: orders resales event_boosts
+            files: orders/orders orders/tokens bookings/resales events/boosts
           - group: organisations
-            files: organisations local_groups activities
+            files: organisations/organisations organisations/caches organisations/followers organisations/local_groups organisations/activities
+          - group: payments
+            files: payments/gocardless payments/mollie payments/paypal orders/refunds bookings/donations organisations/payments
           - group: ticket_types
-            files: ticket_types quotes waitlist
+            files: bookings/ticket_types bookings/quotes bookings/waitlist
           - group: tours
-            files: tour how_to_create_an_event how_to_create_a_gathering
+            files: tours/tour tours/how_to_create_an_event tours/how_to_create_a_gathering
     steps:
     - name: Git checkout
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
