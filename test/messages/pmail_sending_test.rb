@@ -115,6 +115,27 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
     assert_equal [@account.email, member.email].sort, recipients_of(pmail)
   end
 
+  test "a mail to an activity tag goes to the members of the organisation's activities with that tag, not another organisation's" do
+    create_organisation
+    link_mailgun
+    tag = ActivityTag.create!(name: 'yoga')
+    activity = FactoryBot.create(:activity, organisation: @organisation)
+    ActivityTagship.create!(activity: activity, activity_tag: tag)
+    member = FactoryBot.create(:account)
+    activity.activityships.create!(account: member)
+    other_activity = FactoryBot.create(:activity, organisation: FactoryBot.create(:organisation))
+    ActivityTagship.create!(activity: other_activity, activity_tag: tag)
+    other_member = FactoryBot.create(:account)
+    other_activity.activityships.create!(account: other_member)
+
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: "activity_tag:#{tag.id}")
+
+    recipients = recipients_of(pmail)
+    assert_includes recipients, member.email
+    assert_not_includes recipients, other_member.email
+    assert_not_includes recipients, other_activity.account.email
+  end
+
   test "a mail to an event's attendees goes to its ticket holders, including tickets with only an email, and not to its organisation's followers" do
     create_event
     ticket_type = FactoryBot.create(:ticket_type, event: @event, quantity: 10)

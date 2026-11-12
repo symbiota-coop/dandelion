@@ -17,8 +17,10 @@ class ActivityTag
     ActivityTag.and(:id.in => ActivityTagship.pluck(:activity_tag_id)).order('name asc').pluck(:name).map { |name| Sanitize.fragment(name).gsub('&amp;', '&') }
   end
 
-  def subscribed_members
-    Account.and(:id.in => Activityship.and(:activity_id.in => activity_ids).and(unsubscribed: false).pluck(:account_id))
+  # Every organisation's activities share a tag, so only the members of this organisation's activities with it
+  def subscribed_members(organisation)
+    tagged_activity_ids = organisation.activities.and(:id.in => activity_ids).pluck(:id)
+    Account.and(:id.in => Activityship.and(:activity_id.in => tagged_activity_ids).and(unsubscribed: false).pluck(:account_id))
   end
 
   before_validation do

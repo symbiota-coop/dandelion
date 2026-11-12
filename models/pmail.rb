@@ -187,7 +187,8 @@ class Pmail
         when 'ticket_type_waitlist' then ticket_type ? mailable.ticket_type_waiters(ticket_type_id: ticket_type_id) : Account.and(:id.in => [])
         when 'all_ticket_type_waitlists' then mailable.ticket_type_waiters
         when 'waitlist' then mailable.waiters
-        when 'activity', 'activity_tag', 'local_group', 'event' then mailable.subscribed_members
+        when 'activity_tag' then mailable.subscribed_members(organisation)
+        when 'activity', 'local_group', 'event' then mailable.subscribed_members
         end
     t = t.and(:id.nin => event.attendee_ids) if event
     t = t.and(:id.nin => activity.future_attendees.pluck(:id)) if activity
