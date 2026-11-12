@@ -255,6 +255,33 @@ class EventAdminReportsTest < ActiveSupport::TestCase
     refute @event.reload.hidden_from_homepage?
   end
 
+  test 'event admins are not offered hiding their event from the homepage' do
+    create_event(prices: [0], name: 'Hideable Gathering')
+    sign_in(@account)
+    visit '/events'
+    find('.block', text: 'Hideable Gathering').hover
+    assert page.has_link?('Hideable Gathering')
+    assert page.has_no_css?("a[href='/e/#{@event.slug}/do_hide_from_homepage']")
+  end
+
+  test 'only site admins can hide or show an event on the homepage, so event admins can not undo a hide' do
+    create_event(prices: [0])
+    sign_in_with_rack(@account)
+
+    post "/e/#{@event.slug}/do_hide_from_homepage"
+    assert last_response.redirect?
+    refute @event.reload.hidden_from_homepage?
+
+    @event.set(hidden_from_homepage: true)
+    get "/e/#{@event.slug}/hide_from_homepage"
+    assert last_response.redirect?
+    post "/e/#{@event.slug}/unhide_from_homepage"
+    assert last_response.redirect?
+    error = assert_raises(RuntimeError) { post "/e/#{@event.slug}/edit", event: { hidden_from_homepage: '0' } }
+    assert_match(/are protected/, error.message)
+    assert @event.reload.hidden_from_homepage?
+  end
+
   # Email previews
 
   test 'an event admin previews the confirmation, reminder and feedback request emails without any being sent' do
