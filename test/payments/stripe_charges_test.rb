@@ -280,6 +280,20 @@ class PaymentsStripeChargesTest < ActiveSupport::TestCase
                   partly_refunded.donations].map(&:format)
   end
 
+  test 'a charge with no application fee refunded below its donation, or in full, has no ticket revenue, rather than less than none' do
+    create_event(prices: [30], currency: 'GBP')
+    mostly_refunded = charge('ch_mostly_refunded', balance_float: 3, de_donation_revenue: 5)
+    refunded = charge('ch_refunded', balance_float: 0, de_donation_revenue: 5)
+
+    # Ticket revenue, to the organisation, donations: what's left of the balance is the donation's
+    figures = [mostly_refunded, refunded].map do |stripe_charge|
+      [stripe_charge.ticket_revenue, stripe_charge.ticket_revenue_to_organisation, stripe_charge.donations].map(&:format)
+    end
+    assert_equal [%w[£0.00 £0.00 £3.00], %w[£0.00 £0.00 £0.00]], figures
+    event = Event.find(@event.id)
+    assert_equal %w[£3.00 £0.00 £3.00], [event.stripe_revenue, event.stripe_ticket_revenue, event.stripe_donations].map(&:format)
+  end
+
   test 'a charge shared with a revenue sharer splits its ticket revenue by the application fee, in proportion to what is left of it' do
     create_event(prices: [30], currency: 'GBP')
     # £30 paid, £20 of it to the revenue sharer, so the organisation's balance is the £10 application fee: £5 of tickets

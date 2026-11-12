@@ -121,7 +121,8 @@ class StripeCharge
         Money.new(0, currency)
       end
     else
-      balance - de_donation_revenue_money
+      # What's left once the donation, which a refund takes from last, has had its share
+      balance - donations
     end
   end
 
