@@ -140,7 +140,7 @@ jobs:
           - group: ticket_types
             files: bookings/ticket_types bookings/quotes bookings/waitlist bookings/discount_codes
           - group: tours
-            files: tours/tour tours/how_to_create_an_event tours/how_to_create_a_gathering
+            files: tours/tour tours/how_to_create_an_event tours/how_to_create_a_gathering gatherings/timetables gatherings/rotas gatherings/budget
     steps:
     - name: Git checkout
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
