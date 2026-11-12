@@ -346,4 +346,26 @@ class MarkupHelpersTest < ActiveSupport::TestCase
     find('.ticket-type-description a', text: 'handlers').hover
     assert_xss_did_not_run
   end
+
+  test 'md and message_html drop style elements, which would restyle the whole page' do
+    css = '<style>body { background-color: black; color: black } .message-thread { width: 0 }</style>'
+
+    [helpers.md("#{css}\n\nText"), message_html("#{css}Text")].each do |html|
+      assert_empty fragment(html).css('style')
+      refute_includes html, 'background-color'
+      assert_includes html, 'Text'
+    end
+  end
+
+  test 'a message with a style element does not restyle the thread' do
+    account = FactoryBot.create(:account)
+    other = FactoryBot.create(:account)
+    [account, other].each { |a| a.set(email_confirmed: true, can_message: true) }
+    Message.create!(messenger: other, messengee: account, body: 'Restyling<style>body { background-color: rgb(1, 2, 3) }</style>')
+
+    sign_in(account)
+    visit "/messages/#{other.username}"
+    assert find('.message-thread').has_content?('Restyling')
+    refute_equal 'rgb(1, 2, 3)', page.evaluate_script('getComputedStyle(document.body).backgroundColor')
+  end
 end

@@ -18,8 +18,10 @@ module RichTextClasses
   end
 end
 
+# No <style> elements, which RELAXED allows: their rules (even with only the properties below) would apply to the whole
+# page, letting someone's message or description restyle or hide the page around it
 Sanitize::Config::DANDELION = Sanitize::Config.merge(Sanitize::Config::RELAXED,
-                                                     elements: Sanitize::Config::RELAXED[:elements] + %w[oembed],
+                                                     elements: Sanitize::Config::RELAXED[:elements] - %w[style] + %w[oembed],
                                                      attributes: Sanitize::Config::RELAXED[:attributes].merge(
                                                        {
                                                          :all => %w[class target],
