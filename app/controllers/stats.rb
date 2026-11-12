@@ -102,6 +102,7 @@ Dandelion::App.controller do
   get '/stats/indexes' do
     @indexes = index_stats
     @indexes = @indexes.select { |index| index[:unused] } if params[:unused]
+    @indexes = @indexes.select { |index| index[:ttl] } if params[:ttl]
     erb :'stats/indexes'
   end
 

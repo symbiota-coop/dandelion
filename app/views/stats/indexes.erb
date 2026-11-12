@@ -6,6 +6,7 @@
 
 <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>
   <%= checkbox 'Unused only', slug: 'unused' %>
+  <%= checkbox 'TTL only', slug: 'ttl' %>
 <% end %>
 
 <% unused = @indexes.select { |index| index[:unused] } %>

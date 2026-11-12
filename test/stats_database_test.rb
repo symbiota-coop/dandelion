@@ -19,6 +19,14 @@ class StatsDatabaseTest < ActiveSupport::TestCase
     within('tr', text: /\Aaccounts\b/) { assert page.has_no_content? 'No model' }
   end
 
+  test "collections a gem's model uses, like delayed_job's, aren't flagged" do
+    Delayed::Job.create!(handler: '--- !ruby/object:Object {}')
+    sign_in(FactoryBot.create(:account, admin: true))
+
+    visit '/stats/collections'
+    within('tr', text: Delayed::Job.collection.name) { assert page.has_no_content? 'No model' }
+  end
+
   test 'an admin sees indexes, with unused ones flagged and TTL ones not' do
     Mongoid.default_client[:leftover_things].indexes.create_one({ name: 1 }, name: 'leftover_name')
     Mongoid.default_client[:leftover_things].indexes.create_one({ created_at: 1 }, name: 'created_at_ttl', expire_after: 3600)
@@ -35,6 +43,13 @@ class StatsDatabaseTest < ActiveSupport::TestCase
     assert page.has_field? 'unused', checked: true
     assert page.has_content? 'leftover_name'
     assert page.has_no_content? 'created_at_ttl'
+
+    uncheck 'Unused only'
+    assert page.has_field? 'unused', checked: false
+    check 'TTL only'
+    assert page.has_field? 'ttl', checked: true
+    assert page.has_content? 'created_at_ttl'
+    assert page.has_no_content? 'leftover_name'
   end
 
   test 'an admin drops an unused index' do
