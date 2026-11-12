@@ -273,6 +273,19 @@ class IntegrationsAtprotoEventsTest < ActiveSupport::TestCase
     assert_nil @event.reload.atproto_uri
   end
 
+  test 'deleting a published event deletes its record' do
+    published_event
+    uri = @event.atproto_uri
+    with_atproto do
+      @event.destroy
+      run_jobs
+    end
+
+    assert Event.unscoped.find(@event.id).deleted?
+    assert_equal [:create, :delete], organisation_client.actions
+    assert_equal [uri], organisation_client.uris(:delete)
+  end
+
   test "a network failure when publishing is reported, doesn't stop the event saving, and the nightly sync publishes it" do
     connected_organisation
     organisation_client.failure = Faraday::ConnectionFailed.new('Connection refused')

@@ -22,7 +22,7 @@ module EventAtproto
   included do
     after_create :publish_to_atproto, if: :should_publish_to_atproto?
     after_update :update_atproto, if: :should_update_atproto?
-    before_destroy :delete_atproto, if: :atproto_uri?
+    before_destroy :delete_atproto_once_deleted, if: :atproto_uri?
 
     handle_asynchronously :publish_to_atproto
     handle_asynchronously :update_atproto
@@ -68,6 +68,12 @@ module EventAtproto
     return AtprotoClient.new if ENV['ATPROTO_DID'] == record_did
 
     nil
+  end
+
+  # Destroying an event soft-deletes it (Mongoid::Paranoia), and the worker loads a delayed method's event with
+  # Event.find, which skips deleted events, so a delayed delete_atproto would do nothing: the job finds it itself
+  def delete_atproto_once_deleted
+    Event.delay.delete_atproto_of_deleted(id)
   end
 
   def atproto_fields_changed?
@@ -220,6 +226,10 @@ module EventAtproto
   end
 
   class_methods do
+    def delete_atproto_of_deleted(event_id)
+      Event.unscoped.find(event_id)&.delete_atproto_without_delay
+    end
+
     # Sync events created or modified in the last X hours to AT Protocol
     # Useful for catching up after AT Protocol endpoints were temporarily offline
     #
