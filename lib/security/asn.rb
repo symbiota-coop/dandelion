@@ -238,8 +238,7 @@ module Asn
     return true if current.include?(asn.to_s)
 
     new_expression = "#{rule['expression']} or (ip.src.asnum eq #{asn})"
-    update_rule!(rule, new_expression)
-    true
+    rule_updated?(update_rule!(rule, new_expression))
   end
 
   def self.unblock!(asn)
@@ -252,8 +251,12 @@ module Asn
     return if remaining.empty?
 
     new_expression = remaining.map { |a| "(ip.src.asnum eq #{a})" }.join(' or ')
-    update_rule!(rule, new_expression)
-    true
+    rule_updated?(update_rule!(rule, new_expression))
+  end
+
+  # Whether Cloudflare accepted a rule update, so an admin isn't told a block or unblock worked when it didn't
+  def self.rule_updated?(response)
+    response.is_a?(Hash) && response['success'] == true
   end
 
   def self.autoblock

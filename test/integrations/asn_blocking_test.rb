@@ -274,6 +274,17 @@ class IntegrationsAsnBlockingTest < ActiveSupport::TestCase
     end
   end
 
+  test 'blocking and unblocking report it when Cloudflare refuses the change' do
+    sign_in_with_rack(FactoryBot.create(:account, admin: true))
+    with_cloudflare(rule_answer: rule('64500', '64501'), patch_answer: { 'success' => false, 'errors' => [{ 'message' => 'invalid expression' }] }) do |calls|
+      post '/stats/asns/block/64502'
+      assert_equal 400, last_response.status
+      post '/stats/asns/unblock/64500'
+      assert_equal 400, last_response.status
+      assert_equal 2, calls[:patches].length
+    end
+  end
+
   test "an ASN that isn't a number is refused, so it can't add a clause to the rule" do
     sign_in_with_rack(FactoryBot.create(:account, admin: true))
     with_cloudflare(rule_answer: rule('64500', '64501')) do |calls|
