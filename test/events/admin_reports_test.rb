@@ -170,6 +170,9 @@ class EventAdminReportsTest < ActiveSupport::TestCase
     @event.donations.create!(account: donor, order: order, amount: 12.5, payment_completed: true)
     dandelion_order = @event.orders.create!(account: dandelion_donor, currency: 'EUR', value: 5, payment_completed: true, application_fee_paid_to_dandelion: true)
     @event.donations.create!(account: dandelion_donor, order: dandelion_order, amount: 5, payment_completed: true)
+    # A donation whose order is still being paid for is listed, but not counted as received
+    pending_donor = FactoryBot.create(:account, name: 'Penny Pending')
+    @event.donations.create!(account: pending_donor, order: @event.orders.create!(account: pending_donor, currency: 'EUR', value: 20), amount: 20)
     other_event = FactoryBot.create(:event, organisation: @organisation, currency: 'EUR')
     other_donor = FactoryBot.create(:account, name: 'Otto Other')
     other_event.donations.create!(account: other_donor, order: other_event.orders.create!(account: other_donor, currency: 'EUR', value: 7, payment_completed: true),
@@ -177,11 +180,13 @@ class EventAdminReportsTest < ActiveSupport::TestCase
 
     sign_in(@account)
     visit "/e/#{@event.slug}/donations"
-    # Donations to Dandelion don't reach the event's organisers
+    # Donations to Dandelion don't reach the event's organisers, and nor has a donation not yet paid for
     assert page.has_content?('Received €12,50 in donations from this event.')
-    assert page.has_content?('Displaying all 2 donations')
+    assert page.has_content?('Displaying all 3 donations')
     assert_equal '€12,50', find('tr', text: 'Dee Donor').all('td')[1].text.squish
     assert_equal '€5 to Dandelion', find('tr', text: 'Dan Delion').all('td')[1].text.squish
+    assert_equal '€20', find('tr', text: 'Penny Pending').all('td')[1].text.squish
+    assert find('tr', text: 'Penny Pending').has_css?('.bi-arrow-repeat')
     assert page.has_no_content?('Otto Other')
   end
 

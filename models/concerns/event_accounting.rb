@@ -30,7 +30,7 @@ module EventAccounting
 
   # The fields of an event's tickets and donations that its sums and the stats table read, plucked rather than loaded
   TICKET_ACCOUNTING_FIELDS = %i[discounted_price organisation_revenue_share currency payment_completed transferred checked_in account_id ticket_type_id made_available_at].freeze
-  DONATION_ACCOUNTING_FIELDS = %i[amount currency transferred application_fee_paid_to_dandelion].freeze
+  DONATION_ACCOUNTING_FIELDS = %i[amount currency payment_completed transferred application_fee_paid_to_dandelion].freeze
   TicketAccountingRow = Struct.new(*TICKET_ACCOUNTING_FIELDS)
   DonationAccountingRow = Struct.new(*DONATION_ACCOUNTING_FIELDS)
 
@@ -272,8 +272,7 @@ module EventAccounting
     instance_var = skip_transferred ? :@donation_revenue_without_transferred : :@donation_revenue
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
-      donations = skip_transferred ? donation_accounting_rows.select { |donation| donation.transferred == false } : donation_accounting_rows
-      donations.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
+      complete_donation_rows(skip_transferred: skip_transferred).each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -284,8 +283,7 @@ module EventAccounting
     instance_var = skip_transferred ? :@donation_revenue_less_application_fees_without_transferred : :@donation_revenue_less_application_fees
     instance_variable_get(instance_var) || instance_variable_set(instance_var, begin
       r = Money.new(0, currency)
-      donations = skip_transferred ? donation_accounting_rows.select { |donation| donation.transferred == false } : donation_accounting_rows
-      donations.select { |donation| donation.application_fee_paid_to_dandelion == false }.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
+      complete_donation_rows(skip_transferred: skip_transferred).select { |donation| donation.application_fee_paid_to_dandelion == false }.each { |donation| r += Money.new((donation.amount || 0) * 100, donation.currency) }
       r
     rescue Money::Bank::UnknownRate, Money::Currency::UnknownCurrency
       Money.new(0, ENV['DEFAULT_CURRENCY'])
@@ -337,6 +335,12 @@ module EventAccounting
   end
 
   private
+
+  # The donations whose payment completed, as ticket revenue counts only paid tickets: a donation is created with its
+  # order, before the order is paid for
+  def complete_donation_rows(skip_transferred: false)
+    donation_accounting_rows.select { |donation| donation.payment_completed == true && (!skip_transferred || donation.transferred == false) }
+  end
 
   # The sum of field over the orders accounted for, in the event's currency, or nothing in the default currency if
   # an order's currency can't be converted

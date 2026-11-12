@@ -209,4 +209,34 @@ class EventBookingDonationsTest < ActiveSupport::TestCase
     order = @event.orders.unscoped.find_by(account: victim)
     assert_nil order&.credit_applied
   end
+
+  # Totals
+
+  test "an event's donation totals count only paid donations, as its ticket revenue counts only paid tickets" do
+    create_event(prices: [10])
+    donor = FactoryBot.create(:account)
+    paid_order = @event.orders.create!(account: donor, currency: 'GBP', value: 5, payment_completed: true)
+    @event.donations.create!(account: donor, order: paid_order, amount: 5, payment_completed: true)
+    unpaid_order = @event.orders.create!(account: donor, currency: 'GBP', value: 20)
+    @event.donations.create!(account: donor, order: unpaid_order, amount: 20)
+    dandelion_order = @event.orders.create!(account: donor, currency: 'GBP', value: 3, payment_completed: true, application_fee_paid_to_dandelion: true)
+    @event.donations.create!(account: donor, order: dandelion_order, amount: 3, payment_completed: true)
+
+    event = Event.find(@event.id)
+    assert_equal Money.new(800, 'GBP'), event.donation_revenue
+    assert_equal Money.new(800, 'GBP'), event.donation_revenue(skip_transferred: true)
+    assert_equal Money.new(500, 'GBP'), event.donation_revenue_less_application_fees_paid_to_dandelion
+    assert_equal Money.new(800, 'GBP'), event.revenue
+
+    # The stats table reads the same totals from rows read for many events at once
+    preloaded = Event.preload_stats(Event.and(id: @event.id)).first
+    assert_equal Money.new(800, 'GBP'), preloaded.donation_revenue
+    assert_equal Money.new(500, 'GBP'), preloaded.donation_revenue_less_application_fees_paid_to_dandelion
+
+    # Once the order is paid for, its donation counts
+    unpaid_order.payment_completed!
+    event = Event.find(@event.id)
+    assert_equal Money.new(2800, 'GBP'), event.donation_revenue
+    assert_equal Money.new(2500, 'GBP'), event.donation_revenue_less_application_fees_paid_to_dandelion
+  end
 end
