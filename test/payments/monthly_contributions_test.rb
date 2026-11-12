@@ -15,15 +15,17 @@ class PaymentsMonthlyContributionsTest < ActiveSupport::TestCase
     end.new(items)
   end
 
-  def charge(amount:, currency: 'gbp', status: 'succeeded', refunded: false, payment_intent: 'pi_1', fee: nil, fee_currency: 'gbp')
+  def charge(amount:, currency: 'gbp', status: 'succeeded', refunded: false, amount_refunded: 0, payment_intent: 'pi_1', fee: nil,
+             fee_currency: 'gbp')
     balance_transaction = { 'fee' => fee, 'currency' => fee_currency } if fee
-    api_object(amount: amount, currency: currency, status: status, refunded: refunded, payment_intent: payment_intent,
-               balance_transaction: balance_transaction)
+    api_object(amount: amount, currency: currency, status: status, refunded: refunded, amount_refunded: amount_refunded,
+               payment_intent: payment_intent, balance_transaction: balance_transaction)
   end
 
-  def application_fee(amount:, currency: 'gbp', refunded: false, fee: nil, fee_currency: 'gbp')
+  def application_fee(amount:, currency: 'gbp', refunded: false, amount_refunded: 0, fee: nil, fee_currency: 'gbp')
     balance_transaction = { 'fee' => fee, 'currency' => fee_currency } if fee
-    api_object(amount: amount, currency: currency, refunded: refunded, balance_transaction: balance_transaction)
+    api_object(amount: amount, currency: currency, refunded: refunded, amount_refunded: amount_refunded,
+               balance_transaction: balance_transaction)
   end
 
   # Runs the block with Stripe's lists answering these charges and application fees, and fixed exchange rates; yields
@@ -77,12 +79,43 @@ class PaymentsMonthlyContributionsTest < ActiveSupport::TestCase
     with_stripe do |calls|
       MonthlyContributionsCalculator.calculate_month_data(Date.new(2026, 2, 1))
       expected = {
-        created: { gte: Time.local(2026, 2, 1).to_i, lt: Time.local(2026, 3, 1).to_i },
+        created: { gte: Time.utc(2026, 2, 1).to_i, lt: Time.utc(2026, 3, 1).to_i },
         limit: 100,
         expand: ['data.balance_transaction']
       }
       assert_equal [expected], calls[:charges]
       assert_equal [expected], calls[:fees]
+    end
+  end
+
+  test 'months run midnight to midnight UTC, whatever the time zone' do
+    with_env('TZ' => 'Europe/Stockholm') do
+      with_stripe do |calls|
+        MonthlyContributionsCalculator.calculate_month_data(Date.new(2026, 7, 1))
+        # 1 July and 1 August 2026 at 00:00 UTC: 20,635 and 20,666 days after 1 January 1970, times 86,400 seconds
+        # (Stockholm's midnights, in summer time, would be two hours earlier)
+        assert_equal({ gte: 1_782_864_000, lt: 1_785_542_400 }, calls[:charges].first[:created])
+        assert_equal({ gte: 1_782_864_000, lt: 1_785_542_400 }, calls[:fees].first[:created])
+      end
+    end
+  end
+
+  test 'a partially refunded charge or application fee counts what was kept, less the whole of Stripe\'s fee' do
+    charges = [charge(amount: 10_000, amount_refunded: 4000, fee: 170)]
+    fees = [application_fee(amount: 1000, amount_refunded: 250, fee: 10)]
+    with_stripe(charges: charges, fees: fees) do
+      # Charges: £100 less £40 refunded = £60, less the £1.70 fee Stripe keeps = £58.30. Application fees: £10 less
+      # £2.50 refunded = £7.50, less 10p = £7.40
+      assert_equal ['February 2026', 65, { 'direct_stripe_charges' => 58, 'stripe_connect_application_fees' => 7 }],
+                   MonthlyContributionsCalculator.calculate_month_data(Date.new(2026, 2, 1))
+    end
+  end
+
+  test 'the total is the sum of its whole-pound parts' do
+    with_stripe(charges: [charge(amount: 1060)], fees: [application_fee(amount: 1060)]) do
+      # £10.60 and £10.60 are £10 and £10, so £20 in all (not £21.20 cut to £21)
+      assert_equal ['February 2026', 20, { 'direct_stripe_charges' => 10, 'stripe_connect_application_fees' => 10 }],
+                   MonthlyContributionsCalculator.calculate_month_data(Date.new(2026, 2, 1))
     end
   end
 

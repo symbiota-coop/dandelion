@@ -18,8 +18,13 @@ module MonthlyContributionsCalculator
     fragment.update_attributes expires: 2.days.from_now, value: monthly_data.to_json
   end
 
+  # Today in UTC, as months run in UTC (calculate_month_data)
+  def self.today
+    Time.now.utc.to_date
+  end
+
   def self.update_current_month
-    current_month = Date.new(Date.today.year, Date.today.month, 1)
+    current_month = Date.new(today.year, today.month, 1)
     fragment = Fragment.find_by(key: 'monthly_contributions')
     return unless fragment
 
@@ -31,14 +36,17 @@ module MonthlyContributionsCalculator
   end
 
   def self.generate_month_range
-    d = [Date.new(24.months.ago.year, 24.months.ago.month, 1)]
-    d << (d.last + 1.month) while d.last < Date.new(Date.today.year, Date.today.month, 1)
+    d = [Date.new(today.year, today.month, 1) << 24]
+    d << (d.last + 1.month) while d.last < Date.new(today.year, today.month, 1)
     d
   end
 
   def self.calculate_month_data(month)
-    start_timestamp = month.to_time.to_i
-    end_timestamp = (month + 1.month).to_time.to_i
+    # Months run midnight to midnight UTC, as Stripe's own reports and our other Stripe queries (StripeCharge,
+    # StripeTransaction) do, whatever the server's or the app's time zone
+    next_month = month + 1.month
+    start_timestamp = Time.utc(month.year, month.month, 1).to_i
+    end_timestamp = Time.utc(next_month.year, next_month.month, 1).to_i
 
     charges_contrib, charges_stripe_fees = process_charges(start_timestamp, end_timestamp)
     fees_contrib, fees_stripe_fees = process_fees(start_timestamp, end_timestamp)
@@ -48,13 +56,13 @@ module MonthlyContributionsCalculator
       'stripe_connect_application_fees' => (fees_contrib - fees_stripe_fees).exchange_to('GBP')
     }
 
-    monthly_contributions = breakdown.values.reduce(Money.new(0, 'GBP'), :+)
-    monthly_contributions = monthly_contributions.exchange_to('GBP')
+    # Each part is cut to whole pounds and the total is their sum, so the breakdown always adds up to the total
+    breakdown = breakdown.transform_values(&:to_i)
 
     [
       "#{Date::MONTHNAMES[month.month]} #{month.year}",
-      monthly_contributions.to_i,
-      breakdown.transform_values(&:to_i)
+      breakdown.values.sum,
+      breakdown
     ]
   end
 
@@ -73,7 +81,8 @@ module MonthlyContributionsCalculator
       next if c.refunded
       next if ENV['STRIPE_PAYMENT_INTENTS_TO_IGNORE'] && c.payment_intent.in?(ENV['STRIPE_PAYMENT_INTENTS_TO_IGNORE'].split(','))
 
-      contributions += Money.new(c['amount'], c['currency'])
+      # A partial refund counts what was kept. Stripe keeps its fee on a refund, so the fee is still taken off
+      contributions += Money.new(c['amount'] - c['amount_refunded'].to_i, c['currency'])
       if c.balance_transaction && c.balance_transaction['fee']
         bt = c.balance_transaction
         stripe_fees += Money.new(bt['fee'], bt['currency'] || 'usd')
@@ -96,7 +105,8 @@ module MonthlyContributionsCalculator
     fees.auto_paging_each do |f|
       next if f.refunded
 
-      contributions += Money.new(f['amount'], f['currency'])
+      # A partially refunded application fee counts what was kept; its balance transaction's fee is still taken off
+      contributions += Money.new(f['amount'] - f['amount_refunded'].to_i, f['currency'])
       if f.balance_transaction && f.balance_transaction['fee']
         bt = f.balance_transaction
         stripe_fees += Money.new(bt['fee'], bt['currency'] || 'usd')
@@ -129,7 +139,7 @@ module MonthlyContributionsCalculator
     return nil unless fragment&.value
 
     monthly_data = JSON.parse(fragment.value)
-    current_month = "#{Date::MONTHNAMES[Date.today.month]} #{Date.today.year}"
+    current_month = "#{Date::MONTHNAMES[today.month]} #{today.year}"
     current_month_data = monthly_data.find { |d| d[0] == current_month }
 
     return nil unless current_month_data
@@ -140,8 +150,8 @@ module MonthlyContributionsCalculator
     return nil unless monthly_contributions > 0
 
     current_month_value = monthly_contributions.to_i
-    days_in_month = Date.new(Date.today.year, Date.today.month, -1).day
-    days_passed = Date.today.day
+    days_in_month = Date.new(today.year, today.month, -1).day
+    days_passed = today.day
     projected_value = (current_month_value.to_f / days_passed * days_in_month).round
 
     {
