@@ -50,6 +50,19 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
     assert_nil @tactivity.attendances.find_by(account: member)
   end
 
+  test "a member isn't offered a space and slot on an activity's edit form unless members may schedule" do
+    create_gathering(privacy: 'open')
+    create_timetable
+    sign_in(create_member)
+    visit gathering_path("/tactivities/#{@tactivity.id}/edit")
+    assert page.has_field? 'Activity name'
+    assert page.has_no_field? 'Slot'
+
+    @timetable.set(scheduling_by_all: true)
+    visit gathering_path("/tactivities/#{@tactivity.id}/edit")
+    assert page.has_field? 'Slot'
+  end
+
   test "only the gathering's admins make and edit its timetables" do
     create_gathering(privacy: 'open')
     create_timetable
@@ -109,6 +122,33 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
     end
     assert_equal 'Secret session', other_tactivity.reload.name
     assert_nil other_tactivity.tslot_id
+  end
+
+  test 'members schedule and unschedule activities only when the timetable lets all members schedule' do
+    create_gathering(privacy: 'open')
+    create_timetable
+    member = create_member
+
+    sign_in_with_rack(member)
+    post gathering_path("/tactivities/#{@tactivity.id}/schedule"), tslot_id: @tslot.id, space_id: @space.id
+    assert_equal 403, last_response.status
+    assert_nil @tactivity.reload.tslot_id
+    # Nor through the activity's edit form
+    post gathering_path("/tactivities/#{@tactivity.id}/edit"), tactivity: { name: 'Yoga', tslot_id: @tslot.id, space_id: @space.id }
+    assert_nil @tactivity.reload.tslot_id
+
+    @tactivity.update_attributes!(tslot: @tslot, space: @space)
+    post gathering_path("/tactivities/#{@tactivity.id}/unschedule")
+    assert_equal 403, last_response.status
+    post gathering_path("/tactivities/#{@tactivity.id}/edit"), tactivity: { name: 'Yoga', tslot_id: '', space_id: '' }
+    assert_equal @tslot.id, @tactivity.reload.tslot_id
+
+    @timetable.set(scheduling_by_all: true)
+    post gathering_path("/tactivities/#{@tactivity.id}/unschedule")
+    assert_nil @tactivity.reload.tslot_id
+    post gathering_path("/tactivities/#{@tactivity.id}/schedule"), tslot_id: @tslot.id, space_id: @space.id
+    assert last_response.ok?
+    assert_equal [@tslot.id, @space.id, member.id], [@tactivity.reload.tslot_id, @tactivity.space_id, @tactivity.scheduled_by_id]
   end
 
   test "nobody outside the gathering sees, edits, schedules or unschedules its activities" do

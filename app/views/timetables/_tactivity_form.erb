@@ -24,7 +24,7 @@
   <%= f.text_block :name %>
   <%= f.text_area_block :description %>
   <%= f.image_block :image %>
-  <% if @tactivity.persisted? %>
+  <% if @tactivity.persisted? && (gathering_admin? || @tactivity.timetable.scheduling_by_all) %>
     <%= f.select_block :space_id, options: @tactivity.space_ids %>
     <%= f.select_block :tslot_id, options: @tactivity.tslot_ids %>
   <% end %>
