@@ -261,6 +261,38 @@ class OrganisationsCalendarImportsTest < ActiveSupport::TestCase
     end
   end
 
+  test "the same event in two feeds is imported once, and is reported, while the rest of the second feed still syncs" do
+    covers 'organisations/ical-event-skipped@b9bcc0'
+    create_organisation(calendar_import_urls: "#{FEED_URL}\n#{OTHER_FEED_URL}")
+    june = vevent(uid: 'other-june', dtstart: '20270601T180000Z', summary: 'June talk')
+    leaving = vevent(uid: 'other-leaving', dtstart: '20270602T180000Z', summary: 'Leaving talk')
+    stub_faraday(FEED_URL => { status: 200, body: ical(meetup) }, OTHER_FEED_URL => { status: 200, body: ical(june, leaving, name: 'Other Calendar') }) do
+      @organisation.sync_calendar_imports
+    end
+    leaving_event = @organisation.events.find_by(calendar_import_uid: 'other-leaving')
+
+    result = nil
+    july = vevent(uid: 'other-july', dtstart: '20270701T180000Z', summary: 'July talk')
+    stub_faraday(FEED_URL => { status: 200, body: ical(meetup) },
+                 OTHER_FEED_URL => { status: 200, body: ical(meetup(uid: 'other-meetup'), june, july, name: 'Other Calendar') }) do
+      result = @organisation.sync_calendar_imports
+    end
+
+    assert_equal 1, @organisation.events.and(name: 'Monthly meetup').count
+    assert_equal FEED_URL, @organisation.events.find_by(name: 'Monthly meetup').calendar_import_feed_url
+    assert @organisation.events.find_by(calendar_import_feed_url: OTHER_FEED_URL, calendar_import_uid: 'other-july'), "the feed's later events still import"
+    assert @organisation.events.find_by(calendar_import_feed_url: OTHER_FEED_URL, calendar_import_uid: 'other-june')
+    assert_nil Event.find(leaving_event.id), "the feed's removals still run"
+    assert_equal 1, result[:removed]
+    assert_equal 1, result[:created]
+    assert_equal 1, result[:failed]
+    assert_equal 1, result[:errors].count
+    assert_match(/\A#{Regexp.escape(OTHER_FEED_URL)}: Monthly meetup on 1 May 2027 .+ wasn't imported: .*already exists/, result[:errors].first)
+    @organisation.reload
+    assert_equal result[:errors].first, @organisation.calendar_import_last_sync_error
+    assert_equal 'Other Calendar', @organisation.calendar_import_feed_calendar_names[OTHER_FEED_URL], 'the feed still counts as read'
+  end
+
   test 'a malformed feed is reported without touching its events' do
     create_organisation(calendar_import_urls: FEED_URL)
     import(@organisation, ical(meetup))

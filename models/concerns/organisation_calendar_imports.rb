@@ -112,7 +112,9 @@ module OrganisationCalendarImports
     end
 
     results = calendar_import_urls_a.map { |feed_url| sync_calendar_import_feed(feed_url) }
-    errors = results.filter_map { |result| "#{result[:feed_url]}: #{result[:error]}" if result[:error] }
+    errors = results.flat_map do |result|
+      [result[:error], *result[:event_errors]].compact.map { |error| "#{result[:feed_url]}: #{error}" }
+    end
 
     results.each do |result|
       next if result[:error].present?
@@ -132,6 +134,7 @@ module OrganisationCalendarImports
       created: results.sum { |result| result[:created] || 0 },
       updated: results.sum { |result| result[:updated] || 0 },
       skipped: results.sum { |result| result[:skipped] || 0 },
+      failed: results.sum { |result| result[:failed] || 0 },
       removed: results.sum { |result| result[:removed] || 0 },
       feeds: results,
       errors: errors
@@ -160,6 +163,7 @@ module OrganisationCalendarImports
     created = 0
     updated = 0
     skipped = 0
+    event_errors = []
     @present_import_event_ids = Set.new
 
     calendars.flat_map(&:events).each do |ical_event|
@@ -171,11 +175,16 @@ module OrganisationCalendarImports
       else
         skipped += 1
       end
+    rescue Mongoid::Errors::Validations => e
+      # One event that can't be saved (e.g. the same event in another of the organisation's feeds, as an organisation
+      # can't have two events with the same title and start) is reported and skipped, so the rest of the feed still syncs
+      event_errors << calendar_import_event_error(e.document)
     end
 
     removed = destroy_absent_imported_events(normalized_feed_url)
 
-    { created: created, updated: updated, skipped: skipped, removed: removed, feed_url: normalized_feed_url, calendar_name: calendar_name }
+    { created: created, updated: updated, skipped: skipped, failed: event_errors.count, removed: removed, event_errors: event_errors,
+      feed_url: normalized_feed_url, calendar_name: calendar_name }
   rescue StandardError => e
     ErrorReporting.capture_exception(e, context: { organisation_id: id.to_s, calendar_import_url: feed_url }) unless e.is_a?(OrganisationCalendarImports::ConfigurationError)
     { error: e.message, feed_url: feed_url }
@@ -341,6 +350,11 @@ module OrganisationCalendarImports
     end
     mark_present_imported(event)
     event_was_new ? :created : :updated
+  end
+
+  def calendar_import_event_error(event)
+    start = event.start_time&.in_time_zone(time_zone || ENV['DEFAULT_TIME_ZONE'])&.strftime('%-d %b %Y %H:%M')
+    "#{[event.name, start].compact.join(' on ')} wasn't imported: #{event.errors.full_messages.to_sentence}"
   end
 
   def mark_present_imported(event)

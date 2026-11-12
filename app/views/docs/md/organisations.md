@@ -85,6 +85,8 @@ Imported events use the feed's event URL as their RSVP/ticket button, so people 
 
 When a Luma event hides its address until you register, the imported event is placed at the venue's location from the feed and labelled with the city it's in. <!-- claim: ical-gated-venue-city -->
 
+If one of a feed's events can't be imported, such as the same event already imported from another of your feeds, it's skipped and listed on the iCal sync page, and the rest of the feed still syncs. <!-- claim: ical-event-skipped -->
+
 ## Recognising monthly donors
 
 On the Payments tab, click **Set up GoCardless** and provide a GoCardless access token, and/or **Set up Patreon** and provide the client ID, client secret and creator's refresh token of a client you create in Patreon's developer portal. People with active subscriptions or pledges will be recognised as monthly donors/members of the organisation, synced each night. <!-- claim: monthly-donors-synced --> Patreon pledges are recorded in the currency each patron pays. <!-- claim: patreon-pledge-currency --> You can also record a monthly donation by hand on the organisation's members page, once GoCardless or Patreon is set up or the organisation has monthly donors; clear the amount when someone stops donating. <!-- claim: monthly-donation-by-hand -->
