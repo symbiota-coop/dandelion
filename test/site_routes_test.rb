@@ -159,6 +159,14 @@ class SiteRoutesTest < ActiveSupport::TestCase
     end
   end
 
+  test "a map point's popup is a 404 once its record is gone" do
+    covers_route 'GET /points/:model/:id'
+    get point_path('Event', BSON::ObjectId.new)
+    assert_equal 404, last_response.status
+    get point_path('Account', BSON::ObjectId.new)
+    assert_equal 404, last_response.status
+  end
+
   # Uploads
 
   test 'someone signed in uploads an image for the editor, stored as a JPEG of theirs' do

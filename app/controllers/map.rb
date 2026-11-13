@@ -5,7 +5,7 @@ Dandelion::App.controller do
     halt 400 unless decrypted[:model_name] == params[:model]
     halt 400 unless %w[Account ActivityApplication Event Gathering Organisation Organisationship].include?(decrypted[:model_name])
 
-    object = decrypted[:model_name].constantize.find(decrypted[:id])
+    object = decrypted[:model_name].constantize.find(decrypted[:id]) || not_found
 
     unless admin?
       halt 403 if decrypted[:model_name] == 'Account' && (object.location_privacy != 'Public')
