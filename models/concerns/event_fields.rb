@@ -212,7 +212,7 @@ module EventFields
         no_discounts: "Don't apply usual discounts for the organisation's monthly donors",
         redirect_url: 'Optional http(s) URL. By default people will be shown a thank you page on Dandelion.',
         purchase_url: "URL where people can buy tickets (if you're not selling tickets on Dandelion)",
-        capacity: 'Caps the total number of places across all ticket types. Each ticket type can take a different number of slots. Optional',
+        capacity: 'Caps the total number of places across all ticket types. Each ticket type can take up a different number of places. Optional',
         send_order_notifications: 'Send email notifications of orders and waitlist registrations to event facilitators',
         reminder_hours_before: 'Number of hours before the event to send the reminder email. Leave blank to skip the reminder.',
         feedback_hours_after: "Number of hours after the event ends to send the feedback request email (maximum: #{Event::MAX_FEEDBACK_HOURS_AFTER}, or 30 days). Leave blank to send when the event ends.",
