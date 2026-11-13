@@ -14,14 +14,18 @@ class AccountRoutesTest < ActiveSupport::TestCase
     FactoryBot.create(:account, has_signed_in: true, **attrs)
   end
 
-  test 'a link signs someone in to unsubscribe them from all emails, and only them' do
+  test 'an old link to unsubscribe from all emails only opens the settings, where the form opts them out, and only them' do
     covers_route 'GET /accounts/unsubscribe'
     account = FactoryBot.create(:account)
     other = FactoryBot.create(:account)
     account.generate_link_token!
 
+    # As an <img> on any page or in a message could: it only shows the settings
     get '/accounts/unsubscribe', link_token: account.link_token
     assert_equal '/accounts/subscriptions', URI(last_response.location).path
+    refute account.reload.unsubscribed
+
+    post '/accounts/subscriptions', account: { unsubscribed: '1' }
     assert account.reload.unsubscribed
     refute other.reload.unsubscribed
   end

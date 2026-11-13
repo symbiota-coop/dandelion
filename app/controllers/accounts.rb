@@ -116,10 +116,11 @@ Dandelion::App.controller do
     redirect '/'
   end
 
+  # Old emails' links to unsubscribe from everything. A GET can be triggered from any page or message (an <img>), so it
+  # changes nothing: opting out is the subscriptions form's, a POST
   get '/accounts/unsubscribe' do
     sign_in_required!
-    current_account.set(unsubscribed: true)
-    flash[:notice] = 'You were unsubscribed from all emails.'
+    flash[:notice] = 'To stop all emails from Dandelion, tick Opt out of all emails from Dandelion and save.'
     redirect '/accounts/subscriptions'
   end
 
