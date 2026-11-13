@@ -7,10 +7,10 @@ Dandelion::App.controller do
 
     object = decrypted[:model_name].constantize.find(decrypted[:id]) || not_found
 
-    unless admin?
-      halt 403 if decrypted[:model_name] == 'Account' && (object.location_privacy != 'Public')
-      halt 403 if %w[ActivityApplication Organisationship].include?(decrypted[:model_name]) && (object.account.location_privacy != 'Public')
-    end
+    # A person, or the person an application or membership is of: only if their location is public and so is their
+    # profile (a private profile is visible only to its own account)
+    account = decrypted[:model_name] == 'Account' ? object : (object.account if %w[ActivityApplication Organisationship].include?(decrypted[:model_name]))
+    halt 403 if account && !admin? && (account.location_privacy != 'Public' || !profile_viewable?(account))
 
     partial :"points/#{decrypted[:model_name].underscore}", object: object
   end

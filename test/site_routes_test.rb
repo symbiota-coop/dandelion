@@ -159,6 +159,20 @@ class SiteRoutesTest < ActiveSupport::TestCase
     end
   end
 
+  test "a map point's popup doesn't show a private profile, even with its location public" do
+    covers_route 'GET /points/:model/:id'
+    hidden = FactoryBot.create(:account, name: 'Hana Hidden', location_privacy: 'Public', has_signed_in: true, hidden: true)
+    get point_path('Account', hidden.id)
+    assert_equal 403, last_response.status
+    get point_path('Organisationship', FactoryBot.create(:organisationship, account: hidden).id)
+    assert_equal 403, last_response.status
+
+    sign_in_with_rack(hidden)
+    get point_path('Account', hidden.id)
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'Hana Hidden'
+  end
+
   test "a map point's popup is a 404 once its record is gone" do
     covers_route 'GET /points/:model/:id'
     get point_path('Event', BSON::ObjectId.new)
