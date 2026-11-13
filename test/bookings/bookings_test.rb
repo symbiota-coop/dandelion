@@ -31,6 +31,7 @@ class EventBookingsTest < ActiveSupport::TestCase
   end
 
   test 'hidden ticket types can only be bought with their secret link' do
+    covers_route 'POST /e/:slug/purchase'
     create_event(prices: [0])
     hidden = @event.ticket_types.create!(name: 'Secret', price: 0, quantity: 10, hidden: true)
     buyer = FactoryBot.create(:account)
@@ -275,6 +276,7 @@ class EventBookingsTest < ActiveSupport::TestCase
 
   test 'a redirect URL replaces the thank you page after booking' do
     covers 'events/thank-you-redirect-url@ed8cce'
+    covers_route 'GET /e/:slug'
     create_event(prices: [0], redirect_url: 'https://example.com/welcome')
     order = @event.orders.create!(account: FactoryBot.create(:account), currency: @event.currency, value: 0, payment_completed: true)
     order.tickets.create!(event: @event, account: order.account, ticket_type: @event.ticket_types.first, price: 0)

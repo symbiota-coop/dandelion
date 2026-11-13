@@ -132,6 +132,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
 
   test 'org event manager can delete their own event' do
     covers 'organisations/table-delete-events@f21a92'
+    covers_route 'POST /e/:slug/destroy'
     org = FactoryBot.create(:organisation)
     manager = add_event_manager(org)
     event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
@@ -146,6 +147,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
 
   test 'org event manager cannot delete another account event' do
     covers 'organisations/table-delete-events@f21a92'
+    covers_route 'GET /e/:slug/delete'
     org = FactoryBot.create(:organisation)
     manager = add_event_manager(org)
     event = FactoryBot.create(:event, organisation: org)
@@ -435,6 +437,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
   end
 
   test 'event admins cannot stop checkout donations going to Dandelion' do
+    covers_route 'POST /events/new'
     create_event(prices: [0])
     sign_in_with_rack(@account)
 
@@ -519,6 +522,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
 
   test 'only organisation admins can open the organisation settings, followers, bans, mailer, orders, discount codes, activities, local groups, carousels, tiers and deletion pages' do
     covers 'organisations/event-manager-creates-and-edits-events@3f0102', 'organisations/table-edit-organisation-settings@169353', 'organisations/table-manage-followers-credits-bans@7b2dbd', 'organisations/table-organisation-mailer@64db60', 'organisations/table-organisation-orders-discount-codes@1ea827', 'organisations/table-activities-local-groups-carousels-tiers@49b568', 'organisations/table-delete-organisation@467e21', 'events/facilitator-no-organisation-access@ec2446'
+    covers_route 'GET /o/:slug/carousels'
     create_event
     manager = add_event_manager(@organisation)
     facilitator = add_facilitator(@event)
@@ -541,6 +545,10 @@ class EventPermissionsTest < ActiveSupport::TestCase
 
   test 'only organisation admins can add or remove admins, grant event manager, give credit or delete the organisation' do
     covers 'organisations/table-manage-followers-credits-bans@7b2dbd', 'organisations/table-add-remove-organisation-admins@a0a094', 'organisations/table-grant-event-manager@4e7638', 'organisations/table-delete-organisation@467e21'
+    covers_route 'POST /o/:slug/event_manager/:organisationship_id'
+    covers_route 'POST /o/:slug/organisationships/admin'
+    covers_route 'POST /o/:slug/organisationships/unadmin'
+    covers_route 'POST /organisationships/:id/credit/:plus_or_minus'
     create_event
     manager = add_event_manager(@organisation)
     facilitator = add_facilitator(@event)
@@ -566,6 +574,8 @@ class EventPermissionsTest < ActiveSupport::TestCase
 
   test 'organisation admins can add and remove admins, grant event manager and give credit' do
     covers 'organisations/table-manage-followers-credits-bans@7b2dbd', 'organisations/table-add-remove-organisation-admins@a0a094', 'organisations/table-grant-event-manager@4e7638'
+    covers_route 'GET /o/:slug/event_manager/:organisationship_id'
+    covers_route 'GET /o/:slug/organisationships/admins'
     create_organisation
     follower = add_member(@organisation)
     follower.set(name: 'Fern Follower', has_signed_in: true)
@@ -730,6 +740,9 @@ class EventPermissionsTest < ActiveSupport::TestCase
 
   test 'all event admins can email attendees, check people in and add or remove facilitators' do
     covers 'organisations/who-becomes-event-admin@459b2f', 'organisations/facilitator-listed-emailed-opt-in@29059a', 'organisations/table-email-attendees@b952f3', 'organisations/table-check-in@4b9c7e', 'organisations/table-add-remove-facilitators@c8f92a', 'events/facilitator-no-organisation-access@ec2446'
+    covers_route 'GET /e/:slug/check_in_list'
+    covers_route 'GET /e/:slug/check_in_toggle/:ticket_id'
+    covers_route 'POST /e/:slug/event_facilitations/destroy'
     create_event(prices: [0])
     ticket = @event.tickets.create!(account: FactoryBot.create(:account), ticket_type: @event.ticket_types.first, payment_completed: true)
     facilitator = add_facilitator(@event)

@@ -101,6 +101,7 @@ class McpCheckoutTest < ActiveSupport::TestCase
 
   test 'create_checkout_tool keeps the details of a booking made with an API key from a retry without one' do
     covers 'integrations/idempotency-retry-without-key-id-and-status@664443'
+    covers_route 'POST /mcp'
     create_event(prices: [10])
     with_stubbed_stripe_session do
       _rpc, order = create_checkout(quantities: { @event.ticket_types.first.id.to_s => 1 }, idempotency_key: 'retry-1')

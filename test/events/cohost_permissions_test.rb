@@ -107,6 +107,7 @@ class EventCohostPermissionsTest < ActiveSupport::TestCase
 
   test 'activity admin cannot add their own org as cohost to see attendee emails' do
     covers 'events/only-host-admins-add-cohosts@076df9'
+    covers_route 'POST /e/:slug/cohostships/new'
     create_full_event_hierarchy(event_options: { show_emails: false }, skip_local_group: true)
     activity_admin = FactoryBot.create(:account)
     @activity.activityships.create!(account: activity_admin, admin: true, unsubscribed: false)
@@ -177,6 +178,7 @@ class EventCohostPermissionsTest < ActiveSupport::TestCase
 
   test 'events stats page makes event managers revenue admins of hosted and cohosted events' do
     covers 'organisations/table-event-stats@3be66e'
+    covers_route 'GET /o/:slug/events/stats'
     create_event
     # Revenue admins' rows have the allocation columns, which link to the event's rpayments
     @organisation.set(stripe_client_id: 'ca_test')
@@ -196,6 +198,7 @@ class EventCohostPermissionsTest < ActiveSupport::TestCase
 
   test 'host event_manager can add a cohost' do
     covers 'events/only-host-admins-add-cohosts@076df9'
+    covers_route 'GET /organisations/autocomplete'
     create_event
     manager = add_event_manager(@organisation)
     cohost = FactoryBot.create(:organisation)
@@ -210,6 +213,7 @@ class EventCohostPermissionsTest < ActiveSupport::TestCase
 
   test 'activity admin can remove a cohost' do
     covers 'events/who-can-remove-cohosts@fcec2a', 'organisations/org-admins-managers-activity-admins-are-event-admins@a32f62'
+    covers_route 'GET /e/:slug/cohostships'
     create_full_event_hierarchy(skip_local_group: true)
     activity_admin = FactoryBot.create(:account)
     @activity.activityships.create!(account: activity_admin, admin: true, unsubscribed: false)
@@ -245,6 +249,7 @@ class EventCohostPermissionsTest < ActiveSupport::TestCase
 
   test 'facilitator cannot remove a cohost' do
     covers 'events/who-can-remove-cohosts@fcec2a'
+    covers_route 'POST /e/:slug/cohostships/destroy'
     create_event
     cohost = FactoryBot.create(:organisation)
     @event.cohostships.create!(organisation: cohost)
@@ -260,6 +265,7 @@ class EventCohostPermissionsTest < ActiveSupport::TestCase
 
   test 'event admin cannot feature event in a cohost carousel they do not manage' do
     covers 'events/cohost-carousel-feature@022f35'
+    covers_route 'POST /e/:slug/cohostships/:cohostship_id'
     create_event
     cohost = FactoryBot.create(:organisation)
     cohostship = @event.cohostships.create!(organisation: cohost)
@@ -273,6 +279,7 @@ class EventCohostPermissionsTest < ActiveSupport::TestCase
 
   test "co-host admins can feature an event in their organisation's carousels, and other event admins aren't offered it" do
     covers 'events/cohost-carousel-feature@022f35'
+    covers_route 'GET /e/:slug/cohosts'
     create_event
     cohost = FactoryBot.create(:organisation)
     cohostship = @event.cohostships.create!(organisation: cohost)
@@ -307,6 +314,7 @@ class EventCohostPermissionsTest < ActiveSupport::TestCase
 
   test 'admins of a co-host organisation and local group admins are event admins' do
     covers 'organisations/org-admins-managers-activity-admins-are-event-admins@a32f62'
+    covers_route 'GET /e/:slug/edit'
     create_full_event_hierarchy(skip_activity: true)
     cohost = FactoryBot.create(:organisation)
     local_group_admin = FactoryBot.create(:account)

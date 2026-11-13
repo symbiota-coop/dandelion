@@ -220,6 +220,7 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
 
   test 'pixel and google ads tags load on organisation and event pages, held back until marketing cookie consent' do
     covers 'organisations/analytics-tags-need-marketing-consent@3bd32f', 'organisations/google-ads-conversion@d1d9d3'
+    covers_route 'GET /o/:slug'
     create_event_with_analytics
 
     ["/o/#{@organisation.slug}", "/e/#{@event.slug}"].each do |path|

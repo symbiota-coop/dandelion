@@ -39,6 +39,7 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
   end
 
   test 'a member says they are no longer interested in an activity from its page' do
+    covers_route 'GET /g/:slug/tactivities/:id'
     create_gathering(privacy: 'open')
     create_timetable
     member = create_member
@@ -51,6 +52,7 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
   end
 
   test "a member isn't offered a space and slot on an activity's edit form unless members may schedule" do
+    covers_route 'GET /g/:slug/tactivities/:id/edit'
     create_gathering(privacy: 'open')
     create_timetable
     sign_in(create_member)
@@ -64,6 +66,10 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
   end
 
   test "only the gathering's admins make and edit its timetables" do
+    covers_route 'GET /g/:slug/timetables/:id/edit'
+    covers_route 'GET /g/:slug/timetables/new'
+    covers_route 'POST /g/:slug/timetables/:id/edit'
+    covers_route 'POST /g/:slug/timetables/new'
     create_gathering(privacy: 'open')
     create_timetable
     create_other_gathering
@@ -125,6 +131,7 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
   end
 
   test "an activity can't be scheduled into another timetable's slot, or a slot that's taken" do
+    covers_route 'POST /g/:slug/tactivities/:id/schedule'
     create_gathering(privacy: 'open')
     create_timetable
     other_timetable = @gathering.timetables.create!(name: 'Talks', account: @account)
@@ -142,6 +149,8 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
   end
 
   test 'members schedule and unschedule activities only when the timetable lets all members schedule' do
+    covers_route 'POST /g/:slug/tactivities/:id/edit'
+    covers_route 'POST /g/:slug/tactivities/:id/unschedule'
     create_gathering(privacy: 'open')
     create_timetable
     member = create_member
@@ -195,6 +204,7 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
   end
 
   test "a member who's no longer interested in an activity takes only their own interest away" do
+    covers_route 'POST /g/:slug/tactivities/:id/unattend'
     create_gathering(privacy: 'open')
     create_timetable
     member = create_member

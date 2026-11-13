@@ -139,6 +139,7 @@ class WaitlistTest < ActiveSupport::TestCase
 
   test 'sales ended ticket type uses generic sold out flow instead of ticket type waitlist controls' do
     covers 'events/ticket-type-waitlists@ac1e0a'
+    covers_route 'GET /qr'
     create_ticket_type_waitlist_event
     @ticket_type.set(quantity: 0, sales_end: 1.hour.ago)
     @event.refresh_sold_out_cache_and_notify_waitlist
@@ -197,6 +198,8 @@ class WaitlistTest < ActiveSupport::TestCase
 
   test "the waitlist forms refuse a waitlist that isn't open, without making an account" do
     covers 'events/waitlist-on-sell-out@4409be', 'events/ticket-type-waitlists@ac1e0a'
+    covers_route 'POST /e/:slug/ticket_type_waitships'
+    covers_route 'POST /e/:slug/waitship/new'
     create_ticket_type_waitlist_event
 
     header 'Accept', 'application/json'
@@ -274,6 +277,7 @@ class WaitlistTest < ActiveSupport::TestCase
 
   test 'cancelling an order at a sold-out event emails the waitlist' do
     covers 'events/waitlist-emailed-when-tickets-available@a5c6b3'
+    covers_route 'POST /e/:slug/orders/:order_id/destroy'
     create_sold_out_event_with_waitlist
     sign_in(@account)
 
@@ -309,6 +313,7 @@ class WaitlistTest < ActiveSupport::TestCase
 
   test 'the Ticket type waitlists menu item appears once someone has joined one' do
     covers 'events/ticket-type-waitlists-menu-item@66c29c'
+    covers_route 'GET /e/:slug/discount_codes'
     create_ticket_type_waitlist_event
     sell_out_ticket_type
     sign_in_with_rack(@account)

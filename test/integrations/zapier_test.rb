@@ -39,6 +39,7 @@ class ZapierTest < ActiveSupport::TestCase
 
   test 'GET /z refuses an unknown API key or none' do
     covers 'integrations/zapier-get-account@fb0cbb'
+    covers_route 'GET /z'
     get '/z', api_key: 'not-a-real-key'
     assert_equal 403, last_response.status
 
@@ -60,6 +61,7 @@ class ZapierTest < ActiveSupport::TestCase
 
   test 'organisation events include cohosted events, most recent first, by slug or id' do
     covers 'integrations/zapier-identifies-account-and-lists-events@bb9bc2', 'integrations/organisation-events-returns-events@1b8177', 'integrations/zapier-organisation-events-params@8ab821'
+    covers_route 'GET /z/organisation_events'
     create_event(prices: [0], start_time: 2.months.from_now, end_time: 2.months.from_now + 1.hour)
     create_event(prices: [0], as: :earlier_event, start_time: 1.week.ago, end_time: 1.week.ago + 1.hour)
     cohosted = cohosted_event
@@ -94,6 +96,7 @@ class ZapierTest < ActiveSupport::TestCase
 
   test 'organisation followers are those from the last 24 hours, most recent first' do
     covers 'integrations/zapier-new-follower@d5199e', 'integrations/organisation-followers-last-24-hours@8e8cf5', 'integrations/zapier-organisation-followers-params@fd94e6'
+    covers_route 'GET /z/organisation_followers'
     create_organisation
     @organisation.organisationships.find_by(account: @account).set(created_at: 2.days.ago)
     older, newer, stale = Array.new(3) { FactoryBot.create(:account) }.map { |account| @organisation.organisationships.create!(account: account) }
@@ -113,6 +116,7 @@ class ZapierTest < ActiveSupport::TestCase
 
   test 'organisation orders cover hosted and cohosted events, including ones created later' do
     covers 'integrations/zapier-order-confirmed-organisation@93fe70', 'integrations/organisation-orders-most-recently-completed@db1be3', 'integrations/zapier-organisation-orders-params@75c428'
+    covers_route 'GET /z/organisation_orders'
     create_event(prices: [0])
     attendee = FactoryBot.create(:account)
     hosted_order = complete_order(@event, attendee)
@@ -151,6 +155,7 @@ class ZapierTest < ActiveSupport::TestCase
 
   test 'event orders are the completed ones, most recent first, by slug or id' do
     covers 'integrations/zapier-order-confirmed@b66f74', 'integrations/event-orders-returns-completed-orders@2599ad', 'integrations/zapier-event-orders-params@e37544'
+    covers_route 'GET /z/organisation_event_orders'
     create_event(prices: [0])
     attendee = FactoryBot.create(:account)
     older = complete_order(@event, attendee, via: 'newsletter')
@@ -171,6 +176,7 @@ class ZapierTest < ActiveSupport::TestCase
 
   test 'event tickets are the completed ones, most recent first, by slug or id' do
     covers 'integrations/zapier-ticket-confirmed@e8169c', 'integrations/event-tickets-returns-completed-tickets@2c4319', 'integrations/zapier-event-tickets-params@6c1422'
+    covers_route 'GET /z/organisation_event_tickets'
     create_event(prices: [0])
     attendee = FactoryBot.create(:account)
     order = complete_order(@event, attendee)

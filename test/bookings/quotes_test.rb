@@ -326,6 +326,7 @@ class QuotesTest < ActiveSupport::TestCase
   end
 
   test "the quote route refuses a price too big to be one, and counts a quantity that isn't a number as none" do
+    covers_route 'POST /e/:slug/quote'
     create_event(prices: [nil], suggested_donation: 0)
 
     post_quote(quantities: { ticket_type_id => '1' }, prices: { ticket_type_id => '1e400' })

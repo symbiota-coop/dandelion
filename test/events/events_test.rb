@@ -31,6 +31,8 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'adding a facilitator updates the facilitators box in place, without reloading the page' do
+    covers_route 'GET /e/:slug/event_facilitations'
+    covers_route 'POST /e/:slug/event_facilitations/new'
     create_event
     facilitator = FactoryBot.create(:account, name: 'Maya Okoro', has_signed_in: true)
     sign_in(@account)
@@ -191,6 +193,8 @@ class EventsTest < ActiveSupport::TestCase
 
   test 'a duplicated event says it is a copy until it is first saved' do
     covers 'events/duplicate-starts-locked@9b7b43'
+    covers_route 'GET /e/:slug/feedback_questions'
+    covers_route 'GET /e/:slug/questions'
     create_event(prices: [0])
     sign_in(@account)
     duplicate = @event.duplicate!(@account)
@@ -398,6 +402,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'event session create rejects event_id from params' do
+    covers_route 'POST /e/:slug/event_sessions/new'
     create_event(prices: [0])
     other_event = FactoryBot.create(:event)
 
@@ -426,6 +431,7 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'rpayment edit rejects event_id from params' do
+    covers_route 'POST /e/:event_slug/rpayments/:id/edit'
     create_event(prices: [0])
     other_event = FactoryBot.create(:event)
     rpayment = @event.rpayments.create!(account: @account, amount: 10, currency: @event.currency, role: Rpayment.roles.first)
@@ -456,6 +462,7 @@ class EventsTest < ActiveSupport::TestCase
 
   test 'a duplicated event starts locked' do
     covers 'events/duplicate-starts-locked@9b7b43'
+    covers_route 'POST /e/:slug/duplicate'
     create_event(prices: [0], locked: false)
     sign_in(@account)
     visit "/e/#{@event.slug}/edit"
@@ -470,6 +477,7 @@ class EventsTest < ActiveSupport::TestCase
 
   test 'a new event defaults to a reminder 24 hours before it' do
     covers 'events/reminder-default-and-blank@b3faac'
+    covers_route 'GET /events/new'
     create_organisation
     sign_in_with_rack(@account)
     get '/events/new', organisation_id: @organisation.id
@@ -551,6 +559,13 @@ class EventsTest < ActiveSupport::TestCase
   end
 
   test 'URLs that name an event, organisation, activity, local group or account by id redirect to its slug URL' do
+    covers_route 'GET /accounts/:id'
+    covers_route 'GET /activities/:id'
+    covers_route 'GET /events/:id'
+    covers_route 'GET /events/:id/*'
+    covers_route 'GET /local_groups/:id/*'
+    covers_route 'GET /organisations/:id/*'
+    covers_route 'POST /events/:id/*'
     create_full_event_hierarchy
     {
       "/events/#{@event.id}" => "/e/#{@event.slug}",

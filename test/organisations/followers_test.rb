@@ -108,6 +108,7 @@ class OrganisationFollowersTest < ActiveSupport::TestCase
   end
 
   test "a monthly donation recorded by hand without a currency the form offers takes the organisation's" do
+    covers_route 'POST /organisationships/:id/monthly_donation'
     create_organisation(currency: 'GBP')
     donor = @organisation.organisationships.create!(account: FactoryBot.create(:account), sent_monthly_donation_welcome: true)
     @organisation.set(monthly_donors_count: 1)
@@ -122,6 +123,7 @@ class OrganisationFollowersTest < ActiveSupport::TestCase
 
   test 'a monthly donation synced from Patreon cannot be changed by hand' do
     covers 'organisations/monthly-donation-by-hand@ec117b'
+    covers_route 'GET /organisationships/:id/monthly_donation'
     create_organisation(currency: 'GBP')
     @organisation.set(monthly_donors_count: 1)
     sign_in_with_rack(@account)
@@ -211,6 +213,7 @@ class OrganisationFollowersTest < ActiveSupport::TestCase
   end
 
   test 'admins add a follower by email, making an account for an email that has none, and are told if they already follow' do
+    covers_route 'POST /o/:slug/add_follower'
     create_organisation
     sign_in(@account)
     visit "/o/#{@organisation.slug}/followers"

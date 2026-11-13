@@ -20,6 +20,7 @@ class GatheringBudgetTest < ActiveSupport::TestCase
   end
 
   test 'a member lists an expense, which is theirs, and an admin unmarks it reimbursed' do
+    covers_route 'GET /g/:slug/budget'
     create_gathering(privacy: 'open')
     member = create_member
     sign_in(member)
@@ -44,6 +45,8 @@ class GatheringBudgetTest < ActiveSupport::TestCase
   end
 
   test "a member's expenses are their own: they can't list one, or move one, as someone else's" do
+    covers_route 'POST /g/:slug/spends/:id/edit'
+    covers_route 'POST /g/:slug/spends/new'
     create_gathering(privacy: 'open')
     member = create_member
     other = create_member(name: 'Other Person')
@@ -78,6 +81,8 @@ class GatheringBudgetTest < ActiveSupport::TestCase
   end
 
   test "a gathering's expense routes don't find another gathering's" do
+    covers_route 'GET /g/:slug/spends/:id/edit'
+    covers_route 'POST /g/:slug/spends/:id/reimbursed'
     create_gathering(privacy: 'open')
     create_other_gathering
     other_spend = @other_gathering.spends.create!(item: 'Secret wine', amount: 99, team: @other_gathering.teams.first, account: @other_account)
@@ -95,6 +100,7 @@ class GatheringBudgetTest < ActiveSupport::TestCase
   end
 
   test "a member chooses who brings an item, then that no one does" do
+    covers_route 'GET /g/:slug/inventory'
     create_gathering(privacy: 'open')
     create_inventory_item
     member = create_member
@@ -110,6 +116,7 @@ class GatheringBudgetTest < ActiveSupport::TestCase
   end
 
   test "an item is brought by one of the gathering's members, or no one" do
+    covers_route 'POST /g/:slug/inventory_items/:id/provided'
     create_gathering(privacy: 'open')
     create_inventory_item
     member = create_member
@@ -144,6 +151,8 @@ class GatheringBudgetTest < ActiveSupport::TestCase
   end
 
   test "a gathering's item routes don't find another gathering's" do
+    covers_route 'GET /g/:slug/inventory_items/:id/edit'
+    covers_route 'POST /g/:slug/inventory_items/:id/edit'
     create_gathering(privacy: 'open')
     create_other_gathering
     other_item = @other_gathering.inventory_items.create!(name: 'Secret stove', team: @other_gathering.teams.first, account: @other_account)
@@ -160,6 +169,8 @@ class GatheringBudgetTest < ActiveSupport::TestCase
   end
 
   test 'the old accommodation and transport pages go to the options' do
+    covers_route 'GET /g/:slug/accoms'
+    covers_route 'GET /g/:slug/transports'
     create_gathering(privacy: 'open')
     %w[accoms transports].each do |path|
       get gathering_path("/#{path}")
@@ -190,6 +201,7 @@ class GatheringBudgetTest < ActiveSupport::TestCase
   end
 
   test "a member can't be moved into an option that's full, but stays in a full one when it's saved again" do
+    covers_route 'POST /g/:slug/optionships/:id/edit'
     create_gathering(privacy: 'open')
     member = create_member
     other = create_member(name: 'Other Person')
@@ -211,6 +223,7 @@ class GatheringBudgetTest < ActiveSupport::TestCase
   end
 
   test "only the gathering's admins edit its members' options, and paid options themselves" do
+    covers_route 'GET /g/:slug/options/:id/edit'
     create_gathering(privacy: 'open')
     member = create_member
     other = create_member(name: 'Other Person')
@@ -243,6 +256,7 @@ class GatheringBudgetTest < ActiveSupport::TestCase
   end
 
   test "a gathering's option routes don't find another gathering's optionships" do
+    covers_route 'GET /g/:slug/optionships/:id/edit'
     create_gathering(privacy: 'open')
     create_other_gathering
     other_option = @other_gathering.options.create!(name: 'Secret yurt', type: 'Accommodation', account: @other_account)

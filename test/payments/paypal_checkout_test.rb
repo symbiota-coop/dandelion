@@ -255,6 +255,7 @@ class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
   end
 
   test 'a PayPal order captured already completes the order without capturing it again' do
+    covers_route 'GET /e/:slug/orders/:order_id/payment_completed'
     create_paypal_organisation
     create_event(prices: [10])
     order = create_incomplete_order(@event, paypal_order_id: "PAYPAL-#{SecureRandom.hex(4)}")
@@ -362,6 +363,7 @@ class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
   # Webhooks
 
   test 'a forged webhook saying a payment was captured completes nothing unless PayPal says so' do
+    covers_route 'POST /o/:slug/paypal_webhook'
     create_paypal_organisation
     create_event(prices: [10])
     order = create_incomplete_order(@event, paypal_order_id: "PAYPAL-#{SecureRandom.hex(4)}")

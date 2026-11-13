@@ -434,6 +434,7 @@ class IntegrationsAtprotoEventsTest < ActiveSupport::TestCase
   # Connecting an account
 
   test 'an organisation admin connects an account, stored with the DID and handle Bluesky gives, and disconnects it' do
+    covers_route 'POST /o/:slug/atproto/disconnect'
     create_organisation
     sign_in_with_rack(@account)
     with_atproto do
@@ -451,6 +452,7 @@ class IntegrationsAtprotoEventsTest < ActiveSupport::TestCase
   end
 
   test "credentials Bluesky refuses aren't saved" do
+    covers_route 'POST /o/:slug/atproto/connect'
     create_organisation
     sign_in_with_rack(@account)
     with_atproto do
@@ -464,6 +466,7 @@ class IntegrationsAtprotoEventsTest < ActiveSupport::TestCase
   end
 
   test "someone who isn't an admin of the organisation can't see, connect or disconnect its account" do
+    covers_route 'GET /o/:slug/atproto/connect'
     connected_organisation
     [nil, FactoryBot.create(:account)].each do |account|
       account ? sign_in_with_rack(account) : clear_cookies
@@ -485,6 +488,7 @@ class IntegrationsAtprotoEventsTest < ActiveSupport::TestCase
   end
 
   test "the organisation's edit form can't set its Bluesky handle or app password, which only connecting checks and sets" do
+    covers_route 'POST /o/:slug/edit'
     connected_organisation
     sign_in_with_rack(@account)
     [{ atproto_handle: 'someone-else.test' }, { atproto_app_password: 'forged-password' }].each do |organisation_params|

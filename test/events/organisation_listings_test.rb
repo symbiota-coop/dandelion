@@ -213,6 +213,7 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
   end
 
   test "the events block lists the organisation's upcoming public events, ten a page, and members_events just members' events" do
+    covers_route 'GET /o/:slug/events_block'
     create_listing_events
     create_event(as: :past_event, name: 'Bygone event', start_time: 3.days.ago, end_time: 3.days.ago + 2.hours)
     create_event(as: :members_event, name: 'Donors only event', monthly_donors_only: true)
@@ -256,6 +257,7 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
   end
 
   test "the event lookup gives an organisation's admins its own and cohosted events, secret and locked ones too, and nobody else any" do
+    covers_route 'GET /o/:slug/events/lookup'
     create_listing_events
     path = "/o/#{@organisation.id}/events/lookup.json"
 

@@ -21,6 +21,7 @@ class DesignTest < ActiveSupport::TestCase
   end
 
   test 'the design guide renders signed out without writing to the database' do
+    covers_route 'GET /design'
     assert_design_guide_renders_without_writing
   end
 
@@ -30,6 +31,7 @@ class DesignTest < ActiveSupport::TestCase
   end
 
   test 'theme.css darkens a theme colour too light for white text, keeping its hue, and lightens one too dark' do
+    covers_route 'GET /theme.css'
     get '/theme.css', theme_color: '00af5e'
     assert_includes last_response.body, '--theme-500: #00af5e;'
     assert_includes last_response.body, '--theme-500-rgb: 0, 175, 94;'

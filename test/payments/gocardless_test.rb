@@ -105,6 +105,7 @@ class GocardlessPaymentsTest < ActiveSupport::TestCase
   end
 
   test 'confirmed payment webhook restores a deleted instant bank pay checkout' do
+    covers_route 'POST /o/:slug/gocardless_webhook'
     create_instant_event
     order = create_incomplete_order(@event, gocardless_payment_request_id: "PRQ#{SecureRandom.hex(4)}")
     payment_request_id = order.gocardless_payment_request_id

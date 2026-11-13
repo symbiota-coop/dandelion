@@ -11,6 +11,7 @@ class StatsDatabaseTest < ActiveSupport::TestCase
   end
 
   test 'an admin sees each collection, and flags one no model uses' do
+    covers_route 'GET /stats/collections'
     Mongoid.default_client[:leftover_things].insert_one(name: 'x')
     sign_in(FactoryBot.create(:account, admin: true))
 
@@ -28,6 +29,7 @@ class StatsDatabaseTest < ActiveSupport::TestCase
   end
 
   test 'an admin sees indexes, with unused ones flagged and TTL ones not' do
+    covers_route 'GET /stats/indexes'
     Mongoid.default_client[:leftover_things].indexes.create_one({ name: 1 }, name: 'leftover_name')
     Mongoid.default_client[:leftover_things].indexes.create_one({ created_at: 1 }, name: 'created_at_ttl', expire_after: 3600)
     sign_in(FactoryBot.create(:account, admin: true))

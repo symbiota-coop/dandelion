@@ -30,6 +30,7 @@ class PmailsTest < ActiveSupport::TestCase
   end
 
   test 'pmail preview blocks scripts' do
+    covers_route 'GET /pmails/:pmail_id/preview'
     create_organisation
     pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone', body: '<p>Hi</p><script>document.title = "pwned"</script>')
     sign_in(@account)
@@ -169,6 +170,7 @@ class PmailsTest < ActiveSupport::TestCase
   end
 
   test 'ticket group pmail is labelled in the pmail list' do
+    covers_route 'GET /e/:slug/pmails'
     create_event
     ticket_group = @event.ticket_groups.create!(name: 'Backstage', capacity: 10)
     FactoryBot.create(:pmail, organisation: @organisation, to_option: "ticket_group:#{ticket_group.id}")
@@ -269,6 +271,7 @@ class PmailsTest < ActiveSupport::TestCase
 
   test 'event pmail to options include ticket type waitlists when enabled' do
     covers 'events/mailer-to-waitlist@62f7ed', 'events/mailer-to-ticket-type-waitlists@c83e93', 'mailer/waitlist-recipients@085f4c'
+    covers_route 'GET /pmails/:oid/attachments'
     create_event(allow_ticket_type_waitlists: true)
     ticket_type = FactoryBot.create(:ticket_type, event: @event, quantity: 1, name: 'Weekend')
 
@@ -467,6 +470,7 @@ class PmailsTest < ActiveSupport::TestCase
 
   test 'a sent free gift message shows its delivery, open and click rates, and own Mailgun accounts also get a link to Mailgun analytics' do
     covers 'organisations/free-gift-email-analytics@2fc6d9', 'mailer/free-gift-rates@6782fe'
+    covers_route 'GET /pmails/:pmail_id/edit'
     stats = mailgun_tag_stats(delivered: 200, opened: 50, clicked: 10)
     create_organisation
     sign_in_with_rack(@account)

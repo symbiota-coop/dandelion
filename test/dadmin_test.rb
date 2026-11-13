@@ -17,6 +17,7 @@ class DadminTest < ActiveSupport::TestCase
   end
 
   test 'signed-out visitors are sent to sign in' do
+    covers_route 'GET /dadmin'
     get '/dadmin'
     assert last_response.redirect?
     assert_match %r{/accounts/sign_in\z}, last_response.location
@@ -98,6 +99,7 @@ class DadminTest < ActiveSupport::TestCase
   end
 
   test 'unsupported criteria are ignored rather than erroring' do
+    covers_route 'GET /dadmin/index/:model'
     sign_in_as_admin
     create_event
     FactoryBot.create(:ticket_type, event: @event)
@@ -113,6 +115,7 @@ class DadminTest < ActiveSupport::TestCase
   end
 
   test "a record's related lists link by the association's own foreign key" do
+    covers_route 'GET /dadmin/edit/:model/:id'
     admin = sign_in_as_admin
     get "/dadmin/edit/Account/#{admin.id}"
     assert last_response.ok?
@@ -154,6 +157,7 @@ class DadminTest < ActiveSupport::TestCase
   end
 
   test 'new records can have lookups prefilled from the URL' do
+    covers_route 'GET /dadmin/new/:model'
     sign_in_as_admin
     create_event
     get "/dadmin/new/TicketType?event_id=#{@event.id}"
@@ -162,6 +166,8 @@ class DadminTest < ActiveSupport::TestCase
   end
 
   test 'records can be created, edited and deleted' do
+    covers_route 'POST /dadmin/destroy/:model/:id'
+    covers_route 'POST /dadmin/edit/:model/:id'
     sign_in(FactoryBot.create(:account, admin: true))
     visit '/dadmin/new/EventTag'
     fill_in 'Name', with: 'dadmin-tag'
@@ -183,6 +189,7 @@ class DadminTest < ActiveSupport::TestCase
   end
 
   test 'saving in a popup reloads the page that opened it' do
+    covers_route 'POST /dadmin/new/:model'
     sign_in_as_admin
     post '/dadmin/new/EventTag', event_tag: { name: 'popup-tag' }, popup: true
     assert last_response.ok?

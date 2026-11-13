@@ -139,6 +139,8 @@ class MessagesTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test 'messages routes require sign in' do
+    covers_route 'GET /messages'
+    covers_route 'POST /messages/:username/send'
     create_messaging_pair
 
     get '/messages'
@@ -149,6 +151,7 @@ class MessagesTest < ActiveSupport::TestCase
   end
 
   test "a username that is another account's id doesn't take its old links" do
+    covers_route 'GET /messages/:username/send'
     create_messaging_pair
     impostor = create_messenger
     impostor.set(username: @account1.id.to_s)
@@ -183,6 +186,7 @@ class MessagesTest < ActiveSupport::TestCase
   end
 
   test 'thread polls get an empty 304 until a message or read receipt changes the stamp' do
+    covers_route 'GET /messages/:username'
     create_messaging_pair
     sign_in_with_rack(@account)
     create_message(messenger: @account, messengee: @account1, body: 'First')
@@ -232,6 +236,7 @@ class MessagesTest < ActiveSupport::TestCase
   end
 
   test 'index lists conversations and offers more when the page is full' do
+    covers_route 'GET /messages_index'
     create_messaging_pair
     account2 = create_messenger
     create_message(messenger: @account, messengee: @account1, body: 'With account 1')

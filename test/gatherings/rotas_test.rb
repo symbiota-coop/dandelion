@@ -13,6 +13,7 @@ class GatheringRotasTest < ActiveSupport::TestCase
   end
 
   test 'an admin sets how many shift points a slot is worth, and its shifts count them' do
+    covers_route 'POST /g/:slug/rslots/:id/edit'
     create_gathering(privacy: 'open')
     create_rota
     member = create_member
@@ -30,6 +31,8 @@ class GatheringRotasTest < ActiveSupport::TestCase
   end
 
   test "only the gathering's admins make and edit its rotas and their slots" do
+    covers_route 'GET /g/:slug/rotas/new'
+    covers_route 'POST /g/:slug/rotas/new'
     create_gathering(privacy: 'open')
     create_rota
     member = create_member
@@ -63,6 +66,8 @@ class GatheringRotasTest < ActiveSupport::TestCase
   end
 
   test "a gathering's rota and slot edit routes don't find another gathering's" do
+    covers_route 'GET /g/:slug/rotas/:id/edit'
+    covers_route 'POST /g/:slug/rotas/:id/edit'
     create_gathering(privacy: 'open')
     other_account = FactoryBot.create(:account)
     other_gathering = FactoryBot.create(:gathering, account: other_account)

@@ -140,6 +140,7 @@ class EvergreenEventsTest < ActiveSupport::TestCase
   end
 
   test "organisation orders page shows each event's progress with the page, rather than a request for each order" do
+    covers_route 'GET /o/:slug/orders'
     create_evergreen_order
     @event.tickets.create!(account: @attendee, order: @order, ticket_type: @event.ticket_types.first, payment_completed: true)
 
@@ -171,6 +172,7 @@ class EvergreenEventsTest < ActiveSupport::TestCase
 
   test 'evergreen events show first in listings and carousels, as On-demand instead of under a date' do
     covers 'events/evergreen-first-without-date@6b61cc'
+    covers_route 'GET /o/:slug/carousels/:id'
     create_event(as: :event1, name: 'Dated listing event', prices: [0])
     create_evergreen_event(name: 'On-demand listing event')
     [@event1, @event].each { |event| event.set(has_image: true, featured: true) }

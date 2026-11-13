@@ -63,6 +63,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
   end
 
   test 'signed out, feedback needs a feedback token' do
+    covers_route 'POST /e/:slug/give_feedback'
     post "/e/#{@event.slug}/give_feedback", feedback_params
     assert_kicked
     assert_equal 0, EventFeedback.count
@@ -129,6 +130,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
   end
 
   test "an event's feedback preview token shows the form but can't submit feedback" do
+    covers_route 'GET /e/:slug/give_feedback'
     token = @event.feedback_preview_token
     get "/e/#{@event.slug}/give_feedback", token: token
     assert_equal 200, last_response.status
@@ -150,6 +152,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test "only the event's admins can read its feedback, as a page or CSV" do
+    covers_route 'GET /e/:slug/feedback_report'
     feedback = create_feedback
     reviewer = FactoryBot.create(:account)
     @event.tickets.create!(account: reviewer, ticket_type: @event.ticket_types.first, payment_completed: true)
@@ -174,6 +177,9 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
   end
 
   test "only admins of an organisation, activity or local group can read its feedback list" do
+    covers_route 'GET /o/:organisation_slug/a/:slug/feedback'
+    covers_route 'GET /o/:organisation_slug/lg/:slug/feedback'
+    covers_route 'GET /o/:slug/feedback'
     create_feedback
     paths = ["/o/#{@organisation.slug}/feedback", "#{@activity.path}/feedback", "/o/#{@organisation.slug}/lg/#{@local_group.slug}/feedback", '/stats/feedback']
     # A facilitator is an admin of the event, but not of its organisation, activity or local group
@@ -229,6 +235,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
 
   test "named feedback's CSV gives the author's email only to those who may see attendees' emails" do
     covers 'organisations/attendee-emails-admins-and-managers-only@10b712'
+    covers_route 'GET /e/:slug/feedback'
     @event.update!(show_emails: false)
     create_feedback
 
@@ -278,6 +285,8 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
   end
 
   test 'the facilitator feedback report and text are for signed-in facilitators, of their own events' do
+    covers_route 'GET /event_feedbacks/feedback'
+    covers_route 'GET /event_feedbacks/report'
     facilitator = create_facilitator
     create_feedback
     create_event(as: :other_event)
@@ -331,6 +340,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
   end
 
   test "feedback that's anonymous and can't be quoted can't be responded to, and a response to anonymous feedback emails no one" do
+    covers_route 'POST /event_feedbacks/:id/response'
     hidden = create_feedback(anonymous: true)
     sign_in_with_rack(@account)
     post "/event_feedbacks/#{hidden.id}/response", response: 'Reply'
@@ -345,6 +355,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
 
   test "feedback that may not be quoted publicly can't be given a public extract" do
     covers 'events/no-extract-control-not-public@82dbfb'
+    covers_route 'POST /event_feedbacks/:id/public_answers/:i'
     feedback = create_feedback(publicly_visible: false)
     sign_in_with_rack(@account)
     get "/event_feedbacks/#{feedback.id}/public_answers/0"
@@ -358,6 +369,8 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
   end
 
   test "only the organisation's admins can delete feedback, and only site admins delete it for good" do
+    covers_route 'POST /event_feedbacks/:id/destroy'
+    covers_route 'POST /event_feedbacks/:id/hard_destroy'
     feedback = create_feedback
     [@attendee, create_facilitator].each do |account|
       sign_in_with_rack(account)

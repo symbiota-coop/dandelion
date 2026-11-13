@@ -66,6 +66,8 @@ class OrganisationsTest < ActiveSupport::TestCase
   end
 
   test 'creating an organisation via referral link sets referrer' do
+    covers_route 'GET /invite/:username'
+    covers_route 'GET /o/new'
     referrer = FactoryBot.create(:account, username: 'referreruser', has_signed_in: true)
     creator = FactoryBot.create(:account)
     organisation = FactoryBot.build_stubbed(:organisation)
@@ -95,6 +97,7 @@ class OrganisationsTest < ActiveSupport::TestCase
   end
 
   test 'organisation creator cannot set themselves as referrer via params' do
+    covers_route 'POST /o/new'
     account = FactoryBot.create(:account)
     organisation = FactoryBot.build_stubbed(:organisation)
 
@@ -116,6 +119,7 @@ class OrganisationsTest < ActiveSupport::TestCase
   end
 
   test 'organisation unsubscribe rejects arbitrary account_id' do
+    covers_route 'GET /o/:slug/unsubscribe'
     create_organisation
     victim = FactoryBot.create(:account)
     victim.organisationships.create!(organisation: @organisation)
@@ -142,6 +146,7 @@ class OrganisationsTest < ActiveSupport::TestCase
   end
 
   test 'organisation unsubscribe via token is two-click' do
+    covers_route 'POST /o/:slug/unsubscribe'
     create_organisation
     account = FactoryBot.create(:account, email: 'unsub@example.com')
     organisationship = account.organisationships.create!(organisation: @organisation)
@@ -187,6 +192,7 @@ class OrganisationsTest < ActiveSupport::TestCase
   end
 
   test 'organisation tier edit rejects organisation_id from params' do
+    covers_route 'POST /o/:slug/organisation_tiers/:organisation_tier_id/edit'
     create_organisation
     organisation_tier = @organisation.organisation_tiers.create!(name: 'Gold', threshold: 100, discount: 10)
     other_organisation = FactoryBot.create(:organisation)

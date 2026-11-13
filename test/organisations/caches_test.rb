@@ -91,6 +91,8 @@ class OrganisationCachesTest < ActiveSupport::TestCase
   end
 
   test 'only admins can see /stats/caches or repair caches' do
+    covers_route 'GET /stats/caches'
+    covers_route 'POST /stats/caches/repair'
     create_organisation
     member = FactoryBot.create(:account)
     member.organisationships.create!(organisation: @organisation, skip_welcome: true)
@@ -152,6 +154,7 @@ class OrganisationCachesTest < ActiveSupport::TestCase
   end
 
   test 'hiding and showing a membership on the organisation page takes it off and puts it back on the public cache' do
+    covers_route 'POST /o/:slug/show_membership/:f'
     create_organisation
     member = FactoryBot.create(:account)
     member.organisationships.create!(organisation: @organisation, skip_welcome: true)

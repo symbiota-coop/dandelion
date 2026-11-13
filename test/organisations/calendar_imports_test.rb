@@ -363,6 +363,7 @@ class OrganisationsCalendarImportsTest < ActiveSupport::TestCase
   end
 
   test "a feed's calendar name and errors show as text on the iCal sync page" do
+    covers_route 'GET /o/:slug/calendar_import'
     create_organisation(calendar_import_urls: FEED_URL)
     import(@organisation, ical(meetup, name: '<script>window.calendarImportXss = 1</script>Hostile'))
     @organisation.set(calendar_import_last_sync_error: "#{FEED_URL}: <img src=x onerror=window.calendarImportXss=2>")
@@ -531,6 +532,7 @@ class OrganisationsCalendarImportsTest < ActiveSupport::TestCase
   end
 
   test "an admin can't set an organisation's sync results through the iCal sync form" do
+    covers_route 'POST /o/:slug/calendar_import'
     create_organisation
     sign_in_with_rack(@account)
 

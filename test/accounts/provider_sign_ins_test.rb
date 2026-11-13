@@ -20,6 +20,7 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
   ATPROTO_MALLORY_AS = 'https://as.mallory.test'.freeze
 
   test 'connecting a provider while signed in waits for confirmation' do
+    covers_route 'GET /accounts/providers'
     account = FactoryBot.create(:account)
     sign_in(account)
     visit_omniauth_as(uid: 'google-uid-connect')
@@ -71,6 +72,7 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
   end
 
   test 'connecting a provider needs a sign in code from the last hour' do
+    covers_route 'GET /accounts/sign_in_code'
     account = FactoryBot.create(:account)
     sign_in_via_rack(account)
     omniauth_callback_as(uid: 'google-uid-unverified')
@@ -177,6 +179,7 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
   end
 
   test 'siwe request phase renders a message bound to this site' do
+    covers_route 'GET /accounts/ethereum'
     clear_cookies
     get '/auth/ethereum'
     follow_redirect!
@@ -200,6 +203,7 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
   end
 
   test 'siwe signs in an account whose wallet is linked, matching the address case-insensitively' do
+    covers_route 'POST /auth/:provider/callback'
     key = OpenSSL::PKey::EC.generate('secp256k1')
     address = siwe_address(key)
     account = FactoryBot.create(:account)
@@ -275,6 +279,7 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
   end
 
   test 'Bluesky sign-in pushes the authorization request and signs in the account connected to the DID' do
+    covers_route 'GET /auth/:provider/callback'
     account = FactoryBot.create(:account)
     account.provider_links.create!(provider: 'Bluesky', provider_uid: ATPROTO_ALICE, omniauth_hash: { 'info' => { 'did' => ATPROTO_ALICE } })
     network = atproto_network

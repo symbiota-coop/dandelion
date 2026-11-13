@@ -40,6 +40,7 @@ class GatheringRulesTest < ActiveSupport::TestCase
   end
 
   test 'people who are not members are sent to join, to apply or away, by how private the gathering is' do
+    covers_route 'GET /g/:slug/join'
     outsider = FactoryBot.create(:account)
     sign_in(outsider)
     { 'open' => '/join', 'closed' => '/apply' }.each do |privacy, path|
@@ -67,6 +68,8 @@ class GatheringRulesTest < ActiveSupport::TestCase
   end
 
   test 'a full gathering takes no more members, and a paused application waits' do
+    covers_route 'GET /g/:slug/applications/paused'
+    covers_route 'POST /g/:slug/mapplications/:id/process'
     create_gathering(privacy: 'closed', fixed_threshold: 0, member_limit: 1)
     applicant = FactoryBot.create(:account, name: 'Keen Applicant')
     sign_in(applicant)

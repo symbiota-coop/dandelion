@@ -139,6 +139,8 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'event tickets and orders pages run the same queries however many orders there are' do
+    covers_route 'GET /e/:slug/orders'
+    covers_route 'GET /e/:slug/tickets'
     create_event(prices: [10])
     @event.ticket_types.first.update!(quantity: 10)
     attendees = Array.new(2) { add_order_with_ticket(@event) }
@@ -192,6 +194,8 @@ class OrdersTest < ActiveSupport::TestCase
 
   test 'complimentary tickets cannot be cancelled by another account' do
     covers 'events/attendees-cancel-free-rsvps@2edb4c'
+    covers_route 'GET /tickets/:id/confirm_cancel'
+    covers_route 'POST /tickets/:id/destroy'
     ticket = create_complimentary_ticket
     sign_in_with_rack(FactoryBot.create(:account))
 
@@ -216,6 +220,7 @@ class OrdersTest < ActiveSupport::TestCase
 
   test 'free orders can be cancelled by their account, which emails them and tells the waitlist a place is available' do
     covers 'events/attendees-cancel-free-rsvps@2edb4c', 'events/cancellation-emails-and-waitlist@ddd281'
+    covers_route 'POST /orders/:id/destroy'
     Delayed::Job.delete_all
     create_complete_order_with_ticket
     @event.set(capacity: 1)
@@ -251,6 +256,7 @@ class OrdersTest < ActiveSupport::TestCase
 
   test 'the Cancel your RSVP links in ticket and reminder emails cancel a free order' do
     covers 'events/attendees-cancel-free-rsvps@2edb4c'
+    covers_route 'GET /orders/:id/confirm_cancel'
     create_complete_order_with_ticket
     html = EmailHelper.html(:tickets, event: @event, order: @order, account: @attendee, tickets_table: '', header_image_url: nil)
     assert_includes html, "/orders/#{@order.id}/confirm_cancel?link_token=%recipient.token%"
@@ -270,6 +276,7 @@ class OrdersTest < ActiveSupport::TestCase
 
   test 'paid orders and tickets cannot be cancelled or refunded by their attendee' do
     covers 'events/paid-orders-not-cancellable@9106dd', 'events/attendees-cannot-refund@1c589f'
+    covers_route 'POST /e/:slug/tickets/:ticket_id/refund_and_destroy'
     create_event(prices: [10])
     order = create_paid_order(@event)
     ticket = order.tickets.create!(event: @event, account: order.account, ticket_type: @event.ticket_types.first, price: 10,
@@ -316,6 +323,8 @@ class OrdersTest < ActiveSupport::TestCase
 
   test 'only the orderer gets the order confirmation unless the event sends it to other ticketholders' do
     covers 'events/ticketholder-confirmation-setting@b8610e'
+    covers_route 'GET /e/:slug/orders/:order_id/ticketholders/:ticket_id/email'
+    covers_route 'POST /e/:slug/orders/:order_id/ticketholders/:ticket_id/email'
     Delayed::Job.delete_all
     create_complete_order_with_ticket
     @ticket.set(email: 'holder@example.com')
@@ -352,6 +361,7 @@ class OrdersTest < ActiveSupport::TestCase
 
   test 'the original ticket PDF still checks in after the ticketholder changes' do
     covers 'events/ticket-pdf-works-after-transfer@a22930'
+    covers_route 'POST /e/:slug/check_in/:ticket_id'
     create_complete_order_with_ticket
     token = @ticket.public_id
     @ticket.set(name: 'New Holder', email: 'newholder@example.com')

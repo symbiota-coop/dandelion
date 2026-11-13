@@ -56,6 +56,7 @@ class OrderTokensTest < ActiveSupport::TestCase
   end
 
   test 'order confirmation is available via token' do
+    covers_route 'GET /orders/:id'
     create_complete_order
 
     get "/orders/#{@order.token}"
@@ -165,6 +166,7 @@ class OrderTokensTest < ActiveSupport::TestCase
   end
 
   test 'ticketholder details of tokenised tickets cannot be edited with the ticket mongo id' do
+    covers_route 'POST /e/:slug/orders/:order_id/ticketholders/:ticket_id/name'
     create_complete_order_with_ticket
 
     get ticketholder_path(@order.token, 'name', ticket_ref: @ticket.id)
@@ -199,6 +201,7 @@ class OrderTokensTest < ActiveSupport::TestCase
   end
 
   test 'ticketholder fields are served with the order token kept from referrers' do
+    covers_route 'GET /e/:slug/orders/:order_id/ticketholders/:ticket_id/name'
     create_complete_order_with_ticket
 
     get ticketholder_path(@order.token, 'name')

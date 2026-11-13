@@ -74,6 +74,7 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'an image url uses the derivative another process stored while this one made it, dropping its own copy' do
+    covers_route 'GET /notifications'
     datastore = Dragonfly.app.datastore
     job = Dragonfly.app.fetch(Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg')))
     theirs = DragonflyJob.create!(signature: job.signature, uid: Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg')))
@@ -97,6 +98,8 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'generated avatars are PNGs, for initials of one or two Latin letters' do
+    covers_route 'GET /avatar/v2'
+    covers_route 'GET /avatar/v2/:initials'
     # ImageMagick, which draws them, isn't on CI's runner, so this checks the routes, not the drawing
     { '/avatar/v2.png' => nil, '/avatar/v2/SR.png' => 'SR', '/avatar/v2/%C3%89Z.png' => 'ÉZ' }.each do |path, initials|
       drawn = :not_drawn
@@ -163,6 +166,7 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'unsubscribe link does not follow an account you do not already follow' do
+    covers_route 'GET /u/:username/unsubscribe'
     victim = FactoryBot.create(:account)
     attacker = FactoryBot.create(:account)
     sign_in_with_rack(victim)
@@ -199,6 +203,7 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test "leaving an organisation, activity, local group or gathering, or unfollowing someone, takes it off the notification cache's ids at once" do
+    covers_route 'GET /accounts/privacyable/:p'
     organisation = FactoryBot.create(:organisation)
     activity = FactoryBot.create(:activity, organisation: organisation, privacy: 'open')
     local_group = FactoryBot.create(:local_group, organisation: organisation)
@@ -314,6 +319,7 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'return_to is cleared after signup redirect' do
+    covers_route 'GET /accounts/sign_out'
     referrer = FactoryBot.create(:account, username: 'refclear', has_signed_in: true)
     account = FactoryBot.build_stubbed(:account)
 
@@ -412,6 +418,7 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'existing account with organisation_id' do
+    covers_route 'GET /accounts/new'
     create_organisation
     existing_account = FactoryBot.create(:account)
 
@@ -638,6 +645,7 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'maps of many accounts show how many are in each hexagon, whoever is looking' do
+    covers_route 'GET /map'
     organisation = FactoryBot.create(:organisation)
     hackney = [-0.0553, 51.545]
     centre_lng, centre_lat = MapHexagons.point(MapHexagons.hex(*hackney, MapHexagons::SIZE), MapHexagons::SIZE)
@@ -767,6 +775,7 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'signup checks recaptcha when no skip secret is configured' do
+    covers_route 'POST /accounts/new'
     later = FactoryBot.build_stubbed(:account)
     verify_calls = with_recaptcha(skip_secret: nil) { post_new_account(later) }
 

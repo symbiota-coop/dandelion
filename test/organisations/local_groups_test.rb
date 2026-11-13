@@ -4,6 +4,8 @@ class LocalGroupsTest < ActiveSupport::TestCase
   include Capybara::DSL
 
   test 'creating a local group' do
+    covers_route 'GET /local_groups/new'
+    covers_route 'POST /local_groups/new'
     create_organisation
     local_group = FactoryBot.build_stubbed(:local_group)
     sign_in(@account)

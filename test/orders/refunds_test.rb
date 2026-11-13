@@ -241,6 +241,7 @@ class OrderRefundsTest < ActiveSupport::TestCase
 
   test 'Remove and refund order refunds the whole payment, including a donation to Dandelion' do
     covers 'events/refund-order-whole-payment@0235d0'
+    covers_route 'POST /e/:slug/orders/:order_id/refund_and_destroy'
     create_event(prices: [10])
     @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json)
     order = create_paid_order(@event)
@@ -266,6 +267,7 @@ class OrderRefundsTest < ActiveSupport::TestCase
 
   test 'Remove order and Remove ticket remove without refunding' do
     covers 'events/remove-without-refund@febcde'
+    covers_route 'POST /e/:slug/tickets/:ticket_id/destroy'
     create_event(prices: [10])
     order = create_paid_order(@event)
     other_order = create_paid_order(@event)

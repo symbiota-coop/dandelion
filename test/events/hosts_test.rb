@@ -217,6 +217,7 @@ class EventHostsTest < ActiveSupport::TestCase
   end
 
   test 'organisation events json listing filters by stored carousel ids' do
+    covers_route 'GET /o/:slug/events'
     create_event(as: :matching)
     create_event(as: :other)
     tag = FactoryBot.create(:event_tag)

@@ -1,0 +1,178 @@
+# Routes no test covers (covers_route), each with why: test/lint_test.rb fails on any other route no test covers. Take
+# a route out once a test covers it. Not tested yet means a test is wanted
+DELETE /mcp: Not tested yet
+GET /accounts/:id/*: Not tested yet
+GET /accounts/unsubscribe: Not tested yet
+GET /activities/:id/*: Not tested yet
+GET /atproto/oauth-client-metadata.json: Not tested yet
+GET /auth/failure: Not tested yet
+GET /books: Not tested yet
+GET /code: Not tested yet
+GET /contact: Not tested yet
+GET /cookies: Not tested yet
+GET /dandelion-vs-luma: Not tested yet
+GET /docs: Not tested yet
+GET /docs/:slug: Not tested yet
+GET /docs/ask: Not tested yet
+GET /docs/question: Not tested yet
+GET /e/:event_slug/rpayments: Not tested yet
+GET /e/:event_slug/rpayments/:id/edit: Not tested yet
+GET /e/:slug/check_in: Not tested yet
+GET /e/:slug/duplicate: Not tested yet
+GET /e/:slug/event_sessions: Not tested yet
+GET /e/:slug/linked_image: Not tested yet
+GET /e/:slug/progress: Not tested yet
+GET /e/:slug/star: Not tested yet
+GET /e/:slug/stats: Not tested yet
+GET /e/:slug/ticket_type_waitlists: Not tested yet
+GET /e/:slug/ticket_types: Not tested yet
+GET /e/:slug/waitlist: Not tested yet
+GET /error: Not tested yet
+GET /event_sessions/:id: Not tested yet
+GET /features: Not tested yet
+GET /feedback: Not tested yet
+GET /films: Not tested yet
+GET /follow/:username: Not tested yet
+GET /follow/starred/:id: Not tested yet
+GET /fragments/delete/:q: Not tested yet
+GET /g/:slug/options/:id: Not tested yet
+GET /g/:slug/rotas/:id/create_shift: Not tested yet
+GET /g/:slug/subscribe: Not tested yet
+GET /g/:slug/teams/:id/unsubscribe: Not tested yet
+GET /g/:slug/tiers: Not tested yet
+GET /gatherings/autocomplete: Not tested yet
+GET /geolocate: Site admins' stats and diagnostics
+GET /health: Not tested yet
+GET /icons/calendar/:month/:day: Not tested yet
+GET /icons/image/:image: Not tested yet
+GET /local_groups/:id: Not tested yet
+GET /locations/:name: Not tested yet
+GET /map/home: Not tested yet
+GET /map/trigger: Not tested yet
+GET /mcp: Not tested yet
+GET /network: Not tested yet
+GET /not_found: Not tested yet
+GET /o/:organisation_slug/a/:slug/activityship: Not tested yet
+GET /o/:organisation_slug/a/:slug/activityships/admins: Not tested yet
+GET /o/:organisation_slug/a/:slug/events/stats: Not tested yet
+GET /o/:organisation_slug/a/:slug/feedback_summary: Not tested yet
+GET /o/:organisation_slug/a/:slug/pmails: Not tested yet
+GET /o/:organisation_slug/a/:slug/stats: Not tested yet
+GET /o/:organisation_slug/a/:slug/subscribed/:activityship_id: Not tested yet
+GET /o/:organisation_slug/a/:slug/unsubscribe: Not tested yet
+GET /o/:organisation_slug/lg/:slug/events/stats: Not tested yet
+GET /o/:organisation_slug/lg/:slug/local_groupships/admins: Not tested yet
+GET /o/:organisation_slug/lg/:slug/pmails: Not tested yet
+GET /o/:organisation_slug/lg/:slug/stats: Not tested yet
+GET /o/:slug/carousels/:carousel_id/edit: Not tested yet
+GET /o/:slug/carousels/new: Not tested yet
+GET /o/:slug/monthly_donations_count: Not tested yet
+GET /o/:slug/monthly_donors_count: Not tested yet
+GET /o/:slug/news: Not tested yet
+GET /o/:slug/news/latest: Not tested yet
+GET /o/:slug/organisationship: Not tested yet
+GET /o/:slug/subscribe: Not tested yet
+GET /o/:slug/subscribed_accounts_count: Not tested yet
+GET /orders/:id/confirm_destroy: Not tested yet
+GET /photos/:id: Not tested yet
+GET /points/:model/:id: Not tested yet
+GET /posts/:id/unsubscribe: Not tested yet
+GET /privacy: Not tested yet
+GET /raise: Site admins' stats and diagnostics
+GET /raise_job: Site admins' stats and diagnostics
+GET /recommendations/events: Not tested yet
+GET /recommendations/people: Not tested yet
+GET /referrals: Not tested yet
+GET /stats/charts: Site admins' stats and diagnostics
+GET /stats/comments: Site admins' stats and diagnostics
+GET /stats/contributions: Site admins' stats and diagnostics
+GET /stats/delivery: Site admins' stats and diagnostics
+GET /stats/files: Site admins' stats and diagnostics
+GET /stats/icons: Site admins' stats and diagnostics
+GET /stats/messages: Site admins' stats and diagnostics
+GET /stats/openrouter: Site admins' stats and diagnostics
+GET /stats/orders: Site admins' stats and diagnostics
+GET /stats/organisations: Site admins' stats and diagnostics
+GET /stats/packages: Site admins' stats and diagnostics
+GET /stats/referrals: Site admins' stats and diagnostics
+GET /stats/routes: Site admins' stats and diagnostics
+GET /stats/sentry_spans: Site admins' stats and diagnostics
+GET /stats/traces: Site admins' stats and diagnostics
+GET /stats/traces/:id: Site admins' stats and diagnostics
+GET /stats/traces/slowest: Site admins' stats and diagnostics
+GET /stats/transactions: Site admins' stats and diagnostics
+GET /stripe_row_splitter: Not tested yet
+GET /terms: Not tested yet
+GET /tickets/:id/price: Not tested yet
+GET /tickets/:id/ticket_type: Not tested yet
+GET /u/:username/activities: Not tested yet
+GET /u/:username/gatherings: Not tested yet
+GET /u/:username/local_groups: Not tested yet
+GET /wheel-of-the-year.json: Not tested yet
+GET /youtube_thumb/:id: Not tested yet
+POST /accounts/disconnect/:provider: Not tested yet
+POST /accounts/providers/cancel: Not tested yet
+POST /accounts/providers/confirm: Not tested yet
+POST /activities/:id/*: Not tested yet
+POST /activityships/:id/destroy: Not tested yet
+POST /checked_messages: Not tested yet
+POST /checked_notifications: Not tested yet
+POST /comments/:id/destroy: Not tested yet
+POST /comments/:id/file/destroy: Not tested yet
+POST /confirm_email: Not tested yet
+POST /docs/question: Not tested yet
+POST /drafts/:id/destroy: Not tested yet
+POST /e/:event_slug/rpayments/:id/destroy: Not tested yet
+POST /e/:event_slug/rpayments/new: Not tested yet
+POST /e/:slug/do_star: Not tested yet
+POST /e/:slug/event_sessions/destroy: Not tested yet
+POST /e/:slug/unstar: Not tested yet
+POST /event_boosts/stripe_webhook: Not tested yet
+POST /feedback: Not tested yet
+POST /follow/:username: Not tested yet
+POST /follow/star/:id: Not tested yet
+POST /follow/unstar/:id: Not tested yet
+POST /g/:slug/destroy: Not tested yet
+POST /g/:slug/hide_from_sidebar: Not tested yet
+POST /g/:slug/roles/order: Not tested yet
+POST /g/:slug/rslots/order: Not tested yet
+POST /g/:slug/set_subscribe: Not tested yet
+POST /g/:slug/show_in_sidebar: Not tested yet
+POST /g/:slug/spaces/:id/destroy: Not tested yet
+POST /g/:slug/spaces/order: Not tested yet
+POST /g/:slug/teams/:id/budget: Not tested yet
+POST /g/:slug/tslots/:id/destroy: Not tested yet
+POST /g/:slug/tslots/order: Not tested yet
+POST /g/:slug/verdicts/:id/destroy: Not tested yet
+POST /local_groups/:id/*: Not tested yet
+POST /o/:organisation_slug/a/:slug/activityships/admin: Not tested yet
+POST /o/:organisation_slug/a/:slug/activityships/unadmin: Not tested yet
+POST /o/:organisation_slug/a/:slug/destroy: Not tested yet
+POST /o/:organisation_slug/a/:slug/feedback_summary: Not tested yet
+POST /o/:organisation_slug/a/:slug/feedback_summary/delete: Not tested yet
+POST /o/:organisation_slug/a/:slug/followers: Not tested yet
+POST /o/:organisation_slug/a/:slug/subscribed/:activityship_id: Not tested yet
+POST /o/:organisation_slug/a/:slug/unsubscribe: Not tested yet
+POST /o/:organisation_slug/lg/:slug/destroy: Not tested yet
+POST /o/:organisation_slug/lg/:slug/followers: Not tested yet
+POST /o/:organisation_slug/lg/:slug/local_groupships/admin: Not tested yet
+POST /o/:slug/carousels/:carousel_id/destroy: Not tested yet
+POST /o/:slug/carousels/:carousel_id/edit: Not tested yet
+POST /o/:slug/carousels/new: Not tested yet
+POST /o/:slug/carousels/order: Not tested yet
+POST /o/:slug/organisationship: Not tested yet
+POST /organisations/:id/*: Not tested yet
+POST /photos/:id/destroy: Not tested yet
+POST /photos/new: Not tested yet
+POST /pmails/:oid/attachments/:attachment_id/destroy: Not tested yet
+POST /referrals/:id/claim: Not tested yet
+POST /sidebar: Not tested yet
+POST /stats/traces/delete_before: Site admins' stats and diagnostics
+POST /stripe_row_splitter: Not tested yet
+POST /subscriptions/create: Not tested yet
+POST /tickets/:id/price: Not tested yet
+POST /tickets/:id/send_ticket: Not tested yet
+POST /tickets/:id/ticket_type: Not tested yet
+POST /u/:username/reset_password: Not tested yet
+POST /upload: Not tested yet
+POST /whatsapp: Experimental

@@ -100,6 +100,7 @@ class SearchTest < ActiveSupport::TestCase
   end
 
   test 'full page search for events' do
+    covers_route 'GET /search'
     create_event(name: 'Full Page Event Search', prices: [0])
 
     visit '/search?q=Full&type=events'
@@ -360,6 +361,7 @@ class SearchTest < ActiveSupport::TestCase
   end
 
   test 'the Atlas checks page checks each searchable model, and fails them on plain MongoDB' do
+    covers_route 'GET /stats/atlas'
     assert_equal %w[Account Activity Event Gathering LocalGroup Organisation Pmail], AtlasChecks.searchable_models.map(&:name)
 
     sign_in_with_rack(FactoryBot.create(:account, admin: true))

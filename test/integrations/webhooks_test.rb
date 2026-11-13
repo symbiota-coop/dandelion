@@ -17,6 +17,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'checkout.session.completed with unpaid status does not complete the order until async payment succeeds' do
+    covers_route 'POST /o/:slug/stripe_webhook'
     create_organisation(stripe_endpoint_secret: 'whsec_test')
     create_event(prices: [10])
     order = create_incomplete_order(@event, value: 10, session_id: "cs_#{SecureRandom.hex(4)}")
@@ -127,6 +128,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'whatsapp verification is refused when no verify token is configured' do
+    covers_route 'GET /whatsapp'
     with_whatsapp_verify_token(nil) do
       get '/whatsapp', 'hub.challenge' => '<script>alert(1)</script>'
     end
@@ -181,6 +183,7 @@ class WebhooksTest < ActiveSupport::TestCase
   end
 
   test 'a reply to a comment email that Mailgun signed becomes a comment' do
+    covers_route 'POST /inbound/:id'
     create_event
     discussion = @event.discussion_post!(@account)
     with_mailgun_signing_key('signing-key') do
@@ -222,6 +225,7 @@ class WebhooksTest < ActiveSupport::TestCase
 
   test 'a click webhook signed with the organisation\'s key is counted' do
     covers 'organisations/mailgun-click-webhook@cc88d6'
+    covers_route 'POST /o/:slug/mailgun_webhook'
     create_organisation(mailgun_webhook_signing_key: 'organisation-key')
     pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone')
     post "/o/#{@organisation.slug}/mailgun_webhook", mailgun_click_event(pmail, key: 'organisation-key'), 'CONTENT_TYPE' => 'application/json'

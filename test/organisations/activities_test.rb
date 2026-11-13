@@ -18,6 +18,8 @@ class ActivitiesTest < ActiveSupport::TestCase
   end
 
   test 'creating an activity' do
+    covers_route 'GET /activities/new'
+    covers_route 'POST /activities/new'
     create_organisation
     activity = FactoryBot.build_stubbed(:activity)
     sign_in(@account)
@@ -122,6 +124,8 @@ class ActivitiesTest < ActiveSupport::TestCase
 
   test 'organisers are emailed when people apply to an activity' do
     covers 'events/activity-application-emails-organisers@c84fd8'
+    covers_route 'GET /o/:organisation_slug/a/:slug/apply'
+    covers_route 'POST /o/:organisation_slug/a/:slug/apply'
     create_activity_with_questions
     Delayed::Job.delete_all
     applicant = FactoryBot.build_stubbed(:account)
@@ -167,6 +171,7 @@ class ActivitiesTest < ActiveSupport::TestCase
   end
 
   test "the followers list's Subscribed to mailer filter leaves out those unsubscribed from the activity, the organisation or everything" do
+    covers_route 'GET /o/:organisation_slug/a/:slug/followers'
     create_organisation
     activity = FactoryBot.create(:activity, organisation: @organisation)
     subscribed, from_activity, from_organisation, from_everything = Array.new(4) { FactoryBot.create(:account) }

@@ -68,6 +68,7 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
   end
 
   test 'an admin adds a follower by email, who also follows the organisation, and adding them again only warns' do
+    covers_route 'GET /o/:organisation_slug/lg/:slug/followers'
     create_local_group
     sign_in(@account)
     visit "#{@local_group.path}/followers"
@@ -108,6 +109,7 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
   end
 
   test 'an admin chooses whether they receive feedback' do
+    covers_route 'GET /o/:organisation_slug/lg/:slug'
     create_local_group
     local_groupship = @local_group.local_groupships.find_by(account: @account)
 
@@ -123,6 +125,8 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
   end
 
   test "a follower unsubscribes from the group's emails and stays a follower" do
+    covers_route 'GET /o/:organisation_slug/lg/:slug/unsubscribe'
+    covers_route 'POST /o/:organisation_slug/lg/:slug/unsubscribe'
     create_local_group
     person = follower
     sign_in(person)
@@ -137,6 +141,7 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test "followers, another group's admin, another organisation's admin and people signed out can't edit the group" do
+    covers_route 'GET /o/:organisation_slug/lg/:slug/edit'
     create_local_group
     name = @local_group.name
     other_group = FactoryBot.create(:local_group, organisation: @organisation, account: FactoryBot.create(:account))
@@ -177,6 +182,7 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
   end
 
   test "a forged form can't move the group to another organisation, change its creator or set its area apart from its geometry" do
+    covers_route 'POST /o/:organisation_slug/lg/:slug/edit'
     create_local_group
     other_organisation = FactoryBot.create(:organisation)
     area = @local_group.area
@@ -216,6 +222,7 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test "followers and another group's admin can't add followers or choose to receive feedback" do
+    covers_route 'POST /o/:organisation_slug/lg/:slug/add_follower'
     create_local_group
     other_group = FactoryBot.create(:local_group, organisation: @organisation, account: FactoryBot.create(:account))
     person = follower
@@ -238,6 +245,7 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
   end
 
   test 'an admin chooses receiving feedback for themselves only, and one who does not follow the group has nothing to choose' do
+    covers_route 'POST /o/:organisation_slug/lg/:slug/receive_feedback/:f'
     create_local_group
     other_admin = group_admin
     own = @local_group.local_groupships.find_by(account: @account)
@@ -257,6 +265,8 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
   end
 
   test "people follow the group with or without its emails and leave it, but an admin can't leave" do
+    covers_route 'GET /o/:organisation_slug/lg/:slug/local_groupship'
+    covers_route 'POST /o/:organisation_slug/lg/:slug/local_groupship'
     create_local_group
     person = FactoryBot.create(:account)
     sign_in_with_rack(person)
@@ -294,6 +304,8 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
   end
 
   test "hiding and showing membership needs following, and changes only one's own" do
+    covers_route 'POST /o/:organisation_slug/lg/:slug/hide_membership'
+    covers_route 'POST /o/:organisation_slug/lg/:slug/show_membership'
     create_local_group
     person = follower
     other = follower
@@ -315,6 +327,9 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
   end
 
   test "an admin of another group can't change a membership of this group under their own group's URL" do
+    covers_route 'GET /o/:organisation_slug/lg/:slug/subscribed/:local_groupship_id'
+    covers_route 'POST /local_groupships/:id/destroy'
+    covers_route 'POST /o/:organisation_slug/lg/:slug/local_groupships/unadmin'
     create_local_group
     person = follower
     local_groupship = @local_group.local_groupships.find_by(account: person)
@@ -337,6 +352,7 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
   end
 
   test "an admin turns a follower's emails off and on" do
+    covers_route 'POST /o/:organisation_slug/lg/:slug/subscribed/:local_groupship_id'
     create_local_group
     local_groupship = @local_group.local_groupships.find_by(account: follower)
     sign_in_with_rack(@account)

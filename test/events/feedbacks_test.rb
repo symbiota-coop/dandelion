@@ -34,6 +34,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
 
   test 'public activity and organisation lists show deleted feedback as Removed' do
     covers 'events/deleted-feedback-removed-on-public-pages@6a15d2'
+    covers_route 'GET /o/:slug/show_feedback'
     create_attended_event
     reviewer = FactoryBot.create(:account, name: 'Removed Reviewer')
     live_reviewer = FactoryBot.create(:account, name: 'Live Reviewer')
@@ -102,6 +103,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
 
   test 'public feedback shows a reply only under ratings that have a public extract' do
     covers 'events/public-feedback-reply-needs-extract@7877ec'
+    covers_route 'GET /o/:organisation_slug/a/:slug/show_feedback'
     create_attended_event
     quoted = FactoryBot.create(:account, name: 'Quoted Reviewer', has_signed_in: true)
     unquoted = FactoryBot.create(:account, name: 'Unquoted Reviewer', has_signed_in: true)
@@ -178,6 +180,8 @@ class EventFeedbacksTest < ActiveSupport::TestCase
   end
 
   test 'site admins can list and respond to feedback on an event whose organisation was deleted' do
+    covers_route 'GET /event_feedbacks/:id/response'
+    covers_route 'GET /stats/feedback'
     create_attended_event
     feedback = create_feedback(account: @attendee)
     @event.set(organisation_id: nil)
@@ -193,6 +197,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
 
   test 'single feedback page shows the attendee email only to email viewers' do
     covers 'organisations/attendee-emails-admins-and-managers-only@10b712'
+    covers_route 'GET /event_feedbacks/:id'
     create_attended_event
     @event.update!(show_emails: false)
     facilitator = FactoryBot.create(:account)
@@ -273,6 +278,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
 
   test 'an attendee can choose a star rating with the mouse and submit it' do
     covers 'events/attendees-give-feedback@24ba67'
+    covers_route 'GET /donate'
     visit_feedback_form
 
     find('label[for="event_feedback_rating_4"]').hover
@@ -386,6 +392,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
 
   test 'facilitators appear on the Facilitators page once they have received feedback' do
     covers 'events/facilitators-page-after-feedback@4c0000', 'organisations/facilitator-listed-emailed-opt-in@29059a'
+    covers_route 'GET /facilitators'
     create_attended_event
     facilitator = FactoryBot.create(:account, name: 'Rated Facilitator')
     unrated_facilitator = FactoryBot.create(:account, name: 'Unrated Facilitator')
@@ -409,6 +416,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
 
   test 'organisers can resend the feedback email from the Orders page' do
     covers 'events/resend-feedback-email@c5b06a'
+    covers_route 'POST /e/:slug/resend_feedback_email/:account_id'
     create_full_event_hierarchy(event_options: { prices: [0], feedback_questions: 'How was it?' })
     @event.set(start_time: 2.days.ago, end_time: 1.day.ago)
     attendee = FactoryBot.create(:account)
@@ -473,6 +481,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
 
   test 'no extract is suggested when the answer has nothing to quote' do
     covers 'events/public-extract-suggested@9c5eec'
+    covers_route 'GET /event_feedbacks/:id/public_answers/:i'
     create_attended_event
     answer = 'It was a wonderful day.'
     ['', 'Best course ever, highly recommended!'].each do |extract|

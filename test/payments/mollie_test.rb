@@ -112,6 +112,7 @@ class MolliePaymentsTest < ActiveSupport::TestCase
   end
 
   test 'paid mollie webhook restores a deleted checkout' do
+    covers_route 'POST /o/:slug/mollie_webhook'
     create_mollie_event
     order = create_incomplete_order(@event, mollie_payment_id: "tr_#{SecureRandom.hex(4)}")
     payment_id = order.mollie_payment_id

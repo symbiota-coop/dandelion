@@ -116,6 +116,7 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
   end
 
   test 'a mail sent to an activity tag before tags were removed goes to no one, and still lists' do
+    covers_route 'GET /o/:slug/pmails'
     create_organisation
     link_mailgun
     activity = FactoryBot.create(:activity, organisation: @organisation)
@@ -231,6 +232,7 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
   end
 
   test "a mail is saved to the organisation in the URL, whatever organisation or recipients the form names" do
+    covers_route 'POST /pmails/new'
     create_organisation
     other_organisation = FactoryBot.create(:organisation)
     other_activity = FactoryBot.create(:activity, organisation: other_organisation)
@@ -303,6 +305,7 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
   end
 
   test "an event's organiser can mail its attendees, but not the organisation's followers or another event's attendees" do
+    covers_route 'GET /pmails/new'
     create_event
     create_event(as: :other_event)
     organiser = FactoryBot.create(:account)
@@ -324,6 +327,7 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
   # Sending
 
   test 'a test goes only to the admin sending it, marked as a test' do
+    covers_route 'POST /pmails/:pmail_id/edit'
     create_organisation
     link_mailgun
     follower_of(@organisation)
@@ -401,6 +405,7 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
   end
 
   test "a sent mail can't be deleted" do
+    covers_route 'POST /pmails/:pmail_id/destroy'
     create_organisation
     pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: 'everyone')
     pmail.set(sent_at: Time.now)
@@ -415,6 +420,7 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
   # On the web
 
   test "an unsent mail can't be viewed on the web, even with its token" do
+    covers_route 'GET /pmails/:pmail_id'
     create_organisation
     pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: 'everyone')
 

@@ -37,6 +37,7 @@ class AccountSignInsTest < ActiveSupport::TestCase
   end
 
   test 'a sign in code works once' do
+    covers_route 'GET /accounts/sign_in'
     account = FactoryBot.create(:account)
     code = account.issue_sign_in_code!
 
@@ -78,6 +79,7 @@ class AccountSignInsTest < ActiveSupport::TestCase
   end
 
   test 'a POST from our own pages keeps the session, and a cross-site one runs signed out' do
+    covers_route 'POST /tickets/:id/toggle_resale'
     account = FactoryBot.create(:account)
     # Signed in, a ticket that isn't there is a 404; signed out, sign_in_required! sends you to sign up
     path = "/tickets/#{BSON::ObjectId.new}/toggle_resale"
@@ -99,6 +101,7 @@ class AccountSignInsTest < ActiveSupport::TestCase
   end
 
   test 'asking for a sign in code again resends the code already sent' do
+    covers_route 'POST /accounts/sign_in_code'
     account = FactoryBot.create(:account)
     code = account.issue_sign_in_code!
 
@@ -146,6 +149,7 @@ class AccountSignInsTest < ActiveSupport::TestCase
   end
 
   test 'a session from an email link cannot change the email or password without a code' do
+    covers_route 'GET /accounts/password'
     account = FactoryBot.create(:account)
     crypted_password = account.crypted_password
     account.generate_link_token!
@@ -164,6 +168,7 @@ class AccountSignInsTest < ActiveSupport::TestCase
   end
 
   test 'the profile form no longer changes the password' do
+    covers_route 'POST /accounts/edit'
     account = FactoryBot.create(:account)
     crypted_password = account.crypted_password
     sign_in_with_rack(account)
@@ -187,6 +192,7 @@ class AccountSignInsTest < ActiveSupport::TestCase
 
   # The form's minlength stops a browser sending a short one
   test 'changing the password needs it to be long enough' do
+    covers_route 'POST /accounts/password'
     account = FactoryBot.create(:account)
     crypted_password = account.crypted_password
     sign_in_with_rack(account)
@@ -230,6 +236,7 @@ class AccountSignInsTest < ActiveSupport::TestCase
 
   test 'the API key tab shows the key only after a sign in code' do
     covers 'integrations/zapier-and-mcp-same-api-key@a1a235'
+    covers_route 'GET /accounts/api_key'
     account = FactoryBot.create(:account)
     account.set(email_confirmed: true)
     account.generate_link_token!
@@ -249,6 +256,8 @@ class AccountSignInsTest < ActiveSupport::TestCase
   end
 
   test 'a session from an email link needs a sign in code to delete the account' do
+    covers_route 'GET /accounts/delete'
+    covers_route 'POST /accounts/destroy'
     account = FactoryBot.create(:account)
     account.set(email_confirmed: true)
     account.generate_link_token!
@@ -282,6 +291,7 @@ class AccountSignInsTest < ActiveSupport::TestCase
   end
 
   test 'a session from an email link needs a sign in code to disconnect a provider' do
+    covers_route 'POST /accounts/:id/*'
     account = FactoryBot.create(:account)
     account.set(email_confirmed: true)
     account.provider_links.create!(provider: 'Google', provider_uid: 'google-uid-disconnect', omniauth_hash: { 'uid' => 'google-uid-disconnect' })
@@ -314,6 +324,7 @@ class AccountSignInsTest < ActiveSupport::TestCase
   end
 
   test 'the API key tab replaces the API key and the calendar key separately' do
+    covers_route 'POST /accounts/api_key'
     account = FactoryBot.create(:account)
     api_key = account.api_key
     ics_key = account.ensure_ics_key!
@@ -370,6 +381,7 @@ class AccountSignInsTest < ActiveSupport::TestCase
   end
 
   test 'a session from an email link needs a code to sign out other browsers' do
+    covers_route 'POST /accounts/sign_out_other_browsers'
     account = FactoryBot.create(:account)
     account.generate_link_token!
     clear_cookies
@@ -400,6 +412,7 @@ class AccountSignInsTest < ActiveSupport::TestCase
   end
 
   test 'a session from before session tokens is kept until the account revokes its sessions' do
+    covers_route 'GET /accounts/edit'
     account = FactoryBot.create(:account)
     clear_cookies
     env 'rack.session', { 'account_id' => account.id.to_s }

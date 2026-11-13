@@ -17,6 +17,7 @@ class EventDiscussionsTest < ActiveSupport::TestCase
   end
 
   test 'email notifications for a discussion nobody has written in yet make its post' do
+    covers_route 'GET /subscriptions/:id/unsubscribe'
     create_event(prices: [0])
     attendee = visit_discussion_as_attendee
     assert_nil @event.discussion_post
@@ -31,6 +32,7 @@ class EventDiscussionsTest < ActiveSupport::TestCase
   end
 
   test 'the unsubscribe link in older discussion emails unsubscribes' do
+    covers_route 'GET /e/:slug/unsubscribe_discussion'
     create_event(prices: [0])
     attendee = FactoryBot.create(:account)
     @event.tickets.create!(account: attendee, ticket_type: @event.ticket_types.first, payment_completed: true)
@@ -52,6 +54,7 @@ class EventDiscussionsTest < ActiveSupport::TestCase
   end
 
   test 'only people who can see the discussion can subscribe to it' do
+    covers_route 'POST /e/:slug/subscribe_discussion'
     create_event(prices: [0])
     outsider = FactoryBot.create(:account)
 
@@ -79,6 +82,7 @@ class EventDiscussionsTest < ActiveSupport::TestCase
   end
 
   test 'a discussion comment cannot be edited to nothing' do
+    covers_route 'POST /comments/:id/edit'
     create_event(prices: [0])
     attendee = FactoryBot.create(:account)
     @event.tickets.create!(account: attendee, ticket_type: @event.ticket_types.first, payment_completed: true)

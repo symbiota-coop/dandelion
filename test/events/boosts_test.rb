@@ -5,6 +5,8 @@ class EventBoostsTest < ActiveSupport::TestCase
   include Rack::Test::Methods
 
   test 'boost payment can be marked complete' do
+    covers_route 'GET /e/:slug/boosts'
+    covers_route 'POST /e/:slug/boosts'
     create_event(prices: [0])
 
     sign_in(@account)
@@ -101,6 +103,7 @@ class EventBoostsTest < ActiveSupport::TestCase
 
   test 'boosted unpaid event appears in the boost slot but not the regular listing' do
     covers 'events/boosted-slot@240568'
+    covers_route 'GET /events'
     create_organisation
     @organisation.set(paid_up: false)
     create_event(name: 'Promotion-only boosted event')

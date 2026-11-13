@@ -74,6 +74,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   end
 
   test "an event's chat is its attendees' and admins', unless its discussion is hidden" do
+    covers_route 'GET /chat'
     create_event(prices: [0])
     attendee = FactoryBot.create(:account)
     @event.tickets.create!(account: attendee, ticket_type: @event.ticket_types.first, payment_completed: true)
@@ -123,6 +124,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   end
 
   test 'signed out, a discussion sends you to sign in' do
+    covers_route 'GET /commentable'
     team_thread
     get '/commentable', commentable_type: 'Team', commentable_id: @team.id
     assert last_response.redirect?
@@ -181,6 +183,8 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   # Reactions
 
   test 'members react to a comment once each, with one word, and unreact only their own reaction' do
+    covers_route 'GET /comments/:id/reactions'
+    covers_route 'GET /comments/:id/unreact'
     team_thread
     other_member = create_member(name: 'Other Member')
     sign_in_with_rack(other_member)
@@ -210,6 +214,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   end
 
   test "an event's attendees can react to its chat" do
+    covers_route 'POST /comments/:id/react'
     create_event(prices: [0])
     attendee = FactoryBot.create(:account)
     @event.tickets.create!(account: attendee, ticket_type: @event.ticket_types.first, payment_completed: true)
@@ -229,6 +234,8 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   # Read receipts
 
   test "reading a gathering thread marks its comments read, which its members can see who's read" do
+    covers_route 'GET /comments/:id/read_receipts'
+    covers_route 'GET /posts/:id'
     team_thread
     reader = create_member(name: 'Careful Reader')
     sign_in_with_rack(reader)
@@ -250,6 +257,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   # Replies
 
   test "a thread's replies are shown to its discussion's members" do
+    covers_route 'GET /posts/:id/post_replies'
     team_thread
     @post.comments.create!(account: @account, body: 'Count me in')
 
@@ -262,6 +270,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   # Polls
 
   test 'members vote once per option of a poll, and can take their vote back' do
+    covers_route 'GET /comments/:id/voptions'
     team_thread
     tuesday = @comment.voptions.create!(account: @member, text: 'Tuesday')
     wednesday = @comment.voptions.create!(account: @member, text: 'Wednesday')
@@ -309,6 +318,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   end
 
   test 'voting for an option again, as from a second tab, keeps the one vote' do
+    covers_route 'POST /voptions/:id/vote'
     team_thread
     tuesday = @comment.voptions.create!(account: @member, text: 'Tuesday')
     sign_in_with_rack(@member)
@@ -332,6 +342,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   end
 
   test "only a comment's author adds options to its poll" do
+    covers_route 'POST /voptions/create'
     team_thread
     sign_in_with_rack(create_member(name: 'Other Member'))
     xhr :post, '/voptions/create', comment_id: @comment.id, text: 'Never'
@@ -345,6 +356,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   end
 
   test "a poll option is removed by the person who added it, the comment's author or a site admin, and no one else" do
+    covers_route 'POST /voptions/:id/destroy'
     team_thread
     adder = create_member(name: 'Option Adder')
     options = %w[Tuesday Wednesday Thursday].map { |text| @comment.voptions.create!(account: adder, text: text) }
@@ -363,6 +375,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   end
 
   test "a poll option's remove button shows to the person who added it, the comment's author and site admins" do
+    covers_route 'GET /g/:slug/teams/:id'
     team_thread
     adder = create_member(name: 'Option Adder')
     @comment.voptions.create!(account: adder, text: 'Tuesday')
@@ -385,6 +398,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   # Files
 
   test "only a comment's author can attach a file to it, and not one a browser would run" do
+    covers_route 'POST /comments/:id/file'
     team_thread
     sign_in_with_rack(create_member(name: 'Other Member'))
     post "/comments/#{@comment.id}/file", file: upload('notes.txt')
@@ -414,6 +428,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   # Sending a comment by email
 
   test "a gathering's admins can send a comment to the thread's subscribers, once" do
+    covers_route 'POST /comments/:id/send'
     team_thread
     @member.set(has_signed_in: true)
     subscriber = create_member(name: 'Subscriber', has_signed_in: true)

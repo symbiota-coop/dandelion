@@ -13,6 +13,7 @@ require 'yaml'
 require 'rubocop'
 require 'erb_lint/all'
 require_relative '../lib/doc_claims'
+require_relative '../lib/route_marks'
 
 class LintTest < Minitest::Test
   ROOT = File.expand_path('..', __dir__)
@@ -505,6 +506,29 @@ class LintTest < Minitest::Test
     assert_empty problems, problems.join("\n")
     untested = claims.values.reject { |c| covers.any? { |ref, _| ref.split('@').first == c[:ref] } }.map { |c| "#{c[:at]}: #{c[:ref]}" }
     assert_empty untested, "No test covers these claims: write one and add covers '<ref>@<hash>' to it\n#{untested.join("\n")}"
+  end
+
+  def test_route_marks_read_routes_as_controllers_write_them
+    assert_equal 'app/app.rb', RouteMarks.routes['GET /'].split(':').first
+    assert RouteMarks.routes.key?('GET /dadmin/edit/:model/:id'), "a named controller's get :edit, map: '/path'"
+    assert RouteMarks.routes.key?('POST /e/:slug/orders/:order_id/restore_and_complete')
+  end
+
+  # AGENTS.md, Tests: a test covering a route says so (covers_route), so a new route needs a test, or a reason in
+  # test/routes_without_tests.yml
+  def test_every_route_is_covered
+    routes = RouteMarks.routes
+    marks = RouteMarks.marks
+    without = YAML.load_file(File.join(ROOT, 'test/routes_without_tests.yml'))
+    problems = marks.reject { |route, _| routes.key?(route) }.map do |route, at|
+      "#{at}: covers_route '#{route}' names no route: write it as 'VERB /path', the path as the controller writes it"
+    end
+    problems += (without.keys - routes.keys).map { |route| "test/routes_without_tests.yml: #{route} is no longer a route" }
+    problems += (without.keys & marks.map(&:first)).map { |route| "test/routes_without_tests.yml: a test covers #{route}, so take it out" }
+    problems += without.select { |_, why| why.to_s.strip.empty? }.keys.map { |route| "test/routes_without_tests.yml: say why #{route} has no test" }
+    assert_empty problems, problems.join("\n")
+    uncovered = (routes.keys - marks.map(&:first) - without.keys).map { |route| "#{routes[route]}: #{route}" }
+    assert_empty uncovered, "No test covers these routes: write one starting covers_route 'VERB /path', or say why in test/routes_without_tests.yml\n#{uncovered.join("\n")}"
   end
 
   # AGENTS.md, Build/vendored code: CKEditor 38 and later show a Powered by CKEditor badge under the GPL

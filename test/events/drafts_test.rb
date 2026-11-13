@@ -32,6 +32,7 @@ class EventDraftsTest < ActiveSupport::TestCase
 
   test 'draft save keeps ticket types and updates the same draft' do
     covers 'events/draft-autosave-restores-tickets@38928c'
+    covers_route 'POST /events/draft'
     create_organisation
     sign_in(@account)
     visit "/events/new?organisation_id=#{@organisation.id}"
@@ -61,6 +62,7 @@ class EventDraftsTest < ActiveSupport::TestCase
 
   test 'reloading a draft restores ticket types and groups' do
     covers 'events/draft-autosave-restores-tickets@38928c'
+    covers_route 'GET /accounts'
     create_organisation
     draft = create_event_draft
     sign_in(@account)

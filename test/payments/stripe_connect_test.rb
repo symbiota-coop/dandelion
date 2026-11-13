@@ -108,6 +108,7 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
   end
 
   test 'a paid checkout with an unknown session id changes nothing' do
+    covers_route 'POST /organisations/stripe_connect_webhook'
     order = create_connect_order
 
     deliver_connect_webhook(checkout_completed_payload('cs_unknown'))
@@ -134,6 +135,7 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
   end
 
   test 'an organisation admin disconnects the organisation from Stripe, forgetting its account' do
+    covers_route 'POST /organisations/stripe_disconnect'
     create_organisation(stripe_connect_json: connect_json)
     @organisation.set(stripe_account_json: { 'id' => 'acct_connect' }.to_json)
     sign_in_with_rack(@account)
@@ -198,6 +200,7 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
   end
 
   test 'disconnecting a personal Stripe account needs signing in' do
+    covers_route 'POST /o/:slug/stripe_disconnect'
     create_organisation
     @organisation.organisationships.find_by(account: @account).set(stripe_connect_json: connect_json)
 
@@ -268,6 +271,7 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
   end
 
   test 'a member connects their own Stripe account to an organisation, not the organisation\'s' do
+    covers_route 'GET /o/:slug/stripe_connect'
     create_organisation
     member = FactoryBot.create(:account)
     sign_in_with_rack(member)

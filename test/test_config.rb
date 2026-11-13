@@ -94,10 +94,10 @@ if ENV['RECORD_ROUTES'].present? # CI sets it empty unless asked for
   # As the route is matched, before the app's own before filters can halt it
   Dandelion::App.before do
     route = request.route_obj
-    # Padrino adds (.:format)? to the path the controller wrote, and keeps / as ''
+    # Padrino adds (.:format)? to the path the controller wrote, and keeps / as ''. HEAD is the GET route's
     path = route.original_path.delete_suffix('(.:format)?') if route
     path = '/' if path == ''
-    RouteRecording::REQUESTS[RouteRecording.test] << "#{route.verb} #{path}" if route && RouteRecording.test
+    RouteRecording::REQUESTS[RouteRecording.test] << "#{route.verb.sub('HEAD', 'GET')} #{path}" if route && RouteRecording.test
   end
   Minitest.after_run do
     FileUtils.mkdir_p('tmp/routes')

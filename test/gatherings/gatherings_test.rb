@@ -11,6 +11,9 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'creating a gathering' do
+    covers_route 'GET /g/new'
+    covers_route 'GET /gatherings'
+    covers_route 'POST /g/new'
     account = FactoryBot.create(:account)
     gathering = FactoryBot.build_stubbed(:gathering)
     sign_in(account)
@@ -28,6 +31,8 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'editing a gathering' do
+    covers_route 'GET /g/:slug/edit'
+    covers_route 'POST /g/:slug/edit'
     create_gathering
     sign_in(@account)
     visit "/g/#{@gathering.slug}/edit"
@@ -38,6 +43,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'copying a gathering without another admin destination redirects safely' do
+    covers_route 'GET /g/:slug/copy'
     create_gathering
     sign_in(@account)
 
@@ -50,6 +56,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'team edit rejects gathering_id from params' do
+    covers_route 'POST /g/:slug/teams/:id/edit'
     create_two_gatherings
     team = @gathering.teams.find_by(name: 'General')
 
@@ -60,6 +67,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'teamship create cannot attach a team from another gathering' do
+    covers_route 'POST /g/:slug/teamships/new'
     create_two_gatherings
     other_team = @other_gathering.teams.create!(name: 'Kitchen', account: @other_account)
 
@@ -70,6 +78,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'optionship create cannot attach an option from another gathering' do
+    covers_route 'POST /g/:slug/optionships/new'
     create_two_gatherings
     other_option = @other_gathering.options.create!(name: 'Cabin', type: 'Accommodation', account: @other_account)
 
@@ -108,6 +117,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'verdict create rejects mapplication_id from params' do
+    covers_route 'POST /g/:slug/mapplications/:id/verdicts/create'
     create_two_gatherings
     mapplication = @gathering.mapplications.create!(account: FactoryBot.create(:account), status: 'pending')
     other_mapplication = @other_gathering.mapplications.create!(account: FactoryBot.create(:account), status: 'pending')
@@ -120,6 +130,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'shift create cannot use a role from another rota' do
+    covers_route 'POST /g/:slug/rotas/:id/create_shift'
     create_two_gatherings
     rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
     rslot = Rslot.create!(name: 'Morning', rota: rota)
@@ -135,6 +146,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'self-service shift create scopes roles and slots to its rota' do
+    covers_route 'POST /g/:slug/shifts/create'
     create_two_gatherings
     rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
     rslot = Rslot.create!(name: 'Morning', rota: rota)
@@ -150,6 +162,10 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test "a gathering's rota routes only find its own rotas, roles, slots and shifts" do
+    covers_route 'GET /g/:slug/roles/:id/edit'
+    covers_route 'GET /g/:slug/shifts/:id/edit'
+    covers_route 'POST /g/:slug/roles/create'
+    covers_route 'POST /g/:slug/rslots/:id/destroy'
     create_two_gatherings
     rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
     other_rota = @other_gathering.rotas.create!(name: 'Bar', account: @other_account)
@@ -178,6 +194,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'member cannot reassign their shift to another account' do
+    covers_route 'POST /g/:slug/shifts/:id/edit'
     create_gathering
     member = FactoryBot.create(:account)
     other_member = FactoryBot.create(:account)
@@ -196,6 +213,8 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'members cannot create paid options or make free options paid' do
+    covers_route 'POST /g/:slug/options/:id/edit'
+    covers_route 'POST /g/:slug/options/new'
     create_gathering
     member = FactoryBot.create(:account)
     @gathering.memberships.create!(account: member)
@@ -210,6 +229,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'admins can create paid options, and members are not offered a cost' do
+    covers_route 'GET /g/:slug/options'
     create_gathering
     member = create_member
 
@@ -302,6 +322,8 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'applications submitted while signed out for an existing account do not make the account follow members' do
+    covers_route 'GET /g/:slug/apply'
+    covers_route 'POST /g/:slug/apply'
     create_gathering
     admin = @account
     @gathering.set(privacy: 'closed')
@@ -369,6 +391,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'comment cannot attach a post from another commentable' do
+    covers_route 'POST /comment'
     create_two_gatherings
     team = @gathering.teams.find_by(name: 'General')
     other_team = @other_gathering.teams.create!(name: 'Kitchen', account: @other_account)
@@ -433,6 +456,7 @@ class GatheringsTest < ActiveSupport::TestCase
 
   test 'people cannot join a gathering that takes applications through the join route' do
     covers 'gatherings/access-modes@d37537'
+    covers_route 'POST /g/:slug/join'
     create_gathering(privacy: 'closed')
     applicant = FactoryBot.create(:account)
     sign_in_with_rack(applicant)
@@ -457,6 +481,7 @@ class GatheringsTest < ActiveSupport::TestCase
 
   test 'all members can see and propose applicants' do
     covers 'gatherings/video-propose@686842', 'gatherings/members-see-and-vote@d114df'
+    covers_route 'GET /g/:slug/mapplication_row/:id'
     create_gathering(privacy: 'closed', fixed_threshold: 2)
     member = create_member
     applicant = FactoryBot.create(:account, name: 'Applicant Person')
@@ -473,6 +498,7 @@ class GatheringsTest < ActiveSupport::TestCase
 
   test 'non-members cannot see or vote on applications' do
     covers 'gatherings/members-see-and-vote@d114df'
+    covers_route 'GET /g/:slug/applications'
     create_gathering(privacy: 'closed', fixed_threshold: 2)
     mapplication = @gathering.mapplications.create!(account: FactoryBot.create(:account), status: 'pending')
     outsider = FactoryBot.create(:account)
@@ -506,6 +532,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test "an application opened in the modal doesn't focus its discussion form" do
+    covers_route 'GET /g/:slug/mapplications/:id'
     create_gathering(privacy: 'closed')
     mapplication = @gathering.mapplications.create!(account: FactoryBot.create(:account), status: 'pending')
     sign_in(@account)
@@ -517,6 +544,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'an edit form opened in the modal starts at its first field' do
+    covers_route 'GET /g/:slug/rslots/:id/edit'
     create_gathering(privacy: 'open')
     rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
     Rslot.create!(name: 'Morning', rota: rota)
@@ -544,6 +572,8 @@ class GatheringsTest < ActiveSupport::TestCase
 
   test 'the magic number can be the median of the numbers members suggest' do
     covers 'gatherings/median-magic-number@bbe05c'
+    covers_route 'GET /g/:slug/threshold'
+    covers_route 'POST /g/:slug/threshold'
     create_gathering(privacy: 'closed', fixed_threshold: 5, democratic_threshold: true)
     assert_nil @gathering.fixed_threshold
     members = Array.new(2) { FactoryBot.create(:account) }
@@ -604,6 +634,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'a full tier takes no one else through its route' do
+    covers_route 'POST /g/:slug/optionships/create'
     create_gathering
     tier = @gathering.options.create!(name: 'Standard', type: 'Tier', capacity: 1, cost: 100, account: @account)
     tier.optionships.create!(account: create_member, gathering: @gathering)
@@ -614,6 +645,8 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'the members table and the timetable render their rows with the page' do
+    covers_route 'GET /g/:slug/membership_row/:id'
+    covers_route 'GET /g/:slug/timetables/:id'
     create_gathering
     member = FactoryBot.create(:account, name: 'Member Person')
     @gathering.memberships.create!(account: member, added_by: @account)
@@ -645,6 +678,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test "the members CSV keeps each answer under its own question when a member has no joining answers" do
+    covers_route 'GET /g/:slug/members'
     create_gathering
     @gathering.update!(joining_questions: 'Why join?', application_questions: 'Why apply?')
     member = FactoryBot.create(:account, name: 'Applicant Person')
@@ -660,6 +694,7 @@ class GatheringsTest < ActiveSupport::TestCase
 
   test 'each of the six features can be enabled or disabled' do
     covers 'gatherings/optional-features@9dfad8'
+    covers_route 'GET /g/:slug'
     features = { contributions: 'options', teams: 'teams', timetables: 'timetables/new', rotas: 'rotas/new', inventory: 'inventory', budget: 'budget' }
     create_gathering
     sign_in_with_rack(@account)
@@ -675,6 +710,7 @@ class GatheringsTest < ActiveSupport::TestCase
 
   test 'copying a gathering copies its timetables, rotas and options but not its members, payments, activities or shifts' do
     covers 'gatherings/copy-timetables@ed0f5d', 'gatherings/copy-rotas@c68086', 'gatherings/copy-options@a1c0af', 'gatherings/copy-not-members@0f6c02'
+    covers_route 'POST /g/:slug/copy'
     create_two_gatherings
     @other_gathering.memberships.create!(account: @account, admin: true)
     member = FactoryBot.create(:account)
@@ -717,6 +753,8 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test 'site admins can browse and administer every gathering without being a member, but not act as a member' do
+    covers_route 'GET /g/:slug/todos'
+    covers_route 'GET /g/:slug/unsubscribe'
     create_gathering(privacy: 'secret', listed: false)
     team = @gathering.teams.create!(name: 'Kitchen', account: @account)
     rota = @gathering.rotas.create!(name: 'Bar', account: @account)
@@ -778,6 +816,9 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test "members can't change or remove another member's shift, teamship or optionship, nor can anyone signed out" do
+    covers_route 'POST /g/:slug/optionships/:id/destroy'
+    covers_route 'POST /g/:slug/shifts/:id/destroy'
+    covers_route 'POST /g/:slug/teamships/:id/destroy'
     create_gathering
     member = create_member
     other = create_member(name: 'Other Person')
@@ -803,6 +844,7 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test "unsubscribing a teamship from a team's emails clears its member's subscriptions to the team's posts, not the admin's" do
+    covers_route 'GET /g/:slug/teamships/:id/unsubscribe'
     create_gathering
     member = create_member
     team = @gathering.teams.create!(name: 'Garden', account: @account)

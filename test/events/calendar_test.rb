@@ -443,6 +443,7 @@ class CalendarTest < ActiveSupport::TestCase
   end
 
   test 'ics key grants access to my events ics but not my events html' do
+    covers_route 'GET /events/my'
     create_organisation
     create_event(coordinator: @account)
 

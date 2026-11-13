@@ -242,6 +242,8 @@ class IntegrationsAsnBlockingTest < ActiveSupport::TestCase
   end
 
   test 'a site admin blocks and unblocks an ASN in the rule' do
+    covers_route 'POST /stats/asns/block/:asn'
+    covers_route 'POST /stats/asns/unblock/:asn'
     sign_in_with_rack(FactoryBot.create(:account, admin: true))
     with_cloudflare(rule_answer: rule('1', '64500')) do |calls|
       post '/stats/asns/block/64501'
@@ -302,6 +304,7 @@ class IntegrationsAsnBlockingTest < ActiveSupport::TestCase
   end
 
   test 'a site admin marks an ASN legit and unmarks it' do
+    covers_route 'POST /stats/asns/legit/:asn'
     sign_in_with_rack(FactoryBot.create(:account, admin: true))
     post '/stats/asns/legit/64500'
     assert_equal '/stats/asns', URI(last_response.location).path
@@ -312,6 +315,7 @@ class IntegrationsAsnBlockingTest < ActiveSupport::TestCase
   end
 
   test 'a site admin sees the suspicious, blocked and legit ASNs' do
+    covers_route 'GET /stats/asns'
     mark_legit('64999')
     sign_in_with_rack(FactoryBot.create(:account, admin: true))
     rows = [row(BASELINE, 1000), row('64501', 6000, description: 'Surging Hosting')]

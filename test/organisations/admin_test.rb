@@ -39,6 +39,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
 
   test 'an admin creates a tier, edits it and deletes it' do
     covers 'organisations/table-activities-local-groups-carousels-tiers@49b568'
+    covers_route 'GET /o/:slug/tiers'
     create_organisation
     sign_in(@account)
     visit "/o/#{@organisation.slug}/tiers"
@@ -106,6 +107,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   end
 
   test 'an admin asks for the followers CSV, which is emailed to them, and uploads a CSV of followers' do
+    covers_route 'POST /o/:slug/followers'
     create_organisation
     sign_in(@account)
     visit "/o/#{@organisation.slug}/followers"
@@ -130,6 +132,8 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   end
 
   test 'an admin chooses whether they receive feedback' do
+    covers_route 'GET /o/:slug/activities'
+    covers_route 'GET /o/:slug/local_groups'
     create_organisation
     organisationship = @organisation.organisationships.find_by(account: @account)
     assert organisationship.receive_feedback?
@@ -147,6 +151,9 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
 
   test 'an admin bans email addresses and sets the welcome emails' do
     covers 'organisations/table-manage-followers-credits-bans@7b2dbd'
+    covers_route 'GET /o/:slug/banned_emails'
+    covers_route 'GET /o/:slug/emails'
+    covers_route 'POST /o/:slug/banned_emails'
     create_organisation
     sign_in(@account)
     visit "/o/#{@organisation.slug}/banned_emails"
@@ -164,6 +171,9 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
 
   test "an admin deletes the organisation by typing its name, and a name that doesn't match deletes nothing" do
     covers 'organisations/table-delete-organisation@467e21'
+    covers_route 'GET /o/:slug/delete'
+    covers_route 'GET /organisations'
+    covers_route 'POST /o/:slug/destroy'
     create_organisation
     sign_in(@account)
     visit "/o/#{@organisation.slug}/delete"
@@ -184,6 +194,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
 
   test "followers, event managers, others, another organisation's admin and people signed out can't open the admin pages or change anything" do
     covers 'organisations/table-manage-followers-credits-bans@7b2dbd', 'organisations/table-activities-local-groups-carousels-tiers@49b568', 'organisations/table-delete-organisation@467e21'
+    covers_route 'GET /o/:slug/stats'
     create_organisation
     organisation_tier = @organisation.organisation_tiers.create!(name: 'Gold', threshold: 50, discount: 10)
     victim = add_member(@organisation)
@@ -241,6 +252,10 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   end
 
   test "another organisation's admin can't reach this organisation's tiers or followers under their own organisation's URL" do
+    covers_route 'GET /o/:slug/organisation_tiers/:organisation_tier_id/edit'
+    covers_route 'GET /o/:slug/subscribed/:organisationship_id'
+    covers_route 'POST /o/:slug/organisation_tiers/:organisation_tier_id/destroy'
+    covers_route 'POST /o/:slug/subscribed/:organisationship_id'
     create_organisation
     organisation_tier = @organisation.organisation_tiers.create!(name: 'Gold', threshold: 50, discount: 10)
     organisationship = @organisation.organisationships.find_by(account: add_member(@organisation))
@@ -268,6 +283,8 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   end
 
   test "notes on a follower are seen and set only by the organisation's admins, and set nothing else" do
+    covers_route 'GET /organisationships/:id/notes'
+    covers_route 'POST /organisationships/:id/notes'
     create_organisation
     follower = add_member(@organisation)
     organisationship = @organisation.organisationships.find_by(account: follower)
@@ -294,6 +311,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   end
 
   test "an admin chooses receiving feedback for themselves only, and a site admin who doesn't follow has nothing to choose" do
+    covers_route 'POST /o/:slug/receive_feedback/:f'
     create_organisation
     other_admin = add_member(@organisation, admin: true, receive_feedback: true)
     own = @organisation.organisationships.find_by(account: @account)
@@ -312,6 +330,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   end
 
   test 'a removed follower stays an account, and a follower of another organisation is removed only by its own admins' do
+    covers_route 'POST /organisationships/:id/destroy'
     create_organisation
     follower = add_member(@organisation)
     organisationship = @organisation.organisationships.find_by(account: follower)
@@ -333,6 +352,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test "a forged settings or welcome emails form can't set the organisation's protected fields" do
+    covers_route 'POST /o/:slug/emails'
     create_organisation
     sign_in_with_rack(@account)
     { 'feedback_summary' => 'Forged', 'followers_count' => '100000', 'paid_up' => '1', 'stripe_connect_json' => '{}', 'hide_from_homepage' => '1' }.each do |field, value|
@@ -349,6 +369,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   end
 
   test "a forged tier form can't make a tier for another organisation" do
+    covers_route 'POST /o/:slug/organisation_tiers/new'
     create_organisation
     other_organisation = FactoryBot.create(:organisation)
     sign_in_with_rack(@account)
@@ -379,6 +400,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test "the followers CSV goes only to the admin who asked, with each follower's email and whether they unsubscribed, and not their notes" do
+    covers_route 'GET /o/:slug/followers'
     create_organisation
     subscribed = add_member(@organisation)
     unsubscribed = add_member(@organisation)
@@ -406,6 +428,9 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test 'an admin refreshes the feedback summary once a day and removes it, and others see it without the controls' do
+    covers_route 'GET /o/:slug/feedback_summary'
+    covers_route 'POST /o/:slug/feedback_summary'
+    covers_route 'POST /o/:slug/feedback_summary/delete'
     create_organisation
     @organisation.set(feedback_summary: 'Warm and welcoming', feedback_summary_last_refreshed_at: 2.days.ago)
 

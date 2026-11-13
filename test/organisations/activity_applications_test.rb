@@ -145,6 +145,7 @@ class OrganisationsActivityApplicationsTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test "applicants, followers and others can't see applications or set their statuses, an applicant's own included" do
+    covers_route 'GET /o/:organisation_slug/a/:slug/applications'
     create_closed_activity
     applicant = FactoryBot.create(:account)
     application = application_by(applicant)
@@ -173,6 +174,8 @@ class OrganisationsActivityApplicationsTest < ActiveSupport::TestCase
   end
 
   test "an admin of another activity gets a 404 for this activity's application under their own activity's URL" do
+    covers_route 'GET /o/:organisation_slug/a/:slug/activity_applications/:activity_application_id'
+    covers_route 'POST /o/:organisation_slug/a/:slug/activity_applications/:activity_application_id/destroy'
     create_closed_activity
     applicant = FactoryBot.create(:account)
     application = application_by(applicant)
@@ -195,6 +198,7 @@ class OrganisationsActivityApplicationsTest < ActiveSupport::TestCase
   end
 
   test 'an admin can set a status through Rack, and accepting again sends no second email and keeps one follower' do
+    covers_route 'GET /o/:organisation_slug/a/:slug/activity_applications/:activity_application_id/set_status'
     create_closed_activity
     applicant = FactoryBot.create(:account)
     application = application_by(applicant)
@@ -216,6 +220,7 @@ class OrganisationsActivityApplicationsTest < ActiveSupport::TestCase
   end
 
   test 'moving an application from another status to Accepted emails the applicant once' do
+    covers_route 'POST /o/:organisation_slug/a/:slug/activity_applications/:activity_application_id/set_status'
     create_closed_activity
     applicant = FactoryBot.create(:account)
     application = application_by(applicant)
@@ -257,6 +262,7 @@ class OrganisationsActivityApplicationsTest < ActiveSupport::TestCase
   end
 
   test "the latest application page needs signing in, and shows only the signed-in person's own" do
+    covers_route 'GET /o/:organisation_slug/a/:slug/activity_applications/latest'
     create_closed_activity
     applicant = FactoryBot.create(:account)
     application_by(applicant, answer: 'First answer')
@@ -282,6 +288,7 @@ class OrganisationsActivityApplicationsTest < ActiveSupport::TestCase
 
   test 'people follow an open activity themselves, but not a closed or invitation-only one' do
     covers 'organisations/application-only-activities@7b2afe'
+    covers_route 'POST /o/:organisation_slug/a/:slug/activityship'
     create_organisation
     person = FactoryBot.create(:account)
     sign_in_with_rack(person)
@@ -311,6 +318,8 @@ class OrganisationsActivityApplicationsTest < ActiveSupport::TestCase
   end
 
   test "hiding and showing membership needs signing in and following, and changes only one's own" do
+    covers_route 'POST /o/:organisation_slug/a/:slug/hide_membership'
+    covers_route 'POST /o/:organisation_slug/a/:slug/show_membership'
     create_organisation
     activity = FactoryBot.create(:activity, organisation: @organisation, privacy: 'open')
     follower, other_follower = Array.new(2) { FactoryBot.create(:account) }
@@ -335,6 +344,8 @@ class OrganisationsActivityApplicationsTest < ActiveSupport::TestCase
   end
 
   test "followers can't add followers or choose to receive feedback" do
+    covers_route 'POST /o/:organisation_slug/a/:slug/add_follower'
+    covers_route 'POST /o/:organisation_slug/a/:slug/receive_feedback/:f'
     create_organisation
     activity = FactoryBot.create(:activity, organisation: @organisation)
     follower = FactoryBot.create(:account)
@@ -353,6 +364,8 @@ class OrganisationsActivityApplicationsTest < ActiveSupport::TestCase
   end
 
   test "followers can't edit an activity, and admins can't set its protected fields with a forged form" do
+    covers_route 'GET /o/:organisation_slug/a/:slug/edit'
+    covers_route 'POST /o/:organisation_slug/a/:slug/edit'
     create_organisation
     activity = FactoryBot.create(:activity, organisation: @organisation)
     name = activity.name
@@ -378,6 +391,7 @@ class OrganisationsActivityApplicationsTest < ActiveSupport::TestCase
   end
 
   test "a locked activity's page is for its admins only" do
+    covers_route 'GET /o/:organisation_slug/a/:slug'
     create_organisation
     activity = FactoryBot.create(:activity, organisation: @organisation, locked: true)
 
@@ -392,6 +406,7 @@ class OrganisationsActivityApplicationsTest < ActiveSupport::TestCase
   end
 
   test 'only admins preview application questions as they edit them' do
+    covers_route 'GET /o/:organisation_slug/a/:slug/application_questions'
     create_closed_activity
     path = "#{@activity.path}/application_questions"
 

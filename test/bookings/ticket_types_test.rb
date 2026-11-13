@@ -41,6 +41,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'nested ticket type and ticket group attributes cannot take over another event\'s tickets or ticket types' do
+    covers_route 'POST /e/:slug/edit'
     create_event(prices: [0])
     ticket_type = @event.ticket_types.first
     ticket_group = @event.ticket_groups.create!(name: 'Group', capacity: 10)
@@ -63,6 +64,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'a ticket cannot take a ticket type from another event' do
+    covers_route 'POST /e/:slug/create_ticket'
     create_event(prices: [0])
     other_event = FactoryBot.create(:event, prices: [0])
     other_ticket_type = other_event.ticket_types.first

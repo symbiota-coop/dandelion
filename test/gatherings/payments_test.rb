@@ -114,6 +114,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
   end
 
   test 'someone signed out, not a member, or a member of another gathering cannot start a payment' do
+    covers_route 'POST /g/:slug/pay'
     create_paying_gathering
     other_gathering = FactoryBot.create(:gathering, account: FactoryBot.create(:account), stripe_sk: 'sk_test_other')
     other_member = FactoryBot.create(:account).tap { |account| other_gathering.memberships.create!(account: account) }
@@ -154,6 +155,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
   # The webhook
 
   test 'a paid session completes its payment and credits the membership once, however often it is delivered' do
+    covers_route 'POST /g/:slug/stripe_webhook'
     create_paying_gathering
     member = create_member
     payment = create_unpaid_payment(membership_of(member), amount: 30)
@@ -250,6 +252,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
   # Checking on a payment
 
   test 'the payer and the gathering\'s admins see whether a payment is complete, and no other member' do
+    covers_route 'GET /g/:slug/payments/:payment_id'
     create_paying_gathering
     member = create_member
     payment = create_unpaid_payment(membership_of(member))

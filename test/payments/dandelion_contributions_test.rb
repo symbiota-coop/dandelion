@@ -108,6 +108,7 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
   # Organisations paying
 
   test 'an organisation admin pays its contribution through Dandelion\'s own Stripe account, for the amount and currency asked' do
+    covers_route 'POST /o/:slug/pay'
     create_contributing_organisation
     sign_in_with_rack(@account)
 
@@ -322,6 +323,7 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
   end
 
   test 'an organisation admin turns auto top-ups off, forgetting the saved customer' do
+    covers_route 'POST /o/:slug/clear_stripe_customer_id'
     create_contributing_organisation
     @organisation.set(stripe_customer_id: 'cus_saved')
     sign_in_with_rack(@account)
@@ -345,6 +347,7 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
   end
 
   test 'a paid contribution completes once, tells Dandelion\'s admins and makes the organisation paid up' do
+    covers_route 'POST /organisations/stripe_webhook'
     contribution = create_pending_organisation_contribution
 
     deliver_organisations_webhook(checkout_payload(contribution.session_id))
@@ -486,6 +489,7 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
   end
 
   test 'a donation needs an amount above zero and a card' do
+    covers_route 'POST /accounts/pay'
     header 'Accept', 'application/json'
     calls = stub_checkout_session do
       ['', '0', '-1'].each do |amount|
@@ -515,6 +519,7 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
   # Accounts webhook: one-off donations
 
   test 'a paid donation completes once and tells Dandelion\'s admins' do
+    covers_route 'POST /accounts/stripe_webhook'
     account = FactoryBot.create(:account)
     donation = account.account_contributions.create!(amount: 5, currency: 'GBP', session_id: 'cs_donation', payment_completed: false)
     payload = checkout_payload('cs_donation')

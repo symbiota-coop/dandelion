@@ -118,6 +118,7 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
   end
 
   test "a field hidden from someone isn't in the profile page or its modal at all" do
+    covers_route 'GET /u/:username'
     account = profiled_account
     account.set(email_privacy: 'Only me', phone_privacy: 'People I follow', gender_privacy: 'Only me', last_active: 1.day.ago, last_active_privacy: 'Only me',
                 bio: 'I grow dandelions', bio_privacy: 'Only me')
@@ -135,6 +136,7 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
   end
 
   test "an account's organisations, local groups, activities and gatherings are hidden from signed-out visitors, even when public" do
+    covers_route 'GET /u/:username/organisations'
     account = profiled_account(organisations_privacy: 'Public')
     organisation = FactoryBot.create(:organisation, name: 'Secret Society')
     account.organisationships.create!(organisation: organisation)
@@ -156,6 +158,8 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
   end
 
   test 'who an account follows, and who follows it, show only to those their privacy lets see them' do
+    covers_route 'GET /u/:username/followers'
+    covers_route 'GET /u/:username/following'
     account = profiled_account(following_privacy: 'People I follow', followers_privacy: 'Only me')
     followee = FactoryBot.create(:account, name: 'Fern Followee')
     Follow.create!(follower: account, followee: followee)
@@ -206,6 +210,7 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
   end
 
   test "the privacy routes show and set only the signed-in account's own settings, and only its privacy settings" do
+    covers_route 'POST /accounts/set_privacyable/:p'
     account = profiled_account
     other = FactoryBot.create(:account)
 
@@ -259,6 +264,7 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
   end
 
   test 'unhiding needs a signed-in account, and marks an account that never signed in as having signed in' do
+    covers_route 'POST /accounts/unhide'
     account = FactoryBot.create(:account, hidden: true)
     other = FactoryBot.create(:account, hidden: true)
 
@@ -276,6 +282,7 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
   end
 
   test 'replacing the calendar key ends the old feed URL, and needs a sign in code' do
+    covers_route 'POST /accounts/ics_key'
     account = FactoryBot.create(:account)
     old_key = account.ensure_ics_key!
 
@@ -304,6 +311,9 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
   end
 
   test 'only the account or an admin refreshes, removes or previews its feedback summary, and only admins more than once a day' do
+    covers_route 'GET /u/:username/feedback_summary_email_preview'
+    covers_route 'POST /u/:username/feedback_summary'
+    covers_route 'POST /u/:username/feedback_summary/delete'
     account = profiled_account(feedback_summary: 'Wonderfully clear facilitator', feedback_summary_last_refreshed_at: 2.days.ago)
     stranger = FactoryBot.create(:account)
 
@@ -339,6 +349,7 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
   end
 
   test "anyone reads an account's feedback summary, but only the account and admins are offered to refresh or remove it" do
+    covers_route 'GET /u/:username/feedback_summary'
     account = profiled_account(feedback_summary: 'Wonderfully clear facilitator', feedback_summary_last_refreshed_at: 2.days.ago)
 
     [nil, FactoryBot.create(:account)].each do |viewer|
@@ -379,6 +390,7 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
   end
 
   test "the birthdays feed has only the birthdays of public profiles the account may see, as the birthdays page does, and none whose age privacy was never set" do
+    covers_route 'GET /birthdays'
     account = FactoryBot.create(:account)
     # Age is shown only to the account unless it chooses otherwise, so Pat chooses Public
     shown = { 'Pat Public' => { date_of_birth_privacy: 'Public' }, 'Fran Follows Back' => { date_of_birth_privacy: 'People I follow' } }
@@ -437,6 +449,9 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
   end
 
   test "the feedback on a facilitator who never signed in stays public, with its embeds" do
+    covers_route 'GET /u/:username/events'
+    covers_route 'GET /u/:username/feedback'
+    covers_route 'GET /u/:username/show_feedback'
     facilitator = FactoryBot.create(:account, name: 'Nev Never Signed In', feedback_summary: 'Wonderfully clear facilitator')
     assert facilitator.private?
     refute facilitator.hidden?

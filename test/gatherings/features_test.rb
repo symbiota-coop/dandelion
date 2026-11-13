@@ -12,6 +12,8 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test "a gathering's pages load for its admin" do
+    covers_route 'GET /g/:slug/payments'
+    covers_route 'GET /g/:slug/rotas'
     create_gathering(privacy: 'open')
     sign_in(@account)
     ['', '/edit', '/members', '/applications', '/options', '/teams', '/rotas', '/timetables', '/budget', '/payments', '/inventory'].each do |path|
@@ -107,6 +109,9 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test 'creating a team, and a member joining and leaving it' do
+    covers_route 'GET /g/:slug/teams/new'
+    covers_route 'POST /g/:slug/teams/new'
+    covers_route 'POST /g/:slug/teamships/create'
     create_gathering(privacy: 'open')
     member = create_member
     sign_in(@account)
@@ -127,6 +132,9 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test "a member turns a team's email notifications back on from their notification settings" do
+    covers_route 'GET /accounts/subscriptions'
+    covers_route 'GET /g/:slug/teamships/:id/subscribe'
+    covers_route 'POST /g/:slug/teamships/:id/set_subscribe'
     create_gathering(privacy: 'open')
     team = @gathering.teams.create!(name: 'Kitchen', account: @account)
     member = create_member
@@ -161,6 +169,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
 
   test 'creating a rota with roles and slots, and a member signing up for a shift' do
     covers 'gatherings/video-shift-signup@8c93ae'
+    covers_route 'POST /g/:slug/rslots/create'
     create_gathering(privacy: 'open')
     member = create_member
     sign_in(@account)
@@ -183,6 +192,11 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test 'creating a timetable, and a member proposing an activity and showing interest' do
+    covers_route 'GET /g/:slug/tactivities/:id/attendees'
+    covers_route 'POST /g/:slug/spaces/create'
+    covers_route 'POST /g/:slug/tactivities/:id/attend'
+    covers_route 'POST /g/:slug/tactivities/create'
+    covers_route 'POST /g/:slug/tslots/create'
     create_gathering(privacy: 'open')
     member = create_member
     sign_in(@account)
@@ -213,6 +227,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test 'listing an item, and choosing who brings it' do
+    covers_route 'POST /g/:slug/inventory_items/new'
     create_gathering(privacy: 'open')
     member = create_member
     sign_in(@account)
@@ -232,6 +247,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test 'an admin removes a member' do
+    covers_route 'POST /g/:slug/memberships/:id/remove'
     create_gathering(privacy: 'open')
     member = create_member
     sign_in(@account)
@@ -245,6 +261,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test 'an admin deletes an application' do
+    covers_route 'POST /g/:slug/mapplications/:id/destroy'
     create_gathering(privacy: 'closed')
     @gathering.mapplications.create!(account: FactoryBot.create(:account, name: 'Keen Applicant'), status: 'pending')
     sign_in(@account)
@@ -256,6 +273,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test 'editing and deleting an option' do
+    covers_route 'POST /g/:slug/options/:id/destroy'
     create_gathering(privacy: 'open')
     @gathering.options.create!(name: 'Camping', type: 'Tier', account: @account)
     sign_in(@account)
@@ -275,6 +293,9 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test 'editing and deleting a team' do
+    covers_route 'GET /g/:slug/teams'
+    covers_route 'GET /g/:slug/teams/:id/edit'
+    covers_route 'POST /g/:slug/teams/:id/destroy'
     create_gathering(privacy: 'open')
     team = @gathering.teams.create!(name: 'Kitchen', account: @account)
     sign_in(@account)
@@ -292,6 +313,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test 'editing and deleting an expense' do
+    covers_route 'POST /g/:slug/spends/:id/destroy'
     create_gathering(privacy: 'open')
     @gathering.spends.create!(item: 'Vegetables', amount: 30, team: @gathering.teams.first, account: @account)
     sign_in(@account)
@@ -309,6 +331,9 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test "editing and deleting a rota and its roles and slots" do
+    covers_route 'POST /g/:slug/roles/:id/destroy'
+    covers_route 'POST /g/:slug/roles/:id/edit'
+    covers_route 'POST /g/:slug/rotas/:id/destroy'
     create_gathering(privacy: 'open')
     rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
     Role.create!(name: 'Cook', rota: rota)
@@ -349,6 +374,9 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test 'editing and deleting a timetable and its activities' do
+    covers_route 'GET /g/:slug/timetables'
+    covers_route 'POST /g/:slug/tactivities/:id/destroy'
+    covers_route 'POST /g/:slug/timetables/:id/destroy'
     create_gathering(privacy: 'open')
     timetable = @gathering.timetables.create!(name: 'Workshops', account: @account)
     timetable.tactivities.create!(name: 'Yoga', account: @account)
@@ -376,6 +404,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test 'editing and deleting an item' do
+    covers_route 'POST /g/:slug/inventory_items/:id/destroy'
     create_gathering(privacy: 'open')
     @gathering.inventory_items.create!(name: 'Tent', team: @gathering.teams.first, account: @account)
     sign_in(@account)
@@ -435,6 +464,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test 'members export the member list, and admins the rota, as CSV' do
+    covers_route 'GET /g/:slug/rotas/:id'
     create_gathering(privacy: 'open')
     rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
     role = Role.create!(name: 'Cook', rota: rota)

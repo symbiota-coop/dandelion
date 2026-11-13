@@ -94,6 +94,7 @@ class OrganisationPaymentsTest < ActiveSupport::TestCase
   end
 
   test 'stripe setup session is bound to the organisation' do
+    covers_route 'POST /o/:slug/stripe_setup'
     create_organisation
     sign_in_with_rack(@account)
 
@@ -111,6 +112,7 @@ class OrganisationPaymentsTest < ActiveSupport::TestCase
   end
 
   test 'stripe setup complete rejects a session created for another organisation' do
+    covers_route 'GET /o/:slug/stripe_setup_complete'
     create_organisation
     other = FactoryBot.create(:organisation, account: @account)
     sign_in_with_rack(@account)
@@ -213,6 +215,7 @@ class OrganisationPaymentsTest < ActiveSupport::TestCase
 
   test "an attendee's credit balance shows on the organisation page, and its breakdown of credit earned and used" do
     covers 'organisations/credit-balance-shown@e73de3'
+    covers_route 'GET /organisationships/:id/credit_balance'
     enable_affiliate_credits
     referrer = FactoryBot.create(:account)
     referred = FactoryBot.create(:account, name: 'Referred Person')
@@ -293,6 +296,7 @@ class OrganisationPaymentsTest < ActiveSupport::TestCase
 
   test 'each ticket sale adds 1% of its price to the contribution, and the Contribute page shows the total, what was contributed and what is left' do
     covers 'events/contribution-never-from-ticket-sales@73c546', 'events/contribution-running-total@535bd5'
+    covers_route 'GET /o/:slug/contribute'
     create_stripe_connect_organisation
     create_event(as: :event1, prices: [100])
     create_event(as: :event2, prices: [50])
@@ -399,6 +403,7 @@ class OrganisationPaymentsTest < ActiveSupport::TestCase
   end
 
   test "an organisation admin's own Connect state connects the Stripe account they authorised" do
+    covers_route 'GET /o/:slug/edit'
     create_organisation(stripe_pk: nil, stripe_sk: nil)
     sign_in_with_rack(@account)
     state = stripe_connect_state_from_payments_tab
@@ -429,6 +434,7 @@ class OrganisationPaymentsTest < ActiveSupport::TestCase
   end
 
   test 'a Connect state minted without an account, before states were bound to one, is refused' do
+    covers_route 'GET /organisations/stripe_connect'
     create_organisation(stripe_pk: nil, stripe_sk: nil)
     state = TokenVerifier.generate("stripe_connect_org:#{@organisation.id}", expires_in: 15.minutes, purpose: 'stripe_connect')
     sign_in_with_rack(@account)

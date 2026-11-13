@@ -87,6 +87,8 @@ class OrdersAdminTest < ActiveSupport::TestCase
   end
 
   test "an event admin can't restore another event's order or ticket through their own event" do
+    covers_route 'POST /e/:slug/orders/:order_id/restore_and_complete'
+    covers_route 'POST /e/:slug/tickets/:ticket_id/restore'
     create_complete_order
     facilitator = create_facilitator(@event)
     other_event, other_order, other_ticket = create_other_event_order
@@ -143,6 +145,7 @@ class OrdersAdminTest < ActiveSupport::TestCase
   end
 
   test "the transfer page offers only the organisation's other events the account admins" do
+    covers_route 'GET /orders/:id/transfer'
     create_complete_order
     facilitator = create_facilitator(@event)
     create_event(prices: [0], as: :admined_event)
@@ -157,6 +160,7 @@ class OrdersAdminTest < ActiveSupport::TestCase
   end
 
   test "an order can't be transferred to an event its admin doesn't admin, or of another organisation" do
+    covers_route 'POST /orders/:id/transfer'
     create_complete_order_with_ticket
     facilitator = create_facilitator(@event)
     create_event(prices: [0], as: :unadmined_event)
@@ -200,6 +204,7 @@ class OrdersAdminTest < ActiveSupport::TestCase
   end
 
   test "an event admin can't resend another event's tickets" do
+    covers_route 'POST /orders/:id/send_tickets'
     create_complete_order
     facilitator = create_facilitator(@event)
     _, other_order, = create_other_event_order
@@ -230,6 +235,8 @@ class OrdersAdminTest < ActiveSupport::TestCase
   end
 
   test "an event admin can't see or change another event's ticket" do
+    covers_route 'GET /tickets/:id/edit'
+    covers_route 'POST /tickets/:id/edit'
     create_complete_order
     facilitator = create_facilitator(@event)
     _, _, other_ticket = create_other_event_order
@@ -267,6 +274,7 @@ class OrdersAdminTest < ActiveSupport::TestCase
   end
 
   test "an event admin can't clear another event's answers" do
+    covers_route 'POST /e/:slug/orders/clear_answers'
     create_complete_order
     facilitator = create_facilitator(@event)
     other_event, other_order, = create_other_event_order

@@ -57,6 +57,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
   end
 
   test "members can't make anyone an admin, themselves included, nor can anyone signed out or from another gathering" do
+    covers_route 'POST /g/:slug/memberships/:id/make_admin'
     create_gathering(privacy: 'open')
     create_other_gathering
     member = create_member
@@ -98,6 +99,9 @@ class GatheringMembersTest < ActiveSupport::TestCase
   end
 
   test "only a gathering's admins can set what a member paid, their invitations and their shift points" do
+    covers_route 'POST /g/:slug/memberships/:id/invitations_granted'
+    covers_route 'POST /g/:slug/memberships/:id/paid'
+    covers_route 'POST /g/:slug/memberships/:id/shift_points_required'
     create_gathering(privacy: 'open')
     create_other_gathering
     member = create_member
@@ -168,6 +172,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
 
   test "the gathering's only admin can't leave, unadmin themselves or be removed, by them or a site admin" do
     covers 'gatherings/only-admin-stays@432957'
+    covers_route 'POST /g/:slug/memberships/:id/unadmin'
     create_gathering(privacy: 'open')
     member = create_member
     own = membership_of(@account)
@@ -266,6 +271,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
   end
 
   test "a member's answers are for the gathering's confirmed members, and opened directly go to the members page" do
+    covers_route 'GET /g/:slug/memberships/:id'
     create_gathering(privacy: 'open', demand_payment: true)
     create_other_gathering
     answering = create_member(name: 'Answering Person')
@@ -317,6 +323,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
   end
 
   test 'nobody adds members without an invitation left, confirmed membership or being an admin' do
+    covers_route 'POST /g/:slug/add_member'
     create_gathering(privacy: 'open')
     create_other_gathering
     member = create_member
@@ -393,6 +400,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
   end
 
   test 'only a member can leave, and leaving takes no one else out' do
+    covers_route 'POST /g/:slug/leave'
     create_gathering(privacy: 'open')
     member = create_member
     outsider = FactoryBot.create(:account)

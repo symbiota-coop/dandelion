@@ -34,6 +34,7 @@ class AccountEmailConfirmationTest < ActiveSupport::TestCase
   end
 
   test 'the confirmation button does nothing without the link' do
+    covers_route 'POST /accounts/confirm_email'
     account = FactoryBot.create(:account)
     sign_in_via_rack(account)
 
@@ -44,6 +45,7 @@ class AccountEmailConfirmationTest < ActiveSupport::TestCase
   end
 
   test 'email confirmation link rejects a token that does not match the signed-in account' do
+    covers_route 'GET /confirm_email/:link_token'
     account = FactoryBot.create(:account, email_confirmed: false)
     sign_in_with_rack(account)
     account.set(email_confirmed: false)
@@ -56,6 +58,7 @@ class AccountEmailConfirmationTest < ActiveSupport::TestCase
   end
 
   test 'the notification settings form cannot change the email' do
+    covers_route 'POST /accounts/subscriptions'
     account = FactoryBot.create(:account)
     account.generate_link_token!
     clear_cookies
@@ -89,6 +92,7 @@ class AccountEmailConfirmationTest < ActiveSupport::TestCase
   end
 
   test 'the first sign in from a link elsewhere to an unconfirmed account signs out whoever signed up with its email' do
+    covers_route 'GET /accounts/confirm_email'
     start_omniauth_signup(email: 'squatted@example.com')
     post '/accounts/new', account: { name: 'Sid Squatter', email: 'squatted@example.com' }, omniauth_signup: '1'
     account = Account.find_by(email: 'squatted@example.com')
@@ -152,6 +156,7 @@ class AccountEmailConfirmationTest < ActiveSupport::TestCase
   end
 
   test 'not now stops asking to confirm at each link sign in' do
+    covers_route 'POST /accounts/confirm_email/later'
     start_omniauth_signup(email: 'not-now@example.com')
     post '/accounts/new', account: { name: 'Nat Notnow', email: 'not-now@example.com' }, omniauth_signup: '1'
     account = Account.find_by(email: 'not-now@example.com')
@@ -287,6 +292,7 @@ class AccountEmailConfirmationTest < ActiveSupport::TestCase
   end
 
   test 'confirming the email elsewhere removes providers connected before it was tracked' do
+    covers_route 'GET /'
     account = FactoryBot.create(:account)
     link = account.provider_links.create!(provider: 'Google', provider_uid: 'google-uid-legacy', omniauth_hash: { 'uid' => 'google-uid-legacy' })
     ProviderLink.collection.update_one({ _id: link.id }, { '$unset' => { before_email_confirmed: 1 } })
@@ -332,6 +338,9 @@ class AccountEmailConfirmationTest < ActiveSupport::TestCase
   end
 
   test 'email previews do not show the signed-in account a working link token' do
+    covers_route 'GET /e/:slug/feedback_request_email_preview'
+    covers_route 'GET /e/:slug/reminder_email_preview'
+    covers_route 'GET /e/:slug/ticket_email_preview'
     create_event(prices: [0])
     sign_in_with_rack(@account)
     @account.generate_link_token!

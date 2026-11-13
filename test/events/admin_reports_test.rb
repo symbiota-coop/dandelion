@@ -81,6 +81,7 @@ class EventAdminReportsTest < ActiveSupport::TestCase
   end
 
   test 'the Stripe report is refused to event admins who are not revenue admins, other events admins and people signed out' do
+    covers_route 'GET /e/:slug/stripe_report'
     create_event(prices: [30], currency: 'EUR')
     connect_organisation_to_stripe
     facilitator = FactoryBot.create(:account)
@@ -106,6 +107,7 @@ class EventAdminReportsTest < ActiveSupport::TestCase
   # Stripe charges
 
   test 'an event admin sees the event’s Stripe charges with their amounts, fees and refunds, in its currency' do
+    covers_route 'GET /e/:slug/stripe_charges'
     create_event(prices: [30], currency: 'EUR')
     buyer = FactoryBot.create(:account, name: 'Bea Buyer')
     order = @event.orders.create!(account: buyer, currency: 'EUR', value: 30, payment_completed: true)
@@ -140,6 +142,7 @@ class EventAdminReportsTest < ActiveSupport::TestCase
   end
 
   test 'the Stripe charges and donations are refused to other events admins, attendees and people signed out' do
+    covers_route 'GET /e/:slug/donations'
     create_event(prices: [30], currency: 'EUR')
     buyer = FactoryBot.create(:account, name: 'Secret Buyer')
     order = @event.orders.create!(account: buyer, currency: 'EUR', value: 30, payment_completed: true)
@@ -212,6 +215,8 @@ class EventAdminReportsTest < ActiveSupport::TestCase
   end
 
   test 'notes can not be read or changed by other events admins, attendees or people signed out' do
+    covers_route 'GET /e/:slug/notes'
+    covers_route 'POST /e/:slug/notes'
     create_event(prices: [0])
     @event.set(notes: 'Secret note')
     attendee = FactoryBot.create(:account)
@@ -261,6 +266,7 @@ class EventAdminReportsTest < ActiveSupport::TestCase
   end
 
   test 'event admins are not offered hiding their event from the homepage' do
+    covers_route 'GET /e/:slug/block_controls'
     create_event(prices: [0], name: 'Hideable Gathering')
     sign_in(@account)
     visit '/events'
@@ -270,6 +276,9 @@ class EventAdminReportsTest < ActiveSupport::TestCase
   end
 
   test 'only site admins can hide or show an event on the homepage, so event admins can not undo a hide' do
+    covers_route 'GET /e/:slug/hide_from_homepage'
+    covers_route 'POST /e/:slug/do_hide_from_homepage'
+    covers_route 'POST /e/:slug/unhide_from_homepage'
     create_event(prices: [0])
     sign_in_with_rack(@account)
 
@@ -290,6 +299,9 @@ class EventAdminReportsTest < ActiveSupport::TestCase
   # Email previews
 
   test 'an event admin previews the confirmation, reminder and feedback request emails without any being sent' do
+    covers_route 'GET /e/:slug/feedback_request_email'
+    covers_route 'GET /e/:slug/reminder_email'
+    covers_route 'GET /e/:slug/ticket_email'
     create_event(prices: [0], feedback_questions: 'How was it?')
     @event.tickets.create!(account: FactoryBot.create(:account), ticket_type: @event.ticket_types.first, payment_completed: true)
     sign_in_with_rack(@account)
@@ -329,6 +341,7 @@ class EventAdminReportsTest < ActiveSupport::TestCase
   # Resending feedback emails
 
   test 'resending all feedback emails emails the attendees again, but not the unsubscribed or those who have not paid' do
+    covers_route 'POST /e/:slug/resend_all_feedback_emails'
     create_event(prices: [10], feedback_questions: 'How was it?')
     @event.set(start_time: 2.days.ago, end_time: 1.day.ago, sent_feedback_requests_at: 1.hour.ago)
     attendees = Array.new(2) { FactoryBot.create(:account) }

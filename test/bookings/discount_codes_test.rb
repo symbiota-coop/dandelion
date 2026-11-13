@@ -25,6 +25,7 @@ class BookingsDiscountCodesTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test 'an organisation admin creates, edits and deletes an organisation-wide discount code' do
+    covers_route 'GET /o/:slug/discount_codes'
     create_organisation
     sign_in(@account)
 
@@ -84,6 +85,8 @@ class BookingsDiscountCodesTest < ActiveSupport::TestCase
   end
 
   test 'activity and local group admins create codes that belong to the activity or local group' do
+    covers_route 'GET /o/:organisation_slug/a/:slug/discount_codes'
+    covers_route 'GET /o/:organisation_slug/lg/:slug/discount_codes'
     create_full_event_hierarchy
     sign_in(@account)
 
@@ -104,6 +107,7 @@ class BookingsDiscountCodesTest < ActiveSupport::TestCase
   end
 
   test 'a code with both a percentage and a fixed discount is not saved, and the form says why' do
+    covers_route 'GET /discount_codes/new'
     create_event
     sign_in(@account)
 
@@ -164,6 +168,8 @@ class BookingsDiscountCodesTest < ActiveSupport::TestCase
   end
 
   test "an admin of one organisation can't reach another's codes through their own" do
+    covers_route 'GET /discount_codes/:discount_code_id/edit'
+    covers_route 'POST /discount_codes/:discount_code_id/destroy'
     create_organisation
     other_organisation = FactoryBot.create(:organisation, account: FactoryBot.create(:account))
     other_code = other_organisation.discount_codes.create!(code: 'OTHER', percentage_discount: 10)
@@ -182,6 +188,8 @@ class BookingsDiscountCodesTest < ActiveSupport::TestCase
   end
 
   test "a forged form can't move a code to another organisation or credit it to someone else" do
+    covers_route 'POST /discount_codes/:discount_code_id/edit'
+    covers_route 'POST /discount_codes/new'
     create_organisation
     other_organisation = FactoryBot.create(:organisation, account: (other_account = FactoryBot.create(:account)))
     sign_in_with_rack(@account)
