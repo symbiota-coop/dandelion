@@ -204,6 +204,34 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     assert Tslot.find(other_tslot.id)
   end
 
+  test "an admin reorders a timetable's spaces and slots, and ids not in the timetable are ignored" do
+    covers_route 'POST /g/:slug/spaces/order'
+    covers_route 'POST /g/:slug/tslots/order'
+    create_gathering(privacy: 'open')
+    create_timetable
+    dome = @timetable.spaces.create!(name: 'Dome')
+    afternoon = @timetable.tslots.create!(name: 'Saturday afternoon')
+    create_other_gathering
+    other_timetable = @other_gathering.timetables.create!(name: 'Talks', account: @other_account)
+    other_space = other_timetable.spaces.create!(name: 'Cellar')
+    other_tslot = other_timetable.tslots.create!(name: 'Sunday')
+
+    sign_in_with_rack(@account)
+    post gathering_path('/spaces/order'), timetable_id: @timetable.id, space_ids: [dome.id, other_space.id, @space.id]
+    assert last_response.ok?
+    assert_equal [0, 2], [dome.reload.o, @space.reload.o]
+    assert_equal 0, other_space.reload.o
+    post gathering_path('/tslots/order'), timetable_id: @timetable.id, tslot_ids: [other_tslot.id, afternoon.id, @tslot.id]
+    assert last_response.ok?
+    assert_equal [1, 2], [afternoon.reload.o, @tslot.reload.o]
+    assert_equal 0, other_tslot.reload.o
+
+    post gathering_path('/spaces/order'), timetable_id: other_timetable.id, space_ids: [other_space.id]
+    assert_equal 404, last_response.status
+    post gathering_path('/tslots/order'), timetable_id: other_timetable.id, tslot_ids: [other_tslot.id]
+    assert_equal 404, last_response.status
+  end
+
   test "only a gathering's admins reorder its timetables' spaces and slots" do
     create_gathering(privacy: 'open')
     create_timetable
@@ -261,6 +289,34 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     assert_equal 404, last_response.status
     post gathering_path("/rotas/#{@rota.id}/create_shift"), shift: { account_id: @other_account.id, role_id: @role.id, rslot_id: @rslot.id }
     assert_equal 0, @rota.shifts.count
+  end
+
+  test "an admin reorders a rota's roles and slots, and ids not in the rota are ignored" do
+    covers_route 'POST /g/:slug/roles/order'
+    covers_route 'POST /g/:slug/rslots/order'
+    create_gathering(privacy: 'open')
+    create_rota
+    washer = Role.create!(name: 'Washer', rota: @rota)
+    evening = Rslot.create!(name: 'Evening', rota: @rota)
+    create_other_gathering
+    other_rota = @other_gathering.rotas.create!(name: 'Bar', account: @other_account)
+    other_role = Role.create!(name: 'Barista', rota: other_rota)
+    other_rslot = Rslot.create!(name: 'Night', rota: other_rota)
+
+    sign_in_with_rack(@account)
+    post gathering_path('/roles/order'), rota_id: @rota.id, role_ids: [washer.id, other_role.id, @role.id]
+    assert last_response.ok?
+    assert_equal [0, 2], [washer.reload.o, @role.reload.o]
+    assert_equal 0, other_role.reload.o
+    post gathering_path('/rslots/order'), rota_id: @rota.id, rslot_ids: [other_rslot.id, evening.id, @rslot.id]
+    assert last_response.ok?
+    assert_equal [1, 2], [evening.reload.o, @rslot.reload.o]
+    assert_equal 0, other_rslot.reload.o
+
+    post gathering_path('/roles/order'), rota_id: other_rota.id, role_ids: [other_role.id]
+    assert_equal 404, last_response.status
+    post gathering_path('/rslots/order'), rota_id: other_rota.id, rslot_ids: [other_rslot.id]
+    assert_equal 404, last_response.status
   end
 
   test "only a gathering's admins reorder its rotas' roles and slots" do

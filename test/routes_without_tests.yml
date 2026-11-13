@@ -60,12 +60,8 @@ POST /e/:slug/do_star: Not tested yet
 POST /e/:slug/event_sessions/destroy: Not tested yet
 POST /e/:slug/unstar: Not tested yet
 POST /event_boosts/stripe_webhook: Not tested yet
-POST /g/:slug/roles/order: Not tested yet
-POST /g/:slug/rslots/order: Not tested yet
 POST /g/:slug/spaces/:id/destroy: Not tested yet
-POST /g/:slug/spaces/order: Not tested yet
 POST /g/:slug/tslots/:id/destroy: Not tested yet
-POST /g/:slug/tslots/order: Not tested yet
 POST /local_groups/:id/*: Not tested yet
 POST /o/:organisation_slug/a/:slug/activityships/admin: Not tested yet
 POST /o/:organisation_slug/a/:slug/activityships/unadmin: Not tested yet

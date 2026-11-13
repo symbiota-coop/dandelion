@@ -116,8 +116,9 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rota = @gathering.rotas.find(params[:rota_id]) || not_found
-    params[:role_ids].each_with_index do |role_id, i|
-      @rota.roles.find(role_id).set(o: i)
+    # Ids that aren't the rota's are ignored
+    Array(params[:role_ids]).each_with_index do |role_id, i|
+      @rota.roles.find(role_id)&.set(o: i)
     end
     200
   end
@@ -166,8 +167,9 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rota = @gathering.rotas.find(params[:rota_id]) || not_found
-    params[:rslot_ids].each_with_index do |rslot_id, i|
-      @rota.rslots.find(rslot_id).set(o: i)
+    # Ids that aren't the rota's are ignored
+    Array(params[:rslot_ids]).each_with_index do |rslot_id, i|
+      @rota.rslots.find(rslot_id)&.set(o: i)
     end
     200
   end

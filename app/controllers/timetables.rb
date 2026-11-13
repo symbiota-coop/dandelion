@@ -74,8 +74,9 @@ Dandelion::App.controller do
     @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
-    params[:space_ids].each_with_index do |space_id, i|
-      @timetable.spaces.find(space_id).set(o: i)
+    # Ids that aren't the timetable's are ignored
+    Array(params[:space_ids]).each_with_index do |space_id, i|
+      @timetable.spaces.find(space_id)&.set(o: i)
     end
     200
   end
@@ -103,8 +104,9 @@ Dandelion::App.controller do
     @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
-    params[:tslot_ids].each_with_index do |tslot_id, i|
-      @timetable.tslots.find(tslot_id).set(o: i)
+    # Ids that aren't the timetable's are ignored
+    Array(params[:tslot_ids]).each_with_index do |tslot_id, i|
+      @timetable.tslots.find(tslot_id)&.set(o: i)
     end
     200
   end
