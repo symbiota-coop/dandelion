@@ -300,7 +300,8 @@
         <%= f.url_block :redirect_url %>
         <%= f.url_block :purchase_url %>
         <%= f.text_block :match_phrase %>
-        <% if current_account.memberships.and(admin: true).exists? %>
+        <%# Linking a gathering is for those who can see attendee emails (EventValidation) %>
+        <% if current_account.memberships.and(admin: true).exists? && Event.email_viewer?(@event, current_account) %>
           <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,_b| a } %>
         <% end %>
         <%= f.url_block :terms_and_conditions_url %>

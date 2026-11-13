@@ -41,10 +41,11 @@ class Membership
   before_create do
     # Stored rather than derived from added_by_id, which is nullified if the adder deletes their account
     # Applications submitted while signed out for an existing account don't count as the account holder applying
-    self.added_without_applying = (added_by_id || mapplication&.submitted_signed_out) && !gathering.mapplications.and(account_id: account_id, :submitted_signed_out.ne => true).exists? ? true : false
+    # Buying a ticket to an event linked to the gathering doesn't count either (joined_by_ticket)
+    self.added_without_applying = (added_by_id || mapplication&.submitted_signed_out || joined_by_ticket) && !gathering.mapplications.and(account_id: account_id, :submitted_signed_out.ne => true).exists? ? true : false
   end
 
-  attr_accessor :prevent_notifications
+  attr_accessor :prevent_notifications, :joined_by_ticket
 
   has_many :notifications, as: :notifiable, dependent: :destroy
   after_create do

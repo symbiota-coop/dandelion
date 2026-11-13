@@ -68,6 +68,8 @@ Check out the video below, which does assume you have a [Stripe](https://stripe.
 
 It can also work to use both: you can sell tickets to an Event, and choose to automatically add anyone that buys a ticket to one of your Gatherings. <!-- claim: ticket-buyers-join-gathering -->
 
+As the gathering's admins can see its members' email addresses, linking an event to a gathering is only for admins of the gathering who can also see the event's attendee emails: admins and event managers of the event's organisation or a cohost, or any event admin once **Allow all event admins to view attendee emails** is on. <!-- claim: link-gathering-email-viewers --> Ticket buyers added this way don't follow the gathering's other members, so joining doesn't show them their 'People I follow' details. <!-- claim: ticket-buyers-dont-follow-members -->
+
 ## Gathering access
 
 You can choose from three access modes: Anyone with the link can join, People must apply to join, and Invitation-only. <!-- claim: access-modes --> If you select People must apply to join, you will be able to define the questions people are asked on the application form. <!-- claim: application-questions -->

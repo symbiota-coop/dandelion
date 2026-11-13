@@ -177,7 +177,7 @@ class Ticket
     claim_tickets_on_resale_replaced.each { |resold_ticket| complete_resale(resold_ticket) }
     event.waitships.find_by(account: account).try(:destroy)
     ticket_type.ticket_type_waitships.find_by(account: account).try(:destroy) if ticket_type && account
-    event.gathering.memberships.create(account: account, unsubscribed: true) if event.gathering
+    event.gathering.memberships.create(account: account, unsubscribed: true, joined_by_ticket: true) if event.gathering
   end
 
   after_save do

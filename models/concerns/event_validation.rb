@@ -63,7 +63,6 @@ module EventValidation
         errors.add(:activity, "- you don't have permission to create events for this activity") if activity && (new_record? || activity_id_changed?) && !can_assign_activity?(actor)
         errors.add(:local_group, "- you don't have permission to create events for this local group") if local_group && (new_record? || local_group_id_changed?) && !can_assign_local_group?(actor)
       end
-      errors.add(:gathering, "- you don't have permission to add attendees to this gathering") if gathering && (new_record? || gathering_id_changed?) && !Gathering.admin?(gathering, last_saved_by || account)
 
       errors.add(:update_activity_events, "- you don't have permission to update all events in this activity") if update_activity_events.to_s == '1' && !can_bulk_update_activity_events?
 
@@ -148,6 +147,14 @@ module EventValidation
             errors.add(:"#{k}", '- you cannot change this setting')
           end
         end
+      end
+
+      # Linking a gathering adds every ticket buyer to it, and its admins see its members' emails, so only someone who
+      # can see this event's attendee emails can link one. Checked here, once show_emails has been reset above for those
+      # who can't set it, so a new event can't turn it on to get past the check
+      if gathering && (new_record? || gathering_id_changed?)
+        gathering_actor = last_saved_by || account
+        errors.add(:gathering, "- you don't have permission to add attendees to this gathering") unless Gathering.admin?(gathering, gathering_actor) && Event.email_viewer?(self, gathering_actor)
       end
 
       if image

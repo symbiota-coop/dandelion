@@ -958,4 +958,82 @@ class EventPermissionsTest < ActiveSupport::TestCase
       assert_includes event.errors[:profit_share_to_coordinator], '- you cannot change this setting', role
     end
   end
+
+  test 'an event admin who cannot see attendee emails cannot link the event to a gathering they admin' do
+    covers 'gatherings/link-gathering-email-viewers@a35f78'
+    create_event(show_emails: false)
+    facilitator = create_facilitator(@event)
+    gathering = FactoryBot.create(:gathering, account: facilitator)
+    @event.gathering = gathering
+    @event.last_saved_by = facilitator
+    refute @event.valid?
+    assert_includes @event.errors[:gathering], "- you don't have permission to add attendees to this gathering"
+
+    # Once the organisation lets event admins see emails, they can
+    @event.set(show_emails: true)
+    assert @event.valid?, @event.errors.full_messages.join(', ')
+  end
+
+  test 'a new event cannot turn on show_emails to link a gathering' do
+    covers 'gatherings/link-gathering-email-viewers@a35f78'
+    create_organisation(allow_event_submissions: true)
+    submitter = FactoryBot.create(:account)
+    gathering = FactoryBot.create(:gathering, account: submitter)
+    event = FactoryBot.build(:event, organisation: @organisation, account: submitter, last_saved_by: submitter, show_emails: true, gathering: gathering)
+    refute event.valid?
+    assert_includes event.errors[:gathering], "- you don't have permission to add attendees to this gathering"
+  end
+
+  test 'organisation and cohost admins can link an event to a gathering they admin' do
+    covers 'gatherings/link-gathering-email-viewers@a35f78'
+    create_organisation
+    gathering = FactoryBot.create(:gathering, account: @account)
+    event = FactoryBot.build(:event, organisation: @organisation, account: @account, show_emails: false, gathering: gathering)
+    assert event.valid?, event.errors.full_messages.join(', ')
+
+    create_event(show_emails: false)
+    @event.gathering = gathering
+    @event.last_saved_by = @account
+    assert @event.valid?, @event.errors.full_messages.join(', ')
+
+    # And so can an event manager of a cohost
+    cohost = FactoryBot.create(:organisation)
+    manager = add_event_manager(cohost)
+    @event.cohostships.create!(organisation: cohost)
+    @event.gathering = FactoryBot.create(:gathering, account: manager)
+    @event.last_saved_by = manager
+    assert @event.valid?, @event.errors.full_messages.join(', ')
+  end
+
+  test 'an event admin who cannot see attendee emails cannot link a gathering by posting its id' do
+    covers_route 'POST /e/:slug/edit'
+    covers 'gatherings/link-gathering-email-viewers@a35f78'
+    create_event(prices: [0], show_emails: false)
+    facilitator = create_facilitator(@event)
+    gathering = FactoryBot.create(:gathering, account: facilitator)
+
+    sign_in_with_rack(facilitator)
+    post "/e/#{@event.slug}/edit", event: { gathering_id: gathering.id }
+    refute last_response.redirect?
+    assert_nil @event.reload.gathering_id
+  end
+
+  test 'only event admins who can see attendee emails are offered the gathering field' do
+    covers 'gatherings/link-gathering-email-viewers@a35f78'
+    create_event(prices: [0], show_emails: false)
+    facilitator = create_facilitator(@event)
+    FactoryBot.create(:gathering, account: facilitator, name: 'Facilitator Gathering')
+    FactoryBot.create(:gathering, account: @account, name: 'Admin Gathering')
+
+    sign_in(facilitator)
+    visit "/e/#{@event.slug}/edit"
+    click_link 'Everything else'
+    assert page.has_field? 'event_slug'
+    assert page.has_no_field? 'event_gathering_id'
+
+    sign_in(@account)
+    visit "/e/#{@event.slug}/edit"
+    click_link 'Everything else'
+    assert page.has_select? 'event_gathering_id', with_options: ['Admin Gathering']
+  end
 end

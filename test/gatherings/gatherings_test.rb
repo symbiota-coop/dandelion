@@ -417,6 +417,22 @@ class GatheringsTest < ActiveSupport::TestCase
     assert @gathering.memberships.find_by(account: buyer)
   end
 
+  test "ticket buyers added to a gathering don't follow its members" do
+    covers 'gatherings/ticket-buyers-dont-follow-members@9bcb5e'
+    create_gathering
+    create_event(prices: [10], gathering: @gathering)
+    buyer = FactoryBot.create(:account, phone: '+44 7700 900000', phone_privacy: 'People I follow')
+    order = @event.orders.create!(account: buyer, currency: @event.currency, value: 10, payment_completed: false)
+    order.tickets.create!(event: @event, account: buyer, ticket_type: @event.ticket_types.first, price: 10)
+
+    order.payment_completed!
+    membership = @gathering.memberships.find_by(account: buyer)
+    assert membership.added_without_applying
+    refute Follow.find_by(follower: buyer, followee: @account)
+    # So the gathering's admin isn't in their network, and doesn't see their 'People I follow' details
+    refute buyer.network.find(@account.id)
+  end
+
   test 'anyone with the link can join an open gathering' do
     covers 'gatherings/video-access-modes@f478bb', 'gatherings/access-modes@d37537'
     create_gathering(privacy: 'open')
