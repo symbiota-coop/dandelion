@@ -41,4 +41,11 @@ class SentryTest < ActiveSupport::TestCase
     assert_equal '[Filtered]', event.request.query_string['organisation']['mailgun_api_key']
     assert_equal '2', event.request.query_string['page']
   end
+
+  test 'a sign in code in the query is filtered' do
+    event = before_send(error_event_for(Rack::MockRequest.env_for('/events?sign_in_code=abc123&account%5Bpostcode%5D=N1')))
+
+    assert_equal '[Filtered]', event.request.query_string['sign_in_code']
+    assert_equal 'N1', event.request.query_string['account']['postcode']
+  end
 end

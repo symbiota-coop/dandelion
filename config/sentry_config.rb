@@ -17,13 +17,14 @@ end
 
 # Sentry filters the top-level keys of a request's body and query only, so the fields of a form's model (organisation[stripe_sk],
 # gathering[stripe_sk], organisation[mailgun_api_key]...) would reach it. This filters them at every depth, with
-# Sentry's own denylist plus our keys it misses (stripe_sk matches none of its terms)
+# Sentry's own denylist plus our keys it misses: stripe_sk, and sign_in_code, a live code that signs in as its account
+# for an hour if the request errors before redeeming it (and code, discount_code..., but not postcode)
 module SentryRequestScrubber
   module_function
 
   FILTERED = Sentry::DataCollection::KeyValueCollection::FILTERED_VALUE
   SENSITIVE_TERMS = Sentry::DataCollection::KeyValueCollection::SENSITIVE_DENY_LIST
-  OUR_SENSITIVE_KEYS = /(\A|_)sk\z/
+  OUR_SENSITIVE_KEYS = /(\A|_)(sk|code)\z/
 
   def scrub(event)
     request = event.respond_to?(:request) ? event.request : nil
