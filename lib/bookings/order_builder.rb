@@ -294,6 +294,9 @@ class OrderBuilder
     fields = @event.checkout_buyer_fields.map { |field| field[:name].to_sym } - [:hear_about]
     account_hash = @buyer.slice(*fields)
 
+    # By design, to keep booking free of friction: a guest booking uses the account the email typed in belongs to,
+    # signed in or not, so its monthly donor discount and donor-only ticket types apply without signing in. Credit and
+    # profile changes still need the account signed in (signed_in_as_buyer?)
     @account = Account.find_by(email: @buyer[:email].downcase.strip)
     @account ||= Account.new(account_hash.merge(skip_confirmation_email: true, default_currency: @new_account_currency, skip_geocoding: true))
 
