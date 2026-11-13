@@ -402,6 +402,48 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     refute_includes last_response.body, 'Secret cabin'
   end
 
+  test "a member isn't offered who selected an option that hides its members, nor one who hasn't paid" do
+    create_gathering(privacy: 'open')
+    option = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account, hide_members: true)
+    option.optionships.create!(account: create_member(name: 'Other Person'), gathering: @gathering)
+    sign_in(create_member)
+    visit gathering_path('/options')
+    assert page.has_content? 'Tent'
+    assert page.has_content? '1/∞'
+    assert page.has_no_link? '1/∞'
+
+    option.set(hide_members: false)
+    @gathering.set(demand_payment: true)
+    visit gathering_path('/options')
+    assert page.has_content? 'Tent'
+    assert page.has_no_link? '1/∞'
+  end
+
+  test "who selected an option that hides its members is for admins, and every list for members who've paid" do
+    create_gathering(privacy: 'open')
+    option = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account, hide_members: true)
+    open_option = @gathering.options.create!(name: 'Cabin', type: 'Accommodation', account: @account)
+    other = create_member(name: 'Other Person')
+    [option, open_option].each { |o| o.optionships.create!(account: other, gathering: @gathering) }
+    member = create_member
+
+    sign_in_with_rack(member)
+    get gathering_path("/options/#{option.id}")
+    assert_equal 403, last_response.status
+    refute_includes last_response.body, 'Other Person'
+    get gathering_path("/options/#{open_option.id}")
+    assert_includes last_response.body, 'Other Person'
+
+    @gathering.set(demand_payment: true)
+    get gathering_path("/options/#{open_option.id}")
+    assert last_response.redirect?
+    refute_includes last_response.body, 'Other Person'
+
+    sign_in_with_rack(@account)
+    get gathering_path("/options/#{option.id}")
+    assert_includes last_response.body, 'Other Person'
+  end
+
   # Teams
 
   test "a team's unsubscribe link unsubscribes the member from their own teamship, or shows the team if they're not in it" do

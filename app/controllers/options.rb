@@ -37,8 +37,11 @@ Dandelion::App.controller do
 
   get '/g/:slug/options/:id' do
     @gathering = gathering_from_params
-    membership_required!
+    confirmed_membership_required!
     @option = @gathering.options.find(params[:id]) || not_found
+    # As on the options page, which links the list only for confirmed members, and an option that hides its members
+    # only for admins
+    halt 403 if @option.hide_members? && !gathering_admin?
     partial :'options/option_modal'
   end
 
