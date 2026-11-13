@@ -1733,6 +1733,12 @@ input.flatpickr-mobile-empty:not(:focus)::-webkit-datetime-edit {
   border-bottom-right-radius: var(--bs-border-radius);
 }
 
+/* The ticket type's Slots select is followed by its number field, hidden unless Other is picked, so Bootstrap squares its end corners */
+.input-group:not(.has-validation) > .form-select.form-select.slots-choice:has(+ .slots-other[style*="display: none"]) {
+  border-top-right-radius: var(--bs-border-radius);
+  border-bottom-right-radius: var(--bs-border-radius);
+}
+
 .searchForm .form-group,
 .searchForm .form-check {
   margin-bottom: var(--space-2xs);
