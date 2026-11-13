@@ -72,6 +72,35 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     end
   end
 
+  # Delivers payload to path twice at once, as Stripe can, with each delivery looking up the contribution (model) at the
+  # same moment
+  def deliver_twice_at_once(path, env, secret, payload, model)
+    looked_up = Queue.new
+    find_by = model.method(:find_by)
+    timestamp = Time.now
+    signature = Stripe::Webhook::Signature.generate_header(timestamp, Stripe::Webhook::Signature.compute_signature(timestamp, payload, secret))
+    with_env({ env => secret }) do
+      lookup = proc do |*args, **kwargs|
+        found = find_by.call(*args, **kwargs)
+        looked_up << true
+        deadline = Time.now + 2
+        sleep 0.01 until looked_up.size >= 2 || Time.now > deadline
+        found
+      end
+      model.stub(:find_by, lookup) do
+        Array.new(2) do
+          Thread.new do
+            session = Rack::Test::Session.new(app)
+            session.header 'Stripe-Signature', signature
+            session.header 'Content-Type', 'application/json'
+            session.post path, payload
+            session.last_response.status
+          end
+        end.map(&:value)
+      end
+    end
+  end
+
   def run_jobs
     recorded_emails { Delayed::Job.all.each(&:invoke_job) }
   end
@@ -328,6 +357,17 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     assert_equal 1, notification_jobs(contribution.session_id).count
   end
 
+  test 'two deliveries of a paid contribution at once complete and notify once' do
+    contribution = create_pending_organisation_contribution
+
+    statuses = deliver_twice_at_once('/organisations/stripe_webhook', 'STRIPE_ENDPOINT_SECRET_ORGANISATIONS', ORGANISATIONS_SECRET,
+                                     checkout_payload(contribution.session_id), OrganisationContribution)
+
+    assert_equal [200, 200], statuses
+    assert contribution.reload.payment_completed?
+    assert_equal 1, notification_jobs(contribution.session_id).count
+  end
+
   test 'a contribution not yet paid waits for its async payment to succeed' do
     contribution = create_pending_organisation_contribution
 
@@ -471,6 +511,17 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     deliver_accounts_webhook(checkout_payload('cs_donation', type: 'checkout.session.async_payment_succeeded'))
     assert_equal 200, last_response.status
     assert_equal 1, AccountContribution.count
+    assert_equal 1, notification_jobs('cs_donation').count
+  end
+
+  test 'two deliveries of a paid donation at once complete and notify once' do
+    donation = AccountContribution.create!(amount: 5, currency: 'GBP', session_id: 'cs_donation', payment_completed: false)
+
+    statuses = deliver_twice_at_once('/accounts/stripe_webhook', 'STRIPE_ENDPOINT_SECRET_ACCOUNTS', ACCOUNTS_SECRET,
+                                     checkout_payload('cs_donation'), AccountContribution)
+
+    assert_equal [200, 200], statuses
+    assert donation.reload.payment_completed?
     assert_equal 1, notification_jobs('cs_donation').count
   end
 

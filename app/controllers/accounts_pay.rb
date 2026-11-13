@@ -14,8 +14,9 @@ Dandelion::App.controller do
     case event['type']
     when *StripeCheckout::PAID_EVENT_TYPES
       session = StripeCheckout.paid_session(event)
-      if session && (account_contribution = AccountContribution.find_by(session_id: session.id, payment_completed: false))
-        account_contribution.set(payment_completed: true)
+      # Claimed atomically, so concurrent deliveries complete it once
+      if session && (account_contribution = AccountContribution.and(session_id: session.id, payment_completed: false)
+                                                               .find_one_and_update({ '$set' => { payment_completed: true, updated_at: Time.now } }, return_document: :after))
         account_contribution.send_notification
       end
     when 'customer.subscription.created', 'customer.subscription.updated'

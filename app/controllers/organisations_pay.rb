@@ -18,9 +18,10 @@ Dandelion::App.controller do
     end
 
     if (session = StripeCheckout.paid_session(event))
-      if (organisation_contribution = OrganisationContribution.find_by(session_id: session.id, payment_completed: false))
-        organisation_contribution.payment_completed = true
-        organisation_contribution.save
+      # Claimed atomically, so concurrent deliveries complete it once
+      if (organisation_contribution = OrganisationContribution.and(session_id: session.id, payment_completed: false)
+                                                              .find_one_and_update({ '$set' => { payment_completed: true, updated_at: Time.now } }, return_document: :after))
+        organisation_contribution.organisation.update_paid_up
         organisation_contribution.send_notification
       end
     end
