@@ -9,7 +9,13 @@ class Tslot
   field :name, type: String
   field :o, type: Integer
 
-  has_many :tactivities, dependent: :nullify
+  has_many :tactivities
+
+  # Its activities go back to Unscheduled, space and all: with a space and no slot, one would show in neither the grid
+  # nor Unscheduled
+  before_destroy do
+    tactivities.update_all(space_id: nil, tslot_id: nil)
+  end
 
   validates_presence_of :name, :o
 

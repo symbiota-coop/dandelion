@@ -14,7 +14,12 @@ class Space
   field :image_uid, type: String
   field :has_image, type: Boolean
 
-  has_many :tactivities, dependent: :nullify
+  has_many :tactivities
+
+  # Its activities go back to Unscheduled, slot and all, rather than keeping a slot with no space
+  before_destroy do
+    tactivities.update_all(space_id: nil, tslot_id: nil)
+  end
 
   validates_presence_of :name, :o
 

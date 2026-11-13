@@ -176,6 +176,30 @@ class GatheringRoutesTest < ActiveSupport::TestCase
 
   # Timetables' spaces and slots
 
+  test 'an admin deletes a space and a slot, and the activity scheduled in them goes back to Unscheduled' do
+    covers_route 'POST /g/:slug/spaces/:id/destroy'
+    covers_route 'POST /g/:slug/tslots/:id/destroy'
+    create_gathering(privacy: 'open')
+    create_timetable
+    @timetable.spaces.create!(name: 'Dome')
+    dance = @timetable.tactivities.create!(name: 'Dance', account: @account, space: @timetable.spaces.find_by(name: 'Dome'), tslot: @tslot)
+    sign_in(@account)
+    visit gathering_path("/timetables/#{@timetable.id}")
+    assert page.has_css? ".tactivity-accept[data-space-id='#{@space.id}'] .tactivity[data-tactivity-id='#{@tactivity.id}']"
+
+    click_link_and_confirm 'Barn'
+    assert page.has_content? 'Unscheduled'
+    assert page.has_no_link? 'Barn'
+    assert_nil Space.find(@space.id)
+    assert_equal [nil, nil], [@tactivity.reload.space_id, @tactivity.tslot_id]
+
+    click_link_and_confirm 'Saturday morning'
+    assert page.has_no_link? 'Saturday morning'
+    assert_nil Tslot.find(@tslot.id)
+    assert_equal [nil, nil], [dance.reload.space_id, dance.tslot_id]
+    assert page.has_content? 'Dance'
+  end
+
   test "only a gathering's admins delete its spaces and slots, and not another gathering's" do
     create_gathering(privacy: 'open')
     create_timetable
