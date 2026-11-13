@@ -467,7 +467,7 @@ Dandelion::App.controller do
   post '/accounts/disconnect/:provider' do
     sign_in_required!
     verification_required!(return_to: '/accounts/providers', notice: 'Nothing was disconnected: enter the code below, then disconnect it again.')
-    @provider = Provider.object(params[:provider])
+    @provider = Provider.object(params[:provider]) || not_found
     @account = current_account
     if @account.provider_links.find_by(provider: @provider.display_name).try(:destroy)
       flash[:notice] = "<i class=\"#{@provider.icon}\"></i> Disconnected!"

@@ -226,7 +226,7 @@ class AccountRoutesTest < ActiveSupport::TestCase
     assert follow.reload.starred
   end
 
-  test "disconnecting a provider disconnects only one's own" do
+  test "disconnecting a provider disconnects only one's own, and a provider there isn't is not found" do
     account = FactoryBot.create(:account)
     other = FactoryBot.create(:account)
     [account, other].each do |a|
@@ -234,6 +234,8 @@ class AccountRoutesTest < ActiveSupport::TestCase
     end
     sign_in_with_rack(account)
 
+    post '/accounts/disconnect/no_such_provider', account_id: other.id
+    assert_equal 404, last_response.status
     post '/accounts/disconnect/google_oauth2', account_id: other.id
     assert_equal '/accounts/providers', URI(last_response.location).path
     assert_empty account.reload.provider_links
