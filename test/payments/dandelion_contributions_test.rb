@@ -186,6 +186,23 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     assert_equal 200, last_response.status
   end
 
+  test 'paying, saving a card for or turning off auto top-ups for an organisation that does not exist is not found' do
+    create_contributing_organisation
+    sign_in_with_rack(@account)
+
+    calls = stub_checkout_session do
+      post '/o/no-such-organisation/pay', amount: '10', currency: 'GBP', payment_method: 'stripe'
+      assert_equal 404, last_response.status
+      post '/o/no-such-organisation/stripe_setup'
+      assert_equal 404, last_response.status
+    end
+    assert_empty calls
+    get '/o/no-such-organisation/stripe_setup_complete', session_id: 'cs_setup'
+    assert_equal 404, last_response.status
+    post '/o/no-such-organisation/clear_stripe_customer_id'
+    assert_equal 404, last_response.status
+  end
+
   # Saving a card for auto top-ups
 
   test 'an organisation admin starts saving a card in a setup session on Dandelion\'s own Stripe account' do

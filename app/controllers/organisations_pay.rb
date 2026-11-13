@@ -29,7 +29,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/stripe_setup', provides: :json do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug])
+    @organisation = organisation_from_params
     organisation_admins_only!
 
     session = Stripe::Checkout::Session.create({
@@ -45,7 +45,7 @@ Dandelion::App.controller do
   end
 
   get '/o/:slug/stripe_setup_complete' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug])
+    @organisation = organisation_from_params
     organisation_admins_only!
 
     opts = StripeOpts.call
@@ -69,7 +69,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/clear_stripe_customer_id' do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug])
+    @organisation = organisation_from_params
     organisation_admins_only!
 
     @organisation.set(stripe_customer_id: nil)
@@ -77,7 +77,7 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/pay', provides: :json do
-    @organisation = Organisation.find_by_slug_or_id(slug: params[:slug])
+    @organisation = organisation_from_params
     organisation_admins_only!
 
     halt 400 unless params[:amount] && params[:amount].to_f > 0
