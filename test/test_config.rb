@@ -43,7 +43,8 @@ module ActiveSupport
 
     setup do
       puts "\n🧪 Running: #{name}"
-      RouteRecording.test = "#{self.class.instance_method(name).source_location.join(':')} #{name}" if ENV['RECORD_ROUTES'].present?
+      RouteRecording.start("#{self.class.instance_method(name).source_location.join(':')} #{name}")
+      @covered_routes = []
       reset!
       if ENV['CREATE_VIDEO']
         FileUtils.rm_f(Dir.glob("#{Capybara.save_path}/*.{png,mp4}"))
@@ -53,6 +54,7 @@ module ActiveSupport
     end
 
     teardown do
+      check_covered_routes_were_requested
       # Only once the test has used the page (Capybara's own flag, with no reader): a screenshot starts Chrome, which
       # model and Rack tests otherwise never need, and which can't start in some agents' sandboxes (Codex's on macOS)
       save_screenshot if !ENV['CI'] && respond_to?(:save_screenshot) && page.instance_variable_get(:@touched)
@@ -63,8 +65,20 @@ module ActiveSupport
     def covers(*claims); end
 
     # The routes this test is about, as 'VERB /path' as the controller writes it (lib/route_marks.rb): test/lint_test.rb
-    # reads them, so they do nothing here
-    def covers_route(*routes); end
+    # reads them, to fail on a route no test covers, and the test fails if it never requests them
+    def covers_route(*routes)
+      @covered_routes.concat(routes)
+    end
+
+    # A covers_route is only true if the test reaches the route: one that calls the model instead, or requests a route
+    # since renamed, would leave the route untested while the lint counts it covered. Only once the test has passed,
+    # so a test that fails early fails for its own reason
+    def check_covered_routes_were_requested
+      return unless failures.empty?
+
+      unrequested = @covered_routes - RouteRecording.requested.to_a
+      flunk "covers_route #{unrequested.map { |route| "'#{route}'" }.join(', ')}, but the test never requested it: request it, or move the mark to a test that does" if unrequested.any?
+    end
 
     def reset!
       Capybara.reset_sessions!

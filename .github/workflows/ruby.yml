@@ -12,7 +12,8 @@ on:
         type: boolean
         default: false
       # Which routes each test requests (RECORD_ROUTES, test/setup/route_recording.rb), as each group's routes-<group> artifact,
-      # for finding the tests that cover a route (covers_route)
+      # for finding the tests that cover a route (covers_route). Every run records them, to check each covers_route; this
+      # only saves them
       record_routes:
         description: Record which routes each test requests
         type: boolean
