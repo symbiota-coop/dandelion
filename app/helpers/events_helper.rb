@@ -96,7 +96,8 @@ Dandelion::App.helpers do
                                                 ]).map { |hash| hash['_id'] }
       EventIds.new(sampled_ids)
     when 'trending'
-      EventIds.new(events.trending_ids(from))
+      # from is nil when ?from= isn't a date, and trending counts the week's orders back from it
+      EventIds.new(events.trending_ids(from || Date.today))
     else
       events
     end

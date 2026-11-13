@@ -289,7 +289,7 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
   test 'odd params give a listing, not an error, and never widen it to hidden events' do
     create_listing_events
     [
-      { from: 'not-a-date' }, { to: 'not-a-date' }, { from: '2026-13-45' }, { from: { 'x' => '2026-01-01' } }, { to: %w[2026-01-01] }, { from: 'not-a-date', order: 'random' },
+      { from: 'not-a-date' }, { to: 'not-a-date' }, { from: '2026-13-45' }, { from: { 'x' => '2026-01-01' } }, { to: %w[2026-01-01] }, { from: 'not-a-date', order: 'random' }, { from: 'not-a-date', order: 'trending' },
       { page: '99999999999999999999' }, { page: '-1' }, { page: 'abc' }, { per_page: '0' }, { per_page: '-5' },
       { local_group_id: { '$ne' => 'x' } }, { activity_id: { '$exists' => true } }, { activity_id: %w[a b] }, { local_group_id: 'nonsense' },
       { event_tag_id: { '$ne' => '1' } }, { q: { '$ne' => '1' } }, { q: 'x' * 500 }, { order: { '$ne' => 1 } },
