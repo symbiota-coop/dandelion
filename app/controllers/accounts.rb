@@ -184,7 +184,10 @@ Dandelion::App.controller do
     @account = current_account
     @organisationships = @account.organisationships.includes(:organisation).select(&:organisation).sort_by { |organisationship| organisationship.organisation.name.to_s.downcase }
     @activityships_by_organisation_id = @account.activityships.includes(activity: :organisation).select(&:activity).sort_by { |activityship| activityship.activity.name.downcase }.group_by { |activityship| activityship.activity.organisation_id }
-    @local_groupships_by_organisation_id = @account.local_groupships.includes(local_group: :organisation).select(&:local_group).sort_by { |local_groupship| local_groupship.local_group.name.downcase }.group_by { |local_groupship| local_groupship.local_group.organisation_id }
+    # Local groups loaded without their shapes (LocalGroup.without_heavy_fields), rather than through includes
+    local_groupships = @account.local_groupships.to_a
+    @local_groups_by_id = LocalGroup.without_heavy_fields.includes(:organisation).and(:id.in => local_groupships.map(&:local_group_id)).index_by(&:id)
+    @local_groupships_by_organisation_id = local_groupships.select { |local_groupship| @local_groups_by_id[local_groupship.local_group_id] }.sort_by { |local_groupship| @local_groups_by_id[local_groupship.local_group_id].name.downcase }.group_by { |local_groupship| @local_groups_by_id[local_groupship.local_group_id].organisation_id }
     @memberships = @account.memberships.includes(:gathering).select(&:gathering).sort_by { |membership| membership.gathering.name.downcase }
     @teamships_by_gathering_id = @account.teamships.includes(:team).select(&:team).sort_by { |teamship| teamship.team.name.downcase }.group_by(&:gathering_id)
     erb :'accounts/subscriptions'
@@ -441,7 +444,7 @@ Dandelion::App.controller do
   get '/u/:username/local_groups' do
     @account = account_from_params
     kick! unless profile_viewable?(@account) && viewable?(@account, :local_groups)
-    local_groups = LocalGroup.and(:id.in => @account.local_groupships.and(hide_membership: false).pluck(:local_group_id))
+    local_groups = LocalGroup.without_heavy_fields.and(:id.in => @account.local_groupships.and(hide_membership: false).pluck(:local_group_id))
     partial :'local_groups/blocks', locals: { local_groups: local_groups }
   end
 

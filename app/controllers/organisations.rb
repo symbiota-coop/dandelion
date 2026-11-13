@@ -55,7 +55,7 @@ Dandelion::App.controller do
 
   get '/o/:slug/local_groups', provides: %i[html json] do
     @organisation = organisation_from_params
-    @local_groups = @organisation.local_groups.order('name asc')
+    @local_groups = @organisation.local_groups.without_heavy_fields.order('name asc')
     @local_groups = @local_groups.and(:id.in => LocalGroup.search(params[:q], @local_groups).pluck(:id)) if params[:q]
     @local_groups = @local_groups.and(id: params[:id]) if params[:id]
     case content_type
@@ -67,7 +67,7 @@ Dandelion::App.controller do
       end
     when :json
       {
-        results: @local_groups.only(:name).map { |local_group| { id: local_group.id.to_s, text: "#{local_group.name} (id:#{local_group.id})" } }
+        results: @local_groups.map { |local_group| { id: local_group.id.to_s, text: "#{local_group.name} (id:#{local_group.id})" } }
       }.to_json
     end
   end

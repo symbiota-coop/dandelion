@@ -204,7 +204,9 @@ class Pmail
     if event_recipients?
       to
     else
-      to.and(:id.nin => organisation.unsubscribed_member_ids).and(unsubscribed: false)
+      # Matching on the cache rather than plucking the unsubscribed ids, which for a large organisation are tens of
+      # thousands, sent back as a $nin
+      to.and(:unsubscribed_organisation_ids_cache.ne => organisation.id).and(unsubscribed: false)
     end
   end
 

@@ -81,6 +81,12 @@ class LocalGroup
     errors.add(:geometry, e)
   end
 
+  # The shape is stored three times (geometry, area and polygons), up to megabytes for a detailed one, so lists that
+  # show names and links leave it out. Validation parses geometry, so a record loaded this way can't be saved
+  def self.without_heavy_fields
+    without(:geometry, :area, :polygons)
+  end
+
   def event_feedbacks
     EventFeedback.and(:event_id.in => events.pluck(:id))
   end

@@ -35,28 +35,11 @@ elsif @organisation
   end
 
   activities = organisation_admin? ? @organisation.activities : @organisation.activities.and(:id.in => current_account.activityships.and(admin: true).pluck(:activity_id))
-  activity_options = (if activities.count.positive?
-                        activities.order('name asc').map do |activity|
-                          [
-                            ["Activity: #{activity.name}", "activity:#{activity.id}"]
-                          ]
-                        end.sum([])
-                      else
-                        []
-                      end)
-  to_options += activity_options
+  # Names and ids plucked, as loading whole documents (local groups' shapes) is slow
+  to_options += activities.order('name asc').pluck(:name, :id).map { |name, id| ["Activity: #{name}", "activity:#{id}"] }
 
   local_groups = organisation_admin? ? @organisation.local_groups : @organisation.local_groups.and(:id.in => current_account.local_groupships.and(admin: true).pluck(:local_group_id))
-  local_group_options = (if local_groups.count.positive?
-                          local_groups.order('name asc').map do |local_group|
-                            [
-                              ["Local group: #{local_group.name}", "local_group:#{local_group.id}"]
-                            ]
-                          end.sum([])
-                        else
-                          []
-                         end)
-  to_options += local_group_options
+  to_options += local_groups.order('name asc').pluck(:name, :id).map { |name, id| ["Local group: #{name}", "local_group:#{id}"] }
 
 elsif @activity
   to_options << [@activity.name, "activity:#{@activity.id}"]

@@ -77,7 +77,7 @@
           <%= hidden_field_tag :'carousel_ids[]', value: carousel_id %>
         <% end %>
       <% end %>
-      <% local_group_options = local_groups.order('name asc').map { |local_group| ["#{local_group.name}#{@organisation.near_select_suffix}", "#{local_group.name}#{@organisation.near_select_suffix}"] } %>
+      <% local_group_options = local_groups.pluck(:name).map { |name| ["#{name}#{@organisation.near_select_suffix}", "#{name}#{@organisation.near_select_suffix}"] } %>
       <%= select_tag :near, options: ([
           ['Location', '', {disabled: true, selected: !params[:near]}],
           ['Anywhere',''],

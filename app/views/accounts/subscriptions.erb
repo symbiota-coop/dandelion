@@ -89,7 +89,7 @@
                 </div>
               </li>
               <% } %>
-              <% local_groupships.each { |local_groupship| local_group = local_groupship.local_group %>
+              <% local_groupships.each { |local_groupship| local_group = @local_groups_by_id[local_groupship.local_group_id] %>
               <li class="list-group-item subscription-row subscription-child" style="display: none">
                 <a href="/o/<%= organisation.slug %>/lg/<%= local_group.slug %>"><%= local_group.name %></a>
                 <div data-pagelet-url="<%= local_group.path %>/local_groupship">

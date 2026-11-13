@@ -54,10 +54,6 @@ module OrganisationAssociations
     Account.and(subscribed_organisation_ids_cache: id)
   end
 
-  def unsubscribed_member_ids
-    Account.and(unsubscribed_organisation_ids_cache: id).pluck(:id)
-  end
-
   # Followers who get none of the organisation's mailings, nor its activities' or local groups': unsubscribed from
   # everything, or from the organisation. The followers lists' Subscribed to mailer filter leaves them out
   def mailer_unsubscribed_member_ids
