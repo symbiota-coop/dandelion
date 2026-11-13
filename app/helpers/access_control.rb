@@ -321,7 +321,8 @@ Dandelion::App.helpers do
     when Gathering
       gathering_admin?(photoable, account)
     when Comment
-      photoable.account_id == account.id
+      # As for the comment's file: only while its author can still see the discussion
+      photoable.account_id == account.id && commentable_viewer?(photoable.commentable, account)
     when TicketType
       event_admin?(photoable.event, account)
     else

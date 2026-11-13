@@ -238,6 +238,16 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
     assert_equal 1, @comment.photos.count
   end
 
+  test "a comment's author who has left the discussion can't add photos to it" do
+    team_thread
+    @gathering.memberships.find_by(account: @member).destroy
+    sign_in_with_rack(@member)
+
+    post '/photos/new', photoable_type: 'Comment', photoable_id: @comment.id, image: image_upload
+    assert_equal 403, last_response.status
+    assert_equal 0, @comment.photos.count
+  end
+
   test "an event's admins add photos to its ticket types, and its attendees can't" do
     create_event(prices: [0])
     ticket_type = @event.ticket_types.first
