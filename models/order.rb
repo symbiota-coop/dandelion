@@ -102,6 +102,11 @@ class Order
     self.and(payment_completed: true)
   end
 
+  # Unpaid orders past their hold, deleted by the hourly errands (tasks/tasks.rake) to free their places
+  def self.destroy_expired_holds
+    incomplete.and(:created_at.lt => UNPAID_HOLD.ago).destroy_all
+  end
+
   def self.discounted
     self.and(:id.in => self.and(:percentage_discount.ne => nil).pluck(:id) + self.and(:percentage_discount_monthly_donor.ne => nil).pluck(:id))
   end

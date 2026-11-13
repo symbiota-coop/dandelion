@@ -17,7 +17,7 @@ namespace :hourly do
         system('find /tmp -maxdepth 1 -type f -mmin +60 -delete 2>/dev/null')
       end
       Errand.step('delete stale uncompleted orders') do
-        Order.incomplete.and(:created_at.lt => Order::UNPAID_HOLD.ago).destroy_all
+        Order.destroy_expired_holds
       end
       Errand.step('update paid up status for organisations with orders in the last hour') do
         Organisation.and(:id.in => Event.and(:id.in => Order.complete.and(:created_at.gt => 1.hour.ago).pluck(:event_id)).pluck(:organisation_id)).each(&:update_paid_up_without_delay)
