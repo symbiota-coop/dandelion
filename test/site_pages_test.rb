@@ -142,6 +142,7 @@ class SitePagesTest < ActiveSupport::TestCase
     assert page.has_content?('Check out 1 upcoming event near Stockholm on Dandelion')
     assert page.has_link?('Midsummer Dance')
     assert page.has_no_content?('Secret Supper')
+    assert page.has_css?(%(a[aria-label="Map view"][href="/events?display=map&near=Stockholm&search=1"]), visible: :all)
 
     visit '/locations/Nowhere'
     assert page.has_content?("Hmm, we couldn't find that page.")

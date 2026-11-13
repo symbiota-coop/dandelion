@@ -5,6 +5,8 @@ Dandelion::App.controller do
     @title = @location.name
     params[:near] = @location.query
     params[:online] = true if @location.online?
+    # So the view switcher, Sort by and iCal links keep the location
+    @view_params = %w[near online]
 
     @events = Event.live.publicly_visible.browsable
     @from = params[:from] ? parse_date(params[:from]) : Date.today

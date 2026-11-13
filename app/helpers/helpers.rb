@@ -229,8 +229,9 @@ Dandelion::App.helpers do
 
   # The query string's params, to carry over to another view of the same list: not the route's own (slug), which the
   # path already has
+  # The query's own params, plus any a route sets as if they were in the query (@view_params, e.g. a location page's near)
   def view_base_params
-    params.to_h.select { |k, _| request.GET.key?(k) }.reject { |k, v| %w[format search name display].include?(k) || v == false }
+    params.to_h.select { |k, _| request.GET.key?(k) || @view_params&.include?(k) }.reject { |k, v| %w[format search name display].include?(k) || v == false }
   end
 
   def view_url(display, path: nil)
