@@ -69,8 +69,12 @@ Dandelion::App.helpers do
     { html: doc.to_html, headings: headings, sections: sections }
   end
 
+  # Messages are plain text (the messages box is a textarea), so they're escaped rather than sanitised as HTML: what
+  # someone types shows as typed, < and all, and no markup, however deeply nested, reaches the HTML parser. Then line
+  # breaks, and links for URLs and email addresses (Rinku, with no target, onto http(s) and mailto only)
   def message_html(message)
-    Sanitize.fragment(Rinku.auto_link(message.body.gsub("\n", '<br />')), Sanitize::Config::DANDELION)
+    escaped = ERB::Util.html_escape(message.body.to_s)
+    Rinku.auto_link(escaped, :all, nil, nil, Rinku::AUTOLINK_SHORT_DOMAINS).gsub("\n", '<br>').html_safe
   end
 
   def timeago(time)

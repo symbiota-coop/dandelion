@@ -217,18 +217,25 @@ class MarkupHelpersTest < ActiveSupport::TestCase
   end
 
   test 'message_html line breaks inside an attribute do not make a script URL' do
-    a = fragment(message_html(%(<a href="javascript\nscript:window.xss = 1">x</a>))).at_css('a')
+    links = fragment(message_html(%(<a href="javascript\nscript:window.xss = 1">x</a>))).css('a')
 
-    refute_match(/\Ajavascript:/i, a['href'].to_s)
+    assert(links.none? { |a| a['href'].to_s.match?(/\Ajavascript:/i) })
   end
 
-  test 'message_html autolinks URLs, keeps line breaks and allowed markup' do
-    html = message_html("Hi <b>there</b>\nsee https://example.com/a?b=1&c=2 and www.example.org\nor mail someone@example.com")
+  test 'message_html autolinks URLs, keeps line breaks, and shows what was typed, markup and < included' do
+    html = message_html("Hi <b>there</b>, 3 < 5 and see <name> here\nsee https://example.com/a?b=1&c=2 and www.example.org\nor mail someone@example.com")
     doc = fragment(html)
 
     assert_equal 2, doc.css('br').length
-    assert_equal 'there', doc.at_css('b').text
+    assert_nil doc.at_css('b')
+    assert_includes doc.text, 'Hi <b>there</b>, 3 < 5 and see <name> here'
     assert_equal ['https://example.com/a?b=1&c=2', 'http://www.example.org', 'mailto:someone@example.com'], hrefs(doc)
+  end
+
+  test 'message_html shows deeply nested markup as text rather than failing' do
+    html = message_html("#{'<b>' * 500}deep#{'</b>' * 500}")
+
+    assert_includes fragment(html).text, "#{'<b>' * 500}deep"
   end
 
   test 'message_html renders a long message quickly' do
@@ -329,11 +336,11 @@ class MarkupHelpersTest < ActiveSupport::TestCase
     assert thread.has_content?('Hostile message')
     assert_xss_did_not_run
 
-    thread.all('a', text: /js|mixed case|entities|tab|leading space|named colon|vbscript|data|handlers/).each do |link|
-      refute_match(/\A\s*(javascript|vbscript|data):/i, link[:href].to_s)
-    end
-    thread.find('a', text: 'handlers').hover
-    assert_xss_did_not_run
+    # A message is plain text, so the payloads show as typed, with no links or elements of their own to run
+    assert thread.has_content?('<script>')
+    message = thread.find('.widget-chat-message', text: 'Hostile message')
+    message.all('a').each { |link| refute_match(/\A\s*(javascript|vbscript|data):/i, link[:href].to_s) }
+    assert message.has_no_css?('script, iframe, img, svg, style, [onmouseover]')
   end
 
   test 'a hostile ticket type description does not run on the event page' do
@@ -347,14 +354,17 @@ class MarkupHelpersTest < ActiveSupport::TestCase
     assert_xss_did_not_run
   end
 
-  test 'md and message_html drop style elements, which would restyle the whole page' do
+  test 'md drops style elements, and message_html shows them as text, so neither restyles the whole page' do
     css = '<style>body { background-color: black; color: black } .message-thread { width: 0 }</style>'
 
-    [helpers.md("#{css}\n\nText"), message_html("#{css}Text")].each do |html|
-      assert_empty fragment(html).css('style')
-      refute_includes html, 'background-color'
-      assert_includes html, 'Text'
-    end
+    md = helpers.md("#{css}\n\nText")
+    assert_empty fragment(md).css('style')
+    refute_includes md, 'background-color'
+    assert_includes md, 'Text'
+
+    message = fragment(message_html("#{css}Text"))
+    assert_empty message.css('style')
+    assert_includes message.text, "#{css}Text"
   end
 
   test 'a message with a style element does not restyle the thread' do
