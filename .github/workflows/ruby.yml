@@ -109,11 +109,6 @@ jobs:
     runs-on: ubuntu-26.04
     # Two attempts at the tests' 10 minutes, and setting up
     timeout-minutes: 25
-    services:
-      mongodb:
-        image: mirror.gcr.io/library/mongo:8.2
-        ports:
-          - 27017:27017
     strategy:
       fail-fast: false
       # Each job runs a group of test files (test/**/*_test.rb, named by their path in test/, but lint_test.rb, which the
@@ -154,6 +149,12 @@ jobs:
           - group: tours
             files: tours/tour tours/how_to_create_an_event tours/how_to_create_a_gathering gatherings/timetables gatherings/rotas gatherings/budget organisations/activity_admin organisations/local_group_routes
     steps:
+    # Mongo starts in the background rather than as a service container, which the runner starts before the first step:
+    # pulling its image and creating the container take about 17s, now spent while the code checks out and Ruby
+    # installs. Wait for MongoDB, before the tests, waits for it to answer
+    - name: Start MongoDB
+      run: (docker run --detach --name mongodb --publish 27017:27017 mirror.gcr.io/library/mongo:8.2 > "$RUNNER_TEMP/mongodb.log" 2>&1 &)
+
     - name: Git checkout
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
@@ -193,6 +194,17 @@ jobs:
     - name: Install ImageMagick
       if: contains(format(' {0} ', matrix.files), ' images ')
       run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends imagemagick
+
+    - name: Wait for MongoDB
+      run: |
+        for _ in $(seq 90); do
+          docker exec mongodb mongosh --quiet --eval "db.runCommand({ ping: 1 })" > /dev/null 2>&1 && exit 0
+          sleep 1
+        done
+        cat "$RUNNER_TEMP/mongodb.log"
+        docker logs mongodb 2>&1 | tail -n 20
+        echo "::error title=Wait for MongoDB::MongoDB did not answer within 90 seconds"
+        exit 1
 
     # A failing test is retried on its own (TEST_ATTEMPTS in test/test_config.rb), so the group runs again only when it
     # hangs past the timeout, which those retries can't catch
