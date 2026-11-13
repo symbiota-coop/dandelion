@@ -272,6 +272,17 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     assert_equal 403, last_response.status
   end
 
+  test 'another gathering\'s payment is not found under this gathering' do
+    create_paying_gathering
+    other_gathering = FactoryBot.create(:gathering, account: @account)
+    other_payment = create_unpaid_payment(other_gathering.memberships.first)
+    sign_in_with_rack(@account)
+
+    get gathering_path("/payments/#{other_payment.id}")
+
+    assert_equal 404, last_response.status
+  end
+
   # EVM
 
   def evm_transfers(transfers, &)
