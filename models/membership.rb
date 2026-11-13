@@ -3,6 +3,8 @@ class Membership
   include Mongoid::Timestamps
   include CoreExtensions
   include MembershipRows
+  # The member limit and one membership each are checked against the gathering's others, so no other is saved meanwhile
+  include RecordLock.on_insert(:gathering)
 
   belongs_to_without_parent_validation :gathering
   belongs_to_without_parent_validation :account, class_name: 'Account', inverse_of: :memberships

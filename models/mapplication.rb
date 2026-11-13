@@ -58,12 +58,12 @@ class Mapplication
     gathering.threshold && (verdicts.proposers.count + (gathering.enable_supporters ? verdicts.supporters.count : 0)) >= gathering.threshold
   end
 
+  # Whether it was: not if the gathering filled up, or another acceptance made the membership, since acceptable? was
+  # checked
   def accept
-    mapplication = self
-    account = mapplication.account
-    gathering = mapplication.gathering
-    set(status: 'accepted')
-    gathering.memberships.create! account: account, unsubscribed: true, mapplication: mapplication
+    membership = gathering.memberships.create(account: account, unsubscribed: true, mapplication: self)
+    set(status: 'accepted') if membership.persisted?
+    membership.persisted?
   end
 
   def name

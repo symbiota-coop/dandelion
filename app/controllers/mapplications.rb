@@ -61,8 +61,7 @@ Dandelion::App.controller do
     else
       @mapplication = @gathering.mapplications.build account: @account, status: 'pending', answers: question_answer_pairs(params), submitted_signed_out: submitted_signed_out
       if @mapplication.save
-        if @mapplication.acceptable? && @mapplication.meets_threshold
-          @mapplication.accept
+        if @mapplication.acceptable? && @mapplication.meets_threshold && @mapplication.accept
           redirect(@gathering.redirect_on_acceptance || "/g/#{@gathering.slug}/apply?accepted=true")
         else
           redirect "/g/#{@gathering.slug}/apply?applied=true"

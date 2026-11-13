@@ -2,6 +2,8 @@ class Optionship
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  # Capacity and one optionship each are checked against the option's others, so no other is saved meanwhile
+  include RecordLock.on_insert(:option)
 
   belongs_to_without_parent_validation :account
   belongs_to_without_parent_validation :option

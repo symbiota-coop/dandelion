@@ -95,6 +95,15 @@ class OrderBuilder
     end
   end
 
+  # Other bookings held the event, its discount code or the buyer's credit for longer than RecordLock waits
+  class Busy < Error
+    MESSAGE = 'Lots of people are booking at once. Please try again.'.freeze
+
+    def status
+      503
+    end
+  end
+
   class PaymentMethodUnavailable < Error
     MESSAGE = "That payment method isn't available for this event.".freeze
   end
@@ -146,11 +155,6 @@ class OrderBuilder
       409
     end
   end
-
-  # How long a booking may hold the event's booking lock, in case its process dies holding it, and how long another
-  # waits for it before giving up
-  BOOKING_LOCK_TIMEOUT = 20.seconds
-  BOOKING_LOCK_WAIT = 25.seconds
 
   attr_reader :order, :account, :quote
 
@@ -208,15 +212,24 @@ class OrderBuilder
     check_email unless @confirmed_email
     find_or_create_account
     check_duplicate unless @confirmed_duplicate
-    # Worked out now, before the order counts as a use of its discount code
-    @quote = build_quote(account: @account, credit: signed_in_as_buyer?).tap(&:total)
-    create_order
-    with_booking_lock { create_tickets }
+    # Checking what's left and taking it aren't one step, so bookings at once take turns from the quote to the order's
+    # discounts: otherwise two could each see the last place, the code's last use or the whole of the buyer's credit,
+    # and each take it. The payment provider is called after, once the order and its tickets hold what they took
+    RecordLock.hold(*booking_locks) do
+      # Worked out now, before the order counts as a use of its discount code, and checked again: another booking may
+      # have used up the code since check_choices
+      @quote = build_quote(account: @account, credit: signed_in_as_buyer?).validate!.tap(&:total)
+      create_order
+      create_tickets
+      apply_donation_and_discounts
+    end
     @event.refresh_sold_out_cache_and_notify_waitlist
-    apply_donation_and_discounts
     process_payment
   rescue Error
     raise
+  rescue RecordLock::Busy
+    @order.try(:destroy)
+    raise Busy
   rescue StandardError => e
     info = EventPaymentMethod.purchase_error_for(e)
     if info && @order
@@ -247,7 +260,7 @@ class OrderBuilder
     raise NoTickets if chosen.empty?
 
     # Ticket types, prices, the discount code and the donation, before an account is made
-    build_quote.validate!
+    @chosen_discount_code = build_quote.validate!.discount_code
   end
 
   def build_quote(account: nil, credit: false)
@@ -343,32 +356,17 @@ class OrderBuilder
     raise
   end
 
-  # Checking what's left and creating the tickets aren't one step, so two bookings at once could both see the last
-  # place and both take it. Each holds the event's lock for those steps, so they take turns. Only for that: the payment
-  # provider is called once the tickets, which hold the places, exist
-  def with_booking_lock
-    token = SecureRandom.uuid
-    waiting_until = Time.now + BOOKING_LOCK_WAIT
-    until Event.collection.update_one(
-      { _id: @event.id, '$or' => [{ booking_locked_until: nil }, { booking_locked_until: { '$lt' => Time.now } }] },
-      { '$set' => { booking_lock_token: token, booking_locked_until: Time.now + BOOKING_LOCK_TIMEOUT } }
-    ).modified_count == 1
-      if Time.now > waiting_until
-        @order.destroy
-        raise Error
-      end
-
-      sleep 0.02
-    end
-    locked = true
-    # Counted afresh, now that no other booking can be creating tickets
-    @event.reset_ticket_counts
-    yield
-  ensure
-    Event.collection.update_one({ _id: @event.id, booking_lock_token: token }, { '$unset' => { booking_lock_token: 1, booking_locked_until: 1 } }) if locked
+  # What a booking takes from: the event's places; its discount code's uses, which an organisation's code shares across
+  # its events; and the buyer's credit with the organisation, which they can spend on any of them. Always in this
+  # order, so bookings holding some never wait on each other
+  def booking_locks
+    organisationship = @event.organisation.organisationships.find_by(account: @account) if signed_in_as_buyer?
+    [@event, @chosen_discount_code, organisationship].compact
   end
 
   def create_tickets
+    # Counted afresh, now that no other booking can be creating tickets
+    @event.reset_ticket_counts
     # The prices chosen for range and pay-what-you-want ticket types, which Quote has checked
     prices = @quote.lines.to_h { |line| [line.key, line.chosen_price] }
     purchased = Hash.new(0)

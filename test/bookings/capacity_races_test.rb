@@ -1,8 +1,9 @@
 require_relative '../test_config'
 
-# Bookings at the same time: each checks what's left before creating its tickets, so without the event's booking lock
-# (OrderBuilder#with_booking_lock) two could both see the last place and both take it. Each race runs several times,
-# as one that oversells only does so some of the time
+# Bookings at the same time: each checks what's left before taking it, so without the locks a booking holds
+# (OrderBuilder#booking_locks, RecordLock) two could both see the last place, a discount code's last use or the whole
+# of the buyer's credit, and both take it. Each race runs several times, as one that oversells only does so some of
+# the time
 class BookingsCapacityRacesTest < ActiveSupport::TestCase
   ITERATIONS = 5
 
@@ -32,10 +33,11 @@ class BookingsCapacityRacesTest < ActiveSupport::TestCase
 
   # A booking as the checkout form makes one, by a buyer signed out, with its own copy of the event as each request
   # has. Waits at the gate once it's ready to book
-  def book_racing(event, buyer, quantities, wait, payment_method: 'rsvp', idempotency_key: nil)
+  def book_racing(event, buyer, quantities, wait, payment_method: 'rsvp', idempotency_key: nil, signed_in: false, discount_code: nil)
     builder = OrderBuilder.new(event: Event.find(event.id), buyer: { name: buyer.name, email: buyer.email },
                                quantities: quantities.transform_keys { |ticket_type| ticket_type.id.to_s },
-                               payment_method: payment_method, idempotency_key: idempotency_key)
+                               payment_method: payment_method, idempotency_key: idempotency_key,
+                               signed_in_account: (Account.find(buyer.id) if signed_in), discount_code: discount_code)
     wait.call
     builder.call
   end
@@ -163,11 +165,47 @@ class BookingsCapacityRacesTest < ActiveSupport::TestCase
 
   test "a booking lock left past its time, as by a booking whose process died, doesn't stop bookings" do
     event = create_event(prices: [0], capacity: 1)
-    event.set(booking_lock_token: SecureRandom.uuid, booking_locked_until: 1.second.ago)
+    RecordLock.collection.insert_one(_id: "Event:#{event.id}", token: SecureRandom.uuid, expires_at: 1.second.ago)
 
     book_racing(event, FactoryBot.create(:account), { event.ticket_types.first => 1 }, -> {})
     assert_equal 1, event.tickets.count
-    assert_nil Event.find(event.id).booking_locked_until
+    assert_equal 0, RecordLock.collection.count_documents(_id: "Event:#{event.id}")
+  end
+
+  test "a buyer booking two of an organisation's events at once spends their credit once" do
+    ITERATIONS.times do
+      buyer = FactoryBot.create(:account)
+      organisationship = @organisation.organisationships.create!(account: buyer)
+      organisationship.creditings.create!(account: @account, amount: 10, currency: 'GBP')
+      events = Array.new(2) { create_event(prices: [10]) }
+
+      results = with_stripe_sessions do
+        race(2) do |index, wait|
+          book_racing(events[index], buyer, { events[index].ticket_types.first => 1 }, wait, payment_method: 'stripe', signed_in: true)
+        end
+      end
+      assert_empty results.grep(Exception)
+      assert_equal [0, 10], events.map { |event| event.orders.first.credit_applied.to_i }.sort
+      assert_equal 0, organisationship.credit_balance.cents
+    end
+  end
+
+  test "buyers at once of two events with an organisation's discount code's last use: one gets it" do
+    racers = buyers(2)
+    ITERATIONS.times do |iteration|
+      code = @organisation.discount_codes.create!(code: "LAST#{iteration}", percentage_discount: 50, maximum_uses: 1)
+      events = Array.new(2) { create_event(prices: [10]) }
+
+      results = with_stripe_sessions do
+        race(2) do |index, wait|
+          book_racing(events[index], racers[index], { events[index].ticket_types.first => 1 }, wait, payment_method: 'stripe', discount_code: code.code)
+        end
+      end
+      refusals = results.grep(Exception)
+      assert_equal 1, refusals.length, results.inspect
+      assert_kind_of OrderBuilder::DiscountCodeInvalid, refusals.first
+      assert_equal 1, code.orders.count
+    end
   end
 
   test 'the same booking sent twice at once with one idempotency key makes one order' do

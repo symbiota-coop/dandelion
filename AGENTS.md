@@ -65,6 +65,7 @@ script/lint <files>
 - Nil booleans are converted to false using `after_initialize :convert_nil_booleans_to_false` and `before_validation :convert_nil_booleans_to_false`
 - Mongo indexes are created directly in the database, and are not defined in model files (`Dandelion/MongoidIndex`)
 - `Event.hinted(index_name)` makes MongoDB skip query planning, for queries it can't cache a plan for (e.g. an organisation's events `$or`, ~300 ms to plan: `events_including_cohosted.hinted(Event::HOSTS_INDEX)`). Hint only at call sites that need it, since it overrides more selective indexes. Index existence is checked once per process: dropping a hinted index needs a restart (or the queries fail), renaming one a code change
+- A check that counts and then writes (tickets left, an option's capacity, a member limit, a discount code's uses, credit) races with another request doing the same, so it runs holding a lock on what's being filled: `RecordLock.hold(record) { ... }`, or `include RecordLock.on_insert(:parent)` for a model whose validations count its parent's records (`lib/record_lock.rb`). "One each" rules need a unique index instead (below)
 - Unique indexes:
   - Back every `validates_uniqueness_of` with a unique index
   - If nil is allowed, filter it with `partialFilterExpression: { field: { $type: '<BSON type>' } }`, never `$exists: true` (Mongoid stores explicit nulls, which would clash). If nil isn't allowed, use a plain unique index with no filter, but only if every document has the field: documents missing it count as nulls and would clash

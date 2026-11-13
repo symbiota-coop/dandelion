@@ -67,7 +67,7 @@ class Option
   end
 
   def full?
-    capacity && optionships.count == capacity
+    capacity && optionships.count >= capacity
   end
 
   after_save do
