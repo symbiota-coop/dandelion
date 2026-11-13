@@ -209,6 +209,23 @@ class AccountRoutesTest < ActiveSupport::TestCase
     refute follow.reload.starred
   end
 
+  test "someone can't star or see the star of another person's follow" do
+    other = FactoryBot.create(:account)
+    follow = Follow.create!(follower: other, followee: public_account)
+    sign_in_with_rack(FactoryBot.create(:account))
+
+    get "/follow/starred/#{follow.id}", {}, XHR
+    assert_equal 404, last_response.status
+    post "/follow/star/#{follow.id}"
+    assert_equal 404, last_response.status
+    refute follow.reload.starred
+
+    follow.set(starred: true)
+    post "/follow/unstar/#{follow.id}"
+    assert_equal 404, last_response.status
+    assert follow.reload.starred
+  end
+
   test "disconnecting a provider disconnects only one's own" do
     account = FactoryBot.create(:account)
     other = FactoryBot.create(:account)

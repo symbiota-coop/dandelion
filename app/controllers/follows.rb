@@ -34,20 +34,20 @@ Dandelion::App.controller do
 
   get '/follow/starred/:id' do
     sign_in_required!
-    follow = current_account.follows_as_follower.find(params[:id])
+    follow = current_account.follows_as_follower.find(params[:id]) || not_found
     partial :'accounts/star', locals: { follow: follow, btn_class: params[:btn_class] }
   end
 
   post '/follow/star/:id' do
     sign_in_required!
-    follow = current_account.follows_as_follower.find(params[:id])
+    follow = current_account.follows_as_follower.find(params[:id]) || not_found
     follow.set(starred: true)
     200
   end
 
   post '/follow/unstar/:id' do
     sign_in_required!
-    follow = current_account.follows_as_follower.find(params[:id])
+    follow = current_account.follows_as_follower.find(params[:id]) || not_found
     follow.set(starred: false)
     200
   end
