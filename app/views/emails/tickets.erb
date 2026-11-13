@@ -56,9 +56,10 @@
       </p>
     <% end %>
   <% end %>
-  <% if event.organisation.show_sign_in_link_in_ticket_emails && !event.evergreen? %>
+  <%# Not for a ticketholder sent their ticket by email (TicketNotifications#send_ticket): they've no account, so no token for the link %>
+  <% if event.organisation.show_sign_in_link_in_ticket_emails && !event.evergreen? && account.persisted? %>
     <p>
-      <% if !account.has_signed_in? && account.persisted? %>
+      <% if !account.has_signed_in? %>
         <a href="<%= ENV['BASE_URI'] %>/accounts/edit?link_token=%recipient.token%&event_id=<%= event.id %>">Click here to create a profile on Dandelion and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.</a>
       <% else %>
         <a href="<%= ENV['BASE_URI'] %>/e/<%= event.slug %>?link_token=%recipient.token%">Sign in to Dandelion</a> to show or hide your attendance and connect with others <%= event.recording? ? 'who attended' : 'attending' %> the event.
