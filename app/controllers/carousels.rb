@@ -43,9 +43,9 @@ Dandelion::App.controller do
   end
 
   post '/o/:slug/carousels/order' do
-    params[:carousel_ids].each_with_index do |carousel_id, i|
-      @organisation.carousels.find(carousel_id).set(o: i)
-    end
+    # Every id must be one of this organisation's carousels before any is moved
+    carousels = Array(params[:carousel_ids]).map { |carousel_id| @carousels.find(carousel_id) || not_found }
+    carousels.each_with_index { |carousel, i| carousel.set(o: i) }
     200
   end
 end

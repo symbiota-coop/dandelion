@@ -239,7 +239,7 @@ class OrganisationRoutesTest < ActiveSupport::TestCase
 
   test "an organisation's admin can't reach another organisation's carousel through their own" do
     create_organisation
-    other_carousel = FactoryBot.create(:carousel, name: 'Theirs', o: 0)
+    other_carousel = FactoryBot.create(:carousel, name: 'Theirs', o: 5)
     sign_in_with_rack(@account)
 
     get "/o/#{@organisation.slug}/carousels/#{other_carousel.id}/edit"
@@ -248,8 +248,10 @@ class OrganisationRoutesTest < ActiveSupport::TestCase
     assert_equal 404, last_response.status
     post "/o/#{@organisation.slug}/carousels/#{other_carousel.id}/destroy"
     assert_equal 404, last_response.status
+    post "/o/#{@organisation.slug}/carousels/order", carousel_ids: [other_carousel.id.to_s, BSON::ObjectId.new.to_s]
+    assert_equal 404, last_response.status
 
     other_carousel.reload
-    assert_equal ['Theirs', 0], [other_carousel.name, other_carousel.o]
+    assert_equal ['Theirs', 5], [other_carousel.name, other_carousel.o]
   end
 end
