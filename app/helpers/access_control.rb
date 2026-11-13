@@ -92,6 +92,11 @@ Dandelion::App.helpers do
     kick!(redirect_url: @activity.path) unless activity_admin?
   end
 
+  # A locked activity is visible to its admins only: its page, and the feedback on its events
+  def locked_activity_admins_only!
+    kick!(redirect_url: "/o/#{@activity.organisation.slug}") if @activity.locked? && !activity_admin?
+  end
+
   def local_group_admin?(local_group = nil, account = current_account)
     local_group ||= @local_group
     cached_permission(:@local_group_admin_cache, local_group, account) do

@@ -38,7 +38,7 @@ Dandelion::App.controller do
   get '/o/:organisation_slug/a/:slug', prerender: true do
     @activity = activity_from_params
     @title = @activity.name
-    kick!(redirect_url: "/o/#{@activity.organisation.slug}") if @activity.locked? && !activity_admin?
+    locked_activity_admins_only!
     @activityship = @activity.activityships.find_by(account: current_account) if current_account
     erb :'activities/activity'
   end
@@ -56,6 +56,7 @@ Dandelion::App.controller do
 
   get '/o/:organisation_slug/a/:slug/feedback_summary' do
     @activity = activity_from_params
+    locked_activity_admins_only!
     @organisation = @activity.organisation
     partial :'event_feedbacks/feedback_summary', locals: { contents_only: true }
   end
@@ -227,6 +228,7 @@ Dandelion::App.controller do
 
   get '/o/:organisation_slug/a/:slug/show_feedback' do
     @activity = activity_from_params
+    locked_activity_admins_only!
     @organisation = @activity.organisation
     if request.xhr? || params[:minimal]
       partial :'event_feedbacks/event_feedbacks', locals: { event_feedbacks: @activity.public_event_feedbacks.includes(:account, event: :organisation) }, layout: (params[:minimal] ? 'minimal' : false)

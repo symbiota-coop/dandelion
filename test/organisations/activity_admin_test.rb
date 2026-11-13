@@ -415,6 +415,33 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     assert @activity.feedback_summary_last_refreshed_at > 1.minute.ago
   end
 
+  test "a locked activity's feedback and its summary are for its admins only, as its page is" do
+    create_activity
+    create_event(activity: @activity)
+    @event.event_feedbacks.create!(account: FactoryBot.create(:account), rating: 5, public_answers: [['How was it?', 'Glowing review']])
+    # Locked after its event, as creating an event unlocks its activity
+    @activity.set(locked: true, feedback_summary: 'Warm and welcoming')
+    pages = { "#{@activity.path}/feedback_summary" => 'Warm and welcoming', "#{@activity.path}/show_feedback" => 'Glowing review' }
+
+    outsiders.each do |account|
+      sign_in_as(account)
+      pages.each do |url, text|
+        get url, {}, XHR
+        assert_equal 403, last_response.status
+        refute_includes last_response.body, text
+      end
+      get "#{@activity.path}/show_feedback", minimal: 1
+      assert_redirected_to "/o/#{@organisation.slug}"
+    end
+
+    sign_in_with_rack(@account)
+    pages.each do |url, text|
+      get url, {}, XHR
+      assert last_response.ok?
+      assert_includes last_response.body, text
+    end
+  end
+
   # ═══════════════════════════════════════════════════════════════════════════
   # Old URLs
   # ═══════════════════════════════════════════════════════════════════════════
