@@ -1,6 +1,1 @@
-# Routes no test covers (covers_route), each with why: test/lint_test.rb fails on any other route no test covers. Take
-# a route out once a test covers it. Not tested yet means a test is wanted
-GET /geolocate: Site admins' stats and diagnostics
-GET /raise: Site admins' stats and diagnostics
-GET /raise_job: Site admins' stats and diagnostics
 POST /whatsapp: Experimental

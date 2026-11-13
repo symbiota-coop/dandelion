@@ -53,7 +53,7 @@ class StatsPagesTest < ActiveSupport::TestCase
     [nil, FactoryBot.create(:account)].each do |account|
       account ? sign_in_with_rack(account) : clear_cookies
       without_package_registries do
-        (PAGES + ["/stats/traces/#{trace.id}", '/stats/traces/slowest?name=GET+/e/:slug']).each do |path|
+        (PAGES + ["/stats/traces/#{trace.id}", '/stats/traces/slowest?name=GET+/e/:slug', '/raise', '/raise_job', '/geolocate']).each do |path|
           get path
           assert last_response.redirect?, "#{path} for #{account ? 'an account' : 'someone signed out'}"
           refute_includes last_response.body, 'A private message', path
@@ -121,5 +121,40 @@ class StatsPagesTest < ActiveSupport::TestCase
     assert_includes page.html, 'November 2026'
     visit "/stats/traces/#{trace.id}"
     assert page.has_content?('find events')
+  end
+
+  test 'a site admin raises a test error, in a request or a job, to check errors are reported' do
+    covers_route 'GET /raise', 'GET /raise_job'
+    sign_in_with_rack(FactoryBot.create(:account, admin: true))
+
+    error = assert_raises(RuntimeError) { get '/raise', message: 'Checking error reporting' }
+    assert_equal 'Checking error reporting', error.message
+
+    reported = []
+    ErrorReporting.stub(:capture_exception, ->(exception, context: nil, **) { reported << [exception.message, context]; nil }) do
+      get '/raise', message: 'Checking context', detail: 'more'
+    end
+    assert_equal 200, last_response.status
+    assert_equal [['Checking context', { detail: 'more' }]], reported
+
+    # Tests run jobs as they're enqueued, so the job's error comes straight back
+    error = assert_raises(RuntimeError) { get '/raise_job', message: 'Checking the worker' }
+    assert_equal 'Checking the worker', error.message
+    assert_includes error.backtrace.join, 'delayed'
+  end
+
+  test "a site admin sees where their address is, or why it couldn't be found" do
+    covers_route 'GET /geolocate'
+    sign_in_with_rack(FactoryBot.create(:account, admin: true))
+    reader = Object.new
+    reader.define_singleton_method(:city) { |ip| { 'ip' => ip, 'city' => 'Stockholm' } }
+
+    MaxMinder.stub(:reader, reader) { get '/geolocate', {}, 'HTTP_CF_CONNECTING_IP' => '81.2.69.142' }
+    assert_equal({ 'ip' => '81.2.69.142', 'city' => 'Stockholm' }, JSON.parse(last_response.body))
+
+    # No GeoLite database, as on a machine that hasn't downloaded it
+    MaxMinder.stub(:reader, nil) { get '/geolocate', {}, 'HTTP_CF_CONNECTING_IP' => '81.2.69.142' }
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'city'
   end
 end
