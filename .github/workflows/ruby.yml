@@ -11,6 +11,12 @@ on:
         description: Measure test coverage
         type: boolean
         default: false
+      # Which routes each test requests (RECORD_ROUTES, test/test_config.rb), as each group's routes-<group> artifact,
+      # for finding the tests that cover a route (covers_route)
+      record_routes:
+        description: Record which routes each test requests
+        type: boolean
+        default: false
   pull_request:
     branches: [ master ]
 
@@ -173,6 +179,7 @@ jobs:
         TEST_FILES: ${{ matrix.files }}
         # Coverage (test/test_coverage.rb) only when asked for, as it slows the groups and changes slowly
         COVERAGE: ${{ inputs.coverage && '1' || '' }}
+        RECORD_ROUTES: ${{ inputs.record_routes && '1' || '' }}
       with:
         timeout_minutes: 10
         max_attempts: 2
@@ -186,6 +193,14 @@ jobs:
         name: coverage-${{ matrix.group }}
         path: coverage/.resultset.json
         include-hidden-files: true
+        retention-days: 1
+
+    - name: Upload the routes each test requested
+      if: ${{ !cancelled() && inputs.record_routes }}
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      with:
+        name: routes-${{ matrix.group }}
+        path: tmp/routes
         retention-days: 1
 
   # The test groups' coverage in one report: its totals and least-covered files in the run's summary, and the whole report

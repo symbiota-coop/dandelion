@@ -80,6 +80,31 @@ rescue Errno::ENOENT
   # Another run starting at the same time removed it first
 end
 
+# RECORD_ROUTES=1 records which routes each test requests, in tmp/routes/<pid>.json, for finding the tests that cover
+# a route (covers_route). CI's Run workflow does it with record routes ticked, as the routes artifact
+module RouteRecording
+  REQUESTS = Hash.new { |hash, test| hash[test] = Set.new }
+
+  class << self
+    attr_accessor :test
+  end
+end
+
+if ENV['RECORD_ROUTES'].present? # CI sets it empty unless asked for
+  # As the route is matched, before the app's own before filters can halt it
+  Dandelion::App.before do
+    route = request.route_obj
+    # Padrino adds (.:format)? to the path the controller wrote, and keeps / as ''
+    path = route.original_path.delete_suffix('(.:format)?') if route
+    path = '/' if path == ''
+    RouteRecording::REQUESTS[RouteRecording.test] << "#{route.verb} #{path}" if route && RouteRecording.test
+  end
+  Minitest.after_run do
+    FileUtils.mkdir_p('tmp/routes')
+    File.write("tmp/routes/#{Process.pid}.json", RouteRecording::REQUESTS.transform_values(&:to_a).to_json)
+  end
+end
+
 module ActiveSupport
   class TestCase
     include TestHelpers
@@ -107,6 +132,7 @@ module ActiveSupport
 
     setup do
       puts "\n🧪 Running: #{name}"
+      RouteRecording.test = "#{self.class.instance_method(name).source_location.join(':')} #{name}" if ENV['RECORD_ROUTES'].present?
       reset!
       if ENV['CREATE_VIDEO']
         FileUtils.rm_f(Dir.glob("#{Capybara.save_path}/*.{png,mp4}"))
@@ -124,6 +150,10 @@ module ActiveSupport
     # The doc claims this test checks, as 'page/id@hash' (lib/doc_claims.rb): test/lint_test.rb reads them, so they do
     # nothing here
     def covers(*claims); end
+
+    # The routes this test is about, as 'VERB /path' as the controller writes it (lib/route_marks.rb): test/lint_test.rb
+    # reads them, so they do nothing here
+    def covers_route(*routes); end
 
     def reset!
       Capybara.reset_sessions!
