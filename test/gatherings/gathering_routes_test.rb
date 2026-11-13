@@ -1,4 +1,5 @@
 require_relative '../test_config'
+require_relative '../helpers/gatherings_helpers'
 
 # Routes of a gathering not tested elsewhere: deleting it, a member's email and sidebar settings, finding one's
 # gatherings, deleting and reordering timetables' spaces and slots and rotas' roles and slots, adding someone to a shift,
@@ -6,24 +7,7 @@ require_relative '../test_config'
 class GatheringRoutesTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
-
-  def create_other_gathering
-    @other_account = FactoryBot.create(:account)
-    @other_gathering = FactoryBot.create(:gathering, account: @other_account)
-  end
-
-  def create_timetable
-    @timetable = @gathering.timetables.create!(name: 'Workshops', account: @account)
-    @space = @timetable.spaces.create!(name: 'Barn')
-    @tslot = @timetable.tslots.create!(name: 'Saturday morning')
-    @tactivity = @timetable.tactivities.create!(name: 'Yoga', account: @account, space: @space, tslot: @tslot)
-  end
-
-  def create_rota
-    @rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
-    @role = Role.create!(name: 'Cook', rota: @rota)
-    @rslot = Rslot.create!(name: 'Morning', rota: @rota)
-  end
+  include GatheringsHelpers
 
   # Deleting a gathering
 
@@ -32,7 +16,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     create_gathering(privacy: 'open')
     member = create_member
     payment = Payment.create!(membership: @gathering.memberships.find_by(account: member), amount: 50, currency: 'GBP')
-    create_timetable
+    create_timetable(scheduled: true)
     create_rota
     Shift.create!(account: member, role: @role, rslot: @rslot, rota: @rota)
     gathering_id = @gathering.id
@@ -180,7 +164,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/spaces/:id/destroy'
     covers_route 'POST /g/:slug/tslots/:id/destroy'
     create_gathering(privacy: 'open')
-    create_timetable
+    create_timetable(scheduled: true)
     @timetable.spaces.create!(name: 'Dome')
     dance = @timetable.tactivities.create!(name: 'Dance', account: @account, space: @timetable.spaces.find_by(name: 'Dome'), tslot: @tslot)
     sign_in(@account)
@@ -202,7 +186,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
 
   test "only a gathering's admins delete its spaces and slots, and not another gathering's" do
     create_gathering(privacy: 'open')
-    create_timetable
+    create_timetable(scheduled: true)
     member = create_member
     create_other_gathering
     other_timetable = @other_gathering.timetables.create!(name: 'Talks', account: @other_account)
@@ -232,7 +216,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/spaces/order'
     covers_route 'POST /g/:slug/tslots/order'
     create_gathering(privacy: 'open')
-    create_timetable
+    create_timetable(scheduled: true)
     dome = @timetable.spaces.create!(name: 'Dome')
     afternoon = @timetable.tslots.create!(name: 'Saturday afternoon')
     create_other_gathering
@@ -258,7 +242,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
 
   test "only a gathering's admins reorder its timetables' spaces and slots" do
     create_gathering(privacy: 'open')
-    create_timetable
+    create_timetable(scheduled: true)
     dome = @timetable.spaces.create!(name: 'Dome')
     afternoon = @timetable.tslots.create!(name: 'Saturday afternoon')
     member = create_member

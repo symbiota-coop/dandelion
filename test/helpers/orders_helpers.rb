@@ -1,10 +1,5 @@
 # Helpers the order test files (test/orders) share
 module OrdersHelpers
-  # Waits for something a request from the page does, such as a field that saves when it changes, to be done
-  def wait_until(message)
-    page.document.synchronize { raise Capybara::ExpectationNotMet, message unless yield }
-  end
-
   # Changes a ticketholder field on the order's page, which saves it when it changes
   def change_ticketholder_field(field, value)
     fill_in field, with: value

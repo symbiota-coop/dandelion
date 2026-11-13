@@ -7,8 +7,8 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
 
   # The events listing's pagelets (and the calendar and map) load by XHR. The referer is the one an embedding page
   # sends: Rack::Attack challenges a search without one
-  def xhr_get(path, params = {})
-    get path, params, { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest', 'HTTP_REFERER' => 'https://example.com/' }
+  def embedded_xhr_get(path, params = {})
+    xhr_get(path, params, 'HTTP_REFERER' => 'https://example.com/')
   end
 
   def listing_path(format = nil)
@@ -46,11 +46,11 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
   test "the listing shows the organisation's own and cohosted public events, never secret, locked, deleted or another organisation's" do
     create_listing_events
 
-    xhr_get listing_path
+    embedded_xhr_get listing_path
     assert_equal 200, last_response.status
     assert_lists last_response.body, [@public_event, @cohosted_event], hidden_events
 
-    xhr_get listing_path, minimal: 1
+    embedded_xhr_get listing_path, minimal: 1
     assert_lists last_response.body, [@public_event, @cohosted_event], hidden_events
 
     # The full page loads the list as a pagelet, and names none of the hidden events itself
@@ -63,21 +63,21 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
     create_listing_events
     sign_in_with_rack(FactoryBot.create(:account))
 
-    xhr_get listing_path
+    embedded_xhr_get listing_path
     assert_lists last_response.body, [@public_event], [@locked_event, @secret_event]
   end
 
   test 'the JSON listing, and its calendar and map views, follow the same rules' do
     create_listing_events
 
-    xhr_get listing_path(:json)
+    embedded_xhr_get listing_path(:json)
     assert_equal 200, last_response.status
     assert_equal [@public_event.id.to_s, @cohosted_event.id.to_s].sort, json_ids.sort
 
-    xhr_get listing_path(:json), display: 'calendar'
+    embedded_xhr_get listing_path(:json), display: 'calendar'
     assert_equal [@public_event.id.to_s, @cohosted_event.id.to_s].sort, json_ids.sort
 
-    xhr_get listing_path(:json), display: 'map', west: 17, south: 59, east: 19, north: 60
+    embedded_xhr_get listing_path(:json), display: 'map', west: 17, south: 59, east: 19, north: 60
     assert_equal 2, JSON.parse(last_response.body)['pointsCount']
   end
 
@@ -90,7 +90,7 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
     cohost = FactoryBot.create(:organisation, name: 'Cohost Org')
     @event.cohostships.create!(organisation: cohost)
 
-    xhr_get listing_path(:json)
+    embedded_xhr_get listing_path(:json)
     event = JSON.parse(last_response.body).sole
     assert_equal({ 'id' => @event.id.to_s, 'slug' => @event.slug, 'url' => "#{ENV['BASE_URI']}/e/#{@event.slug}", 'name' => 'Fielded event',
                    'location' => @event.location, 'description' => '<p>All about it</p>', 'tags' => ['breath'],
@@ -140,11 +140,11 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
       { from: 15.days.from_now.to_date.to_s } => [@local_group_event, @tagged_event, @online_event],
       { from: 15.days.from_now.to_date.to_s, to: 25.days.from_now.to_date.to_s } => [@local_group_event]
     }.each do |filter, shown|
-      xhr_get listing_path, filter
+      embedded_xhr_get listing_path, filter
       assert_equal 200, last_response.status
       assert_lists last_response.body, shown, all - shown
 
-      xhr_get listing_path(:json), filter
+      embedded_xhr_get listing_path(:json), filter
       assert_equal shown.map { |event| event.id.to_s }.sort, json_ids.sort, "JSON with #{filter}"
     end
   end
@@ -157,12 +157,12 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
     cohosted = FactoryBot.create(:event, organisation: FactoryBot.create(:organisation), name: 'Cohosted past event', start_time: 5.days.ago, end_time: 5.days.ago + 2.hours)
     cohosted.cohostships.create!(organisation: @organisation)
 
-    xhr_get listing_path, past: 1
+    embedded_xhr_get listing_path, past: 1
     body = last_response.body
     assert_lists body, [@newer_event, @older_event], [@upcoming_event, @secret_past_event, cohosted]
     assert_operator body.index('Newer past event'), :<, body.index('Older past event')
 
-    xhr_get listing_path
+    embedded_xhr_get listing_path
     assert_lists last_response.body, [@upcoming_event], [@newer_event, @older_event]
   end
 
@@ -171,25 +171,25 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
     create_event(as: :soonest_event, name: 'First soonest event', start_time: 10.days.from_now, end_time: 10.days.from_now + 2.hours, created_at: 1.day.ago)
     create_event(as: :middle_event, name: 'Second soonest event', start_time: 20.days.from_now, end_time: 20.days.from_now + 2.hours, created_at: 2.days.ago)
 
-    xhr_get listing_path
+    embedded_xhr_get listing_path
     body = last_response.body
     assert_operator body.index('First soonest event'), :<, body.index('Second soonest event')
     assert_operator body.index('Second soonest event'), :<, body.index('Third soonest event')
 
-    xhr_get listing_path, order: 'created_at'
+    embedded_xhr_get listing_path, order: 'created_at'
     body = last_response.body
     assert_operator body.index('First soonest event'), :<, body.index('Second soonest event')
     assert_operator body.index('Second soonest event'), :<, body.index('Third soonest event')
     @soonest_event.set(created_at: 5.days.ago)
-    xhr_get listing_path, order: 'created_at'
+    embedded_xhr_get listing_path, order: 'created_at'
     body = last_response.body
     assert_operator body.index('Second soonest event'), :<, body.index('Third soonest event')
     assert_operator body.index('Third soonest event'), :<, body.index('First soonest event')
 
-    xhr_get listing_path, per_page: 2
+    embedded_xhr_get listing_path, per_page: 2
     assert_lists last_response.body, [@soonest_event, @middle_event], [@later_event]
     assert_includes last_response.body, 'page=2'
-    xhr_get listing_path, per_page: 2, page: 2
+    embedded_xhr_get listing_path, per_page: 2, page: 2
     assert_lists last_response.body, [@later_event], [@soonest_event, @middle_event]
   end
 
@@ -202,13 +202,13 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
     assert_nil last_response.headers['X-Frame-Options']
     refute_includes last_response.body, "'s events"
     assert_includes last_response.body, 'id="events-container"'
-    xhr_get listing_path, minimal: 1
+    embedded_xhr_get listing_path, minimal: 1
     assert_lists last_response.body, [@event, @embed_event], []
 
     get listing_path
     assert_equal 'SAMEORIGIN', last_response.headers['X-Frame-Options']
     assert_includes last_response.body, "'s events"
-    xhr_get listing_path
+    embedded_xhr_get listing_path
     assert_lists last_response.body, [@event], [@embed_event]
   end
 
@@ -219,18 +219,18 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
     create_event(as: :members_event, name: 'Donors only event', monthly_donors_only: true)
     path = "/o/#{@organisation.slug}/events_block"
 
-    xhr_get path
+    embedded_xhr_get path
     assert_equal 200, last_response.status
     assert_lists last_response.body, [@public_event, @cohosted_event, @members_event], hidden_events + [@past_event]
 
-    xhr_get path, members_events: 1
+    embedded_xhr_get path, members_events: 1
     assert_lists last_response.body, [@members_event], [@public_event, @cohosted_event]
 
     10.times { |i| create_event(as: :"filler#{i}", name: "Filler #{i} event", start_time: 1.day.from_now + i.hours, end_time: 1.day.from_now + i.hours + 1.hour) }
-    xhr_get path
+    embedded_xhr_get path
     assert_equal 10, last_response.body.scan(/Filler \d event/).size
     assert_includes last_response.body, 'events_page=2'
-    xhr_get path, events_page: 2
+    embedded_xhr_get path, events_page: 2
     assert_lists last_response.body, [@public_event, @cohosted_event, @members_event], [@filler0]
   end
 
@@ -246,7 +246,7 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
         assert_equal "/o/#{@organisation.slug}", URI(last_response.location).path
         [@public_event, @secret_event, @locked_event, @deleted_event].each { |event| refute_includes last_response.body, event.name }
       end
-      xhr_get path, table: 1
+      embedded_xhr_get path, table: 1
       assert_equal 403, last_response.status
       refute_includes last_response.body, @secret_event.name
     end
@@ -261,7 +261,7 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
     create_listing_events
     path = "/o/#{@organisation.id}/events/lookup.json"
 
-    xhr_get path
+    embedded_xhr_get path
     assert_equal 403, last_response.status
     refute_includes last_response.body, @secret_event.name
     get path
@@ -270,21 +270,21 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
 
     other_admin = @other_event.organisation.account
     sign_in_with_rack(other_admin)
-    xhr_get path
+    embedded_xhr_get path
     assert_equal 403, last_response.status
 
     sign_in_with_rack(@account)
-    xhr_get path
+    embedded_xhr_get path
     assert_equal 200, last_response.status
     results = JSON.parse(last_response.body)['results']
     assert_equal [@public_event, @cohosted_event, @secret_event, @locked_event].map { |event| event.id.to_s }.sort, results.map { |result| result['id'] }.sort
     assert_equal "#{@public_event.name} (#{@public_event.start_time.to_date})", results.detect { |result| result['id'] == @public_event.id.to_s }['text']
 
-    xhr_get path, q: 'hush'
+    embedded_xhr_get path, q: 'hush'
     assert_equal [@secret_event.id.to_s], lookup_ids
-    xhr_get path, id: @cohosted_event.id.to_s
+    embedded_xhr_get path, id: @cohosted_event.id.to_s
     assert_equal [@cohosted_event.id.to_s], lookup_ids
-    xhr_get path, id: @other_event.id.to_s
+    embedded_xhr_get path, id: @other_event.id.to_s
     assert_empty JSON.parse(last_response.body)['results']
   end
 
@@ -298,14 +298,14 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
       { carousel_ids: { '$ne' => 'x' } }, { near: 'nowhere-at-all' }, { secret: true }, { locked: true }
     ].each do |params|
       [listing_path, listing_path(:json)].each do |path|
-        xhr_get path, params
+        embedded_xhr_get path, params
         assert_equal 200, last_response.status, "#{path} #{params}"
         hidden_events.each { |event| refute_includes last_response.body, event.name, "#{path} #{params}" }
       end
     end
     get listing_path(:ics), q: { 'a' => 'b' }
     assert_equal 200, last_response.status
-    xhr_get "/o/#{@organisation.slug}/events_block", events_page: '99999999999999999999'
+    embedded_xhr_get "/o/#{@organisation.slug}/events_block", events_page: '99999999999999999999'
     assert_equal 200, last_response.status
   end
 end

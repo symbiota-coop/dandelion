@@ -212,7 +212,7 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
     @organisation.update!(facebook_pixel_id: '1234567890', google_ads_conversion_id: '6782912626', google_ads_conversion_label: 'Purchase', google_ads_enhanced_conversions: true)
   end
 
-  def create_paid_order
+  def create_paid_order_with_ticket
     buyer = FactoryBot.create(:account, phone: '+447700900123')
     @order = @event.orders.create!(account: buyer, currency: 'GBP', value: 10, payment_completed: true)
     @order.tickets.create!(event: @event, account: buyer, ticket_type: @event.ticket_types.first)
@@ -247,7 +247,7 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
     assert_equal({ 'content_name' => @event.name, 'content_ids' => [@event.id.to_s], 'content_type' => 'product' }, view_content)
     assert_nil purchase
 
-    create_paid_order
+    create_paid_order_with_ticket
     pixel = marketing_scripts(get_in_production("/e/#{@event.slug}?order_id=#{@order.token}&success=true")).find { |script| script.text.include?('fbq(') }
     assert_includes pixel.text, "fbq('track', 'PageView')"
     view_content, purchase = script_arguments(pixel)
@@ -267,7 +267,7 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
     gtag = marketing_scripts(get_in_production("/e/#{@event.slug}")).find { |script| script.text.include?('gtag(') }
     assert_equal [nil], script_arguments(gtag)
 
-    create_paid_order
+    create_paid_order_with_ticket
     gtag = marketing_scripts(get_in_production("/e/#{@event.slug}?order_id=#{@order.token}&success=true")).find { |script| script.text.include?('gtag(') }
     purchase = script_arguments(gtag).first
     assert_equal({ 'value' => 10.0, 'currency' => 'GBP', 'transaction_id' => @order.id.to_s }, purchase['params'])

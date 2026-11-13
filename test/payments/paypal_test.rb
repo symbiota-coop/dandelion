@@ -32,7 +32,7 @@ class PaypalPaymentsTest < ActiveSupport::TestCase
     client
   end
 
-  def deliver_paypal_webhook(organisation, event_type:, order_id: nil, capture_id: nil)
+  def deliver_paypal_event(organisation, event_type:, order_id: nil, capture_id: nil)
     resource = { 'id' => order_id }
     if event_type == 'PAYMENT.CAPTURE.COMPLETED'
       resource = {
@@ -40,8 +40,7 @@ class PaypalPaymentsTest < ActiveSupport::TestCase
         'supplementary_data' => { 'related_ids' => { 'order_id' => order_id } }
       }
     end
-    header 'Content-Type', 'application/json'
-    post "/o/#{organisation.slug}/paypal_webhook", { event_type: event_type, resource: resource }.to_json
+    deliver_paypal_webhook(organisation, { event_type: event_type, resource: resource })
   end
 
   def post_paypal_purchase(event, account)
@@ -156,7 +155,7 @@ class PaypalPaymentsTest < ActiveSupport::TestCase
     refute order.tickets.first.payment_completed?
 
     Paypal.stub :new, client do
-      deliver_paypal_webhook(@organisation, event_type: 'CHECKOUT.ORDER.APPROVED', order_id: created['id'])
+      deliver_paypal_event(@organisation, event_type: 'CHECKOUT.ORDER.APPROVED', order_id: created['id'])
     end
 
     assert_equal 200, last_response.status
@@ -174,7 +173,7 @@ class PaypalPaymentsTest < ActiveSupport::TestCase
     client = stub_paypal_client(get: stub_paypal_order(id: paypal_order_id, status: 'COMPLETED', capture_id: 'CAPTURE'))
 
     Paypal.stub :new, client do
-      deliver_paypal_webhook(@organisation, event_type: 'PAYMENT.CAPTURE.COMPLETED', order_id: paypal_order_id)
+      deliver_paypal_event(@organisation, event_type: 'PAYMENT.CAPTURE.COMPLETED', order_id: paypal_order_id)
     end
 
     restored = Order.find(order.id)
@@ -189,7 +188,7 @@ class PaypalPaymentsTest < ActiveSupport::TestCase
     create_paypal_event
 
     Paypal.stub :new, ->(*) { raise 'Paypal.new should not be called' } do
-      deliver_paypal_webhook(@organisation, event_type: 'CHECKOUT.ORDER.APPROVED', order_id: 'PAYPAL-unknown')
+      deliver_paypal_event(@organisation, event_type: 'CHECKOUT.ORDER.APPROVED', order_id: 'PAYPAL-unknown')
     end
 
     assert_equal 200, last_response.status
@@ -201,7 +200,7 @@ class PaypalPaymentsTest < ActiveSupport::TestCase
     client = stub_paypal_client(get: stub_paypal_order(id: order.paypal_order_id, status: 'PAYER_ACTION_REQUIRED'))
 
     Paypal.stub :new, client do
-      deliver_paypal_webhook(@organisation, event_type: 'CHECKOUT.ORDER.APPROVED', order_id: order.paypal_order_id)
+      deliver_paypal_event(@organisation, event_type: 'CHECKOUT.ORDER.APPROVED', order_id: order.paypal_order_id)
     end
 
     assert_equal 200, last_response.status

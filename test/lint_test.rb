@@ -531,6 +531,24 @@ class LintTest < Minitest::Test
     assert_empty uncovered, "No test covers these routes: write one starting covers_route 'VERB /path', or say why in test/routes_without_tests.yml\n#{uncovered.join("\n")}"
   end
 
+  # AGENTS.md, Tests: a helper is defined once, in its test file or in a module in test/helpers that the files sharing
+  # it include, so two files' copies can't drift apart, nor one name mean two things. Only the methods of test classes
+  # and helper modules count, not of the fakes a test defines (a class RecordedEmail's header)
+  def test_test_helpers_are_defined_once
+    defined = Hash.new { |hash, name| hash[name] = [] }
+    Dir[File.join(ROOT, 'test/**/*.rb')].each do |path|
+      owner = nil
+      File.foreach(path, encoding: 'UTF-8').with_index(1) do |line, number|
+        owner = Regexp.last_match(1) if line =~ /\A(?:class|module) (\w+)/
+        next unless owner&.match?(/(Test|Helpers|TestCase)\z/) && line =~ /\A  def (?:self\.)?(\w+[?!=]?)/
+
+        defined[Regexp.last_match(1)] << "#{path.delete_prefix("#{ROOT}/")}:#{number}"
+      end
+    end
+    repeated = defined.select { |_, ats| ats.map { |at| at.split(':').first }.uniq.size > 1 }
+    assert_empty repeated, "Define each test helper once: share it in a module in test/helpers, or give each its own name\n#{repeated.map { |name, ats| "#{name}: #{ats.join(', ')}" }.join("\n")}"
+  end
+
   # AGENTS.md, Build/vendored code: CKEditor 38 and later show a Powered by CKEditor badge under the GPL
   def test_ckeditor_stays_on_37
     JSON.parse(File.read(File.join(ROOT, 'ckeditor/package.json'))).values_at('dependencies', 'devDependencies').compact.reduce({}, :merge).each do |name, version|

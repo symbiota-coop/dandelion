@@ -31,6 +31,12 @@ module BookingsHelpers
     execute_script 'window.confirm = function () { return false }'
   end
 
+  # Gives account credit of amount with @organisation, granted by @account, in @event's currency unless another
+  def grant_credit(account, amount:, currency: @event.currency)
+    organisationship = @organisation.organisationships.find_or_create_by(account: account)
+    organisationship.creditings.create!(account: @account, amount: amount, currency: currency)
+  end
+
   def post_checkout(ticket_form: {}, details_form: {}, buyer: FactoryBot.create(:account))
     header 'Accept', 'application/json'
     post "/e/#{@event.slug}/purchase",

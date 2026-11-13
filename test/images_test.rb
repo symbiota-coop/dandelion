@@ -14,10 +14,6 @@ class ImagesTest < ActiveSupport::TestCase
     end
   end
 
-  def without_imagemagick(&)
-    Dragonfly.app.shell.stub(:run, ->(command, *) { flunk "ran #{command}" }, &)
-  end
-
   test 'image fields refuse SVG, PostScript and other files, whatever their name, before ImageMagick sees them' do
     create_organisation
     { SVG => '.svg', POSTSCRIPT => '.jpg', 'hello' => '.png' }.each do |data, ext|

@@ -11,10 +11,6 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
 
   # Webhook
 
-  def checkout_completed_payload(session_id, type: 'checkout.session.completed', payment_status: 'paid')
-    { id: "evt_#{SecureRandom.hex(4)}", object: 'event', type: type, data: { object: { id: session_id, object: 'checkout.session', payment_status: payment_status } } }.to_json
-  end
-
   # Posts payload to the Connect webhook as Stripe would, signed with secret
   def deliver_connect_webhook(payload, secret: CONNECT_SECRET)
     timestamp = Time.now
@@ -23,14 +19,6 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
       header 'Stripe-Signature', Stripe::Webhook::Signature.generate_header(timestamp, signature)
       header 'Content-Type', 'application/json'
       post '/organisations/stripe_connect_webhook', payload
-    end
-  end
-
-  # The queued jobs that would email order's tickets, matched by the order's session id and the method each calls, as
-  # the records a job carries can mention send_tickets too
-  def send_tickets_jobs(order)
-    Delayed::Job.all.select do |job|
-      job.handler.match?(/^method_name: :send_tickets(_without_delay)?$/) && job.handler.include?("session_id: #{order.session_id}\n")
     end
   end
 
@@ -48,7 +36,7 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
     assert_equal 200, last_response.status
     assert order.reload.payment_completed?
     assert order.tickets.first.payment_completed?
-    assert_equal 1, send_tickets_jobs(order).count
+    assert_equal 1, send_tickets_jobs(order, by: :session_id).count
   end
 
   test 'a checkout that is not yet paid waits for its async payment to succeed' do
@@ -57,11 +45,11 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
     deliver_connect_webhook(checkout_completed_payload(order.session_id, payment_status: 'unpaid'))
     assert_equal 200, last_response.status
     refute order.reload.payment_completed?
-    assert_equal 0, send_tickets_jobs(order).count
+    assert_equal 0, send_tickets_jobs(order, by: :session_id).count
 
     deliver_connect_webhook(checkout_completed_payload(order.session_id, type: 'checkout.session.async_payment_succeeded'))
     assert order.reload.payment_completed?
-    assert_equal 1, send_tickets_jobs(order).count
+    assert_equal 1, send_tickets_jobs(order, by: :session_id).count
   end
 
   test 'a paid checkout restores and completes its order once it was deleted' do
@@ -78,7 +66,7 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
     assert restored.restored?
     assert_equal 1, restored.tickets.count
     assert restored.tickets.first.payment_completed?
-    assert_equal 1, send_tickets_jobs(order).count
+    assert_equal 1, send_tickets_jobs(order, by: :session_id).count
   end
 
   test 'the same webhook delivered again does not complete the order twice' do
@@ -92,7 +80,7 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
     assert_equal 200, last_response.status
     assert_equal completed_at, order.reload.completed_at
     assert_equal 1, order.tickets.count
-    assert_equal 1, send_tickets_jobs(order).count
+    assert_equal 1, send_tickets_jobs(order, by: :session_id).count
   end
 
   test 'an order already completed is left as it was' do
@@ -104,7 +92,7 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
 
     assert_equal 200, last_response.status
     assert_equal completed_at, order.reload.completed_at
-    assert_equal 0, send_tickets_jobs(order).count
+    assert_equal 0, send_tickets_jobs(order, by: :session_id).count
   end
 
   test 'a paid checkout with an unknown session id changes nothing' do
@@ -115,7 +103,7 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
 
     assert_equal 200, last_response.status
     refute order.reload.payment_completed?
-    assert_equal 0, send_tickets_jobs(order).count
+    assert_equal 0, send_tickets_jobs(order, by: :session_id).count
   end
 
   test 'a webhook with a bad signature is refused and completes nothing' do
@@ -125,7 +113,7 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
     assert_equal 200, last_response.status
 
     refute order.reload.payment_completed?
-    assert_equal 0, send_tickets_jobs(order).count
+    assert_equal 0, send_tickets_jobs(order, by: :session_id).count
   end
 
   # Disconnecting

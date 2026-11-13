@@ -1,36 +1,21 @@
 require_relative '../test_config'
+require_relative '../helpers/organisations_helpers'
 
 # Editing a local group, adding and following it, who may do either, and who joins it by where they live
 class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
+  include OrganisationsHelpers
 
   # A square around the factory's group in Stockholm, larger than it
   WIDER_AREA = { type: 'Polygon', coordinates: [[[18.0, 59.3], [18.1, 59.3], [18.1, 59.35], [18.0, 59.35], [18.0, 59.3]]] }.freeze
   INSIDE = [18.068, 59.325].freeze
   OUTSIDE = [-0.12, 51.5].freeze
 
-  # @local_group in @organisation, whose owner (@account) is an organisation admin and the group's creator
-  def create_local_group(**attrs)
-    create_organisation
-    @local_group = FactoryBot.create(:local_group, organisation: @organisation, **attrs)
-  end
-
   def group_admin
     account = FactoryBot.create(:account)
     @local_group.local_groupships.create!(account: account).set(admin: true)
     account
-  end
-
-  def follower(local_group = @local_group, **attrs)
-    account = FactoryBot.create(:account)
-    local_group.local_groupships.create!(account: account, **attrs)
-    account
-  end
-
-  def assert_redirected_to(path)
-    assert last_response.redirect?, "Expected a redirect to #{path}, got #{last_response.status}"
-    assert_equal path, URI(last_response.location).path
   end
 
   def map_count(local_group)
@@ -128,7 +113,7 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
     covers_route 'GET /o/:organisation_slug/lg/:slug/unsubscribe'
     covers_route 'POST /o/:organisation_slug/lg/:slug/unsubscribe'
     create_local_group
-    person = follower
+    person = local_group_follower
     sign_in(person)
     visit "#{@local_group.path}/unsubscribe"
     click_button 'Yes, unsubscribe'
@@ -147,7 +132,7 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
     other_group = FactoryBot.create(:local_group, organisation: @organisation, account: FactoryBot.create(:account))
     other_organisation = FactoryBot.create(:organisation)
 
-    [follower, other_group.account, other_organisation.account, nil].each do |account|
+    [local_group_follower, other_group.account, other_organisation.account, nil].each do |account|
       account ? sign_in_with_rack(account) : clear_cookies
       get "#{@local_group.path}/edit"
       assert_redirected_to @local_group.path
@@ -225,7 +210,7 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
     covers_route 'POST /o/:organisation_slug/lg/:slug/add_follower'
     create_local_group
     other_group = FactoryBot.create(:local_group, organisation: @organisation, account: FactoryBot.create(:account))
-    person = follower
+    person = local_group_follower
     other_admin = other_group.account
     # The other group's admin also follows this group, so has a membership receive_feedback could change
     other_admins_membership = @local_group.local_groupships.create!(account: other_admin)
@@ -307,8 +292,8 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
     covers_route 'POST /o/:organisation_slug/lg/:slug/hide_membership'
     covers_route 'POST /o/:organisation_slug/lg/:slug/show_membership'
     create_local_group
-    person = follower
-    other = follower
+    person = local_group_follower
+    other = local_group_follower
     own = @local_group.local_groupships.find_by(account: person)
     others = @local_group.local_groupships.find_by(account: other)
 
@@ -331,7 +316,7 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
     covers_route 'POST /local_groupships/:id/destroy'
     covers_route 'POST /o/:organisation_slug/lg/:slug/local_groupships/unadmin'
     create_local_group
-    person = follower
+    person = local_group_follower
     local_groupship = @local_group.local_groupships.find_by(account: person)
     other_group = FactoryBot.create(:local_group, organisation: @organisation, account: FactoryBot.create(:account))
     sign_in_with_rack(other_group.account)
@@ -354,7 +339,7 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
   test "an admin turns a follower's emails off and on" do
     covers_route 'POST /o/:organisation_slug/lg/:slug/subscribed/:local_groupship_id'
     create_local_group
-    local_groupship = @local_group.local_groupships.find_by(account: follower)
+    local_groupship = @local_group.local_groupships.find_by(account: local_group_follower)
     sign_in_with_rack(@account)
 
     post "#{@local_group.path}/subscribed/#{local_groupship.id}"
@@ -367,8 +352,8 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
   test "the group's map counts only the followers who show their membership" do
     create_local_group
     @account.set(coordinates: nil, map_hex: nil) # the group's creator, so only the followers below are on the map
-    shown = follower
-    follower(hide_membership: true)
+    shown = local_group_follower
+    local_group_follower(following: { hide_membership: true })
     assert_equal 1, map_count(@local_group)
 
     @local_group.local_groupships.find_by(account: shown).set(hide_membership: true)

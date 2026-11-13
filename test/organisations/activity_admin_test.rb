@@ -1,10 +1,12 @@
 require_relative '../test_config'
+require_relative '../helpers/organisations_helpers'
 require_relative '../helpers/event_permissions_helpers'
 
 # An activity's admins, followers, stats, mailer, feedback summary and deletion, who may use each, and its old URLs
 class OrganisationsActivityAdminTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
+  include OrganisationsHelpers
   include EventPermissionsHelpers
 
   XHR = { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }.freeze
@@ -15,7 +17,7 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     @activity = FactoryBot.create(:activity, organisation: @organisation, **attrs)
   end
 
-  def follower(activity = @activity, **attrs)
+  def activity_follower(activity = @activity, **attrs)
     account = FactoryBot.create(:account, **attrs)
     activity.activityships.create!(account: account)
     account
@@ -28,24 +30,15 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
 
   # People who aren't admins of @activity: a follower, another activity's admin, another organisation's admin, and
   # someone signed out
-  def outsiders
-    [follower, other_activity.account, FactoryBot.create(:organisation).account, nil]
+  def activity_outsiders
+    [activity_follower, other_activity.account, FactoryBot.create(:organisation).account, nil]
   end
 
   def sign_in_as(account)
     account ? sign_in_with_rack(account) : clear_cookies
   end
 
-  def assert_redirected_to(path)
-    assert last_response.redirect?, "Expected a redirect to #{path}, got #{last_response.status}"
-    assert_equal path, URI(last_response.location).path
-  end
-
-  def csv_upload(rows)
-    Rack::Test::UploadedFile.new(StringIO.new(rows), 'text/csv', original_filename: 'followers.csv')
-  end
-
-  def admins_box
+  def activity_admins_box
     "[data-pagelet-url='#{@activity.path}/activityships/admins']"
   end
 
@@ -58,27 +51,27 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     covers_route 'POST /o/:organisation_slug/a/:slug/activityships/admin'
     covers_route 'POST /o/:organisation_slug/a/:slug/activityships/unadmin'
     create_activity
-    person = follower(name: 'Fern Follower', has_signed_in: true)
+    person = activity_follower(name: 'Fern Follower', has_signed_in: true)
     activityship = @activity.activityships.find_by(account: person)
 
     sign_in(@account)
     visit @activity.path
-    assert page.has_no_css? "#{admins_box} .remove-role-toggle"
-    within(admins_box) { find('.add-role-toggle').click }
+    assert page.has_no_css? "#{activity_admins_box} .remove-role-toggle"
+    within(activity_admins_box) { find('.add-role-toggle').click }
     choose_in_lookup('activityship_account_id', person.name)
-    within(admins_box) { click_button 'Add admin' }
-    assert page.has_css? "#{admins_box} img[alt='#{person.name}']"
+    within(activity_admins_box) { click_button 'Add admin' }
+    assert page.has_css? "#{activity_admins_box} img[alt='#{person.name}']"
     assert activityship.reload.admin?
     assert_equal 1, @activity.activityships.and(account: person).count
 
-    within(admins_box) do
+    within(activity_admins_box) do
       find('.remove-role-toggle').click
       select "#{person.name} (#{person.username})", from: 'account_id'
       click_button_and_confirm 'Remove admin'
     end
-    assert page.has_css? "#{admins_box} .add-role-toggle"
-    assert page.has_no_css? "#{admins_box} img[alt='#{person.name}']"
-    assert page.has_no_css? "#{admins_box} .remove-role-toggle"
+    assert page.has_css? "#{activity_admins_box} .add-role-toggle"
+    assert page.has_no_css? "#{activity_admins_box} img[alt='#{person.name}']"
+    assert page.has_no_css? "#{activity_admins_box} .remove-role-toggle"
     refute activityship.reload.admin?
     assert @activity.activityships.find_by(account: @account).admin?
   end
@@ -88,7 +81,7 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     covers_route 'POST /o/:organisation_slug/a/:slug/subscribed/:activityship_id'
     covers_route 'POST /activityships/:id/destroy'
     create_activity
-    person = follower
+    person = activity_follower
     activityship = @activity.activityships.find_by(account: person)
     switch = "#activityship-subscribed-#{activityship.id}"
 
@@ -175,7 +168,7 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
   test "an admin deletes the activity, which keeps its events in the organisation but ends its followings and deletes its mails" do
     covers_route 'POST /o/:organisation_slug/a/:slug/destroy'
     create_activity
-    person = follower
+    person = activity_follower
     create_event(activity: @activity)
     pmail = FactoryBot.create(:pmail, organisation: @organisation, account: @account, to_option: "activity:#{@activity.id}")
 
@@ -198,8 +191,8 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     covers_route 'GET /o/:organisation_slug/a/:slug/unsubscribe'
     covers_route 'POST /o/:organisation_slug/a/:slug/unsubscribe'
     create_activity
-    person = follower(email_confirmed: true)
-    other = follower
+    person = activity_follower(email_confirmed: true)
+    other = activity_follower
     person.generate_link_token!
 
     visit "#{@activity.path}/unsubscribe?link_token=#{person.link_token}"
@@ -216,13 +209,13 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
 
   test "people who aren't the activity's admins can't see its admins box, stats or mailer, or change its admins, followers or existence" do
     create_activity
-    person = follower(name: 'Private Person')
+    person = activity_follower(name: 'Private Person')
     activityship = @activity.activityships.find_by(account: person)
     create_event(activity: @activity, name: 'Secret summit', secret: true)
     FactoryBot.create(:pmail, organisation: @organisation, account: @account, to_option: "activity:#{@activity.id}", subject: 'Confidential plans')
     path = @activity.path
 
-    outsiders.each do |account|
+    activity_outsiders.each do |account|
       sign_in_as(account)
       ["#{path}/activityships/admins", "#{path}/stats", "#{path}/pmails", "#{path}/subscribed/#{activityship.id}"].each do |url|
         get url
@@ -259,7 +252,7 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     create_activity
     organisation_admin = FactoryBot.create(:account)
     @organisation.organisationships.create!(account: organisation_admin).set(admin: true)
-    person = follower
+    person = activity_follower
 
     sign_in_with_rack(organisation_admin)
     get "#{@activity.path}/activityships/admins", {}, XHR
@@ -284,7 +277,7 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
 
   test "another activity's admin can't reach this activity's followers or admins under their own activity's URL" do
     create_activity
-    person = follower
+    person = activity_follower
     activityship = @activity.activityships.find_by(account: person)
     elsewhere = other_activity
     sign_in_with_rack(elsewhere.account)
@@ -307,8 +300,8 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
 
   test 'unsubscribing needs signing in, changes only one\'s own following, and makes no following for someone who has none' do
     create_activity
-    person = follower
-    other = follower
+    person = activity_follower
+    other = activity_follower
     stranger = FactoryBot.create(:account)
     path = "#{@activity.path}/unsubscribe"
 
@@ -334,8 +327,8 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
 
   test "an unsubscribe link signs in only the person it's for, and unsubscribes only them" do
     create_activity
-    person = follower(email_confirmed: true)
-    other = follower
+    person = activity_follower(email_confirmed: true)
+    other = activity_follower
     person.generate_link_token!
 
     post "#{@activity.path}/unsubscribe", link_token: person.link_token
@@ -357,7 +350,7 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     get "#{@activity.path}/activityship"
     assert_redirected_to '/accounts/new'
 
-    sign_in_with_rack(follower)
+    sign_in_with_rack(activity_follower)
     get "#{@activity.path}/activityship", { membership_toggle: '1' }, XHR
     assert last_response.ok?
     assert_includes last_response.body, 'Showing on your profile'
@@ -377,7 +370,7 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     @activity.set(feedback_summary: 'Warm and welcoming', feedback_summary_last_refreshed_at: 2.days.ago)
     path = "#{@activity.path}/feedback_summary"
 
-    outsiders.each do |account|
+    activity_outsiders.each do |account|
       sign_in_as(account)
       get path, {}, XHR
       assert last_response.ok?
@@ -423,7 +416,7 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     @activity.set(locked: true, feedback_summary: 'Warm and welcoming')
     pages = { "#{@activity.path}/feedback_summary" => 'Warm and welcoming', "#{@activity.path}/show_feedback" => 'Glowing review' }
 
-    outsiders.each do |account|
+    activity_outsiders.each do |account|
       sign_in_as(account)
       pages.each do |url, text|
         get url, {}, XHR

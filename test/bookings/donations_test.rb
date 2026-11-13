@@ -120,11 +120,6 @@ class EventBookingDonationsTest < ActiveSupport::TestCase
     refute_includes last_response.body, 'id="donation_amount"'
   end
 
-  def grant_credit(account, amount:)
-    organisationship = @organisation.organisationships.find_or_create_by(account: account)
-    organisationship.creditings.create!(account: @account, amount: amount, currency: @event.currency)
-  end
-
   test 'credit pays for tickets, not a donation to Dandelion' do
     create_event(prices: [10])
     @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)

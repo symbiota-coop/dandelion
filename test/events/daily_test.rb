@@ -53,7 +53,7 @@ class EventsDailyTest < ActiveSupport::TestCase
   end
 
   # A facilitator who qualifies for facilitator of the day: a photo, 20 feedbacks and an event facilitated this year
-  def create_facilitator(event, **attrs)
+  def create_qualifying_facilitator(event, **attrs)
     account = FactoryBot.create(:account, **attrs)
     account.set(has_image: true, event_feedbacks_as_facilitator_count: 20)
     event.event_facilitations.create!(account: account)
@@ -242,10 +242,10 @@ class EventsDailyTest < ActiveSupport::TestCase
 
   test 'facilitator of the day has a photo, 20 feedbacks and facilitated in the last year, and for a location, there' do
     public_event('Sound Bath', noon(Date.today + 1))
-    facilitator = create_facilitator(@event)
-    create_facilitator(@event, name: 'No Photo').set(has_image: false)
-    create_facilitator(@event, name: 'Few Feedbacks').set(event_feedbacks_as_facilitator_count: 19)
-    create_facilitator(@event, name: 'Long Ago').event_facilitations.first.set(created_at: 13.months.ago)
+    facilitator = create_qualifying_facilitator(@event)
+    create_qualifying_facilitator(@event, name: 'No Photo').set(has_image: false)
+    create_qualifying_facilitator(@event, name: 'Few Feedbacks').set(event_feedbacks_as_facilitator_count: 19)
+    create_qualifying_facilitator(@event, name: 'Long Ago').event_facilitations.first.set(created_at: 13.months.ago)
 
     assert_equal facilitator.id.to_s, Daily.facilitator_id
 
@@ -256,8 +256,8 @@ class EventsDailyTest < ActiveSupport::TestCase
   test "someone who hid their profile is never facilitator of the day, nor shown as one once they've hidden it" do
     covers_route 'GET /daily'
     public_event('Sound Bath', noon(Date.today + 1))
-    facilitator = create_facilitator(@event, name: 'Fay Cilitator')
-    create_facilitator(@event, name: 'Hidden Facilitator', hidden: true)
+    facilitator = create_qualifying_facilitator(@event, name: 'Fay Cilitator')
+    create_qualifying_facilitator(@event, name: 'Hidden Facilitator', hidden: true)
 
     10.times { assert_equal facilitator.id.to_s, Daily.facilitator_id }
 
@@ -278,7 +278,7 @@ class EventsDailyTest < ActiveSupport::TestCase
     today = Date.today
     public_event('Sound Bath', noon(today))
     public_event('Secret Supper', noon(today), as: :secret, secret: true)
-    facilitator = create_facilitator(@event, name: 'Fay Cilitator')
+    facilitator = create_qualifying_facilitator(@event, name: 'Fay Cilitator')
     publish(today)
     stash_edition(today - 3, articles: [{ 'title' => "Today's events", 'summary' => 'Older news.' }])
 

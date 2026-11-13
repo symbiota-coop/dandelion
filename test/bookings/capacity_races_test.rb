@@ -32,7 +32,7 @@ class BookingsCapacityRacesTest < ActiveSupport::TestCase
 
   # A booking as the checkout form makes one, by a buyer signed out, with its own copy of the event as each request
   # has. Waits at the gate once it's ready to book
-  def book(event, buyer, quantities, wait, payment_method: 'rsvp', idempotency_key: nil)
+  def book_racing(event, buyer, quantities, wait, payment_method: 'rsvp', idempotency_key: nil)
     builder = OrderBuilder.new(event: Event.find(event.id), buyer: { name: buyer.name, email: buyer.email },
                                quantities: quantities.transform_keys { |ticket_type| ticket_type.id.to_s },
                                payment_method: payment_method, idempotency_key: idempotency_key)
@@ -44,7 +44,7 @@ class BookingsCapacityRacesTest < ActiveSupport::TestCase
   # but there not being enough left fails the test
   def race_bookings(event, buyers, payment_method: 'rsvp', &quantities_for)
     results = race(buyers.length) do |index, wait|
-      book(event, buyers[index], quantities_for.call(index), wait, payment_method: payment_method)
+      book_racing(event, buyers[index], quantities_for.call(index), wait, payment_method: payment_method)
     end
     refusals = results.grep(Exception)
     refusals.each { |refusal| assert_kind_of OrderBuilder::NotEnoughTickets, refusal, refusal.full_message }
@@ -67,7 +67,7 @@ class BookingsCapacityRacesTest < ActiveSupport::TestCase
 
   # An order by buyer for a ticket that isn't paid for yet, and so holds its place
   def hold_place(event, buyer)
-    with_stripe_sessions { book(event, buyer, { event.ticket_types.first => 1 }, -> {}, payment_method: 'stripe') }
+    with_stripe_sessions { book_racing(event, buyer, { event.ticket_types.first => 1 }, -> {}, payment_method: 'stripe') }
     Order.find_by(event: event, account: buyer)
   end
 
@@ -165,7 +165,7 @@ class BookingsCapacityRacesTest < ActiveSupport::TestCase
     event = create_event(prices: [0], capacity: 1)
     event.set(booking_lock_token: SecureRandom.uuid, booking_locked_until: 1.second.ago)
 
-    book(event, FactoryBot.create(:account), { event.ticket_types.first => 1 }, -> {})
+    book_racing(event, FactoryBot.create(:account), { event.ticket_types.first => 1 }, -> {})
     assert_equal 1, event.tickets.count
     assert_nil Event.find(event.id).booking_locked_until
   end
@@ -180,7 +180,7 @@ class BookingsCapacityRacesTest < ActiveSupport::TestCase
 
       results = with_stripe_sessions do
         race(2) do |_index, wait|
-          book(event, buyer, { event.ticket_types.first => 1 }, wait, payment_method: 'stripe', idempotency_key: "key-#{iteration}")
+          book_racing(event, buyer, { event.ticket_types.first => 1 }, wait, payment_method: 'stripe', idempotency_key: "key-#{iteration}")
         end
       end
 
@@ -222,7 +222,7 @@ class BookingsCapacityRacesTest < ActiveSupport::TestCase
             Order.destroy_expired_holds
             :errands
           else
-            book(event, racers[index], { event.ticket_types.first => 1 }, wait, payment_method: 'stripe')
+            book_racing(event, racers[index], { event.ticket_types.first => 1 }, wait, payment_method: 'stripe')
           end
         end
       end
@@ -236,7 +236,7 @@ class BookingsCapacityRacesTest < ActiveSupport::TestCase
       # Once it's deleted, the place is there for whoever books next, if no one in the race took it
       next unless places_taken(event).zero?
 
-      with_stripe_sessions { book(event, FactoryBot.create(:account), { event.ticket_types.first => 1 }, -> {}, payment_method: 'stripe') }
+      with_stripe_sessions { book_racing(event, FactoryBot.create(:account), { event.ticket_types.first => 1 }, -> {}, payment_method: 'stripe') }
       assert_equal 1, places_taken(event)
     end
   end

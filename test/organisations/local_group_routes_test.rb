@@ -1,25 +1,15 @@
 require_relative '../test_config'
+require_relative '../helpers/organisations_helpers'
 require_relative '../helpers/event_permissions_helpers'
 
 # A local group's admins, stats, mailer, follower imports and deletion, who may use each, and its old URLs
 class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
+  include OrganisationsHelpers
   include EventPermissionsHelpers
 
   XHR = { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }.freeze
-
-  # @local_group in @organisation, whose owner (@account) is an organisation admin and the group's admin
-  def create_local_group(**attrs)
-    create_organisation
-    @local_group = FactoryBot.create(:local_group, organisation: @organisation, **attrs)
-  end
-
-  def follower(local_group = @local_group, **attrs)
-    account = FactoryBot.create(:account, **attrs)
-    local_group.local_groupships.create!(account: account)
-    account
-  end
 
   # Another group of the organisation, with an admin of its own who is no admin of @local_group
   def other_local_group
@@ -28,20 +18,11 @@ class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
 
   # People who aren't admins of @local_group: a follower, another group's admin, another organisation's admin, and
   # someone signed out
-  def outsiders
-    [follower, other_local_group.account, FactoryBot.create(:organisation).account, nil]
+  def local_group_outsiders
+    [local_group_follower, other_local_group.account, FactoryBot.create(:organisation).account, nil]
   end
 
-  def assert_redirected_to(path)
-    assert last_response.redirect?, "Expected a redirect to #{path}, got #{last_response.status}"
-    assert_equal path, URI(last_response.location).path
-  end
-
-  def csv_upload(rows)
-    Rack::Test::UploadedFile.new(StringIO.new(rows), 'text/csv', original_filename: 'followers.csv')
-  end
-
-  def admins_box
+  def local_group_admins_box
     "[data-pagelet-url='#{@local_group.path}/local_groupships/admins']"
   end
 
@@ -53,18 +34,18 @@ class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
     covers_route 'GET /o/:organisation_slug/lg/:slug/local_groupships/admins'
     covers_route 'POST /o/:organisation_slug/lg/:slug/local_groupships/admin'
     create_local_group
-    person = follower(name: 'Fern Follower', has_signed_in: true)
+    person = local_group_follower(name: 'Fern Follower', has_signed_in: true)
     local_groupship = @local_group.local_groupships.find_by(account: person)
 
     sign_in(@account)
     visit @local_group.path
-    assert page.has_css? "#{admins_box} .add-role-toggle"
-    assert page.has_no_css? "#{admins_box} .remove-role-toggle"
-    within(admins_box) { find('.add-role-toggle').click }
+    assert page.has_css? "#{local_group_admins_box} .add-role-toggle"
+    assert page.has_no_css? "#{local_group_admins_box} .remove-role-toggle"
+    within(local_group_admins_box) { find('.add-role-toggle').click }
     choose_in_lookup('local_groupship_account_id', person.name)
-    within(admins_box) { click_button 'Add admin' }
-    assert page.has_css? "#{admins_box} img[alt='#{person.name}']"
-    assert page.has_css? "#{admins_box} .remove-role-toggle"
+    within(local_group_admins_box) { click_button 'Add admin' }
+    assert page.has_css? "#{local_group_admins_box} img[alt='#{person.name}']"
+    assert page.has_css? "#{local_group_admins_box} .remove-role-toggle"
     assert local_groupship.reload.admin?
     assert_equal 1, @local_group.local_groupships.and(account: person).count
 
@@ -127,7 +108,7 @@ class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
   test 'an admin deletes the group, which keeps its events in the organisation but ends its followings and deletes its mails' do
     covers_route 'POST /o/:organisation_slug/lg/:slug/destroy'
     create_local_group
-    person = follower
+    person = local_group_follower
     create_event(local_group: @local_group)
     pmail = FactoryBot.create(:pmail, organisation: @organisation, account: @account, to_option: "local_group:#{@local_group.id}")
 
@@ -152,12 +133,12 @@ class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
 
   test "people who aren't the group's admins can't see its admins box, stats or mailer, or change its admins, followers or existence" do
     create_local_group
-    person = follower(name: 'Private Person')
+    person = local_group_follower(name: 'Private Person')
     create_event(local_group: @local_group, name: 'Secret summit', secret: true)
     FactoryBot.create(:pmail, organisation: @organisation, account: @account, to_option: "local_group:#{@local_group.id}", subject: 'Confidential plans')
     path = @local_group.path
 
-    outsiders.each do |account|
+    local_group_outsiders.each do |account|
       account ? sign_in_with_rack(account) : clear_cookies
       ["#{path}/local_groupships/admins", "#{path}/stats", "#{path}/pmails"].each do |url|
         get url
@@ -200,7 +181,7 @@ class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
     assert last_response.redirect?
     assert @local_group.local_groupships.find_by(account: newcomer).admin?
 
-    person = follower
+    person = local_group_follower
     elsewhere = other_local_group
     sign_in_with_rack(elsewhere.account)
     post "#{elsewhere.path}/local_groupships/admin", local_groupship: { account_id: person.id }
@@ -220,8 +201,8 @@ class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
 
   test "an unsubscribe link unsubscribes only the person it's for, and someone who didn't follow the group is kept out of its emails" do
     create_local_group
-    person = follower(email_confirmed: true)
-    other = follower
+    person = local_group_follower(email_confirmed: true)
+    other = local_group_follower
     person.generate_link_token!
 
     post "#{@local_group.path}/unsubscribe", link_token: person.link_token, account_id: other.id

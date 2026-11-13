@@ -16,10 +16,6 @@ class SiteRoutesTest < ActiveSupport::TestCase
     Rack::Test::UploadedFile.new(file.path, type, true, original_filename: filename)
   end
 
-  def without_imagemagick(&)
-    Dragonfly.app.shell.stub(:run, ->(command, *) { flunk "ran #{command}" }, &)
-  end
-
   def point_path(model_name, id)
     "/points/#{model_name}/#{TokenEncryptor.encrypt("map:#{model_name}:#{id}")}"
   end

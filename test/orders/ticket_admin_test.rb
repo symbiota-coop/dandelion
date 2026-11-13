@@ -11,11 +11,6 @@ class OrdersTicketAdminTest < ActiveSupport::TestCase
 
   SEND_TICKET_JOB = /method_name: :send_ticket_without_delay/
 
-  # Someone who admins only this event, as its facilitator
-  def create_facilitator(event)
-    FactoryBot.create(:account).tap { |account| event.event_facilitations.create!(account: account) }
-  end
-
   # A paid order of one £10 ticket
   def create_paid_ticket
     create_event(prices: [10])

@@ -1,14 +1,11 @@
 require_relative '../test_config'
+require_relative '../helpers/bookings_helpers'
 
 # Quote: what a booking costs, which the checkout form shows (POST /e/:slug/quote) and OrderBuilder charges
 class QuotesTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
-
-  def grant_credit(account, amount:, currency: @event.currency)
-    organisationship = @organisation.organisationships.find_or_create_by(account: account)
-    organisationship.creditings.create!(account: @account, amount: amount, currency: currency)
-  end
+  include BookingsHelpers
 
   def donations_to_dandelion!
     @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)

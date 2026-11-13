@@ -1,22 +1,12 @@
 require_relative '../test_config'
+require_relative '../helpers/gatherings_helpers'
 
 # A gathering's timetables and their activities: who may make and change them, schedule activities and say they're
 # interested. Creating, editing and dragging activities in the browser are also in features_test.rb
 class GatheringTimetablesTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
-
-  def create_timetable(**attrs)
-    @timetable = @gathering.timetables.create!(name: 'Workshops', account: @account, **attrs)
-    @space = @timetable.spaces.create!(name: 'Barn')
-    @tslot = @timetable.tslots.create!(name: 'Saturday morning')
-    @tactivity = @timetable.tactivities.create!(name: 'Yoga', account: @account)
-  end
-
-  def create_other_gathering
-    @other_account = FactoryBot.create(:account)
-    @other_gathering = FactoryBot.create(:gathering, account: @other_account)
-  end
+  include GatheringsHelpers
 
   test "an admin schedules an activity from its edit form, and its page shows who's interested" do
     create_gathering(privacy: 'open')

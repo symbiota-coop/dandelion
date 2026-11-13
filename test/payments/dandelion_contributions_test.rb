@@ -101,7 +101,7 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     end
   end
 
-  def run_jobs
+  def run_queued_jobs
     recorded_emails { Delayed::Job.all.each(&:invoke_job) }
   end
 
@@ -357,7 +357,7 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     assert_equal 1, notification_jobs(contribution.session_id).count
     refute @organisation.reload.paid_up # until the queued update runs
 
-    run_jobs
+    run_queued_jobs
     @organisation.reload
     assert @organisation.paid_up
     assert_in_delta 10, @organisation.contribution_paid_gbp_cache

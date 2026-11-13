@@ -88,6 +88,11 @@ module TestHelpers
     instance_variable_set(:"@#{as}", FactoryBot.create(:event, *traits, organisation: @organisation, **attrs))
   end
 
+  # A new account, with these attributes, who admins only event, as its facilitator
+  def create_facilitator(event, **attrs)
+    FactoryBot.create(:account, **attrs).tap { |account| event.event_facilitations.create!(account: account) }
+  end
+
   def create_gathering(*traits, **attrs)
     @account ||= FactoryBot.create(:account)
     @gathering = FactoryBot.create(:gathering, *traits, account: @account, **attrs)
@@ -144,6 +149,28 @@ module TestHelpers
     previous&.each { |key, value| ENV[key] = value }
   end
 
+  # Stubs Dragonfly's shell, failing the test if the block hands a file to ImageMagick
+  def without_imagemagick(&)
+    Dragonfly.app.shell.stub(:run, ->(command, *) { flunk "ran #{command}" }, &)
+  end
+
+  # Requests
+
+  # A request as a page's pagelets make it, which a refusal answers with 403 rather than a redirect. env adds to the
+  # Rack env it's sent with
+  def xhr(method, path, params = {}, env = {})
+    send(method, path, params, env.merge('HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'))
+  end
+
+  def xhr_get(path, params = {}, env = {})
+    xhr(:get, path, params, env)
+  end
+
+  def assert_redirected_to(path)
+    assert last_response.redirect?, "Expected a redirect to #{path}, got #{last_response.status}"
+    assert_equal path, URI(last_response.location).path
+  end
+
   # Emails
 
   # The emails the block would send, one per Mailgun::BatchMessage it makes
@@ -165,6 +192,16 @@ module TestHelpers
     recorded_emails { Delayed::Job.and(handler: handler).each(&:invoke_job) }
   end
 
+  # A Mailgun webhook's click event for pmail at url from a device_type, signed with key
+  def mailgun_click_event(pmail, key:, url: 'https://example.com/page', device_type: nil)
+    timestamp = Time.now.to_i.to_s
+    token = SecureRandom.hex(25)
+    {
+      'signature' => { 'timestamp' => timestamp, 'token' => token, 'signature' => OpenSSL::HMAC.hexdigest('SHA256', key, "#{timestamp}#{token}") },
+      'event-data' => { 'event' => 'clicked', 'tags' => [pmail.id.to_s], 'url' => url, 'client-info' => { 'device-type' => device_type } }
+    }.to_json
+  end
+
   # Stripe
 
   # Stripe Checkout gives this session for any checkout the block starts, and the block is given it
@@ -181,6 +218,11 @@ module TestHelpers
 
   def has_checkout_session?(session_id)
     page.has_css? "body[data-checkout-session='#{session_id}']"
+  end
+
+  # The body of a Stripe webhook's checkout.session.completed event (or another type) for session_id
+  def checkout_completed_payload(session_id, type: 'checkout.session.completed', payment_status: 'paid')
+    { id: "evt_#{SecureRandom.hex(4)}", object: 'event', type: type, data: { object: { id: session_id, object: 'checkout.session', payment_status: payment_status } } }.to_json
   end
 
   # Gatherings
@@ -205,6 +247,11 @@ module TestHelpers
   def click_button_and_confirm(label, button: label)
     click_button button
     page.document.find('.popover').click_button label
+  end
+
+  # Waits for something a request from the page does, such as a field that saves when it changes, to be done
+  def wait_until(message)
+    page.document.synchronize { raise Capybara::ExpectationNotMet, message unless yield }
   end
 
   # Signing up

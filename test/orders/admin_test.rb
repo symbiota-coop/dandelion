@@ -12,17 +12,17 @@ class OrdersAdminTest < ActiveSupport::TestCase
   # Queued Order#send_tickets jobs: other jobs' handlers can mention orders and tickets anywhere in the records they carry
   SEND_TICKETS_JOB = /Mongoid:Order\n.*method_name: :send_tickets_without_delay/m
 
-  def send_tickets_jobs
+  def all_send_tickets_jobs
     Delayed::Job.and(handler: SEND_TICKETS_JOB)
   end
 
   # The emails the Order#send_tickets jobs this test queued would send, running them
   def ticket_emails
-    recorded_emails { send_tickets_jobs.each(&:invoke_job) }
+    recorded_emails { all_send_tickets_jobs.each(&:invoke_job) }
   end
 
   def queued_ticket_emails
-    send_tickets_jobs.count
+    all_send_tickets_jobs.count
   end
 
   # An order whose payment didn't complete, removed with its ticket, as a timed-out checkout is
@@ -32,11 +32,6 @@ class OrdersAdminTest < ActiveSupport::TestCase
     @ticket.set(payment_completed: false)
     @order.prevent_refund = true
     @order.destroy
-  end
-
-  # Someone who admins only this event, as its facilitator
-  def create_facilitator(event)
-    FactoryBot.create(:account).tap { |account| event.event_facilitations.create!(account: account) }
   end
 
   # An event of another organisation, with a complete order and ticket of its own

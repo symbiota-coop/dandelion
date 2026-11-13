@@ -1,24 +1,12 @@
 require_relative '../test_config'
+require_relative '../helpers/comments_helpers'
 
 # The routes around a discussion's comments that change things: deleting a comment or its file, subscribing to and
 # unsubscribing from a thread, adding and deleting photos (on gatherings, comments and ticket types), deleting an
 # organisation's mail attachments, and clearing cached fragments. Who may, with others' ids forged in
 class MessagesCommentRoutesTest < ActiveSupport::TestCase
   include Rack::Test::Methods
-
-  # A thread in @gathering's General team, opened by @member with @comment
-  def team_thread
-    create_gathering
-    @team = @gathering.teams.find_by(name: 'General')
-    @member = create_member
-    @post = @team.posts.create!(account: @member, subject: 'Rota')
-    @comment = @post.comments.create!(account: @member, body: 'Secret plans')
-  end
-
-  # A request as the page's pagelets make it, which a refusal answers with 403 rather than a redirect
-  def xhr(method, path, params = {})
-    send(method, path, params, 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest')
-  end
+  include CommentsHelpers
 
   def text_file(name = 'notes.txt')
     file = Tempfile.new(['upload', File.extname(name)])
@@ -36,10 +24,6 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
     file.write('<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10"/></svg>')
     file.close
     Rack::Test::UploadedFile.new(file.path, 'image/svg+xml', original_filename: 'picture.svg')
-  end
-
-  def without_imagemagick(&)
-    Dragonfly.app.shell.stub(:run, ->(command, *) { flunk "ran #{command}" }, &)
   end
 
   def site_admin

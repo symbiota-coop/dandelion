@@ -1,24 +1,12 @@
 require_relative '../test_config'
+require_relative '../helpers/comments_helpers'
 
 # Comments in discussions (a gathering's teams, timetable activities and applications, events and activity
 # applications), with their reactions, read receipts, polls, files and emails: who may read and take part in each
 class MessagesCommentsTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
-
-  # A thread in @gathering's General team, opened by @member with @comment
-  def team_thread
-    create_gathering
-    @team = @gathering.teams.find_by(name: 'General')
-    @member = create_member
-    @post = @team.posts.create!(account: @member, subject: 'Rota')
-    @comment = @post.comments.create!(account: @member, body: 'Secret plans')
-  end
-
-  # A request as the page's pagelets make it, which a refusal answers with 403 rather than a redirect
-  def xhr(method, path, params = {})
-    send(method, path, params, 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest')
-  end
+  include CommentsHelpers
 
   def assert_refused(text = nil)
     assert_equal 403, last_response.status

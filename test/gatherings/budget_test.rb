@@ -1,15 +1,12 @@
 require_relative '../test_config'
+require_relative '../helpers/gatherings_helpers'
 
 # A gathering's budget, inventory and options: who may list and change expenses and items, mark them reimbursed or
 # provided, and move members between options. Listing and editing them in the browser are also in features_test.rb
 class GatheringBudgetTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
-
-  def create_other_gathering
-    @other_account = FactoryBot.create(:account)
-    @other_gathering = FactoryBot.create(:gathering, account: @other_account)
-  end
+  include GatheringsHelpers
 
   def create_spend(account: @account)
     @spend = @gathering.spends.create!(item: 'Vegetables', amount: 30, team: @gathering.teams.first, account: account)

@@ -1,16 +1,12 @@
 require_relative '../test_config'
+require_relative '../helpers/gatherings_helpers'
 
 # Who may make and change a gathering's rotas and their slots. Creating and editing them in the browser are also in
 # features_test.rb, and shifts in gatherings_test.rb
 class GatheringRotasTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
-
-  def create_rota
-    @rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
-    @role = Role.create!(name: 'Cook', rota: @rota)
-    @rslot = Rslot.create!(name: 'Morning', rota: @rota)
-  end
+  include GatheringsHelpers
 
   test 'an admin sets how many shift points a slot is worth, and its shifts count them' do
     covers_route 'POST /g/:slug/rslots/:id/edit'

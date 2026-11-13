@@ -10,11 +10,6 @@ class EventAdminRoutesTest < ActiveSupport::TestCase
   BOOSTS_SECRET = 'whsec_event_boosts_test'.freeze
   ADMIN_NOTIFICATION_JOB = /method_name: :send_admin_notification_without_delay/
 
-  # Someone who admins only this event, as its facilitator
-  def create_facilitator(event)
-    FactoryBot.create(:account).tap { |account| event.event_facilitations.create!(account: account) }
-  end
-
   def create_waiter(name)
     FactoryBot.create(:account, name: name, email: "#{name.parameterize}@example.com")
   end
@@ -417,10 +412,6 @@ class EventAdminRoutesTest < ActiveSupport::TestCase
   end
 
   # Event boosts Stripe webhook
-
-  def checkout_completed_payload(session_id, payment_status: 'paid')
-    { id: "evt_#{SecureRandom.hex(4)}", object: 'event', type: 'checkout.session.completed', data: { object: { id: session_id, object: 'checkout.session', payment_status: payment_status } } }.to_json
-  end
 
   # Posts payload to the event boosts webhook as Stripe would, signed with secret
   def deliver_boosts_webhook(payload, secret: BOOSTS_SECRET)

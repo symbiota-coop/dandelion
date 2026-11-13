@@ -10,19 +10,10 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
 
   XHR = { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }.freeze
 
-  def assert_redirected_to(path)
-    assert last_response.redirect?, "Expected a redirect to #{path}, got #{last_response.status}"
-    assert_equal path, URI(last_response.location).path
-  end
-
   # A follower, an event manager, someone who doesn't follow, another organisation's admin and someone signed out
   def outsiders
     other_organisation = FactoryBot.create(:organisation)
     [add_member(@organisation), add_event_manager(@organisation), FactoryBot.create(:account), other_organisation.account, nil]
-  end
-
-  def wait_until(message, &)
-    page.document.synchronize { raise Capybara::ExpectationNotMet, message unless yield }
   end
 
   # The CSV each send_followers_csv job queued would email, with whom it would go to

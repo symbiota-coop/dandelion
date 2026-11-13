@@ -1,14 +1,12 @@
 require_relative '../test_config'
+require_relative '../helpers/gatherings_helpers'
 
 # A gathering's members: what its admins set on a membership (admin, paid, invitations, shift points), adding members,
 # seeing a member's answers and leaving (though not by a gathering's only admin), and who may do each
 class GatheringMembersTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
-
-  def membership_of(account)
-    @gathering.memberships.find_by(account: account)
-  end
+  include GatheringsHelpers
 
   def membership_row(membership)
     find("[data-pagelet-url='#{gathering_path("/membership_row/#{membership.id}")}']")
@@ -20,8 +18,8 @@ class GatheringMembersTest < ActiveSupport::TestCase
   end
 
   # A second gathering, with its own admin and a member, for requests that name its memberships from the first
-  def create_other_gathering
-    @other_gathering = FactoryBot.create(:gathering, account: FactoryBot.create(:account))
+  def create_other_gathering_with_member
+    create_other_gathering
     @other_membership = @other_gathering.memberships.create!(account: FactoryBot.create(:account))
   end
 
@@ -59,7 +57,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
   test "members can't make anyone an admin, themselves included, nor can anyone signed out or from another gathering" do
     covers_route 'POST /g/:slug/memberships/:id/make_admin'
     create_gathering(privacy: 'open')
-    create_other_gathering
+    create_other_gathering_with_member
     member = create_member
     other = membership_of(create_member(name: 'Other Person'))
     own = membership_of(member)
@@ -90,7 +88,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
 
   test "an admin can't make a member of another gathering an admin through their own gathering's address" do
     create_gathering(privacy: 'open')
-    create_other_gathering
+    create_other_gathering_with_member
     sign_in_with_rack(@account)
     post gathering_path("/memberships/#{@other_membership.id}/make_admin")
     assert_equal 404, last_response.status
@@ -103,7 +101,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/memberships/:id/paid'
     covers_route 'POST /g/:slug/memberships/:id/shift_points_required'
     create_gathering(privacy: 'open')
-    create_other_gathering
+    create_other_gathering_with_member
     member = create_member
     targets = [membership_of(member), membership_of(create_member(name: 'Other Person'))]
     changes = { 'paid' => 500, 'invitations_granted' => 10, 'shift_points_required' => 0 }
@@ -273,7 +271,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
   test "a member's answers are for the gathering's confirmed members, and opened directly go to the members page" do
     covers_route 'GET /g/:slug/memberships/:id'
     create_gathering(privacy: 'open', demand_payment: true)
-    create_other_gathering
+    create_other_gathering_with_member
     answering = create_member(name: 'Answering Person')
     membership = membership_of(answering)
     membership.set(answers: [['Why are you joining?', 'To build the dome']], paid: 10)
@@ -325,7 +323,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
   test 'nobody adds members without an invitation left, confirmed membership or being an admin' do
     covers_route 'POST /g/:slug/add_member'
     create_gathering(privacy: 'open')
-    create_other_gathering
+    create_other_gathering_with_member
     member = create_member
     path = gathering_path('/add_member')
 

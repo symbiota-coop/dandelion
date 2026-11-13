@@ -88,18 +88,6 @@ class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
     end
   end
 
-  # The queued jobs that would email order's tickets, matched by the order's PayPal order id and the method each calls
-  def send_tickets_jobs(order)
-    Delayed::Job.all.select do |job|
-      job.handler.match?(/^method_name: :send_tickets(_without_delay)?$/) && job.handler.include?("paypal_order_id: #{order.paypal_order_id}\n")
-    end
-  end
-
-  def deliver_paypal_webhook(organisation, body)
-    header 'Content-Type', 'application/json'
-    post "/o/#{organisation.slug}/paypal_webhook", body.is_a?(String) ? body : body.to_json
-  end
-
   def create_paid_paypal_order(value: 10, tickets: 1)
     order = Order.create!(event: @event, account: FactoryBot.create(:account), value: value, currency: @event.currency,
                           payment_completed: true, paypal_order_id: "PAYPAL-#{SecureRandom.hex(4)}", paypal_capture_id: 'CAPTURE')
@@ -219,7 +207,7 @@ class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
       deliver_paypal_webhook(@organisation, event_type: 'CHECKOUT.ORDER.APPROVED', resource: { id: order.paypal_order_id })
       assert_equal 200, last_response.status
       assert order.reload.payment_completed?
-      assert_equal 1, send_tickets_jobs(order).count
+      assert_equal 1, send_tickets_jobs(order, by: :paypal_order_id).count
 
       # The buyer comes back from PayPal, and PayPal sends its capture webhook too
       get "/e/#{@event.slug}?success=true&order_id=#{order.public_id}"
@@ -229,7 +217,7 @@ class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
       assert_equal 200, last_response.status
     end
 
-    assert_equal 1, send_tickets_jobs(order).count
+    assert_equal 1, send_tickets_jobs(order, by: :paypal_order_id).count
     assert_equal 1, captures.size
     assert_equal "dandelion-capture-#{order.id}", captures.first.request_headers['PayPal-Request-Id']
     assert_equal 'CAPTURE', order.reload.paypal_capture_id
@@ -249,7 +237,7 @@ class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
       EventPaymentMethod::Paypal.complete_if_paid(from_return_page)
     end
 
-    assert_equal 1, send_tickets_jobs(order).count
+    assert_equal 1, send_tickets_jobs(order, by: :paypal_order_id).count
     assert order.reload.payment_completed?
     assert order.tickets.first.payment_completed?
   end

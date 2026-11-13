@@ -17,11 +17,6 @@ class OrganisationsActivityApplicationsTest < ActiveSupport::TestCase
     @activity.activity_applications.create!(account: applicant, status: 'Pending', answers: [[QUESTION, answer]])
   end
 
-  def assert_redirected_to(path)
-    assert last_response.redirect?, "Expected a redirect to #{path}, got #{last_response.status}"
-    assert_equal path, URI(last_response.location).path
-  end
-
   # ═══════════════════════════════════════════════════════════════════════════
   # Deciding applications, in the browser
   # ═══════════════════════════════════════════════════════════════════════════

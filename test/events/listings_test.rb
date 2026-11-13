@@ -40,10 +40,6 @@ class EventListingsTest < ActiveSupport::TestCase
     Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
   end
 
-  def xhr_get(path, params = {})
-    get path, params, { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }
-  end
-
   test 'upcoming events on the home page show whether each is starred, with the page' do
     create_event(as: :starred_event)
     create_event(as: :unstarred_event)

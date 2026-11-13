@@ -1,27 +1,18 @@
 require_relative '../test_config'
+require_relative '../helpers/checkout_webhook_helpers'
 require_relative '../helpers/orders_helpers'
 
 # Completing and cancelling orders, their emails and receipts, and the queries order pages run
 class OrdersTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
+  include CheckoutWebhookHelpers
   include OrdersHelpers
 
-  def create_incomplete_order
+  # @event, with one £10 ticket type, and an order of one of its tickets whose payment hasn't completed
+  def create_event_with_incomplete_order
     create_event(prices: [10])
-    order = @event.orders.create!(
-      account: FactoryBot.create(:account),
-      currency: @event.currency,
-      value: 10,
-      payment_completed: false
-    )
-    order.tickets.create!(
-      event: @event,
-      account: order.account,
-      ticket_type: @event.ticket_types.first,
-      price: 10
-    )
-    order
+    create_incomplete_order(@event)
   end
 
   def stub_completion_side_effects(order)
@@ -44,7 +35,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'complete_or_restore completes an order only once' do
-    order = create_incomplete_order
+    order = create_event_with_incomplete_order
 
     stub_completion_side_effects(order) do |counts|
       order.complete_or_restore
@@ -57,7 +48,7 @@ class OrdersTest < ActiveSupport::TestCase
   end
 
   test 'complete_or_restore clears completing_at after an exception' do
-    order = create_incomplete_order
+    order = create_event_with_incomplete_order
     order.stub :payment_completed!, proc { raise 'boom' } do
       assert_raises(RuntimeError) { order.complete_or_restore }
     end
@@ -303,7 +294,7 @@ class OrdersTest < ActiveSupport::TestCase
   test 'order notifications are emailed to facilitators only when the event sends them' do
     covers 'events/order-notification-emails@73c132'
     Delayed::Job.delete_all
-    order = create_incomplete_order
+    order = create_event_with_incomplete_order
     facilitator = FactoryBot.create(:account)
     @event.event_facilitations.create!(account: facilitator)
     @event.set(send_order_notifications: true)
@@ -314,7 +305,7 @@ class OrdersTest < ActiveSupport::TestCase
     refute_includes @event.event_facilitators, order.account
 
     Delayed::Job.delete_all
-    order = create_incomplete_order
+    order = create_event_with_incomplete_order
     @event.set(send_order_notifications: false)
     order.complete_or_restore
     assert order.reload.payment_completed

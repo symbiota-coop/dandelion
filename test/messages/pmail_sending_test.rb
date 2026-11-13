@@ -433,16 +433,6 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
     assert_includes last_response.body, pmail.subject
   end
 
-  # A Mailgun click event for pmail at url from a device_type, signed with key
-  def mailgun_click_event(pmail, url:, key:, device_type: nil)
-    timestamp = Time.now.to_i.to_s
-    token = SecureRandom.hex(25)
-    {
-      'signature' => { 'timestamp' => timestamp, 'token' => token, 'signature' => OpenSSL::HMAC.hexdigest('SHA256', key, "#{timestamp}#{token}") },
-      'event-data' => { 'event' => 'clicked', 'tags' => [pmail.id.to_s], 'url' => url, 'client-info' => { 'device-type' => device_type } }
-    }.to_json
-  end
-
   test "clicks are counted per link, by device, without recipients' tokens, and only for the organisation's own mails" do
     create_organisation(mailgun_webhook_signing_key: 'organisation-key')
     pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: 'everyone')

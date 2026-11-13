@@ -88,7 +88,7 @@ class PaymentsStripeChargesTest < ActiveSupport::TestCase
 
   # Charges, with the balance and fees the daily task gives them from their transactions
 
-  def charge(id, **attributes)
+  def create_stripe_charge(id, **attributes)
     @organisation.stripe_charges.create!(id: id, event: @event, amount: 3000, currency: 'gbp', created: Time.utc(2026, 11, 5, 12),
                                          balance_transaction: "txn_#{id}", de_donation_revenue: 0, **attributes)
   end
@@ -190,7 +190,7 @@ class PaymentsStripeChargesTest < ActiveSupport::TestCase
 
   test 'syncing transactions waits for Stripe’s report, then stores each row against its charge, once' do
     organisation_with_own_stripe
-    stripe_charge = charge('ch_1')
+    stripe_charge = create_stripe_charge('ch_1')
     csv = transactions_csv([
                              { balance_transaction_id: 'txn_1', created_utc: '2026-11-05 12:00:00', available_on_utc: '2026-11-12 00:00:00', currency: 'gbp',
                                gross: '30.00', fee: '1.20', net: '28.80', reporting_category: 'charge', source_id: 'ch_1', charge_id: 'ch_1',
@@ -225,23 +225,23 @@ class PaymentsStripeChargesTest < ActiveSupport::TestCase
 
   test 'a charge’s balance is what its transactions leave of it, less refunds and disputes, and its fees are theirs added up' do
     create_event(prices: [30], currency: 'GBP')
-    paid = charge('ch_paid')
+    paid = create_stripe_charge('ch_paid')
     transaction(paid, gross: 30, fee: 1.2)
-    partly_refunded = charge('ch_partly_refunded')
+    partly_refunded = create_stripe_charge('ch_partly_refunded')
     transaction(partly_refunded, gross: 30, fee: 1.2)
     transaction(partly_refunded, gross: -12.5, category: 'refund')
-    refunded = charge('ch_refunded')
+    refunded = create_stripe_charge('ch_refunded')
     transaction(refunded, gross: 30, fee: 1.2)
     transaction(refunded, gross: -30, category: 'refund')
     # A lost dispute takes the charge back and adds a dispute fee
-    disputed = charge('ch_disputed')
+    disputed = create_stripe_charge('ch_disputed')
     transaction(disputed, gross: 30, fee: 1.2)
     transaction(disputed, gross: -30, fee: 20, category: 'dispute')
     # More refunded than was charged leaves no balance, not less than none
-    overrefunded = charge('ch_overrefunded')
+    overrefunded = create_stripe_charge('ch_overrefunded')
     transaction(overrefunded, gross: 30, fee: 1.2)
     transaction(overrefunded, gross: -35, category: 'refund')
-    unsettled = charge('ch_unsettled')
+    unsettled = create_stripe_charge('ch_unsettled')
 
     balances_and_fees = [paid, partly_refunded, refunded, disputed, overrefunded, unsettled].map do |stripe_charge|
       [stripe_charge.balance_from_transactions.format, stripe_charge.fees_from_transactions.format]
@@ -251,7 +251,7 @@ class PaymentsStripeChargesTest < ActiveSupport::TestCase
 
   test 'transactions settled in another currency give the charge’s balance and fees in the charge’s currency' do
     create_event(prices: [30], currency: 'EUR')
-    stripe_charge = charge('ch_1', currency: 'eur')
+    stripe_charge = create_stripe_charge('ch_1', currency: 'eur')
     transaction(stripe_charge, gross: 24, fee: 0.96, currency: 'gbp')
 
     Money.default_bank.stub(:get_rate, ->(from, to, *) { { %w[GBP EUR] => 1.25 }.fetch([from.to_s, to.to_s]) }) do
@@ -270,8 +270,8 @@ class PaymentsStripeChargesTest < ActiveSupport::TestCase
 
   test 'a charge with no application fee is all the organisation’s, its donations coming out of its balance first' do
     create_event(prices: [30], currency: 'GBP')
-    paid = charge('ch_paid', balance_float: 30, de_donation_revenue: 5)
-    partly_refunded = charge('ch_partly_refunded', balance_float: 20, de_donation_revenue: 5)
+    paid = create_stripe_charge('ch_paid', balance_float: 30, de_donation_revenue: 5)
+    partly_refunded = create_stripe_charge('ch_partly_refunded', balance_float: 20, de_donation_revenue: 5)
 
     # Ticket revenue, to the organisation, to a revenue sharer, donations
     assert_equal %w[£25.00 £25.00 £0.00 £5.00], [paid.ticket_revenue, paid.ticket_revenue_to_organisation, paid.ticket_revenue_to_revenue_sharer, paid.donations].map(&:format)
@@ -282,8 +282,8 @@ class PaymentsStripeChargesTest < ActiveSupport::TestCase
 
   test 'a charge with no application fee refunded below its donation, or in full, has no ticket revenue, rather than less than none' do
     create_event(prices: [30], currency: 'GBP')
-    mostly_refunded = charge('ch_mostly_refunded', balance_float: 3, de_donation_revenue: 5)
-    refunded = charge('ch_refunded', balance_float: 0, de_donation_revenue: 5)
+    mostly_refunded = create_stripe_charge('ch_mostly_refunded', balance_float: 3, de_donation_revenue: 5)
+    refunded = create_stripe_charge('ch_refunded', balance_float: 0, de_donation_revenue: 5)
 
     # Ticket revenue, to the organisation, donations: what's left of the balance is the donation's
     figures = [mostly_refunded, refunded].map do |stripe_charge|
@@ -299,11 +299,11 @@ class PaymentsStripeChargesTest < ActiveSupport::TestCase
     # £30 paid, £20 of it to the revenue sharer, so the organisation's balance is the £10 application fee: £5 of tickets
     # and a £5 donation
     attributes = { amount: 3000, application_fee_amount: 1000, de_discounted_ticket_revenue: 25, de_donation_revenue: 5 }
-    paid = charge('ch_paid', balance_float: 10, **attributes)
-    half_refunded = charge('ch_half_refunded', balance_float: 5, **attributes)
-    refunded = charge('ch_refunded', balance_float: 0, **attributes)
+    paid = create_stripe_charge('ch_paid', balance_float: 10, **attributes)
+    half_refunded = create_stripe_charge('ch_half_refunded', balance_float: 5, **attributes)
+    refunded = create_stripe_charge('ch_refunded', balance_float: 0, **attributes)
     # An application fee of nothing gives the organisation no balance, and the revenue sharer all of it
-    all_to_sharer = charge('ch_all_to_sharer', balance_float: 0, amount: 3000, application_fee_amount: 0, de_discounted_ticket_revenue: 30)
+    all_to_sharer = create_stripe_charge('ch_all_to_sharer', balance_float: 0, amount: 3000, application_fee_amount: 0, de_discounted_ticket_revenue: 30)
 
     figures = [paid, half_refunded, refunded, all_to_sharer].map do |stripe_charge|
       [stripe_charge.ticket_revenue, stripe_charge.ticket_revenue_to_organisation, stripe_charge.ticket_revenue_to_revenue_sharer, stripe_charge.donations].map(&:format)
@@ -321,10 +321,10 @@ class PaymentsStripeChargesTest < ActiveSupport::TestCase
     buyer = FactoryBot.create(:account)
     transferred_order = @event.orders.create!(account: buyer, currency: 'GBP', value: 20, payment_completed: true)
     transferred_order.set(transferred: true)
-    paid = charge('ch_paid', balance_float: 30, fees_float: 1.2, de_donation_revenue: 5)
-    charge('ch_refunded', balance_float: 0, fees_float: 0.8)
-    transferred = charge('ch_transferred', order: transferred_order, balance_float: 20, fees_float: 0.6)
-    charge('ch_other_event', event: FactoryBot.create(:event, organisation: @organisation), balance_float: 100, fees_float: 3)
+    paid = create_stripe_charge('ch_paid', balance_float: 30, fees_float: 1.2, de_donation_revenue: 5)
+    create_stripe_charge('ch_refunded', balance_float: 0, fees_float: 0.8)
+    transferred = create_stripe_charge('ch_transferred', order: transferred_order, balance_float: 20, fees_float: 0.6)
+    create_stripe_charge('ch_other_event', event: FactoryBot.create(:event, organisation: @organisation), balance_float: 100, fees_float: 3)
 
     event = Event.find(@event.id)
     assert_equal %w[£50.00 £2.60 £5.00 £45.00 £45.00 £0.00],
@@ -335,9 +335,9 @@ class PaymentsStripeChargesTest < ActiveSupport::TestCase
 
   test 'an event admin sees a charge with no description among the event’s Stripe charges' do
     create_event(prices: [30], currency: 'GBP')
-    charge('ch_described', description: "#{@event.name}: 1 ticket", balance_float: 30)
+    create_stripe_charge('ch_described', description: "#{@event.name}: 1 ticket", balance_float: 30)
     # Charges made or edited in Stripe's dashboard can have none
-    charge('ch_undescribed', description: nil, balance_float: 30, created: Time.utc(2026, 11, 4))
+    create_stripe_charge('ch_undescribed', description: nil, balance_float: 30, created: Time.utc(2026, 11, 4))
 
     sign_in(@account)
     visit "/e/#{@event.slug}/stripe_charges"

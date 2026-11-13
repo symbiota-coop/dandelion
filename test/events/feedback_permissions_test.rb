@@ -12,16 +12,12 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
     @event.tickets.create!(account: @attendee, ticket_type: @event.ticket_types.first, payment_completed: true)
   end
 
-  def create_feedback(account: @attendee, event: @event, **attrs)
+  def create_answered_feedback(account: @attendee, event: @event, **attrs)
     event.event_feedbacks.create!(account: account, rating: 4, answers: [['How was it?', 'Private thoughts here']], **attrs)
   end
 
   def feedback_params(rating: 4)
     { event_feedback: { rating: rating }, questions: { '0' => 'How was it?' }, answers: { '0' => 'Lovely' } }
-  end
-
-  def create_facilitator
-    FactoryBot.create(:account, name: 'Event Facilitator').tap { |facilitator| @event.event_facilitations.create!(account: facilitator) }
   end
 
   def assert_kicked
@@ -153,10 +149,10 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
 
   test "only the event's admins can read its feedback, as a page or CSV" do
     covers_route 'GET /e/:slug/feedback_report'
-    feedback = create_feedback
+    feedback = create_answered_feedback
     reviewer = FactoryBot.create(:account)
     @event.tickets.create!(account: reviewer, ticket_type: @event.ticket_types.first, payment_completed: true)
-    create_feedback(account: reviewer)
+    create_answered_feedback(account: reviewer)
 
     paths = ["/e/#{@event.slug}/feedback", "/e/#{@event.slug}/feedback.csv", "/event_feedbacks/#{feedback.id}", "/e/#{@event.slug}/feedback_report"]
     [nil, reviewer, FactoryBot.create(:account)].each do |account|
@@ -167,7 +163,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
       end
     end
 
-    sign_in_with_rack(create_facilitator)
+    sign_in_with_rack(create_facilitator(@event, name: 'Event Facilitator'))
     get "/e/#{@event.slug}/feedback"
     assert_equal 200, last_response.status
     assert_includes last_response.body, 'Private thoughts here'
@@ -180,10 +176,10 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
     covers_route 'GET /o/:organisation_slug/a/:slug/feedback'
     covers_route 'GET /o/:organisation_slug/lg/:slug/feedback'
     covers_route 'GET /o/:slug/feedback'
-    create_feedback
+    create_answered_feedback
     paths = ["/o/#{@organisation.slug}/feedback", "#{@activity.path}/feedback", "/o/#{@organisation.slug}/lg/#{@local_group.slug}/feedback", '/stats/feedback']
     # A facilitator is an admin of the event, but not of its organisation, activity or local group
-    [nil, @attendee, create_facilitator].each do |account|
+    [nil, @attendee, create_facilitator(@event, name: 'Event Facilitator')].each do |account|
       account ? sign_in_with_rack(account) : clear_cookies
       paths.each do |path|
         get path
@@ -200,7 +196,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
   end
 
   test 'anonymous feedback never names its author to admins, in pages or the CSV' do
-    feedback = create_feedback(anonymous: true)
+    feedback = create_answered_feedback(anonymous: true)
     site_admin = FactoryBot.create(:account, admin: true)
 
     [@account, site_admin].each do |admin|
@@ -237,9 +233,9 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
     covers 'organisations/attendee-emails-admins-and-managers-only@10b712'
     covers_route 'GET /e/:slug/feedback'
     @event.update!(show_emails: false)
-    create_feedback
+    create_answered_feedback
 
-    sign_in_with_rack(create_facilitator)
+    sign_in_with_rack(create_facilitator(@event, name: 'Event Facilitator'))
     get "/e/#{@event.slug}/feedback.csv"
     row = CSV.parse(last_response.body, headers: true).first
     assert_equal @attendee.name, row['name']
@@ -251,8 +247,8 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
   end
 
   test 'public feedback lists hide anonymous authors and show only the extracts chosen for them' do
-    facilitator = create_facilitator
-    create_feedback(anonymous: true, publicly_visible: true, public_answers: [['How was it?', 'Quotable line']])
+    facilitator = create_facilitator(@event, name: 'Event Facilitator')
+    create_answered_feedback(anonymous: true, publicly_visible: true, public_answers: [['How was it?', 'Quotable line']])
 
     ["/o/#{@organisation.slug}/show_feedback?minimal=1", "#{@activity.path}/show_feedback?minimal=1", "/u/#{facilitator.username}/show_feedback",
      "/u/#{facilitator.username}/feedback"].each do |path|
@@ -266,9 +262,9 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
   end
 
   test 'anonymous feedback makes no feed notification and its emails name no one' do
-    facilitator = create_facilitator
+    facilitator = create_facilitator(@event, name: 'Event Facilitator')
     emails = recorded_emails do
-      create_feedback(anonymous: true, publicly_visible: true)
+      create_answered_feedback(anonymous: true, publicly_visible: true)
       Delayed::Job.and(handler: /send_feedback/).each(&:invoke_job)
     end
     assert_equal 0, Notification.and(type: 'left_feedback').count
@@ -287,8 +283,8 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
   test 'the facilitator feedback report and text are for signed-in facilitators, of their own events' do
     covers_route 'GET /event_feedbacks/feedback'
     covers_route 'GET /event_feedbacks/report'
-    facilitator = create_facilitator
-    create_feedback
+    facilitator = create_facilitator(@event, name: 'Event Facilitator')
+    create_answered_feedback
     create_event(as: :other_event)
     stranger = FactoryBot.create(:account)
     @other_event.event_facilitations.create!(account: stranger)
@@ -313,7 +309,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test "only the event's admins can respond to feedback or choose its public extract" do
-    feedback = create_feedback(publicly_visible: true)
+    feedback = create_answered_feedback(publicly_visible: true)
     [nil, @attendee, FactoryBot.create(:account)].each do |account|
       account ? sign_in_with_rack(account) : clear_cookies
       get "/event_feedbacks/#{feedback.id}/response"
@@ -329,7 +325,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
     assert_nil feedback.response
     assert_nil feedback.public_answers
 
-    sign_in_with_rack(create_facilitator)
+    sign_in_with_rack(create_facilitator(@event, name: 'Event Facilitator'))
     post "/event_feedbacks/#{feedback.id}/response", response: 'Thanks!'
     assert_equal 200, last_response.status
     post "/event_feedbacks/#{feedback.id}/public_answers/0", public_answer: 'Private thoughts'
@@ -341,7 +337,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
 
   test "feedback that's anonymous and can't be quoted can't be responded to, and a response to anonymous feedback emails no one" do
     covers_route 'POST /event_feedbacks/:id/response'
-    hidden = create_feedback(anonymous: true)
+    hidden = create_answered_feedback(anonymous: true)
     sign_in_with_rack(@account)
     post "/event_feedbacks/#{hidden.id}/response", response: 'Reply'
     assert_equal 400, last_response.status
@@ -356,7 +352,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
   test "feedback that may not be quoted publicly can't be given a public extract" do
     covers 'events/no-extract-control-not-public@82dbfb'
     covers_route 'POST /event_feedbacks/:id/public_answers/:i'
-    feedback = create_feedback(publicly_visible: false)
+    feedback = create_answered_feedback(publicly_visible: false)
     sign_in_with_rack(@account)
     get "/event_feedbacks/#{feedback.id}/public_answers/0"
     assert_equal 403, last_response.status
@@ -371,8 +367,8 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
   test "only the organisation's admins can delete feedback, and only site admins delete it for good" do
     covers_route 'POST /event_feedbacks/:id/destroy'
     covers_route 'POST /event_feedbacks/:id/hard_destroy'
-    feedback = create_feedback
-    [@attendee, create_facilitator].each do |account|
+    feedback = create_answered_feedback
+    [@attendee, create_facilitator(@event, name: 'Event Facilitator')].each do |account|
       sign_in_with_rack(account)
       post "/event_feedbacks/#{feedback.id}/destroy"
       assert last_response.redirect?

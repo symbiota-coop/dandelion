@@ -15,7 +15,7 @@ class PaymentsMonthlyContributionsTest < ActiveSupport::TestCase
     end.new(items)
   end
 
-  def charge(amount:, currency: 'gbp', status: 'succeeded', refunded: false, amount_refunded: 0, payment_intent: 'pi_1', fee: nil,
+  def charge_object(amount:, currency: 'gbp', status: 'succeeded', refunded: false, amount_refunded: 0, payment_intent: 'pi_1', fee: nil,
              fee_currency: 'gbp')
     balance_transaction = { 'fee' => fee, 'currency' => fee_currency } if fee
     api_object(amount: amount, currency: currency, status: status, refunded: refunded, amount_refunded: amount_refunded,
@@ -53,12 +53,12 @@ class PaymentsMonthlyContributionsTest < ActiveSupport::TestCase
 
   test "a month's contributions are its succeeded charges and its application fees, less Stripe's fees, in whole pounds" do
     charges = [
-      charge(amount: 10_000, fee: 170),
-      charge(amount: 2000, currency: 'usd', fee: 100),
-      charge(amount: 500),
-      charge(amount: 5000, status: 'failed', fee: 175),
-      charge(amount: 3000, refunded: true, fee: 120),
-      charge(amount: 7000, payment_intent: 'pi_ignored', fee: 150)
+      charge_object(amount: 10_000, fee: 170),
+      charge_object(amount: 2000, currency: 'usd', fee: 100),
+      charge_object(amount: 500),
+      charge_object(amount: 5000, status: 'failed', fee: 175),
+      charge_object(amount: 3000, refunded: true, fee: 120),
+      charge_object(amount: 7000, payment_intent: 'pi_ignored', fee: 150)
     ]
     fees = [
       application_fee(amount: 1000, fee: 50),
@@ -101,7 +101,7 @@ class PaymentsMonthlyContributionsTest < ActiveSupport::TestCase
   end
 
   test 'a partially refunded charge or application fee counts what was kept, less the whole of Stripe\'s fee' do
-    charges = [charge(amount: 10_000, amount_refunded: 4000, fee: 170)]
+    charges = [charge_object(amount: 10_000, amount_refunded: 4000, fee: 170)]
     fees = [application_fee(amount: 1000, amount_refunded: 250, fee: 10)]
     with_stripe(charges: charges, fees: fees) do
       # Charges: £100 less £40 refunded = £60, less the £1.70 fee Stripe keeps = £58.30. Application fees: £10 less
@@ -112,7 +112,7 @@ class PaymentsMonthlyContributionsTest < ActiveSupport::TestCase
   end
 
   test 'the total is the sum of its whole-pound parts' do
-    with_stripe(charges: [charge(amount: 1060)], fees: [application_fee(amount: 1060)]) do
+    with_stripe(charges: [charge_object(amount: 1060)], fees: [application_fee(amount: 1060)]) do
       # £10.60 and £10.60 are £10 and £10, so £20 in all (not £21.20 cut to £21)
       assert_equal ['February 2026', 20, { 'direct_stripe_charges' => 10, 'stripe_connect_application_fees' => 10 }],
                    MonthlyContributionsCalculator.calculate_month_data(Date.new(2026, 2, 1))
@@ -138,7 +138,7 @@ class PaymentsMonthlyContributionsTest < ActiveSupport::TestCase
 
   test 'calculate caches every month in the fragment for two days' do
     travel_to Time.local(2026, 11, 12, 12) do
-      with_stripe(charges: [charge(amount: 1000)]) do
+      with_stripe(charges: [charge_object(amount: 1000)]) do
         MonthlyContributionsCalculator.calculate
       end
       fragment = Fragment.find_by(key: 'monthly_contributions')
@@ -153,7 +153,7 @@ class PaymentsMonthlyContributionsTest < ActiveSupport::TestCase
   test "updating the current month replaces its entry and keeps the other months'" do
     travel_to Time.local(2026, 11, 12, 12) do
       fragment = contributions_fragment([['October 2026', 50, {}], ['November 2026', 1, {}]])
-      with_stripe(charges: [charge(amount: 4200)]) do
+      with_stripe(charges: [charge_object(amount: 4200)]) do
         MonthlyContributionsCalculator.update_current_month
       end
       assert_equal [

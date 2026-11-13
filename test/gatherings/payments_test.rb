@@ -1,19 +1,17 @@
 require_relative '../test_config'
+require_relative '../helpers/gatherings_helpers'
 
 # Members paying into a gathering: starting a payment by card (Stripe Checkout, on the gathering's own keys) or EVM,
 # the gathering's Stripe webhook completing it and crediting the membership once, and checking on a payment
 class GatheringPaymentsTest < ActiveSupport::TestCase
   include Rack::Test::Methods
+  include GatheringsHelpers
 
   ENDPOINT_SECRET = 'whsec_gathering_test'.freeze
   EVM_ADDRESS = '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed'.freeze
 
   def create_paying_gathering(**attrs)
     create_gathering(stripe_sk: 'sk_test_gathering', stripe_pk: 'pk_test_gathering', stripe_endpoint_secret: ENDPOINT_SECRET, **attrs)
-  end
-
-  def membership_of(account, gathering = @gathering)
-    gathering.memberships.find_by(account: account)
   end
 
   # Posts to the pay route as the page's jQuery does
@@ -24,7 +22,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
   end
 
   # Starts a card payment for amount, with Stripe's session creation stubbed, returning what Stripe was sent
-  def pay_by_card(amount, **params)
+  def start_card_payment(amount, **params)
     sent = {}
     session = api_object(id: "cs_#{SecureRandom.hex(4)}", payment_intent: "pi_#{SecureRandom.hex(4)}")
     Stripe::Checkout::Session.stub(:create, proc { |hash, opts|
@@ -51,7 +49,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
   end
 
   # Posts payload to the gathering's webhook as Stripe would, signed with secret
-  def deliver_webhook(payload, gathering: @gathering, secret: ENDPOINT_SECRET)
+  def deliver_gathering_webhook(payload, gathering: @gathering, secret: ENDPOINT_SECRET)
     timestamp = Time.now
     signature = Stripe::Webhook::Signature.compute_signature(timestamp, payload, secret)
     header 'Stripe-Signature', Stripe::Webhook::Signature.generate_header(timestamp, signature)
@@ -72,7 +70,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     member = create_member
     sign_in_with_rack(member)
 
-    sent = pay_by_card('25', currency: 'USD')
+    sent = start_card_payment('25', currency: 'USD')
 
     assert_equal 200, last_response.status, last_response.body
     payment = membership_of(member).payments.first
@@ -104,11 +102,11 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     refute membership_of(member).confirmed?
     sign_in_with_rack(member)
 
-    pay_by_card('10')
+    start_card_payment('10')
     assert_equal 200, last_response.status, last_response.body
     payment = membership_of(member).payments.first
 
-    deliver_webhook(session_payload(payment.session_id))
+    deliver_gathering_webhook(session_payload(payment.session_id))
 
     assert membership_of(member).confirmed?
   end
@@ -161,7 +159,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     payment = create_unpaid_payment(membership_of(member), amount: 30)
     payload = session_payload(payment.session_id)
 
-    deliver_webhook(payload)
+    deliver_gathering_webhook(payload)
 
     assert_equal 200, last_response.status
     assert payment.reload.payment_completed?
@@ -170,8 +168,8 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     assert_equal 30, @gathering.processed_via_dandelion
     assert_equal 1, payment.notifications.and(type: 'created_payment').count
 
-    deliver_webhook(payload)
-    deliver_webhook(session_payload(payment.session_id, type: 'checkout.session.async_payment_succeeded'))
+    deliver_gathering_webhook(payload)
+    deliver_gathering_webhook(session_payload(payment.session_id, type: 'checkout.session.async_payment_succeeded'))
 
     assert_equal 200, last_response.status
     assert_equal 30, membership_of(member).paid
@@ -200,14 +198,14 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     create_paying_gathering
     payment = create_unpaid_payment(membership_of(create_member))
 
-    deliver_webhook(session_payload(payment.session_id, payment_status: 'unpaid'))
+    deliver_gathering_webhook(session_payload(payment.session_id, payment_status: 'unpaid'))
     assert_equal 200, last_response.status
     assert_uncredited(payment)
 
-    deliver_webhook(session_payload(payment.session_id, type: 'checkout.session.expired', payment_status: 'paid'))
+    deliver_gathering_webhook(session_payload(payment.session_id, type: 'checkout.session.expired', payment_status: 'paid'))
     assert_uncredited(payment)
 
-    deliver_webhook(session_payload(payment.session_id, type: 'checkout.session.async_payment_succeeded'))
+    deliver_gathering_webhook(session_payload(payment.session_id, type: 'checkout.session.async_payment_succeeded'))
     assert payment.reload.payment_completed?
     assert_equal 10, payment.membership.reload.paid
   end
@@ -218,14 +216,14 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     other_gathering = FactoryBot.create(:gathering, account: FactoryBot.create(:account), stripe_endpoint_secret: 'whsec_other')
     other_payment = create_unpaid_payment(other_gathering.memberships.first)
 
-    deliver_webhook(session_payload(payment.session_id), secret: 'whsec_wrong')
+    deliver_gathering_webhook(session_payload(payment.session_id), secret: 'whsec_wrong')
     assert_equal 200, last_response.status
-    deliver_webhook(session_payload(payment.session_id), secret: 'whsec_other')
+    deliver_gathering_webhook(session_payload(payment.session_id), secret: 'whsec_other')
     assert_equal 200, last_response.status
-    deliver_webhook(session_payload('cs_unknown'))
+    deliver_gathering_webhook(session_payload('cs_unknown'))
     assert_equal 200, last_response.status
     # Signed for this gathering, but the session is another gathering's
-    deliver_webhook(session_payload(other_payment.session_id))
+    deliver_gathering_webhook(session_payload(other_payment.session_id))
     assert_equal 200, last_response.status
 
     assert_uncredited(payment)
@@ -241,7 +239,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
 
     reported = []
     ErrorReporting.stub(:capture_exception, ->(e, **) { reported << e }) do
-      deliver_webhook(session_payload(payment.session_id))
+      deliver_gathering_webhook(session_payload(payment.session_id))
     end
 
     assert_equal 200, last_response.status
