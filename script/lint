@@ -111,7 +111,7 @@ LINTERS = [
   {
     # Tests our checks and the rules no linter covers, so runs when what they read changes: our linters and
     # their configs, the files its other tests compare, and a new test file (which needs listing in ruby.yml). It reads
-    # files from disk, even with --staged
+    # the whole checkout from disk, so --staged runs it in a copy of the index (staged_tree)
     name: 'lint_test',
     files: %r{
       \A(
@@ -172,6 +172,17 @@ hand_edited = GENERATED.select { |file, built| files.include?(file) && files.non
 hand_edited.each { |file, built| $stderr.puts "#{file} #{built[:message]}, rather than editing it" }
 
 copies = nil # where --staged writes the copies of staged files, for linters that can't read stdin
+# For a linter that reads the whole checkout from disk (lint_test), --staged runs it in a copy of the index instead, so
+# another session's unstaged edits (a doc it's halfway through, the test it hasn't updated yet) don't fail your commit,
+# and yours don't pass it. The index holds no installed packages, so node_modules is linked in, and git reads the
+# checkout's own repository (lint_test lists its files with git ls-files, which then gives the index's)
+staged_tree = lambda do
+  @staged_tree ||= Dir.mktmpdir('lint-staged').tap do |dir|
+    at_exit { FileUtils.rm_rf(dir) }
+    system('git', 'checkout-index', '--all', "--prefix=#{dir}/", exception: true)
+    File.symlink(File.expand_path('node_modules'), File.join(dir, 'node_modules')) if File.exist?('node_modules')
+  end
+end
 jobs = LINTERS.flat_map do |linter|
   next [] if only && linter[:name].downcase != only.downcase
   next [] if linter[:whole] && ENV['LINT_TEST']
@@ -191,7 +202,10 @@ jobs = LINTERS.flat_map do |linter|
   end
 
   env = linter[:env] || {}
-  if linter[:whole]
+  if linter[:whole] && mode == '--staged'
+    git_dir = Open3.capture2('git', 'rev-parse', '--absolute-git-dir').first.strip
+    [{ name: linter[:name], command: linter[:command], env: env.merge('GIT_DIR' => git_dir), chdir: staged_tree.call }]
+  elsif linter[:whole]
     [{ name: linter[:name], command: linter[:command], env: env }]
   elsif all && linter[:shards]
     templates = Dir[linter[:shards]]
@@ -229,7 +243,7 @@ results = Array.new(WORKERS) do
     done = []
     while (item = queue.pop)
       job, index = item
-      output, status = Open3.capture2e(job[:env], *job[:command], stdin_data: job[:stdin] || '')
+      output, status = Open3.capture2e(job[:env], *job[:command], stdin_data: job[:stdin] || '', chdir: job[:chdir] || Dir.pwd)
       done << [index, job, output, status]
     end
     done
