@@ -354,6 +354,28 @@ class SiteRoutesTest < ActiveSupport::TestCase
 
   # Messages, notifications and the network
 
+  test "the notifications menu is the signed-in account's own, cached for a minute" do
+    covers_route 'GET /notifications'
+    account = FactoryBot.create(:account)
+    other = FactoryBot.create(:account)
+    Fragment.create!(key: "/notifications?account_id=#{other.id}", value: "other's notifications", expires: 1.hour.from_now)
+
+    get '/notifications', {}, XHR
+    assert_equal 403, last_response.status
+
+    sign_in_with_rack(account)
+    # It's a pagelet the nav loads, not a page
+    get '/notifications'
+    assert_equal '/', URI(last_response.location).path
+
+    get '/notifications', { account_id: other.id }, XHR
+    assert last_response.ok?
+    assert_not_includes last_response.body, "other's notifications"
+    fragment = Fragment.find_by(key: "/notifications?account_id=#{account.id}")
+    assert_equal fragment.value, last_response.body
+    assert_in_delta 1.minute.from_now, fragment.expires, 10
+  end
+
   test 'checking messages and notifications marks only the signed-in account, and clears only its notifications' do
     covers_route 'POST /checked_messages', 'POST /checked_notifications'
     account = FactoryBot.create(:account)

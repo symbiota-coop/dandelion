@@ -210,7 +210,7 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
   end
 
   test "the privacy routes show and set only the signed-in account's own settings, and only its privacy settings" do
-    covers_route 'POST /accounts/set_privacyable/:p'
+    covers_route 'GET /accounts/privacyable/:p', 'POST /accounts/set_privacyable/:p'
     account = profiled_account
     other = FactoryBot.create(:account)
 

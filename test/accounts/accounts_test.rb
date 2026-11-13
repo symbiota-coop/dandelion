@@ -79,7 +79,6 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'an image url uses the derivative another process stored while this one made it, dropping its own copy' do
-    covers_route 'GET /notifications'
     datastore = Dragonfly.app.datastore
     job = Dragonfly.app.fetch(Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg')))
     theirs = DragonflyJob.create!(signature: job.signature, uid: Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg')))
@@ -208,7 +207,6 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test "leaving an organisation, activity, local group or gathering, or unfollowing someone, takes it off the notification cache's ids at once" do
-    covers_route 'GET /accounts/privacyable/:p'
     organisation = FactoryBot.create(:organisation)
     activity = FactoryBot.create(:activity, organisation: organisation, privacy: 'open')
     local_group = FactoryBot.create(:local_group, organisation: organisation)
