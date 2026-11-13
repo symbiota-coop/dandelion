@@ -16,6 +16,10 @@ class SiteRoutesTest < ActiveSupport::TestCase
     Rack::Test::UploadedFile.new(file.path, type, true, original_filename: filename)
   end
 
+  def without_imagemagick(&)
+    Dragonfly.app.shell.stub(:run, ->(command, *) { flunk "ran #{command}" }, &)
+  end
+
   def point_path(model_name, id)
     "/points/#{model_name}/#{TokenEncryptor.encrypt("map:#{model_name}:#{id}")}"
   end
@@ -170,11 +174,11 @@ class SiteRoutesTest < ActiveSupport::TestCase
     assert_equal upload.file.url, url
   end
 
-  test "uploads refuse files that aren't images, and anyone signed out" do
+  test "uploads refuse files that aren't images, before ImageMagick sees them, and anyone signed out" do
     covers_route 'POST /upload'
     sign_in_with_rack(FactoryBot.create(:account))
     [[SVG, 'drawing.svg', 'image/svg+xml'], [SVG, 'drawing.jpg', 'image/jpeg'], ['hello', 'notes.txt', 'text/plain']].each do |data, filename, type|
-      post '/upload', { upload: uploaded(data, filename, type) }, XHR
+      without_imagemagick { post '/upload', { upload: uploaded(data, filename, type) }, XHR }
       assert_equal 422, last_response.status, filename
       assert_equal 'Only images can be uploaded', JSON.parse(last_response.body).dig('error', 'message')
     end
