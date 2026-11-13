@@ -357,6 +357,20 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     assert_equal 0, Delayed::Job.count
   end
 
+  test 'a contribution webhook with a bad signature, or a body that is not JSON, is turned away and completes nothing' do
+    contribution = create_pending_organisation_contribution
+
+    deliver_organisations_webhook(checkout_payload(contribution.session_id), secret: 'whsec_wrong')
+    assert_equal 200, last_response.status
+    deliver_organisations_webhook(checkout_payload(contribution.session_id), secret: ACCOUNTS_SECRET)
+    assert_equal 200, last_response.status
+    deliver_organisations_webhook('not json')
+    assert_equal 200, last_response.status
+
+    refute contribution.reload.payment_completed?
+    assert_equal 0, Delayed::Job.count
+  end
+
   # People paying
 
   test 'someone signed in donates through Dandelion\'s own Stripe account, for the amount and currency asked' do
@@ -488,6 +502,18 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     assert_equal 0, Delayed::Job.count
   end
 
+  test 'a donation webhook with a bad signature is turned away and completes nothing' do
+    donation = AccountContribution.create!(amount: 5, currency: 'GBP', session_id: 'cs_donation', payment_completed: false)
+
+    deliver_accounts_webhook(checkout_payload('cs_donation'), secret: 'whsec_wrong')
+    assert_equal 200, last_response.status
+    deliver_accounts_webhook(checkout_payload('cs_donation'), secret: ORGANISATIONS_SECRET)
+    assert_equal 200, last_response.status
+
+    refute donation.reload.payment_completed?
+    assert_equal 0, Delayed::Job.count
+  end
+
   # Accounts webhook: monthly subscriptions
 
   # Stubs Stripe::Customer.retrieve to answer with email, returning the [id, opts] it got
@@ -606,5 +632,15 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
 
     assert_nil donor.reload.stripe_subscription_id
     assert_empty emails.select(&:subject_line)
+  end
+
+  test 'a subscription webhook with a bad signature is turned away and changes nothing' do
+    donor = create_donor
+    donor.set(stripe_subscription_id: 'sub_monthly')
+
+    deliver_accounts_webhook(subscription_payload('customer.subscription.deleted', status: 'canceled'), secret: 'whsec_wrong')
+
+    assert_equal 200, last_response.status
+    assert_equal 'sub_monthly', donor.reload.stripe_subscription_id
   end
 end
