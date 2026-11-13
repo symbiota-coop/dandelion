@@ -12,8 +12,17 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   end
 
   test "a gathering's pages load for its admin" do
-    covers_route 'GET /g/:slug/payments'
+    covers_route 'GET /g/:slug'
+    covers_route 'GET /g/:slug/edit'
+    covers_route 'GET /g/:slug/members'
+    covers_route 'GET /g/:slug/applications'
+    covers_route 'GET /g/:slug/options'
+    covers_route 'GET /g/:slug/teams'
     covers_route 'GET /g/:slug/rotas'
+    covers_route 'GET /g/:slug/timetables'
+    covers_route 'GET /g/:slug/budget'
+    covers_route 'GET /g/:slug/payments'
+    covers_route 'GET /g/:slug/inventory'
     create_gathering(privacy: 'open')
     sign_in(@account)
     ['', '/edit', '/members', '/applications', '/options', '/teams', '/rotas', '/timetables', '/budget', '/payments', '/inventory'].each do |path|
