@@ -142,9 +142,9 @@ Dandelion::App.helpers do
   def verification_required!(return_to:, notice:)
     return if recently_verified?
 
-    current_account.send_sign_in_code
+    sent = current_account.send_sign_in_code
     session[:return_to] = return_to
-    flash[:notice] = "We've emailed you a sign in code to confirm it's you. #{notice}"
+    flash[:notice] = sent ? "We've emailed you a sign in code to confirm it's you. #{notice}" : RecipientLimit::SIGN_IN_CODE_WITHHELD
     redirect "/accounts/sign_in_code?account_id=#{current_account.id}"
   end
 

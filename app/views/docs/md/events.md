@@ -208,6 +208,10 @@ Dandelion can send event attendees a reminder email before the event starts. <!-
 
 Attendees can cancel free orders, and free complimentary tickets you've added from the Tickets page, themselves: from the event page, and via the **Cancel your RSVP** link in their ticket and reminder emails. <!-- claim: attendees-cancel-free-rsvps --> They're emailed to confirm the cancellation, and anyone on the waitlist is told a place is available. <!-- claim: cancellation-emails-and-waitlist --> Paid orders and tickets can't be cancelled by attendees; see [Refunds](#refunds). <!-- claim: paid-orders-not-cancellable -->
 
+## Booking limits
+
+So no one can flood someone's inbox with tickets, each email address can be booked for up to 10 times an hour by anyone not signed in as it, across all events. <!-- claim: guest-bookings-limited-per-email --> Someone signed in to their own account, with its email confirmed, isn't limited. <!-- claim: own-bookings-not-limited --> If you're booking tickets for lots of people on one address, sign in as that account, or add them as complimentary tickets from the Tickets page.
+
 ## Feedback
 
 Attendees receive an email with a request for feedback after the event ends. <!-- claim: feedback-request-after-event --> Set **Hours after the event to send the feedback request email** in the event's Emails tab (maximum: 720 hours, or 30 days). <!-- claim: feedback-request-max-30-days --> Leave blank to send when the event ends. <!-- claim: feedback-request-blank-at-end -->

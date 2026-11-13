@@ -100,7 +100,7 @@ Dandelion::App.controller do
   post '/accounts/sign_in_code' do
     @body_class = 'lavender-wash'
     if params[:email] && (@account = Account.find_by(email: params[:email].downcase.strip))
-      @account.send_sign_in_code
+      flash.now[:notice] = RecipientLimit::SIGN_IN_CODE_WITHHELD unless @account.send_sign_in_code
       @show_email = true
       erb :'accounts/requested_sign_in_code'
     elsif params[:code]

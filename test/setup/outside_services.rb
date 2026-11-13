@@ -1,4 +1,4 @@
-# What tests don't reach outside: Mailgun, DNS for email domains, geocoding and exchange rates
+# What tests don't reach outside: Mailgun, Redis, DNS for email domains, geocoding and exchange rates
 
 # No test reaches Mailgun: Mailer sends through an organisation's own account whenever it has an API key, even here, so
 # an email a test doesn't record (recorded_email, recorded_emails) would otherwise really be sent
@@ -8,6 +8,10 @@ module RefuseMailgunInTests
   end
 end
 Mailgun::Client.prepend(RefuseMailgunInTests)
+
+# Rack::Attack's counts (RecipientLimit, the blocklists) are kept in memory rather than Redis, which tests don't have:
+# without it the store counts nothing. reset! clears them between tests
+Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
 
 # Tests don't look email domains up in DNS: it's slow, and a domain that stops resolving fails tests that aren't about it
 EmailAddress::Config.configure(host_validation: :syntax)

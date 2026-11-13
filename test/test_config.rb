@@ -68,6 +68,7 @@ module ActiveSupport
 
     def reset!
       Capybara.reset_sessions!
+      Rack::Attack.cache.store.clear
       AppModels.all.each do |model|
         next unless model.respond_to?(:delete_all)
 

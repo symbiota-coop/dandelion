@@ -135,6 +135,17 @@ class OrderBuilder
   # The tickets came to a different price from the quote's: a bug, so reported, and nothing is charged
   class QuoteMismatch < StandardError; end
 
+  # Bookings for someone, made by anyone who isn't signed in as them with their email confirmed, are limited per email
+  # (RecipientLimit), as each can email them tickets. Signing up signs in before the email is confirmed, so being signed
+  # in alone doesn't show the address is theirs
+  class TooManyBookings < Error
+    MESSAGE = "There have been several bookings for this email address in the last hour. Please sign in to book, or try again later.".freeze
+
+    def status
+      429
+    end
+  end
+
   class Duplicate < Error
     def status
       409
@@ -212,6 +223,8 @@ class OrderBuilder
     check_email unless @confirmed_email
     find_or_create_account
     check_duplicate unless @confirmed_duplicate
+    # After check_duplicate, so its warning and the booking confirmed after it count once
+    raise TooManyBookings unless (signed_in_as_buyer? && @account.email_confirmed?) || RecipientLimit.allow?(:guest_booking, @account.email)
     # Checking what's left and taking it aren't one step, so bookings at once take turns from the quote to the order's
     # discounts: otherwise two could each see the last place, the code's last use or the whole of the buyer's credit,
     # and each take it. The payment provider is called after, once the order and its tickets hold what they took

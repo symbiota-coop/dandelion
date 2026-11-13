@@ -539,4 +539,63 @@ class EventBookingsTest < ActiveSupport::TestCase
     click_button 'RSVP'
     assert page.has_content? 'Thanks for booking'
   end
+
+  test 'anyone not signed in as an email can book for it only so many times an hour' do
+    covers 'events/guest-bookings-limited-per-email@3b708e'
+    create_event(prices: [0])
+    buyer = FactoryBot.create(:account)
+    limit = RecipientLimit::LIMITS[:guest_booking][:limit]
+
+    limit.times do
+      post_purchase(@event, buyer, confirmed_duplicate: true)
+      assert_equal 200, last_response.status
+    end
+    post_purchase(@event, buyer, confirmed_duplicate: true)
+    assert_equal 429, last_response.status
+    assert_equal OrderBuilder::TooManyBookings::MESSAGE, JSON.parse(last_response.body)['error']
+    assert_equal limit, @event.orders.count
+  end
+
+  test 'a duplicate booking confirmed after its warning counts once towards the limit' do
+    create_event(prices: [0])
+    buyer = FactoryBot.create(:account)
+    post_purchase(@event, buyer)
+    assert_equal 200, last_response.status
+
+    (RecipientLimit::LIMITS[:guest_booking][:limit] - 1).times do
+      post_purchase(@event, buyer)
+      assert_equal 409, last_response.status
+      post_purchase(@event, buyer, confirmed_duplicate: true)
+      assert_equal 200, last_response.status
+    end
+    assert_equal RecipientLimit::LIMITS[:guest_booking][:limit], @event.orders.count
+  end
+
+  test 'someone signed in as the buyer can book beyond the limit' do
+    covers 'events/own-bookings-not-limited@cdc1bb'
+    create_event(prices: [0])
+    buyer = FactoryBot.create(:account)
+    sign_in_with_rack(buyer)
+
+    (RecipientLimit::LIMITS[:guest_booking][:limit] + 1).times do
+      post_purchase(@event, buyer, confirmed_duplicate: true)
+      assert_equal 200, last_response.status
+    end
+  end
+
+  test 'someone signed in as the buyer before confirming its email is limited' do
+    covers 'events/own-bookings-not-limited@cdc1bb'
+    create_event(prices: [0])
+    buyer = FactoryBot.create(:account)
+    sign_in_with_rack(buyer)
+    # As after signing up with an address, which signs in before the email is confirmed
+    buyer.set(email_confirmed: false)
+
+    RecipientLimit::LIMITS[:guest_booking][:limit].times do
+      post_purchase(@event, buyer, confirmed_duplicate: true)
+      assert_equal 200, last_response.status
+    end
+    post_purchase(@event, buyer, confirmed_duplicate: true)
+    assert_equal 429, last_response.status
+  end
 end

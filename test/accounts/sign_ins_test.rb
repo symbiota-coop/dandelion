@@ -119,6 +119,32 @@ class AccountSignInsTest < ActiveSupport::TestCase
     assert page.has_content?('Signed in with a sign in code')
   end
 
+  test 'only so many sign in codes are emailed to an address an hour' do
+    account = FactoryBot.create(:account)
+    limit = RecipientLimit::LIMITS[:sign_in_code][:limit]
+
+    emails = recorded_emails { limit.times { assert account.send_sign_in_code } }
+    assert_equal limit, emails.count
+    emails = recorded_emails { refute account.send_sign_in_code }
+    assert_empty emails
+  end
+
+  test 'asking for a sign in code past the limit says none was sent, and the last code still signs in' do
+    account = FactoryBot.create(:account)
+    RecipientLimit::LIMITS[:sign_in_code][:limit].times { account.send_sign_in_code }
+    code = account.issue_sign_in_code!
+
+    visit '/accounts/sign_in'
+    click_link 'Get a sign in code to your email'
+    fill_in 'sign-in-code-email', with: account.email
+    click_button 'Get code'
+    assert page.has_content?(RecipientLimit::SIGN_IN_CODE_WITHHELD)
+
+    fill_in 'code', with: code
+    click_button 'Submit'
+    assert page.has_content?('Signed in with a sign in code')
+  end
+
   test 'asking for a sign in code gives a new one once the last has little time left or was used' do
     account = FactoryBot.create(:account)
     code = account.issue_sign_in_code!

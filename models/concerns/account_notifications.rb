@@ -33,7 +33,11 @@ module AccountNotifications
     account.set(sent_first_event_email: Time.now)
   end
 
+  # Returns false, sending nothing, when this address has had RecipientLimit's number of codes this hour: the code in
+  # the latest still works (SIGN_IN_CODE_LIFETIME)
   def send_sign_in_code
+    return false unless RecipientLimit.allow?(:sign_in_code, email)
+
     account = self
     Mailer.deliver(
       :sign_in_code,
@@ -41,6 +45,7 @@ module AccountNotifications
       subject: 'Sign in code for Dandelion',
       microsoft_workaround: true
     )
+    true
   end
 
   def send_confirmation_email
