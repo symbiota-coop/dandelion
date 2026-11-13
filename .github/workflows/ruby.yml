@@ -27,9 +27,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Each job has a time limit, so a step that hangs (a checkout that never finishes, say) fails in minutes rather than at
+# GitHub's six hours
 jobs:
   lint:
     runs-on: ubuntu-26.04
+    timeout-minutes: 15
     steps:
     - name: Git checkout
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -103,6 +106,8 @@ jobs:
   test:
     name: test (${{ matrix.group }})
     runs-on: ubuntu-26.04
+    # Two attempts at the tests' 10 minutes, and setting up
+    timeout-minutes: 25
     services:
       mongodb:
         image: mirror.gcr.io/library/mongo:8.2
@@ -209,6 +214,7 @@ jobs:
     needs: test
     if: ${{ !cancelled() && inputs.coverage }}
     runs-on: ubuntu-26.04
+    timeout-minutes: 15
     steps:
     - name: Git checkout
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
