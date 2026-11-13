@@ -666,7 +666,7 @@ class GatheringsTest < ActiveSupport::TestCase
     create_gathering
     member = FactoryBot.create(:account, name: 'Member Person')
     @gathering.memberships.create!(account: member, added_by: @account)
-    event = FactoryBot.create(:event, gathering: @gathering, last_saved_by: @account, name: 'Opening night')
+    event = FactoryBot.create(:event, organisation: create_organisation, gathering: @gathering, last_saved_by: @account, name: 'Opening night')
     Ticket.create!(event: event, account: member, ticket_type: FactoryBot.create(:ticket_type, event: event, name: 'Early bird'), payment_completed: true)
     rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
     Shift.create!(account: member, role: Role.create!(name: 'Cook', rota: rota), rslot: Rslot.create!(name: 'Morning', rota: rota), rota: rota)
