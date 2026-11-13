@@ -20,6 +20,9 @@ class Gmail
   FROM = 'Stephen Reid <stephen@symbiota.coop>'.freeze
   MAX_TEXT = 20_000 # characters of each message get_thread returns
   QUOTE_STYLE = 'margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex'.freeze
+  # The tags the agent's HTML can keep, without attributes but for a link's http(s) or mailto href: an <img>, a
+  # stylesheet or a font would load when the draft's opened, sending whatever an email got the agent to put in its URL
+  DRAFT_TAGS = %w[a b br em i li ol p strong u ul].freeze
 
   def initialize(client_id:, client_secret:, refresh_token:)
     @client_id = client_id
@@ -87,7 +90,7 @@ class Gmail
       'Content-Type: text/html; charset=UTF-8',
       'Content-Transfer-Encoding: quoted-printable',
       '',
-      quoted_printable("#{html}<br><br>#{quote(inbound)}")
+      quoted_printable("#{sanitize(html)}<br><br>#{quote(inbound)}")
     ].join("\r\n")
 
     draft = request(:post, 'drafts', body: { message: { raw: base64url(mime), threadId: thread_id } })
@@ -127,6 +130,25 @@ class Gmail
     token = JSON.parse(res.body)
     @expires_at = Time.now + token['expires_in'].to_i - 60
     @access_token = token['access_token']
+  end
+
+  # Keeps DRAFT_TAGS and escapes everything else, so a tag it doesn't know comes out as text
+  def sanitize(html)
+    html = html.to_s.gsub(%r{<(script|style)\b.*?</\1\s*>}mi, '').gsub(/<!--.*?-->/m, '')
+    html.split(%r{(</?[a-z][a-z0-9]*\b[^<>]*>)}i).map do |piece|
+      closing, name, attributes = piece.match(%r{\A<(/?)([a-z][a-z0-9]*)\b([^<>]*)>\z}i)&.captures
+      name = name&.downcase
+      if !DRAFT_TAGS.include?(name) then name ? '' : CGI.escapeHTML(CGI.unescapeHTML(piece))
+      elsif !closing.empty? then "</#{name}>"
+      elsif name == 'a' then link(attributes)
+      else "<#{name}>"
+      end
+    end.join
+  end
+
+  def link(attributes)
+    href = CGI.unescapeHTML(attributes.match(/\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))/i)&.captures&.compact&.first.to_s).strip
+    href.match?(%r{\A(https?://|mailto:)[^\s<>"]+\z}i) ? %(<a href="#{CGI.escapeHTML(href)}">) : '<a>'
   end
 
   def header(message, name)
@@ -236,7 +258,8 @@ module GmailMCP
         type: 'object',
         properties: {
           thread_id: { type: 'string' },
-          html: { type: 'string', description: 'The reply alone, as HTML: <br><br> between paragraphs and <a href> for links' }
+          html: { type: 'string', description: 'The reply alone, as HTML: <br><br> between paragraphs and <a href> for ' \
+                                               'links. Only <a href>, <b>, <br>, <em>, <i>, <p>, <strong>, <u> and lists are kept' }
         },
         required: %w[thread_id html]
       }
