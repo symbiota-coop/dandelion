@@ -41,7 +41,11 @@ Dandelion::App.controller do
     membership_required!
     @payment = @gathering.payments.find(params[:payment_id]) || not_found
     own_or_gathering_admins_only!(@payment)
-    @gathering.check_evm_account if @payment.evm_secret && @gathering.evm_address
+    if @payment.evm_secret && @gathering.evm_address
+      @gathering.check_evm_account
+      # It completes a copy of its own
+      @payment.reload
+    end
     { id: @payment.id.to_s, payment_completed: @payment.payment_completed || false }.to_json
   end
 end

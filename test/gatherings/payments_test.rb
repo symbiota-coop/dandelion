@@ -321,7 +321,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     # As Blockscout gives it: a float, from the transfer's value and decimals
     transfer = ['BREAD', (payment.evm_amount * (10**18)).to_i.to_f / (10**18)]
     evm_transfers([transfer]) { get path }
-    assert payment.reload.payment_completed?
+    assert_equal true, JSON.parse(last_response.body)['payment_completed']
     assert_equal 20, membership_of(member).paid
 
     # The transfer is still in the list next time
