@@ -514,21 +514,16 @@ class LintTest < Minitest::Test
     assert RouteMarks.routes.key?('POST /e/:slug/orders/:order_id/restore_and_complete')
   end
 
-  # AGENTS.md, Tests: a test covering a route says so (covers_route), so a new route needs a test, or a reason in
-  # test/routes_without_tests.yml
+  # AGENTS.md, Tests: a test covering a route says so (covers_route), so a new route needs a test
   def test_every_route_is_covered
     routes = RouteMarks.routes
     marks = RouteMarks.marks
-    without = YAML.load_file(File.join(ROOT, 'test/routes_without_tests.yml'))
     problems = marks.reject { |route, _| routes.key?(route) }.map do |route, at|
       "#{at}: covers_route '#{route}' names no route: write it as 'VERB /path', the path as the controller writes it"
     end
-    problems += (without.keys - routes.keys).map { |route| "test/routes_without_tests.yml: #{route} is no longer a route" }
-    problems += (without.keys & marks.map(&:first)).map { |route| "test/routes_without_tests.yml: a test covers #{route}, so take it out" }
-    problems += without.select { |_, why| why.to_s.strip.empty? }.keys.map { |route| "test/routes_without_tests.yml: say why #{route} has no test" }
     assert_empty problems, problems.join("\n")
-    uncovered = (routes.keys - marks.map(&:first) - without.keys).map { |route| "#{routes[route]}: #{route}" }
-    assert_empty uncovered, "No test covers these routes: write one starting covers_route 'VERB /path', or say why in test/routes_without_tests.yml\n#{uncovered.join("\n")}"
+    uncovered = (routes.keys - marks.map(&:first)).map { |route| "#{routes[route]}: #{route}" }
+    assert_empty uncovered, "No test covers these routes: write one starting covers_route 'VERB /path'\n#{uncovered.join("\n")}"
   end
 
   # AGENTS.md, Tests: a helper is defined once, in its test file or in a module in test/helpers that the files sharing

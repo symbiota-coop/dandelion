@@ -1,6 +1,6 @@
 # The app's routes, read from app/app.rb and app/controllers without booting the app, and the routes tests say they
-# cover with covers_route 'VERB /path' (AGENTS.md, Tests). test/lint_test.rb fails on a route no test covers, unless
-# test/routes_without_tests.yml says why, and on a covers_route naming no route
+# cover with covers_route 'VERB /path' (AGENTS.md, Tests). test/lint_test.rb fails on a route no test covers, and on a
+# covers_route naming no route
 module RouteMarks
   ROOT = File.expand_path('..', __dir__)
   # get '/path' or, in a named controller, get :name, map: '/path'
