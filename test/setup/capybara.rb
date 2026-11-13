@@ -24,3 +24,40 @@ Capybara.register_driver :cuprite do |app|
 end
 Capybara.javascript_driver = :cuprite
 Capybara.default_driver = :cuprite
+
+# In CI, how long each part of the first browser test's start-up takes: Puma booting, Chrome starting and the first
+# visit. Together they take 2s to over 40s there, landing on whichever browser test runs first, but 5s locally
+if ENV['CI']
+  module BrowserStartTiming
+    def self.time(what)
+      started = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
+      yield
+    ensure
+      puts "⏱ #{what}: #{(::Process.clock_gettime(::Process::CLOCK_MONOTONIC) - started).round(1)}s"
+    end
+
+    module Server
+      def boot
+        BrowserStartTiming.time('Puma booting') { super }
+      end
+    end
+
+    module ChromeProcess
+      def start
+        BrowserStartTiming.time('Chrome starting') { super }
+      end
+    end
+
+    module Session
+      def visit(url)
+        return super if @first_visit_timed
+
+        @first_visit_timed = true
+        BrowserStartTiming.time("First visit (#{url})") { super }
+      end
+    end
+  end
+  Capybara::Server.prepend(BrowserStartTiming::Server)
+  Ferrum::Browser::Process.prepend(BrowserStartTiming::ChromeProcess)
+  Capybara::Session.prepend(BrowserStartTiming::Session)
+end
