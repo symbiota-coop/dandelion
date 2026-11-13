@@ -167,14 +167,14 @@ Dandelion::App.controller do
   get '/o/:slug/organisation_tiers/:organisation_tier_id/edit' do
     @organisation = organisation_from_params
     organisation_admins_only!
-    @organisation_tier = @organisation.organisation_tiers.find(params[:organisation_tier_id])
+    @organisation_tier = @organisation.organisation_tiers.find(params[:organisation_tier_id]) || not_found
     erb :'organisation_tiers/build'
   end
 
   post '/o/:slug/organisation_tiers/:organisation_tier_id/edit' do
     @organisation = organisation_from_params
     organisation_admins_only!
-    @organisation_tier = @organisation.organisation_tiers.find(params[:organisation_tier_id])
+    @organisation_tier = @organisation.organisation_tiers.find(params[:organisation_tier_id]) || not_found
     if @organisation_tier.update_attributes(mass_assigning(params[:organisation_tier], OrganisationTier))
       redirect "/o/#{@organisation.slug}/tiers"
     else
@@ -186,7 +186,7 @@ Dandelion::App.controller do
   post '/o/:slug/organisation_tiers/:organisation_tier_id/destroy' do
     @organisation = organisation_from_params
     organisation_admins_only!
-    @organisation_tier = @organisation.organisation_tiers.find(params[:organisation_tier_id])
+    @organisation_tier = @organisation.organisation_tiers.find(params[:organisation_tier_id]) || not_found
     @organisation_tier.destroy
     redirect "/o/#{@organisation.slug}/tiers"
   end

@@ -240,12 +240,21 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
     assert_nil @organisation.feedback_summary_requested_at
   end
 
-  test "another organisation's admin can't reach this organisation's followers under their own organisation's URL" do
+  test "another organisation's admin can't reach this organisation's tiers or followers under their own organisation's URL" do
     create_organisation
+    organisation_tier = @organisation.organisation_tiers.create!(name: 'Gold', threshold: 50, discount: 10)
     organisationship = @organisation.organisationships.find_by(account: add_member(@organisation))
     other_organisation = FactoryBot.create(:organisation)
     other_path = "/o/#{other_organisation.slug}"
     sign_in_with_rack(other_organisation.account)
+
+    get "#{other_path}/organisation_tiers/#{organisation_tier.id}/edit"
+    assert_equal 404, last_response.status
+    post "#{other_path}/organisation_tiers/#{organisation_tier.id}/edit", organisation_tier: { name: 'Forged' }
+    assert_equal 404, last_response.status
+    post "#{other_path}/organisation_tiers/#{organisation_tier.id}/destroy"
+    assert_equal 404, last_response.status
+    assert_equal 'Gold', organisation_tier.reload.name
 
     get "#{other_path}/subscribed/#{organisationship.id}"
     assert_equal 404, last_response.status
