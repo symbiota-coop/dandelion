@@ -249,7 +249,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
 
   # Checking on a payment
 
-  test 'the payer and the gathering\'s admins see whether a payment is complete' do
+  test 'the payer and the gathering\'s admins see whether a payment is complete, and no other member' do
     create_paying_gathering
     member = create_member
     payment = create_unpaid_payment(membership_of(member))
@@ -265,6 +265,10 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     get path
     assert_equal 200, last_response.status
     assert_equal({ 'id' => payment.id.to_s, 'payment_completed' => true }, JSON.parse(last_response.body))
+
+    sign_in_with_rack(create_member(name: 'Another Member'))
+    get path
+    assert_equal 403, last_response.status
 
     sign_in_with_rack(FactoryBot.create(:account))
     header 'X-Requested-With', 'XMLHttpRequest'
