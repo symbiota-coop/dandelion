@@ -1,9 +1,9 @@
 module OrganisationFields
   extend ActiveSupport::Concern
 
-  included do
-    include EmailFields
+  include EmailFields
 
+  included do
     field :name, type: String
     field :slug, type: String
     field :website, type: String

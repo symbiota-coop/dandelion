@@ -91,6 +91,10 @@ class LintTest < Minitest::Test
       'Dandelion/TestInstanceVariable' => {
         "test 'x' do\n  @a ||= 1\nend" => 1, "it 'x' do\n  @a = 1\nend" => 0, "def setup_a\n  @a = 1\nend\ntest 'x' do\n  @a = 2\nend" => 0
       },
+      'Dandelion/ConcernInclude' => {
+        "included do\n  include Searchable, Taggable\nend" => 2, "included do\n  include ::Searchable\nend" => 0, 'include Searchable' => 0,
+        "included do\n  include Mongoid::Document\nend" => 0, "class_methods do\n  include Searchable\nend" => 0, "x.included do\n  include Searchable\nend" => 0
+      },
       'Dandelion/MongoidIndex' => { 'index slug: 1' => 1, 'index' => 0, 'events.index(1)' => 0 },
       'Dandelion/MailgunDirect' => {
         'Mailgun::Client.new(key, region)' => 1, '::Mailgun::BatchMessage.new(client, host)' => 1, 'Mailgun::Tags.new(client)' => 0,

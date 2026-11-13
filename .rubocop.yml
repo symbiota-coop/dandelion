@@ -124,6 +124,9 @@ Dandelion/CapybaraHasNoAfterClick:
 Dandelion/MongoidIndex:
   Include:
     - models/**/*.rb
+Dandelion/ConcernInclude:
+  Include:
+    - models/concerns/**/*.rb
 Dandelion/TestInstanceVariable:
   Include:
     - test/**/*_test.rb

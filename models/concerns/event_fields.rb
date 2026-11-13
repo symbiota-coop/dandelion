@@ -1,9 +1,9 @@
 module EventFields
   extend ActiveSupport::Concern
 
-  included do
-    include EmailFields
+  include EmailFields
 
+  included do
     attr_accessor :prevent_notifications, :duplicate, :update_activity_events, :prevent_order_refunds
     # Set by code that already knows the event's coordinates (iCal GEO), so a new location doesn't look them up again
     attr_accessor :coordinates_known

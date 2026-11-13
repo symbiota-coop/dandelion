@@ -4,12 +4,13 @@
 module Subgroup
   extend ActiveSupport::Concern
 
-  included do
-    include SlugLookup
-    include ImportFromCsv
-    include SendFollowersCsv
-    include Searchable
+  # Included in the model before this one, so these class methods (search_fields...) override theirs (Dandelion/ConcernInclude)
+  include SlugLookup
+  include ImportFromCsv
+  include SendFollowersCsv
+  include Searchable
 
+  included do
     validates_presence_of :name, :slug
     validates_uniqueness_of :slug, scope: :organisation_id
     validates_format_of :slug, with: /\A[a-z0-9-]+\z/
