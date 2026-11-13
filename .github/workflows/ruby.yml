@@ -109,6 +109,9 @@ jobs:
     runs-on: ubuntu-26.04
     # Two attempts at the tests' 10 minutes, and setting up
     timeout-minutes: 25
+    env:
+      MONGODB_VERSION: 8.2.12
+      MONGODB_SHA256: 7489c024860eb33ee50190fba3ba75efca4a50d94265c4882de6c2d1751a9b88
     strategy:
       fail-fast: false
       # Each job runs a group of test files (test/**/*_test.rb, named by their path in test/, but lint_test.rb, which the
@@ -149,11 +152,31 @@ jobs:
           - group: tours
             files: tours/tour tours/how_to_create_an_event tours/how_to_create_a_gathering gatherings/timetables gatherings/rotas gatherings/budget organisations/activity_admin organisations/local_group_routes
     steps:
-    # Mongo starts in the background rather than as a service container, which the runner starts before the first step:
-    # pulling its image and creating the container take about 17s, now spent while the code checks out and Ruby
-    # installs. Wait for MongoDB, before the tests, waits for it to answer
+    # mongod from MongoDB's own build, cached: a service container took about 17s to pull and create before the first step,
+    # and docker run in the background still kept the tests waiting up to 22s. Restoring it takes a second or two, and
+    # --fork returns once it accepts connections. Bump MONGODB_VERSION and MONGODB_SHA256 together, from
+    # https://downloads.mongodb.org/full.json (the targeted ubuntu2404 x86_64 archive)
+    - name: Cache MongoDB
+      id: mongodb-cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/mongodb
+        key: mongodb-${{ env.MONGODB_VERSION }}-ubuntu2404-x86_64
+
     - name: Start MongoDB
-      run: (docker run --detach --name mongodb --publish 27017:27017 mirror.gcr.io/library/mongo:8.2 > "$RUNNER_TEMP/mongodb.log" 2>&1 &)
+      env:
+        CACHE_HIT: ${{ steps.mongodb-cache.outputs.cache-hit }}
+      run: |
+        if [ "$CACHE_HIT" != true ]; then
+          archive="mongodb-linux-x86_64-ubuntu2404-$MONGODB_VERSION"
+          curl --fail --silent --show-error --location "https://fastdl.mongodb.org/linux/$archive.tgz" --output "$RUNNER_TEMP/mongodb.tgz"
+          echo "$MONGODB_SHA256  $RUNNER_TEMP/mongodb.tgz" | sha256sum --check --quiet
+          mkdir -p ~/mongodb
+          tar --extract --gzip --file "$RUNNER_TEMP/mongodb.tgz" --directory ~/mongodb --strip-components 2 "$archive/bin/mongod"
+        fi
+        mkdir -p "$RUNNER_TEMP/mongodb-data"
+        ~/mongodb/mongod --dbpath "$RUNNER_TEMP/mongodb-data" --bind_ip 127.0.0.1 --port 27017 --fork --logpath "$RUNNER_TEMP/mongod.log" ||
+          { tail -n 30 "$RUNNER_TEMP/mongod.log"; exit 1; }
 
     - name: Git checkout
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -194,17 +217,6 @@ jobs:
     - name: Install ImageMagick
       if: contains(format(' {0} ', matrix.files), ' images ')
       run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends imagemagick
-
-    - name: Wait for MongoDB
-      run: |
-        for _ in $(seq 90); do
-          docker exec mongodb mongosh --quiet --eval "db.runCommand({ ping: 1 })" > /dev/null 2>&1 && exit 0
-          sleep 1
-        done
-        cat "$RUNNER_TEMP/mongodb.log"
-        docker logs mongodb 2>&1 | tail -n 20
-        echo "::error title=Wait for MongoDB::MongoDB did not answer within 90 seconds"
-        exit 1
 
     # A failing test is retried on its own (TEST_ATTEMPTS in test/test_config.rb), so the group runs again only when it
     # hangs past the timeout, which those retries can't catch
