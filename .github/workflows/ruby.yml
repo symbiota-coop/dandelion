@@ -171,6 +171,15 @@ jobs:
           echo "$key=$value" >> "$GITHUB_ENV"
         done
 
+    # The CDN and font files browser tests are answered with (test/setup/cdn_cache.rb), so a group downloads none. Their
+    # URLs name versions, so a cached file never goes stale; a new one is downloaded once and saved with the next key
+    - name: Cache CDN files
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: tmp/cdn_cache
+        key: cdn-cache-${{ hashFiles('frontend/integrity.json', 'app/views/layouts/_head.erb') }}
+        restore-keys: cdn-cache-
+
     # Production's Dragonfly runs ImageMagick, and images_test.rb checks our policy against it; the runner has none
     - name: Install ImageMagick
       if: contains(format(' {0} ', matrix.files), ' images ')

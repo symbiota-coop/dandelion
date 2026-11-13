@@ -14,7 +14,7 @@ require 'minitest/rg'
 require 'rack/test'
 require_relative 'helpers/test_helpers'
 
-%w[outside_services fake_imagemagick capybara cleanup route_recording].each { |file| require_relative "setup/#{file}" }
+%w[outside_services fake_imagemagick capybara cdn_cache cleanup route_recording].each { |file| require_relative "setup/#{file}" }
 
 module ActiveSupport
   class TestCase
