@@ -14,7 +14,10 @@ Dandelion::App.helpers do
     "&timezone=#{tz}" if tz
   end
 
+  # A date from params, or nil if it isn't one: ?from[x]=... gives a hash, which Date.parse raises a TypeError on
   def parse_date(date)
+    return unless date.is_a?(String)
+
     Date.parse(date)
   rescue Date::Error
     nil
