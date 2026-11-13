@@ -57,7 +57,7 @@ class Account
   end
 
   def feedback_summary_prompt
-    "Provide a one-paragraph summary of the feedback on this facilitator, #{name}. Focus on their strengths and what they do well. The feedback:\n\n#{feedback_summaries_source.joined}"
+    "Provide a one-paragraph summary of the feedback on this facilitator, #{name}. Focus on their strengths and what they do well. #{FeedbackSummaries::SUMMARY_INSTRUCTIONS} The feedback:\n\n#{feedback_summaries_source.joined}"
   end
 
   def self.sensitive?(privacyable)

@@ -4,8 +4,14 @@
 Further instructions (don't mention in your response):
 - Present as a numbered list
 - Address your answer in the second person ('you')
+- Only suggest what the feedback itself points to: criticisms, suggestions, or things attendees wished were different. Don't invent any
+- If the feedback points to nothing to improve, reply with just NONE
 
 The feedback:\n\n#{feedback}}
-  content = OpenRouter.chat(prompt).split('1.').last
+  content = OpenRouter.chat(prompt).strip # nil (no answer) raises, as before, so nothing is cached
 %>
-<%== md(%(#{intro}:\n\n1. #{content})) %>
+<% if content.start_with?('NONE') || !content.include?('1.') %>
+  <p>The feedback doesn't point to anything to improve.</p>
+<% else %>
+  <%== md(%(#{intro}:\n\n1. #{content.split('1.', 2).last.strip})) %>
+<% end %>

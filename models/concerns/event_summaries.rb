@@ -3,6 +3,9 @@ module EventSummaries
   extend ActiveSupport::Concern
 
   GENERAL_INSTRUCTIONS = 'Do not mention specific dates or times. Return well-formatted markdown. Do not use italics. Do not use headers. Link all event names using proper markdown syntax like [Event Name](URL).'.freeze
+  # Added to every summary's prompt, whatever its instructions: the answer is published as it is, so it mustn't talk
+  # to whoever asked (e.g. Haiku opening with "Only one event was included in your list...")
+  TEXT_ONLY_INSTRUCTIONS = 'Write only the text to be published, for its readers: nothing addressed to me, and no comments on the events you were given, such as how many there are.'.freeze
 
   class_methods do
     # Markdown summarising the events (or their feedback), or nil if the model didn't answer
@@ -22,7 +25,7 @@ module EventSummaries
         output << "\n\n"
       end
 
-      prompt = %(#{prompt_prefix}\n\n#{general_instructions}\n\n#{output})
+      prompt = %(#{prompt_prefix}\n\n#{general_instructions}\n#{TEXT_ONLY_INSTRUCTIONS}\n\n#{output})
 
       result = OpenRouter.chat(prompt)
       return if result.nil?

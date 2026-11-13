@@ -66,7 +66,7 @@ class Activity
   end
 
   def feedback_summary_prompt
-    "Provide a one-paragraph summary of the feedback on this activity (family of events), #{name}, hosted by #{organisation.name}. Focus on the positives. The feedback:\n\n#{feedback_summaries_source.joined}"
+    "Provide a one-paragraph summary of the feedback on this activity (family of events), #{name}, hosted by #{organisation.name}. Focus on the positives. #{FeedbackSummaries::SUMMARY_INSTRUCTIONS} The feedback:\n\n#{feedback_summaries_source.joined}"
   end
 
   def self.new_hints

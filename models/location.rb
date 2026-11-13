@@ -105,7 +105,7 @@ class Location
 
     summary = Event.summarise(
       "Create a summary of these events, happening in #{online? ? 'online' : query}, in one paragraph of three sentences.
-      Don't mention specific events, just give a general sense of the vibe.",
+      Don't name or describe any one event, even if there's only one: just give a general sense of the vibe.",
       events.sample(20),
       general_instructions: 'Return well-formatted markdown. Do not use italics. Do not use headers.'
     )

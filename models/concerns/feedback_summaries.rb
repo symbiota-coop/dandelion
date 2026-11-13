@@ -2,6 +2,8 @@ module FeedbackSummaries
   extend ActiveSupport::Concern
 
   MAX_ATTEMPTS = 10
+  # Added to each model's feedback_summary_prompt: the summary is shown as it is on their page
+  SUMMARY_INSTRUCTIONS = "Say only what the feedback says, leaving out criticisms and suggestions. Where it doesn't mention them by name, describe what attendees valued about the events rather than crediting them with it. Write only the paragraph itself, for people reading their page on Dandelion, with no notes or questions addressed to me.".freeze
   MIN_FEEDBACKS = 10
 
   class_methods do

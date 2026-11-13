@@ -532,4 +532,30 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     refute_includes html, 'href="javascript:'
     refute_includes html, '<img'
   end
+
+  def create_five_answered_feedbacks
+    create_attended_event
+    5.times { @event.event_feedbacks.create!(account: FactoryBot.create(:account), rating: 5, answers: [['How was it?', 'Lovely']]) }
+  end
+
+  test "an event's improvement report lists what the feedback points to" do
+    create_five_answered_feedbacks
+    sign_in(@account)
+    OpenRouter.stub :chat, "1. You could start on time.\n\n2. You could open the windows." do
+      visit "/e/#{@event.slug}/feedback"
+      assert page.has_content?('here are up to 5 possible areas for improvement')
+      assert page.has_css?('li', text: 'You could start on time.')
+      assert page.has_css?('li', text: 'You could open the windows.')
+    end
+  end
+
+  test "an event's improvement report says so when the feedback points to nothing to improve" do
+    create_five_answered_feedbacks
+    sign_in(@account)
+    OpenRouter.stub :chat, 'NONE' do
+      visit "/e/#{@event.slug}/feedback"
+      assert page.has_content?("The feedback doesn't point to anything to improve.")
+      assert page.has_no_content?('possible areas for improvement')
+    end
+  end
 end

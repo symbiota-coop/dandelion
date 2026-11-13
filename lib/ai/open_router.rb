@@ -1,7 +1,9 @@
 class OpenRouter
   BASE_URL = 'https://openrouter.ai'.freeze
+  # Haiku 5.5 at low effort: against gemini-3.8-flash on recent prod prompts (Nov 2026) it was about a quarter of the
+  # cost and twice as fast, and made less up in feedback summaries and reports
   CHAT_DEFAULTS = {
-    model: 'google/gemini-3.8-flash',
+    model: 'anthropic/claude-haiku-5.5',
     context_window_size: 1_000_000,
     reasoning_effort: 'low'
   }.freeze
