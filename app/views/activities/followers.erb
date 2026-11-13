@@ -1,3 +1,3 @@
 <%= partial :'activities/nav', locals: { activity: @activity } %>
 
-<%= partial :'activities_and_local_groups/followers', locals: { resource: @activity, resourceships: @activityships, resourceship_name: 'activityship', resource_path: @activity.path } %>
+<%= partial :'activities_and_local_groups/followers', locals: { resource: @activity, resourceships: @subgroupships, resourceship_name: 'activityship', resource_path: @activity.path } %>

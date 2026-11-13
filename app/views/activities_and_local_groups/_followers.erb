@@ -52,7 +52,7 @@
     </td>
     <td>
       <div data-pagelet-url="<%= resource_path %>/subscribed/<%= resourceship.id %>">
-        <%= partial :"#{resource.class.name.pluralize.underscore}/subscribed", locals: { "#{resourceship_name}": resourceship } %>
+        <%= partial :'activities_and_local_groups/subscribed', locals: { resource: resource, resourceship: resourceship } %>
       </div>
     </td>
     <td>

@@ -2,12 +2,9 @@ class LocalGroup
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
-  include SlugLookup
+  include Subgroup
 
   extend Dragonfly::Model
-  include ImportFromCsv
-  include SendFollowersCsv
-  include Searchable
 
   belongs_to_without_parent_validation :organisation
   belongs_to_without_parent_validation :account
@@ -20,18 +17,7 @@ class LocalGroup
   field :type, type: String
   field :slug, type: String
 
-  def self.search_fields
-    %w[name slug]
-  end
-
-  # Its Atlas Search index maps name and slug as autocomplete too, so searches match the start of a word in them (Searchable)
-  def self.autocomplete_fields
-    %w[name slug]
-  end
-
-  validates_presence_of :name, :geometry, :slug
-  validates_uniqueness_of :slug, scope: :organisation_id
-  validates_format_of :slug, with: /\A[a-z0-9-]+\z/
+  validates_presence_of :geometry
 
   has_many :discount_codes, class_name: 'DiscountCode', as: :codeable, dependent: :destroy
 
@@ -43,10 +29,6 @@ class LocalGroup
   # Its URLs are under its organisation's, as its slug is unique only within the organisation
   def path
     "/o/#{organisation.slug}/lg/#{slug}"
-  end
-
-  def pmails_including_events
-    Pmail.and(:id.in => pmails_as_mailable.pluck(:id) + Pmail.and(:mailable_type => 'Event', :mailable_id.in => events.pluck(:id)).pluck(:id))
   end
 
   with_options class_name: 'Account', through: :local_groupships do
@@ -62,9 +44,6 @@ class LocalGroup
   after_create :add_organisation_members_within
 
   before_validation do
-    errors.add(:organisation, 'cannot be changed') if persisted? && organisation_id_changed?
-    errors.add(:account, 'cannot be changed') if persisted? && account_id_changed?
-
     g = JSON.parse(geometry)
     unless g['coordinates']
       g = g['features'].first['geometry']
@@ -102,10 +81,6 @@ class LocalGroup
     errors.add(:geometry, e)
   end
 
-  def event_tags
-    EventTag.and(:id.in => EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id))
-  end
-
   def event_feedbacks
     EventFeedback.and(:event_id.in => events.pluck(:id))
   end
@@ -128,16 +103,6 @@ class LocalGroup
     }[attr.to_sym] || super
   end
 
-  def self.admin?(local_group, account, organisation_admin: nil)
-    account && local_group &&
-      (
-        account.admin? ||
-        organisation_admin ||
-        local_group.local_groupships.find_by(account: account, admin: true) ||
-        (organisation_admin.nil? && Organisation.admin?(local_group.organisation, account))
-      )
-  end
-
   def self.new_hints
     {
       geometry: 'Accepts a GeoJSON Polygon or MultiPolygon created via https://geojson.io/ (copy and paste the contents of the box on the right)'
@@ -146,10 +111,5 @@ class LocalGroup
 
   def self.edit_hints
     {}.merge(new_hints)
-  end
-
-  def subscribed_accounts
-    # Members subscribed to local_group AND subscribed to org AND not globally unsubscribed
-    subscribed_members.and(subscribed_organisation_ids_cache: organisation_id, unsubscribed: false)
   end
 end

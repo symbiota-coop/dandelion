@@ -21,7 +21,7 @@
           <td>Admins</td>
           <td>
             <div data-pagelet-url="<%= @local_group.path %>/local_groupships/admins">
-              <%= partial :'local_groups/admins_box' %>
+              <%= partial :'activities_and_local_groups/admins_box', locals: { resource: @local_group } %>
             </div>
           </td>
         </tr>

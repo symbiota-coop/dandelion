@@ -2,14 +2,11 @@ class Activity
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
-  include SlugLookup
+  include Subgroup
 
   extend Dragonfly::Model
   include FeedbackSummaries
-  include ImportFromCsv
-  include SendFollowersCsv
   include ImageWithValidation
-  include Searchable
 
   def self.prewarmed_image_derivative_sizes
     %w[200x200 400x400 500x500#]
@@ -42,15 +39,6 @@ class Activity
 
   def self.protected_attributes
     %w[feedback_summary feedback_summary_last_refreshed_at feedback_summary_requested_at feedback_summary_failed_at has_image]
-  end
-
-  def self.search_fields
-    %w[name slug]
-  end
-
-  # Its Atlas Search index maps name and slug as autocomplete too, so searches match the start of a word in them (Searchable)
-  def self.autocomplete_fields
-    %w[name slug]
   end
 
   def self.feedback_summaries_scope
@@ -96,11 +84,6 @@ class Activity
     "/o/#{organisation.slug}/a/#{slug}"
   end
 
-  def pmails_including_events
-    Pmail.and(:id.in => pmails_as_mailable.pluck(:id) + Pmail.and(:mailable_type => 'Event', :mailable_id.in => events.pluck(:id)).pluck(:id))
-  end
-
-
   with_options class_name: 'Account' do
     has_many_through :members, through: :activityships
     has_many_through :applicants, through: :activity_applications
@@ -124,20 +107,7 @@ class Activity
     EventFeedback.unscoped.and(:event_id.in => events.publicly_visible.pluck(:id) + events_as_feedback_activity.publicly_visible.pluck(:id))
   end
 
-  def event_tags
-    EventTag.and(:id.in => EventTagship.and(:event_id.in => events.pluck(:id)).pluck(:event_tag_id))
-  end
-
-
-  validates_presence_of :name, :slug
-  validates_uniqueness_of :slug, scope: :organisation_id
-  validates_format_of :slug, with: /\A[a-z0-9-]+\z/
   validates_http_url :website
-
-  before_validation do
-    errors.add(:organisation, 'cannot be changed') if persisted? && organisation_id_changed?
-    errors.add(:account, 'cannot be changed') if persisted? && account_id_changed?
-  end
 
   def self.with_upcoming_events
     self.and(:id.in => Event.future.pluck(:activity_id).compact.uniq)
@@ -152,23 +122,8 @@ class Activity
     q.empty? ? [] : q
   end
 
-  def self.admin?(activity, account, organisation_admin: nil)
-    account && activity &&
-      (
-        account.admin? ||
-        organisation_admin ||
-        activity.activityships.find_by(account: account, admin: true) ||
-        (organisation_admin.nil? && Organisation.admin?(activity.organisation, account))
-      )
-  end
-
   def future_attendees
     Account.and(:id.in => Ticket.and(:event_id.in => events.live.publicly_visible.future.pluck(:id)).pluck(:account_id))
-  end
-
-  def subscribed_accounts
-    # Members subscribed to activity AND subscribed to org AND not globally unsubscribed
-    subscribed_members.and(subscribed_organisation_ids_cache: organisation_id, unsubscribed: false)
   end
 
   def sync_activityships

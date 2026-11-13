@@ -12,15 +12,8 @@ Dandelion::App.controller do
     organisation_id = params.dig(:activity, :organisation_id)
     @organisation = (Organisation.find(organisation_id) if organisation_id) || not_found
     organisation_admins_only!
-    @activity = @organisation.activities.new(mass_assigning(params[:activity], Activity))
-    @activity.account = current_account
-    if @activity.save
-      flash[:notice] = 'The activity was created.'
-      redirect @activity.path
-    else
-      flash.now[:error] = 'There was an error saving the activity'
-      erb :'activities/build'
-    end
+    @activity = @organisation.activities.new
+    save_subgroup(@activity, :'activities/build')
   end
 
   # Activity URLs named activities by id before they used slugs: /activities/:id/... is now
@@ -85,14 +78,7 @@ Dandelion::App.controller do
   post '/o/:organisation_slug/a/:slug/edit' do
     @activity = activity_from_params
     activity_admins_only!
-    if @activity.update_attributes(mass_assigning(params[:activity], Activity))
-      flash[:notice] = 'The activity was saved.'
-      redirect @activity.path
-    else
-      @edit_path = "/o/#{params[:organisation_slug]}/a/#{params[:slug]}/edit" # Use the original slugs for the form action, not the (possibly invalid) in-memory ones
-      flash.now[:error] = 'There was an error saving the activity'
-      erb :'activities/build'
-    end
+    save_subgroup(@activity, :'activities/build')
   end
 
   get '/o/:organisation_slug/a/:slug/stats' do
@@ -104,16 +90,7 @@ Dandelion::App.controller do
   post '/o/:organisation_slug/a/:slug/add_follower' do
     @activity = activity_from_params
     activity_admins_only!
-
-    @account = account_from_email_param!
-
-    if @activity.activityships.find_by(account: @account)
-      flash[:warning] = 'That person is already following the activity'
-    else
-      @account.associate_with_activity!(@activity, force: true)
-    end
-
-    redirect back
+    add_subgroup_follower(@activity) { |account| account.associate_with_activity!(@activity, force: true) }
   end
 
   post '/o/:organisation_slug/a/:slug/receive_feedback/:f' do
@@ -128,14 +105,13 @@ Dandelion::App.controller do
   get '/o/:organisation_slug/a/:slug/activityships/admins' do
     @activity = activity_from_params
     activity_admins_only!
-    partial :'activities/admins_box'
+    partial :'activities_and_local_groups/admins_box', locals: { resource: @activity }
   end
 
   post '/o/:organisation_slug/a/:slug/activityships/admin' do
     @activity = activity_from_params
     activity_admins_only!
-    @activityship = @activity.activityships.find_by(account_id: params[:activityship][:account_id]) || @activity.activityships.create(account_id: params[:activityship][:account_id])
-    @activityship.set(admin: true)
+    @activity.activityships.find_or_create_by(account_id: params[:activityship][:account_id]).set(admin: true)
     redirect back
   end
 
@@ -160,27 +136,24 @@ Dandelion::App.controller do
     erb :'activities/unsubscribe'
   end
 
+  # Unlike a local group's, this doesn't make someone who doesn't follow the activity a follower
   post '/o/:organisation_slug/a/:slug/unsubscribe' do
     sign_in_required!
     @activity = activity_from_params
-    if (@activityship = current_account.activityships.find_by(activity: @activity))
-      @activityship.set(unsubscribed: true)
-    end
-    flash[:notice] = "You were unsubscribed from #{@activity.name}."
-    redirect '/accounts/subscriptions'
+    unsubscribe_from_subgroup(@activity, @activity.activityships.find_by(account: current_account))
   end
 
   get '/o/:organisation_slug/a/:slug/activityship' do
     sign_in_required!
     @activity = activity_from_params
-    request.xhr? ? (partial :'activities_and_local_groups/resourceship', locals: { resource: @activity, resourceship_name: 'activityship', resource_path: @activity.path, membership_toggle: params[:membership_toggle], btn_class: params[:btn_class] }) : redirect(@activity.path)
+    subgroupship_button(@activity)
   end
 
   post '/o/:organisation_slug/a/:slug/activityship' do
     sign_in_required!
     @activity = activity_from_params
     # Only open activities can be joined without an admin
-    set_own_subgroupship(@activity, :activityships, params[:f]) if @activity.activityships.find_by(account: current_account) || @activity.privacy == 'open'
+    set_own_subgroupship(@activity, params[:f]) if @activity.activityships.find_by(account: current_account) || @activity.privacy == 'open'
     request.xhr? ? 200 : redirect(@activity.path)
   end
 
@@ -203,19 +176,13 @@ Dandelion::App.controller do
   get '/o/:organisation_slug/a/:slug/followers', provides: %i[html csv] do
     @activity = activity_from_params
     activity_admins_only!
-    case content_type
-    when :html
-      @activityships = subgroup_followers(@activity, :activityships).paginate(page: params[:page], per_page: 25)
-      erb :'activities/followers'
-    when :csv
-      send_subgroup_followers_csv(@activity, :activityships)
-    end
+    subgroup_followers_page(@activity, :'activities/followers')
   end
 
   post '/o/:organisation_slug/a/:slug/followers' do
     @activity = activity_from_params
     activity_admins_only!
-    import_subgroup_followers(@activity, :activityships)
+    import_subgroup_followers(@activity)
   end
 
   post '/activityships/:id/destroy' do
@@ -239,18 +206,15 @@ Dandelion::App.controller do
 
   get '/o/:organisation_slug/a/:slug/pmails' do
     @activity = activity_from_params
-    @_organisation = @activity.organisation
     activity_admins_only!
-    @pmails = @activity.pmails_including_events.order('created_at desc').paginate(page: params[:page])
-    @scope = "activity_id=#{@activity.id}"
-    erb :'pmails/pmails'
+    subgroup_pmails_page(@activity)
   end
 
   get '/o/:organisation_slug/a/:slug/subscribed/:activityship_id' do
     @activity = activity_from_params
     activity_admins_only!
     @activityship = @activity.activityships.find(params[:activityship_id]) || not_found
-    partial :'activities/subscribed', locals: { activityship: @activityship }
+    partial :'activities_and_local_groups/subscribed', locals: { resource: @activity, resourceship: @activityship }
   end
 
   post '/o/:organisation_slug/a/:slug/subscribed/:activityship_id' do
@@ -264,9 +228,7 @@ Dandelion::App.controller do
   get '/o/:organisation_slug/a/:slug/discount_codes' do
     @activity = activity_from_params
     activity_admins_only!
-    @discount_codes = @activity.discount_codes
-    @scope = "activity_id=#{@activity.id}"
-    erb :'discount_codes/discount_codes'
+    subgroup_discount_codes_page(@activity)
   end
 
   get '/o/:organisation_slug/a/:slug/application_questions' do

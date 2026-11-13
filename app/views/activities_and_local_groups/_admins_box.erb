@@ -1,0 +1,10 @@
+<%# An activity's or local group's admins and the forms to add and remove them, a pagelet (its path/activityships/admins or /local_groupships/admins) that reloads after either %>
+<%= partial :'accounts/add', locals: {
+      role: 'admin',
+      accounts: resource.admins.order('name asc'),
+      add_and_remove: resource.is_a?(Activity) ? activity_admin?(resource) : local_group_admin?(resource),
+      min_accounts: 1,
+      new_object: resource.subgroupships.new,
+      new_url: "#{resource.path}/#{resource.subgroupships_name}/admin",
+      destroy_url: "#{resource.path}/#{resource.subgroupships_name}/unadmin"
+    } %>
