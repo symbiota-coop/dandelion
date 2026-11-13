@@ -416,4 +416,43 @@ class GatheringMembersTest < ActiveSupport::TestCase
     assert_nil membership_of(member)
     assert membership_of(@account)
   end
+
+  test "an open gathering's members CSV hides from a member what the members page hides, but not from an admin" do
+    covers_route 'GET /g/:slug/members'
+    create_gathering(privacy: 'open', hide_paid: true)
+    option = @gathering.options.create!(name: 'Quiet tent', type: 'Accommodation', cost: 20, hide_members: true, account: @account)
+    hidden = create_member(name: 'Hidden Person', email: 'hidden@example.com', email_privacy: 'Only me')
+    option.optionships.create!(account: hidden, gathering: @gathering)
+    membership_of(hidden).set(paid: 20)
+    create_member(name: 'Public Person', email: 'public@example.com', email_privacy: 'Public')
+    viewer = create_member(name: 'Viewer Person')
+
+    sign_in_with_rack(viewer)
+    get gathering_path('/members.csv')
+    rows = CSV.parse(last_response.body, headers: true).index_by { |row| row['name'] }
+    assert_nil rows['Hidden Person']['email']
+    assert_equal 'public@example.com', rows['Public Person']['email']
+    assert_nil rows['Hidden Person']['paid']
+    assert_includes rows['Hidden Person']['options'], 'Accommodation'
+    refute_includes rows['Hidden Person']['options'], 'Quiet tent'
+
+    sign_in_with_rack(@account)
+    get gathering_path('/members.csv')
+    row = CSV.parse(last_response.body, headers: true).find { |csv_row| csv_row['name'] == 'Hidden Person' }
+    assert_equal 'hidden@example.com', row['email']
+    assert_equal '20', row['paid']
+    assert_includes row['options'], 'Quiet tent'
+  end
+
+  test "a closed gathering's members CSV shows every member's email, as its members were let in" do
+    covers_route 'GET /g/:slug/members'
+    create_gathering(privacy: 'closed')
+    create_member(name: 'Hidden Person', email: 'hidden@example.com', email_privacy: 'Only me')
+    viewer = create_member(name: 'Viewer Person')
+
+    sign_in_with_rack(viewer)
+    get gathering_path('/members.csv')
+    row = CSV.parse(last_response.body, headers: true).find { |csv_row| csv_row['name'] == 'Hidden Person' }
+    assert_equal 'hidden@example.com', row['email']
+  end
 end

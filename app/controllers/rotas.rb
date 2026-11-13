@@ -40,6 +40,9 @@ Dandelion::App.controller do
       when :html
         erb :'rotas/rota'
       when :csv
+        # By design, any confirmed member gets every shift's phone number, whatever its account's phone_privacy: gatherings are
+        # intentionally intimate. But anyone can join an open gathering, so there non-admins get only the numbers it shows them
+        private_shown = gathering_admin? || @gathering.privacy != 'open'
         CSV.generate do |csv|
           csv << ([''] + @rota.roles.order('o asc').map(&:name))
           shifts_by_rslot_role = @rota.shifts.includes(:account).index_by { |s| [s.rslot_id, s.role_id] }
@@ -47,7 +50,7 @@ Dandelion::App.controller do
             row = [rslot.name]
             @rota.roles.order('o asc').each do |role|
               row << if (shift = shifts_by_rslot_role[[rslot.id, role.id]]) && shift.account
-                       "#{shift.account.name} #{shift.account.phone}"
+                       [shift.account.name, (shift.account.phone if private_shown || viewable?(shift.account, :phone))].compact.join(' ')
                      else
                        ''
                      end

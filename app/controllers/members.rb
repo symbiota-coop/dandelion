@@ -15,7 +15,11 @@ Dandelion::App.controller do
     when :html
       erb :'gatherings/members'
     when :csv
-      # By design, any confirmed member (not just admins) can export the full member list including emails
+      # By design, any confirmed member (not just admins) can export the member list: gatherings are intentionally intimate. But
+      # anyone can join an open gathering, so there the CSV hides what the members page hides from non-admins: emails their
+      # accounts' email privacy doesn't show the viewer, the financial columns under hide_paid, and options under hide_members
+      private_shown = gathering_admin? || @gathering.privacy != 'open'
+      paid_shown = private_shown || !@gathering.hide_paid
       CSV.generate do |csv|
         row = %w[name firstname lastname email proposed_by accepted_at options requested_contribution paid]
         @gathering.joining_questions_a.each { |q| row << q }
@@ -27,12 +31,15 @@ Dandelion::App.controller do
             membership.account.name,
             membership.account.firstname,
             membership.account.lastname,
-            membership.account.email,
+            (membership.account.email if private_shown || viewable?(membership.account, :email)),
             (membership.proposed_by.map(&:name).to_sentence(last_word_connector: ' and ') if membership.proposed_by),
             membership.created_at.to_fs(:db_local),
-            membership.optionships.map { |optionship| [optionship.option.name, optionship.option.cost_per_person] },
-            membership.requested_contribution,
-            membership.paid
+            membership.optionships.map do |optionship|
+              option = optionship.option
+              private_shown || !option.hide_members? ? [option.name, option.cost_per_person] : [option.type]
+            end,
+            (membership.requested_contribution if paid_shown),
+            (membership.paid if paid_shown)
           ]
           # Every question gets a cell, answered or not, so a member without joining answers doesn't shift their application answers under the joining questions
           joining_answers = membership.answers.to_h

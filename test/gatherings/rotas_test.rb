@@ -83,4 +83,21 @@ class GatheringRotasTest < ActiveSupport::TestCase
     assert_equal 404, last_response.status
     assert_equal ['Secret bar', 'Secret evening'], [other_rota.reload.name, other_rslot.reload.name]
   end
+
+  test "an open gathering's rota CSV gives a member only the phone numbers their owners' privacy shows them" do
+    covers_route 'GET /g/:slug/rotas/:id'
+    create_gathering(privacy: 'open')
+    create_rota
+    hidden = create_member(name: 'Hidden Person', phone: '+447700900123', phone_privacy: 'Only me')
+    Shift.create!(account: hidden, role: @role, rslot: @rslot, rota: @rota)
+    viewer = create_member(name: 'Viewer Person')
+
+    sign_in_with_rack(viewer)
+    get gathering_path("/rotas/#{@rota.id}.csv")
+    assert_equal ['Morning', 'Hidden Person'], CSV.parse(last_response.body).last
+
+    sign_in_with_rack(@account)
+    get gathering_path("/rotas/#{@rota.id}.csv")
+    assert_equal ['Morning', 'Hidden Person +447700900123'], CSV.parse(last_response.body).last
+  end
 end
