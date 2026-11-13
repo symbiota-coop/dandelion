@@ -14,12 +14,6 @@ GET /e/:slug/ticket_type_waitlists: Not tested yet
 GET /e/:slug/ticket_types: Not tested yet
 GET /e/:slug/waitlist: Not tested yet
 GET /event_sessions/:id: Not tested yet
-GET /g/:slug/options/:id: Not tested yet
-GET /g/:slug/rotas/:id/create_shift: Not tested yet
-GET /g/:slug/subscribe: Not tested yet
-GET /g/:slug/teams/:id/unsubscribe: Not tested yet
-GET /g/:slug/tiers: Not tested yet
-GET /gatherings/autocomplete: Not tested yet
 GET /geolocate: Site admins' stats and diagnostics
 GET /local_groups/:id: Not tested yet
 GET /o/:organisation_slug/a/:slug/activityship: Not tested yet
@@ -66,18 +60,12 @@ POST /e/:slug/do_star: Not tested yet
 POST /e/:slug/event_sessions/destroy: Not tested yet
 POST /e/:slug/unstar: Not tested yet
 POST /event_boosts/stripe_webhook: Not tested yet
-POST /g/:slug/destroy: Not tested yet
-POST /g/:slug/hide_from_sidebar: Not tested yet
 POST /g/:slug/roles/order: Not tested yet
 POST /g/:slug/rslots/order: Not tested yet
-POST /g/:slug/set_subscribe: Not tested yet
-POST /g/:slug/show_in_sidebar: Not tested yet
 POST /g/:slug/spaces/:id/destroy: Not tested yet
 POST /g/:slug/spaces/order: Not tested yet
-POST /g/:slug/teams/:id/budget: Not tested yet
 POST /g/:slug/tslots/:id/destroy: Not tested yet
 POST /g/:slug/tslots/order: Not tested yet
-POST /g/:slug/verdicts/:id/destroy: Not tested yet
 POST /local_groups/:id/*: Not tested yet
 POST /o/:organisation_slug/a/:slug/activityships/admin: Not tested yet
 POST /o/:organisation_slug/a/:slug/activityships/unadmin: Not tested yet
