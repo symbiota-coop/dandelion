@@ -127,6 +127,9 @@ Dandelion/MongoidIndex:
 Dandelion/ConcernInclude:
   Include:
     - models/concerns/**/*.rb
+Dandelion/CapybaraTabAfterFillIn:
+  Include:
+    - test/**/*.rb
 Dandelion/TestInstanceVariable:
   Include:
     - test/**/*_test.rb

@@ -583,7 +583,7 @@ class GatheringsTest < ActiveSupport::TestCase
     [[members[1], 4, 4], [@account, 1, 3], [members[0], 2, 2]].each do |account, number, median|
       sign_in(account)
       visit "/g/#{@gathering.slug}/applications"
-      find_field('desired_threshold').fill_in(with: number).send_keys(:tab)
+      find_field('desired_threshold').fill_in(with: number)
       assert page.has_content? "Automatically accepting applications with #{median}"
     end
     assert_equal 2, @gathering.reload.threshold

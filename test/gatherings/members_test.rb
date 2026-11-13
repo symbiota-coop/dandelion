@@ -30,18 +30,18 @@ class GatheringMembersTest < ActiveSupport::TestCase
     sign_in(@account)
     visit gathering_path('/members')
 
-    # Paid starts at nothing, shown as a link that opens its field
+    # Paid starts at nothing, shown as a link that opens its field. Each field saves as Cuprite's fill_in blurs it, as its
+    # onblur submits the form and reloads the cell, so nothing more is needed (and a send_keys(:tab) on it would race the
+    # reload: ObsoleteNode)
     paid = cell_posting_to(membership_row(membership), '/paid')
     paid.find('a').click
     paid.fill_in 'paid', with: '50'
-    paid.find_field('paid').send_keys(:tab)
     assert membership_row(membership).has_link? '£50'
     assert_equal 50, membership.reload.paid
 
     invitations = cell_posting_to(membership_row(membership), '/invitations_granted')
     invitations.click_link '0'
     invitations.fill_in 'invitations_granted', with: '3'
-    invitations.find_field('invitations_granted').send_keys(:tab)
     assert cell_posting_to(membership_row(membership), '/invitations_granted').has_link? '3'
     assert_equal 3, membership.reload.invitations_granted
     assert_equal 3, membership.invitations_remaining
@@ -49,7 +49,6 @@ class GatheringMembersTest < ActiveSupport::TestCase
     shifts = cell_posting_to(membership_row(membership), '/shift_points_required')
     shifts.click_link '?'
     shifts.fill_in 'shift_points_required', with: '2.5'
-    shifts.find_field('shift_points_required').send_keys(:tab)
     assert cell_posting_to(membership_row(membership), '/shift_points_required').has_link? '2.5'
     assert_in_delta 2.5, membership.reload.shift_points_required
   end
@@ -217,13 +216,11 @@ class GatheringMembersTest < ActiveSupport::TestCase
     invitations = cell_posting_to(membership_row(membership), '/invitations_granted')
     invitations.click_link '0'
     invitations.fill_in 'invitations_granted', with: '-1'
-    invitations.find_field('invitations_granted').send_keys(:tab)
     assert invitations.has_css? '.invalid-feedback', text: 'Invitations granted must be greater than or equal to 0'
     assert_nil membership.reload.invitations_granted
 
     # Corrected, it saves
     invitations.fill_in 'invitations_granted', with: '2'
-    invitations.find_field('invitations_granted').send_keys(:tab)
     assert cell_posting_to(membership_row(membership), '/invitations_granted').has_link? '2'
     assert_equal 2, membership.reload.invitations_granted
   end

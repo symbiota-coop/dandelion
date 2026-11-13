@@ -1,9 +1,8 @@
 # Helpers the order test files (test/orders) share
 module OrdersHelpers
-  # Changes a ticketholder field on the order's page, which saves it when it changes
+  # Changes a ticketholder field on the order's page, which saves it when it changes, as fill_in blurs it
   def change_ticketholder_field(field, value)
     fill_in field, with: value
-    find_field(field).send_keys(:tab)
   end
 
   def create_complete_order
