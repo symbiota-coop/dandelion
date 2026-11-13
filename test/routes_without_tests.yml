@@ -1,6 +1,5 @@
 # Routes no test covers (covers_route), each with why: test/lint_test.rb fails on any other route no test covers. Take
 # a route out once a test covers it. Not tested yet means a test is wanted
-GET /activities/:id/*: Not tested yet
 GET /e/:event_slug/rpayments: Not tested yet
 GET /e/:event_slug/rpayments/:id/edit: Not tested yet
 GET /e/:slug/check_in: Not tested yet
@@ -15,19 +14,6 @@ GET /e/:slug/ticket_types: Not tested yet
 GET /e/:slug/waitlist: Not tested yet
 GET /event_sessions/:id: Not tested yet
 GET /geolocate: Site admins' stats and diagnostics
-GET /local_groups/:id: Not tested yet
-GET /o/:organisation_slug/a/:slug/activityship: Not tested yet
-GET /o/:organisation_slug/a/:slug/activityships/admins: Not tested yet
-GET /o/:organisation_slug/a/:slug/events/stats: Not tested yet
-GET /o/:organisation_slug/a/:slug/feedback_summary: Not tested yet
-GET /o/:organisation_slug/a/:slug/pmails: Not tested yet
-GET /o/:organisation_slug/a/:slug/stats: Not tested yet
-GET /o/:organisation_slug/a/:slug/subscribed/:activityship_id: Not tested yet
-GET /o/:organisation_slug/a/:slug/unsubscribe: Not tested yet
-GET /o/:organisation_slug/lg/:slug/events/stats: Not tested yet
-GET /o/:organisation_slug/lg/:slug/local_groupships/admins: Not tested yet
-GET /o/:organisation_slug/lg/:slug/pmails: Not tested yet
-GET /o/:organisation_slug/lg/:slug/stats: Not tested yet
 GET /orders/:id/confirm_destroy: Not tested yet
 GET /raise: Site admins' stats and diagnostics
 GET /raise_job: Site admins' stats and diagnostics
@@ -51,8 +37,6 @@ GET /stats/traces/slowest: Site admins' stats and diagnostics
 GET /stats/transactions: Site admins' stats and diagnostics
 GET /tickets/:id/price: Not tested yet
 GET /tickets/:id/ticket_type: Not tested yet
-POST /activities/:id/*: Not tested yet
-POST /activityships/:id/destroy: Not tested yet
 POST /drafts/:id/destroy: Not tested yet
 POST /e/:event_slug/rpayments/:id/destroy: Not tested yet
 POST /e/:event_slug/rpayments/new: Not tested yet
@@ -60,18 +44,6 @@ POST /e/:slug/do_star: Not tested yet
 POST /e/:slug/event_sessions/destroy: Not tested yet
 POST /e/:slug/unstar: Not tested yet
 POST /event_boosts/stripe_webhook: Not tested yet
-POST /local_groups/:id/*: Not tested yet
-POST /o/:organisation_slug/a/:slug/activityships/admin: Not tested yet
-POST /o/:organisation_slug/a/:slug/activityships/unadmin: Not tested yet
-POST /o/:organisation_slug/a/:slug/destroy: Not tested yet
-POST /o/:organisation_slug/a/:slug/feedback_summary: Not tested yet
-POST /o/:organisation_slug/a/:slug/feedback_summary/delete: Not tested yet
-POST /o/:organisation_slug/a/:slug/followers: Not tested yet
-POST /o/:organisation_slug/a/:slug/subscribed/:activityship_id: Not tested yet
-POST /o/:organisation_slug/a/:slug/unsubscribe: Not tested yet
-POST /o/:organisation_slug/lg/:slug/destroy: Not tested yet
-POST /o/:organisation_slug/lg/:slug/followers: Not tested yet
-POST /o/:organisation_slug/lg/:slug/local_groupships/admin: Not tested yet
 POST /stats/traces/delete_before: Site admins' stats and diagnostics
 POST /tickets/:id/price: Not tested yet
 POST /tickets/:id/send_ticket: Not tested yet
