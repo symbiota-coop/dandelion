@@ -147,6 +147,11 @@ class OrderBuilder
     end
   end
 
+  # How long a booking may hold the event's booking lock, in case its process dies holding it, and how long another
+  # waits for it before giving up
+  BOOKING_LOCK_TIMEOUT = 20.seconds
+  BOOKING_LOCK_WAIT = 25.seconds
+
   attr_reader :order, :account, :quote
 
   # buyer: name, email, and optionally phone, postcode and country, of which only those the event asks for
@@ -206,7 +211,7 @@ class OrderBuilder
     # Worked out now, before the order counts as a use of its discount code
     @quote = build_quote(account: @account, credit: signed_in_as_buyer?).tap(&:total)
     create_order
-    create_tickets
+    with_booking_lock { create_tickets }
     @event.refresh_sold_out_cache_and_notify_waitlist
     apply_donation_and_discounts
     process_payment
@@ -336,6 +341,31 @@ class OrderBuilder
     raise IdempotencyKeyTaken if @idempotency_key && e.code == 11_000
 
     raise
+  end
+
+  # Checking what's left and creating the tickets aren't one step, so two bookings at once could both see the last
+  # place and both take it. Each holds the event's lock for those steps, so they take turns. Only for that: the payment
+  # provider is called once the tickets, which hold the places, exist
+  def with_booking_lock
+    token = SecureRandom.uuid
+    waiting_until = Time.now + BOOKING_LOCK_WAIT
+    until Event.collection.update_one(
+      { _id: @event.id, '$or' => [{ booking_locked_until: nil }, { booking_locked_until: { '$lt' => Time.now } }] },
+      { '$set' => { booking_lock_token: token, booking_locked_until: Time.now + BOOKING_LOCK_TIMEOUT } }
+    ).modified_count == 1
+      if Time.now > waiting_until
+        @order.destroy
+        raise Error
+      end
+
+      sleep 0.02
+    end
+    locked = true
+    # Counted afresh, now that no other booking can be creating tickets
+    @event.reset_ticket_counts
+    yield
+  ensure
+    Event.collection.update_one({ _id: @event.id, booking_lock_token: token }, { '$unset' => { booking_lock_token: 1, booking_locked_until: 1 } }) if locked
   end
 
   def create_tickets

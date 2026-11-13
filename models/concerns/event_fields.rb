@@ -70,6 +70,10 @@ module EventFields
     field :locked_error_provider, type: String
     # Views of the event page, counted until the event starts (Event#count_page_view)
     field :page_views_count, type: Integer, default: 0
+    # Held while a booking checks what's left and creates its tickets, so bookings at once can't both take the last
+    # places (OrderBuilder#with_booking_lock)
+    field :booking_lock_token, type: String
+    field :booking_locked_until, type: Time
 
     field :revenue_share_to_revenue_sharer, type: Integer
     field :profit_share_to_organiser, type: Integer
