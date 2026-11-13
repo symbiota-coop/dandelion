@@ -3142,17 +3142,21 @@ ul.map-event li {
 }
 
 /* On phones the ticket table's three columns are wider than the card, so the cells take table-sm's padding, and the
-   outer cells drop theirs, lining the table up with the card's padding */
+   outer cells drop theirs, lining the table up with the card's padding. The text above and below the ticket types
+   (.select-tickets-text) does the same, so it lines up with the ticket type names */
 @media (max-width: 575.98px) {
-  #ticket-types .table > :not(caption) > * > * {
+  #ticket-types .table > :not(caption) > * > *,
+  .table.select-tickets-text > :not(caption) > * > * {
     padding: var(--space-xs);
   }
 
-  #ticket-types .table > :not(caption) > * > :first-child {
+  #ticket-types .table > :not(caption) > * > :first-child,
+  .table.select-tickets-text > :not(caption) > * > :first-child {
     padding-left: 0;
   }
 
-  #ticket-types .table > :not(caption) > * > :last-child {
+  #ticket-types .table > :not(caption) > * > :last-child,
+  .table.select-tickets-text > :not(caption) > * > :last-child {
     padding-right: 0;
   }
 }

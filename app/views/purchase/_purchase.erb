@@ -26,7 +26,7 @@ discount_code_used_up = discount_code_problem == :used_up
     <% unless @concise_ticket_form %>
       <%= partial :'purchase/started' %>
       <% if @event.select_tickets_intro %>
-        <table class="table table-borderless mb-0">
+        <table class="table table-borderless mb-0 select-tickets-text">
           <tr>
             <td>
               <%== md(@event.select_tickets_intro) %>
@@ -93,7 +93,7 @@ discount_code_used_up = discount_code_problem == :used_up
 
     <% unless @concise_ticket_form %>
       <% if @event.select_tickets_outro %>
-        <table class="table table-borderless mb-0">
+        <table class="table table-borderless mb-0 select-tickets-text">
           <tr>
             <td>
               <%== md(@event.select_tickets_outro) %>
