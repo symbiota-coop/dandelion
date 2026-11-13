@@ -1605,9 +1605,17 @@ label .form-text {
   font-weight: 500
 }
 
-textarea[id=comment_body] {
-  height: 4em;
-  overflow: hidden;
+/* A textarea that grows with what's typed in it, starting at --autosize-rows lines (text_area_block's autosize: true
+   sets it from rows), or 1 for rows="1" and 2 with no rows, as browsers show. field-sizing ignores rows, so this
+   minimum stands in for it. Browsers without field-sizing keep this height and scroll */
+textarea.autosize {
+  --autosize-rows: 2;
+  field-sizing: content;
+  min-height: calc(var(--autosize-rows) * 1.5em + 1rem + 2px);
+}
+
+textarea.autosize[rows="1"] {
+  --autosize-rows: 1;
 }
 
 /* The @ mention menu under comment boxes (comments.js), floating like a dropdown menu: a hairline border, the base shadow

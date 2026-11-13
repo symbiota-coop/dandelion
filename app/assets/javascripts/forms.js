@@ -64,10 +64,6 @@ $(function () {
 
     $('input.flatpickr-mobile').once('mobile-empty').each(markEmptyDateInput)
 
-    $('textarea[id=comment_body], textarea.autosize').once('autosize').each(function () {
-      autosize(this)
-    })
-
     $('select.lookup').once('lookup').each(function () {
       $(this).lookup({
         lookup_url: $(this).attr('data-lookup-url'),

@@ -1,17 +1,6 @@
-<style>
-  #option_description {
-    height: 5em
-  }
-</style>
-<script>
-  $(function() {
-    // By name, not id: the options page has this form twice, to add an option and to edit one (in #modal)
-    autosize($('textarea[name="option[description]"]'));
-  });
-</script>
 <% form_for @option ||= Option.new, @option.new_record? ? "/g/#{@gathering.slug}/options/new" : "/g/#{@gathering.slug}/options/#{@option.id}/edit" do |f| %>
   <%= f.text_block :name %>
-  <%= f.text_area_block :description %>
+  <%= f.text_area_block :description, rows: 3, autosize: true %>
   <%= f.select_block :type %>
   <%= f.number_block :capacity %>
   <%= f.currency_block :cost, money_symbol: money_symbol(@gathering.currency), disabled: !gathering_admin?, hint: ('Only admins can add paid options' if !gathering_admin?) %>

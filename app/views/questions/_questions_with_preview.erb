@@ -13,7 +13,7 @@
 </style>
 <div class="row">
   <div class="col-lg-6">
-    <%= f.text_area_block field_name, placeholder: (defined?(placeholder) ? placeholder : nil) %>
+    <%= f.text_area_block field_name, rows: (defined?(rows) ? rows : 8), autosize: true, placeholder: (defined?(placeholder) ? placeholder : nil) %>
     <div class="q-help">
       <p class="text-body-secondary"><%= help_text %></p>
       <%= partial :'questions/questions_help', locals: (defined?(questions_help_locals) && questions_help_locals ? questions_help_locals : {}) %>

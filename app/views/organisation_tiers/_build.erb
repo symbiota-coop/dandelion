@@ -1,12 +1,6 @@
 <% form_for @organisation_tier, @organisation_tier.new_record? ? "/o/#{@organisation.slug}/organisation_tiers/new" : "/o/#{@organisation.slug}/organisation_tiers/#{@organisation_tier.id}/edit" do  |f| %>
   <%= f.text_block :name %>
-  <%= f.text_area_block :description %>
-  <script>
-    $(function () {
-      $('#organisation_tier_description').attr('rows', '2')
-      autosize($('#organisation_tier_description')[0])
-    })
-  </script>
+  <%= f.text_area_block :description, rows: 2, autosize: true %>
 
   <%= f.currency_block :threshold, money_symbol: money_symbol(@organisation.currency) %>
   <%= f.percentage_block :discount %>

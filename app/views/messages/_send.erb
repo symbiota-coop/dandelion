@@ -20,9 +20,16 @@
   $(function () {
     scrollMessageThreadToBottom()
 
-    $('#message-body').on('autosize:resized', function () {
-      scrollMessageThreadToBottom()
-    })
+    // The box grows with what's typed in it (field-sizing), so keep the latest message in view as it does
+    const messageBody = document.getElementById('message-body')
+    if (messageBody) {
+      let lastHeight = messageBody.offsetHeight
+      new ResizeObserver(function () {
+        if (messageBody.offsetHeight === lastHeight) return
+        lastHeight = messageBody.offsetHeight
+        scrollMessageThreadToBottom()
+      }).observe(messageBody)
+    }
 
     $('#message-body').on('keydown', function (e) {
       if (e.key !== 'Enter' || e.shiftKey) return

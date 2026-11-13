@@ -8,7 +8,6 @@
     "@googlemaps/markerclusterer": "2.6.2",
     "@highlightjs/cdn-assets": "11.12.0",
     "@melloware/coloris": "0.25.1",
-    "autosize": "6.0.1",
     "bootstrap-icons": "1.13.2",
     "chart.js": "4.6.1",
     "chartjs-plugin-datalabels": "2.2.0",

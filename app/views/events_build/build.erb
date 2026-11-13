@@ -157,7 +157,7 @@
         <%= partial :'questions/questions_with_preview', locals: { f: f, field_name: :questions, placeholder: "e.g. Any dietary requirements?\n[Check this box to agree to the terms and conditions]", help_text: 'Questions to ask participants upon booking.', questions_help_locals: { answers_url: "/e/#{@event.slug}/orders" } } %>
         <div class="row">
           <div class="col-lg-6">
-            <%= f.text_area_block :feedback_questions %>
+            <%= f.text_area_block :feedback_questions, rows: 8, autosize: true %>
             <div class="q-help">
               <p class="text-body-secondary">Questions to ask participants in the post-event feedback form.</p>
               <ul class="text-body-secondary">
@@ -304,7 +304,7 @@
           <%= f.select_block :gathering_id, options: [''] + current_account.memberships.and(admin: true).map { |m| [m.gathering.name, m.gathering_id] }.sort_by { |a,_b| a } %>
         <% end %>
         <%= f.url_block :terms_and_conditions_url %>
-        <%= f.text_area_block :terms_and_conditions %>
+        <%= f.text_area_block :terms_and_conditions, rows: 2, autosize: true %>
         <%= f.check_box_block :terms_and_conditions_check_box %>
         <%= f.check_box_block :no_tickets_pdf %>
         <%= f.check_box_block :send_ticketholder_confirmation %>
@@ -323,7 +323,7 @@
           <%= f.check_box_block :update_activity_events %>
         <% end %>
         <% if !@event.organisation.stripe_client_id %>
-          <%= f.text_area_block :notes %>
+          <%= f.text_area_block :notes, rows: 2, autosize: true %>
         <% end %>
 
         <% if Padrino.env == :development || @event.organisation.experimental? %>
@@ -359,7 +359,7 @@
           <%= f.number_block :profit_share_to_organisation, disabled: true %>
 
           <%= f.number_block :stripe_revenue_adjustment, disabled: revenue_fields_disabled %>
-          <%= f.text_area_block :notes %>
+          <%= f.text_area_block :notes, rows: 2, autosize: true %>
 
           <% if @event.new_record? %>
             <%= f.submit_block %>

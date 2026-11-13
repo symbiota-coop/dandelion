@@ -8,14 +8,14 @@
   <% if defined?(chat) && chat %>
     <%= f.text_block :body, placeholder: 'Write a comment...', label_class: 'd-none', container_class: 'mb-2' %>
   <% elsif defined?(reply) %>
-    <%= f.text_area_block :body, placeholder: 'Write a comment...', label_class: 'd-none' %>
+    <%= f.text_area_block :body, placeholder: 'Write a comment...', label_class: 'd-none', rows: 2, autosize: true %>
   <% else %>
     <% if comment.new_record? && comment.first_in_post? %>
       <div id="comment-subject-container" <% if defined?(from_homepage) %> style="display: none"<% end %>>
         <%= f.text_block :subject, label_class: 'd-none', required: true %>
       </div>
     <% end %>
-    <%= f.text_area_block :body, placeholder: (defined?(placeholder) ? placeholder : 'Write a comment... (optional)'), label_class: 'd-none' %>
+    <%= f.text_area_block :body, placeholder: (defined?(placeholder) ? placeholder : 'Write a comment... (optional)'), label_class: 'd-none', rows: 2, autosize: true %>
   <% end %>
   <div class="comment-options"<% unless @show_buttons %> style="display: none"<% end %>>
     <% unless defined?(chat) %>

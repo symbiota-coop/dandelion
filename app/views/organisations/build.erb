@@ -33,17 +33,10 @@
   </p>
 <% end %>
 
-<style>
-  #organisation_minimal_head { height: 5em }
-  #organisation_terms_and_conditions { height: 5em }
-</style>
 <script>
   $(function () {
 
     placeAutocomplete('#organisation_location')
-
-    autosize($('#organisation_minimal_head')[0])
-    autosize($('#organisation_terms_and_conditions')[0])
 
     $('#organisation-build-nav a[data-bs-toggle="tab"]').on('show.bs.tab', function (e) {
       var form = $('#organisation-build-nav').closest('form')[0]
@@ -215,7 +208,7 @@
           <%= f.number_block :event_image_required_height %>
           <%= f.url_block :become_a_member_url %>
           <%= f.url_block :terms_and_conditions_url %>
-          <%= f.text_area_block :terms_and_conditions %>
+          <%= f.text_area_block :terms_and_conditions, rows: 3, autosize: true %>
           <%= f.check_box_block :terms_and_conditions_check_box %>
           <%= f.check_box_block :collect_location %>
           <%= f.check_box_block :collect_phone %>
@@ -231,7 +224,7 @@
             <%= f.text_block :stripe_pk %>
             <%= f.secret_block :stripe_sk %>
             <%= f.text_block :stripe_client_id %>
-            <%= f.text_area_block :minimal_head %>
+            <%= f.text_area_block :minimal_head, rows: 3, autosize: true %>
             <%= f.text_area_block :events_banner %>
           </div>
         <% end %>

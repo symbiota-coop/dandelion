@@ -1,4 +1,4 @@
-/* global introJs, autosize, google, initQuestionsPreview */
+/* global introJs, google, initQuestionsPreview */
 
 $(function () {
   const config = (function () {
@@ -255,28 +255,8 @@ $(function () {
 
   $('label[for$="_email_greeting"], label[for$="_email_body"]').hide()
 
-  const autosizeFields = [
-    ['#event_questions', 8],
-    ['#event_feedback_questions', 8],
-    ['#event_notes', 2],
-    ['#event_terms_and_conditions', 2]
-  ]
-  autosizeFields.forEach(function (pair) {
-    const el = $(pair[0])[0]
-    if (el) $(el).attr('rows', pair[1])
-    if (el && typeof autosize !== 'undefined') autosize(el)
-  })
-
-  // Validate on tab change and keep textareas sized
+  // Validate on tab change
   $('#event-build-nav a[data-bs-toggle="tab"]').on('show.bs.tab', function (e) {
-    setTimeout(function () {
-      if (typeof autosize === 'undefined') return
-      ;['#event_questions', '#event_feedback_questions', '#event_terms_and_conditions'].forEach(function (sel) {
-        const el = $(sel)[0]
-        if (el) autosize.update(el)
-      })
-    }, 0)
-
     const form = $('#event-build-nav').closest('form')[0]
     if (form.reportValidity()) {
       // continue

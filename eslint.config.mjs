@@ -6,7 +6,7 @@ import bootstrap4Leftovers from './config/bootstrap4_leftovers.json' with { type
 // (config/frontend_dependencies.rb and layouts/_dependencies.erb, or a page's own <script src>), and some files and
 // templates define functions others call
 const libraries = [
-  'autosize', 'bootstrap', 'Chart', 'ChartDataLabels', 'ClassicEditor', 'Coloris', 'cytoscape', 'DataTable', 'flatpickr',
+  'bootstrap', 'Chart', 'ChartDataLabels', 'ClassicEditor', 'Coloris', 'cytoscape', 'DataTable', 'flatpickr',
   'FullCalendar', 'google', 'grecaptcha', 'iframely', 'introJs', 'jsQR', 'markerClusterer', 'Stripe'
 ]
 const shared = [

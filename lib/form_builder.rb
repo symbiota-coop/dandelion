@@ -67,8 +67,13 @@ module Padrino
           end
         end
 
-        def text_area_block(fieldname, rows: 5, placeholder: nil, **block_options)
-          input_block(fieldname, 'form-control', **block_options) { |attrs| text_area(fieldname, rows: rows, placeholder: placeholder, **attrs) }
+        # autosize: true makes the textarea grow with what's typed in it, from its rows (app.css's .autosize)
+        def text_area_block(fieldname, rows: 5, placeholder: nil, autosize: false, **block_options)
+          classes = autosize ? 'form-control autosize' : 'form-control'
+          style = ("--autosize-rows: #{rows}" if autosize)
+          input_block(fieldname, classes, **block_options) do |attrs|
+            text_area(fieldname, rows: rows, placeholder: placeholder, style: style, **attrs)
+          end
         end
 
         def wysiwyg_block(fieldname, rows: 5, placeholder: nil, **block_options)

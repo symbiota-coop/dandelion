@@ -12,9 +12,6 @@
     })
     $('#activity_privacy').change()
 
-    $('#activity_application_questions').attr('rows', '3')
-    autosize($('#activity_application_questions')[0])
-
     if (<%== @activity.persisted?.to_json %>) {
       initQuestionsPreview('#activity_application_questions', <%== "#{@activity.path}/application_questions".to_json %>, {
         extraParams: function () {
@@ -45,7 +42,7 @@
     <%= f.select_block :privacy %>
   </div>
   <div id="application-options" style="display: none">
-    <%= partial :'questions/questions_with_preview', locals: { f: f, field_name: :application_questions, help_text: 'Questions to ask applicants.', placeholder: "e.g. Why do you want to join?\n[I have read and agree to the code of conduct]" } %>
+    <%= partial :'questions/questions_with_preview', locals: { f: f, field_name: :application_questions, rows: 3, help_text: 'Questions to ask applicants.', placeholder: "e.g. Why do you want to join?\n[I have read and agree to the code of conduct]" } %>
     <%= f.check_box_block :hide_image %>
     <%= f.check_box_block :hide_location %>
     <%= f.check_box_block :hide_date_of_birth %>

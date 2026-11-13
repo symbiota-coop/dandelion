@@ -1,14 +1,3 @@
-<style>
-  #tactivity_description {
-    height: 5em
-  }
-</style>
-<script>
-  $(function() {
-    autosize($('#tactivity_description')[0]);
-  });
-</script>
-
 <% form_for @tactivity ||= Tactivity.new, @tactivity.new_record? ? "/g/#{@gathering.slug}/tactivities/create?timetable_id=#{timetable.id}" : "/g/#{@gathering.slug}/tactivities/#{@tactivity.id}/edit" do |f| %>
 
   <% if @tactivity.errors.exists? %>
@@ -22,7 +11,7 @@
   <% end %>
 
   <%= f.text_block :name %>
-  <%= f.text_area_block :description %>
+  <%= f.text_area_block :description, rows: 3, autosize: true %>
   <%= f.image_block :image %>
   <% if @tactivity.persisted? && (gathering_admin? || @tactivity.timetable.scheduling_by_all) %>
     <%= f.select_block :space_id, options: @tactivity.space_ids %>

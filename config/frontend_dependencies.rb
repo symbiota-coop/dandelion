@@ -24,7 +24,6 @@ FRONTEND_DEPENDENCIES = {
   'intro.js' => 'minified/intro.min.js minified/introjs.min.css',
   'bootstrap-icons' => 'font/bootstrap-icons.min.css',
   'chartjs-plugin-datalabels' => 'dist/chartjs-plugin-datalabels.min.js',
-  'autosize' => 'dist/autosize.min.js',
   '@googlemaps/markerclusterer' => 'dist/index.min.js',
   '@melloware/coloris' => 'dist/umd/coloris.min.js dist/coloris.min.css'
 }.freeze
