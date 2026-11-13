@@ -13,6 +13,15 @@ require 'minitest/rg'
 require 'rack/test'
 require_relative 'helpers/test_helpers'
 
+# No test reaches Mailgun: Mailer sends through an organisation's own account whenever it has an API key, even here, so
+# an email a test doesn't record (recorded_email, recorded_emails) would otherwise really be sent
+module RefuseMailgunInTests
+  %i[get post put delete].each do |verb|
+    define_method(verb) { |*| raise "A test tried to reach Mailgun (#{verb.upcase}): record the email with recorded_email(s)" }
+  end
+end
+Mailgun::Client.prepend(RefuseMailgunInTests)
+
 Capybara.app = Padrino.application
 Capybara.server_port = ENV['PORT']
 # Each run saves its screenshots to its own folder, so runs at the same time don't delete each other's
