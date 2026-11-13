@@ -1,4 +1,14 @@
 Dandelion::App.helpers do
+  # An activity form's params, less its space and slot for those the schedule route doesn't let schedule
+  def tactivity_params(timetable)
+    tactivity_params = (params[:tactivity] || {}).dup
+    unless gathering_admin? || timetable.scheduling_by_all
+      tactivity_params.delete(:space_id)
+      tactivity_params.delete(:tslot_id)
+    end
+    mass_assigning(tactivity_params, Tactivity)
+  end
+
   # The members table's columns (gatherings/members, details), in order: each row's cell partial (membership_row/), its
   # header and th attributes, and a footer: block for what the footer shows under it
   def membership_columns

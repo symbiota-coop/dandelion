@@ -152,6 +152,11 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
     # Nor through the activity's edit form
     post gathering_path("/tactivities/#{@tactivity.id}/edit"), tactivity: { name: 'Yoga', tslot_id: @tslot.id, space_id: @space.id }
     assert_nil @tactivity.reload.tslot_id
+    # Nor by creating it scheduled
+    post gathering_path("/tactivities/create?timetable_id=#{@timetable.id}"), tactivity: { name: 'Sneaky', tslot_id: @tslot.id, space_id: @space.id }
+    created = @timetable.tactivities.find_by(name: 'Sneaky')
+    assert_equal [nil, nil], [created.tslot_id, created.space_id]
+    created.destroy
 
     @tactivity.update_attributes!(tslot: @tslot, space: @space)
     post gathering_path("/tactivities/#{@tactivity.id}/unschedule")

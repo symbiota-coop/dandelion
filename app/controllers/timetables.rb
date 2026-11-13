@@ -133,7 +133,7 @@ Dandelion::App.controller do
     @gathering = gathering_from_params
     @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
     confirmed_membership_required!
-    @tactivity = Tactivity.new(mass_assigning(params[:tactivity], Tactivity))
+    @tactivity = Tactivity.new(tactivity_params(@timetable))
     @tactivity.timetable = @timetable
     @tactivity.account = current_account
     if @tactivity.save
@@ -164,13 +164,7 @@ Dandelion::App.controller do
     @gathering = gathering_from_params
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     confirmed_membership_required!
-    tactivity_params = (params[:tactivity] || {}).dup
-    # Scheduling is for those the schedule route lets schedule
-    unless gathering_admin? || @tactivity.timetable.scheduling_by_all
-      tactivity_params.delete(:space_id)
-      tactivity_params.delete(:tslot_id)
-    end
-    if @tactivity.update_attributes(mass_assigning(tactivity_params, Tactivity))
+    if @tactivity.update_attributes(tactivity_params(@tactivity.timetable))
       redirect "/g/#{@gathering.slug}/timetables/#{@tactivity.timetable_id}"
     else
       flash.now[:error] = 'There was an error saving the tactivity'
