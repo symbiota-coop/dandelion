@@ -40,8 +40,8 @@
   placeAutocomplete('#account_location')
   })
 </script>
-<%= f.text_block :name %>
-<%= f.email_block :email %>
+<%= f.text_block :name, autocomplete: 'name' %>
+<%= f.email_block :email, autocomplete: 'email' %>
 <%= f.text_block :location %>
 <% if ENV['RECAPTCHA_SITE_KEY'] %>
   <div class="g-recaptcha mb-3" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>

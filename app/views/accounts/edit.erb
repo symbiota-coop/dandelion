@@ -47,9 +47,9 @@
     <% end %>
     <% } %>
     <%= hidden_field_tag :'account[updated_profile]', value: true %>
-    <%= f.text_block :name %>
+    <%= f.text_block :name, autocomplete: 'name' %>
     <%= f.text_block :username %>
-    <%= f.email_block :email %>
+    <%= f.email_block :email, autocomplete: 'email' %>
     <% if !@account.email_confirmed? %>
       <p class="field-note"><a data-method="post" href="/confirm_email">Resend confirmation email</a></p>
     <% end %>

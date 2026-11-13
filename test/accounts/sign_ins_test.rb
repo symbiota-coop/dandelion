@@ -107,10 +107,12 @@ class AccountSignInsTest < ActiveSupport::TestCase
 
     visit '/accounts/sign_in'
     click_link 'Get a sign in code to your email'
+    assert page.has_css?('#sign-in-code-email[autocomplete="username"]')
     fill_in 'sign-in-code-email', with: account.email
     click_button 'Get code'
     assert page.has_content?("A sign in code was sent to #{account.email}")
     assert_equal code, account.reload.issue_sign_in_code!
+    assert page.has_css?('#code[autocomplete="one-time-code"]')
 
     fill_in 'code', with: code
     click_button 'Submit'

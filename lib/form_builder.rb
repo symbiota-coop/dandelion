@@ -6,8 +6,11 @@ module Padrino
       class BootstrapFormBuilder < AbstractFormBuilder
         # Text
 
-        def text_block(fieldname, placeholder: nil, **block_options)
-          input_block(fieldname, 'form-control', **block_options) { |attrs| text_field(fieldname, placeholder: placeholder, **attrs) }
+        # autocomplete takes an autofill token (name, email...), so browsers and password managers fill the field in
+        def text_block(fieldname, placeholder: nil, autocomplete: nil, **block_options)
+          input_block(fieldname, 'form-control', **block_options) do |attrs|
+            text_field(fieldname, placeholder: placeholder, autocomplete: autocomplete, **attrs)
+          end
         end
 
         # The admin's type for the id of a polymorphic association (auto_admin_fields), which dadmin/build calls as id_block
@@ -17,8 +20,10 @@ module Padrino
           input_block(fieldname, 'form-control', **block_options) { |attrs| number_field(fieldname, step: step, min: min, placeholder: placeholder, **attrs) }
         end
 
-        def email_block(fieldname, placeholder: nil, **block_options)
-          input_block(fieldname, 'form-control', **block_options) { |attrs| email_field(fieldname, placeholder: placeholder, **attrs) }
+        def email_block(fieldname, placeholder: nil, autocomplete: nil, **block_options)
+          input_block(fieldname, 'form-control', **block_options) do |attrs|
+            email_field(fieldname, placeholder: placeholder, autocomplete: autocomplete, **attrs)
+          end
         end
 
         def url_block(fieldname, placeholder: nil, **block_options)

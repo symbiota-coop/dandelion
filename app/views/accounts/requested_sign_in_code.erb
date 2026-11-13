@@ -14,7 +14,7 @@
         <% form_tag '/accounts/sign_in_code', class: 'my-3' do %>
 
           <div class="input-group">
-            <%= text_field_tag :code, class: 'form-control', placeholder: 'Code', id: 'code' %>
+            <%= text_field_tag :code, class: 'form-control', placeholder: 'Code', id: 'code', autocomplete: 'one-time-code' %>
             <button class="btn btn-primary" type="submit">Submit</button>
           </div>
 

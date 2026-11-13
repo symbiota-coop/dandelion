@@ -27,6 +27,8 @@ class AccountsTest < ActiveSupport::TestCase
   test 'signing up' do
     account = FactoryBot.build_stubbed(:account)
     visit '/accounts/new'
+    assert page.has_css?('#account_name[autocomplete="name"]')
+    assert page.has_css?('#account_email[autocomplete="email"]')
     fill_signup_form(account)
     assert page.has_content?('Welcome to Dandelion!')
   end
@@ -34,6 +36,9 @@ class AccountsTest < ActiveSupport::TestCase
   test 'signing in' do
     account = FactoryBot.create(:account)
     visit '/accounts/sign_in'
+    # Autofill tokens, so password managers fill the saved account in
+    assert page.has_css?('#email[autocomplete="username"]')
+    assert page.has_css?('#password[autocomplete="current-password"]')
     fill_in 'Email', with: account.email
     fill_in 'Password', with: account.password
     click_button 'Sign in'

@@ -19,8 +19,8 @@
     <%= hidden_field_tag :"#{r}_id", value: instance_variable_get("@#{r}").id %>
   <% end %>
   <% } %>
-  <%= text_field_tag :'account[name]', class: 'form-control me-1 mb-1', required: true, placeholder: 'Name' %>
-  <%= email_field_tag :'account[email]', class: 'form-control me-1 mb-1', required: true, placeholder: 'Email' %>
+  <%= text_field_tag :'account[name]', class: 'form-control me-1 mb-1', required: true, placeholder: 'Name', autocomplete: 'name' %>
+  <%= email_field_tag :'account[email]', class: 'form-control me-1 mb-1', required: true, placeholder: 'Email', autocomplete: 'email' %>
   <%= text_field_tag :'account[location]', class: 'form-control me-1 mb-1', placeholder: 'Location (postcode works best)' %>
   <% if ENV['RECAPTCHA_SITE_KEY'] %>
     <div class="g-recaptcha mb-1" data-sitekey="<%= ENV['RECAPTCHA_SITE_KEY'] %>"></div>
