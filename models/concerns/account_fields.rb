@@ -41,6 +41,7 @@ module AccountFields
     field :can_message, type: Mongoid::Boolean
     field :blocked_from_messaging, type: Mongoid::Boolean
     field :failed_sign_in_attempts, type: Integer
+    field :password_sign_in_paused_until, type: Time
     field :minimal_head, type: String
     field :theme_color, type: String
     field :stripe_subscription_id, type: String

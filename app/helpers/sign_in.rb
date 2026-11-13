@@ -33,7 +33,7 @@ Dandelion::App.helpers do
 
     kick! notice: "That sign in code isn't valid any longer. Please request a new one." if sign_in_code && !account.redeem_sign_in_code!(sign_in_code)
 
-    account.set(failed_sign_in_attempts: 0)
+    account.clear_failed_sign_ins!
     account.sign_ins.create(request: request, skip_increment: %w[unsubscribe give_feedback subscriptions].any? { |p| request.path.include?(p) })
     # Only a code confirms the email here: anyone the email reaches, mail scanners included, can open a link
     undone = confirm_email_of(account, same_browser: account_set_up_in_this_session?(account)) if sign_in_code && !account.email_confirmed?

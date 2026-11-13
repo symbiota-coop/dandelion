@@ -6,7 +6,13 @@ Dandelion::App.controller do
 
   get '/auth/failure' do
     @body_class = 'lavender-wash'
-    flash.now[:error] = '<strong>Hmm.</strong> There was a problem signing you in.'
+    paused_until = session.delete('sign_in_paused_until')
+    flash.now[:error] = if params[:message] == 'sign_in_paused' && paused_until
+                          wait = distance_of_time_in_words(Time.now, Time.at([paused_until.to_i, Time.now.to_i + 1].max))
+                          "<strong>Too many wrong passwords.</strong> You can try your password again in #{wait}, or get a sign in code to your email now."
+                        else
+                          '<strong>Hmm.</strong> There was a problem signing you in.'
+                        end
     erb :'accounts/sign_in'
   end
 

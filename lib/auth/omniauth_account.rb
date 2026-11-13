@@ -14,6 +14,10 @@ module OmniAuth
 
         if account
           super
+        elsif (paused = ::Account.find_by(email: request.params['email'].to_s.downcase.strip)) && paused.password_sign_in_paused?
+          # For the failure page to say when they can next try
+          session['sign_in_paused_until'] = paused.password_sign_in_paused_until.to_i
+          fail!(:sign_in_paused)
         else
           fail!(:invalid_credentials)
         end

@@ -399,8 +399,8 @@ Dandelion::App.controller do
     @account = account_from_params
     halt 403 if @account.admin? && !current_account.admin?
     @account.password = Account.generate_password
-    @account.failed_sign_in_attempts = nil
     @account.save!
+    @account.clear_failed_sign_ins!
     @account.revoke_sessions!
     { password: @account.password }.to_json
   end

@@ -440,18 +440,49 @@ class Account
     notifications_as_notifiable.create! circle: self, type: 'created_profile'
   end
 
+  # Wrong passwords an account can have in a row before password sign in pauses
+  FREE_FAILED_SIGN_INS = 5
+  # How long the first pause lasts. Each wrong password after it doubles the pause, up to the longest
+  FIRST_SIGN_IN_PAUSE = 1.minute
+  LONGEST_SIGN_IN_PAUSE = 1.day
+
+  # How long password sign in pauses after the account's nth wrong password in a row
+  def self.sign_in_pause_after(failures)
+    return 0 if failures <= FREE_FAILED_SIGN_INS
+
+    [FIRST_SIGN_IN_PAUSE * (2**[failures - FREE_FAILED_SIGN_INS - 1, 20].min), LONGEST_SIGN_IN_PAUSE].min
+  end
+
+  # Passwords can be guessed from many IPs at once, so wrong ones are limited by account: after FREE_FAILED_SIGN_INS
+  # in a row, each pauses password sign in for twice as long as the one before, so a guesser gets a few a day at most.
+  # While paused, a password isn't checked at all, right or not. Signing in with a code or link ends the pause.
+  # Each check first takes its turn: one atomic update, which only matches if no other check has counted since this
+  # one read the account, counts the attempt as wrong and starts the pause it would bring, so checks at the same time
+  # can't each get a free guess. A right password then clears them
   def self.authenticate(email, password)
     return unless email.present? && (account = find_by(email: email.downcase.strip))
+    return if account.password_sign_in_paused?
 
-    if account.failed_sign_in_attempts && account.failed_sign_in_attempts >= 99
-      nil
-    elsif account.password_matches?(password)
-      account.set(failed_sign_in_attempts: 0)
-      account
-    else
-      account.inc(failed_sign_in_attempts: 1)
-      nil
-    end
+    failures = account.failed_sign_in_attempts.to_i + 1
+    pause = sign_in_pause_after(failures)
+    turn = collection.update_one(
+      { _id: account.id, failed_sign_in_attempts: account.failed_sign_in_attempts, '$or' => [{ password_sign_in_paused_until: nil }, { password_sign_in_paused_until: { '$lte' => Time.now } }] },
+      { '$set' => { failed_sign_in_attempts: failures, password_sign_in_paused_until: (pause.from_now if pause.positive?) } }
+    )
+    return unless turn.modified_count == 1
+
+    return unless account.password_matches?(password)
+
+    account.clear_failed_sign_ins!
+    account
+  end
+
+  def password_sign_in_paused?
+    password_sign_in_paused_until.present? && password_sign_in_paused_until > Time.now
+  end
+
+  def clear_failed_sign_ins!
+    set(failed_sign_in_attempts: 0, password_sign_in_paused_until: nil)
   end
 
   before_save :encrypt_password, if: :password_required
