@@ -306,6 +306,7 @@ class AccountSignInsTest < ActiveSupport::TestCase
   end
 
   test 'disconnecting a provider from a session from an email link, after entering a sign in code' do
+    covers_route 'POST /accounts/disconnect/:provider'
     account = FactoryBot.create(:account)
     account.set(email_confirmed: true)
     account.provider_links.create!(provider: 'Google', provider_uid: 'google-uid-disconnect', omniauth_hash: { 'uid' => 'google-uid-disconnect' })

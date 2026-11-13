@@ -21,6 +21,7 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
 
   test 'connecting a provider while signed in waits for confirmation' do
     covers_route 'GET /accounts/providers'
+    covers_route 'POST /accounts/providers/confirm'
     account = FactoryBot.create(:account)
     sign_in(account)
     visit_omniauth_as(uid: 'google-uid-connect')
@@ -33,6 +34,7 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
   end
 
   test 'cancelling a provider connection links nothing' do
+    covers_route 'POST /accounts/providers/cancel'
     account = FactoryBot.create(:account)
     sign_in(account)
     visit_omniauth_as(uid: 'google-uid-cancel')
