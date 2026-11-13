@@ -3,23 +3,4 @@
 GET /geolocate: Site admins' stats and diagnostics
 GET /raise: Site admins' stats and diagnostics
 GET /raise_job: Site admins' stats and diagnostics
-GET /stats/charts: Site admins' stats and diagnostics
-GET /stats/comments: Site admins' stats and diagnostics
-GET /stats/contributions: Site admins' stats and diagnostics
-GET /stats/delivery: Site admins' stats and diagnostics
-GET /stats/files: Site admins' stats and diagnostics
-GET /stats/icons: Site admins' stats and diagnostics
-GET /stats/messages: Site admins' stats and diagnostics
-GET /stats/openrouter: Site admins' stats and diagnostics
-GET /stats/orders: Site admins' stats and diagnostics
-GET /stats/organisations: Site admins' stats and diagnostics
-GET /stats/packages: Site admins' stats and diagnostics
-GET /stats/referrals: Site admins' stats and diagnostics
-GET /stats/routes: Site admins' stats and diagnostics
-GET /stats/sentry_spans: Site admins' stats and diagnostics
-GET /stats/traces: Site admins' stats and diagnostics
-GET /stats/traces/:id: Site admins' stats and diagnostics
-GET /stats/traces/slowest: Site admins' stats and diagnostics
-GET /stats/transactions: Site admins' stats and diagnostics
-POST /stats/traces/delete_before: Site admins' stats and diagnostics
 POST /whatsapp: Experimental
