@@ -3447,7 +3447,7 @@ table.event-details td {
   display: none;
   justify-content: center;
   gap: var(--space-2xs);
-  padding-top: var(--space-2xs);
+  padding-top: var(--space-sm);
 }
 
 .snap-carousel-overflowing .snap-carousel-prev,
