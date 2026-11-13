@@ -84,8 +84,8 @@ Dandelion::App.controller do
 
   get '/o/:slug/news/latest' do
     @organisation = organisation_from_params
-    @pmails = @organisation.news
-    redirect "/pmails/#{@pmails.first.public_id}"
+    pmail = @organisation.news.first || not_found
+    redirect "/pmails/#{pmail.public_id}"
   end
 
   get '/o/:slug/subscribe' do

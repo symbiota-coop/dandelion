@@ -128,6 +128,13 @@ class OrganisationRoutesTest < ActiveSupport::TestCase
     assert_equal "/pmails/#{latest.public_id}", URI(last_response.location).path
   end
 
+  test 'an organisation with no news has no latest news' do
+    create_organisation
+    FactoryBot.create(:pmail, organisation: @organisation, to_option: 'everyone')
+    get "/o/#{@organisation.slug}/news/latest"
+    assert_equal 404, last_response.status
+  end
+
   test "an organisation's counts are its cached counts, and an organisation that doesn't exist has none" do
     covers_route 'GET /o/:slug/subscribed_accounts_count'
     covers_route 'GET /o/:slug/monthly_donors_count'
