@@ -224,6 +224,8 @@ jobs:
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
       env:
         TEST_FILES: ${{ matrix.files }}
+        # Two runs at once: one is mostly one Ruby process and one Chrome, and the runner has 4 CPUs (rake test:parallel)
+        TEST_PROCESSES: 2
         # Coverage (test/setup/coverage.rb) only when asked for, as it slows the groups and changes slowly
         COVERAGE: ${{ inputs.coverage && '1' || '' }}
         RECORD_ROUTES: ${{ inputs.record_routes && '1' || '' }}
@@ -231,7 +233,7 @@ jobs:
         timeout_minutes: 10
         max_attempts: 2
         retry_on: timeout
-        command: bundle exec rake test:files
+        command: bundle exec rake test:parallel
 
     - name: Upload coverage
       if: ${{ !cancelled() && inputs.coverage }}
