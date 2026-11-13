@@ -39,8 +39,8 @@ class OrdersTicketAdminTest < ActiveSupport::TestCase
     price_cell = "[data-pagelet-url='/tickets/#{@ticket.id}/price']"
     within(price_cell) do
       click_link '£10'
+      # Cuprite's fill_in blurs the field when it's done, and the field's onblur submits the form
       fill_in 'price', with: '7.5'
-      find_field('price').send_keys(:tab)
     end
     wait_until('price not saved') { @ticket.reload.discounted_price.to_s == '7.5' }
     # The cell reloads from /tickets/:id/price with the new price
