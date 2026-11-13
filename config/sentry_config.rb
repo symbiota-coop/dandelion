@@ -15,6 +15,42 @@ end
 # Every request is traced and saved to Mongo (see before_send_transaction below), and viewed at /stats/transactions
 # and /stats/traces. Only errors and logs are sent to Sentry, never transactions.
 
+# Sentry filters the top-level keys of a request's body and query only, so the fields of a form's model (organisation[stripe_sk],
+# gathering[stripe_sk], organisation[mailgun_api_key]...) would reach it. This filters them at every depth, with
+# Sentry's own denylist plus our keys it misses (stripe_sk matches none of its terms)
+module SentryRequestScrubber
+  module_function
+
+  FILTERED = Sentry::DataCollection::KeyValueCollection::FILTERED_VALUE
+  SENSITIVE_TERMS = Sentry::DataCollection::KeyValueCollection::SENSITIVE_DENY_LIST
+  OUR_SENSITIVE_KEYS = /(\A|_)sk\z/
+
+  def scrub(event)
+    request = event.respond_to?(:request) ? event.request : nil
+    if request.is_a?(Sentry::RequestInterface)
+      request.data = scrub_value(request.data)
+      request.query_string = scrub_value(request.query_string)
+    end
+    event
+  end
+
+  def scrub_value(value)
+    case value
+    when Hash
+      value.to_h { |key, v| [key, sensitive?(key) ? FILTERED : scrub_value(v)] }
+    when Array
+      value.map { |v| scrub_value(v) }
+    else
+      value
+    end
+  end
+
+  def sensitive?(key)
+    key = key.to_s.downcase
+    SENSITIVE_TERMS.any? { |term| key.include?(term) } || key.match?(OUR_SENSITIVE_KEYS)
+  end
+end
+
 # Discards everything, so development can trace (which Sentry only does with a DSN) without sending anything
 class SentryNullTransport < Sentry::Transport
   def send_envelope(_envelope); end
@@ -61,6 +97,7 @@ Sentry.init do |config|
   end
 
   config.before_send = lambda do |event, hint|
+    SentryRequestScrubber.scrub(event)
     exception = hint[:exception]
     next event unless exception
 

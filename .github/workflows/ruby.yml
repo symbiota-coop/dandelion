@@ -136,7 +136,7 @@ jobs:
           - group: gatherings
             files: gatherings/gatherings gatherings/members
           - group: general
-            files: dadmin design images search errands record_lock stats_database stats_pages organisations/activity_applications messages/markup site_pages site_routes
+            files: dadmin design images search errands record_lock sentry stats_database stats_pages organisations/activity_applications messages/markup site_pages site_routes
           - group: integrations
             files: integrations/mcp integrations/mcp_checkout integrations/whatsapp integrations/zapier integrations/webhooks integrations/analytics_providers events/admin_reports events/my_events accounts/account_routes organisations/organisation_routes
           - group: messages
