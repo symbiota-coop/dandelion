@@ -18,22 +18,31 @@ end
 
 # TEST_FILES split between TEST_PROCESSES (default 2) runs of test:files at once, as CI runs each group: a run is mostly
 # one Ruby process and one Chrome, and the runner has 4 CPUs. Each run has its own database, port and Chrome
-# (config/boot.rb), so they can't clash. Files go to the run with the fewest tests so far, biggest first; each run's
-# output is printed whole once it's done, and the task fails if any run does.
+# (config/boot.rb), so they can't clash. Files are split by how long they took last time, from TEST_TIMES_FILE (default
+# tmp/test_times.json, which each run updates and CI caches between runs), or, with no time yet, by their number of tests
+# at the average time a test took: biggest first, each to the run with least so far. Each run's output is printed whole
+# once it's done, and the task fails if any run does.
 # TEST_FILES="accounts/accounts accounts/sign_ins" rake test:parallel
 task 'test:parallel' do
-  counts = Hash.new { |hash, name| hash[name] = File.read("test/#{name}_test.rb", encoding: "UTF-8").scan(/^\s*test\s+['"]/).length }
-  tests_in = counts.method(:[])
-  files = ENV.fetch('TEST_FILES', '').split
-  shares = Array.new([Integer(ENV.fetch('TEST_PROCESSES', '2')), files.length].min) { [] }
-  files.sort_by { |name| -tests_in.call(name) }.each do |name|
-    shares.min_by { |share| share.sum(&tests_in) } << name
+  times_file = ENV.fetch('TEST_TIMES_FILE', 'tmp/test_times.json')
+  times = File.exist?(times_file) ? JSON.parse(File.read(times_file)) : {}
+  tests_in = ->(path) { File.exist?(path) ? File.read(path, encoding: 'UTF-8').scan(/^\s*test\s+['"]/).length : 0 }
+  per_test = times.empty? ? 1.0 : times.values.sum / [times.keys.sum(&tests_in), 1].max
+  weights = ENV.fetch('TEST_FILES', '').split.to_h do |name|
+    path = "test/#{name}_test.rb"
+    [name, times[path] || (tests_in.call(path) * per_test)]
   end
+  shares = Array.new([Integer(ENV.fetch('TEST_PROCESSES', '2')), weights.length].min) { [] }
+  weights.sort_by { |_name, seconds| -seconds }.each do |name, _seconds|
+    shares.min_by { |share| share.sum { |n| weights[n] } } << name
+  end
+  shares.each { |share| puts "Run of about #{share.sum { |n| weights[n] }.round}s: #{share.join(' ')}" }
 
   FileUtils.mkdir_p('tmp/test_runs')
+  FileUtils.rm_rf('tmp/test_runs/times')
   runs = shares.map do |share|
     log = "tmp/test_runs/#{SecureRandom.hex(4)}.log"
-    pid = Process.spawn({ 'TEST_FILES' => share.join(' ') }, 'bundle', 'exec', 'rake', 'test:files', out: log, err: %i[child out])
+    pid = Process.spawn({ 'TEST_FILES' => share.join(' '), 'TEST_TIMES' => 'tmp/test_runs/times' }, 'bundle', 'exec', 'rake', 'test:files', out: log, err: %i[child out])
     { pid: pid, files: share, log: log }
   end
   # Stopped (a timeout, Ctrl-C), stop the runs too
@@ -54,6 +63,10 @@ task 'test:parallel' do
     File.delete(run[:log])
     failed << run[:files] unless status.success?
   end
+  # This run's times replace those it has of the same files, for the next run to split by
+  Dir['tmp/test_runs/times/*.json'].each { |path| times.merge!(JSON.parse(File.read(path))) }
+  FileUtils.mkdir_p(File.dirname(times_file))
+  File.write(times_file, JSON.pretty_generate(times.sort.to_h))
   abort "Failed: #{failed.map { |share| share.join(' ') }.join('; ')}" if failed.any?
 end
 

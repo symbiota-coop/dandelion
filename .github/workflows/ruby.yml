@@ -218,6 +218,16 @@ jobs:
       if: contains(format(' {0} ', matrix.files), ' images ')
       run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends imagemagick
 
+    # How long each of the group's files took in its last run, which rake test:parallel splits them by, and saves after.
+    # A cache entry can't be overwritten, so each run saves its own and the next restores the newest; files with no time
+    # yet are split by their number of tests
+    - name: Cache test times
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: tmp/test_times.json
+        key: test-times-${{ matrix.group }}-${{ github.run_id }}-${{ github.run_attempt }}
+        restore-keys: test-times-${{ matrix.group }}-
+
     # A failing test is retried on its own (TEST_ATTEMPTS in test/test_config.rb), so the group runs again only when it
     # hangs past the timeout, which those retries can't catch
     - name: Run tests (${{ matrix.files }})

@@ -14,7 +14,7 @@ require 'minitest/rg'
 require 'rack/test'
 require_relative 'helpers/test_helpers'
 
-%w[outside_services fake_imagemagick capybara cdn_cache cleanup route_recording].each { |file| require_relative "setup/#{file}" }
+%w[outside_services fake_imagemagick capybara cdn_cache cleanup route_recording test_times].each { |file| require_relative "setup/#{file}" }
 
 module ActiveSupport
   class TestCase
@@ -30,6 +30,7 @@ module ActiveSupport
     def self.run(klass, method_name, reporter)
       reporter.prerecord klass, method_name
       result = nil
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       (1..TEST_ATTEMPTS).each do |attempt|
         result = klass.new(method_name).run
         if result.passed? || result.skipped?
@@ -38,6 +39,7 @@ module ActiveSupport
         end
         puts "\n🔁 #{klass}##{method_name} failed on attempt #{attempt} of #{TEST_ATTEMPTS}: #{result.failure.message.lines.first}" if attempt < TEST_ATTEMPTS
       end
+      TestTimes.record(klass, method_name, started)
       reporter.record result
     end
 
