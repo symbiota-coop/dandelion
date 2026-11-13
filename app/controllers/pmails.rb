@@ -163,6 +163,8 @@ Dandelion::App.controller do
   post '/pmails/:oid/attachments/:attachment_id/destroy' do
     halt 403 unless @_organisation && params[:oid] == @_organisation.id.to_s
     @organisation = @_organisation
+    # Only the organisation's admins: deleting an attachment breaks it in mails already sent
+    halt 403 unless organisation_admin?
     @organisation.attachments.find(params[:attachment_id]).try(:destroy)
     200
   end

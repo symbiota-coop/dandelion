@@ -358,6 +358,21 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
     assert_nil Attachment.find(attachment.id)
   end
 
+  test "an event's admins who don't admin its organisation can't delete the organisation's mail attachments" do
+    create_event
+    attachment = @organisation.attachments.create!(file: text_file('flyer.txt'))
+    sign_in_with_rack(create_facilitator(@event))
+
+    get "/pmails/#{@organisation.id}/attachments", event_id: @event.id
+    assert last_response.ok?
+    assert_includes last_response.body, 'flyer.txt'
+    refute_includes last_response.body, '/destroy'
+
+    post "/pmails/#{@organisation.id}/attachments/#{attachment.id}/destroy", event_id: @event.id
+    assert_equal 403, last_response.status
+    assert Attachment.find(attachment.id)
+  end
+
   test "an organisation's admins can't delete another organisation's mail attachments" do
     create_organisation
     other_organisation = FactoryBot.create(:organisation, account: FactoryBot.create(:account))
