@@ -12,7 +12,7 @@ ADJECTIVES = %w[soulful regenerative metamodern participatory conscious transfor
 # LANG isn't set, and Padrino no longer sets this. Email templates with a ✓ or £ would then fail to render
 Encoding.default_external = Encoding::UTF_8
 
-# Each test run gets its own database, which test_config.rb drops afterwards, and a free port, so runs at the
+# Each test run gets its own database, which test/setup/cleanup.rb drops afterwards, and a free port, so runs at the
 # same time (in one checkout or several) can't wipe each other's data or clash on the port
 if RACK_ENV == 'test'
   require 'socket'

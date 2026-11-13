@@ -22,12 +22,12 @@ Rake::TestTask.new(:test) do |test|
   test.pattern = 'test/**/*_test.rb'
 end
 
-# Collates the coverage CI's test groups recorded (COVERAGE, test/test_coverage.rb), downloaded into coverage-groups/, into
+# Collates the coverage CI's test groups recorded (COVERAGE, test/setup/coverage.rb), downloaded into coverage-groups/, into
 # one report in coverage/, and writes its totals and least-covered files to GitHub's job summary when there is one
 desc 'Collate test coverage from coverage-groups/*/.resultset.json'
 task 'test:coverage' do
   require 'simplecov'
-  require_relative 'test_coverage'
+  require_relative 'setup/coverage'
   SimpleCov.collate(Dir['coverage-groups/*/.resultset.json'], &TestCoverage::CONFIG)
   result = SimpleCov.result
   summary = ["## Test coverage: #{result.covered_percent.round(1)}% of lines\n", '| Group | Lines | Covered |',

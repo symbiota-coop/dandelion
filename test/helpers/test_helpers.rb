@@ -150,7 +150,7 @@ module TestHelpers
   end
 
   # Stubs Dragonfly's shell, failing the test if the block hands a file to ImageMagick
-  # Real ImageMagick, for a test of ImageMagick itself (test/test_config.rb fakes it for the rest)
+  # Real ImageMagick, for a test of ImageMagick itself (test/setup/fake_imagemagick.rb fakes it for the rest)
   def with_imagemagick
     FakeImageMagick.real = true
     yield
