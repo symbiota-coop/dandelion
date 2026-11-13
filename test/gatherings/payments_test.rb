@@ -177,6 +177,23 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     assert_equal 1, payment.notifications.count
   end
 
+  test 'a payment completed by two deliveries at once is credited once' do
+    create_paying_gathering
+    member = create_member
+    payment = create_unpaid_payment(membership_of(member), amount: 30)
+
+    # Each delivery found the payment not yet completed before either completed it
+    first = Payment.find(payment.id)
+    second = Payment.find(payment.id)
+    first.payment_completed!
+    second.payment_completed!
+
+    assert payment.reload.payment_completed?
+    assert_equal 30, membership_of(member).paid
+    assert_equal 30, @gathering.reload.balance
+    assert_equal 1, payment.notifications.count
+  end
+
   test 'a session not yet paid completes nothing until its async payment succeeds' do
     create_paying_gathering
     payment = create_unpaid_payment(membership_of(create_member))

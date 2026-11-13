@@ -42,8 +42,12 @@ class Payment
     self.evm_amount = amount.to_d + evm_offset if evm_secret && !evm_amount
   end
 
+  # Claims the payment atomically, so two callers at once (two deliveries of Stripe's webhook, or a poll checking the
+  # EVM account) credit the membership only once
   def payment_completed!
-    set(payment_completed: true)
+    return unless Payment.collection.find_one_and_update({ _id: id, payment_completed: { '$ne' => true } }, { '$set' => { payment_completed: true } })
+
+    attributes['payment_completed'] = true
     membership.inc(paid: amount)
     gathering.inc(processed_via_dandelion: amount, balance: amount)
     notifications.create! circle: circle, type: 'created_payment' unless gathering.hide_paid || gathering.options.any?(&:hide_members)
