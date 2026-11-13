@@ -17,8 +17,12 @@ module TestCoverage
   end
 
   # SimpleCov adds the templates no test rendered at 0% for Rails' ActionView only, so Padrino's are compiled here,
-  # without running them, so they count as uncovered rather than being left out
+  # without running them, so they count as uncovered rather than being left out. Not once Coverage has stopped: when
+  # a run at the same time has already reported (as test:parallel's runs do), SimpleCov collects this run's result
+  # before its exit task, to check it isn't empty, and that run's results already list the unrendered templates
   def self.compile_unrendered_templates
+    return unless Coverage.running?
+
     rendered = Coverage.peek_result.keys.to_set
     Dir[File.expand_path("../#{VIEWS}", __dir__)].each do |path|
       next if rendered.include?(path)
