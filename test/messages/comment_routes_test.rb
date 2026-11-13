@@ -270,15 +270,22 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
     assert_equal 0, Photo.count
   end
 
-  test "a photo that isn't a JPEG, PNG, GIF, WebP or HEIC is refused before ImageMagick sees it" do
+  test "a photo that isn't a JPEG, PNG, GIF, WebP or HEIC is refused before ImageMagick sees it, saying why" do
     create_gathering
     sign_in_with_rack(@account)
 
     without_imagemagick do
-      assert_raises(Mongoid::Errors::Validations) do
-        post '/photos/new', photoable_type: 'Gathering', photoable_id: @gathering.id, image: svg_upload
-      end
+      post '/photos/new', photoable_type: 'Gathering', photoable_id: @gathering.id, image: svg_upload
     end
+    # Back to the gathering rather than an error page
+    assert_equal "#{ENV.fetch('BASE_URI', nil)}/g/#{@gathering.slug}", last_response.location.split('#').first
+    follow_redirect!
+    assert_includes last_response.body, 'must be a JPEG, PNG, GIF, WebP or HEIC image'
+    assert_equal 0, @gathering.photos.count
+
+    # Or no file at all
+    post '/photos/new', photoable_type: 'Gathering', photoable_id: @gathering.id
+    assert last_response.redirect?
     assert_equal 0, @gathering.photos.count
   end
 

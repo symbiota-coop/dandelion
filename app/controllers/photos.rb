@@ -13,7 +13,8 @@ Dandelion::App.controller do
     photoable = photoable_type.constantize.find(params[:photoable_id]) || not_found
     halt(403) unless can_add_photo_to?(photoable, current_account)
 
-    @photo = Photo.create!(image: params[:image], account: current_account, photoable_type: photoable_type, photoable_id: photoable.id)
+    @photo = Photo.new(image: params[:image], account: current_account, photoable_type: photoable_type, photoable_id: photoable.id)
+    flash[:error] = @photo.errors.full_messages.to_sentence unless @photo.save
     redirect @photo.url
   end
 
