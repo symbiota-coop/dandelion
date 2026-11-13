@@ -30,12 +30,14 @@ class ImagesTest < ActiveSupport::TestCase
 
   test 'image fields still take JPEGs and PNGs, stored as JPEGs' do
     create_organisation
-    %w[test-event.jpg coop.png].each do |name|
-      organisation = Organisation.find(@organisation.id)
-      organisation.image = File.new("app/assets/images/#{name}")
+    with_imagemagick do
+      %w[test-event.jpg coop.png].each do |name|
+        organisation = Organisation.find(@organisation.id)
+        organisation.image = File.new("app/assets/images/#{name}")
 
-      assert organisation.save, organisation.errors.full_messages.to_sentence
-      assert_equal 'jpeg', organisation.reload.image.format
+        assert organisation.save, organisation.errors.full_messages.to_sentence
+        assert_equal 'jpeg', organisation.reload.image.format
+      end
     end
   end
 
@@ -59,9 +61,11 @@ class ImagesTest < ActiveSupport::TestCase
 
   test 'ImageMagick refuses SVG and PostScript under our policy' do
     assert_includes ENV.fetch('MAGICK_CONFIGURE_PATH'), File.expand_path('../config/imagemagick', __dir__)
-    [SVG, POSTSCRIPT].each do |data|
-      assert_raises(Dragonfly::Shell::CommandFailed) { Dragonfly.app.create(data).analyse(:format) }
+    with_imagemagick do
+      [SVG, POSTSCRIPT].each do |data|
+        assert_raises(Dragonfly::Shell::CommandFailed) { Dragonfly.app.create(data).analyse(:format) }
+      end
+      assert_equal 'png', Dragonfly.app.create(File.binread('app/assets/images/coop.png')).analyse(:format)
     end
-    assert_equal 'png', Dragonfly.app.create(File.binread('app/assets/images/coop.png')).analyse(:format)
   end
 end

@@ -132,7 +132,7 @@ jobs:
           - group: gatherings
             files: gatherings/gatherings gatherings/members
           - group: general
-            files: dadmin design images search errands stats_database organisations/activity_applications messages/markup site_pages site_routes messages/comment_routes
+            files: dadmin design images search errands stats_database organisations/activity_applications messages/markup site_pages site_routes
           - group: integrations
             files: integrations/mcp integrations/mcp_checkout integrations/zapier integrations/webhooks integrations/analytics_providers events/admin_reports events/my_events accounts/account_routes organisations/organisation_routes
           - group: messages
@@ -142,7 +142,7 @@ jobs:
           - group: organisations
             files: organisations/organisations organisations/caches organisations/followers organisations/local_groups organisations/activities organisations/calendar_imports organisations/local_group_admin organisations/admin
           - group: payments
-            files: payments/gocardless payments/mollie payments/paypal payments/stripe_connect payments/stripe_row_splitter payments/monthly_contributions orders/refunds bookings/donations organisations/payments payments/paypal_checkout payments/stripe_charges gatherings/payments
+            files: payments/gocardless payments/mollie payments/paypal payments/stripe_connect payments/stripe_row_splitter payments/monthly_contributions orders/refunds bookings/donations organisations/payments payments/paypal_checkout payments/stripe_charges gatherings/payments messages/comment_routes
           - group: ticket_types
             files: bookings/ticket_types bookings/quotes bookings/waitlist bookings/discount_codes events/event_admin_routes orders/ticket_admin
           - group: tours

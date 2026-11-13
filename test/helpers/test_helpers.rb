@@ -150,6 +150,14 @@ module TestHelpers
   end
 
   # Stubs Dragonfly's shell, failing the test if the block hands a file to ImageMagick
+  # Real ImageMagick, for a test of ImageMagick itself (test/test_config.rb fakes it for the rest)
+  def with_imagemagick
+    FakeImageMagick.real = true
+    yield
+  ensure
+    FakeImageMagick.real = false
+  end
+
   def without_imagemagick(&)
     Dragonfly.app.shell.stub(:run, ->(command, *) { flunk "ran #{command}" }, &)
   end

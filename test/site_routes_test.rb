@@ -210,18 +210,42 @@ class SiteRoutesTest < ActiveSupport::TestCase
 
   # YouTube thumbnails
 
-  # MiniMagick fetching YouTube's thumbnails: served, from the app's test image, for the sizes listed, and a 404 for
+  # A MiniMagick image as the YouTube thumbnail route uses one, without ImageMagick: crop and composite record what
+  # they were asked to do, and to_blob gives that back
+  FakeThumbnail = Struct.new(:width, :height, :steps) do
+    def crop(geometry)
+      width, height = geometry[/\A\d+x\d+/].split('x').map(&:to_i)
+      FakeThumbnail.new(width, height, steps + ["crop #{geometry}"])
+    end
+
+    def composite(overlay)
+      options = []
+      settings = Object.new
+      %i[compose geometry].each { |option| settings.define_singleton_method(option) { |value| options << "#{option} #{value}" } }
+      yield settings
+      FakeThumbnail.new(width, height, steps + ["composite #{overlay.width}x#{overlay.height} #{options.join(' ')}"])
+    end
+
+    def to_blob
+      "#{width}x#{height}: #{steps.join('; ')}"
+    end
+
+    def destroy!; end
+  end
+
+  # MiniMagick fetching YouTube's thumbnails: served, as the app's test image, for the sizes listed, and a 404 for
   # others. Gives the URLs asked for
   def stub_youtube(served)
     requested = []
-    original = MiniMagick::Image.method(:open)
-    opener = lambda do |path, *args|
-      return original.call(path, *args) unless path.start_with?('https://')
+    opener = lambda do |path, *|
+      if path.start_with?('https://')
+        requested << path
+        raise OpenURI::HTTPError.new('404 Not Found', StringIO.new) unless served.any? { |size| path.end_with?("/#{size}.jpg") }
 
-      requested << path
-      raise OpenURI::HTTPError.new('404 Not Found', StringIO.new) unless served.any? { |size| path.end_with?("/#{size}.jpg") }
-
-      original.call('app/assets/images/test-event.jpg')
+        path = 'app/assets/images/test-event.jpg'
+      end
+      _, width, height = FakeImageMagick.header(File.binread(path))
+      FakeThumbnail.new(width, height, [File.basename(path)])
     end
     MiniMagick::Image.stub(:open, opener) { yield }
     requested
@@ -232,7 +256,10 @@ class SiteRoutesTest < ActiveSupport::TestCase
     requested = stub_youtube(%w[sddefault hqdefault]) { get '/youtube_thumb/dQw4w9WgXcQ' }
     assert_equal 200, last_response.status
     assert_equal 'image/jpeg', last_response.media_type
-    assert_equal [640, 360], MiniMagick::Image.read(last_response.body).dimensions
+    _, button_width, button_height = FakeImageMagick.header(File.binread('app/assets/images/youtube.png'))
+    play_button = "+#{(640 - button_width) / 2}+#{(360 - button_height) / 2}"
+    assert_equal "640x360: test-event.jpg; crop 640x360+0+60; composite #{button_width}x#{button_height} compose Over geometry #{play_button}",
+                 last_response.body
     assert_equal ['https://i.ytimg.com/vi/dQw4w9WgXcQ/sddefault.jpg'], requested
 
     requested = stub_youtube(%w[hqdefault]) { get '/youtube_thumb/dQw4w9WgXcQ' }
