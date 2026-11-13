@@ -1165,9 +1165,9 @@
       <div class="spec">The whole tile links through the title's .stretched-link; hovered or keyboard focused, it takes --bs-box-shadow and a photo's black eases to 40% · title .block-title: --font-size-xl at every width, clamped to 4 lines, so a line is always left empty at the bottom; long words break · with an image: the photo under black at 50%, white text · without: .block-fill, the lavender wash (lavender-50 to paper) with a --hairline border, dark text · an icon such as the verified tick follows the title after a &amp;nbsp;, so it keeps to the line with its last word · admins get a pencil on hover, and activities a link to their organisation at the bottom right</div>
     <% end %>
 
-    <% design_subsection 'Carousel', 'Featured events and the organisation\'s own carousels (upcoming events, plus past ones with recordings) on organisation pages (events/_carousel.erb), with Slick: three to a slide from 992px, two from 576px, then one.' do %>
-      <div class="slick-container" id="dg-slick">
-        <div class="slick-responsive row justify-content-center">
+    <% design_subsection 'Carousel', 'Featured events and the organisation\'s own carousels (upcoming events, plus past ones with recordings) on organisation pages (events/_carousel.erb): a row that scrolls with CSS scroll-snap, three to a screen from 992px, two from 576px, then one.' do %>
+      <div class="snap-carousel">
+        <div class="snap-carousel-track row">
           <%# The slides are events/_block_carousel.erb; the wrapper is _carousel.erb's, which caches each slide by event id %>
           <% saturday = Date.today.next_occurring(:saturday) %>
           <% [design_sample_event,
@@ -1175,26 +1175,13 @@
               design_build_event('Breathwork weekend retreat', day: saturday + 6, days: 2),
               design_build_event('Ecstatic dance', day: saturday + 11),
               design_build_event('Breathwork foundations course', evergreen: true)].each do |event| %>
-            <div class="col-12 col-sm-6 col-lg-4 slick-item">
+            <div class="col-12 col-sm-6 col-lg-4 snap-carousel-item">
               <%= partial :'events/block_carousel', locals: { event: event } %>
             </div>
           <% end %>
         </div>
       </div>
-      <script>
-        $(function () {
-          $('#dg-slick .slick-responsive').slick({
-            speed: 300,
-            dots: true,
-            prevArrow: "<button type='button' class='rounded-circle slick-prev float-start'><i class='bi bi-chevron-compact-left'></i></button>",
-            nextArrow: "<button type='button' class='rounded-circle slick-next float-end'><i class='bi bi-chevron-compact-right'></i></button>",
-            slidesToShow: 3,
-            slidesToScroll: 3,
-            responsive: [{ breakpoint: 992, settings: { slidesToShow: 2, slidesToScroll: 2 } }, { breakpoint: 576, settings: { slidesToShow: 1, slidesToScroll: 1 } }]
-          })
-        })
-      </script>
-      <div class="spec">Arrows: 2.5rem white circles with black bi-chevron-compact icons, the whole button at 50% opacity, 75% on hover · dates and Sold out as .badge-overlay (see Badges) · before Slick loads, only the first item shows</div>
+      <div class="spec">.snap-carousel around a .snap-carousel-track row of .snap-carousel-item columns · it scrolls natively (swipe, trackpad, shift-scroll), snapping to the start of an item, with no scrollbar; fewer items than fit sit in the middle · carousels.js adds the arrows and dots once the items overflow: arrows are 2.5rem white circles with black bi-chevron-compact icons, the whole button at 50% opacity, 75% on hover, paging a screenful at a time and wrapping round at the ends; a dot per screenful, the current one darker · dates and Sold out as .badge-overlay (see Badges)</div>
     <% end %>
 
     <% design_subsection 'Ticket purchase form', 'The Select tickets card on an event page (purchase/_purchase.erb), one row per ticket type from purchase/_ticket_type.erb, then discounts, a donation and the total down the right-hand column. Shown here without purchase.js, so totals don\'t add up.' do %>

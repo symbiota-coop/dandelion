@@ -87,18 +87,6 @@ blockquote {
   font-style: italic;
 }
 
-@media (min-width: 576px) {
-  .slick-container .slick-item:nth-child(2) {
-    display: block;
-  }
-}
-
-@media (min-width: 992px) {
-  .slick-container .slick-item:nth-child(3) {
-    display: block;
-  }
-}
-
 .ck-progress-bar {
   height: 100% !important;
   width: 100% !important;

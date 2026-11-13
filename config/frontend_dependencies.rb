@@ -19,7 +19,6 @@ FRONTEND_DEPENDENCIES = {
   'select2' => 'dist/js/select2.full.min.js dist/css/select2.min.css',
   'select2-bootstrap-5-theme' => 'dist/select2-bootstrap-5-theme.min.css',
   'iframe-resizer' => 'js/iframeResizer.contentWindow.min.js',
-  'slick-carousel' => 'slick/slick.min.js slick/slick.css slick/slick-theme.css',
   'chart.js' => 'dist/chart.umd.min.js',
   'intro.js' => 'minified/intro.min.js minified/introjs.min.css',
   'bootstrap-icons' => 'font/bootstrap-icons.min.css',
@@ -33,7 +32,7 @@ FRONTEND_LOCAL_FILES = {
   # jQuery UI's autocomplete, built from the modules we use (rake jquery_ui:build). Pages that drag things also load
   # jquery-ui-interactions.min.js
   'javascripts/ext' => 'ckeditor.js jquery-ui-autocomplete.min.js',
-  'javascripts' => 'utils.js confirm.js pagelets.js map.js places.js cookie_consent.js sidebar.js header_search.js scrollspy.js app.js forms.js comments.js rich_text.js tabs.js wysiwyg.js sheets.js'
+  'javascripts' => 'utils.js confirm.js pagelets.js map.js places.js cookie_consent.js sidebar.js header_search.js scrollspy.js carousels.js app.js forms.js comments.js rich_text.js tabs.js wysiwyg.js sheets.js'
 }.freeze
 
 # Packages whose files are ES modules, loaded with type="module"

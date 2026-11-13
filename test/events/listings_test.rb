@@ -231,7 +231,7 @@ class EventListingsTest < ActiveSupport::TestCase
     assert_includes last_response.body, "id=\"carousel-#{carousel1.id}\""
     refute_includes last_response.body, "id=\"carousel-#{carousel2.id}\""
     get "/o/#{@organisation.slug}/carousels/featured", hide_featured_title: 1
-    assert_includes last_response.body, 'slick-item'
+    assert_includes last_response.body, 'snap-carousel-item'
     refute_includes last_response.body, '<h2 class="text-center">Featured</h2>'
 
     get "/o/#{@organisation.slug}/events", minimal: 1, no_search: 1, no_view_options: 1

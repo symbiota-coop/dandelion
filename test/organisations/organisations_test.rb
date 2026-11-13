@@ -252,7 +252,7 @@ class OrganisationsTest < ActiveSupport::TestCase
     # The carousel's cards share the grid's cache keys
     get "/o/#{@organisation.slug}/carousels/featured"
     assert last_response.ok?
-    assert_equal 2, last_response.body.scan('slick-item"').length
+    assert_equal 2, last_response.body.scan('snap-carousel-item"').length
     assert_equal 2, Fragment.count
 
     Fragment.all.each { |fragment| fragment.set(value: '<p>cached card</p>') }

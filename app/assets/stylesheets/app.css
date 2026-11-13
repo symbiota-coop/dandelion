@@ -3364,73 +3364,115 @@ table.event-details td {
 }
 
 /* ==========================================================================
-   Carousels (Slick)
+   Carousels (events/_carousel.erb, organisations/_carousel.erb; carousels.js adds the arrows and dots)
    ========================================================================== */
 
-.slick-placeholder img,
-.slick-placeholder .placeholder {
+.snap-carousel {
+  position: relative;
+  margin-bottom: var(--space-lg);
+}
+
+/* A row that scrolls rather than wraps, snapping to its items, with no scrollbar: the arrows, dots, a swipe or a
+   trackpad move it. Fewer items than fit sit in the middle */
+.snap-carousel-track {
+  flex-wrap: nowrap;
+  justify-content: safe center;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.snap-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .snap-carousel-track {
+    scroll-behavior: smooth;
+  }
+}
+
+.snap-carousel-item {
+  scroll-snap-align: start;
+}
+
+.snap-carousel-placeholder img,
+.snap-carousel-placeholder .placeholder {
   background: var(--bs-secondary-bg);
 }
 
-.slick-container .slick-responsive {
-  margin-bottom: var(--space-lg)
-}
-
-/* The grid's half-gutter: Bootstrap gives it to .row > *, but Slick moves the items out of the row into its track */
-.slick-container .slick-item {
+.snap-carousel-prev,
+.snap-carousel-next {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  z-index: 2;
   display: none;
-  padding-left: calc(var(--bs-gutter-x) * 0.5);
-  padding-right: calc(var(--bs-gutter-x) * 0.5);
-}
-
-.slick-container .slick-item:nth-child(1) {
-  display: block;
-}
-
-.slick-container .slick-responsive.slick-initialized .slick-item {
-  display: block;
-  max-width: none !important
-}
-
-.slick-placeholder .slick-dots {
-  opacity: .25
-}
-
-.slick-next:before {
-  content: none
-}
-
-.slick-prev:before {
-  content: none
-}
-
-.slick-prev {
-  left: 0
-}
-
-.slick-next {
-  right: 0
-}
-
-.slick-next:focus,
-.slick-next:hover,
-.slick-prev:focus,
-.slick-prev:hover {
-  color: var(--bs-body-color);
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
   background: var(--bs-white);
+  color: var(--bs-body-color);
+  font-size: 2.5rem;
+  line-height: 1;
+  opacity: 0.5;
+  transition: opacity var(--transition-fast);
+}
+
+.snap-carousel-prev {
+  left: 0;
+}
+
+.snap-carousel-next {
+  right: 0;
+}
+
+.snap-carousel-prev:hover,
+.snap-carousel-prev:focus-visible,
+.snap-carousel-next:hover,
+.snap-carousel-next:focus-visible {
   opacity: 0.75;
 }
 
-.slick-prev,
-.slick-next {
-  border-radius: 50% !important;
-  background: var(--bs-white);
-  font-size: 2.5rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  z-index: 2;
-  color: var(--bs-body-color);
-  opacity: 0.5;
+.snap-carousel-dots {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: none;
+  justify-content: center;
+  gap: var(--space-2xs);
+  padding-top: var(--space-2xs);
+}
+
+.snap-carousel-overflowing .snap-carousel-prev,
+.snap-carousel-overflowing .snap-carousel-next,
+.snap-carousel-overflowing .snap-carousel-dots {
+  display: flex;
+}
+
+.snap-carousel-dots button {
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bs-body-color);
+  opacity: 0.25;
+  transition: opacity var(--transition-fast);
+}
+
+.snap-carousel-dots button[aria-current] {
+  opacity: 0.75;
+}
+
+.snap-carousel-placeholder .snap-carousel-dots {
+  opacity: 0.25;
 }
 
 /* ==========================================================================
