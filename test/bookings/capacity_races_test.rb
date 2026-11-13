@@ -78,8 +78,10 @@ class BookingsCapacityRacesTest < ActiveSupport::TestCase
   end
 
   test "two buyers at once for an event's last place: one gets it" do
-    racers = buyers(2)
     (ITERATIONS * 4).times do
+      # Buyers of their own each race: the same two would pass the bookings an address may make in an hour
+      # (RecipientLimit), each attempt counting, refused or not
+      racers = buyers(2)
       event = create_event(prices: [0], capacity: 1)
 
       assert_equal 1, race_bookings(event, racers) { { event.ticket_types.first => 1 } }
