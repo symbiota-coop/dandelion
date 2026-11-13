@@ -144,7 +144,7 @@ jobs:
           - group: payments
             files: payments/gocardless payments/mollie payments/paypal payments/stripe_connect payments/stripe_row_splitter payments/monthly_contributions orders/refunds bookings/donations organisations/payments payments/paypal_checkout payments/stripe_charges gatherings/payments messages/comment_routes
           - group: ticket_types
-            files: bookings/ticket_types bookings/quotes bookings/waitlist bookings/discount_codes
+            files: bookings/ticket_types bookings/quotes bookings/waitlist bookings/discount_codes events/event_admin_routes orders/ticket_admin
           - group: tours
             files: tours/tour tours/how_to_create_an_event tours/how_to_create_a_gathering gatherings/timetables gatherings/rotas gatherings/budget organisations/activity_admin organisations/local_group_routes
     steps:

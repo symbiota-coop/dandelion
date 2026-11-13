@@ -1,20 +1,6 @@
 # Routes no test covers (covers_route), each with why: test/lint_test.rb fails on any other route no test covers. Take
 # a route out once a test covers it. Not tested yet means a test is wanted
-GET /e/:event_slug/rpayments: Not tested yet
-GET /e/:event_slug/rpayments/:id/edit: Not tested yet
-GET /e/:slug/check_in: Not tested yet
-GET /e/:slug/duplicate: Not tested yet
-GET /e/:slug/event_sessions: Not tested yet
-GET /e/:slug/linked_image: Not tested yet
-GET /e/:slug/progress: Not tested yet
-GET /e/:slug/star: Not tested yet
-GET /e/:slug/stats: Not tested yet
-GET /e/:slug/ticket_type_waitlists: Not tested yet
-GET /e/:slug/ticket_types: Not tested yet
-GET /e/:slug/waitlist: Not tested yet
-GET /event_sessions/:id: Not tested yet
 GET /geolocate: Site admins' stats and diagnostics
-GET /orders/:id/confirm_destroy: Not tested yet
 GET /raise: Site admins' stats and diagnostics
 GET /raise_job: Site admins' stats and diagnostics
 GET /stats/charts: Site admins' stats and diagnostics
@@ -35,17 +21,5 @@ GET /stats/traces: Site admins' stats and diagnostics
 GET /stats/traces/:id: Site admins' stats and diagnostics
 GET /stats/traces/slowest: Site admins' stats and diagnostics
 GET /stats/transactions: Site admins' stats and diagnostics
-GET /tickets/:id/price: Not tested yet
-GET /tickets/:id/ticket_type: Not tested yet
-POST /drafts/:id/destroy: Not tested yet
-POST /e/:event_slug/rpayments/:id/destroy: Not tested yet
-POST /e/:event_slug/rpayments/new: Not tested yet
-POST /e/:slug/do_star: Not tested yet
-POST /e/:slug/event_sessions/destroy: Not tested yet
-POST /e/:slug/unstar: Not tested yet
-POST /event_boosts/stripe_webhook: Not tested yet
 POST /stats/traces/delete_before: Site admins' stats and diagnostics
-POST /tickets/:id/price: Not tested yet
-POST /tickets/:id/send_ticket: Not tested yet
-POST /tickets/:id/ticket_type: Not tested yet
 POST /whatsapp: Experimental
