@@ -24,8 +24,11 @@
     <%= cp(:chart, locals: { countable: Account.all, months_ago: 24, make_projection: true }, key: "/stats/charts/accounts", expires: 3.hours.from_now) %>
   </div>
 
-  <div class="col-lg-6 mb-4">
-    <h2>Dominance of leading organisation</h2>
-    <%= cp(:'stats/dominance_chart', key: "/stats/charts/dominance", expires: 3.hours.from_now) %>
-  </div>
+  <%# The leading organisation is LEAD_ORG_SLUG's, which an install may not have %>
+  <% if Organisation.lead %>
+    <div class="col-lg-6 mb-4">
+      <h2>Dominance of leading organisation</h2>
+      <%= cp(:'stats/dominance_chart', key: "/stats/charts/dominance", expires: 3.hours.from_now) %>
+    </div>
+  <% end %>
 </div>
