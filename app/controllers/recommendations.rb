@@ -4,14 +4,20 @@ Dandelion::App.controller do
     @account = current_account
   end
 
+  # Builds the recommendations on a first visit, before the nightly Event.recommend has, holding a lock on the account
+  # so a second request at once (a reload) waits for the first's rather than building them again
   get '/recommendations/people' do
-    @account.recommend_people! if @account.recommended_people.nil?
+    RecordLock.hold(@account) do
+      @account.recommend_people! if @account.recommended_people.nil?
+    end
     erb :'recommendations/people'
   end
 
   get '/recommendations/events' do
-    @account.recommend_people! if @account.recommended_people.nil?
-    @account.recommend_events! if @account.recommended_events.nil?
+    RecordLock.hold(@account) do
+      @account.recommend_people! if @account.recommended_people.nil?
+      @account.recommend_events! if @account.recommended_events.nil?
+    end
     erb :'recommendations/events'
   end
 end

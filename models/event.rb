@@ -121,10 +121,21 @@ class Event
     CURRENCY_OPTIONS
   end
 
-  def self.recommend
-    events_with_participant_ids = Event.live.publicly_visible.future.map do |event|
-      [event.id.to_s, event.attendee_ids.compact.map(&:to_s).reject(&:blank?)]
+  # Each live, public, future event's id and its attendees' ids, as strings, for recommending events. One query for
+  # all the events' tickets, rather than one per event (~1,000 queries, 6 seconds, on an account's first visit to
+  # /recommendations/events)
+  def self.participant_ids_for_recommendations
+    event_ids = live.publicly_visible.future.pluck(:id)
+    attendee_ids = Ticket.and(:event_id.in => event_ids, payment_completed: true, :account_id.ne => nil)
+                         .pluck(:event_id, :account_id)
+                         .group_by(&:first)
+    event_ids.map do |event_id|
+      [event_id.to_s, (attendee_ids[event_id] || []).map { |_event_id, account_id| account_id.to_s }.uniq]
     end
+  end
+
+  def self.recommend
+    events_with_participant_ids = participant_ids_for_recommendations
 
     # Clean up caches for non-recommendable accounts
     recommendable_ids = Account.recommendable.pluck(:id)
