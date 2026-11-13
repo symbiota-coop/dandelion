@@ -13,7 +13,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'remaining excludes tickets made available again' do
-    covers 'events/resale-frees-place@9c6500'
+    covers 'events/resale-frees-place@53935d'
     create_event(prices: [0])
     ticket_type = @event.ticket_types.first
     ticket_type.set(quantity: 2)
@@ -78,7 +78,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'turning resales off takes tickets off resale' do
-    covers 'events/resale-frees-place@9c6500', 'events/resales-off-returns-tickets@ad509e'
+    covers 'events/resale-frees-place@53935d', 'events/resales-off-returns-tickets@ad509e'
     create_event(prices: [0], enable_resales: true)
     ticket_type = @event.ticket_types.first
     ticket = ticket_type.tickets.create!(event: @event, payment_completed: true, price: 0, made_available_at: Time.now)
@@ -163,7 +163,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'a sale past a ticket group capacity replaces a ticket on resale in the group' do
-    covers 'events/resold-past-limit@0b575f', 'events/resale-frees-place@9c6500'
+    covers 'events/resold-past-limit@0b575f', 'events/resale-frees-place@53935d'
     create_event(prices: [0], enable_resales: true)
     standard = @event.ticket_types.first
     concession = @event.ticket_types.create!(name: 'Concession', price: 0, quantity: 10)
@@ -366,7 +366,7 @@ class ResalesTest < ActiveSupport::TestCase
   end
 
   test 'a sale of a ticket taking two places resells two tickets on resale taking one' do
-    covers 'events/resale-of-several-places@162449'
+    covers 'events/resale-of-several-places@a78c55'
     create_event(prices: [0], enable_resales: true)
     @event.set(capacity: 2)
     single = @event.ticket_types.first

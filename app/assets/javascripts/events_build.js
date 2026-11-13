@@ -21,7 +21,7 @@ $(function () {
     }
   }
 
-  // Slots: the select picks 1, 0 or 2; Other shows the number field beside it, which is what's submitted
+  // Takes up (slots): the select picks 0, 1 or 2 places; Other shows the number field beside it, which is what's submitted
   $(document).on('change', '.slots-choice', function () {
     const $number = $(this).siblings('.slots-other')
     if (this.value === 'other') {

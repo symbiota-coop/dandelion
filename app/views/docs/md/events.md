@@ -51,17 +51,17 @@ To let your attendees choose how much to pay for a ticket type:
 - Leave the 'Price or range' field of a ticket type blank to allow attendees to pay any amount <!-- claim: pay-any-amount-when-price-blank -->
 - Enter two numbers separated by a dash to create a slider e.g. 5-50 creates a slider where attendees can choose to pay any amount between £5–50 ($/€/etc) <!-- claim: price-range-slider -->
 
-## Ticket slots and capacity
+## Ticket places and capacity
 
-Each ticket type has a **Quantity** (how many of that ticket you want to sell) and **Slots** (how many places each of those tickets takes from the event's total capacity and any ticket group capacity).
+Each ticket type has a **Quantity** (how many of that ticket you want to sell) and **Takes up** (how many places each of those tickets takes up in the event's total capacity and any ticket group capacity).
 
-Slots defaults to 1. <!-- claim: slots-default-one --> Set it to:
+Each ticket takes up 1 place by default. <!-- claim: places-default-one --> Set it to:
 
-- **0** for add-on tickets that should not count towards venue capacity, such as meals <!-- claim: zero-slot-add-ons -->
-- **2** for a couples ticket <!-- claim: two-slot-couples-tickets -->
-- **1** (the default) for a standard ticket
+- **0 places** for add-on tickets that should not count towards venue capacity, such as meals <!-- claim: zero-place-add-ons -->
+- **1 place** (the default) for a standard ticket
+- **2 places** for a couples ticket <!-- claim: two-place-couples-tickets -->
 
-If you set a total capacity on the event or on a ticket group, Dandelion uses slots rather than the raw number of tickets sold. <!-- claim: capacity-counts-slots -->
+If you set a total capacity on the event or on a ticket group, Dandelion counts the places tickets take up rather than the number of tickets sold. <!-- claim: capacity-counts-places -->
 
 ### Role balance (linked ticket type quantity)
 
@@ -360,7 +360,7 @@ Check 'enable resales' under 'Everything else' when editing an event to enable r
 
 Attendees mark a ticket for resale by logging in to Dandelion, visiting the event page and selecting 'Mark for resale' next to a ticket. They can do this at any time, whether or not the event is sold out. <!-- claim: resale-at-any-time -->
 
-A ticket marked for resale frees its place: in its ticket type, in its ticket group if it has one, and in the event's capacity (see [Ticket slots and capacity](#ticket-slots-and-capacity)). <!-- claim: resale-frees-place --> Anyone can then buy that place, including with a different ticket type (a concession ticket can take the place of a standard one when the event as a whole is full). <!-- claim: resale-any-ticket-type --> If the event was sold out, people on your waitlist are emailed that tickets are available again. <!-- claim: resale-emails-waitlist -->
+A ticket marked for resale frees its place: in its ticket type, in its ticket group if it has one, and in the event's capacity (see [Ticket places and capacity](#ticket-places-and-capacity)). <!-- claim: resale-frees-place --> Anyone can then buy that place, including with a different ticket type (a concession ticket can take the place of a standard one when the event as a whole is full). <!-- claim: resale-any-ticket-type --> If the event was sold out, people on your waitlist are emailed that tickets are available again. <!-- claim: resale-emails-waitlist -->
 
 The ticket is resold when a purchase would otherwise take its ticket type, its ticket group or the event past its limit. <!-- claim: resold-past-limit --> Then:
 
@@ -369,7 +369,7 @@ The ticket is resold when a purchase would otherwise take its ticket type, its t
 - the event's facilitators (see [Adding event facilitators](#adding-event-facilitators)) are emailed about the resale <!-- claim: resale-emails-facilitators -->
 - the new buyer gets their ticket as with any purchase
 
-If several tickets are on resale, the one that has been on resale longest is resold first. <!-- claim: resale-oldest-first --> A ticket that takes more than one place (see [Ticket slots and capacity](#ticket-slots-and-capacity)) resells as many tickets on resale as it needs places. <!-- claim: resale-of-several-places --> While the ticket type, group and event still have places left, a purchase just takes one of those, and tickets on resale stay on resale. <!-- claim: resale-only-when-full -->
+If several tickets are on resale, the one that has been on resale longest is resold first. <!-- claim: resale-oldest-first --> A ticket that takes more than one place (see [Ticket places and capacity](#ticket-places-and-capacity)) resells as many tickets on resale as it needs places. <!-- claim: resale-of-several-places --> While the ticket type, group and event still have places left, a purchase just takes one of those, and tickets on resale stay on resale. <!-- claim: resale-only-when-full -->
 
 Only the price paid for the ticket is refunded (less any percentage discount), not other tickets in the same order or a donation. <!-- claim: resale-refunds-own-price --> If Dandelion can't refund the ticket automatically (for example if the payment provider is unavailable), the ticket is still resold, and the event's contacts and Dandelion admins are emailed to refund the original ticketholder themselves. <!-- claim: resale-refund-fails --> The new buyer pays the ticket's current price, which may be different.
 

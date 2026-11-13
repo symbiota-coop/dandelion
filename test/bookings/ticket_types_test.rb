@@ -309,7 +309,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test 'nil slots is saved as 1' do
-    covers 'events/slots-default-one@4abd36'
+    covers 'events/places-default-one@792820'
     create_event(prices: [0], capacity: 10)
     ticket_type = @event.ticket_types.first
     ticket_type.quantity = 10
@@ -351,7 +351,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'event places remaining uses slots rather than ticket count' do
-    covers 'events/capacity-counts-slots@d8b46e'
+    covers 'events/capacity-counts-places@086260'
     create_event(prices: [0], capacity: 10)
     ticket_type = @event.ticket_types.first
     ticket_type.set(slots: 2, quantity: 10)
@@ -363,7 +363,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'add-on tickets with 0 slots do not reduce event capacity' do
-    covers 'events/zero-slot-add-ons@ff75c7'
+    covers 'events/zero-place-add-ons@92caf1'
     create_event(prices: [0], capacity: 1)
     main = @event.ticket_types.first
     main.set(quantity: 10, slots: 1)
@@ -380,7 +380,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'couples tickets take two places from event capacity' do
-    covers 'events/two-slot-couples-tickets@2f6b97'
+    covers 'events/two-place-couples-tickets@91e78e'
     create_event(prices: [0], capacity: 3)
     ticket_type = @event.ticket_types.first
     ticket_type.set(slots: 2, quantity: 10)
@@ -395,7 +395,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'ticket group places remaining uses slots' do
-    covers 'events/capacity-counts-slots@d8b46e'
+    covers 'events/capacity-counts-places@086260'
     create_event(prices: [0])
     ticket_group = @event.ticket_groups.create!(name: 'Saturday', capacity: 3)
     ticket_type = @event.ticket_types.first
@@ -411,7 +411,7 @@ class TicketTypesTest < ActiveSupport::TestCase
   end
 
   test 'add-on tickets with 0 slots do not reduce ticket group capacity' do
-    covers 'events/zero-slot-add-ons@ff75c7'
+    covers 'events/zero-place-add-ons@92caf1'
     create_event(prices: [0])
     ticket_group = @event.ticket_groups.create!(name: 'Saturday', capacity: 1)
     main = @event.ticket_types.first

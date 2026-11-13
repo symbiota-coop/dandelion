@@ -83,9 +83,9 @@ class EventsTest < ActiveSupport::TestCase
     sign_in(@account)
     visit "/e/#{@event.slug}/edit"
     click_link 'Tickets'
-    assert page.has_css? 'select.slots-choice option[selected]', text: 'Standard: 1 place'
+    assert page.has_css? 'select.slots-choice option[selected]', text: '1 place (standard)'
     assert page.has_no_field? 'event_ticket_types_attributes_0_slots'
-    find('select.slots-choice').select 'Add-on: no places (not counted towards capacity)'
+    find('select.slots-choice').select '0 places (add-on, not counted towards capacity)'
     click_button 'Update event'
     assert page.has_content? 'The event was saved'
     assert_equal 0, ticket_type.reload.slots
