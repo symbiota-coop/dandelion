@@ -159,6 +159,14 @@ jobs:
       with:
         persist-credentials: false
 
+    # Chrome's first start on a fresh runner takes up to 30s, then its first page up to 13s more, as it reads itself and
+    # its fonts from a cold disk (the timings test/setup/capybara.rb logs), and that lands on whichever browser test runs
+    # first. Starting it once in the background now, while Ruby installs and the app boots, leaves them warm for the tests
+    - name: Warm up Chrome
+      run: |
+        command -v google-chrome || { echo "::warning title=Warm up Chrome::No google-chrome on the runner, so Chrome starts cold in the tests"; exit 0; }
+        (google-chrome --headless=new --no-first-run --disable-gpu --dump-dom 'data:text/html,<p style="font-family:sans-serif">Warm</p>' > /dev/null 2>&1 &)
+
     - name: Install Ruby
       uses: ruby/setup-ruby@de492cf36cbab201753d720ce4f4e336cd688c94 # v1.336.0
       with:
