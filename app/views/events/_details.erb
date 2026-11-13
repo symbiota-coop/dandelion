@@ -22,7 +22,8 @@
 
         <% end %>
 
-        <% if @event.event_sessions.exists? || (@event.start_time.to_date != @event.end_time.to_date) %>
+        <%# Not on a cancelled event's page: its forms post to routes a deleted event no longer answers %>
+        <% if !@event.deleted_at && (@event.event_sessions.exists? || (@event.start_time.to_date != @event.end_time.to_date)) %>
           <div data-pagelet-url="/e/<%= @event.slug %>/event_sessions">
             <%= partial :'events/sessions_box' %>
           </div>

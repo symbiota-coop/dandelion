@@ -138,8 +138,9 @@ class EventPermissionsTest < ActiveSupport::TestCase
     event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
     sign_in(manager)
     visit "/e/#{event.slug}/delete"
-    click_link 'Delete event and attempt to refund all orders'
+    choose 'Delete event'
     click_button 'Delete event'
+    click_button 'Yes, delete event'
     assert page.has_current_path?("/o/#{org.slug}/events", ignore_query: true)
     assert page.has_content?('The event was deleted')
     assert event.reload.deleted?
@@ -153,8 +154,8 @@ class EventPermissionsTest < ActiveSupport::TestCase
     event = FactoryBot.create(:event, organisation: org)
     sign_in(manager)
     visit "/e/#{event.slug}/delete"
-    assert page.has_content?("Please ask an admin of #{org.name} to delete the event")
-    assert page.has_no_link?('Delete event and attempt to refund all orders')
+    assert page.has_content?("Please ask an admin of #{org.name} to cancel or delete the event")
+    assert page.has_no_button?('Cancel event')
     refute event.reload.deleted?
   end
 
@@ -165,10 +166,69 @@ class EventPermissionsTest < ActiveSupport::TestCase
     event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
     sign_in(org.account)
     visit "/e/#{event.slug}/delete"
-    click_link 'Delete event and attempt to refund all orders'
+    choose 'Delete event'
     click_button 'Delete event'
+    click_button 'Yes, delete event'
     assert page.has_current_path?("/o/#{org.slug}/events", ignore_query: true)
     assert event.reload.deleted?
+  end
+
+  test 'a cancelled event keeps its page, showing the cancellation message' do
+    covers 'events/cancel-or-delete-event@69b41c'
+    org = FactoryBot.create(:organisation)
+    event = FactoryBot.create(:event, organisation: org, account: org.account, last_saved_by: org.account)
+    sign_in(org.account)
+    visit "/e/#{event.slug}/delete"
+    fill_in 'Cancellation message (optional)', with: "Sorry, the venue flooded.\nWe'll be back in spring."
+    click_button 'Cancel event'
+    click_button 'Yes, cancel event'
+    assert page.has_content?('This event has been cancelled')
+    assert page.has_content?('Sorry, the venue flooded.')
+    assert page.has_content?(event.name)
+    assert event.reload.deleted?
+  end
+
+  test 'a deleted event loses its page' do
+    covers 'events/cancel-or-delete-event@69b41c'
+    org = FactoryBot.create(:organisation)
+    event = FactoryBot.create(:event, organisation: org, account: org.account, last_saved_by: org.account)
+    sign_in(org.account)
+    visit "/e/#{event.slug}/delete"
+    assert page.has_field?('Cancellation message (optional)')
+    choose 'Delete event'
+    assert page.has_button?('Delete event')
+    assert page.has_no_field?('Cancellation message (optional)')
+    click_button 'Delete event'
+    click_button 'Yes, delete event'
+    assert page.has_content?('The event was deleted')
+    visit "/e/#{event.slug}"
+    assert page.has_content?("we couldn't find that page")
+    assert page.has_no_content?('This event has been cancelled')
+  end
+
+  test 'a cancelled event page answers 410 Gone, and only as HTML' do
+    covers_route 'GET /e/:slug'
+    create_event(prices: [0])
+    @event.set(cancelled: true, cancellation_message: 'Cancelled, sorry')
+    @event.destroy
+    get "/e/#{@event.slug}"
+    assert_equal 410, last_response.status
+    assert_includes last_response.body, 'Cancelled, sorry'
+    get "/e/#{@event.slug}.json"
+    assert_equal 404, last_response.status
+  end
+
+  test "a cancelled locked event's page is only for its admins" do
+    create_event(prices: [0], locked: true)
+    @event.set(cancelled: true, cancellation_message: 'Cancelled, sorry')
+    @event.destroy
+    get "/e/#{@event.slug}"
+    assert last_response.redirect?, last_response.status.to_s
+    refute_includes last_response.body, 'Cancelled, sorry'
+    sign_in_with_rack(@organisation.account)
+    get "/e/#{@event.slug}"
+    assert_equal 410, last_response.status
+    assert_includes last_response.body, 'Cancelled, sorry'
   end
 
   test 'organisation_id and account_id cannot be reassigned on update' do

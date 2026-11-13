@@ -1,0 +1,15 @@
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h1 class="ms-2 mb-0"><%= @event.name %></h1>
+    <%= partial :'events/details', locals: { n: 1, events: [@event] } %>
+    <div class="alert alert-warning" id="cancellation-message">
+      <h2 class="h5<%= ' mb-0' unless @event.cancellation_message %>">This event has been cancelled</h2>
+      <% if @event.cancellation_message %>
+        <%== Sanitize.fragment(Rinku.auto_link(ERB::Util.h(@event.cancellation_message).gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+      <% end %>
+    </div>
+    <% if @organisation %>
+      <p><a href="/o/<%= @organisation.slug %>/events">See other events by <%= @organisation.name %></a></p>
+    <% end %>
+  </div>
+</div>

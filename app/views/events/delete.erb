@@ -5,18 +5,66 @@
   <% if @event.orders.exists? %>
     <div class="alert alert-warning">
       <p class="mb-0">
-        Make sure you <a href="/pmails/new?event_id=<%= @event.id %>">contact ticketholders to let them know the event is cancelled</a> before you delete the event!
+        Make sure you <a href="/pmails/new?event_id=<%= @event.id %>">contact ticketholders to let them know the event is cancelled</a> before you cancel or delete the event!
       </p>
     </div>
   <% end %>
 
-  <div class="text-center">
-    <p><a data-method="post" class="d-block d-lg-inline btn btn-danger" data-confirm="Delete this event and attempt to refund all its orders?" data-confirm-label="Delete event" href="/e/<%= @event.slug %>/destroy">Delete event and attempt to refund all orders</a></p>
-    <p>or</p>
-    <p><a data-method="post" class="d-block d-lg-inline btn btn-outline-danger" data-confirm="Delete this event without refunding its orders?" data-confirm-label="Delete event" href="/e/<%= @event.slug %>/destroy?no_refunds=1">Delete event without refunding orders</a></p>
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <% form_tag "/e/#{@event.slug}/destroy", id: 'cancel-or-delete-event' do %>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="radio" name="outcome" value="cancel" id="outcome_cancel" checked>
+          <label class="form-check-label" for="outcome_cancel">
+            Cancel event
+            <span class="form-text d-block">The event's page stays up, saying it has been cancelled.</span>
+          </label>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="radio" name="outcome" value="delete" id="outcome_delete">
+          <label class="form-check-label" for="outcome_delete">
+            Delete event
+            <span class="form-text d-block">The event's page is removed entirely.</span>
+          </label>
+        </div>
+        <div class="mb-3" id="cancellation-message-field">
+          <label class="form-label" for="cancellation_message">Cancellation message (optional)</label>
+          <textarea class="form-control" id="cancellation_message" name="cancellation_message" rows="3"></textarea>
+        </div>
+        <% if @event.orders.exists? %>
+          <div class="form-check mb-3">
+            <input type="hidden" name="refund" value="0">
+            <input class="form-check-input" type="checkbox" name="refund" value="1" id="refund" checked>
+            <label class="form-check-label" for="refund">
+              Attempt to refund all orders
+              <span class="form-text d-block">Untick if you've already refunded people, or don't intend to.</span>
+            </label>
+          </div>
+        <% end %>
+        <button type="submit" class="btn btn-danger" id="cancel-or-delete-submit" data-confirm="Cancel this event?" data-confirm-label="Yes, cancel event">Cancel event</button>
+      <% end %>
+    </div>
   </div>
+  <script>
+    $(function () {
+      const form = $('#cancel-or-delete-event')
+      const button = form.find('#cancel-or-delete-submit')
+      function update () {
+        const cancel = form.find('input[name=outcome]:checked').val() === 'cancel'
+        const refundBox = form.find('#refund')
+        form.find('#cancellation-message-field').toggle(cancel)
+        button.text(cancel ? 'Cancel event' : 'Delete event')
+        button.attr('data-confirm-label', cancel ? 'Yes, cancel event' : 'Yes, delete event')
+        let question = cancel ? 'Cancel this event' : 'Delete this event'
+        if (refundBox.length) question += refundBox.is(':checked') ? ' and attempt to refund all its orders' : ' without refunding its orders'
+        button.attr('data-confirm', question + '?')
+      }
+      form.find('input[name=outcome], #refund').on('change', update)
+      update()
+    })
+  </script>
 <% else %>
   <div class="alert alert-warning">
-    Please ask an admin of <a href="/o/<%= @event.organisation.slug %>"><%= @event.organisation.name %></a> to delete the event.
+    Please ask an admin of <a href="/o/<%= @event.organisation.slug %>"><%= @event.organisation.name %></a> to cancel or delete the event.
   </div>
 <% end %>

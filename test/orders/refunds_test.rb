@@ -31,7 +31,7 @@ class OrderRefundsTest < ActiveSupport::TestCase
   end
 
   test 'destroying an event refunds its orders' do
-    covers 'events/delete-event-refund-choice@eba303'
+    covers 'events/delete-event-refund-choice@154629'
     create_event(prices: [10])
     create_paid_order(@event)
     with_stubbed_stripe_refunds do |refunds|
@@ -44,7 +44,7 @@ class OrderRefundsTest < ActiveSupport::TestCase
   end
 
   test 'destroying an event with prevent_order_refunds does not refund orders' do
-    covers 'events/delete-event-refund-choice@eba303'
+    covers 'events/delete-event-refund-choice@154629'
     create_event(prices: [10])
     create_paid_order(@event)
     @event.prevent_order_refunds = true
@@ -52,6 +52,35 @@ class OrderRefundsTest < ActiveSupport::TestCase
       destroy_and_refund(@event)
       assert_empty refunds
     end
+  end
+
+  test 'unticking Attempt to refund all orders deletes the event without refunding them' do
+    covers 'events/delete-event-refund-choice@154629'
+    covers_route 'POST /e/:slug/destroy'
+    create_event(prices: [10])
+    create_paid_order(@event)
+    sign_in(@organisation.account)
+    visit "/e/#{@event.slug}/delete"
+    choose 'Delete event'
+    uncheck 'Attempt to refund all orders'
+    click_button 'Delete event'
+    click_button 'Yes, delete event'
+    assert page.has_content?('The event was deleted')
+    assert @event.reload.deleted?
+    assert_equal 0, Delayed::Job.and(handler: /refund_destroyed/).count
+  end
+
+  test 'cancelling an event with Attempt to refund all orders ticked refunds them' do
+    covers 'events/delete-event-refund-choice@154629'
+    create_event(prices: [10])
+    create_paid_order(@event)
+    sign_in(@organisation.account)
+    visit "/e/#{@event.slug}/delete"
+    assert page.has_checked_field?('Attempt to refund all orders')
+    click_button 'Cancel event'
+    click_button 'Yes, cancel event'
+    assert page.has_content?('This event has been cancelled')
+    assert_equal 1, Delayed::Job.and(handler: /refund_destroyed/).count
   end
 
   test 'successful refund emails the buyer a confirmation' do

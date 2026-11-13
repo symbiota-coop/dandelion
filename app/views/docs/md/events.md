@@ -188,9 +188,11 @@ Ticket groups are created on the Tickets tab when editing your event. To assign 
 
 ## Cancelling/deleting an event
 
-Click the event dropdown and select **Delete event**. If the event has orders, email ticketholders first to let them know.
+Click the event dropdown and select **Cancel or delete event**. If the event has orders, email ticketholders first to let them know.
 
-You can then **Delete event and attempt to refund all orders**, or **Delete event without refunding orders** if you have already refunded people (or don't intend to). <!-- claim: delete-event-refund-choice --> See [Refunds](#refunds) for refunding individual tickets or orders instead of deleting the event.
+Choose **Cancel event** to keep the event's page up, saying it has been cancelled, with a message if you leave one, or **Delete event** to remove its page entirely. <!-- claim: cancel-or-delete-event -->
+
+Either way, if the event has orders, **Attempt to refund all orders** refunds them; untick it if you have already refunded people (or don't intend to). <!-- claim: delete-event-refund-choice --> See [Refunds](#refunds) for refunding individual tickets or orders instead of deleting the event.
 
 ## Where did my secret/locked event go?
 

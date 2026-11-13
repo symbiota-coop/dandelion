@@ -172,7 +172,17 @@ Dandelion::App.controller do
   get '/e/:slug', provides: %i[html ics json jpg], prerender: true do
     session[:via] = params[:via] if params[:via]
     events = Event.with_key_includes.without(:voyage_embedding)
-    @event = events.find_by_slug_or_id(slug: params[:slug]) || events.find_by(slug: params[:slug].downcase) || not_found
+    @event = events.find_by_slug_or_id(slug: params[:slug]) || events.find_by(slug: params[:slug].downcase)
+    unless @event
+      # A cancelled event keeps its page, saying so
+      @event = Event.cancelled_by_slug(params[:slug]) || not_found
+      not_found unless content_type == :html
+      @title = @event.name
+      @organisation = @event.organisation
+      # As for a live event, below: a locked event is only for its admins, cancelled or not
+      kick!(redirect_url: ("/o/#{@organisation.slug}/events" if @organisation)) if @event.locked? && !event_admin?
+      halt 410, erb(:'events/cancelled')
+    end
     redirect request.url.sub("/e/#{params[:slug]}", "/e/#{@event.slug}") unless @event.slug == params[:slug]
 
     redirect @event.purchase_url if @event.minimal_only? && @event.purchase_url

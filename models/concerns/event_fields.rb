@@ -31,6 +31,10 @@ module EventFields
     field :extra_info_for_ticket_email, type: String
     field :extra_info_for_recording_email, type: String
     field :notes, type: String
+    # Set when the event is cancelled rather than deleted: its page stays up after the soft delete, saying so, with the
+    # admin's message if they left one
+    field :cancelled, type: Mongoid::Boolean
+    field :cancellation_message, type: String
     field :redirect_url, type: String
     field :purchase_url, type: String
     field :currency, type: String

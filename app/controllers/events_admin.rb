@@ -36,11 +36,22 @@ Dandelion::App.controller do
   post '/e/:slug/destroy' do
     @event = event_from_params
     can_delete_event_only!
-    @event.prevent_order_refunds = true if params[:no_refunds]
+    @event.prevent_order_refunds = true if params[:refund] == '0'
     @event.send_destroy_notification(current_account)
+    cancel = params[:outcome] == 'cancel'
+    if cancel
+      # Set apart from destroy, as Mongoid::Paranoia's soft delete only saves deleted_at
+      cancellation_message = params[:cancellation_message].to_s.strip
+      @event.set(cancelled: true, cancellation_message: (cancellation_message unless cancellation_message.empty?))
+    end
     @event.destroy
-    flash[:notice] = 'The event was deleted.'
-    redirect "/o/#{@event.organisation.slug}/events"
+    if cancel
+      flash[:notice] = 'The event was cancelled.'
+      redirect "/e/#{@event.slug}"
+    else
+      flash[:notice] = 'The event was deleted.'
+      redirect "/o/#{@event.organisation.slug}/events"
+    end
   end
 
   get '/e/:slug/progress' do

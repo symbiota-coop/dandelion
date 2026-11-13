@@ -43,6 +43,11 @@ class Event
     true
   end
 
+  # A deleted event that was cancelled rather than deleted outright, whose page still says so
+  def self.cancelled_by_slug(slug)
+    unscoped.and(:deleted_at.ne => nil, cancelled: true, slug: slug.to_s.downcase).first
+  end
+
   def self.protected_attributes
     %w[
       raw_description direct_charges donations_to_organisation trending carousel_ids atproto_uri fixed_contribution_gbp cap_gbp promotion_fee_gbp
@@ -50,7 +55,7 @@ class Event
       sent_feedback_requests_at sent_reminders_at sent_star_reminders_at
       voyage_embedding ai_tagged sold_out_cache sold_out_due_to_sales_end_cache browsable
       calendar_import_feed_url calendar_import_uid calendar_import_source_url calendar_import_last_synced_at
-      locked_error locked_error_provider page_views_count hidden_from_homepage
+      locked_error locked_error_provider page_views_count hidden_from_homepage cancelled cancellation_message
     ]
   end
 

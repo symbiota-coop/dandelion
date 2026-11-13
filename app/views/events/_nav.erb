@@ -37,7 +37,7 @@
             ['View event', "/e/#{event.slug}"],
             ['Stats', 'javascript:;', { 'data-stats-sheet' => '#event_stats' }],
             ['Edit event', "/e/#{event.slug}/edit"],
-            ['Delete event', "/e/#{event.slug}/delete"],
+            ['Cancel or delete event', "/e/#{event.slug}/delete"],
             ['Duplicate event', "/e/#{event.slug}/duplicate", { 'data-method' => 'post', 'data-confirm' => 'Are you sure you want to duplicate the event?' }],
             ['Discount codes' + (discount_codes_count.positive? ? " <span class='badge text-bg-primary'>#{discount_codes_count}</span>" : ''), "/e/#{event.slug}/discount_codes"],
             ([%(Orders <span class="badge text-bg-primary">#{orders_count}</span>), "/e/#{event.slug}/orders"] if orders_count.positive?),
