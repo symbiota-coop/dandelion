@@ -16,6 +16,7 @@ This repo's workflow logs are public, so keep emails and query results out of an
 ## Issues to pull requests
 
 - When someone with write access opens an issue, Claude works on it and opens a pull request from `claude/issue-<number>`, or comments if there's nothing to change (`issue-to-pr.yml`, with the prompt `.github/prompts/issue-to-pr.md`)
+- So do the daily bug reviews' bug issues. Bots open them, with no write access, and an issue opened with a workflow's own token starts no workflow, so `issue-to-pr.yml` also runs when a review on master finishes (`workflow_run`), on the open `bug` issues `github-actions[bot]` or `claude[bot]` opened while it ran. It takes only their title and body, never comments. Add a review's workflow name to its `workflow_run` list when adding one
 - The `no-pr` label skips it
 
 ## Replies to users' emails
