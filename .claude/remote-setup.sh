@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Sets up Claude Code on the web sessions with script/agent-env, as .cursor/ does.
+# Sets up Claude Code on the web sessions with script/agent-env.
 # No-op outside the cloud environment.
 set -euo pipefail
 [ "${CLAUDE_CODE_REMOTE:-}" = "true" ] || exit 0

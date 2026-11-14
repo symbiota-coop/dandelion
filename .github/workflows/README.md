@@ -10,7 +10,7 @@ This repo's workflow logs are public, so keep emails and query results out of an
 
 ## Daily bug reviews
 
-- `daily-bug-review-claude.yml`, `-codex.yml`, `-cursor.yml` and `-opencode.yml` run Claude, Codex, Cursor and opencode on the same prompt (`.github/prompts/daily-bug-review.md`), with the steps they share in `.github/actions`
+- `daily-bug-review-claude.yml`, `-codex.yml` and `-opencode.yml` run Claude, Codex and opencode on the same prompt (`.github/prompts/daily-bug-review.md`), with the steps they share in `.github/actions`
 - Their models are in `.github/models.env`. opencode takes several (`OPENCODE_MODELS`), each with its own effort where it has a choice of them, and runs a review with each
 
 ## Issues to pull requests

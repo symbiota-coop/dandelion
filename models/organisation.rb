@@ -21,6 +21,7 @@ class Organisation
   include OrganisationCalendarImports
   include Geocoded
   include EvmTransactions
+  include SpringCleaning
   include StripeWebhooks
   include PaypalWebhooks
   include ImportFromCsv
@@ -156,17 +157,10 @@ class Organisation
     total > 0 ? total.format(no_cents: true) : total
   end
 
+  # Over a month old, with no image and nothing in any association but its organisationships and notifications
   def self.spring_clean
-    fields = %i[image_uid]
-    ignore = %i[organisationships notifications_as_notifiable]
-    Organisation.all.each do |organisation|
-      next unless Organisation.reflect_on_all_associations(:has_many).all? do |assoc|
-        organisation.send(assoc.name).empty? || ignore.include?(assoc.name)
-      end && fields.all? { |f| organisation.send(f).blank? } && organisation.created_at < 1.month.ago
-
-      puts organisation.name
-      # organisation.destroy
-    end
+    without_associated(Organisation.and(:created_at.lt => 1.month.ago, :image_uid.in => [nil, '']),
+                       ignore: %i[organisationships notifications_as_notifiable]).order('created_at asc')
   end
 
   def self.currencies

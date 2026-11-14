@@ -16,7 +16,6 @@ module McpConfigFiles
 
   def self.files
     {
-      '.cursor/mcp.json' => cursor,
       '.opencode/opencode.json' => opencode,
       '.codex/config.toml' => codex
     }
@@ -24,11 +23,6 @@ module McpConfigFiles
 
   def self.sync
     files.each { |path, content| File.write(File.join(ROOT, path), content) }
-  end
-
-  # Cursor takes the same JSON, with ${env:VAR} rather than ${VAR}
-  def self.cursor
-    "#{JSON.pretty_generate('mcpServers' => servers).gsub(VARIABLE, '${env:\1}')}\n"
   end
 
   # opencode has remote and local servers, the command and its args in one array, and {env:VAR}
@@ -79,7 +73,7 @@ module McpConfigFiles
 end
 
 namespace :mcp do
-  desc 'Write .cursor/mcp.json, .opencode/opencode.json and .codex/config.toml from .mcp.json'
+  desc 'Write .opencode/opencode.json and .codex/config.toml from .mcp.json'
   task :sync do
     McpConfigFiles.sync
     McpConfigFiles.files.each_key { |path| puts "Wrote #{path}" }
