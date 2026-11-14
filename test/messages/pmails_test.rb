@@ -156,6 +156,7 @@ class PmailsTest < ActiveSupport::TestCase
     pmail.reload
 
     assert_equal "ticket_group:#{ticket_group_id}", pmail.to_selected
+    assert_equal "in a ticket group for #{@organisation.name}'s event #{@event.name}", pmail.reason
     assert_empty pmail.to.pluck(:id)
     assert_empty pmail.event_emails
     assert_equal 0, pmail.send_count
@@ -244,6 +245,7 @@ class PmailsTest < ActiveSupport::TestCase
     pmail.reload
 
     assert_equal "ticket_type_waitlist:#{ticket_type_id}", pmail.to_selected
+    assert_equal "on a ticket type waitlist for #{@organisation.name}'s event #{@event.name}", pmail.reason
     assert_empty pmail.to.pluck(:id)
     assert_equal 0, pmail.send_count
 
