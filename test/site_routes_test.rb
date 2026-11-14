@@ -1,8 +1,9 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 # The site's routes that answer programs and pagelets, or refuse forged requests: health checks, error pages, MCP
-# sessions, icons, maps and their popups, uploads, YouTube thumbnails, the Stripe row splitter, and who may send
-# feedback and questions, claim referral rewards, mark their messages and notifications checked and search their network
+# sessions, icons, QR codes, book and film links, maps and their popups, uploads, YouTube thumbnails, the Stripe row
+# splitter, and who may send feedback and questions, claim referral rewards, mark their messages and notifications
+# checked and search their network
 class SiteRoutesTest < ActiveSupport::TestCase
   include Rack::Test::Methods
 
@@ -104,6 +105,65 @@ class SiteRoutesTest < ActiveSupport::TestCase
     wheel['timeline'].each_value do |timeline|
       assert timeline.any?
       assert(timeline.all? { |entry| Time.iso8601(entry['at']) && wheel['festivals'].any? { |festival| festival['id'] == entry['id'] } })
+    end
+  end
+
+  # QR codes
+
+  test 'a QR code is a PNG or a PDF of the url given, and a 400 without one' do
+    covers_route 'GET /qr'
+    get '/qr.png', url: 'https://example.com/e/an-event'
+    assert_equal 200, last_response.status
+    assert_equal 'image/png', last_response.content_type
+    assert last_response.body.start_with?("\x89PNG".b)
+    # The PNG's width and height, from its header, are the 500 pixels asked for
+    assert_equal [500, 500], last_response.body.byteslice(16, 8).unpack('NN')
+
+    get '/qr.pdf', url: 'https://example.com/e/an-event'
+    assert_equal 200, last_response.status
+    assert_equal 'application/pdf', last_response.content_type
+    assert last_response.body.start_with?('%PDF')
+
+    get '/qr.png'
+    assert_equal 400, last_response.status
+  end
+
+  # Books and films
+
+  def with_library
+    LIBRARY_CACHE[:books] = [{ slug: 'the-dawn-of-everything', title: 'The Dawn of Everything', book_id: '56269264', cover_image: '/images/books/56269264.jpg' }]
+    LIBRARY_CACHE[:films] = [{ slug: 'koyaanisqatsi', name: 'Koyaanisqatsi', image: '/images/films/koyaanisqatsi.jpg' }]
+    yield
+  ensure
+    LIBRARY_CACHE.delete(:books)
+    LIBRARY_CACHE.delete(:films)
+  end
+
+  test "a book's page is its Goodreads page and its image its cover, and an unknown book is a 404" do
+    covers_route 'GET /books/:slug'
+    with_library do
+      get '/books/the-dawn-of-everything'
+      assert_equal 302, last_response.status
+      assert_equal 'https://goodreads.com/book/show/56269264', last_response.location
+
+      get '/books/the-dawn-of-everything.jpg'
+      assert_equal 302, last_response.status
+      assert_equal 'https://cdn.jsdelivr.net/gh/stephenreid321/stephenreid@master/site/images/books/56269264.jpg', last_response.location
+
+      get '/books/no-such-book'
+      assert_equal 404, last_response.status
+    end
+  end
+
+  test "a film's image is its still, and an unknown film is a 404" do
+    covers_route 'GET /films/:slug'
+    with_library do
+      get '/films/koyaanisqatsi.jpg'
+      assert_equal 302, last_response.status
+      assert_equal 'https://cdn.jsdelivr.net/gh/stephenreid321/stephenreid@master/site/images/films/koyaanisqatsi.jpg', last_response.location
+
+      get '/films/no-such-film.jpg'
+      assert_equal 404, last_response.status
     end
   end
 

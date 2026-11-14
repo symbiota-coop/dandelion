@@ -34,7 +34,7 @@ class GocardlessPaymentsTest < ActiveSupport::TestCase
   end
 
   def payment_confirmed_event(payment_request_id, payment_id: 'PM123')
-    GoCardlessPro::Resources::Event.new(
+    {
       'id' => 'EV123',
       'resource_type' => 'payments',
       'action' => 'confirmed',
@@ -42,20 +42,19 @@ class GocardlessPaymentsTest < ActiveSupport::TestCase
         'payment' => payment_id,
         'payment_request' => payment_request_id
       }
-    )
+    }
   end
 
-  def deliver_gocardless_webhook(organisation, gc_event, client = nil)
-    GoCardlessPro::Webhook.stub :parse, [gc_event] do
-      if client
-        GoCardlessPro::Client.stub :new, client do
-          header 'Webhook-Signature', 'sig'
-          post "/o/#{organisation.slug}/gocardless_webhook"
-        end
-      else
-        header 'Webhook-Signature', 'sig'
-        post "/o/#{organisation.slug}/gocardless_webhook"
-      end
+  # Posts gc_event to organisation's GoCardless webhook as GoCardless would: in a JSON body of events, signed with the
+  # HMAC-SHA256 hex digest of the body under the endpoint secret (secret, by default the organisation's)
+  def deliver_gocardless_webhook(organisation, gc_event, client = nil, secret: organisation.gocardless_endpoint_secret)
+    body = { 'events' => [gc_event] }.to_json
+    header 'Webhook-Signature', OpenSSL::HMAC.hexdigest('SHA256', secret, body)
+    header 'Content-Type', 'application/json'
+    if client
+      GoCardlessPro::Client.stub(:new, client) { post "/o/#{organisation.slug}/gocardless_webhook", body }
+    else
+      post "/o/#{organisation.slug}/gocardless_webhook", body
     end
   end
 
@@ -121,6 +120,24 @@ class GocardlessPaymentsTest < ActiveSupport::TestCase
     assert restored.tickets.first.payment_completed?
   end
 
+  test 'a webhook signed with the wrong secret, or another organisation\'s, completes no order' do
+    create_instant_event
+    order = create_incomplete_order(@event, gocardless_payment_request_id: "PRQ#{SecureRandom.hex(4)}")
+    other_organisation = FactoryBot.create(:organisation, gocardless_endpoint_secret: 'other_webhook_secret')
+
+    [@organisation.gocardless_endpoint_secret.reverse, other_organisation.gocardless_endpoint_secret].each do |secret|
+      # The controller doesn't rescue the gem's error, so the request fails (a 500 in production)
+      assert_raises(GoCardlessPro::Webhook::InvalidSignatureError) do
+        deliver_gocardless_webhook(@organisation, payment_confirmed_event(order.gocardless_payment_request_id), secret: secret)
+      end
+      refute order.reload.payment_completed?
+    end
+
+    deliver_gocardless_webhook(@organisation, payment_confirmed_event(order.gocardless_payment_request_id))
+    assert_equal 200, last_response.status
+    assert order.reload.payment_completed?
+  end
+
   test 'instant bank pay return page says how long confirmation usually takes' do
     create_instant_event
     order = create_incomplete_order(@event, gocardless_payment_request_id: "PRQ#{SecureRandom.hex(4)}")
@@ -163,12 +180,12 @@ class GocardlessPaymentsTest < ActiveSupport::TestCase
   end
 
   def billing_request_event(billing_request_id)
-    api_object(
-      resource_type: 'billing_requests',
-      action: 'fulfilled',
-      links: api_object(billing_request: billing_request_id),
-      id: 'EV123'
-    )
+    {
+      'id' => 'EV123',
+      'resource_type' => 'billing_requests',
+      'action' => 'fulfilled',
+      'links' => { 'billing_request' => billing_request_id }
+    }
   end
 
   test 'instalments are only available for GBP and EUR events' do
@@ -283,12 +300,12 @@ class GocardlessPaymentsTest < ActiveSupport::TestCase
     deliver_gocardless_webhook(@organisation, billing_request_event(order.gocardless_billing_request_id), client)
     assert order.reload.payment_completed?
 
-    failed = GoCardlessPro::Resources::Event.new(
+    failed = {
       'id' => 'EV124',
       'resource_type' => 'payments',
       'action' => 'failed',
       'links' => { 'payment' => 'PM456' }
-    )
+    }
     deliver_gocardless_webhook(@organisation, failed, client)
 
     assert_equal 200, last_response.status

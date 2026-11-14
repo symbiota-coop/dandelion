@@ -139,7 +139,6 @@ class WaitlistTest < ActiveSupport::TestCase
 
   test 'sales ended ticket type uses generic sold out flow instead of ticket type waitlist controls' do
     covers 'events/ticket-type-waitlists@ac1e0a'
-    covers_route 'GET /qr'
     create_ticket_type_waitlist_event
     @ticket_type.set(quantity: 0, sales_end: 1.hour.ago)
     @event.refresh_sold_out_cache_and_notify_waitlist

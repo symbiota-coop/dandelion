@@ -102,7 +102,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal "Creditor <b>not</b> verified: creditor_not_verified Creditor account not fully verified\nRequest ID: RQ456", @event.locked_error
   end
 
-  test 'booking onto a paid event' do
+  test "a paid event's checkout asks for the ticket price and the donation" do
     create_event(prices: [(ticket_price = 10)], suggested_donation: 0)
     sign_in(@account)
     visit "/e/#{@event.slug}"
@@ -130,7 +130,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     end
   end
 
-  test 'booking onto a paid event with a range' do
+  test 'with a price range, the checkout asks for the price chosen on the slider and the donation' do
     covers 'events/price-range-slider@693b77'
     create_event(prices: ['10-100'], suggested_donation: 0)
     sign_in(@account)
@@ -168,7 +168,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     end
   end
 
-  test 'booking onto a paid event with a user-set price' do
+  test 'with a price left blank, the checkout asks for the price entered and the donation' do
     covers 'events/pay-any-amount-when-price-blank@778398'
     create_event(prices: [nil], suggested_donation: 0)
     sign_in(@account)

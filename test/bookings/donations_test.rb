@@ -178,7 +178,7 @@ class EventBookingDonationsTest < ActiveSupport::TestCase
     assert_equal donation_amount, order.donations.first.amount
   end
 
-  test 'checkout takes credit off the tickets, not a donation to Dandelion, when the tickets are free' do
+  test 'with free tickets, the checkout asks for the whole donation to Dandelion, taking no credit off it' do
     create_event(prices: [0, 10])
     @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
     assert @event.reload.donations_to_dandelion?

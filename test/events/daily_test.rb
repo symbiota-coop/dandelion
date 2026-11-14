@@ -273,8 +273,6 @@ class EventsDailyTest < ActiveSupport::TestCase
   # The page
 
   test 'the page shows the latest edition by default, its stories linking their events, with arrows between editions' do
-    covers_route 'GET /books/:slug'
-    covers_route 'GET /films/:slug'
     today = Date.today
     public_event('Sound Bath', noon(today))
     public_event('Secret Supper', noon(today), as: :secret, secret: true)
