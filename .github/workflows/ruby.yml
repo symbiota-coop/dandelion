@@ -134,7 +134,7 @@ jobs:
           - group: gathering_features
             files: gatherings/features gatherings/rules gatherings/joining
           - group: gatherings
-            files: gatherings/gatherings gatherings/members
+            files: gatherings/gatherings gatherings/members notifications
           - group: general
             files: dadmin admin_pages_browser design images search errands record_lock sentry stats_database stats_pages organisations/activity_applications messages/markup site_pages site_routes
           - group: integrations
