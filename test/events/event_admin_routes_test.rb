@@ -102,7 +102,10 @@ class EventAdminRoutesTest < ActiveSupport::TestCase
 
   test "a session's calendar file has its times and the event's name" do
     covers_route 'GET /event_sessions/:id'
-    create_event(prices: [0], name: 'Weekly sitting')
+    # At 10:00 rather than the factory's time of day (now), so the session's hour never runs past midnight, which makes
+    # its calendar entry an all-day one
+    starts = (Time.zone.now + 1.month).beginning_of_day + 10.hours
+    create_event(prices: [0], name: 'Weekly sitting', start_time: starts, end_time: starts + 1.day)
     event_session = create_event_session(@event)
 
     get "/event_sessions/#{event_session.id}.ics"
