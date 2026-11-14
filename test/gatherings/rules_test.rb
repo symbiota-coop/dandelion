@@ -91,6 +91,24 @@ class GatheringRulesTest < ActiveSupport::TestCase
     assert page.has_link? 'Unpause'
   end
 
+  test 'an application from someone already a member by another route can still be accepted, even when the gathering is full' do
+    create_gathering(privacy: 'closed', fixed_threshold: 0, member_limit: 2)
+    applicant = FactoryBot.create(:account, name: 'Keen Applicant')
+    mapplication = @gathering.mapplications.create!(account: applicant, status: 'pending')
+    # Since joined another way, as by a ticket to a linked event, filling the gathering
+    membership = @gathering.memberships.create!(account: applicant, joined_by_ticket: true)
+
+    sign_in(@account)
+    visit gathering_path('/applications')
+    assert page.has_content? 'Keen Applicant'
+    click_link 'Accept'
+    assert page.has_content? 'Non-members can apply via'
+    assert page.has_no_content? 'Keen Applicant'
+    assert_equal 'accepted', mapplication.reload.status
+    assert_equal [membership.id], @gathering.memberships.and(account: applicant).pluck(:id)
+    assert_equal mapplication.id, membership.reload.mapplication_id
+  end
+
   test "a shift once taken, or marked not needed, can't be signed up for" do
     create_gathering(privacy: 'open')
     rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
