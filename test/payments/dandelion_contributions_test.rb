@@ -53,21 +53,21 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     queued_jobs(:send_notification).select { |job| job.handler.include?("session_id: #{session_id}\n") }
   end
 
-  # Delivers payload to path twice at once, as Stripe can, with each delivery looking up the contribution (model) at the
-  # same moment
-  def deliver_twice_at_once(path, env, secret, payload, model)
-    looked_up = Queue.new
-    find_by = model.method(:find_by)
+  # Delivers payload to path twice at once, as Stripe can, holding each delivery once it has read the paid session
+  # until both have, so both then claim the contribution together
+  def deliver_twice_at_once(path, env, secret, payload)
+    read = Queue.new
+    paid_session = StripeCheckout.method(:paid_session)
     signature = stripe_signature_header(payload, secret)
-    with_env({ env => secret }) do
-      lookup = proc do |*args, **kwargs|
-        found = find_by.call(*args, **kwargs)
-        looked_up << true
+    statuses = with_env({ env => secret }) do
+      gate = proc do |event|
+        session = paid_session.call(event)
+        read << true
         deadline = Time.now + 2
-        sleep 0.01 until looked_up.size >= 2 || Time.now > deadline
-        found
+        sleep 0.01 until read.size >= 2 || Time.now > deadline
+        session
       end
-      model.stub(:find_by, lookup) do
+      StripeCheckout.stub(:paid_session, gate) do
         Array.new(2) do
           Thread.new do
             session = Rack::Test::Session.new(app)
@@ -79,6 +79,8 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
         end.map(&:value)
       end
     end
+    assert_equal 2, read.size, 'both deliveries should have reached the gate'
+    statuses
   end
 
   # Organisations paying
@@ -357,7 +359,7 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     contribution = create_pending_organisation_contribution
 
     statuses = deliver_twice_at_once('/organisations/stripe_webhook', 'STRIPE_ENDPOINT_SECRET_ORGANISATIONS', ORGANISATIONS_SECRET,
-                                     checkout_completed_payload(contribution.session_id), OrganisationContribution)
+                                     checkout_completed_payload(contribution.session_id))
 
     assert_equal [200, 200], statuses
     assert contribution.reload.payment_completed?
@@ -516,7 +518,7 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     donation = AccountContribution.create!(amount: 5, currency: 'GBP', session_id: 'cs_donation', payment_completed: false)
 
     statuses = deliver_twice_at_once('/accounts/stripe_webhook', 'STRIPE_ENDPOINT_SECRET_ACCOUNTS', ACCOUNTS_SECRET,
-                                     checkout_completed_payload('cs_donation'), AccountContribution)
+                                     checkout_completed_payload('cs_donation'))
 
     assert_equal [200, 200], statuses
     assert donation.reload.payment_completed?

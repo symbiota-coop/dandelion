@@ -199,8 +199,25 @@ class QuotesTest < ActiveSupport::TestCase
   test 'credit is only for the buyer signed in' do
     create_event(prices: [10], suggested_donation: 0)
     grant_credit(@buyer, amount: 4)
-    quote = Quote.new(event: @event, account: @buyer, credit: false, quantities: { ticket_type_id => '1' })
-    assert_quote quote, tickets: 10, total: 10
+    credit_balance = -> { @organisation.organisationships.find_by(account: @buyer).credit_balance.to_f }
+    starting_balance = credit_balance.call
+    assert starting_balance.positive?
+
+    # Booking with the buyer's email, signed out and then signed in as someone else, uses none of their credit
+    [nil, FactoryBot.create(:account)].each do |signed_in_account|
+      builder = OrderBuilder.new(event: @event, buyer: { name: @buyer.name, email: @buyer.email }, signed_in_account: signed_in_account,
+                                 quantities: { ticket_type_id => '1' }, payment_method: 'stripe')
+      with_stubbed_stripe_session(session_id: "cs_#{SecureRandom.hex(4)}", payment_intent: "pi_#{SecureRandom.hex(4)}") { builder.call }
+      order = builder.order.reload
+      assert_equal @buyer.id, order.account_id
+      assert_nil order.credit_applied
+      assert_equal 10, order.value
+      assert_equal starting_balance, credit_balance.call
+    end
+
+    order = book(@buyer, quantities: { ticket_type_id => '1' })
+    assert_equal 4, order.credit_applied
+    assert_equal 6, order.value
   end
 
   test 'credit pays for a donation to the organisation too' do

@@ -98,23 +98,42 @@ class EvergreenEventsTest < ActiveSupport::TestCase
     assert page.has_content? 'Thanks for booking'
   end
 
-  test 'evergreen event reminder_due_within returns false' do
-    covers 'events/evergreen-no-reminders-or-feedback@b0f8f7'
-    event = Event.new(evergreen: true, name: 'Test', currency: 'GBP', reminder_hours_before: 24)
-    refute event.reminder_due_within?(1.hour)
+  # An attendee's ticket to @event
+  def create_attendee_ticket
+    order = @event.orders.create!(account: @account, currency: @event.currency, value: 0, payment_completed: true)
+    @event.tickets.create!(account: @account, order: order, ticket_type: @event.ticket_types.first, payment_completed: true)
   end
 
-  test 'evergreen event feedback_due_within returns false' do
+  test 'an event made evergreen gets no reminder' do
     covers 'events/evergreen-no-reminders-or-feedback@b0f8f7'
-    event = Event.new(
-      evergreen: true,
-      name: 'Test',
-      currency: 'GBP',
-      feedback_questions: 'Q?',
-      end_time: 1.day.ago,
-      feedback_hours_after: 1
-    )
-    refute event.feedback_due_within?(1.hour)
+    create_event(prices: [0], start_time: 2.hours.from_now, end_time: 3.hours.from_now, reminder_hours_before: 2)
+    create_attendee_ticket
+    assert @event.reminder_due_within?(1.hour)
+
+    @event.update!(evergreen: true)
+    refute @event.reminder_due_within?(1.hour)
+    # Even with the dates and reminder hours an evergreen event loses when saved, as one set without validation keeps
+    @event.set(start_time: 2.hours.from_now, end_time: 3.hours.from_now, reminder_hours_before: 2)
+    assert_empty(recorded_emails { @event.send_reminders_without_delay(:all) }.flat_map(&:recipients))
+    @event.set(evergreen: false)
+    assert_equal [@account.email], recorded_emails { @event.send_reminders_without_delay(:all) }.flat_map(&:recipients)
+  end
+
+  test 'an event made evergreen gets no feedback requests' do
+    covers 'events/evergreen-no-reminders-or-feedback@b0f8f7'
+    create_event(prices: [0], start_time: 3.hours.ago, end_time: 90.minutes.ago, feedback_questions: 'How was it?', feedback_hours_after: 1)
+    create_attendee_ticket
+    assert @event.feedback_due_within?(1.hour)
+
+    @event.update!(evergreen: true)
+    refute @event.feedback_due_within?(1.hour)
+    # Even with the dates and feedback hours an evergreen event loses when saved, as one set without validation keeps
+    @event.set(start_time: 3.hours.ago, end_time: 90.minutes.ago, feedback_hours_after: 1)
+    refute @event.feedback_due_within?(1.hour)
+    assert_empty(recorded_emails { @event.send_feedback_requests_without_delay(:all) }.flat_map(&:recipients))
+    @event.set(evergreen: false)
+    assert @event.feedback_due_within?(1.hour)
+    assert_equal [@account.email], recorded_emails { @event.send_feedback_requests_without_delay(:all) }.flat_map(&:recipients)
   end
 
   test 'evergreen event json endpoint returns nil dates' do

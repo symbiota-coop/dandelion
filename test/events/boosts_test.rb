@@ -58,6 +58,8 @@ class EventBoostsTest < ActiveSupport::TestCase
     assert_equal 1, @event1.event_boost_impressions.count
 
     visit "/events?organisation_id=#{@organisation.id}&page=2"
+    # Page 2 is empty, so wait for the list's placeholder to be replaced before looking for the slot
+    assert page.has_no_css?('#events .placeholder')
     assert page.has_no_content?('Boosted by')
   end
 
@@ -77,9 +79,9 @@ class EventBoostsTest < ActiveSupport::TestCase
 
     visit '/events'
 
-    assert page.has_no_content?('Boosted')
     assert page.has_content?('Org one event')
     assert page.has_content?('Org two event')
+    assert page.has_no_content?('Boosted')
   end
 
   test 'boost slot is not shown on homepage teasers or minimal embeds' do
@@ -89,14 +91,17 @@ class EventBoostsTest < ActiveSupport::TestCase
     FactoryBot.create(:event_boost,
                       event: @event,
                       account: @account,
-                      start_time: Time.zone.now.beginning_of_hour + 2.hours,
+                      start_time: Time.zone.now.beginning_of_hour,
                       hours: 1,
                       hourly_amount: 10)
+    assert_includes EventBoost.active_at.pluck(:event_id), @event.id
 
     visit '/events?home=1&images=1&order=trending'
+    assert page.has_content?('Hidden boost slot event')
     assert page.has_no_content?('Boosted')
 
     visit "/o/#{@organisation.slug}/events?minimal=1"
+    assert page.has_content?('Hidden boost slot event')
     assert page.has_no_content?('Boosted')
   end
 

@@ -231,8 +231,17 @@ class MessagesTest < ActiveSupport::TestCase
     assert last_response.redirect?
     assert_equal '/messages', URI(last_response.location).path
 
+    post "/messages/#{@account.username}/send", body: 'Hello me'
+    assert_equal 400, last_response.status
+    assert_equal 0, Message.and(messenger: @account).count
+
     post "/messages/#{@account1.username}/send", body: ''
     assert_equal 400, last_response.status
+    assert_equal 0, Message.and(messenger: @account).count
+
+    post "/messages/#{@account1.username}/send", body: 'Hello'
+    assert_equal 200, last_response.status
+    assert_equal 1, Message.and(messenger: @account).count
   end
 
   test 'index lists conversations and offers more when the page is full' do

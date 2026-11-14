@@ -72,6 +72,12 @@ module CalendarImportHelpers
               [spec[:status], spec[:headers] || {}, spec[:body]]
             end
           end
+          # Any other URL is recorded too before it fails, so a test can tell it was requested: the app rescues the
+          # failure, which would otherwise leave no trace
+          stub.get(/.*/) do |env|
+            requested_urls&.push(env.url.to_s)
+            raise "Unexpected Faraday request for #{env.url}"
+          end
         end
       end
     end

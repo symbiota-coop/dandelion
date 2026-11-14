@@ -8,35 +8,39 @@ class WebhooksTest < ActiveSupport::TestCase
   include BookingsHelpers
   include CheckoutWebhookHelpers
 
-  def checkout_completed_event(session_id, type: 'checkout.session.completed', payment_status: 'paid')
-    Stripe::Event.construct_from(
-      {
-        id: 'evt_test',
-        type: type,
-        data: { object: { id: session_id, payment_status: payment_status } }
-      }
-    )
-  end
-
   test 'checkout.session.completed with unpaid status does not complete the order until async payment succeeds' do
     covers_route 'POST /o/:slug/stripe_webhook'
     create_organisation(stripe_endpoint_secret: 'whsec_test')
     create_event(prices: [10])
     order = create_incomplete_order(@event, value: 10, session_id: "cs_#{SecureRandom.hex(4)}")
 
-    deliver_stripe_event(@organisation, checkout_completed_event(order.session_id, payment_status: 'unpaid'))
+    deliver_stripe_event(@organisation, checkout_completed_payload(order.session_id, payment_status: 'unpaid'))
     refute order.reload.payment_completed?
 
-    deliver_stripe_event(@organisation, checkout_completed_event(order.session_id, type: 'checkout.session.async_payment_succeeded'))
+    deliver_stripe_event(@organisation, checkout_completed_payload(order.session_id, type: 'checkout.session.async_payment_succeeded'))
     assert order.reload.payment_completed?
   end
 
-  # Posts stripe_event to organisation's Stripe webhook, unsigned, as if Stripe had sent it
-  def deliver_stripe_event(organisation, stripe_event)
-    Stripe::Webhook.stub :construct_event, stripe_event do
-      header 'Stripe-Signature', 'sig'
-      post "/o/#{organisation.slug}/stripe_webhook"
-    end
+  test 'a checkout webhook not signed with the organisation\'s endpoint secret completes nothing' do
+    create_organisation(stripe_endpoint_secret: 'whsec_test')
+    create_event(prices: [10])
+    order = create_incomplete_order(@event, value: 10, session_id: "cs_#{SecureRandom.hex(4)}")
+    payload = checkout_completed_payload(order.session_id)
+
+    deliver_stripe_event(@organisation, payload, secret: 'whsec_someone_else')
+    assert_equal 200, last_response.status
+    header 'Stripe-Signature', nil
+    post "/o/#{@organisation.slug}/stripe_webhook", payload
+    assert_equal 200, last_response.status
+    refute order.reload.payment_completed?
+
+    deliver_stripe_event(@organisation, payload)
+    assert order.reload.payment_completed?
+  end
+
+  # Posts payload to organisation's Stripe webhook as Stripe would, signed with its endpoint secret (or secret)
+  def deliver_stripe_event(organisation, payload, secret: organisation.stripe_endpoint_secret)
+    deliver_stripe_webhook("/o/#{organisation.slug}/stripe_webhook", payload, secret: secret)
   end
 
   def create_stripe_event(ticket_quantity: 10)
@@ -52,7 +56,7 @@ class WebhooksTest < ActiveSupport::TestCase
     session_id = order.session_id
     order.destroy
 
-    deliver_stripe_event(@organisation, checkout_completed_event(session_id))
+    deliver_stripe_event(@organisation, checkout_completed_payload(session_id))
 
     restored = Order.find(order.id)
     assert restored
@@ -78,7 +82,7 @@ class WebhooksTest < ActiveSupport::TestCase
     refute order.payment_completed?
     refute order.tickets.first.payment_completed?
 
-    deliver_stripe_event(@organisation, checkout_completed_event(order.session_id))
+    deliver_stripe_event(@organisation, checkout_completed_payload(order.session_id))
 
     assert order.reload.payment_completed?
     assert order.tickets.first.reload.payment_completed?
@@ -108,7 +112,7 @@ class WebhooksTest < ActiveSupport::TestCase
     assert_equal 1, @event.orders.count
     assert_equal 1, @event.tickets.count
 
-    deliver_stripe_event(@organisation, checkout_completed_event(order.session_id))
+    deliver_stripe_event(@organisation, checkout_completed_payload(order.session_id))
 
     assert order.reload.payment_completed?
     assert @event.reload.sold_out_cache

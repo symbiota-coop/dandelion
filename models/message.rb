@@ -18,6 +18,7 @@ class Message
   end
 
   validates_presence_of :body
+  validate :messengee_not_messenger
   validate :messenger_send_rate_limit, on: :create
 
   def self.between(a, b)
@@ -65,6 +66,10 @@ class Message
   handle_asynchronously :send_email
 
   private
+
+  def messengee_not_messenger
+    errors.add(:messengee, "can't be yourself") if messenger_id && messenger_id == messengee_id
+  end
 
   def messenger_send_rate_limit
     return unless new_record? && messenger_id
