@@ -453,8 +453,10 @@ class AccountsTest < ActiveSupport::TestCase
 
     visit "/accounts/new?activity_id=#{activity.id}"
     fill_signup_form(account)
+    assert page.has_current_path?('/accounts/edit', ignore_query: true)
 
     created_account = Account.find_by(email: account.email.downcase)
+    assert created_account
     assert_nil activity.activityships.find_by(account: created_account)
   end
 
