@@ -71,6 +71,8 @@ Dandelion::App.controller do
     @order = @event.orders.find_by_id_or_token(params[:order_id]) || not_found
     @event.organisation.check_evm_account if @order.evm_secret && @event.organisation.evm_address
     @event.check_oc_event if @order.oc_secret && @event.oc_slug
+    # The checks complete the order they find in the database, not this copy of it
+    @order.reload
     if @order.paypal_order_id && !@order.payment_completed?
       begin
         EventPaymentMethod::Paypal.complete_if_paid(@order)

@@ -112,9 +112,10 @@ class OrdersAdminTest < ActiveSupport::TestCase
 
   # Transferring
 
-  test 'an admin transfers an order and its tickets to another event of the organisation, freeing its place' do
+  test 'an admin transfers an order, its tickets and its donations to another event of the organisation, freeing its place' do
     create_complete_order_with_ticket
     @ticket.set(payment_completed: true)
+    donation = @order.donations.create!(account: @attendee, event: @event, amount: 5)
     @event.update_attributes!(capacity: 1)
     assert Event.find(@event.id).sold_out_cache
     create_event(prices: [0], as: :new_event)
@@ -135,6 +136,9 @@ class OrdersAdminTest < ActiveSupport::TestCase
     assert_equal @new_event.id, ticket.event_id
     assert ticket.transferred
     assert_nil ticket.ticket_type_id
+    donation = Donation.find(donation.id)
+    assert_equal @new_event.id, donation.event_id
+    assert donation.transferred
     refute Event.find(@event.id).sold_out_cache
     assert_equal [[@attendee.email]], ticket_emails.map(&:recipients)
   end

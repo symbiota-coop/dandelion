@@ -41,7 +41,6 @@ module EvmTransactions
         "https://base.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers",
         "https://celo.blockscout.com/api/v2/addresses/#{evm_address}/token-transfers"
       ].each do |url|
-        puts url
         response = begin
           Faraday.get(url)
         rescue Faraday::Error
@@ -51,8 +50,6 @@ module EvmTransactions
 
         j = JSON.parse(response.body)
         j['items'].each do |item|
-          puts item['block_hash']
-
           to = item['to']['hash']
           unless to.downcase == evm_address.downcase
             # puts 'transaction is not to the address'
@@ -83,7 +80,6 @@ module EvmTransactions
             next
           end
 
-          puts [token, amount]
           transactions << [token, amount]
         end
       rescue StandardError => e

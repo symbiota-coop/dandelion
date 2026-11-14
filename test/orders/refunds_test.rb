@@ -207,6 +207,35 @@ class OrderRefundsTest < ActiveSupport::TestCase
     assert_equal 10, captured
   end
 
+  test 'Remove and refund ticket refunds that ticket\'s price and removes it, leaving the rest of its order' do
+    covers 'events/refund-ticket-own-price@985cff'
+    covers_route 'POST /e/:slug/tickets/:ticket_id/refund_and_destroy'
+    create_event(prices: [10])
+    order = create_paid_order(@event)
+    order.set(value: 20)
+    ticket, other_ticket = Array.new(2) do
+      order.tickets.create!(event: @event, account: order.account, ticket_type: @event.ticket_types.first, price: 10,
+                            payment_completed: true, payment_intent: order.payment_intent)
+    end
+    sign_in(@account)
+
+    visit "/e/#{@event.slug}/tickets"
+    refund_params = []
+    Stripe::PaymentIntent.stub :retrieve, stripe_payment_intent('ch_test', amount: 2000) do
+      Stripe::Refund.stub :create, proc { |params, _opts| refund_params << params } do
+        within(:xpath, "//tr[.//a[@href='/e/#{@event.slug}/tickets/#{ticket.id}/refund_and_destroy']]") do
+          click_button 'Actions'
+          click_link_and_confirm 'Remove and refund ticket'
+        end
+        assert page.has_content? 'Displaying 1 ticket'
+      end
+    end
+    assert_equal [{ charge: 'ch_test', amount: 1000 }], refund_params
+    assert_nil Ticket.find(ticket.id)
+    assert Ticket.find(other_ticket.id)
+    assert Order.find(order.id)
+  end
+
   test 'refund confirmation email includes the amount' do
     covers 'events/refund-confirmation-email@e7eb67'
     create_event(prices: [10])
