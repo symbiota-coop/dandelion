@@ -1,9 +1,9 @@
 require_relative '../test_config'
-require_relative '../helpers/video_narration_helper'
+require_relative '../helpers/video_narration_helpers'
 
 class HowToCreateAnEventTest < ActiveSupport::TestCase
   include Capybara::DSL
-  include VideoNarrationHelper
+  include VideoNarrationHelpers
 
   test 'how to create an event' do
     account = FactoryBot.build_stubbed(:account, name: 'Maria Sabina', email: 'maria@symbiota.coop', location: nil)

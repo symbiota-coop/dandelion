@@ -548,6 +548,64 @@ class LintTest < Minitest::Test
     assert_empty repeated, "Define each test helper once: share it in a module in test/helpers, or give each its own name\n#{repeated.map { |name, ats| "#{name}: #{ats.join(', ')}" }.join("\n")}"
   end
 
+  # The helpers test classes and helper modules define: [name, file, line, body], the body without its def line or
+  # comments and with its whitespace squeezed, for the methods written with an end (endless ones are a line each)
+  def test_helper_definitions
+    Dir[File.join(ROOT, 'test/**/*.rb')].flat_map do |path|
+      owner = nil
+      lines = File.readlines(path, encoding: 'UTF-8')
+      lines.each_with_index.filter_map do |line, index|
+        owner = Regexp.last_match(1) if line =~ /\A(?:class|module) (\w+)/
+        next unless owner&.match?(/(Test|Helpers|TestCase)\z/) && line =~ /\A  def (?:self\.)?(\w+[?!=]?)(?!.*\) = |.* = )/
+
+        name = Regexp.last_match(1)
+        last = ((index + 1)...lines.size).find { |i| lines[i].start_with?('  end') } or next
+        body = lines[(index + 1)...last].reject { |body_line| body_line.strip.start_with?('#') }.join.split.join(' ')
+        [name, path.delete_prefix("#{ROOT}/"), index + 1, body]
+      end
+    end
+  end
+
+  # AGENTS.md, Tests: a helper copied under another name is as able to drift apart as one copied under the same name
+  # (test_test_helpers_are_defined_once), so no two helpers have the same body. Bodies too short to be worth sharing
+  # (a line calling another helper, say) don't count
+  def test_test_helper_bodies_are_written_once
+    repeated = test_helper_definitions.reject { |_, _, _, body| body.length < 40 }.group_by(&:last).values.select { |defs| defs.size > 1 }
+    assert_empty repeated, "Write each helper once, sharing it in a module in test/helpers, rather than copying it under another name:\n" \
+                           "#{repeated.map { |defs| defs.map { |name, path, line| "#{name} (#{path}:#{line})" }.join(', ') }.join("\n")}"
+  end
+
+  # AGENTS.md, Tests: each module in test/helpers is named for what it holds and its file (bookings_helpers.rb holds
+  # BookingsHelpers), so test_test_helpers_are_defined_once, which finds them by name, checks them. It includes neither
+  # Rack::Test::Methods nor Capybara::DSL, which the test files that use them include, so what a file includes says how
+  # its tests reach the app (Dandelion/TestUnusedParadigm). Besides TestHelpers, which every test includes, each is
+  # shared: a module only one test file includes belongs in that file, as does a helper only one test file calls (unless
+  # another of its module's helpers calls it)
+  def test_test_helper_modules
+    tests = Dir[File.join(ROOT, 'test/**/*_test.rb')].to_h { |path| [path.delete_prefix("#{ROOT}/"), File.read(path, encoding: 'UTF-8')] }
+    problems = Dir[File.join(ROOT, 'test/helpers/*.rb')].flat_map do |path|
+      file = path.delete_prefix("#{ROOT}/")
+      source = File.read(path, encoding: 'UTF-8')
+      name = File.basename(path, '.rb').split('_').map(&:capitalize).join
+      next ["#{file}: name it something_helpers.rb, for the SomethingHelpers it holds"] unless name.end_with?('Helpers')
+      next ["#{file}: define module #{name} in it, for the file's name"] unless source.match?(/^module #{name}$/)
+
+      included = source.scan(/^\s*include ((?:Rack::Test::Methods|Capybara::DSL))$/).flatten.map { |mixin| "#{file}: don't include #{mixin}; the test files that use it do" }
+      next included if name == 'TestHelpers'
+
+      includers = tests.select { |_, test| test.match?(/^\s*include #{name}$/) }
+      next included + ["#{file}: #{includers.size} test file includes #{name}; define its helpers there"] if includers.size < 2
+
+      helpers = source.scan(/^  def (?:self\.)?(\w+[?!=]?)/).flatten
+      included + helpers.filter_map do |helper|
+        called = /(?<![\w@:])#{Regexp.escape(helper)}(?![\w?!=:])/
+        callers = includers.count { |_, test| test.match?(called) }
+        "#{file}: fewer than two test files call #{helper}; define it in the one that does" if callers < 2 && source.scan(called).size < 2
+      end
+    end
+    assert_empty problems, problems.join("\n")
+  end
+
   # AGENTS.md, Build/vendored code: CKEditor 38 and later show a Powered by CKEditor badge under the GPL
   def test_ckeditor_stays_on_37
     JSON.parse(File.read(File.join(ROOT, 'ckeditor/package.json'))).values_at('dependencies', 'devDependencies').compact.reduce({}, :merge).each do |name, version|

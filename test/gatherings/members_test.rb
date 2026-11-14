@@ -26,7 +26,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
   test 'an admin records what a member paid, their invitations and the shift points they owe' do
     create_gathering(privacy: 'open', enable_shift_worth: true)
     @gathering.rotas.create!(name: 'Kitchen', account: @account)
-    membership = membership_of(create_member)
+    membership = membership_of(create_gathering_member)
     sign_in(@account)
     visit gathering_path('/members')
 
@@ -57,8 +57,8 @@ class GatheringMembersTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/memberships/:id/make_admin'
     create_gathering(privacy: 'open')
     create_other_gathering_with_member
-    member = create_member
-    other = membership_of(create_member(name: 'Other Person'))
+    member = create_gathering_member
+    other = membership_of(create_gathering_member(name: 'Other Person'))
     own = membership_of(member)
 
     sign_in_with_rack(member)
@@ -101,8 +101,8 @@ class GatheringMembersTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/memberships/:id/shift_points_required'
     create_gathering(privacy: 'open')
     create_other_gathering_with_member
-    member = create_member
-    targets = [membership_of(member), membership_of(create_member(name: 'Other Person'))]
+    member = create_gathering_member
+    targets = [membership_of(member), membership_of(create_gathering_member(name: 'Other Person'))]
     changes = { 'paid' => 500, 'invitations_granted' => 10, 'shift_points_required' => 0 }
 
     refused = lambda do |membership|
@@ -143,7 +143,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
   test "the gathering's only admin isn't offered leaving, unadmining or removing themselves until there's another admin" do
     covers 'gatherings/only-admin-stays@432957'
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     sign_in(@account)
     visit gathering_path
     assert page.has_button? 'Leave gathering', disabled: true
@@ -171,7 +171,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
     covers 'gatherings/only-admin-stays@432957'
     covers_route 'POST /g/:slug/memberships/:id/unadmin'
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     own = membership_of(@account)
     site_admin = FactoryBot.create(:account, admin: true)
 
@@ -209,7 +209,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
   test "a value the members table can't take is refused, says why and saves nothing" do
     create_gathering(privacy: 'open', enable_shift_worth: true)
     @gathering.rotas.create!(name: 'Kitchen', account: @account)
-    membership = membership_of(create_member)
+    membership = membership_of(create_gathering_member)
     sign_in(@account)
     visit gathering_path('/members')
 
@@ -227,7 +227,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
 
   test 'what a member paid, their invitations and shift points must be numbers of 0 or more, and whole where they count money or people' do
     create_gathering(privacy: 'open')
-    membership = membership_of(create_member)
+    membership = membership_of(create_gathering_member)
     membership.set(paid: 10, invitations_granted: 2, shift_points_required: 1.5)
     sign_in_with_rack(@account)
     refused = {
@@ -256,8 +256,8 @@ class GatheringMembersTest < ActiveSupport::TestCase
 
   test "members see another member's answers to the joining questions" do
     create_gathering(privacy: 'open')
-    create_member(name: 'Answering Person').then { |account| membership_of(account).set(answers: [['Why are you joining?', 'To build the dome']]) }
-    sign_in(create_member(name: 'Curious Person'))
+    create_gathering_member(name: 'Answering Person').then { |account| membership_of(account).set(answers: [['Why are you joining?', 'To build the dome']]) }
+    sign_in(create_gathering_member(name: 'Curious Person'))
     visit gathering_path('/members')
     row = membership_row(membership_of(Account.find_by(name: 'Answering Person')))
     row.find("a[onclick*='/memberships/']").click
@@ -269,10 +269,10 @@ class GatheringMembersTest < ActiveSupport::TestCase
     covers_route 'GET /g/:slug/memberships/:id'
     create_gathering(privacy: 'open', demand_payment: true)
     create_other_gathering_with_member
-    answering = create_member(name: 'Answering Person')
+    answering = create_gathering_member(name: 'Answering Person')
     membership = membership_of(answering)
     membership.set(answers: [['Why are you joining?', 'To build the dome']], paid: 10)
-    unpaid = create_member(name: 'Unpaid Person')
+    unpaid = create_gathering_member(name: 'Unpaid Person')
     path = gathering_path("/memberships/#{membership.id}")
 
     get path, {}, 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'
@@ -301,7 +301,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
 
   test 'a member adds someone with their invitations, until they run out' do
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     membership_of(member).set(invitations_granted: 1)
     sign_in(member)
     visit gathering_path('/members')
@@ -321,7 +321,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/add_member'
     create_gathering(privacy: 'open')
     create_other_gathering_with_member
-    member = create_member
+    member = create_gathering_member
     path = gathering_path('/add_member')
 
     sign_in_with_rack(member)
@@ -353,7 +353,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
 
   test "adding someone who's already a member doesn't add them again" do
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     sign_in(@account)
     visit gathering_path('/members')
     click_link 'Add member'
@@ -366,7 +366,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
 
   test 'a member leaves, giving up their shifts, teams and options, while their payments stay on record' do
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     membership = membership_of(member)
     rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
     shift = Shift.create!(account: member, role: Role.create!(name: 'Cook', rota: rota), rslot: Rslot.create!(name: 'Morning', rota: rota), rota: rota)
@@ -397,7 +397,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
   test 'only a member can leave, and leaving takes no one else out' do
     covers_route 'POST /g/:slug/leave'
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     outsider = FactoryBot.create(:account)
     path = gathering_path('/leave')
 
@@ -421,11 +421,11 @@ class GatheringMembersTest < ActiveSupport::TestCase
     covers_route 'GET /g/:slug/members'
     create_gathering(privacy: 'open', hide_paid: true)
     option = @gathering.options.create!(name: 'Quiet tent', type: 'Accommodation', cost: 20, hide_members: true, account: @account)
-    hidden = create_member(name: 'Hidden Person', email: 'hidden@example.com', email_privacy: 'Only me')
+    hidden = create_gathering_member(name: 'Hidden Person', email: 'hidden@example.com', email_privacy: 'Only me')
     option.optionships.create!(account: hidden, gathering: @gathering)
     membership_of(hidden).set(paid: 20)
-    create_member(name: 'Public Person', email: 'public@example.com', email_privacy: 'Public')
-    viewer = create_member(name: 'Viewer Person')
+    create_gathering_member(name: 'Public Person', email: 'public@example.com', email_privacy: 'Public')
+    viewer = create_gathering_member(name: 'Viewer Person')
 
     sign_in_with_rack(viewer)
     get gathering_path('/members.csv')
@@ -447,8 +447,8 @@ class GatheringMembersTest < ActiveSupport::TestCase
   test "a closed gathering's members CSV shows every member's email, as its members were let in" do
     covers_route 'GET /g/:slug/members'
     create_gathering(privacy: 'closed')
-    create_member(name: 'Hidden Person', email: 'hidden@example.com', email_privacy: 'Only me')
-    viewer = create_member(name: 'Viewer Person')
+    create_gathering_member(name: 'Hidden Person', email: 'hidden@example.com', email_privacy: 'Only me')
+    viewer = create_gathering_member(name: 'Viewer Person')
 
     sign_in_with_rack(viewer)
     get gathering_path('/members.csv')

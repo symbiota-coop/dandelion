@@ -1,9 +1,11 @@
 require_relative '../test_config'
+require_relative '../helpers/bookings_helpers'
 require_relative '../helpers/checkout_webhook_helpers'
 
 # Stripe checkout webhooks, WhatsApp verification and Mailgun webhooks
 class WebhooksTest < ActiveSupport::TestCase
   include Rack::Test::Methods
+  include BookingsHelpers
   include CheckoutWebhookHelpers
 
   def checkout_completed_event(session_id, type: 'checkout.session.completed', payment_status: 'paid')
@@ -22,14 +24,15 @@ class WebhooksTest < ActiveSupport::TestCase
     create_event(prices: [10])
     order = create_incomplete_order(@event, value: 10, session_id: "cs_#{SecureRandom.hex(4)}")
 
-    deliver_stripe_webhook(@organisation, checkout_completed_event(order.session_id, payment_status: 'unpaid'))
+    deliver_stripe_event(@organisation, checkout_completed_event(order.session_id, payment_status: 'unpaid'))
     refute order.reload.payment_completed?
 
-    deliver_stripe_webhook(@organisation, checkout_completed_event(order.session_id, type: 'checkout.session.async_payment_succeeded'))
+    deliver_stripe_event(@organisation, checkout_completed_event(order.session_id, type: 'checkout.session.async_payment_succeeded'))
     assert order.reload.payment_completed?
   end
 
-  def deliver_stripe_webhook(organisation, stripe_event)
+  # Posts stripe_event to organisation's Stripe webhook, unsigned, as if Stripe had sent it
+  def deliver_stripe_event(organisation, stripe_event)
     Stripe::Webhook.stub :construct_event, stripe_event do
       header 'Stripe-Signature', 'sig'
       post "/o/#{organisation.slug}/stripe_webhook"
@@ -42,17 +45,6 @@ class WebhooksTest < ActiveSupport::TestCase
     @event.ticket_types.first.set(quantity: ticket_quantity)
   end
 
-  def post_stripe_purchase(event, account)
-    ticket_type = event.ticket_types.first
-    header 'Accept', 'application/json'
-    post "/e/#{event.slug}/purchase",
-         ticketForm: { quantities: { ticket_type.id.to_s => '1' } },
-         detailsForm: {
-           payment_method: 'stripe',
-           account: { name: account.name, email: account.email }
-         }
-  end
-
   test 'checkout.session.completed webhook restores a deleted checkout' do
     create_organisation(stripe_endpoint_secret: 'whsec_test')
     create_event(prices: [10])
@@ -60,7 +52,7 @@ class WebhooksTest < ActiveSupport::TestCase
     session_id = order.session_id
     order.destroy
 
-    deliver_stripe_webhook(@organisation, checkout_completed_event(session_id))
+    deliver_stripe_event(@organisation, checkout_completed_event(session_id))
 
     restored = Order.find(order.id)
     assert restored
@@ -74,7 +66,7 @@ class WebhooksTest < ActiveSupport::TestCase
     buyer = FactoryBot.create(:account)
 
     with_stubbed_stripe_session do
-      post_stripe_purchase(@event, buyer)
+      post_purchase(@event, buyer, payment_method: 'stripe')
     end
 
     assert_equal 200, last_response.status
@@ -86,7 +78,7 @@ class WebhooksTest < ActiveSupport::TestCase
     refute order.payment_completed?
     refute order.tickets.first.payment_completed?
 
-    deliver_stripe_webhook(@organisation, checkout_completed_event(order.session_id))
+    deliver_stripe_event(@organisation, checkout_completed_event(order.session_id))
 
     assert order.reload.payment_completed?
     assert order.tickets.first.reload.payment_completed?
@@ -98,7 +90,7 @@ class WebhooksTest < ActiveSupport::TestCase
     other = FactoryBot.create(:account)
 
     with_stubbed_stripe_session do
-      post_stripe_purchase(@event, buyer)
+      post_purchase(@event, buyer, payment_method: 'stripe')
     end
 
     assert_equal 200, last_response.status
@@ -109,14 +101,14 @@ class WebhooksTest < ActiveSupport::TestCase
     assert @event.ticket_types.first.reload.sold_out_cache
 
     with_stubbed_stripe_session(session_id: 'cs_other') do
-      post_stripe_purchase(@event, other)
+      post_purchase(@event, other, payment_method: 'stripe')
     end
 
     assert_equal 400, last_response.status
     assert_equal 1, @event.orders.count
     assert_equal 1, @event.tickets.count
 
-    deliver_stripe_webhook(@organisation, checkout_completed_event(order.session_id))
+    deliver_stripe_event(@organisation, checkout_completed_event(order.session_id))
 
     assert order.reload.payment_completed?
     assert @event.reload.sold_out_cache

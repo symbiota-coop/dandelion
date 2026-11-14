@@ -14,7 +14,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
   test 'an admin deletes a gathering from its edit page, taking its memberships and records with it, but keeping its payments' do
     covers_route 'POST /g/:slug/destroy'
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     payment = Payment.create!(membership: @gathering.memberships.find_by(account: member), amount: 50, currency: 'GBP')
     create_timetable(scheduled: true)
     create_rota
@@ -37,7 +37,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
 
   test "only a gathering's admins delete it" do
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     create_other_gathering
 
     [member, @other_account, nil].each do |account|
@@ -55,7 +55,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     covers_route 'GET /g/:slug/subscribe'
     covers_route 'POST /g/:slug/set_subscribe'
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     membership = @gathering.memberships.find_by(account: member)
     sign_in(member)
     visit gathering_path
@@ -70,7 +70,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
 
   test 'turning email notifications back on is for members, and only changes their own' do
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     membership = @gathering.memberships.find_by(account: member)
     membership.set(unsubscribed: true)
     create_other_gathering
@@ -97,7 +97,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/hide_from_sidebar'
     covers_route 'POST /g/:slug/show_in_sidebar'
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     membership = @gathering.memberships.find_by(account: member)
     sign_in(member)
     visit gathering_path
@@ -187,7 +187,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
   test "only a gathering's admins delete its spaces and slots, and not another gathering's" do
     create_gathering(privacy: 'open')
     create_timetable(scheduled: true)
-    member = create_member
+    member = create_gathering_member
     create_other_gathering
     other_timetable = @other_gathering.timetables.create!(name: 'Talks', account: @other_account)
     other_space = other_timetable.spaces.create!(name: 'Cellar')
@@ -245,7 +245,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     create_timetable(scheduled: true)
     dome = @timetable.spaces.create!(name: 'Dome')
     afternoon = @timetable.tslots.create!(name: 'Saturday afternoon')
-    member = create_member
+    member = create_gathering_member
     create_other_gathering
 
     [member, @other_account, nil].each do |account|
@@ -265,7 +265,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     covers_route 'GET /g/:slug/rotas/:id/create_shift'
     create_gathering(privacy: 'open')
     create_rota
-    create_member
+    create_gathering_member
     sign_in(@account)
     visit gathering_path("/rotas/#{@rota.id}/create_shift")
     select 'Member Person', from: 'Account'
@@ -279,7 +279,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
   test "adding someone else to a shift is for the gathering's admins, and only adds its members" do
     create_gathering(privacy: 'open')
     create_rota
-    member = create_member
+    member = create_gathering_member
     create_other_gathering
     other_rota = @other_gathering.rotas.create!(name: 'Bar', account: @other_account)
 
@@ -332,7 +332,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     create_rota
     washer = Role.create!(name: 'Washer', rota: @rota)
     evening = Rslot.create!(name: 'Evening', rota: @rota)
-    member = create_member
+    member = create_gathering_member
     create_other_gathering
 
     [member, @other_account, nil].each do |account|
@@ -353,9 +353,9 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     covers_route 'GET /g/:slug/tiers'
     create_gathering(privacy: 'open')
     option = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account)
-    other = create_member(name: 'Other Person')
+    other = create_gathering_member(name: 'Other Person')
     option.optionships.create!(account: other, gathering: @gathering)
-    sign_in(create_member)
+    sign_in(create_gathering_member)
     visit gathering_path('/tiers')
     assert page.has_content? 'Tent'
     assert page.has_current_path?(gathering_path('/options'))
@@ -369,7 +369,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
   test "who selected an option is for the gathering's members, and not another gathering's option" do
     create_gathering(privacy: 'open')
     option = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account)
-    option.optionships.create!(account: create_member(name: 'Other Person'), gathering: @gathering)
+    option.optionships.create!(account: create_gathering_member(name: 'Other Person'), gathering: @gathering)
     create_other_gathering
     other_option = @other_gathering.options.create!(name: 'Secret cabin', type: 'Accommodation', account: @other_account)
 
@@ -389,8 +389,8 @@ class GatheringRoutesTest < ActiveSupport::TestCase
   test "a member isn't offered who selected an option that hides its members, nor one who hasn't paid" do
     create_gathering(privacy: 'open')
     option = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account, hide_members: true)
-    option.optionships.create!(account: create_member(name: 'Other Person'), gathering: @gathering)
-    sign_in(create_member)
+    option.optionships.create!(account: create_gathering_member(name: 'Other Person'), gathering: @gathering)
+    sign_in(create_gathering_member)
     visit gathering_path('/options')
     assert page.has_content? 'Tent'
     assert page.has_content? '1/∞'
@@ -407,9 +407,9 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     create_gathering(privacy: 'open')
     option = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account, hide_members: true)
     open_option = @gathering.options.create!(name: 'Cabin', type: 'Accommodation', account: @account)
-    other = create_member(name: 'Other Person')
+    other = create_gathering_member(name: 'Other Person')
     [option, open_option].each { |o| o.optionships.create!(account: other, gathering: @gathering) }
-    member = create_member
+    member = create_gathering_member
 
     sign_in_with_rack(member)
     get gathering_path("/options/#{option.id}")
@@ -433,8 +433,8 @@ class GatheringRoutesTest < ActiveSupport::TestCase
   test "a team's unsubscribe link unsubscribes the member from their own teamship, or shows the team if they're not in it" do
     covers_route 'GET /g/:slug/teams/:id/unsubscribe'
     create_gathering(privacy: 'open')
-    member = create_member
-    other = create_member(name: 'Other Person')
+    member = create_gathering_member
+    other = create_gathering_member(name: 'Other Person')
     team = @gathering.teams.create!(name: 'Garden', account: @account)
     teamship = team.teamships.create!(account: member, gathering: @gathering)
     other_teamship = team.teamships.create!(account: other, gathering: @gathering)
@@ -479,7 +479,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/teams/:id/budget'
     create_gathering(privacy: 'open')
     team = @gathering.teams.find_by(name: 'General')
-    sign_in(create_member)
+    sign_in(create_gathering_member)
     visit gathering_path('/budget')
     find("form[action='#{gathering_path("/teams/#{team.id}/budget")}'] input[name='budget']").fill_in(with: '200')
     find('h2', text: 'Projected outgoings').click
@@ -511,7 +511,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
   test 'a member withdraws their proposal of an applicant' do
     covers_route 'POST /g/:slug/verdicts/:id/destroy'
     create_gathering(privacy: 'closed', fixed_threshold: 2)
-    member = create_member
+    member = create_gathering_member
     mapplication = @gathering.mapplications.create!(account: FactoryBot.create(:account, name: 'Applicant Person'), status: 'pending')
     mapplication.verdicts.create!(account: member, type: 'proposer')
     sign_in(member)
@@ -523,7 +523,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
 
   test "only a verdict's author withdraws it, and not through another gathering's URL" do
     create_gathering(privacy: 'closed', fixed_threshold: 2)
-    member = create_member
+    member = create_gathering_member
     mapplication = @gathering.mapplications.create!(account: FactoryBot.create(:account), status: 'pending')
     verdict = mapplication.verdicts.create!(account: member, type: 'proposer')
     create_other_gathering

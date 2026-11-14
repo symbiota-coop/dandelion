@@ -55,11 +55,11 @@ class EventBookingsTest < ActiveSupport::TestCase
     buyer = FactoryBot.create(:account)
 
     # A form with no quantity chosen sends a blank ticketForm[quantities], which blanks_to_nils turns into nil
-    post_purchase(@event, buyer, quantities: '')
+    post_purchase(@event, buyer, ticket_form: { quantities: '' })
     assert_equal 400, last_response.status
     assert_equal OrderBuilder::NoTickets::MESSAGE, JSON.parse(last_response.body)['error']
 
-    post_purchase(@event, buyer, quantities: { @event.ticket_types.first.id.to_s => '0' })
+    post_purchase(@event, buyer, quantity: 0)
     assert_equal 400, last_response.status
     assert_equal 0, @event.orders.count
   end
@@ -410,7 +410,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert organisationship, 'User should be subscribed to organisation'
     assert_nil local_group.local_groupships.find_by(account: new_account)
 
-    assert Delayed::Job.and(handler: /geocode_location!/).exists?, 'Checkout should queue geocoding'
+    assert queued_jobs(:geocode_location!).exists?, 'Checkout should queue geocoding'
     new_account.geocode_location!
     assert new_account.reload.coordinates.present?, 'Account should have coordinates from geocoding'
 

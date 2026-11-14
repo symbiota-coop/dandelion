@@ -9,7 +9,6 @@ class OrdersTicketAdminTest < ActiveSupport::TestCase
   include Rack::Test::Methods
   include OrdersHelpers
 
-  SEND_TICKET_JOB = /method_name: :send_ticket_without_delay/
 
   # A paid order of one £10 ticket
   def create_paid_ticket
@@ -123,7 +122,7 @@ class OrdersTicketAdminTest < ActiveSupport::TestCase
     click_link 'Resend single ticket'
     assert page.has_content?('The ticket was resent.')
 
-    emails = emails_sent_by_jobs(SEND_TICKET_JOB)
+    emails = emails_sent_by_jobs(:send_ticket)
     assert_equal [[@attendee.email]], emails.map(&:recipients)
     assert_equal ["Ticket to #{@event.name}"], emails.map(&:subject_line)
     assert_equal @order.id, Ticket.find(@ticket.id).order_id
@@ -138,7 +137,7 @@ class OrdersTicketAdminTest < ActiveSupport::TestCase
       post "/tickets/#{@ticket.id}/send_ticket"
       assert last_response.redirect?
     end
-    assert_equal 0, Delayed::Job.and(handler: SEND_TICKET_JOB).count
+    assert_equal 0, queued_jobs(:send_ticket).count
   end
 
   # Cancelling a free order

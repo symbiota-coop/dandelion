@@ -1,13 +1,11 @@
 require_relative '../test_config'
 require_relative '../helpers/organisations_helpers'
-require_relative '../helpers/event_permissions_helpers'
 
 # A local group's admins, stats, mailer, follower imports and deletion, who may use each, and its old URLs
 class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
   include OrganisationsHelpers
-  include EventPermissionsHelpers
 
   XHR = { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }.freeze
 
@@ -68,7 +66,7 @@ class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
     accept_alert('CSV, two columns, with headers: name, email') { click_link 'Upload CSV' }
     attach_file 'csv', file.path
     assert page.has_content? 'The followers will be added shortly'
-    Delayed::Job.and(handler: /import_from_csv/).each(&:invoke_job)
+    run_jobs(:import_from_csv)
 
     newcomer = Account.find_by(email: 'new.person@example.com')
     assert newcomer
@@ -166,7 +164,7 @@ class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
 
     assert LocalGroup.find(@local_group.id)
     assert_equal [@account.id], @local_group.admins.pluck(:id)
-    assert_empty Delayed::Job.and(handler: /import_from_csv/)
+    assert_empty queued_jobs(:import_from_csv)
   end
 
   test "organisation admins who are not the group's admins make admins, and making an admin under another group's URL makes them that group's admin only" do
@@ -197,7 +195,7 @@ class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
     assert_redirected_to "#{@local_group.path}/followers"
     follow_redirect!
     assert_includes last_response.body, 'The CSV needs a column headed email'
-    assert_empty Delayed::Job.and(handler: /import_from_csv/)
+    assert_empty queued_jobs(:import_from_csv)
   end
 
   test "an unsubscribe link unsubscribes only the person it's for, and someone who didn't follow the group is kept out of its emails" do

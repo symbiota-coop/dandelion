@@ -1,10 +1,12 @@
 require_relative '../test_config'
+require_relative '../helpers/bookings_helpers'
 require_relative '../helpers/checkout_webhook_helpers'
 
 # Paying with PayPal through its API, with PayPal's HTTP answered by stubs: creating the PayPal order at checkout,
 # capturing it once from the webhook or the return page, and refunding its capture
 class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
   include Rack::Test::Methods
+  include BookingsHelpers
   include CheckoutWebhookHelpers
 
   JSON_HEADERS = { 'Content-Type' => 'application/json' }.freeze
@@ -66,13 +68,6 @@ class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
     create_organisation(stripe_pk: nil, stripe_sk: nil, paypal_client_id: 'org_client', paypal_secret: 'org_secret')
   end
 
-  def post_paypal_checkout(ticket_form: {}, buyer: FactoryBot.create(:account))
-    header 'Accept', 'application/json'
-    post "/e/#{@event.slug}/purchase",
-         ticketForm: { quantities: { @event.ticket_types.first.id.to_s => '1' } }.merge(ticket_form),
-         detailsForm: { payment_method: 'paypal', account: { name: buyer.name, email: buyer.email } }
-  end
-
   # A PayPal order the buyer has approved, which PayPal captures (once) when asked: the stubs say how many times it was
   def approved_paypal_order_stubs(paypal_order_id, captures)
     lambda do |stub, requests|
@@ -113,7 +108,7 @@ class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
       end
     end
     with_paypal_api(stubs) do |requests|
-      post_paypal_checkout(ticket_form: { quantities: { @event.ticket_types.first.id.to_s => '2' }, applied_discount_code: 'TWENTY', donation_amount: '3.33' })
+      post_purchase(payment_method: 'paypal', quantity: 2, ticket_form: { applied_discount_code: 'TWENTY', donation_amount: '3.33' })
 
       assert_equal 200, last_response.status
       assert_equal 'https://www.sandbox.paypal.com/checkoutnow?token=PAYPAL-NEW', JSON.parse(last_response.body)['redirect_url']
@@ -142,7 +137,7 @@ class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
     end
 
     emails = with_paypal_api(stubs) do
-      recorded_emails { post_paypal_checkout }
+      recorded_emails { post_purchase(payment_method: 'paypal') }
     end
 
     assert_equal 400, last_response.status
@@ -162,7 +157,7 @@ class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
       stub.post('/v2/checkout/orders') { [401, JSON_HEADERS, { error: 'invalid_token', error_description: 'Token signature verification failed' }.to_json] }
     end
 
-    with_paypal_api(stubs) { post_paypal_checkout }
+    with_paypal_api(stubs) { post_purchase(payment_method: 'paypal') }
 
     assert_equal 400, last_response.status
     assert_equal 0, @event.orders.count
@@ -184,7 +179,7 @@ class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
     end
 
     [no_link, unreachable].each do |stubs|
-      with_paypal_api(stubs) { post_paypal_checkout }
+      with_paypal_api(stubs) { post_purchase(payment_method: 'paypal') }
 
       assert_equal 400, last_response.status
       assert_equal OrderBuilder::PaymentFailed::MESSAGE, JSON.parse(last_response.body)['error']

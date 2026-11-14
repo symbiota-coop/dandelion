@@ -26,20 +26,6 @@ class EventListingsTest < ActiveSupport::TestCase
     event
   end
 
-  # The response body of the request the block makes, and how many Mongo commands it ran
-  def mongo_commands_during
-    commands = []
-    subscriber = Object.new
-    subscriber.define_singleton_method(:started) { |e| commands << e.command_name }
-    subscriber.define_singleton_method(:succeeded) { |_| nil }
-    subscriber.define_singleton_method(:failed) { |_| nil }
-    Mongoid.default_client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
-    yield
-    [last_response.body, commands.size]
-  ensure
-    Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
-  end
-
   test 'upcoming events on the home page show whether each is starred, with the page' do
     create_event(as: :starred_event)
     create_event(as: :unstarred_event)
@@ -91,24 +77,19 @@ class EventListingsTest < ActiveSupport::TestCase
     @event.event_tagships.create!(event_tag: tag)
 
     preloaded = Event.and(id: @event.id).with_key_includes.first
-    commands = []
-    subscriber = Object.new
-    subscriber.define_singleton_method(:started) { |e| commands << e.command_name }
-    subscriber.define_singleton_method(:succeeded) { |_| nil }
-    subscriber.define_singleton_method(:failed) { |_| nil }
-    Mongoid.default_client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
-    assert_equal [tag], preloaded.event_tagships.map(&:event_tag)
-    assert_equal [cohost], preloaded.cohostships.map(&:organisation)
-    preloaded.image_source(cohost)
+    commands = mongo_commands_during do
+      assert_equal [tag], preloaded.event_tagships.map(&:event_tag)
+      assert_equal [cohost], preloaded.cohostships.map(&:organisation)
+      preloaded.image_source(cohost)
+    end
     assert_empty commands
-  ensure
-    Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber) if subscriber
   end
 
   test 'events stats CSV reads every event with the same queries, however many events there are' do
     create_stats_event(:event1)
     sign_in_with_rack(@account)
-    body, one_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats.csv", from: Date.today.to_s }
+    one_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats.csv", from: Date.today.to_s }.size
+    body = last_response.body
     row = CSV.parse(body, headers: true).first
     assert_equal 'Coco Ordinator', row['coordinator']
     assert_includes row['facilitators'], 'Fay Cilitator'
@@ -122,7 +103,8 @@ class EventListingsTest < ActiveSupport::TestCase
 
     create_stats_event(:event2)
     create_stats_event(:event3)
-    body, three_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats.csv", from: Date.today.to_s }
+    three_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats.csv", from: Date.today.to_s }.size
+    body = last_response.body
     assert_equal 3, CSV.parse(body, headers: true).size
     assert_equal one_event_commands, three_event_commands
   end
@@ -136,14 +118,16 @@ class EventListingsTest < ActiveSupport::TestCase
     end
     share_revenue.call(create_stats_event(:event1))
     sign_in_with_rack(@account)
-    body, one_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats.csv", from: Date.today.to_s }
+    one_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats.csv", from: Date.today.to_s }.size
+    body = last_response.body
     # £5 of the £10 tickets, less the sharer's part of the £3 credit: £3 × (£10 / £15) × 0.5 = £1
     # Then what Stripe reports: nothing, as the charge has no application fee to split it by
     assert_equal '£4, £0', CSV.parse(body, headers: true).first['ticket_revenue_to_revenue_sharer']
 
     share_revenue.call(create_stats_event(:event2))
     share_revenue.call(create_stats_event(:event3))
-    body, three_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats.csv", from: Date.today.to_s }
+    three_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats.csv", from: Date.today.to_s }.size
+    body = last_response.body
     assert_equal 3, CSV.parse(body, headers: true).size
     assert_equal one_event_commands, three_event_commands
   end
@@ -157,10 +141,12 @@ class EventListingsTest < ActiveSupport::TestCase
     coordinator.set(image_uid: Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg')))
     DragonflyJob.create!(signature: coordinator.image.thumb('400x400#').signature, uid: Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg')))
     sign_in_with_rack(@account)
-    page, one_event_page_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s }
+    one_event_page_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s }.size
+    page = last_response.body
     assert_includes page, %(data-pagelet-url="/o/#{@organisation.slug}/events/stats?from=#{Rack::Utils.escape(Date.today.to_s)}&amp;table=1")
     refute_includes page, '1/1 tickets sold'
-    body, one_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s, table: 1 }
+    one_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s, table: 1 }.size
+    body = last_response.body
     assert_includes body, 'Coco Ordinator'
     assert_includes body, 'Fay Cilitator'
     assert_includes body, 'wellbeing'
@@ -171,9 +157,10 @@ class EventListingsTest < ActiveSupport::TestCase
 
     create_stats_event(:event2)
     create_stats_event(:event3)
-    _, three_event_page_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s }
+    three_event_page_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s }.size
     assert_equal one_event_page_commands, three_event_page_commands
-    body, three_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s, table: 1 }
+    three_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats", from: Date.today.to_s, table: 1 }.size
+    body = last_response.body
     assert_equal 3, body.scan('1 response').size
     assert_equal one_event_commands, three_event_commands
   end

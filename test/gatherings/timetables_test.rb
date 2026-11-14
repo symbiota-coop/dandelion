@@ -11,7 +11,7 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
   test "an admin schedules an activity from its edit form, and its page shows who's interested" do
     create_gathering(privacy: 'open')
     create_timetable
-    member = create_member
+    member = create_gathering_member
     @tactivity.attendances.create!(account: member)
     sign_in(@account)
     visit gathering_path("/tactivities/#{@tactivity.id}/edit")
@@ -32,7 +32,7 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
     covers_route 'GET /g/:slug/tactivities/:id'
     create_gathering(privacy: 'open')
     create_timetable
-    member = create_member
+    member = create_gathering_member
     @tactivity.attendances.create!(account: member)
     sign_in(member)
     visit gathering_path("/tactivities/#{@tactivity.id}")
@@ -45,7 +45,7 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
     covers_route 'GET /g/:slug/tactivities/:id/edit'
     create_gathering(privacy: 'open')
     create_timetable
-    sign_in(create_member)
+    sign_in(create_gathering_member)
     visit gathering_path("/tactivities/#{@tactivity.id}/edit")
     assert page.has_field? 'Activity name'
     assert page.has_no_field? 'Slot'
@@ -63,7 +63,7 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
     create_gathering(privacy: 'open')
     create_timetable
     create_other_gathering
-    member = create_member
+    member = create_gathering_member
 
     [member, @other_account, nil].each do |account|
       account ? sign_in_with_rack(account) : clear_cookies
@@ -143,7 +143,7 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/tactivities/:id/unschedule'
     create_gathering(privacy: 'open')
     create_timetable
-    member = create_member
+    member = create_gathering_member
 
     sign_in_with_rack(member)
     post gathering_path("/tactivities/#{@tactivity.id}/schedule"), tslot_id: @tslot.id, space_id: @space.id
@@ -202,8 +202,8 @@ class GatheringTimetablesTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/tactivities/:id/unattend'
     create_gathering(privacy: 'open')
     create_timetable
-    member = create_member
-    other = create_member(name: 'Other Person')
+    member = create_gathering_member
+    other = create_gathering_member(name: 'Other Person')
     @tactivity.attendances.create!(account: other)
 
     # Not interested themselves, they take no one's away

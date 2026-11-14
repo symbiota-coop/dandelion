@@ -34,7 +34,7 @@ module RuboCop
       class TestOneParadigm < Base
         MSG = 'Use Rack or the browser in a test, not both: Rack for a program or a forged request, the browser for a person ' \
               '(AGENTS.md, Tests). Split it into two tests, unless a program\'s request is part of a person\'s flow.'
-        RACK = %i[get post put patch delete head options sign_in_with_rack last_response last_request follow_redirect!
+        RACK = %i[get post put patch delete head options header sign_in_with_rack last_response last_request follow_redirect!
                   clear_cookies].freeze
         BROWSER = %i[visit sign_in page click_on click_button click_link click_link_or_button fill_in within accept_confirm
                      dismiss_confirm execute_script evaluate_script].freeze

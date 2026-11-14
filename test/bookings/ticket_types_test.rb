@@ -131,22 +131,13 @@ class TicketTypesTest < ActiveSupport::TestCase
       refreshes += 1
       super()
     end
-    commands = []
-    subscriber = Object.new
-    subscriber.define_singleton_method(:started) { |e| commands << e.command }
-    subscriber.define_singleton_method(:succeeded) { |_| nil }
-    subscriber.define_singleton_method(:failed) { |_| nil }
-    Mongoid.default_client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
-
-    assert event.update_attributes(ticket_types_attributes: attributes)
+    commands = mongo_commands_during { assert event.update_attributes(ticket_types_attributes: attributes) }
 
     event_reads = commands.count { |c| c['find'] == 'events' }
     sold_out_cache_writes = commands.count { |c| c['update'] == 'ticket_types' && c['updates'].first['u'].fetch('$set', {}).key?('sold_out_cache') }
     assert_equal 3, refreshes
     assert_operator event_reads, :<=, refreshes
     assert_equal 0, sold_out_cache_writes
-  ensure
-    Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber) if subscriber
   end
 
   test 'saving unchanged ticket types via nested attributes does not refresh the event' do
@@ -333,21 +324,17 @@ class TicketTypesTest < ActiveSupport::TestCase
     create_event(prices: [0] * 10, capacity: 100)
     @event.ticket_types.each { |ticket_type| ticket_type.tickets.create!(event: @event, payment_completed: true) }
     event = Event.find(@event.id)
-    commands = []
-    subscriber = Object.new
-    subscriber.define_singleton_method(:started) { |e| commands << e.command }
-    subscriber.define_singleton_method(:succeeded) { |_| nil }
-    subscriber.define_singleton_method(:failed) { |_| nil }
-    Mongoid.default_client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
 
-    # As the event page's structured data does: each type's availability while iterating the types
-    availability = event.ticket_types.map(&:number_of_tickets_available_in_single_purchase)
+    availability = places_remaining = nil
+    commands = mongo_commands_during do
+      # As the event page's structured data does: each type's availability while iterating the types
+      availability = event.ticket_types.map(&:number_of_tickets_available_in_single_purchase)
+      places_remaining = event.places_remaining
+    end
 
     assert_equal 10, availability.size
-    assert_equal 90, event.places_remaining
+    assert_equal 90, places_remaining
     assert_operator commands.count { |c| c['find'] == 'ticket_types' }, :<=, 2
-  ensure
-    Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber) if subscriber
   end
 
   test 'event places remaining uses slots rather than ticket count' do

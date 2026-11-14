@@ -1,4 +1,5 @@
 require_relative '../test_config'
+require_relative '../helpers/checkout_webhook_helpers'
 
 # An event's admin pages and pagelets (app/controllers/events_admin.rb, rpayments.rb, check_in.rb): duplicating, sessions,
 # waitlists, stats, revenue payments and check-in, and that nobody else can reach them. Also starring an event, its
@@ -6,9 +7,9 @@ require_relative '../test_config'
 class EventAdminRoutesTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
+  include CheckoutWebhookHelpers
 
   BOOSTS_SECRET = 'whsec_event_boosts_test'.freeze
-  ADMIN_NOTIFICATION_JOB = /method_name: :send_admin_notification_without_delay/
 
   def create_waiter(name)
     FactoryBot.create(:account, name: name, email: "#{name.parameterize}@example.com")
@@ -415,13 +416,7 @@ class EventAdminRoutesTest < ActiveSupport::TestCase
 
   # Posts payload to the event boosts webhook as Stripe would, signed with secret
   def deliver_boosts_webhook(payload, secret: BOOSTS_SECRET)
-    timestamp = Time.now
-    signature = Stripe::Webhook::Signature.compute_signature(timestamp, payload, secret)
-    with_env({ 'STRIPE_ENDPOINT_SECRET_EVENT_BOOSTS' => BOOSTS_SECRET }) do
-      header 'Stripe-Signature', Stripe::Webhook::Signature.generate_header(timestamp, signature)
-      header 'Content-Type', 'application/json'
-      post '/event_boosts/stripe_webhook', payload
-    end
+    deliver_stripe_webhook('/event_boosts/stripe_webhook', payload, secret: secret, env: { 'STRIPE_ENDPOINT_SECRET_EVENT_BOOSTS' => BOOSTS_SECRET })
   end
 
   def create_pending_boost
@@ -442,7 +437,7 @@ class EventAdminRoutesTest < ActiveSupport::TestCase
     deliver_boosts_webhook(payload)
     assert_equal 200, last_response.status
 
-    emails = emails_sent_by_jobs(ADMIN_NOTIFICATION_JOB)
+    emails = emails_sent_by_jobs(:send_admin_notification)
     assert_equal ["[Event boost] #{event_boost.account.name} boosted #{@event.name}"], emails.map(&:subject_line)
   end
 
@@ -467,6 +462,6 @@ class EventAdminRoutesTest < ActiveSupport::TestCase
     end
     refute event_boost.reload.payment_completed?
     assert_empty emails
-    assert_equal 0, Delayed::Job.and(handler: ADMIN_NOTIFICATION_JOB).count
+    assert_equal 0, queued_jobs(:send_admin_notification).count
   end
 end

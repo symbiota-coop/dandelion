@@ -1,26 +1,26 @@
 require_relative '../test_config'
-require_relative '../helpers/event_permissions_helpers'
+require_relative '../helpers/organisations_helpers'
 
 # Running an organisation: tiers, notes on followers and their emails, removing and exporting them, bans, welcome
 # emails, feedback, its feedback summary and deleting it, and who may do each
 class OrganisationsAdminTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
-  include EventPermissionsHelpers
+  include OrganisationsHelpers
 
   XHR = { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }.freeze
 
   # A follower, an event manager, someone who doesn't follow, another organisation's admin and someone signed out
   def outsiders
     other_organisation = FactoryBot.create(:organisation)
-    [add_member(@organisation), add_event_manager(@organisation), FactoryBot.create(:account), other_organisation.account, nil]
+    [add_organisation_member(@organisation), add_event_manager(@organisation), FactoryBot.create(:account), other_organisation.account, nil]
   end
 
   # The CSV each send_followers_csv job queued would email, with whom it would go to
   def followers_csvs
     sent = []
     deliver = ->(*, to:, attachments: {}, **) { sent << [to, attachments['followers.csv']] }
-    Mailer.stub(:deliver, deliver) { Delayed::Job.and(handler: /send_followers_csv/).each(&:invoke_job) }
+    Mailer.stub(:deliver, deliver) { run_jobs(:send_followers_csv) }
     sent
   end
 
@@ -60,7 +60,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   test "an admin writes notes on a follower and turns their emails off and on from the followers page" do
     covers 'organisations/table-manage-followers-credits-bans@7b2dbd'
     create_organisation
-    follower = add_member(@organisation)
+    follower = add_organisation_member(@organisation)
     organisationship = @organisation.organisationships.find_by(account: follower)
 
     sign_in(@account)
@@ -82,7 +82,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
 
   test 'an admin removes a follower from the followers page' do
     create_organisation
-    follower = add_member(@organisation)
+    follower = add_organisation_member(@organisation)
     follower.set(name: 'Fern Follower')
     organisationship = @organisation.organisationships.find_by(account: follower)
 
@@ -114,7 +114,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
     accept_alert { click_link 'Upload CSV' }
     attach_file 'csv', file.path
     assert page.has_content? 'The followers will be added shortly'
-    Delayed::Job.and(handler: /import_from_csv/).each(&:invoke_job)
+    run_jobs(:import_from_csv)
     ada = Account.find_by(email: 'ada@example.com')
     assert_equal 'Ada Lovelace', ada.name
     assert @organisation.organisationships.find_by(account: ada)
@@ -188,7 +188,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
     covers_route 'GET /o/:slug/stats'
     create_organisation
     organisation_tier = @organisation.organisation_tiers.create!(name: 'Gold', threshold: 50, discount: 10)
-    victim = add_member(@organisation)
+    victim = add_organisation_member(@organisation)
     organisationship = @organisation.organisationships.find_by(account: victim)
     organisationship.set(notes: 'Private note')
     path = "/o/#{@organisation.slug}"
@@ -231,7 +231,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
     assert_equal ['Gold', 10], [organisation_tier.reload.name, organisation_tier.discount]
     assert_equal 1, @organisation.organisation_tiers.count
     assert_nil Account.find_by(email: 'intruder@example.com')
-    assert_empty Delayed::Job.and(handler: /send_followers_csv|import_from_csv/)
+    assert_empty queued_jobs(/send_followers_csv|import_from_csv/)
     organisationship.reload
     assert_equal 'Private note', organisationship.notes
     refute organisationship.unsubscribed?
@@ -249,7 +249,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
     covers_route 'POST /o/:slug/subscribed/:organisationship_id'
     create_organisation
     organisation_tier = @organisation.organisation_tiers.create!(name: 'Gold', threshold: 50, discount: 10)
-    organisationship = @organisation.organisationships.find_by(account: add_member(@organisation))
+    organisationship = @organisation.organisationships.find_by(account: add_organisation_member(@organisation))
     other_organisation = FactoryBot.create(:organisation)
     other_path = "/o/#{other_organisation.slug}"
     sign_in_with_rack(other_organisation.account)
@@ -277,7 +277,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
     covers_route 'GET /organisationships/:id/notes'
     covers_route 'POST /organisationships/:id/notes'
     create_organisation
-    follower = add_member(@organisation)
+    follower = add_organisation_member(@organisation)
     organisationship = @organisation.organisationships.find_by(account: follower)
     organisationship.set(notes: 'Prefers morning sessions')
 
@@ -304,7 +304,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   test "an admin chooses receiving feedback for themselves only, and a site admin who doesn't follow has nothing to choose" do
     covers_route 'POST /o/:slug/receive_feedback/:f'
     create_organisation
-    other_admin = add_member(@organisation, admin: true, receive_feedback: true)
+    other_admin = add_organisation_member(@organisation, admin: true, receive_feedback: true)
     own = @organisation.organisationships.find_by(account: @account)
     others = @organisation.organisationships.find_by(account: other_admin)
 
@@ -323,7 +323,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   test 'a removed follower stays an account, and a follower of another organisation is removed only by its own admins' do
     covers_route 'POST /organisationships/:id/destroy'
     create_organisation
-    follower = add_member(@organisation)
+    follower = add_organisation_member(@organisation)
     organisationship = @organisation.organisationships.find_by(account: follower)
     other_organisation = FactoryBot.create(:organisation)
     elsewhere = other_organisation.organisationships.create!(account: follower)
@@ -393,11 +393,11 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   test "the followers CSV goes only to the admin who asked, with each follower's email and whether they unsubscribed, and not their notes" do
     covers_route 'GET /o/:slug/followers'
     create_organisation
-    subscribed = add_member(@organisation)
-    unsubscribed = add_member(@organisation)
+    subscribed = add_organisation_member(@organisation)
+    unsubscribed = add_organisation_member(@organisation)
     @organisation.organisationships.find_by(account: subscribed).set(notes: 'Prefers morning sessions')
     @organisation.organisationships.find_by(account: unsubscribed).set(unsubscribed: true)
-    other_admin = add_member(@organisation, admin: true)
+    other_admin = add_organisation_member(@organisation, admin: true)
     elsewhere = FactoryBot.create(:organisation).organisationships.create!(account: FactoryBot.create(:account)).account
 
     sign_in_with_rack(@account)
@@ -442,7 +442,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
     post "/o/#{@organisation.slug}/feedback_summary", {}, XHR
     assert last_response.ok?
     assert @organisation.reload.feedback_summary_requested_at
-    assert Delayed::Job.and(handler: /generate_requested_feedback_summary/).exists?
+    assert queued_jobs(:generate_requested_feedback_summary).exists?
 
     @organisation.set(feedback_summary_requested_at: nil, feedback_summary_last_refreshed_at: 1.hour.ago)
     post "/o/#{@organisation.slug}/feedback_summary"

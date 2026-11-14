@@ -1,10 +1,12 @@
 require_relative '../test_config'
+require_relative '../helpers/checkout_webhook_helpers'
 require_relative '../helpers/gatherings_helpers'
 
 # Members paying into a gathering: starting a payment by card (Stripe Checkout, on the gathering's own keys) or EVM,
 # the gathering's Stripe webhook completing it and crediting the membership once, and checking on a payment
 class GatheringPaymentsTest < ActiveSupport::TestCase
   include Rack::Test::Methods
+  include CheckoutWebhookHelpers
   include GatheringsHelpers
 
   ENDPOINT_SECRET = 'whsec_gathering_test'.freeze
@@ -44,17 +46,9 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     membership.payments.create!(amount: amount, currency: membership.gathering.currency, session_id: "cs_#{SecureRandom.hex(4)}")
   end
 
-  def session_payload(session_id, type: 'checkout.session.completed', payment_status: 'paid')
-    { id: "evt_#{SecureRandom.hex(4)}", object: 'event', type: type, data: { object: { id: session_id, object: 'checkout.session', payment_status: payment_status } } }.to_json
-  end
-
   # Posts payload to the gathering's webhook as Stripe would, signed with secret
   def deliver_gathering_webhook(payload, gathering: @gathering, secret: ENDPOINT_SECRET)
-    timestamp = Time.now
-    signature = Stripe::Webhook::Signature.compute_signature(timestamp, payload, secret)
-    header 'Stripe-Signature', Stripe::Webhook::Signature.generate_header(timestamp, signature)
-    header 'Content-Type', 'application/json'
-    post "/g/#{gathering.slug}/stripe_webhook", payload
+    deliver_stripe_webhook("/g/#{gathering.slug}/stripe_webhook", payload, secret: secret)
   end
 
   def assert_uncredited(payment)
@@ -67,7 +61,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
 
   test 'a member starts a card payment: an unpaid payment and a Stripe Checkout session on the gathering\'s own key' do
     create_paying_gathering
-    member = create_member
+    member = create_gathering_member
     sign_in_with_rack(member)
 
     sent = start_card_payment('25', currency: 'USD')
@@ -98,7 +92,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
 
   test 'a member not yet confirmed, as the gathering demands a payment, can pay, and is confirmed once it\'s paid' do
     create_paying_gathering(demand_payment: true)
-    member = create_member
+    member = create_gathering_member
     refute membership_of(member).confirmed?
     sign_in_with_rack(member)
 
@@ -106,7 +100,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     assert_equal 200, last_response.status, last_response.body
     payment = membership_of(member).payments.first
 
-    deliver_gathering_webhook(session_payload(payment.session_id))
+    deliver_gathering_webhook(checkout_completed_payload(payment.session_id))
 
     assert membership_of(member).confirmed?
   end
@@ -132,7 +126,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
 
   test 'a payment method that is unknown, or that the gathering does not take, is refused' do
     create_paying_gathering
-    sign_in_with_rack(create_member)
+    sign_in_with_rack(create_gathering_member)
 
     refusing_stripe do
       post_pay(payment_method: 'bogus', amount: '10')
@@ -155,9 +149,9 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
   test 'a paid session completes its payment and credits the membership once, however often it is delivered' do
     covers_route 'POST /g/:slug/stripe_webhook'
     create_paying_gathering
-    member = create_member
+    member = create_gathering_member
     payment = create_unpaid_payment(membership_of(member), amount: 30)
-    payload = session_payload(payment.session_id)
+    payload = checkout_completed_payload(payment.session_id)
 
     deliver_gathering_webhook(payload)
 
@@ -169,7 +163,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     assert_equal 1, payment.notifications.and(type: 'created_payment').count
 
     deliver_gathering_webhook(payload)
-    deliver_gathering_webhook(session_payload(payment.session_id, type: 'checkout.session.async_payment_succeeded'))
+    deliver_gathering_webhook(checkout_completed_payload(payment.session_id, type: 'checkout.session.async_payment_succeeded'))
 
     assert_equal 200, last_response.status
     assert_equal 30, membership_of(member).paid
@@ -179,7 +173,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
 
   test 'a payment completed by two deliveries at once is credited once' do
     create_paying_gathering
-    member = create_member
+    member = create_gathering_member
     payment = create_unpaid_payment(membership_of(member), amount: 30)
 
     # Each delivery found the payment not yet completed before either completed it
@@ -196,34 +190,34 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
 
   test 'a session not yet paid completes nothing until its async payment succeeds' do
     create_paying_gathering
-    payment = create_unpaid_payment(membership_of(create_member))
+    payment = create_unpaid_payment(membership_of(create_gathering_member))
 
-    deliver_gathering_webhook(session_payload(payment.session_id, payment_status: 'unpaid'))
+    deliver_gathering_webhook(checkout_completed_payload(payment.session_id, payment_status: 'unpaid'))
     assert_equal 200, last_response.status
     assert_uncredited(payment)
 
-    deliver_gathering_webhook(session_payload(payment.session_id, type: 'checkout.session.expired', payment_status: 'paid'))
+    deliver_gathering_webhook(checkout_completed_payload(payment.session_id, type: 'checkout.session.expired', payment_status: 'paid'))
     assert_uncredited(payment)
 
-    deliver_gathering_webhook(session_payload(payment.session_id, type: 'checkout.session.async_payment_succeeded'))
+    deliver_gathering_webhook(checkout_completed_payload(payment.session_id, type: 'checkout.session.async_payment_succeeded'))
     assert payment.reload.payment_completed?
     assert_equal 10, payment.membership.reload.paid
   end
 
   test 'a bad signature, an unknown session or another gathering\'s session changes nothing' do
     create_paying_gathering
-    payment = create_unpaid_payment(membership_of(create_member))
+    payment = create_unpaid_payment(membership_of(create_gathering_member))
     other_gathering = FactoryBot.create(:gathering, account: FactoryBot.create(:account), stripe_endpoint_secret: 'whsec_other')
     other_payment = create_unpaid_payment(other_gathering.memberships.first)
 
-    deliver_gathering_webhook(session_payload(payment.session_id), secret: 'whsec_wrong')
+    deliver_gathering_webhook(checkout_completed_payload(payment.session_id), secret: 'whsec_wrong')
     assert_equal 200, last_response.status
-    deliver_gathering_webhook(session_payload(payment.session_id), secret: 'whsec_other')
+    deliver_gathering_webhook(checkout_completed_payload(payment.session_id), secret: 'whsec_other')
     assert_equal 200, last_response.status
-    deliver_gathering_webhook(session_payload('cs_unknown'))
+    deliver_gathering_webhook(checkout_completed_payload('cs_unknown'))
     assert_equal 200, last_response.status
     # Signed for this gathering, but the session is another gathering's
-    deliver_gathering_webhook(session_payload(other_payment.session_id))
+    deliver_gathering_webhook(checkout_completed_payload(other_payment.session_id))
     assert_equal 200, last_response.status
 
     assert_uncredited(payment)
@@ -232,14 +226,14 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
 
   test 'a failure completing a payment is reported, and Stripe is told 200' do
     create_paying_gathering
-    member = create_member
+    member = create_gathering_member
     payment = create_unpaid_payment(membership_of(member))
     # The member left before Stripe's webhook came
     membership_of(member).destroy
 
     reported = []
     ErrorReporting.stub(:capture_exception, ->(e, **) { reported << e }) do
-      deliver_gathering_webhook(session_payload(payment.session_id))
+      deliver_gathering_webhook(checkout_completed_payload(payment.session_id))
     end
 
     assert_equal 200, last_response.status
@@ -252,7 +246,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
   test 'the payer and the gathering\'s admins see whether a payment is complete, and no other member' do
     covers_route 'GET /g/:slug/payments/:payment_id'
     create_paying_gathering
-    member = create_member
+    member = create_gathering_member
     payment = create_unpaid_payment(membership_of(member))
     path = gathering_path("/payments/#{payment.id}")
 
@@ -267,7 +261,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     assert_equal 200, last_response.status
     assert_equal({ 'id' => payment.id.to_s, 'payment_completed' => true }, JSON.parse(last_response.body))
 
-    sign_in_with_rack(create_member(name: 'Another Member'))
+    sign_in_with_rack(create_gathering_member(name: 'Another Member'))
     get path
     assert_equal 403, last_response.status
 
@@ -296,7 +290,7 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
 
   test 'an EVM payment asks for its amount plus its secret in millionths, and completes once that arrives' do
     create_gathering(currency: 'BREAD', evm_address: EVM_ADDRESS)
-    member = create_member
+    member = create_gathering_member
     sign_in_with_rack(member)
 
     post_pay(payment_method: 'evm', amount: '20')

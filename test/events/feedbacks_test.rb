@@ -433,7 +433,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     click_link 'Resend feedback email'
     assert page.has_content?('The feedback email was resent.')
 
-    emails = emails_sent_by_jobs(/send_feedback_requests/)
+    emails = emails_sent_by_jobs(:send_feedback_requests)
     assert_equal [[attendee.email]], emails.map(&:recipients)
   end
 
@@ -443,7 +443,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
 
   def run_public_answer_jobs(extract)
     OpenRouter.stub :chat, extract do
-      Delayed::Job.and(handler: /generate_public_answers/).each(&:invoke_job)
+      run_jobs(:generate_public_answers)
     end
   end
 
@@ -458,7 +458,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
       { rating: 5, publicly_visible: false, answers: [['How was it?', answer]] },
       { rating: 5, publicly_visible: true, answers: [['How was it?', answer], ['Anything else?', answer]] }
     ].each { |attributes| @event.event_feedbacks.create!(account: FactoryBot.create(:account), **attributes) }
-    assert_equal 1, Delayed::Job.and(handler: /generate_public_answers/).count
+    assert_equal 1, queued_jobs(:generate_public_answers).count
 
     run_public_answer_jobs('"The teacher was kind and the room was too cold."')
     assert_equal [['How was it?', 'The teacher was kind and the room was too cold.']], feedback.reload.public_answers
@@ -488,7 +488,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
       EventFeedback.unscoped.delete_all
       Delayed::Job.delete_all
       feedback = @event.event_feedbacks.create!(account: @attendee, rating: 5, publicly_visible: true, answers: [['How was it?', answer]])
-      assert_equal 1, Delayed::Job.and(handler: /generate_public_answers/).count
+      assert_equal 1, queued_jobs(:generate_public_answers).count
       run_public_answer_jobs(extract)
       assert_nil feedback.reload.public_answers, extract
     end

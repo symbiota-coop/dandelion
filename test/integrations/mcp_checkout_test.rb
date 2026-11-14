@@ -3,6 +3,7 @@ require_relative '../helpers/mcp_helpers'
 
 # The MCP server's checkout tools: checkout requirements, create_checkout_tool and join_waitlist_tool
 class McpCheckoutTest < ActiveSupport::TestCase
+  include Rack::Test::Methods
   include McpHelpers
 
   test 'get_event_checkout_requirements_tool describes the checkout form' do

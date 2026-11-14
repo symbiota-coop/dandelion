@@ -15,10 +15,6 @@ class EventHostsTest < ActiveSupport::TestCase
     carousel
   end
 
-  def listing_event_ids
-    JSON.parse(last_response.body).map { |event| event['id'] }
-  end
-
   test 'tagging a carousel stores matching event carousel ids' do
     create_event
     tag = FactoryBot.create(:event_tag)
@@ -228,8 +224,8 @@ class EventHostsTest < ActiveSupport::TestCase
     header 'Referer', "http://example.org/o/#{@organisation.slug}/events"
     get "/o/#{@organisation.slug}/events.json", carousel_ids: [carousel.id.to_s]
     assert last_response.ok?
-    assert_includes listing_event_ids, @matching.id.to_s
-    refute_includes listing_event_ids, @other.id.to_s
+    assert_includes json_ids, @matching.id.to_s
+    refute_includes json_ids, @other.id.to_s
   end
 
   test 'organisation events json listing ignores another organisation carousel id' do
@@ -243,6 +239,6 @@ class EventHostsTest < ActiveSupport::TestCase
     header 'Referer', "http://example.org/o/#{@organisation.slug}/events"
     get "/o/#{@organisation.slug}/events.json", carousel_ids: [other_carousel.id.to_s]
     assert last_response.ok?
-    refute_includes listing_event_ids, @event.id.to_s
+    refute_includes json_ids, @event.id.to_s
   end
 end

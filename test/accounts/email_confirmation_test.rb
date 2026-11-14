@@ -36,7 +36,7 @@ class AccountEmailConfirmationTest < ActiveSupport::TestCase
   test 'the confirmation button does nothing without the link' do
     covers_route 'POST /accounts/confirm_email'
     account = FactoryBot.create(:account)
-    sign_in_via_rack(account)
+    sign_in_with_password_via_rack(account)
 
     post '/accounts/confirm_email'
     follow_redirect! while last_response.redirect?
@@ -204,7 +204,7 @@ class AccountEmailConfirmationTest < ActiveSupport::TestCase
 
   test 'confirming the email elsewhere resets a password set before it was confirmed' do
     account = FactoryBot.create(:account)
-    sign_in_via_rack(account)
+    sign_in_with_password_via_rack(account)
     assert_equal account.id.to_s, last_request.session[:account_id]
 
     victim_browser = Rack::Test::Session.new(app)
@@ -214,7 +214,7 @@ class AccountEmailConfirmationTest < ActiveSupport::TestCase
 
     get '/accounts/edit'
     assert last_response.redirect?
-    sign_in_via_rack(account)
+    sign_in_with_password_via_rack(account)
     assert_nil last_request.session[:account_id]
   end
 

@@ -145,6 +145,10 @@ Dandelion/TestOneParadigm:
 Dandelion/TestUnusedParadigm:
   Include:
     - test/**/*_test.rb
+# The shared helpers in test/helpers are where what it flags is done
+Dandelion/TestSharedHelper:
+  Include:
+    - test/**/*_test.rb
 # Mailer and the Mailgun stats in lib/mail use Mailgun themselves, for everything else
 Dandelion/MailgunDirect:
   Exclude:

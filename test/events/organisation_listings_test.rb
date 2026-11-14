@@ -39,10 +39,6 @@ class EventOrganisationListingsTest < ActiveSupport::TestCase
     hidden.each { |event| refute_includes body, event.name }
   end
 
-  def json_ids
-    JSON.parse(last_response.body).map { |event| event['id'] }
-  end
-
   test "the listing shows the organisation's own and cohosted public events, never secret, locked, deleted or another organisation's" do
     create_listing_events
 

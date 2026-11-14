@@ -130,15 +130,6 @@ module TestHelpers
     Struct.new(*attributes.keys).new(*attributes.values)
   end
 
-  # A Stripe payment intent with one charge, of amount and amount_refunded cents. The default is more than any test's
-  # refund, so refunds aren't capped at what's left unless a test sets it. With an application_fee (its id), the
-  # charge answers that too
-  def stripe_payment_intent(charge_id, amount: 1_000_000, amount_refunded: 0, application_fee: nil)
-    charge = { id: charge_id, amount: amount, amount_refunded: amount_refunded }
-    charge[:application_fee] = application_fee if application_fee
-    api_object(charges: [api_object(**charge)])
-  end
-
   # Sets these ENV variables while the block runs, then puts back what they were (nil unsets one). .env.test has no
   # Mailgun or recaptcha settings, for instance
   def with_env(vars)
@@ -149,7 +140,6 @@ module TestHelpers
     previous&.each { |key, value| ENV[key] = value }
   end
 
-  # Stubs Dragonfly's shell, failing the test if the block hands a file to ImageMagick
   # Real ImageMagick, for a test of ImageMagick itself (test/setup/fake_imagemagick.rb fakes it for the rest)
   def with_imagemagick
     FakeImageMagick.real = true
@@ -158,11 +148,20 @@ module TestHelpers
     FakeImageMagick.real = false
   end
 
+  # Stubs Dragonfly's shell, failing the test if the block hands a file to ImageMagick
   def without_imagemagick(&)
     Dragonfly.app.shell.stub(:run, ->(command, *) { flunk "ran #{command}" }, &)
   end
 
   # Requests
+
+  # A file of content named filename, as a form's file field sends it
+  def uploaded_file(content, filename, type = 'text/plain')
+    file = Tempfile.new(['upload', File.extname(filename)], binmode: true)
+    file.write(content)
+    file.close
+    Rack::Test::UploadedFile.new(file.path, type, true, original_filename: filename)
+  end
 
   # A request as a page's pagelets make it, which a refusal answers with 403 rather than a redirect. env adds to the
   # Rack env it's sent with
@@ -172,6 +171,25 @@ module TestHelpers
 
   def xhr_get(path, params = {}, env = {})
     xhr(:get, path, params, env)
+  end
+
+  # The commands (BSON documents, like { 'find' => 'events', ... }) the block sends to MongoDB
+  def mongo_commands_during
+    commands = []
+    subscriber = Object.new
+    subscriber.define_singleton_method(:started) { |event| commands << event.command }
+    subscriber.define_singleton_method(:succeeded) { |_| nil }
+    subscriber.define_singleton_method(:failed) { |_| nil }
+    Mongoid.default_client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
+    yield
+    commands
+  ensure
+    Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
+  end
+
+  # The ids of the records the last response's JSON lists
+  def json_ids
+    JSON.parse(last_response.body).map { |record| record['id'] }
   end
 
   def assert_redirected_to(path)
@@ -195,9 +213,36 @@ module TestHelpers
     email
   end
 
-  # The emails the queued jobs with this handler would send, running them
-  def emails_sent_by_jobs(handler)
-    recorded_emails { Delayed::Job.and(handler: handler).each(&:invoke_job) }
+  # Jobs
+
+  # The queued jobs that would call method_name (or the methods a Regexp matches) on a record of class on, if given,
+  # however it was delayed: by .delay, or by handle_asynchronously, which queues method_name_without_delay
+  def queued_jobs(method_name, on: nil)
+    name = method_name.is_a?(Regexp) ? method_name.source : Regexp.escape(method_name.to_s)
+    # Built from strings, as interpolating a Regexp would turn off the m (^ and $ at each line) Mongo matches it with
+    handler = "^method_name: :(?:#{name})(?:_without_delay)?$"
+    handler = "Mongoid:#{Regexp.escape(on.to_s)}\n.*#{handler}" if on
+    Delayed::Job.and(handler: Regexp.new(handler, Regexp::MULTILINE))
+  end
+
+  # Runs the queued jobs queued_jobs finds (every queued job, without a method_name) as the worker would, deleting
+  # each, then any matching jobs they queue
+  def run_jobs(method_name = nil, on: nil)
+    10.times do
+      jobs = (method_name ? queued_jobs(method_name, on: on) : Delayed::Job.all).to_a
+      return if jobs.empty?
+
+      jobs.each do |job|
+        job.invoke_job
+        job.destroy
+      end
+    end
+    flunk "Running #{method_name || 'the'} jobs kept queueing more"
+  end
+
+  # The emails running those jobs sends
+  def emails_sent_by_jobs(method_name = nil, on: nil)
+    recorded_emails { run_jobs(method_name, on: on) }
   end
 
   # A Mailgun webhook's click event for pmail at url from a device_type, signed with key
@@ -228,20 +273,23 @@ module TestHelpers
     page.has_css? "body[data-checkout-session='#{session_id}']"
   end
 
-  # The body of a Stripe webhook's checkout.session.completed event (or another type) for session_id
-  def checkout_completed_payload(session_id, type: 'checkout.session.completed', payment_status: 'paid')
-    { id: "evt_#{SecureRandom.hex(4)}", object: 'event', type: type, data: { object: { id: session_id, object: 'checkout.session', payment_status: payment_status } } }.to_json
-  end
-
   # Gatherings
 
   # A new account, a member of @gathering
-  def create_member(name: 'Member Person', **attrs)
+  def create_gathering_member(name: 'Member Person', **attrs)
     FactoryBot.create(:account, name: name, **attrs).tap { |account| @gathering.memberships.create!(account: account) }
   end
 
   def gathering_path(path = '')
     "/g/#{@gathering.slug}#{path}"
+  end
+
+  # Picks an option in a lookup field, a select2 that searches as you type
+  def choose_in_lookup(select_id, search, option = search)
+    find("##{select_id} + .select2 .select2-selection").click
+    # select2 puts its search and results at the end of the page
+    find('.select2-search__field').send_keys(search)
+    find('.select2-results__option', text: option).click
   end
 
   # Buttons and links that ask first, in a popover whose button is named label. The popover hangs off the page, outside
@@ -262,21 +310,4 @@ module TestHelpers
     page.document.synchronize { raise Capybara::ExpectationNotMet, message unless yield }
   end
 
-  # Signing up
-
-  # Fills in and sends the sign up form, in the browser, as account
-  def fill_signup_form(account)
-    fill_in 'Full name', with: account.name
-    fill_in 'Email', with: account.email
-    fill_in 'Location', with: account.location
-    click_button 'Sign up'
-  end
-
-  # Posts the sign up form, through Rack, as account
-  def post_new_account(account, extra = {})
-    post '/accounts/new', {
-      account: { name: account.name, email: account.email, location: account.location },
-      recaptcha_skip_secret: ENV['RECAPTCHA_SKIP_SECRET']
-    }.merge(extra)
-  end
 end

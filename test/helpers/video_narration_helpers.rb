@@ -1,4 +1,4 @@
-module VideoNarrationHelper
+module VideoNarrationHelpers
   PAUSE = 2 # seconds of silence around each action
 
   def narrate(narration, action = nil)

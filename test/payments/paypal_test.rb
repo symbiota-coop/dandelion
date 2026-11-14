@@ -1,9 +1,11 @@
 require_relative '../test_config'
+require_relative '../helpers/bookings_helpers'
 require_relative '../helpers/checkout_webhook_helpers'
 
 # Paying with PayPal, its webhooks and its return page
 class PaypalPaymentsTest < ActiveSupport::TestCase
   include Rack::Test::Methods
+  include BookingsHelpers
   include CheckoutWebhookHelpers
 
   def create_paypal_event
@@ -41,17 +43,6 @@ class PaypalPaymentsTest < ActiveSupport::TestCase
       }
     end
     deliver_paypal_webhook(organisation, { event_type: event_type, resource: resource })
-  end
-
-  def post_paypal_purchase(event, account)
-    ticket_type = event.ticket_types.first
-    header 'Accept', 'application/json'
-    post "/e/#{event.slug}/purchase",
-         ticketForm: { quantities: { ticket_type.id.to_s => '1' } },
-         detailsForm: {
-           payment_method: 'paypal',
-           account: { name: account.name, email: account.email }
-         }
   end
 
   test 'paypal error message includes oauth fields' do
@@ -142,7 +133,7 @@ class PaypalPaymentsTest < ActiveSupport::TestCase
     client = stub_paypal_client(create: created, get: approved, capture: captured)
 
     Paypal.stub :new, client do
-      post_paypal_purchase(@event, buyer)
+      post_purchase(@event, buyer, payment_method: 'paypal')
     end
 
     assert_equal 200, last_response.status

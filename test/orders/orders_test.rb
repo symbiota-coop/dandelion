@@ -24,16 +24,6 @@ class OrdersTest < ActiveSupport::TestCase
     end
   end
 
-  # The jobs queued to run a handle_asynchronously or .delay method
-  def queued_jobs(method_name)
-    Delayed::Job.and(handler: /\b#{method_name}(_without_delay)?\b/)
-  end
-
-  # The emails the jobs queued to run a method send
-  def emails_from_jobs(method_name)
-    recorded_emails { queued_jobs(method_name).each(&:invoke_job) }
-  end
-
   test 'complete_or_restore completes an order only once' do
     order = create_event_with_incomplete_order
 
@@ -87,20 +77,6 @@ class OrdersTest < ActiveSupport::TestCase
     attendee
   end
 
-  # The queries a request runs, as [command, collection] pairs
-  def queries_during
-    commands = []
-    subscriber = Object.new
-    subscriber.define_singleton_method(:started) { |e| commands << [e.command_name, e.command.values.first] }
-    subscriber.define_singleton_method(:succeeded) { |_| nil }
-    subscriber.define_singleton_method(:failed) { |_| nil }
-    Mongoid.default_client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
-    yield
-    commands
-  ensure
-    Mongoid.default_client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber) if subscriber
-  end
-
   test "the organisation orders page shows each event's revenue, reading every event's tickets at once" do
     create_event(prices: [10])
     sign_in_with_rack(@account)
@@ -111,7 +87,7 @@ class OrdersTest < ActiveSupport::TestCase
     # An event's column in its orders' rows: its name, countdown, progress and revenue
     event_cell = ->(event) { last_response.body[%r{<td>\s*<a href="/e/#{event.slug}">.*?</td>}m] }
     ticket_queries = lambda do
-      queries = queries_during { get "/o/#{@organisation.slug}/orders" }
+      queries = mongo_commands_during { get "/o/#{@organisation.slug}/orders" }.map(&:first)
       assert_equal 200, last_response.status
       queries.count(%w[find tickets])
     end
@@ -138,7 +114,7 @@ class OrdersTest < ActiveSupport::TestCase
     sign_in_with_rack(@account)
 
     counts = lambda do |path|
-      queries = queries_during { get path }
+      queries = mongo_commands_during { get path }.map(&:first)
       assert_equal 200, last_response.status
       { events: queries.count(%w[find events]), tickets: queries.count(%w[find tickets]), orders: queries.count(%w[find orders]) }
     end
@@ -227,7 +203,7 @@ class OrdersTest < ActiveSupport::TestCase
     assert_nil Order.find(@order.id)
     assert_nil Ticket.find(@ticket.id)
 
-    assert_equal [[@attendee.email]], emails_from_jobs(:send_rsvp_cancelled_email).map(&:recipients)
+    assert_equal [[@attendee.email]], emails_sent_by_jobs(:send_rsvp_cancelled_email).map(&:recipients)
     assert_equal 1, queued_jobs(:send_waitlist_tickets_available).count
   end
 
@@ -242,7 +218,7 @@ class OrdersTest < ActiveSupport::TestCase
     click_link_and_confirm 'Cancel RSVP'
     wait_until('ticket not cancelled') { queued_jobs(:send_rsvp_cancelled_email).exists? }
     assert_nil Ticket.find(ticket.id)
-    assert_equal [[@attendee.email]], emails_from_jobs(:send_rsvp_cancelled_email).map(&:recipients)
+    assert_equal [[@attendee.email]], emails_sent_by_jobs(:send_rsvp_cancelled_email).map(&:recipients)
   end
 
   test 'the Cancel your RSVP links in ticket and reminder emails cancel a free order' do
@@ -300,7 +276,7 @@ class OrdersTest < ActiveSupport::TestCase
 
     order.complete_or_restore
     # The event's creator is a facilitator too
-    assert_equal [[@account.email, facilitator.email].sort], (emails_from_jobs(:send_notification).map { |email| email.recipients.sort })
+    assert_equal [[@account.email, facilitator.email].sort], (emails_sent_by_jobs(:send_notification).map { |email| email.recipients.sort })
     refute_includes @event.event_facilitators, order.account
 
     Delayed::Job.delete_all
@@ -332,7 +308,7 @@ class OrdersTest < ActiveSupport::TestCase
     change_ticketholder_field 'email', 'friend@example.com'
     wait_until('order confirmation not sent') { queued_jobs(:send_ticket).exists? }
     # Only for the second email, as the first was entered while the event didn't send it
-    assert_equal [['friend@example.com']], emails_from_jobs(:send_ticket).map(&:recipients)
+    assert_equal [['friend@example.com']], emails_sent_by_jobs(:send_ticket).map(&:recipients)
   end
 
   test 'the ticket keeps its token, which its PDF holds, when the ticketholder changes' do

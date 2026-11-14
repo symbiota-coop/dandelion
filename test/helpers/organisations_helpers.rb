@@ -1,5 +1,17 @@
-# Helpers the organisation test files (test/organisations) share: local groups and importing followers
+# Helpers the organisation test files (test/organisations, and test/events for who may make events) share: members,
+# local groups and importing followers
 module OrganisationsHelpers
+  # A new account following org, the organisationship with these attributes (admin: true, ...)
+  def add_organisation_member(org, **attrs)
+    account = FactoryBot.create(:account)
+    account.organisationships.create!(organisation: org, unsubscribed: false, **attrs)
+    account
+  end
+
+  def add_event_manager(org)
+    add_organisation_member(org, event_manager: true)
+  end
+
   # @local_group in @organisation, whose owner (@account) is an organisation admin and the group's admin
   def create_local_group(**attrs)
     create_organisation

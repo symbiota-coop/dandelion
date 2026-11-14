@@ -1,9 +1,11 @@
 require_relative '../test_config'
+require_relative '../helpers/checkout_webhook_helpers'
 
 # Paying Dandelion itself: organisations contributing (and saving a card for auto top-ups), people donating once or
 # monthly, and the webhooks from Dandelion's own Stripe account that complete them
 class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
   include Rack::Test::Methods
+  include CheckoutWebhookHelpers
 
   ORGANISATIONS_SECRET = 'whsec_organisations_test'.freeze
   ACCOUNTS_SECRET = 'whsec_accounts_test'.freeze
@@ -33,43 +35,22 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
 
   # Webhooks
 
-  # Posts payload to path as Stripe would, signed with secret, while the endpoint's secret (env) is expected
-  def deliver_webhook(path, env, expected_secret, payload, secret: expected_secret)
-    timestamp = Time.now
-    signature = Stripe::Webhook::Signature.compute_signature(timestamp, payload, secret)
-    with_env({ env => expected_secret }) do
-      header 'Stripe-Signature', Stripe::Webhook::Signature.generate_header(timestamp, signature)
-      header 'Content-Type', 'application/json'
-      post path, payload
-    end
-  end
-
   def deliver_organisations_webhook(payload, secret: ORGANISATIONS_SECRET)
-    deliver_webhook('/organisations/stripe_webhook', 'STRIPE_ENDPOINT_SECRET_ORGANISATIONS', ORGANISATIONS_SECRET, payload, secret: secret)
+    deliver_stripe_webhook('/organisations/stripe_webhook', payload, secret: secret, env: { 'STRIPE_ENDPOINT_SECRET_ORGANISATIONS' => ORGANISATIONS_SECRET })
   end
 
   def deliver_accounts_webhook(payload, secret: ACCOUNTS_SECRET)
-    deliver_webhook('/accounts/stripe_webhook', 'STRIPE_ENDPOINT_SECRET_ACCOUNTS', ACCOUNTS_SECRET, payload, secret: secret)
-  end
-
-  def event_payload(type, object)
-    { id: "evt_#{SecureRandom.hex(4)}", object: 'event', type: type, data: { object: object } }.to_json
-  end
-
-  def checkout_payload(session_id, type: 'checkout.session.completed', payment_status: 'paid')
-    event_payload(type, { id: session_id, object: 'checkout.session', payment_status: payment_status })
+    deliver_stripe_webhook('/accounts/stripe_webhook', payload, secret: secret, env: { 'STRIPE_ENDPOINT_SECRET_ACCOUNTS' => ACCOUNTS_SECRET })
   end
 
   def subscription_payload(type, subscription_id: 'sub_monthly', status: 'active', customer: 'cus_donor', amount: 1000)
-    event_payload(type, { id: subscription_id, object: 'subscription', status: status, customer: customer,
-                          plan: { id: 'plan_monthly', object: 'plan', amount: amount, currency: 'gbp' } })
+    stripe_event_payload(type, { id: subscription_id, object: 'subscription', status: status, customer: customer,
+                                 plan: { id: 'plan_monthly', object: 'plan', amount: amount, currency: 'gbp' } })
   end
 
   # The queued jobs that would email Dandelion's admins about the contribution with this session id
   def notification_jobs(session_id)
-    Delayed::Job.all.select do |job|
-      job.handler.match?(/^method_name: :send_notification(_without_delay)?$/) && job.handler.include?("session_id: #{session_id}\n")
-    end
+    queued_jobs(:send_notification).select { |job| job.handler.include?("session_id: #{session_id}\n") }
   end
 
   # Delivers payload to path twice at once, as Stripe can, with each delivery looking up the contribution (model) at the
@@ -77,8 +58,7 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
   def deliver_twice_at_once(path, env, secret, payload, model)
     looked_up = Queue.new
     find_by = model.method(:find_by)
-    timestamp = Time.now
-    signature = Stripe::Webhook::Signature.generate_header(timestamp, Stripe::Webhook::Signature.compute_signature(timestamp, payload, secret))
+    signature = stripe_signature_header(payload, secret)
     with_env({ env => secret }) do
       lookup = proc do |*args, **kwargs|
         found = find_by.call(*args, **kwargs)
@@ -99,10 +79,6 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
         end.map(&:value)
       end
     end
-  end
-
-  def run_queued_jobs
-    recorded_emails { Delayed::Job.all.each(&:invoke_job) }
   end
 
   # Organisations paying
@@ -350,14 +326,14 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     covers_route 'POST /organisations/stripe_webhook'
     contribution = create_pending_organisation_contribution
 
-    deliver_organisations_webhook(checkout_payload(contribution.session_id))
+    deliver_organisations_webhook(checkout_completed_payload(contribution.session_id))
 
     assert_equal 200, last_response.status
     assert contribution.reload.payment_completed?
     assert_equal 1, notification_jobs(contribution.session_id).count
     refute @organisation.reload.paid_up # until the queued update runs
 
-    run_queued_jobs
+    run_jobs
     @organisation.reload
     assert @organisation.paid_up
     assert_in_delta 10, @organisation.contribution_paid_gbp_cache
@@ -366,11 +342,11 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
 
   test 'the same contribution webhook delivered again completes and notifies once' do
     contribution = create_pending_organisation_contribution
-    payload = checkout_payload(contribution.session_id)
+    payload = checkout_completed_payload(contribution.session_id)
 
     deliver_organisations_webhook(payload)
     deliver_organisations_webhook(payload)
-    deliver_organisations_webhook(checkout_payload(contribution.session_id, type: 'checkout.session.async_payment_succeeded'))
+    deliver_organisations_webhook(checkout_completed_payload(contribution.session_id, type: 'checkout.session.async_payment_succeeded'))
 
     assert_equal 200, last_response.status
     assert_equal 1, @organisation.organisation_contributions.count
@@ -381,7 +357,7 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     contribution = create_pending_organisation_contribution
 
     statuses = deliver_twice_at_once('/organisations/stripe_webhook', 'STRIPE_ENDPOINT_SECRET_ORGANISATIONS', ORGANISATIONS_SECRET,
-                                     checkout_payload(contribution.session_id), OrganisationContribution)
+                                     checkout_completed_payload(contribution.session_id), OrganisationContribution)
 
     assert_equal [200, 200], statuses
     assert contribution.reload.payment_completed?
@@ -391,12 +367,12 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
   test 'a contribution not yet paid waits for its async payment to succeed' do
     contribution = create_pending_organisation_contribution
 
-    deliver_organisations_webhook(checkout_payload(contribution.session_id, payment_status: 'unpaid'))
+    deliver_organisations_webhook(checkout_completed_payload(contribution.session_id, payment_status: 'unpaid'))
     assert_equal 200, last_response.status
     refute contribution.reload.payment_completed?
     assert_equal 0, notification_jobs(contribution.session_id).count
 
-    deliver_organisations_webhook(checkout_payload(contribution.session_id, type: 'checkout.session.async_payment_succeeded'))
+    deliver_organisations_webhook(checkout_completed_payload(contribution.session_id, type: 'checkout.session.async_payment_succeeded'))
     assert contribution.reload.payment_completed?
     assert_equal 1, notification_jobs(contribution.session_id).count
   end
@@ -405,9 +381,9 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     contribution = create_pending_organisation_contribution
     donation = AccountContribution.create!(amount: 5, currency: 'GBP', session_id: 'cs_donation', payment_completed: false)
 
-    [checkout_payload('cs_unknown'), checkout_payload('cs_donation'),
-     checkout_payload(contribution.session_id, type: 'checkout.session.expired'),
-     event_payload('payment_intent.succeeded', { id: 'pi_org', object: 'payment_intent', status: 'succeeded' })].each do |payload|
+    [checkout_completed_payload('cs_unknown'), checkout_completed_payload('cs_donation'),
+     checkout_completed_payload(contribution.session_id, type: 'checkout.session.expired'),
+     stripe_event_payload('payment_intent.succeeded', { id: 'pi_org', object: 'payment_intent', status: 'succeeded' })].each do |payload|
       deliver_organisations_webhook(payload)
       assert_equal 200, last_response.status
     end
@@ -420,9 +396,9 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
   test 'a contribution webhook with a bad signature, or a body that is not JSON, is turned away and completes nothing' do
     contribution = create_pending_organisation_contribution
 
-    deliver_organisations_webhook(checkout_payload(contribution.session_id), secret: 'whsec_wrong')
+    deliver_organisations_webhook(checkout_completed_payload(contribution.session_id), secret: 'whsec_wrong')
     assert_equal 200, last_response.status
-    deliver_organisations_webhook(checkout_payload(contribution.session_id), secret: ACCOUNTS_SECRET)
+    deliver_organisations_webhook(checkout_completed_payload(contribution.session_id), secret: ACCOUNTS_SECRET)
     assert_equal 200, last_response.status
     deliver_organisations_webhook('not json')
     assert_equal 200, last_response.status
@@ -522,7 +498,7 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     covers_route 'POST /accounts/stripe_webhook'
     account = FactoryBot.create(:account)
     donation = account.account_contributions.create!(amount: 5, currency: 'GBP', session_id: 'cs_donation', payment_completed: false)
-    payload = checkout_payload('cs_donation')
+    payload = checkout_completed_payload('cs_donation')
 
     deliver_accounts_webhook(payload)
     assert_equal 200, last_response.status
@@ -530,7 +506,7 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     assert_equal 1, notification_jobs('cs_donation').count
 
     deliver_accounts_webhook(payload)
-    deliver_accounts_webhook(checkout_payload('cs_donation', type: 'checkout.session.async_payment_succeeded'))
+    deliver_accounts_webhook(checkout_completed_payload('cs_donation', type: 'checkout.session.async_payment_succeeded'))
     assert_equal 200, last_response.status
     assert_equal 1, AccountContribution.count
     assert_equal 1, notification_jobs('cs_donation').count
@@ -540,7 +516,7 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     donation = AccountContribution.create!(amount: 5, currency: 'GBP', session_id: 'cs_donation', payment_completed: false)
 
     statuses = deliver_twice_at_once('/accounts/stripe_webhook', 'STRIPE_ENDPOINT_SECRET_ACCOUNTS', ACCOUNTS_SECRET,
-                                     checkout_payload('cs_donation'), AccountContribution)
+                                     checkout_completed_payload('cs_donation'), AccountContribution)
 
     assert_equal [200, 200], statuses
     assert donation.reload.payment_completed?
@@ -550,11 +526,11 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
   test 'a donation not yet paid waits for its async payment to succeed' do
     donation = AccountContribution.create!(amount: 5, currency: 'GBP', session_id: 'cs_donation', payment_completed: false)
 
-    deliver_accounts_webhook(checkout_payload('cs_donation', payment_status: 'unpaid'))
+    deliver_accounts_webhook(checkout_completed_payload('cs_donation', payment_status: 'unpaid'))
     assert_equal 200, last_response.status
     refute donation.reload.payment_completed?
 
-    deliver_accounts_webhook(checkout_payload('cs_donation', type: 'checkout.session.async_payment_succeeded'))
+    deliver_accounts_webhook(checkout_completed_payload('cs_donation', type: 'checkout.session.async_payment_succeeded'))
     assert donation.reload.payment_completed?
     assert_equal 1, notification_jobs('cs_donation').count
   end
@@ -563,9 +539,9 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     donation = AccountContribution.create!(amount: 5, currency: 'GBP', session_id: 'cs_donation', payment_completed: false)
     contribution = create_pending_organisation_contribution(session_id: 'cs_org')
 
-    [checkout_payload('cs_unknown'), checkout_payload('cs_org'),
-     checkout_payload('cs_donation', type: 'checkout.session.expired'),
-     event_payload('invoice.paid', { id: 'in_1', object: 'invoice', status: 'paid' })].each do |payload|
+    [checkout_completed_payload('cs_unknown'), checkout_completed_payload('cs_org'),
+     checkout_completed_payload('cs_donation', type: 'checkout.session.expired'),
+     stripe_event_payload('invoice.paid', { id: 'in_1', object: 'invoice', status: 'paid' })].each do |payload|
       deliver_accounts_webhook(payload)
       assert_equal 200, last_response.status
     end
@@ -578,9 +554,9 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
   test 'a donation webhook with a bad signature is turned away and completes nothing' do
     donation = AccountContribution.create!(amount: 5, currency: 'GBP', session_id: 'cs_donation', payment_completed: false)
 
-    deliver_accounts_webhook(checkout_payload('cs_donation'), secret: 'whsec_wrong')
+    deliver_accounts_webhook(checkout_completed_payload('cs_donation'), secret: 'whsec_wrong')
     assert_equal 200, last_response.status
-    deliver_accounts_webhook(checkout_payload('cs_donation'), secret: ORGANISATIONS_SECRET)
+    deliver_accounts_webhook(checkout_completed_payload('cs_donation'), secret: ORGANISATIONS_SECRET)
     assert_equal 200, last_response.status
 
     refute donation.reload.payment_completed?

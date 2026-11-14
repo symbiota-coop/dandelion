@@ -91,17 +91,9 @@ class IntegrationsAtprotoEventsTest < ActiveSupport::TestCase
     create_organisation(atproto_handle: 'organisation.test', atproto_app_password: 'organisation-password', atproto_did: ORGANISATION_DID, **attrs)
   end
 
-  # Runs the queued jobs as the worker would, loading each event afresh, until none are left
-  def run_jobs
-    while (job = Delayed::Job.first)
-      job.invoke_job
-      job.destroy
-    end
-  end
-
   # The queued jobs that would publish, update or delete a record
   def atproto_jobs
-    Delayed::Job.all.select { |job| job.handler.match?(/^method_name: :\w*atproto/) }
+    queued_jobs(/\w*atproto\w*/).to_a
   end
 
   # The exceptions ErrorReporting would send to Sentry while the block runs

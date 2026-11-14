@@ -55,7 +55,7 @@ class GatheringJoiningTest < ActiveSupport::TestCase
 
   test 'a member sees only a preview of the joining form, with no Join button to press' do
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     sign_in(member)
 
     visit gathering_path('/join')
@@ -65,7 +65,7 @@ class GatheringJoiningTest < ActiveSupport::TestCase
 
   test 'the join route tells a member they are already part of the gathering' do
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     sign_in_with_rack(member)
 
     header 'Referer', "http://example.org#{gathering_path('/join')}"
@@ -146,7 +146,7 @@ class GatheringJoiningTest < ActiveSupport::TestCase
     create_gathering(privacy: 'closed')
     applicant = FactoryBot.create(:account)
     @gathering.mapplications.create!(account: applicant, status: 'pending')
-    member = create_member
+    member = create_gathering_member
 
     visit gathering_path('/apply')
     fill_in 'Full name', with: 'Anyone'
@@ -173,7 +173,7 @@ class GatheringJoiningTest < ActiveSupport::TestCase
     assert page.has_content? 'Thanks for applying'
     assert page.has_no_button? 'Apply'
 
-    sign_in(create_member)
+    sign_in(create_gathering_member)
     visit gathering_path('/apply')
     assert page.has_content? 'Preview of application form'
     assert page.has_button? 'Apply', disabled: true
@@ -183,7 +183,7 @@ class GatheringJoiningTest < ActiveSupport::TestCase
     create_gathering(privacy: 'closed')
     applicant = FactoryBot.create(:account)
     @gathering.mapplications.create!(account: applicant, status: 'pending')
-    member = create_member
+    member = create_gathering_member
     header 'Referer', "http://example.org#{gathering_path('/apply')}"
 
     sign_in_with_rack(applicant)

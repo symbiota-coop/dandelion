@@ -13,14 +13,6 @@ class MessagesCommentsTest < ActiveSupport::TestCase
     refute_includes last_response.body, text if text
   end
 
-  # A text file to attach, named name
-  def upload(name)
-    file = Tempfile.new(['upload', File.extname(name)])
-    file.write('Hello')
-    file.close
-    Rack::Test::UploadedFile.new(file.path, 'text/plain', original_filename: name)
-  end
-
   # Each kind of discussion, with someone who may read it and someone who may not
 
   test "a gathering's team, timetable activity and application discussions are its confirmed members'" do
@@ -159,7 +151,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
     assert_refused
     xhr :post, '/voptions/create', comment_id: @comment.id, text: 'Never'
     assert_refused
-    xhr :post, "/comments/#{own_comment.id}/file", file: upload('notes.txt')
+    xhr :post, "/comments/#{own_comment.id}/file", file: uploaded_file('Hello', 'notes.txt')
     assert_refused
 
     assert_equal %w[🎉 👀], @comment.comment_reactions.order('created_at asc').pluck(:body)
@@ -174,7 +166,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
     covers_route 'GET /comments/:id/reactions'
     covers_route 'GET /comments/:id/unreact'
     team_thread
-    other_member = create_member(name: 'Other Member')
+    other_member = create_gathering_member(name: 'Other Member')
     sign_in_with_rack(other_member)
 
     xhr :post, "/comments/#{@comment.id}/react", body: '🙌 hooray'
@@ -225,7 +217,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
     covers_route 'GET /comments/:id/read_receipts'
     covers_route 'GET /posts/:id'
     team_thread
-    reader = create_member(name: 'Careful Reader')
+    reader = create_gathering_member(name: 'Careful Reader')
     sign_in_with_rack(reader)
 
     xhr :get, "/posts/#{@post.id}"
@@ -262,7 +254,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
     team_thread
     tuesday = @comment.voptions.create!(account: @member, text: 'Tuesday')
     wednesday = @comment.voptions.create!(account: @member, text: 'Wednesday')
-    voter = create_member(name: 'Keen Voter')
+    voter = create_gathering_member(name: 'Keen Voter')
     sign_in_with_rack(voter)
 
     xhr :post, "/voptions/#{tuesday.id}/vote", vote: true
@@ -288,7 +280,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   test "a member ticks a poll's option on the team's page, and unticks it" do
     team_thread
     @comment.voptions.create!(account: @member, text: 'Tuesday')
-    voter = create_member(name: 'Keen Voter')
+    voter = create_gathering_member(name: 'Keen Voter')
     sign_in(voter)
     visit gathering_path("/teams/#{@team.id}")
     assert page.has_content?('Secret plans')
@@ -323,7 +315,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
     tuesday = @comment.voptions.create!(account: @member, text: 'Tuesday')
     tuesday.votes.create!(account: @member)
 
-    sign_in_with_rack(create_member(name: 'Fence Sitter'))
+    sign_in_with_rack(create_gathering_member(name: 'Fence Sitter'))
     xhr :post, "/voptions/#{tuesday.id}/vote"
     assert last_response.ok?
     assert_equal [@member.id], tuesday.votes.pluck(:account_id)
@@ -332,7 +324,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   test "only a comment's author adds options to its poll" do
     covers_route 'POST /voptions/create'
     team_thread
-    sign_in_with_rack(create_member(name: 'Other Member'))
+    sign_in_with_rack(create_gathering_member(name: 'Other Member'))
     xhr :post, '/voptions/create', comment_id: @comment.id, text: 'Never'
     assert_refused
     assert_equal 0, @comment.voptions.count
@@ -346,15 +338,15 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   test "a poll option is removed by the person who added it, the comment's author or a site admin, and no one else" do
     covers_route 'POST /voptions/:id/destroy'
     team_thread
-    adder = create_member(name: 'Option Adder')
+    adder = create_gathering_member(name: 'Option Adder')
     options = %w[Tuesday Wednesday Thursday].map { |text| @comment.voptions.create!(account: adder, text: text) }
 
-    sign_in_with_rack(create_member(name: 'Other Member'))
+    sign_in_with_rack(create_gathering_member(name: 'Other Member'))
     xhr :post, "/voptions/#{options[0].id}/destroy"
     assert_refused
     assert Voption.find(options[0].id)
 
-    [adder, @member, create_member(name: 'Site Admin', admin: true)].zip(options).each do |account, option|
+    [adder, @member, create_gathering_member(name: 'Site Admin', admin: true)].zip(options).each do |account, option|
       sign_in_with_rack(account)
       xhr :post, "/voptions/#{option.id}/destroy"
       assert last_response.ok?, account.name
@@ -365,13 +357,13 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   test "a poll option's remove button shows to the person who added it, the comment's author and site admins" do
     covers_route 'GET /g/:slug/teams/:id'
     team_thread
-    adder = create_member(name: 'Option Adder')
+    adder = create_gathering_member(name: 'Option Adder')
     @comment.voptions.create!(account: adder, text: 'Tuesday')
     poll = "[data-pagelet-url='/comments/#{@comment.id}/voptions']"
     remove = "#{poll} a[href$='/destroy']"
 
-    [[adder, true], [@member, true], [create_member(name: 'Site Admin', admin: true), true],
-     [create_member(name: 'Other Member'), false]].each do |account, shown|
+    [[adder, true], [@member, true], [create_gathering_member(name: 'Site Admin', admin: true), true],
+     [create_gathering_member(name: 'Other Member'), false]].each do |account, shown|
       sign_in(account)
       visit gathering_path("/teams/#{@team.id}")
       assert page.has_field?('Tuesday'), account.name
@@ -388,17 +380,17 @@ class MessagesCommentsTest < ActiveSupport::TestCase
   test "only a comment's author can attach a file to it, and not one a browser would run" do
     covers_route 'POST /comments/:id/file'
     team_thread
-    sign_in_with_rack(create_member(name: 'Other Member'))
-    post "/comments/#{@comment.id}/file", file: upload('notes.txt')
+    sign_in_with_rack(create_gathering_member(name: 'Other Member'))
+    post "/comments/#{@comment.id}/file", file: uploaded_file('Hello', 'notes.txt')
     assert_refused
     assert_nil @comment.reload.file_uid
 
     sign_in_with_rack(@member)
-    post "/comments/#{@comment.id}/file", file: upload('page.html')
+    post "/comments/#{@comment.id}/file", file: uploaded_file('Hello', 'page.html')
     assert last_response.redirect?
     assert_nil @comment.reload.file_uid
 
-    post "/comments/#{@comment.id}/file", file: upload('notes.txt')
+    post "/comments/#{@comment.id}/file", file: uploaded_file('Hello', 'notes.txt')
     assert last_response.redirect?
     assert @comment.reload.file_uid
   end
@@ -408,7 +400,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
     @gathering.memberships.find_by(account: @member).destroy
     sign_in_with_rack(@member)
 
-    post "/comments/#{@comment.id}/file", file: upload('notes.txt')
+    post "/comments/#{@comment.id}/file", file: uploaded_file('Hello', 'notes.txt')
     assert last_response.redirect?
     assert_nil @comment.reload.file_uid
   end
@@ -419,12 +411,12 @@ class MessagesCommentsTest < ActiveSupport::TestCase
     covers_route 'POST /comments/:id/send'
     team_thread
     @member.set(has_signed_in: true)
-    subscriber = create_member(name: 'Subscriber', has_signed_in: true)
+    subscriber = create_gathering_member(name: 'Subscriber', has_signed_in: true)
     @post.subscriptions.find_or_create_by!(account: subscriber)
-    unsubscribed = create_member(name: 'Unsubscribed', has_signed_in: true, unsubscribed: true)
+    unsubscribed = create_gathering_member(name: 'Unsubscribed', has_signed_in: true, unsubscribed: true)
     @post.subscriptions.find_or_create_by!(account: unsubscribed)
     # Joining the team subscribed them to its threads: this one they've turned off
-    bystander = create_member(name: 'Bystander', has_signed_in: true)
+    bystander = create_gathering_member(name: 'Bystander', has_signed_in: true)
     @post.subscriptions.and(account: bystander).destroy_all
     comment = @post.comments.create!(account: @member, body: 'Please read')
     Delayed::Job.delete_all
@@ -432,7 +424,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
     sign_in_with_rack(@account)
     post "/comments/#{comment.id}/send"
     assert last_response.redirect?
-    emails = emails_sent_by_jobs(/send_comment/)
+    emails = emails_sent_by_jobs(:send_comment)
     assert_equal 1, emails.length
     assert_includes emails.first.recipients, subscriber.email
     assert_includes emails.first.recipients, @member.email
@@ -442,7 +434,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
 
     Delayed::Job.delete_all
     post "/comments/#{comment.id}/send"
-    assert_empty emails_sent_by_jobs(/send_comment/)
+    assert_empty emails_sent_by_jobs(:send_comment)
   end
 
   test "a comment's author can't send it unless they're an admin of its gathering" do

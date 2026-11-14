@@ -204,14 +204,14 @@ class EventBookingRulesTest < ActiveSupport::TestCase
   test "purchase checks answers and stores them with the event's own questions" do
     create_event(prices: [0], questions: "T-shirt size <S, M, L>*\nDietary requirements")
 
-    post_checkout(details_form: { payment_method: 'rsvp', answers: { '1' => 'None' } })
+    post_purchase(details_form: { answers: { '1' => 'None' } })
     assert_equal 400, last_response.status
 
-    post_checkout(details_form: { payment_method: 'rsvp', answers: { '0' => 'XL' } })
+    post_purchase(details_form: { answers: { '0' => 'XL' } })
     assert_equal 400, last_response.status
     assert_equal 0, @event.orders.count
 
-    post_checkout(details_form: { payment_method: 'rsvp', answers: { '0' => 'M', '1' => 'None' }, questions: { '0' => 'Forged question', '1' => 'Another' } })
+    post_purchase(details_form: { answers: { '0' => 'M', '1' => 'None' }, questions: { '0' => 'Forged question', '1' => 'Another' } })
     assert_equal 200, last_response.status
     assert_equal [['T-shirt size <S, M, L>*', 'M'], ['Dietary requirements', 'None']], @event.orders.last.answers
   end
@@ -222,14 +222,14 @@ class EventBookingRulesTest < ActiveSupport::TestCase
     ticket_type_id = @event.ticket_types.first.id.to_s
 
     # Rather than booking at £0, or at the nearest end of the range
-    post_checkout
+    post_purchase(payment_method: 'stripe')
     assert_equal 400, last_response.status
-    post_checkout(ticket_form: { prices: { ticket_type_id => '150' } })
+    post_purchase(payment_method: 'stripe', ticket_form: { prices: { ticket_type_id => '150' } })
     assert_equal 400, last_response.status
     assert_equal 0, @event.orders.count
 
     with_stubbed_stripe_session do
-      post_checkout(ticket_form: { prices: { ticket_type_id => '25' } })
+      post_purchase(payment_method: 'stripe', ticket_form: { prices: { ticket_type_id => '25' } })
     end
     assert_equal 200, last_response.status
     assert_equal 25, @event.tickets.first.price
@@ -239,12 +239,12 @@ class EventBookingRulesTest < ActiveSupport::TestCase
     create_event(prices: [10], suggested_donation: 0)
     FactoryBot.create(:discount_code, codeable: @event, code: 'HALF', percentage_discount: 50)
 
-    post_checkout(ticket_form: { applied_discount_code: 'NOPE' })
+    post_purchase(payment_method: 'stripe', ticket_form: { applied_discount_code: 'NOPE' })
     assert_equal 400, last_response.status
     assert_equal 0, @event.orders.count
 
     with_stubbed_stripe_session do
-      post_checkout(ticket_form: { applied_discount_code: 'HALF' })
+      post_purchase(payment_method: 'stripe', ticket_form: { applied_discount_code: 'HALF' })
     end
     assert_equal 200, last_response.status
     assert_equal 5, @event.orders.last.total
@@ -290,14 +290,7 @@ class EventBookingRulesTest < ActiveSupport::TestCase
     buyer = FactoryBot.create(:account)
     ticket_type_id = ticket_type.id.to_s
 
-    post_purchase(
-      @event,
-      buyer,
-      quantities: {
-        ticket_type_id => '1',
-        ticket_type_id.upcase => '1'
-      }
-    )
+    post_purchase(@event, buyer, ticket_form: { quantities: { ticket_type_id => '1', ticket_type_id.upcase => '1' } })
 
     assert_equal 400, last_response.status
     assert_equal 0, @event.orders.count
@@ -311,14 +304,7 @@ class EventBookingRulesTest < ActiveSupport::TestCase
     buyer = FactoryBot.create(:account)
     ticket_type_id = ticket_type.id.to_s
 
-    post_purchase(
-      @event,
-      buyer,
-      quantities: {
-        ticket_type_id => '1',
-        ticket_type_id.upcase => '1'
-      }
-    )
+    post_purchase(@event, buyer, ticket_form: { quantities: { ticket_type_id => '1', ticket_type_id.upcase => '1' } })
 
     assert_equal 200, last_response.status
     assert_equal 2, @event.orders.find_by(account: buyer).tickets.count

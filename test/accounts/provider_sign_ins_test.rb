@@ -76,7 +76,7 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
   test 'connecting a provider needs a sign in code from the last hour' do
     covers_route 'GET /accounts/sign_in_code'
     account = FactoryBot.create(:account)
-    sign_in_via_rack(account)
+    sign_in_with_password_via_rack(account)
     omniauth_callback_as(uid: 'google-uid-unverified')
     assert_equal '/accounts/sign_in_code', last_request.path
     post '/accounts/providers/confirm'

@@ -1,8 +1,10 @@
 require_relative '../test_config'
+require_relative '../helpers/orders_helpers'
 
 class ResalesTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
+  include OrdersHelpers
 
   def complete_without_notifications(ticket)
     ticket.stub :send_resale_notification_to_previous_ticketholder, nil do
@@ -574,7 +576,7 @@ class ResalesTest < ActiveSupport::TestCase
     click_link 'Mark for resale'
     assert page.has_content? 'On resale'
     assert ticket.reload.made_available_at
-    assert_equal 1, Delayed::Job.and(handler: /send_waitlist_tickets_available/).count
+    assert_equal 1, queued_jobs(:send_waitlist_tickets_available).count
   end
 
   test 'a resold ticket is refunded only its own price' do

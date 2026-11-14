@@ -9,20 +9,10 @@ class OrdersAdminTest < ActiveSupport::TestCase
   include Rack::Test::Methods
   include OrdersHelpers
 
-  # Queued Order#send_tickets jobs: other jobs' handlers can mention orders and tickets anywhere in the records they carry
-  SEND_TICKETS_JOB = /Mongoid:Order\n.*method_name: :send_tickets_without_delay/m
-
-  def all_send_tickets_jobs
-    Delayed::Job.and(handler: SEND_TICKETS_JOB)
-  end
-
-  # The emails the Order#send_tickets jobs this test queued would send, running them
-  def ticket_emails
-    recorded_emails { all_send_tickets_jobs.each(&:invoke_job) }
-  end
-
+  # How many Order#send_tickets jobs are queued (on: Order, as other jobs' handlers can mention orders and tickets
+  # anywhere in the records they carry)
   def queued_ticket_emails
-    all_send_tickets_jobs.count
+    queued_jobs(:send_tickets, on: 'Order').count
   end
 
   # An order whose payment didn't complete, removed with its ticket, as a timed-out checkout is
@@ -58,7 +48,7 @@ class OrdersAdminTest < ActiveSupport::TestCase
     assert order.payment_completed
     assert order.restored
     assert Ticket.find(@ticket.id).payment_completed
-    assert_equal [[@attendee.email]], ticket_emails.map(&:recipients)
+    assert_equal [[@attendee.email]], emails_sent_by_jobs(:send_tickets, on: 'Order').map(&:recipients)
   end
 
   test 'a restored ticket counts against the event capacity' do
@@ -140,7 +130,7 @@ class OrdersAdminTest < ActiveSupport::TestCase
     assert_equal @new_event.id, donation.event_id
     assert donation.transferred
     refute Event.find(@event.id).sold_out_cache
-    assert_equal [[@attendee.email]], ticket_emails.map(&:recipients)
+    assert_equal [[@attendee.email]], emails_sent_by_jobs(:send_tickets, on: 'Order').map(&:recipients)
   end
 
   test "the transfer page offers only the organisation's other events the account admins" do
@@ -198,7 +188,7 @@ class OrdersAdminTest < ActiveSupport::TestCase
     click_link 'Resend order confirmation'
     assert page.has_content? 'The tickets for the order were resent.'
 
-    emails = ticket_emails
+    emails = emails_sent_by_jobs(:send_tickets, on: 'Order')
     assert_equal [[@attendee.email]], emails.map(&:recipients)
   end
 

@@ -13,13 +13,7 @@ class PaymentsStripeConnectTest < ActiveSupport::TestCase
 
   # Posts payload to the Connect webhook as Stripe would, signed with secret
   def deliver_connect_webhook(payload, secret: CONNECT_SECRET)
-    timestamp = Time.now
-    signature = Stripe::Webhook::Signature.compute_signature(timestamp, payload, secret)
-    with_env({ 'STRIPE_ENDPOINT_SECRET_CONNECT' => CONNECT_SECRET }) do
-      header 'Stripe-Signature', Stripe::Webhook::Signature.generate_header(timestamp, signature)
-      header 'Content-Type', 'application/json'
-      post '/organisations/stripe_connect_webhook', payload
-    end
+    deliver_stripe_webhook('/organisations/stripe_connect_webhook', payload, secret: secret, env: { 'STRIPE_ENDPOINT_SECRET_CONNECT' => CONNECT_SECRET })
   end
 
   def create_connect_order

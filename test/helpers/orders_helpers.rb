@@ -1,4 +1,4 @@
-# Helpers the order test files (test/orders) share
+# Helpers the order test files (test/orders, and the resales in test/bookings) share
 module OrdersHelpers
   # Changes a ticketholder field on the order's page, which saves it when it changes, as fill_in blurs it
   def change_ticketholder_field(field, value)
@@ -42,5 +42,14 @@ module OrdersHelpers
   def create_complete_order_with_ticket
     create_complete_order
     @ticket = @order.tickets.create!(event: @event, account: @attendee, ticket_type: @event.ticket_types.first, price: 0)
+  end
+
+  # A Stripe payment intent with one charge, of amount and amount_refunded cents. The default is more than any test's
+  # refund, so refunds aren't capped at what's left unless a test sets it. With an application_fee (its id), the
+  # charge answers that too
+  def stripe_payment_intent(charge_id, amount: 1_000_000, amount_refunded: 0, application_fee: nil)
+    charge = { id: charge_id, amount: amount, amount_refunded: amount_refunded }
+    charge[:application_fee] = application_fee if application_fee
+    api_object(charges: [api_object(**charge)])
   end
 end

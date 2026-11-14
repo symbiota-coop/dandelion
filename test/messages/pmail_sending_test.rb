@@ -32,10 +32,6 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
     "/pmails/#{pmail.id}/edit?#{scope}"
   end
 
-  def send_pmail_jobs
-    Delayed::Job.and(handler: /method_name: :send_pmail$/)
-  end
-
   # Recipients
 
   test 'a mail to everyone goes to the subscribed followers, never to those who unsubscribed from the organisation or from everything' do
@@ -202,7 +198,7 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
     pmail.reload
     assert_not_equal 'Changed', pmail.subject
     assert_nil pmail.requested_send_at
-    assert_equal 0, send_pmail_jobs.count
+    assert_equal 0, queued_jobs(:send_pmail).count
   end
 
   test "an organisation's admin can't reach another organisation's mails through their own" do
@@ -228,7 +224,7 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
     pmail.reload
     assert_not_equal 'Changed', pmail.subject
     assert_nil pmail.requested_send_at
-    assert_equal 0, send_pmail_jobs.count
+    assert_equal 0, queued_jobs(:send_pmail).count
   end
 
   test "a mail is saved to the organisation in the URL, whatever organisation or recipients the form names" do
@@ -339,7 +335,7 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
     assert_equal [@account.email], email.recipients
     assert_match(/\AHello \[test sent /, email.subject_line)
     assert_nil pmail.reload.requested_send_at
-    assert_equal 0, send_pmail_jobs.count
+    assert_equal 0, queued_jobs(:send_pmail).count
   end
 
   test 'sending queues the mail once, and it goes to its recipients once' do
@@ -353,13 +349,13 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
     assert_empty emails
     assert last_response.redirect?
     assert pmail.reload.requested_send_at
-    assert_equal 1, send_pmail_jobs.count
+    assert_equal 1, queued_jobs(:send_pmail).count
 
     # Sending again, from a second tab or a double click, neither queues it again nor cancels the queued send
     post edit_path(pmail), pmail: { subject: 'Hello' }, send: 1
-    assert_equal 1, send_pmail_jobs.count
+    assert_equal 1, queued_jobs(:send_pmail).count
 
-    emails = emails_sent_by_jobs(/method_name: :send_pmail$/)
+    emails = emails_sent_by_jobs(:send_pmail)
     assert_equal 1, emails.count
     assert_equal [@account.email, follower.email].sort, emails.first.recipients.sort
 
@@ -377,31 +373,31 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
     tomorrow = 1.day.from_now.change(sec: 0)
 
     post edit_path(pmail), pmail: { will_send_at: tomorrow.strftime('%Y-%m-%d %H:%M') }, send_later: 1
-    assert_equal 1, send_pmail_jobs.count
-    assert_equal tomorrow.to_i, send_pmail_jobs.first.run_at.to_i
+    assert_equal 1, queued_jobs(:send_pmail).count
+    assert_equal tomorrow.to_i, queued_jobs(:send_pmail).first.run_at.to_i
     assert_nil pmail.reload.requested_send_at
 
     next_week = 1.week.from_now.change(sec: 0)
     post edit_path(pmail), pmail: { will_send_at: next_week.strftime('%Y-%m-%d %H:%M') }, send_later: 1
-    assert_equal 1, send_pmail_jobs.count
-    assert_equal next_week.to_i, send_pmail_jobs.first.run_at.to_i
+    assert_equal 1, queued_jobs(:send_pmail).count
+    assert_equal next_week.to_i, queued_jobs(:send_pmail).first.run_at.to_i
 
-    emails = emails_sent_by_jobs(/method_name: :send_pmail$/)
+    emails = emails_sent_by_jobs(:send_pmail)
     assert_equal [@account.email, follower.email].sort, emails.first.recipients.sort
-    send_pmail_jobs.destroy_all
+    queued_jobs(:send_pmail).destroy_all
 
     # Without a time, nothing is scheduled
     unscheduled = FactoryBot.create(:pmail, organisation: @organisation, to_option: 'everyone')
     post edit_path(unscheduled), pmail: { subject: 'No time' }, send_later: 1
-    assert_equal 0, send_pmail_jobs.count
+    assert_equal 0, queued_jobs(:send_pmail).count
 
     # Nor without the organisation's own Mailgun account, nor to an event's attendees
     event_pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: "event:#{@event.id}")
     post edit_path(event_pmail), pmail: { will_send_at: tomorrow.strftime('%Y-%m-%d %H:%M') }, send_later: 1
-    assert_equal 0, send_pmail_jobs.count
+    assert_equal 0, queued_jobs(:send_pmail).count
     @organisation.set(mailgun_api_key: nil)
     post edit_path(unscheduled), pmail: { will_send_at: tomorrow.strftime('%Y-%m-%d %H:%M') }, send_later: 1
-    assert_equal 0, send_pmail_jobs.count
+    assert_equal 0, queued_jobs(:send_pmail).count
   end
 
   test "a sent mail can't be deleted" do
@@ -485,7 +481,7 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
     without_phone = FactoryBot.create(:account)
     [with_phone, without_phone].each { |account| Ticket.create!(event: @event, account: account, ticket_type: ticket_type, price: 0) }
     pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: "event:#{@event.id}")
-    signal_jobs = -> { Delayed::Job.and(handler: /method_name: :send_signal_messages_without_delay$/) }
+    signal_jobs = -> { queued_jobs(:send_signal_messages) }
 
     with_env('SIGNAL_API_URL' => 'https://signal.example.com', 'SIGNAL_PHONE_NUMBER' => '+15550000000') do
       recorded_email { pmail.send_batch_message }

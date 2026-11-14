@@ -10,14 +10,7 @@ class OrderRefundsTest < ActiveSupport::TestCase
   # Destroying an order (or its event) queues its refund (Order#refund_later): this runs it, as the worker would
   def destroy_and_refund(record)
     record.destroy
-    run_refund_jobs
-  end
-
-  def run_refund_jobs
-    Delayed::Job.and(handler: /refund_destroyed/).each do |job|
-      job.invoke_job
-      job.destroy
-    end
+    run_jobs(:refund_destroyed)
   end
 
   test 'destroying an order refunds it' do
@@ -38,7 +31,7 @@ class OrderRefundsTest < ActiveSupport::TestCase
       # Refunds take seconds each, so the event is deleted without waiting for them, and the worker makes them
       @event.destroy
       assert_empty refunds
-      run_refund_jobs
+      run_jobs(:refund_destroyed)
       assert_equal 1, refunds.size
     end
   end
@@ -67,7 +60,7 @@ class OrderRefundsTest < ActiveSupport::TestCase
     click_button 'Yes, delete event'
     assert page.has_content?('The event was deleted')
     assert @event.reload.deleted?
-    assert_equal 0, Delayed::Job.and(handler: /refund_destroyed/).count
+    assert_equal 0, queued_jobs(:refund_destroyed).count
   end
 
   test 'cancelling an event with Attempt to refund all orders ticked refunds them' do
@@ -80,7 +73,7 @@ class OrderRefundsTest < ActiveSupport::TestCase
     click_button 'Cancel event'
     click_button 'Yes, cancel event'
     assert page.has_content?('This event has been cancelled')
-    assert_equal 1, Delayed::Job.and(handler: /refund_destroyed/).count
+    assert_equal 1, queued_jobs(:refund_destroyed).count
   end
 
   test 'successful refund emails the buyer a confirmation' do
@@ -315,7 +308,7 @@ class OrderRefundsTest < ActiveSupport::TestCase
         click_button 'Actions'
         click_link_and_confirm 'Remove and refund order'
         assert page.has_content? 'No orders found'
-        run_refund_jobs
+        run_jobs(:refund_destroyed)
       end
     end
     # No amount refunds the whole charge

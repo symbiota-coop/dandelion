@@ -1,13 +1,11 @@
 require_relative '../test_config'
 require_relative '../helpers/organisations_helpers'
-require_relative '../helpers/event_permissions_helpers'
 
 # An activity's admins, followers, stats, mailer, feedback summary and deletion, who may use each, and its old URLs
 class OrganisationsActivityAdminTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
   include OrganisationsHelpers
-  include EventPermissionsHelpers
 
   XHR = { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }.freeze
 
@@ -118,7 +116,7 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     accept_alert('CSV, two columns, with headers: name, email') { click_link 'Upload CSV' }
     attach_file 'csv', file.path
     assert page.has_content? 'The followers will be added shortly'
-    Delayed::Job.and(handler: /import_from_csv/).each(&:invoke_job)
+    run_jobs(:import_from_csv)
 
     newcomer = Account.find_by(email: 'new.person@example.com')
     assert newcomer
@@ -137,7 +135,7 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     assert_redirected_to "#{@activity.path}/followers"
     follow_redirect!
     assert_includes last_response.body, 'The CSV needs a column headed email'
-    assert_empty Delayed::Job.and(handler: /import_from_csv/)
+    assert_empty queued_jobs(:import_from_csv)
   end
 
   test 'an admin sees the event stats, audience stats and mailer of the activity, with only its own events and mails' do
@@ -246,7 +244,7 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     assert_equal [@account.id], @activity.admins.pluck(:id)
     assert Activityship.find(activityship.id)
     refute activityship.reload.unsubscribed?
-    assert_empty Delayed::Job.and(handler: /import_from_csv/)
+    assert_empty queued_jobs(:import_from_csv)
   end
 
   test 'organisation admins who are not the activity\'s admins manage it, as its own admins do' do
@@ -395,7 +393,7 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     post path, {}, XHR
     assert last_response.ok?
     assert @activity.reload.feedback_summary_requested_at
-    assert Delayed::Job.and(handler: /generate_requested_feedback_summary/).exists?
+    assert queued_jobs(:generate_requested_feedback_summary).exists?
 
     @activity.set(feedback_summary_requested_at: nil, feedback_summary_last_refreshed_at: 1.hour.ago)
     post path

@@ -1,13 +1,14 @@
 require_relative '../test_config'
+require_relative '../helpers/gatherings_helpers'
 
 class GatheringsTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
+  include GatheringsHelpers
 
   def create_two_gatherings
     create_gathering
-    @other_account = FactoryBot.create(:account)
-    @other_gathering = FactoryBot.create(:gathering, account: @other_account)
+    create_other_gathering
   end
 
   test 'creating a gathering' do
@@ -71,7 +72,7 @@ class GatheringsTest < ActiveSupport::TestCase
   test 'a gathering admin adds a member to one of its teams' do
     covers_route 'POST /g/:slug/teamships/new'
     create_gathering
-    member = create_member
+    member = create_gathering_member
     team = @gathering.teams.create!(name: 'Kitchen', account: @account)
 
     sign_in_with_rack(@account)
@@ -99,7 +100,7 @@ class GatheringsTest < ActiveSupport::TestCase
   test 'a gathering admin adds a member to one of its options' do
     covers_route 'POST /g/:slug/optionships/new'
     create_gathering
-    member = create_member
+    member = create_gathering_member
     option = @gathering.options.create!(name: 'Cabin', type: 'Accommodation', account: @account)
 
     sign_in_with_rack(@account)
@@ -126,7 +127,7 @@ class GatheringsTest < ActiveSupport::TestCase
 
   test 'members can join open options but are not offered those by invitation' do
     create_gathering
-    member = create_member
+    member = create_gathering_member
     open_option = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account)
     @gathering.options.create!(name: 'Cabin', type: 'Accommodation', account: @account, by_invitation: true)
 
@@ -143,7 +144,7 @@ class GatheringsTest < ActiveSupport::TestCase
 
   test 'members cannot join an option by invitation through its route' do
     create_gathering
-    member = create_member
+    member = create_gathering_member
     invitation_option = @gathering.options.create!(name: 'Cabin', type: 'Accommodation', account: @account, by_invitation: true)
 
     sign_in_with_rack(member)
@@ -267,7 +268,7 @@ class GatheringsTest < ActiveSupport::TestCase
   test 'admins can create paid options, and members are not offered a cost' do
     covers_route 'GET /g/:slug/options'
     create_gathering
-    member = create_member
+    member = create_gathering_member
 
     sign_in(@account)
     visit "/g/#{@gathering.slug}/options"
@@ -535,7 +536,7 @@ class GatheringsTest < ActiveSupport::TestCase
     covers 'gatherings/video-propose@686842', 'gatherings/members-see-and-vote@d114df'
     covers_route 'GET /g/:slug/mapplication_row/:id'
     create_gathering(privacy: 'closed', fixed_threshold: 2)
-    member = create_member
+    member = create_gathering_member
     applicant = FactoryBot.create(:account, name: 'Applicant Person')
     mapplication = @gathering.mapplications.create!(account: applicant, status: 'pending')
 
@@ -573,11 +574,11 @@ class GatheringsTest < ActiveSupport::TestCase
     assert page.has_link? 'Propose'
     assert page.has_no_link? 'Support'
     mapplication.verdicts.create!(account: @account, type: 'proposer')
-    mapplication.verdicts.create!(account: create_member, type: 'supporter')
+    mapplication.verdicts.create!(account: create_gathering_member, type: 'supporter')
     refute mapplication.meets_threshold
 
     @gathering.update!(enable_supporters: true)
-    sign_in(create_member)
+    sign_in(create_gathering_member)
     visit "/g/#{@gathering.slug}/applications"
     assert page.has_link? 'Support'
     assert mapplication.reload.meets_threshold
@@ -611,13 +612,13 @@ class GatheringsTest < ActiveSupport::TestCase
     create_gathering(privacy: 'closed', fixed_threshold: 2, enable_supporters: true)
     supporters_only = @gathering.mapplications.create!(account: FactoryBot.create(:account), status: 'pending')
     supporters_only.verdicts.create!(account: @account, type: 'supporter')
-    supporters_only.verdicts.create!(account: create_member, type: 'supporter')
+    supporters_only.verdicts.create!(account: create_gathering_member, type: 'supporter')
     assert_equal 'pending', supporters_only.reload.status
 
     mapplication = @gathering.mapplications.create!(account: FactoryBot.create(:account), status: 'pending')
     mapplication.verdicts.create!(account: @account, type: 'proposer')
     assert_equal 'pending', mapplication.reload.status
-    mapplication.verdicts.create!(account: create_member, type: 'supporter')
+    mapplication.verdicts.create!(account: create_gathering_member, type: 'supporter')
     assert_equal 'accepted', mapplication.reload.status
     assert @gathering.memberships.find_by(account: mapplication.account)
   end
@@ -689,7 +690,7 @@ class GatheringsTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/optionships/create'
     create_gathering
     tier = @gathering.options.create!(name: 'Standard', type: 'Tier', capacity: 1, cost: 100, account: @account)
-    tier.optionships.create!(account: create_member, gathering: @gathering)
+    tier.optionships.create!(account: create_gathering_member, gathering: @gathering)
 
     sign_in_with_rack(@account)
     post "/g/#{@gathering.slug}/optionships/create", option_id: tier.id
@@ -872,8 +873,8 @@ class GatheringsTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/shifts/:id/destroy'
     covers_route 'POST /g/:slug/teamships/:id/destroy'
     create_gathering
-    member = create_member
-    other = create_member(name: 'Other Person')
+    member = create_gathering_member
+    other = create_gathering_member(name: 'Other Person')
     rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
     shift = Shift.create!(account: other, role: Role.create!(name: 'Cook', rota: rota), rslot: Rslot.create!(name: 'Morning', rota: rota), rota: rota)
     team = @gathering.teams.create!(name: 'Garden', account: @account)
@@ -898,7 +899,7 @@ class GatheringsTest < ActiveSupport::TestCase
   test "unsubscribing a teamship from a team's emails clears its member's subscriptions to the team's posts, not the admin's" do
     covers_route 'GET /g/:slug/teamships/:id/unsubscribe'
     create_gathering
-    member = create_member
+    member = create_gathering_member
     team = @gathering.teams.create!(name: 'Garden', account: @account)
     team.teamships.create!(account: @account, gathering: @gathering)
     teamship = team.teamships.create!(account: member, gathering: @gathering)

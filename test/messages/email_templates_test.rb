@@ -147,7 +147,7 @@ class MessagesEmailTemplatesTest < ActiveSupport::TestCase
 
   def gathering_member
     create_gathering
-    create_member(name: 'Gita Member')
+    create_gathering_member(name: 'Gita Member')
   end
 
   def organisationship_with_donation

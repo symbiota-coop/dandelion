@@ -12,7 +12,7 @@ class GatheringRotasTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/rslots/:id/edit'
     create_gathering(privacy: 'open')
     create_rota
-    member = create_member
+    member = create_gathering_member
     Shift.create!(account: member, role: @role, rslot: @rslot, rota: @rota)
     sign_in(@account)
     visit gathering_path("/rotas/#{@rota.id}")
@@ -31,7 +31,7 @@ class GatheringRotasTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/rotas/new'
     create_gathering(privacy: 'open')
     create_rota
-    member = create_member
+    member = create_gathering_member
     other_admin = FactoryBot.create(:account)
     FactoryBot.create(:gathering, account: other_admin)
 
@@ -88,9 +88,9 @@ class GatheringRotasTest < ActiveSupport::TestCase
     covers_route 'GET /g/:slug/rotas/:id'
     create_gathering(privacy: 'open')
     create_rota
-    hidden = create_member(name: 'Hidden Person', phone: '+447700900123', phone_privacy: 'Only me')
+    hidden = create_gathering_member(name: 'Hidden Person', phone: '+447700900123', phone_privacy: 'Only me')
     Shift.create!(account: hidden, role: @role, rslot: @rslot, rota: @rota)
-    viewer = create_member(name: 'Viewer Person')
+    viewer = create_gathering_member(name: 'Viewer Person')
 
     sign_in_with_rack(viewer)
     get gathering_path("/rotas/#{@rota.id}.csv")

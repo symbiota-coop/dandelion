@@ -1,11 +1,11 @@
 require_relative '../test_config'
-require_relative '../helpers/event_permissions_helpers'
+require_relative '../helpers/organisations_helpers'
 
 # Who is an event admin, and what each kind of event admin can do
 class EventPermissionsTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
-  include EventPermissionsHelpers
+  include OrganisationsHelpers
 
   test 'organisations_for_creating_events includes org when account has event_manager on organisationship' do
     org = FactoryBot.create(:organisation)
@@ -16,13 +16,13 @@ class EventPermissionsTest < ActiveSupport::TestCase
   test 'organisations_for_creating_events includes org when account is org admin on organisationship' do
     covers 'organisations/table-create-events@8599fc'
     org = FactoryBot.create(:organisation)
-    other = add_member(org, admin: true)
+    other = add_organisation_member(org, admin: true)
     assert_includes other.organisations_for_creating_events.pluck(:id), org.id
   end
 
   test 'organisations_for_creating_events does not include org for plain follower only' do
     org = FactoryBot.create(:organisation)
-    follower = add_member(org)
+    follower = add_organisation_member(org)
     refute_includes follower.organisations_for_creating_events.pluck(:id), org.id
   end
 
@@ -87,7 +87,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
 
   test 'event is invalid for org-wide create when account is only a follower' do
     org = FactoryBot.create(:organisation, allow_event_submissions: false)
-    follower = add_member(org)
+    follower = add_organisation_member(org)
     event = FactoryBot.build(:event, organisation: org, account: follower, last_saved_by: follower, duplicate: false)
     refute event.valid?
     assert_includes event.errors[:organisation], "- you don't have permission to create events for this organisation"
@@ -105,7 +105,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
   test 'GET /events/new with organisation_id redirects for plain follower' do
     covers 'organisations/table-create-events@8599fc'
     org = FactoryBot.create(:organisation, contribution_not_required: true)
-    follower = add_member(org)
+    follower = add_organisation_member(org)
     sign_in(follower)
     visit "/events/new?organisation_id=#{org.id}"
     assert page.has_current_path?('/events', ignore_query: true)
@@ -114,7 +114,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
 
   test 'requests that started before a redirect, finishing after it, keep its flash message' do
     org = FactoryBot.create(:organisation, contribution_not_required: true)
-    sign_in_with_rack(add_member(org))
+    sign_in_with_rack(add_organisation_member(org))
     get '/'
     cookies_before = last_request.env['HTTP_COOKIE']
 
@@ -612,9 +612,9 @@ class EventPermissionsTest < ActiveSupport::TestCase
     create_event
     manager = add_event_manager(@organisation)
     facilitator = add_facilitator(@event)
-    follower = add_member(@organisation)
+    follower = add_organisation_member(@organisation)
     followership = @organisation.organisationships.find_by(account: follower)
-    other_admin = add_member(@organisation, admin: true)
+    other_admin = add_organisation_member(@organisation, admin: true)
 
     [manager, facilitator].each do |account|
       sign_in_with_rack(account)
@@ -637,10 +637,10 @@ class EventPermissionsTest < ActiveSupport::TestCase
     covers_route 'GET /o/:slug/event_manager/:organisationship_id'
     covers_route 'GET /o/:slug/organisationships/admins'
     create_organisation
-    follower = add_member(@organisation)
+    follower = add_organisation_member(@organisation)
     follower.set(name: 'Fern Follower', has_signed_in: true)
     followership = @organisation.organisationships.find_by(account: follower)
-    other_admin = add_member(@organisation, admin: true)
+    other_admin = add_organisation_member(@organisation, admin: true)
     admins_box = "[data-pagelet-url='/o/#{@organisation.slug}/organisationships/admins']"
 
     sign_in(@account)
@@ -730,7 +730,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
   test "a submitted event's submitter and facilitators cannot publish it" do
     covers 'organisations/community-event-submissions@e06059', 'organisations/table-publish-submitted@1383ec'
     create_organisation(allow_event_submissions: true)
-    submitter = add_member(@organisation)
+    submitter = add_organisation_member(@organisation)
     create_event(locked: true)
     @event.set(account_id: submitter.id)
     facilitator = add_facilitator(@event)
@@ -746,7 +746,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
   test 'event managers are offered publishing a submitted event, and its submitter and facilitators are not' do
     covers 'organisations/community-event-submissions@e06059', 'organisations/table-publish-submitted@1383ec'
     create_organisation(allow_event_submissions: true)
-    submitter = add_member(@organisation)
+    submitter = add_organisation_member(@organisation)
     create_event(locked: true, prices: [0])
     @event.set(account_id: submitter.id)
     facilitator = add_facilitator(@event)

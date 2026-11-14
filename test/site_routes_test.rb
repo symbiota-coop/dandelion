@@ -10,13 +10,6 @@ class SiteRoutesTest < ActiveSupport::TestCase
   XHR = { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }.freeze
   SVG = '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10"/></svg>'.freeze
 
-  def uploaded(data, filename, type)
-    file = Tempfile.new(['upload', File.extname(filename)], binmode: true)
-    file.write(data)
-    file.rewind
-    Rack::Test::UploadedFile.new(file.path, type, true, original_filename: filename)
-  end
-
   def point_path(model_name, id)
     "/points/#{model_name}/#{TokenEncryptor.encrypt("map:#{model_name}:#{id}")}"
   end
@@ -243,7 +236,7 @@ class SiteRoutesTest < ActiveSupport::TestCase
     covers_route 'POST /upload'
     account = FactoryBot.create(:account)
     sign_in_with_rack(account)
-    post '/upload', { upload: uploaded(File.binread('app/assets/images/coop.png'), 'coop.png', 'image/png') }, XHR
+    post '/upload', { upload: uploaded_file(File.binread('app/assets/images/coop.png'), 'coop.png', 'image/png') }, XHR
     assert_equal 200, last_response.status
     url = JSON.parse(last_response.body)['default']
     upload = Upload.last
@@ -256,14 +249,14 @@ class SiteRoutesTest < ActiveSupport::TestCase
     covers_route 'POST /upload'
     sign_in_with_rack(FactoryBot.create(:account))
     [[SVG, 'drawing.svg', 'image/svg+xml'], [SVG, 'drawing.jpg', 'image/jpeg'], ['hello', 'notes.txt', 'text/plain']].each do |data, filename, type|
-      without_imagemagick { post '/upload', { upload: uploaded(data, filename, type) }, XHR }
+      without_imagemagick { post '/upload', { upload: uploaded_file(data, filename, type) }, XHR }
       assert_equal 422, last_response.status, filename
       assert_equal 'Only images can be uploaded', JSON.parse(last_response.body).dig('error', 'message')
     end
     assert_equal 0, Upload.count
 
     clear_cookies
-    post '/upload', { upload: uploaded(File.binread('app/assets/images/coop.png'), 'coop.png', 'image/png') }, XHR
+    post '/upload', { upload: uploaded_file(File.binread('app/assets/images/coop.png'), 'coop.png', 'image/png') }, XHR
     assert_equal 403, last_response.status
     assert_equal 0, Upload.count
   end
@@ -349,7 +342,7 @@ class SiteRoutesTest < ActiveSupport::TestCase
 
     description = 'Bach Cantatas, Tue 3 Feb 2026, 19:00 at St Mary, London: Standard £10x2, Concession £5x1'
     csv = CSV.generate { |rows| rows << %w[id Description Amount Currency] << ['ch_1', description, '25.00', 'gbp'] }
-    post '/stripe_row_splitter', csv: uploaded(csv, 'payments.csv', 'text/csv')
+    post '/stripe_row_splitter', csv: uploaded_file(csv, 'payments.csv', 'text/csv')
     assert_equal 200, last_response.status
     assert_equal 'text/csv', last_response.media_type
     assert_equal [%w[id Description Amount Currency],

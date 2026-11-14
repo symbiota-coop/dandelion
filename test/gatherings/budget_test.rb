@@ -19,7 +19,7 @@ class GatheringBudgetTest < ActiveSupport::TestCase
   test 'a member lists an expense, which is theirs, and an admin unmarks it reimbursed' do
     covers_route 'GET /g/:slug/budget'
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     sign_in(member)
     visit gathering_path('/budget')
     click_link 'List expense'
@@ -45,8 +45,8 @@ class GatheringBudgetTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/spends/:id/edit'
     covers_route 'POST /g/:slug/spends/new'
     create_gathering(privacy: 'open')
-    member = create_member
-    other = create_member(name: 'Other Person')
+    member = create_gathering_member
+    other = create_gathering_member(name: 'Other Person')
     create_spend(account: other)
 
     sign_in_with_rack(member)
@@ -100,7 +100,7 @@ class GatheringBudgetTest < ActiveSupport::TestCase
     covers_route 'GET /g/:slug/inventory'
     create_gathering(privacy: 'open')
     create_inventory_item
-    member = create_member
+    member = create_gathering_member
     sign_in(member)
     visit gathering_path('/inventory')
     find("select[aria-label='Responsible']").select 'Member Person'
@@ -116,7 +116,7 @@ class GatheringBudgetTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/inventory_items/:id/provided'
     create_gathering(privacy: 'open')
     create_inventory_item
-    member = create_member
+    member = create_gathering_member
     create_other_gathering
 
     sign_in_with_rack(member)
@@ -178,7 +178,7 @@ class GatheringBudgetTest < ActiveSupport::TestCase
 
   test "an admin moves a member to another option, which then asks for that option's cost" do
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     tent = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account)
     cabin = @gathering.options.create!(name: 'Cabin', type: 'Accommodation', cost: 100, account: @account)
     optionship = tent.optionships.create!(account: member, gathering: @gathering)
@@ -200,8 +200,8 @@ class GatheringBudgetTest < ActiveSupport::TestCase
   test "a member can't be moved into an option that's full, but stays in a full one when it's saved again" do
     covers_route 'POST /g/:slug/optionships/:id/edit'
     create_gathering(privacy: 'open')
-    member = create_member
-    other = create_member(name: 'Other Person')
+    member = create_gathering_member
+    other = create_gathering_member(name: 'Other Person')
     tent = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account)
     cabin = @gathering.options.create!(name: 'Cabin', type: 'Accommodation', capacity: 1, account: @account)
     cabin.optionships.create!(account: other, gathering: @gathering)
@@ -222,8 +222,8 @@ class GatheringBudgetTest < ActiveSupport::TestCase
   test "only the gathering's admins edit its members' options, and paid options themselves" do
     covers_route 'GET /g/:slug/options/:id/edit'
     create_gathering(privacy: 'open')
-    member = create_member
-    other = create_member(name: 'Other Person')
+    member = create_gathering_member
+    other = create_gathering_member(name: 'Other Person')
     create_other_gathering
     tent = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account)
     cabin = @gathering.options.create!(name: 'Cabin', type: 'Accommodation', cost: 100, account: @account)

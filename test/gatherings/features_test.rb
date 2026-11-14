@@ -52,8 +52,8 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   test 'an admin filters the members list' do
     covers 'gatherings/member-filters@f9ffca'
     create_gathering(privacy: 'open')
-    create_member(name: 'Wendy Woman', gender: 'Woman')
-    create_member(name: 'Manfred Man', gender: 'Man')
+    create_gathering_member(name: 'Wendy Woman', gender: 'Woman')
+    create_gathering_member(name: 'Manfred Man', gender: 'Man')
     sign_in(@account)
     visit gathering_path('/members')
     assert page.has_content? 'Manfred Man'
@@ -97,7 +97,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
 
   test 'adding an option, and a member joining and leaving it' do
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     sign_in(@account)
     visit gathering_path('/options')
     click_link 'Add an option'
@@ -122,7 +122,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/teams/new'
     covers_route 'POST /g/:slug/teamships/create'
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     sign_in(@account)
     visit gathering_path('/teams/new')
     fill_in 'Name', with: 'Kitchen'
@@ -146,7 +146,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/teamships/:id/set_subscribe'
     create_gathering(privacy: 'open')
     team = @gathering.teams.create!(name: 'Kitchen', account: @account)
-    member = create_member
+    member = create_gathering_member
     teamship = team.teamships.create!(account: member, gathering: @gathering, unsubscribed: true)
     sign_in(member)
     visit '/accounts/subscriptions'
@@ -180,7 +180,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     covers 'gatherings/video-shift-signup@8c93ae'
     covers_route 'POST /g/:slug/rslots/create'
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     sign_in(@account)
     visit gathering_path('/rotas/new')
     fill_in 'Name', with: 'Kitchen'
@@ -207,7 +207,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     covers_route 'POST /g/:slug/tactivities/create'
     covers_route 'POST /g/:slug/tslots/create'
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     sign_in(@account)
     visit gathering_path('/timetables/new')
     fill_in 'Name', with: 'Workshops'
@@ -238,7 +238,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   test 'listing an item, and choosing who brings it' do
     covers_route 'POST /g/:slug/inventory_items/new'
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     sign_in(@account)
     visit gathering_path('/inventory')
     click_link 'List item'
@@ -258,7 +258,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   test 'an admin removes a member' do
     covers_route 'POST /g/:slug/memberships/:id/remove'
     create_gathering(privacy: 'open')
-    member = create_member
+    member = create_gathering_member
     sign_in(@account)
     visit gathering_path('/members')
     within("[data-pagelet-url='#{gathering_path("/membership_row/#{@gathering.memberships.find_by(account: member).id}")}']") do
@@ -456,7 +456,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     rota = @gathering.rotas.create!(name: 'Washing up', account: @account)
     Role.create!(name: 'Washer', rota: rota)
     Rslot.create!(name: 'Evening', rota: rota)
-    member = create_member
+    member = create_gathering_member
     sign_in(member)
     visit gathering_path("/teams/#{team.id}")
     click_link 'Join'
@@ -478,7 +478,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
     role = Role.create!(name: 'Cook', rota: rota)
     rslot = Rslot.create!(name: 'Morning', rota: rota)
-    member = create_member(email: 'member.person@example.com', phone: '+447700900123')
+    member = create_gathering_member(email: 'member.person@example.com', phone: '+447700900123')
     Shift.create!(account: member, role: role, rslot: rslot, rota: rota)
 
     sign_in(member)
@@ -499,7 +499,7 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
   test 'choosing an option with a cost, and paying for it by card' do
     create_gathering(privacy: 'open', stripe_pk: 'pk_test_gathering', stripe_sk: 'sk_test_gathering', stripe_endpoint_secret: 'whsec_test')
     @gathering.options.create!(name: 'Camping', type: 'Tier', cost: 20, account: @account)
-    member = create_member
+    member = create_gathering_member
     sign_in(member)
     visit gathering_path('/options')
     click_link 'Join'
@@ -517,8 +517,8 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     # Stripe tells the gathering the checkout is paid
     paid = Stripe::Event.construct_from({ id: 'evt_gathering', type: 'checkout.session.completed', data: { object: { id: 'cs_gathering', payment_status: 'paid' } } })
     Stripe::Webhook.stub(:construct_event, paid) do
-      header 'Stripe-Signature', 'sig'
-      post gathering_path('/stripe_webhook') # rubocop:disable Dandelion/TestOneParadigm -- Stripe's webhook, a program's request in the member's flow
+      header 'Stripe-Signature', 'sig' # rubocop:disable Dandelion/TestOneParadigm -- Stripe's webhook, a program's request in the member's flow
+      post gathering_path('/stripe_webhook')
     end
     assert payment.reload.payment_completed
     assert_equal 20, @gathering.memberships.find_by(account: member).paid

@@ -1,7 +1,5 @@
 # Helpers the MCP test files (test/integrations) share: JSON-RPC calls to /mcp
 module McpHelpers
-  include Rack::Test::Methods
-
   def mcp_post(body, headers: {})
     header 'Content-Type', 'application/json'
     header 'Accept', 'application/json, text/event-stream'

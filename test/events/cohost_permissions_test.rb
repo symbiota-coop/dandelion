@@ -1,11 +1,11 @@
 require_relative '../test_config'
-require_relative '../helpers/event_permissions_helpers'
+require_relative '../helpers/organisations_helpers'
 
 # Who can add and remove co-hosts, and what co-hosting gives them
 class EventCohostPermissionsTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
-  include EventPermissionsHelpers
+  include OrganisationsHelpers
 
   def cohosts_box
     "[data-pagelet-url='/e/#{@event.slug}/cohostships']"

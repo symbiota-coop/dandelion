@@ -355,7 +355,7 @@ class EventAdminReportsTest < ActiveSupport::TestCase
     post "/e/#{@event.slug}/resend_all_feedback_emails"
     assert last_response.redirect?
 
-    emails = emails_sent_by_jobs(/send_feedback_requests/)
+    emails = emails_sent_by_jobs(:send_feedback_requests)
     assert_equal 1, emails.length
     assert_equal attendees.map(&:email).sort, emails.first.recipients.sort
   end
@@ -373,6 +373,6 @@ class EventAdminReportsTest < ActiveSupport::TestCase
       assert last_response.redirect?, account&.email
       assert_equal "/e/#{@event.slug}", URI(last_response.location).path
     end
-    assert_equal 0, Delayed::Job.and(handler: /send_feedback_requests/).count
+    assert_equal 0, queued_jobs(:send_feedback_requests).count
   end
 end

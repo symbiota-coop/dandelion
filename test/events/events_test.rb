@@ -132,7 +132,7 @@ class EventsTest < ActiveSupport::TestCase
     assert created_event.locked?, 'Event should be locked when submitted by non-admin'
     assert_equal submitter.id, created_event.account_id, 'Event should be attributed to submitter'
     assert_equal 0, created_event.notifications.and(type: 'created_event').count, 'Locked submission should not create a public event notification'
-    assert_equal 1, Delayed::Job.and(handler: /send_public_submission_notification/).count, 'Submission email should be queued'
+    assert_equal 1, queued_jobs(:send_public_submission_notification).count, 'Submission email should be queued'
 
     visit "/e/#{created_event.slug}/edit"
     assert page.has_content?('Event title'), 'Submitter should be able to access edit page'

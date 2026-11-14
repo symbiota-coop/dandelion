@@ -392,7 +392,7 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
     FactoryBot.create(:organisation).organisationships.create!(account: elsewhere, skip_welcome: true)
 
     local_group = FactoryBot.create(:local_group, organisation: @organisation)
-    Delayed::Job.and(handler: /add_organisation_members_within/).each(&:invoke_job)
+    run_jobs(:add_organisation_members_within)
 
     assert local_group.local_groupships.find_by(account: inside)
     assert_nil local_group.local_groupships.find_by(account: outside)

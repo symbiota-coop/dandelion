@@ -1,9 +1,11 @@
 require_relative '../test_config'
+require_relative '../helpers/bookings_helpers'
 require_relative '../helpers/checkout_webhook_helpers'
 
 # Paying with Mollie, and its webhooks
 class MolliePaymentsTest < ActiveSupport::TestCase
   include Rack::Test::Methods
+  include BookingsHelpers
   include CheckoutWebhookHelpers
 
   def create_mollie_event
@@ -23,17 +25,6 @@ class MolliePaymentsTest < ActiveSupport::TestCase
     Mollie::Payment.stub :get, payment do
       post "/o/#{organisation.slug}/mollie_webhook", id: payment.id
     end
-  end
-
-  def post_mollie_purchase(event, account)
-    ticket_type = event.ticket_types.first
-    header 'Accept', 'application/json'
-    post "/e/#{event.slug}/purchase",
-         ticketForm: { quantities: { ticket_type.id.to_s => '1' } },
-         detailsForm: {
-           payment_method: 'mollie',
-           account: { name: account.name, email: account.email }
-         }
   end
 
   test 'organisation with a mollie api key has a payment method' do
@@ -92,7 +83,7 @@ class MolliePaymentsTest < ActiveSupport::TestCase
     payment = stub_mollie_payment
 
     Mollie::Payment.stub :create, payment do
-      post_mollie_purchase(@event, buyer)
+      post_purchase(@event, buyer, payment_method: 'mollie')
     end
 
     assert_equal 200, last_response.status

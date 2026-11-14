@@ -12,12 +12,12 @@ class EventBookingDonationsTest < ActiveSupport::TestCase
     @organisation.set(stripe_pk: nil, stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json, paid_up: false)
     assert @event.reload.donations_to_dandelion?
 
-    post_checkout(ticket_form: { donation_amount: '0.1' })
+    post_purchase(payment_method: 'stripe', ticket_form: { donation_amount: '0.1' })
     assert_equal 400, last_response.status
     assert_equal 'A donation to Dandelion must be at least £1, or nothing.', JSON.parse(last_response.body)['error']
     assert_equal 0, @event.orders.count
 
-    with_stubbed_stripe_session { post_checkout(ticket_form: { donation_amount: '1' }) }
+    with_stubbed_stripe_session { post_purchase(payment_method: 'stripe', ticket_form: { donation_amount: '1' }) }
     assert_equal 200, last_response.status
     assert_equal 1, @event.orders.last.donations.first.amount
   end
@@ -27,7 +27,7 @@ class EventBookingDonationsTest < ActiveSupport::TestCase
     create_event(prices: [10])
     @event.set(suggested_donation: nil)
 
-    post_checkout(ticket_form: { donation_amount: '5' })
+    post_purchase(payment_method: 'stripe', ticket_form: { donation_amount: '5' })
 
     assert_equal 400, last_response.status
     assert_equal 0, @event.orders.count
@@ -129,7 +129,7 @@ class EventBookingDonationsTest < ActiveSupport::TestCase
     sign_in_with_rack(buyer)
 
     # Credit covers the tickets, so the order completes with no payment, which a donation to Dandelion would need
-    post_checkout(ticket_form: { donation_amount: '1' }, buyer: buyer)
+    post_purchase(@event, buyer, payment_method: 'stripe', ticket_form: { donation_amount: '1' })
     assert_equal 200, last_response.status
     order = @event.orders.find_by(account: buyer)
     assert_equal 10, order.credit_applied

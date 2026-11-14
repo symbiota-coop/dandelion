@@ -133,7 +133,7 @@ class ActivitiesTest < ActiveSupport::TestCase
     apply(applicant)
     assert_equal 1, @activity.activity_applications.count
 
-    emails = emails_sent_by_jobs(/ActivityApplication.*send_notification/m)
+    emails = emails_sent_by_jobs(:send_notification, on: 'ActivityApplication')
     assert_equal 1, emails.length
     assert_includes emails.first.recipients, @account.email
     assert_equal @activity.admins.pluck(:email).sort, emails.first.recipients.sort

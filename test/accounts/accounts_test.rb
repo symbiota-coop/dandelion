@@ -1,11 +1,13 @@
 require_relative '../test_config'
 require_relative '../helpers/recaptcha_helpers'
+require_relative '../helpers/sign_in_helpers'
 
 # Signing up, profiles, avatars, notifications, signing up from an organisation, activity, local group or event, merging accounts and maps of accounts
 class AccountsTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
   include RecaptchaHelpers
+  include SignInHelpers
 
   # Stands in for the Places library, so places.js can be tested without a Google Maps key. places.js only asks
   # for the library as someone types, so this can replace importLibrary once the page has loaded. The setter

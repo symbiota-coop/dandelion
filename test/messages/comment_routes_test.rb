@@ -8,22 +8,12 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
   include Rack::Test::Methods
   include CommentsHelpers
 
-  def text_file(name = 'notes.txt')
-    file = Tempfile.new(['upload', File.extname(name)])
-    file.write('Hello')
-    file.close
-    Rack::Test::UploadedFile.new(file.path, 'text/plain', original_filename: name)
-  end
-
   def image_upload(name = 'coop.png', type = 'image/png')
     Rack::Test::UploadedFile.new("app/assets/images/#{name}", type)
   end
 
   def svg_upload
-    file = Tempfile.new(['upload', '.svg'])
-    file.write('<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10"/></svg>')
-    file.close
-    Rack::Test::UploadedFile.new(file.path, 'image/svg+xml', original_filename: 'picture.svg')
+    uploaded_file('<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10"/></svg>', 'picture.svg', 'image/svg+xml')
   end
 
   def site_admin
@@ -53,7 +43,7 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
     team_thread
     reply = @post.comments.create!(account: @member, body: 'And another thing')
 
-    [create_member(name: 'Other Member'), @account, FactoryBot.create(:account)].each do |account|
+    [create_gathering_member(name: 'Other Member'), @account, FactoryBot.create(:account)].each do |account|
       sign_in_with_rack(account)
       xhr :post, "/comments/#{reply.id}/destroy"
       assert_equal 403, last_response.status
@@ -90,10 +80,10 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
   test "only a comment's author removes its file, while they can still see the discussion" do
     covers_route 'POST /comments/:id/file/destroy'
     team_thread
-    @comment.update!(file: text_file)
+    @comment.update!(file: uploaded_file('Hello', 'notes.txt'))
     assert @comment.reload.file_uid
 
-    [create_member(name: 'Other Member'), @account, FactoryBot.create(:account)].each do |account|
+    [create_gathering_member(name: 'Other Member'), @account, FactoryBot.create(:account)].each do |account|
       sign_in_with_rack(account)
       post "/comments/#{@comment.id}/file/destroy"
       assert_equal 403, last_response.status
@@ -109,7 +99,7 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
 
   test "a comment's author who has left the discussion can't remove its file" do
     team_thread
-    @comment.update!(file: text_file)
+    @comment.update!(file: uploaded_file('Hello', 'notes.txt'))
     @gathering.memberships.find_by(account: @member).destroy
     sign_in_with_rack(@member)
 
@@ -123,7 +113,7 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
   test "a discussion's members subscribe to its threads, once each" do
     covers_route 'POST /subscriptions/create'
     team_thread
-    other_member = create_member(name: 'Other Member')
+    other_member = create_gathering_member(name: 'Other Member')
     @post.subscriptions.find_by(account: other_member)&.destroy
     sign_in_with_rack(other_member)
 
@@ -155,7 +145,7 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
   test "unsubscribing from a thread removes only one's own subscription" do
     covers_route 'GET /posts/:id/unsubscribe'
     team_thread
-    other_member = create_member(name: 'Other Member')
+    other_member = create_gathering_member(name: 'Other Member')
     @post.subscriptions.find_or_create_by!(account: other_member)
     assert @post.subscriptions.find_by(account: @member)
     sign_in_with_rack(@member)
@@ -188,7 +178,7 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
   test "a gathering's admins add photos to it, and its other members and outsiders can't" do
     covers_route 'POST /photos/new'
     create_gathering
-    member = create_member
+    member = create_gathering_member
 
     [member, FactoryBot.create(:account)].each do |account|
       sign_in_with_rack(account)
@@ -209,7 +199,7 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
   test "a comment's author adds photos to it, and no one else can" do
     team_thread
 
-    [create_member(name: 'Other Member'), @account].each do |account|
+    [create_gathering_member(name: 'Other Member'), @account].each do |account|
       sign_in_with_rack(account)
       post '/photos/new', photoable_type: 'Comment', photoable_id: @comment.id, image: image_upload
       assert_equal 403, last_response.status
@@ -310,7 +300,7 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
     post "/photos/#{photo.id}/destroy"
     assert_includes last_response.location, '/accounts/new'
 
-    [create_member(name: 'Other Member'), @account, FactoryBot.create(:account)].each do |account|
+    [create_gathering_member(name: 'Other Member'), @account, FactoryBot.create(:account)].each do |account|
       sign_in_with_rack(account)
       post "/photos/#{photo.id}/destroy"
       assert_equal 403, last_response.status
@@ -333,7 +323,7 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
   test "an organisation's admins delete its mail attachments, and no one else can" do
     covers_route 'POST /pmails/:oid/attachments/:attachment_id/destroy'
     create_organisation
-    attachment = @organisation.attachments.create!(file: text_file('flyer.txt'))
+    attachment = @organisation.attachments.create!(file: uploaded_file('Hello', 'flyer.txt'))
     path = "/pmails/#{@organisation.id}/attachments/#{attachment.id}/destroy"
 
     post path, organisation_id: @organisation.id
@@ -360,7 +350,7 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
 
   test "an event's admins who don't admin its organisation can't delete the organisation's mail attachments" do
     create_event
-    attachment = @organisation.attachments.create!(file: text_file('flyer.txt'))
+    attachment = @organisation.attachments.create!(file: uploaded_file('Hello', 'flyer.txt'))
     sign_in_with_rack(create_facilitator(@event))
 
     get "/pmails/#{@organisation.id}/attachments", event_id: @event.id
@@ -376,7 +366,7 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
   test "an organisation's admins can't delete another organisation's mail attachments" do
     create_organisation
     other_organisation = FactoryBot.create(:organisation, account: FactoryBot.create(:account))
-    other_attachment = other_organisation.attachments.create!(file: text_file('theirs.txt'))
+    other_attachment = other_organisation.attachments.create!(file: uploaded_file('Hello', 'theirs.txt'))
     sign_in_with_rack(@account)
 
     # Naming the other organisation in the path, with their own in the scope

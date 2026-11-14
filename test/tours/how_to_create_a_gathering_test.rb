@@ -1,9 +1,9 @@
 require_relative '../test_config'
-require_relative '../helpers/video_narration_helper'
+require_relative '../helpers/video_narration_helpers'
 
 class HowToCreateAGatheringTest < ActiveSupport::TestCase
   include Capybara::DSL
-  include VideoNarrationHelper
+  include VideoNarrationHelpers
 
   test 'how to create a gathering' do
     account1 = FactoryBot.create(:account, name: 'Maria Sabina', email: 'maria@symbiota.coop')

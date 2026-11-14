@@ -4,7 +4,7 @@ module CommentsHelpers
   def team_thread
     create_gathering
     @team = @gathering.teams.find_by(name: 'General')
-    @member = create_member
+    @member = create_gathering_member
     @post = @team.posts.create!(account: @member, subject: 'Rota')
     @comment = @post.comments.create!(account: @member, body: 'Secret plans')
   end

@@ -191,7 +191,7 @@ class WaitlistTest < ActiveSupport::TestCase
     @event.refresh_sold_out_cache_and_notify_waitlist
 
     assert_not @ticket_type.reload.sold_out?, 'Ticket type should no longer be sold out'
-    assert_equal 1, Delayed::Job.and(handler: /send_ticket_type_waitlist_tickets_available/).count,
+    assert_equal 1, queued_jobs(:send_ticket_type_waitlist_tickets_available).count,
                  'Ticket type waitlist notification should be queued'
   end
 
@@ -222,7 +222,7 @@ class WaitlistTest < ActiveSupport::TestCase
     Delayed::Job.delete_all
     @event.waitships.create!(account: FactoryBot.create(:account))
 
-    emails = emails_sent_by_jobs(/Waitship.*send_notification/m)
+    emails = emails_sent_by_jobs(:send_notification, on: 'Waitship')
     assert_equal 1, emails.length
     assert_equal @event.event_facilitators.pluck(:email).sort, emails.first.recipients.sort
     assert_includes emails.first.recipients, @facilitator.email
@@ -230,7 +230,7 @@ class WaitlistTest < ActiveSupport::TestCase
     Delayed::Job.delete_all
     @event.set(send_order_notifications: false)
     @event.waitships.create!(account: FactoryBot.create(:account))
-    assert_equal 0, Delayed::Job.and(handler: /send_notification/).count
+    assert_equal 0, queued_jobs(:send_notification).count
   end
 
   test 'facilitators are emailed when someone joins a ticket type waitlist if order notifications are on' do
@@ -241,7 +241,7 @@ class WaitlistTest < ActiveSupport::TestCase
     Delayed::Job.delete_all
     TicketTypeWaitship.create!(ticket_type: @ticket_type, account: FactoryBot.create(:account))
 
-    emails = emails_sent_by_jobs(/TicketTypeWaitship.*send_notification/m)
+    emails = emails_sent_by_jobs(:send_notification, on: 'TicketTypeWaitship')
     assert_equal 1, emails.length
     assert_equal @event.event_facilitators.pluck(:email).sort, emails.first.recipients.sort
     assert_includes emails.first.recipients, @facilitator.email
@@ -249,7 +249,7 @@ class WaitlistTest < ActiveSupport::TestCase
     Delayed::Job.delete_all
     @event.set(send_order_notifications: false)
     TicketTypeWaitship.create!(ticket_type: @ticket_type, account: FactoryBot.create(:account))
-    assert_equal 0, Delayed::Job.and(handler: /send_notification/).count
+    assert_equal 0, queued_jobs(:send_notification).count
   end
 
   def create_sold_out_event_with_waitlist
@@ -270,7 +270,7 @@ class WaitlistTest < ActiveSupport::TestCase
 
     @ticket_type.update!(quantity: 2)
 
-    emails = emails_sent_by_jobs(/send_waitlist_tickets_available/)
+    emails = emails_sent_by_jobs(:send_waitlist_tickets_available)
     assert_equal [[@waiter.email]], emails.map(&:recipients)
   end
 
@@ -286,7 +286,7 @@ class WaitlistTest < ActiveSupport::TestCase
     assert page.has_content? 'No orders found'
     assert_nil Order.find(@order.id)
 
-    emails = emails_sent_by_jobs(/send_waitlist_tickets_available/)
+    emails = emails_sent_by_jobs(:send_waitlist_tickets_available)
     assert_equal [[@waiter.email]], emails.map(&:recipients)
   end
 

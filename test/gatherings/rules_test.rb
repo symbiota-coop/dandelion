@@ -9,9 +9,9 @@ class GatheringRulesTest < ActiveSupport::TestCase
     create_gathering(privacy: 'open')
     rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
     timetable = @gathering.timetables.create!(name: 'Workshops', account: @account)
-    create_member(name: 'Other Member')
+    create_gathering_member(name: 'Other Member')
     @gathering.mapplications.create!(account: FactoryBot.create(:account, name: 'Keen Applicant'), status: 'pending')
-    sign_in(create_member)
+    sign_in(create_gathering_member)
 
     visit gathering_path('/members')
     assert page.has_content? 'Other Member'
@@ -115,8 +115,8 @@ class GatheringRulesTest < ActiveSupport::TestCase
     Role.create!(name: 'Cook', rota: rota)
     Rslot.create!(name: 'Morning', rota: rota)
     Rslot.create!(name: 'Evening', rota: rota)
-    first = create_member(name: 'First Member')
-    second = create_member(name: 'Second Member')
+    first = create_gathering_member(name: 'First Member')
+    second = create_gathering_member(name: 'Second Member')
 
     sign_in(@account)
     visit gathering_path("/rotas/#{rota.id}")

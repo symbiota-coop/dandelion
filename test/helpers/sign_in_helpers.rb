@@ -1,4 +1,4 @@
-# Helpers the sign-in test files (test/accounts) share
+# Helpers the sign-up and sign-in test files (test/accounts) share
 module SignInHelpers
   # Comes back from Google, in the browser, as this Google account
   def visit_omniauth_as(uid:, email: 'alice-oauth@example.com')
@@ -20,7 +20,7 @@ module SignInHelpers
     click_button 'Submit'
   end
 
-  def sign_in_via_rack(account)
+  def sign_in_with_password_via_rack(account)
     clear_cookies
     post '/auth/account/callback', email: account.email, password: account.password
   end
@@ -48,5 +48,21 @@ module SignInHelpers
   ensure
     OmniAuth.config.test_mode = false
     OmniAuth.config.mock_auth[:google_oauth2] = nil
+  end
+
+  # Fills in and sends the sign up form, in the browser, as account
+  def fill_signup_form(account)
+    fill_in 'Full name', with: account.name
+    fill_in 'Email', with: account.email
+    fill_in 'Location', with: account.location
+    click_button 'Sign up'
+  end
+
+  # Posts the sign up form, through Rack, as account
+  def post_new_account(account, extra = {})
+    post '/accounts/new', {
+      account: { name: account.name, email: account.email, location: account.location },
+      recaptcha_skip_secret: ENV['RECAPTCHA_SKIP_SECRET']
+    }.merge(extra)
   end
 end

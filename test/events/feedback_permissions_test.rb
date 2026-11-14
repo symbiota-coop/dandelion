@@ -265,7 +265,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
     facilitator = create_facilitator(@event, name: 'Event Facilitator')
     emails = recorded_emails do
       create_answered_feedback(anonymous: true, publicly_visible: true)
-      Delayed::Job.and(handler: /send_feedback/).each(&:invoke_job)
+      run_jobs(:send_feedback)
     end
     assert_equal 0, Notification.and(type: 'left_feedback').count
     assert_equal 1, emails.length
@@ -275,7 +275,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
 
     feedback = @event.event_feedbacks.first
     feedback.send_destroy_notification(@account)
-    emails = emails_sent_by_jobs(/send_destroy_notification/)
+    emails = emails_sent_by_jobs(:send_destroy_notification)
     assert_equal 1, emails.length
     refute_reveals_attendee(emails.first.html)
   end
@@ -346,7 +346,7 @@ class EventFeedbackPermissionsTest < ActiveSupport::TestCase
     hidden.update!(publicly_visible: true)
     post "/event_feedbacks/#{hidden.id}/response", response: 'Reply'
     assert_equal 200, last_response.status
-    assert_empty emails_sent_by_jobs(/send_response/)
+    assert_empty emails_sent_by_jobs(:send_response)
   end
 
   test "feedback that may not be quoted publicly can't be given a public extract" do
