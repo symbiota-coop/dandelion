@@ -22,7 +22,8 @@ Dandelion::App.controller do
   end
 
   get '/e/:slug/check_in_toggle/:ticket_id' do
-    ticket = @event.tickets.complete.find_by_id_or_token(params[:ticket_id])
+    # Gone once its order is cancelled or refunded, after the list showing it loaded
+    ticket = @event.tickets.complete.find_by_id_or_token(params[:ticket_id]) || not_found
     partial :'events/check_in_toggle', locals: { ticket: ticket }
   end
 
