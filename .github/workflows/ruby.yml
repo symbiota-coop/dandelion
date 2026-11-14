@@ -132,7 +132,7 @@ jobs:
           - group: events
             files: events/events events/drafts events/content_safety events/hosts
           - group: gathering_features
-            files: gatherings/features gatherings/rules
+            files: gatherings/features gatherings/rules gatherings/joining
           - group: gatherings
             files: gatherings/gatherings gatherings/members
           - group: general
