@@ -27,7 +27,9 @@ on:
 permissions: {}
 
 jobs:
-  # The open bug issues, without no-pr, that the reviews' bots opened while the review that just finished ran
+  # The open bug issues, without no-pr, that the review that just finished opened while it ran. The reviews run at the
+  # same time, so the bots open the others' issues meanwhile too: the review's own are those with its title prefix
+  # ("🐛 [Claude] ", "🐛 [Codex] ", "🐛 [opencode <model>] "), its name in its workflow's name, or each would run twice
   find-bug-issues:
     if: >-
       github.event_name == 'workflow_run' &&
@@ -46,11 +48,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           STARTED: ${{ github.event.workflow_run.run_started_at }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
         run: |
+          # Daily Bug Review (Codex) -> Codex
+          REVIEWER=${WORKFLOW_NAME##*(}
+          export REVIEWER=${REVIEWER%)}
           ISSUES=$(gh api "repos/$GITHUB_REPOSITORY/issues?state=open&labels=bug&since=$STARTED&per_page=100" --jq '
             [.[] | select(.pull_request == null)
                  | select(.user.login == "github-actions[bot]" or .user.login == "claude[bot]")
                  | select(.created_at >= env.STARTED)
+                 | select(.title | startswith("🐛 [" + env.REVIEWER + "]") or startswith("🐛 [" + env.REVIEWER + " "))
                  | select([.labels[].name] | index("no-pr") | not)
                  | .number]')
           echo "issues=$ISSUES" >> "$GITHUB_OUTPUT"
