@@ -417,6 +417,100 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
     assert Pmail.find(pmail.id)
   end
 
+  # Mailgun's events API, answering these pages of recipients in turn and then an empty page, as Mailgun does
+  class FakeMailgunEvents
+    attr_reader :requests
+
+    def initialize(pages)
+      @pages = pages
+      @requests = []
+    end
+
+    def get(params)
+      @requests << params
+      page
+    end
+
+    def next(params)
+      @requests << params
+      page
+    end
+
+    def page
+      { 'items' => (@pages.shift || []).map { |recipient| { 'recipient' => recipient } } }
+    end
+  end
+
+  test "resending a mail leaves out everyone Mailgun has already accepted it for, across pages of events, and still sends it to the rest" do
+    create_organisation
+    link_mailgun
+    followers = Array.new(4) { follower_of(@organisation) }
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: 'everyone')
+    events = FakeMailgunEvents.new([[followers[0].email], [followers[1].email, @account.email]])
+
+    email = Mailgun::Events.stub(:new, events) { recorded_email { pmail.send_batch_message(check_already_sent: true) } }
+
+    assert_equal [followers[2].email, followers[3].email].sort, email.recipients.sort
+    # Asked only for this mail's accepted events, page after page until one came back empty
+    assert_equal 3, events.requests.count
+    assert(events.requests.all? { |params| params == { 'event' => 'accepted', 'tags' => pmail.id.to_s } })
+  end
+
+  test "an organisation's mail from an address off its Mailgun domain goes from the Mailgun domain, keeping the name, with replies to the address" do
+    create_organisation
+    link_mailgun
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: 'everyone', from: 'Jo Bloggs <jo@elsewhere.org>')
+
+    email = recorded_email { pmail.send_batch_message }
+    assert_equal 'Jo Bloggs <mailer@mg.example.com>', email.sender
+    assert_equal 'Jo Bloggs <jo@elsewhere.org>', email.reply_to_address
+
+    # A from with no name goes from the bare mailer address
+    pmail.set(from: 'jo@elsewhere.org')
+    email = recorded_email { pmail.send_batch_message }
+    assert_equal 'mailer@mg.example.com', email.sender
+    assert_equal 'jo@elsewhere.org', email.reply_to_address
+
+    # From the Mailgun domain or one it's a subdomain of, it goes as it is
+    pmail.set(from: 'Jo Bloggs <jo@example.com>')
+    email = recorded_email { pmail.send_batch_message }
+    assert_equal 'Jo Bloggs <jo@example.com>', email.sender
+    assert_nil email.reply_to_address
+  end
+
+  test 'with Signal set up, a mail to an event queues a Signal message to its recipients with a phone number, and none when nobody has one' do
+    create_event
+    ticket_type = FactoryBot.create(:ticket_type, event: @event, quantity: 10)
+    with_phone = FactoryBot.create(:account, phone: '+44 7700 900000')
+    without_phone = FactoryBot.create(:account)
+    [with_phone, without_phone].each { |account| Ticket.create!(event: @event, account: account, ticket_type: ticket_type, price: 0) }
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: "event:#{@event.id}")
+    signal_jobs = -> { Delayed::Job.and(handler: /method_name: :send_signal_messages_without_delay$/) }
+
+    with_env('SIGNAL_API_URL' => 'https://signal.example.com', 'SIGNAL_PHONE_NUMBER' => '+15550000000') do
+      recorded_email { pmail.send_batch_message }
+      assert_equal 1, signal_jobs.call.count
+      assert_equal [with_phone.id], signal_jobs.call.first.payload_object.args.first
+
+      sent = []
+      pmail.stub(:send_signal_message, ->(phones, message) { sent << [phones, message] }) do
+        pmail.send_signal_messages_without_delay([with_phone.id, without_phone.id])
+      end
+      assert_equal [['+44 7700 900000']], sent.map(&:first)
+      assert_includes sent.first.last, pmail.subject
+
+      signal_jobs.call.destroy_all
+      with_phone.set(phone: nil)
+      recorded_email { pmail.send_batch_message }
+      assert_equal 0, signal_jobs.call.count
+    end
+
+    # Without Signal set up, none
+    with_phone.set(phone: '+44 7700 900000')
+    recorded_email { pmail.send_batch_message }
+    assert_equal 0, signal_jobs.call.count
+  end
+
   # On the web
 
   test "an unsent mail can't be viewed on the web, even with its token" do

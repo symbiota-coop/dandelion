@@ -332,7 +332,6 @@ class Pmail
           break if result.to_h['items'].empty?
 
           result.to_h['items'].each { |item| recipients << item['recipient'] }
-          puts recipients.count
         end
       end
     elsif free_gift?(sending: true)
