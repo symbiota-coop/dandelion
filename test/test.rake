@@ -68,14 +68,11 @@ task 'test:parallel' do
   times.merge!(run_times)
   FileUtils.mkdir_p(File.dirname(times_file))
   File.write(times_file, JSON.pretty_generate(times.sort.to_h))
-  # Each file's time, slowest first, in the log and, on CI, the job's summary, as the times file is only in a cache
-  slowest = run_times.sort_by { |_path, seconds| -seconds }
+  # Each file's time, slowest first, in the log, as the times file is only in a cache. CI uploads this run's alone
+  # (tmp/file_times.json), for the run's summary to list the slowest of every group's
+  File.write('tmp/file_times.json', JSON.pretty_generate(run_times))
   puts 'Seconds each file took:'
-  slowest.each { |path, seconds| puts format('%7.1f  %s', seconds, path) }
-  if ENV['GITHUB_STEP_SUMMARY'].present?
-    rows = slowest.map { |path, seconds| "| `#{path}` | #{seconds} |" }
-    File.write(ENV['GITHUB_STEP_SUMMARY'], ["### Test file times: #{shares.length} runs at once", '', '| File | Seconds |', '|---|---:|', *rows, ''].join("\n"), mode: 'a')
-  end
+  run_times.sort_by { |_path, seconds| -seconds }.each { |path, seconds| puts format('%7.1f  %s', seconds, path) }
   abort "Failed: #{failed.map { |share| share.join(' ') }.join('; ')}" if failed.any?
 end
 

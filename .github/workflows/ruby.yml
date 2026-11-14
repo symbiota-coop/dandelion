@@ -262,6 +262,68 @@ jobs:
         path: tmp/routes
         retention-days: 1
 
+    - name: Upload the time each file took
+      if: ${{ !cancelled() }}
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      with:
+        name: file-times-${{ matrix.group }}
+        path: tmp/file_times.json
+        retention-days: 1
+
+  # How long each test group took, and the slowest test files of every group, in the run's summary
+  test-times:
+    needs: test
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    # To read the test jobs' times
+    permissions:
+      actions: read
+    steps:
+    - name: List the time each group took
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs" --jq '
+          def seconds: try ((.completed_at | fromdate) - (.started_at | fromdate)) catch "";
+          .jobs[] | select(.name | startswith("test (")) |
+          [(.name | ltrimstr("test (") | rtrimstr(")")), seconds, ([.steps[] | select(.name | startswith("Run tests")) | seconds][0] // "")] | @tsv
+        ' | sort -t "$(printf '\t')" -k2,2 -g -r > groups.tsv
+        {
+          echo '### Time each test group took'
+          echo
+          echo 'The job includes setting up (MongoDB, checkout, Ruby) before the tests'
+          echo
+          echo '| Group | Job (s) | Tests (s) |'
+          echo '|---|---:|---:|'
+          awk -F '\t' '{ printf "| %s | %s | %s |\n", $1, $2, $3 }' groups.tsv
+          echo
+        } >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Download the groups' file times
+      uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+      with:
+        pattern: file-times-*
+        path: file-times
+
+    - name: List the slowest files
+      run: |
+        for file in file-times/file-times-*/file_times.json; do
+          [ -e "$file" ] || continue
+          group=${file#file-times/file-times-}
+          group=${group%/file_times.json}
+          jq -r --arg group "$group" 'to_entries[] | [.value, .key, $group] | @tsv' "$file"
+        done | sort -t "$(printf '\t')" -k1,1 -g -r > all.tsv
+        {
+          echo '### Slowest test files'
+          echo
+          awk -F '\t' '{ seconds += $1 } END { printf "%d files, %.0f seconds of tests in all\n", NR, seconds }' all.tsv
+          echo
+          echo '| File | Group | Seconds |'
+          echo '|---|---|---:|'
+          head -n 15 all.tsv | awk -F '\t' '{ printf "| `%s` | %s | %s |\n", $2, $3, $1 }'
+        } >> "$GITHUB_STEP_SUMMARY"
+
   # The test groups' coverage in one report: its totals and least-covered files in the run's summary, and the whole report
   # in its coverage artifact
   coverage:
