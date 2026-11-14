@@ -111,6 +111,87 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
     assert_equal [@account.email, member.email].sort, recipients_of(pmail)
   end
 
+  test "a mail to facilitators goes to the subscribed facilitators of the organisation's future events and admins of its activities, and no one else" do
+    create_event
+    link_mailgun
+    facilitator = create_facilitator(@event)
+    @organisation.organisationships.create!(account: facilitator)
+    # Facilitators needn't follow the organisation to be among its facilitators
+    unfollowing_facilitator = create_facilitator(@event)
+    activity = FactoryBot.create(:activity, organisation: @organisation)
+    activity_admin = FactoryBot.create(:account)
+    activity.activityships.create!(account: activity_admin, admin: true)
+    activity.activityships.create!(account: FactoryBot.create(:account))
+    unsubscribed_from_organisation = create_facilitator(@event)
+    @organisation.organisationships.create!(account: unsubscribed_from_organisation)
+    unsubscribe_from(@organisation, unsubscribed_from_organisation)
+    unsubscribed_from_everything = create_facilitator(@event, unsubscribed: true)
+    create_event(as: :past_event, start_time: 2.days.ago, end_time: 1.day.ago)
+    create_facilitator(@past_event)
+    follower_of(@organisation)
+    other_organisation = FactoryBot.create(:organisation)
+    create_facilitator(FactoryBot.create(:event, organisation: other_organisation))
+    FactoryBot.create(:activity, organisation: other_organisation).activityships.create!(account: FactoryBot.create(:account), admin: true)
+
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: 'facilitators')
+
+    email = recorded_email { pmail.send_pmail }
+    # The activity's creator admins it
+    assert_equal [@account.email, facilitator.email, unfollowing_facilitator.email, activity_admin.email].sort, email.recipients.sort
+    assert_not_includes email.recipients, unsubscribed_from_everything.email
+    assert_includes email.html, "You're receiving this email because you're a facilitator at #{@organisation.name}"
+  end
+
+  test 'a mail to a ticket group goes to its ticket holders, including tickets with only an email, and says so in its footer' do
+    create_event
+    ticket_group = @event.ticket_groups.create!(name: 'Backstage', capacity: 10)
+    attendee = FactoryBot.create(:account)
+    Ticket.create!(event: @event, account: attendee, ticket_type: FactoryBot.create(:ticket_type, event: @event, ticket_group: ticket_group, quantity: 10), price: 0)
+    Ticket.create!(event: @event, ticket_type: ticket_group.ticket_types.first, price: 0, email: 'guest@example.com')
+    other_ticket_type = FactoryBot.create(:ticket_type, event: @event, quantity: 10)
+    Ticket.create!(event: @event, account: FactoryBot.create(:account), ticket_type: other_ticket_type, price: 0)
+    Ticket.create!(event: @event, ticket_type: other_ticket_type, price: 0, email: 'other-guest@example.com')
+    follower_of(@organisation)
+
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: "ticket_group:#{ticket_group.id}")
+
+    email = recorded_email { pmail.send_pmail }
+    assert_equal [attendee.email, 'guest@example.com'].sort, email.recipients.sort
+    assert_includes email.html, "You're receiving this email because you're in the Backstage ticket group for #{@organisation.name}'s event #{@event.name}"
+  end
+
+  test "a mail to an event's waitlist goes to those waiting for it, not another event's, and says so in its footer" do
+    create_event(allow_ticket_type_waitlists: true)
+    waiter = FactoryBot.create(:account)
+    @event.waitships.create!(account: waiter)
+    weekend = FactoryBot.create(:ticket_type, event: @event, quantity: 0, name: 'Weekend')
+    TicketTypeWaitship.create!(ticket_type: weekend, account: FactoryBot.create(:account))
+    create_event(as: :other_event)
+    @other_event.waitships.create!(account: FactoryBot.create(:account))
+    follower_of(@organisation)
+
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: "waitlist:#{@event.id}")
+
+    email = recorded_email { pmail.send_pmail }
+    assert_equal [waiter.email], email.recipients
+    assert_includes email.html, "You're receiving this email because you're on the waitlist for #{@organisation.name}'s event #{@event.name}"
+  end
+
+  test "a mail to a ticket type's waitlist goes to those waiting for that ticket type, not another's, and says so in its footer" do
+    create_event(allow_ticket_type_waitlists: true)
+    weekend = FactoryBot.create(:ticket_type, event: @event, quantity: 0, name: 'Weekend')
+    weekend_waiter = FactoryBot.create(:account)
+    TicketTypeWaitship.create!(ticket_type: weekend, account: weekend_waiter)
+    TicketTypeWaitship.create!(ticket_type: FactoryBot.create(:ticket_type, event: @event, quantity: 0, name: 'Day'), account: FactoryBot.create(:account))
+    @event.waitships.create!(account: FactoryBot.create(:account))
+
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: "ticket_type_waitlist:#{weekend.id}")
+
+    email = recorded_email { pmail.send_pmail }
+    assert_equal [weekend_waiter.email], email.recipients
+    assert_includes email.html, "You're receiving this email because you're on the Weekend waitlist for #{@organisation.name}'s event #{@event.name}"
+  end
+
   test 'a mail sent to an activity tag before tags were removed goes to no one, and still lists' do
     covers_route 'GET /o/:slug/pmails'
     create_organisation
