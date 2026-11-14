@@ -50,20 +50,31 @@ class Mapplication
     self.and(status: 'paused')
   end
 
+  # The member limit doesn't stop accepting someone who is already a member (by a ticket, or added by a member), as
+  # accepting them takes no new place
   def acceptable?
-    status == 'pending' && (!gathering.member_limit or (gathering.memberships.count < gathering.member_limit)) && (gathering.threshold == 0 || verdicts.proposers.exists?)
+    status == 'pending' && (!gathering.member_limit || gathering.memberships.count < gathering.member_limit || existing_membership) && (gathering.threshold == 0 || verdicts.proposers.exists?)
+  end
+
+  def existing_membership
+    gathering.memberships.find_by(account: account)
   end
 
   def meets_threshold
     gathering.threshold && (verdicts.proposers.count + (gathering.enable_supporters ? verdicts.supporters.count : 0)) >= gathering.threshold
   end
 
-  # Whether it was: not if the gathering filled up, or another acceptance made the membership, since acceptable? was
-  # checked
+  # Whether it was: not if the gathering filled up since acceptable? was checked. An account that is already a member
+  # (by a ticket, added by a member, or another acceptance made the membership meanwhile) keeps its membership, which
+  # takes this application if it has none
   def accept
-    membership = gathering.memberships.create(account: account, unsubscribed: true, mapplication: self)
-    set(status: 'accepted') if membership.persisted?
-    membership.persisted?
+    membership = existing_membership || gathering.memberships.create(account: account, unsubscribed: true, mapplication: self)
+    membership = existing_membership unless membership.persisted? # another acceptance made it meanwhile
+    return false unless membership
+
+    membership.set(mapplication_id: id) unless membership.mapplication_id
+    set(status: 'accepted')
+    true
   end
 
   def name

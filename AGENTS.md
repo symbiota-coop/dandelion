@@ -34,6 +34,8 @@ Dandelion is built with many coding agents (Claude Code, Codex, Cursor, opencode
 
 Commit only the changes you made: other sessions may be editing the same checkout, so stage your files by name rather than with `git add -A` or `git commit -a`.
 
+Fixing an issue: once the fix is committed, with its tests passing and lint clean, push it and open a pull request without waiting to be asked, saying `Fixes #<number>` in its description.
+
 ## Linting
 
 `script/lint` runs our linters, each on the files of its kind: RuboCop, with our own cops (`.rubocop/dandelion/`), also on the Ruby in templates through erb_lint; erb_lint (`.erb_linters/`); ESLint (`eslint.config.mjs`) and Stylelint (`stylelint.config.mjs`), also on the scripts and styles in templates; Herb (`.herb.yml`); zizmor and actionlint (`.github/actionlint.yaml`) on `.github`; ShellCheck; and `test/lint_test.rb`, which tests our checks and the rules no linter covers. Each rule's message says what to do instead, and its config or code says why. CI's lint job runs it, so it is the one place their commands and flags are set. Run it on the files you add or change as you go, and fix what it reports:
