@@ -94,6 +94,13 @@ Dandelion::App.controller do
     redirect '/stats/caches'
   end
 
+  # Records nobody uses, to look over: nothing is deleted here
+  get '/stats/spring_clean' do
+    @organisations = Organisation.spring_clean.includes(:account)
+    @gatherings = Gathering.spring_clean.includes(:account)
+    erb :'stats/spring_clean'
+  end
+
   get '/stats/collections' do
     @collections = collection_stats
     erb :'stats/collections'

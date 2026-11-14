@@ -132,21 +132,21 @@ jobs:
           - group: events
             files: events/events events/drafts events/content_safety events/hosts
           - group: gathering_features
-            files: gatherings/features gatherings/rules
+            files: gatherings/features gatherings/rules gatherings/joining
           - group: gatherings
             files: gatherings/gatherings gatherings/members
           - group: general
             files: dadmin design images search errands record_lock sentry stats_database stats_pages organisations/activity_applications messages/markup site_pages site_routes
           - group: integrations
-            files: integrations/mcp integrations/mcp_checkout integrations/whatsapp integrations/zapier integrations/webhooks integrations/analytics_providers events/admin_reports events/my_events accounts/account_routes organisations/organisation_routes
+            files: admin_pages integrations/mcp integrations/mcp_checkout integrations/whatsapp integrations/zapier integrations/webhooks integrations/analytics_providers events/admin_reports events/my_events accounts/account_routes organisations/organisation_routes
           - group: messages
             files: messages/messages messages/pmails messages/mailer events/feedbacks events/discussions messages/pmail_sending events/daily messages/email_templates
           - group: orders
             files: orders/orders orders/tokens orders/admin bookings/resales integrations/asn_blocking payments/dandelion_contributions
           - group: organisations
-            files: organisations/organisations organisations/caches organisations/followers organisations/local_groups organisations/activities organisations/calendar_imports organisations/local_group_admin organisations/admin
+            files: organisations/organisations organisations/evm_payments organisations/caches organisations/followers organisations/local_groups organisations/activities organisations/calendar_imports organisations/calendar_import_updates organisations/calendar_import_luma organisations/local_group_admin organisations/admin
           - group: payments
-            files: payments/gocardless payments/mollie payments/paypal payments/stripe_connect payments/stripe_row_splitter payments/monthly_contributions orders/refunds bookings/donations organisations/payments payments/paypal_checkout payments/stripe_charges gatherings/payments messages/comment_routes
+            files: payments/gocardless payments/revenue_sharing payments/mollie payments/paypal payments/stripe_connect payments/stripe_row_splitter payments/monthly_contributions orders/refunds bookings/donations organisations/payments payments/paypal_checkout payments/stripe_charges gatherings/payments messages/comment_routes
           - group: ticket_types
             files: bookings/ticket_types bookings/quotes bookings/waitlist bookings/discount_codes bookings/capacity_races events/event_admin_routes orders/ticket_admin
           - group: tours

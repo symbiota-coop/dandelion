@@ -267,7 +267,6 @@ class OrdersTest < ActiveSupport::TestCase
 
   test 'paid orders and tickets cannot be cancelled or refunded by their attendee' do
     covers 'events/paid-orders-not-cancellable@9106dd', 'events/attendees-cannot-refund@1c589f'
-    covers_route 'POST /e/:slug/tickets/:ticket_id/refund_and_destroy'
     create_event(prices: [10])
     order = create_paid_order(@event)
     ticket = order.tickets.create!(event: @event, account: order.account, ticket_type: @event.ticket_types.first, price: 10,

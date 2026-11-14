@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# System packages, Chromium and MongoDB for cloud agent environments (Cursor, Claude Code).
+# System packages, Chromium and MongoDB for cloud agent environments (Claude Code on the web).
 # Run as root or with passwordless sudo.
 set -euo pipefail
 

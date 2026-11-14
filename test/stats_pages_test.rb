@@ -10,7 +10,8 @@ class StatsPagesTest < ActiveSupport::TestCase
   PAGES = %w[
     /stats/charts /stats/comments /stats/contributions /stats/delivery /stats/files /stats/icons /stats/messages
     /stats/openrouter /stats/orders /stats/organisations /stats/packages /stats/packages?tab=frontend
-    /stats/packages?tab=actions /stats/referrals /stats/routes /stats/sentry_spans /stats/transactions /stats/traces
+    /stats/packages?tab=actions /stats/referrals /stats/routes /stats/sentry_spans /stats/spring_clean /stats/transactions
+    /stats/traces
   ].freeze
 
   # Trace.summary hints its index, which a query fails without, and the releases' one is read the same way in production
@@ -44,7 +45,8 @@ class StatsPagesTest < ActiveSupport::TestCase
     covers_route 'GET /stats/charts', 'GET /stats/comments', 'GET /stats/contributions', 'GET /stats/delivery'
     covers_route 'GET /stats/files', 'GET /stats/icons', 'GET /stats/messages', 'GET /stats/openrouter'
     covers_route 'GET /stats/orders', 'GET /stats/organisations', 'GET /stats/packages', 'GET /stats/referrals'
-    covers_route 'GET /stats/routes', 'GET /stats/sentry_spans', 'GET /stats/transactions', 'GET /stats/traces'
+    covers_route 'GET /stats/routes', 'GET /stats/sentry_spans', 'GET /stats/spring_clean', 'GET /stats/transactions'
+    covers_route 'GET /stats/traces'
     covers_route 'GET /stats/traces/:id', 'GET /stats/traces/slowest'
     create_trace_indexes
     trace = create_trace
@@ -121,6 +123,41 @@ class StatsPagesTest < ActiveSupport::TestCase
     assert_includes page.html, 'November 2026'
     visit "/stats/traces/#{trace.id}"
     assert page.has_content?('find events')
+  end
+
+  test 'Spring clean lists the organisations and gatherings over a month old that nobody uses, and deletes nothing' do
+    covers_route 'GET /stats/spring_clean'
+    old = 2.months.ago
+    unused_organisation = FactoryBot.create(:organisation, name: 'Unused Organisation')
+    with_event = FactoryBot.create(:organisation, name: 'With An Event')
+    FactoryBot.create(:event, organisation: with_event)
+    # Through a polymorphic association
+    with_code = FactoryBot.create(:organisation, name: 'With A Discount Code')
+    with_code.discount_codes.create!(code: 'SPRING', percentage_discount: 10)
+    with_image = FactoryBot.create(:organisation, name: 'With An Image')
+    with_image.set(image_uid: 'image')
+    [unused_organisation, with_event, with_code, with_image].each { |organisation| organisation.set(created_at: old) }
+    FactoryBot.create(:organisation, name: 'New Organisation')
+
+    unused_gathering = FactoryBot.create(:gathering, name: 'Unused Gathering')
+    with_member = FactoryBot.create(:gathering, name: 'With Another Member')
+    with_member.memberships.create!(account: FactoryBot.create(:account))
+    with_option = FactoryBot.create(:gathering, name: 'With An Option')
+    with_option.options.create!(name: 'Tent', type: 'Accommodation', account: with_option.account)
+    unlisted = FactoryBot.create(:gathering, name: 'Unlisted Gathering', listed: false)
+    [unused_gathering, with_member, with_option, unlisted].each { |gathering| gathering.set(created_at: old) }
+    FactoryBot.create(:gathering, name: 'New Gathering')
+    sign_in(FactoryBot.create(:account, admin: true))
+
+    visit '/stats/spring_clean'
+    assert page.has_link? 'Unused Organisation', href: "/o/#{unused_organisation.slug}"
+    assert page.has_link? 'Unused Gathering', href: "/g/#{unused_gathering.slug}"
+    ['With An Event', 'With A Discount Code', 'With An Image', 'New Organisation',
+     'With Another Member', 'With An Option', 'Unlisted Gathering', 'New Gathering'].each do |name|
+      assert page.has_no_link?(name), name
+    end
+    assert Organisation.find(unused_organisation.id)
+    assert Gathering.find(unused_gathering.id)
   end
 
   test 'a site admin raises a test error, in a request or a job, to check errors are reported' do

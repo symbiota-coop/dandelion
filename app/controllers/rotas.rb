@@ -232,7 +232,7 @@ Dandelion::App.controller do
     confirmed_membership_required! unless gathering_admin?
     @shift = @gathering.shifts.find(params[:id]) || not_found
     own_or_gathering_admins_only!(@shift)
-    request.xhr? ? partial(:'gatherings/modal_content', locals: { title: "#{@shift.account.name}'s #{@shift.rota.name} shift", form: :'rotas/shift_form' }) : erb(:'rotas/shift')
+    request.xhr? ? partial(:'gatherings/modal_content', locals: { title: @shift.title, form: :'rotas/shift_form' }) : erb(:'rotas/shift')
   end
 
   post '/g/:slug/shifts/:id/edit' do
