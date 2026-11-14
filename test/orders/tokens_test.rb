@@ -242,8 +242,40 @@ class OrderTokensTest < ActiveSupport::TestCase
     assert_nil @ticket.reload.email
   end
 
-  test 'check-in accepts the ticket token from the QR code, and legacy ticket mongo ids' do
+  # The check-in scanner asks for the camera, which the tests' Chrome hasn't got: leave the request unanswered, as while
+  # someone decides whether to allow it, rather than failing with a JavaScript error
+  def without_camera
+    page.driver.browser.evaluate_on_new_document('navigator.mediaDevices.getUserMedia = () => new Promise(() => {})')
+  end
+
+  test "an event admin shares the check-in scanner's link with an assistant, who can check people in but not run the event" do
     covers 'events/check-in-link-for-assistants@079793', 'organisations/check-in-scanner-link@4740c2'
+    create_complete_order_with_ticket
+    sign_in(@account)
+    without_camera
+    visit "/e/#{@event.slug}"
+    click_button @event.name
+    click_on 'Check-in scanner'
+    assert page.has_content?('Assistants can check-in attendees at')
+    check_in_link = URI(find_link(href: %r{/e/#{@event.slug}/check_in\?secret=})[:href]).request_uri
+
+    assistant = FactoryBot.create(:account)
+    sign_in(assistant)
+    without_camera
+    visit check_in_link
+    click_on 'Check-in list'
+    find("#check-in-#{@ticket.id}").click
+    # The switch saves as it's flicked, and its box comes back with it on
+    assert page.has_css?("#check-in-#{@ticket.id}[checked]")
+    assert @ticket.reload.checked_in
+
+    # The link opens check-in only: the event's settings still turn the assistant away
+    visit "/e/#{@event.slug}/edit"
+    assert page.has_current_path?("/e/#{@event.slug}")
+    refute Event.admin?(@event, assistant)
+  end
+
+  test 'check-in accepts the ticket token from the QR code, and legacy ticket mongo ids' do
     create_complete_order_with_ticket
     secret = OpenSSL::HMAC.hexdigest('SHA256', ENV['CHECK_IN_SECRET'], "check_in:#{@event.id}")[0, 32]
 

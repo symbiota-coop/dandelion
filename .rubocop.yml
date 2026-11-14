@@ -118,6 +118,9 @@ Dandelion/GatheringScope:
 Dandelion/GatheringPermission:
   Include:
     - app/controllers/**/*.rb
+Dandelion/AssertReload:
+  Include:
+    - test/**/*.rb
 Dandelion/CapybaraHasNoAfterClick:
   Include:
     - test/**/*.rb

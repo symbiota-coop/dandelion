@@ -76,7 +76,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
   end
 
   test 'cohost event_manager is email viewer when show_emails is false' do
-    covers 'events/only-host-admins-add-cohosts@076df9', 'organisations/attendee-emails-admins-and-managers-only@10b712'
+    covers 'organisations/attendee-emails-admins-and-managers-only@10b712'
     org = FactoryBot.create(:organisation)
     cohost = FactoryBot.create(:organisation)
     manager = add_event_manager(cohost)
@@ -312,7 +312,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
   end
 
   test 'event facilitator cannot change revenue share fields' do
-    covers 'events/facilitator-no-organisation-access@ec2446', 'organisations/who-becomes-event-admin@459b2f', 'organisations/facilitator-listed-emailed-opt-in@29059a', 'organisations/table-change-revenue-sharer@a04837', 'organisations/revenue-fields-activity-local-group-admins@2eb0aa'
+    covers 'events/facilitator-no-organisation-access@ec2446', 'organisations/table-change-revenue-sharer@a04837', 'organisations/revenue-fields-activity-local-group-admins@2eb0aa'
     create_organisation(stripe_client_id: 'ca_test')
     create_event(prices: [0])
     facilitator = FactoryBot.create(:account)

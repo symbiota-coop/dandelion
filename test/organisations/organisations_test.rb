@@ -130,6 +130,26 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal false, victim.organisationships.find_by(organisation: @organisation).unsubscribed
   end
 
+  test 'posting another account_id to organisation unsubscribe unsubscribes only the account signed in' do
+    create_organisation
+    victim = FactoryBot.create(:account)
+    victim_organisationship = victim.organisationships.create!(organisation: @organisation)
+    attacker = FactoryBot.create(:account)
+    attacker_organisationship = attacker.organisationships.create!(organisation: @organisation)
+
+    post "/o/#{@organisation.slug}/unsubscribe", account_id: victim.id
+    assert last_response.redirect?
+    assert_equal '/accounts/new', URI(last_response.location).path
+    refute victim_organisationship.reload.unsubscribed
+
+    sign_in_with_rack(attacker)
+    post "/o/#{@organisation.slug}/unsubscribe", account_id: victim.id
+    assert last_response.redirect?
+    assert_equal '/accounts/subscriptions', URI(last_response.location).path
+    assert attacker_organisationship.reload.unsubscribed
+    refute victim_organisationship.reload.unsubscribed
+  end
+
   test 'organisation welcome email website link cannot carry a sign-in token' do
     create_organisation
     @organisation.set(website: 'https://attacker.example/?t=%recipient.token%')

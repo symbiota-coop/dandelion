@@ -232,22 +232,27 @@ class AccountSignInsTest < ActiveSupport::TestCase
   test 'changing the email sends a confirmation email whose link still works' do
     account = FactoryBot.create(:account)
     sign_in(account)
-    sent_tokens = []
-    original = Account.instance_method(:send_confirmation_email)
-    Account.define_method(:send_confirmation_email) { sent_tokens << link_token_for_email }
 
     visit '/accounts/edit'
     fill_in 'Email', with: 'new-address@example.com'
-    click_button 'Save profile'
-    assert page.has_content?('Please click the link in the email we sent to confirm your new email address')
+    email = recorded_email do
+      click_button 'Save profile'
+      assert page.has_content?('Please click the link in the email we sent to confirm your new email address')
+    end
     assert_equal 'new-address@example.com', account.reload.email
     refute account.email_confirmed?
-    assert_equal [account.link_token], sent_tokens
+    assert_equal ['new-address@example.com'], email.recipients
+    assert_equal 'Confirm your email address', email.subject_line
 
-    visit "/confirm_email/#{sent_tokens.first}"
+    # The link as Mailgun fills it in for the recipient
+    variables = email.variables['new-address@example.com']
+    link = email.html[%r{href="([^"]*/confirm_email/[^"]*)"}, 1].gsub(/%recipient\.(\w+)%/) { variables[Regexp.last_match(1)] }
+    Capybara.reset_sessions!
+    visit URI(link).request_uri
     assert page.has_button?('Confirm my email address')
-  ensure
-    Account.define_method(:send_confirmation_email, original)
+    click_button 'Confirm my email address'
+    assert page.has_content?('Your email address was confirmed.')
+    assert account.reload.email_confirmed?
   end
 
   test 'a session from an email link can still edit the rest of the profile' do

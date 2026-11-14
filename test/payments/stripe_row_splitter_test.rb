@@ -55,19 +55,35 @@ class PaymentsStripeRowSplitterTest < ActiveSupport::TestCase
     ], rows
   end
 
-  test 'takes a fixed discount off a single ticket type' do
-    rows = split(['ch_1', "#{EVENT}: Standard £25x2, £5 discount", '45.00', 'gbp'])
-    assert_equal [header, ['ch_1', "#{EVENT}: Standard £25x2, £5 discount", '45.00', 'gbp']], rows
+  test 'takes a fixed discount off the order once, rather than off each ticket type' do
+    rows = split(['ch_1', "#{EVENT}: Standard £25x2, Concession £10x1, £6 discount", '54.00', 'gbp'])
+    # £6 is a tenth of the £60, so £5 off Standard's £50 and £1 off Concession's £10
+    assert_equal [
+      header,
+      ['ch_1', "#{EVENT}: Standard £25x2, £6 discount", '45.00', 'gbp'],
+      ['ch_1', "#{EVENT}: Concession £10x1, £6 discount", '9.00', 'gbp']
+    ], rows
   end
 
   test 'takes the percentage off before the fixed discount' do
-    rows = split(['ch_1', "#{EVENT}: Standard £50x1, 10% discount, £5 discount", '40.00', 'gbp'])
-    assert_equal [header, ['ch_1', "#{EVENT}: Standard £50x1, 10% discount, £5 discount", '40.00', 'gbp']], rows
+    rows = split(['ch_1', "#{EVENT}: Standard £50x1, Concession £30x1, 10% discount, £8 discount", '64.00', 'gbp'])
+    # 10% off makes them £45 and £27; the £8 is a ninth of the £72, so £5 off Standard and £3 off Concession. The £8 off
+    # first would leave £45 and £25, and 10% off those £63, not the £64 charged
+    assert_equal [
+      header,
+      ['ch_1', "#{EVENT}: Standard £50x1, 10% discount, £8 discount", '40.00', 'gbp'],
+      ['ch_1', "#{EVENT}: Concession £30x1, 10% discount, £8 discount", '24.00', 'gbp']
+    ], rows
   end
 
   test 'reads prices and discounts with thousands separators, and writes the discount with them' do
-    rows = split(['ch_1', "#{EVENT}: Patron £1,000x2, £1,500 discount", '500.00', 'gbp'])
-    assert_equal [header, ['ch_1', "#{EVENT}: Patron £1,000x2, £1,500 discount", '500.00', 'gbp']], rows
+    rows = split(['ch_1', "#{EVENT}: Patron £1,000x2, Friend £500x1, £1,500 discount", '1000.00', 'gbp'])
+    # £1,500 is three fifths of the £2,500, so £1,200 off the Patrons' £2,000 and £300 off the Friend's £500
+    assert_equal [
+      header,
+      ['ch_1', "#{EVENT}: Patron £1,000x2, £1,500 discount", '800.00', 'gbp'],
+      ['ch_1', "#{EVENT}: Friend £500x1, £1,500 discount", '200.00', 'gbp']
+    ], rows
   end
 
   test 'gives a donation its own row after the tickets, undiscounted' do
@@ -120,8 +136,13 @@ class PaymentsStripeRowSplitterTest < ActiveSupport::TestCase
   end
 
   test 'takes credit applied off the tickets' do
-    rows = split(['ch_1', "#{EVENT}: A £10x2, £3 credit applied", '17.00', 'gbp'])
-    assert_equal [header, ['ch_1', "#{EVENT}: A £10x2, £3 credit applied", '17.00', 'gbp']], rows
+    rows = split(['ch_1', "#{EVENT}: A £10x2, B £5x1, £5 credit applied", '20.00', 'gbp'])
+    # £5 is a fifth of the £25, so £4 off A's £20 and £1 off B's £5
+    assert_equal [
+      header,
+      ['ch_1', "#{EVENT}: A £10x2, £5 credit applied", '16.00', 'gbp'],
+      ['ch_1', "#{EVENT}: B £5x1, £5 credit applied", '4.00', 'gbp']
+    ], rows
   end
 
   test 'takes percentage discounts off first, then spreads credit and a fixed discount across what is left' do
@@ -147,40 +168,48 @@ class PaymentsStripeRowSplitterTest < ActiveSupport::TestCase
 
   test 'applies both percentage discounts, one after the other, to each ticket rounded to the penny' do
     rows = split(
-      ['ch_1', "#{EVENT}: Standard £10x1, 20% discount, 10% discount", '7.20', 'gbp'],
-      ['ch_2', "#{EVENT}: Standard £7.99x3, 20% discount, 10% discount", '17.25', 'gbp']
+      ['ch_1', "#{EVENT}: Standard £10x1, Concession £6x1, 20% discount, 10% discount", '11.52', 'gbp'],
+      ['ch_2', "#{EVENT}: Standard £7.99x3, Concession £3.33x1, 20% discount, 10% discount", '19.65', 'gbp']
     )
-    # ch_1: £10 less 20% is £8, less 10% £7.20; ch_2: £7.99 less 20% less 10% is £5.7528, so £5.75 a ticket, £17.25
+    # ch_1: £10 less 20% is £8, less 10% £7.20; £6 less 20% is £4.80, less 10% £4.32. ch_2: £7.99 less 20% less 10% is
+    # £5.7528, so £5.75 a ticket, £17.25 (not £17.26, rounding the three together); £3.33 less both is £2.3976, so £2.40
     assert_equal [
       header,
       ['ch_1', "#{EVENT}: Standard £10x1, 20% discount, 10% discount", '7.20', 'gbp'],
-      ['ch_2', "#{EVENT}: Standard £7.99x3, 20% discount, 10% discount", '17.25', 'gbp']
+      ['ch_1', "#{EVENT}: Concession £6x1, 20% discount, 10% discount", '4.32', 'gbp'],
+      ['ch_2', "#{EVENT}: Standard £7.99x3, 20% discount, 10% discount", '17.25', 'gbp'],
+      ['ch_2', "#{EVENT}: Concession £3.33x1, 20% discount, 10% discount", '2.40', 'gbp']
     ], rows
   end
 
   test 'reads amounts in the currency of the row, as Money writes them' do
     rows = split(
       ['ch_1', "#{EVENT}: Standard €12,50x2, Patron €1.000x1, €5 discount, €5 donation ", '1025.00', 'eur'],
-      ['ch_2', "#{EVENT}: $10x1, 10% discount", '9.00', 'usd'],
+      ['ch_2', "#{EVENT}: Standard $10x1, Concession $5.50x1, 10% discount", '13.95', 'usd'],
       ['ch_3', "#{EVENT}: Standard 1 234,50 złx1, Concession 100 złx1, 50 zł discount", '1284.50', 'pln'],
-      ['ch_4', "#{EVENT}: Standard CHF 1'000x1", '1000.00', 'chf'],
-      ['ch_5', "#{EVENT}: Standard SEK 1,234.50x1", '1234.50', 'sek']
+      ['ch_4', "#{EVENT}: Standard CHF 1'000x1, Concession CHF 500x1, CHF 300 discount", '1200.00', 'chf'],
+      ['ch_5', "#{EVENT}: Standard SEK 1,234.50x2, Concession SEK 1,000x1, 10% discount", '3122.10', 'sek']
     )
     # ch_1: the €5 discount is spread over €1,025 of tickets: €0.12 (rounded from 0.1219...) off the €25, and the other
-    # €4.88 off the €1,000. ch_3: the 50 zł is spread over 1,334.50 zł: 3.75 zł (3.7467...) off the 100 zł, and the
-    # other 46.25 zł off the 1,234.50 zł
+    # €4.88 off the €1,000. ch_2: 10% off $10 and $5.50 is $9 and $4.95. ch_3: the 50 zł is spread over 1,334.50 zł:
+    # 3.75 zł (3.7467...) off the 100 zł, and the other 46.25 zł off the 1,234.50 zł. ch_4: CHF 300 is a fifth of the
+    # CHF 1,500, so CHF 200 off the CHF 1,000 and CHF 100 off the CHF 500. ch_5: 10% off SEK 1,234.50 is SEK 1,111.05,
+    # twice SEK 2,222.10, and off SEK 1,000 SEK 900
     assert_equal [
       header,
       ['ch_1', "#{EVENT}: Standard €12,50x2, €5 discount", '24.88', 'eur'],
       ['ch_1', "#{EVENT}: Patron €1.000x1, €5 discount", '995.12', 'eur'],
       ['ch_1', "#{EVENT}: €5 donation", '5.00', 'eur'],
-      ['ch_2', "#{EVENT}: $10x1, 10% discount", '9.00', 'usd'],
+      ['ch_2', "#{EVENT}: Standard $10x1, 10% discount", '9.00', 'usd'],
+      ['ch_2', "#{EVENT}: Concession $5.50x1, 10% discount", '4.95', 'usd'],
       ['ch_3', "#{EVENT}: Standard 1 234,50 złx1, 50 zł discount", '1188.25', 'pln'],
       ['ch_3', "#{EVENT}: Concession 100 złx1, 50 zł discount", '96.25', 'pln'],
-      ['ch_4', "#{EVENT}: Standard CHF 1'000x1", '1000.00', 'chf'],
-      ['ch_5', "#{EVENT}: Standard SEK 1,234.50x1", '1234.50', 'sek']
+      ['ch_4', "#{EVENT}: Standard CHF 1'000x1, CHF 300 discount", '800.00', 'chf'],
+      ['ch_4', "#{EVENT}: Concession CHF 500x1, CHF 300 discount", '400.00', 'chf'],
+      ['ch_5', "#{EVENT}: Standard SEK 1,234.50x2, 10% discount", '2222.10', 'sek'],
+      ['ch_5', "#{EVENT}: Concession SEK 1,000x1, 10% discount", '900.00', 'sek']
     ], rows
-    assert_equal({ 'ch_1' => 102_500, 'ch_2' => 900, 'ch_3' => 128_450, 'ch_4' => 100_000, 'ch_5' => 123_450 }, pence_by_payment(rows))
+    assert_equal({ 'ch_1' => 102_500, 'ch_2' => 1395, 'ch_3' => 128_450, 'ch_4' => 120_000, 'ch_5' => 312_210 }, pence_by_payment(rows))
   end
 
   test 'finds the order\'s parts after an event name with a colon in it' do

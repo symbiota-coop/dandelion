@@ -31,7 +31,6 @@ class OrganisationPaymentsTest < ActiveSupport::TestCase
   end
 
   test 'events count the promotion fee paid for them, and nothing for events without ticket sales' do
-    covers 'events/contribution-running-total@535bd5'
     create_organisation(currency: 'GBP')
     create_event(fixed_contribution_gbp: 10)
     create_event(as: :event2, promotion_fee_gbp: 25)

@@ -333,7 +333,7 @@ class OrganisationsLocalGroupAdminTest < ActiveSupport::TestCase
 
     post "/local_groupships/#{local_groupship.id}/destroy"
     assert_redirected_to @local_group.path
-    assert local_groupship.reload
+    assert LocalGroupship.find(local_groupship.id)
   end
 
   test "an admin turns a follower's emails off and on" do

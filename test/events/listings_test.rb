@@ -138,7 +138,8 @@ class EventListingsTest < ActiveSupport::TestCase
     sign_in_with_rack(@account)
     body, one_event_commands = mongo_commands_during { get "/o/#{@organisation.slug}/events/stats.csv", from: Date.today.to_s }
     # £5 of the £10 tickets, less the sharer's part of the £3 credit: £3 × (£10 / £15) × 0.5 = £1
-    assert_includes CSV.parse(body, headers: true).first['ticket_revenue_to_revenue_sharer'], '£4'
+    # Then what Stripe reports: nothing, as the charge has no application fee to split it by
+    assert_equal '£4, £0', CSV.parse(body, headers: true).first['ticket_revenue_to_revenue_sharer']
 
     share_revenue.call(create_stats_event(:event2))
     share_revenue.call(create_stats_event(:event3))

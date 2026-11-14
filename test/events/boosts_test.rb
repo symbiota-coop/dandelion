@@ -4,7 +4,7 @@ class EventBoostsTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
 
-  test 'boost payment can be marked complete' do
+  test 'buying a boost starts a Stripe checkout, and once paid the boost shows in the boosts history as Upcoming' do
     covers_route 'GET /e/:slug/boosts'
     covers_route 'POST /e/:slug/boosts'
     create_event(prices: [0])
@@ -30,9 +30,8 @@ class EventBoostsTest < ActiveSupport::TestCase
     assert_equal 'cs_complete_me', event_boost.session_id
     assert_equal 'pi_test', event_boost.payment_intent
     refute event_boost.payment_completed?
+    # As Stripe's webhook would once the checkout is paid
     event_boost.set(payment_completed: true)
-
-    assert event_boost.reload.payment_completed?
 
     visit "/e/#{@event.slug}/boosts"
 

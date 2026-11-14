@@ -119,7 +119,8 @@ class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
     assert page.has_no_content? @local_group.name
 
     assert_nil LocalGroup.find(@local_group.id)
-    assert @event.reload
+    assert Event.find(@event.id)
+    @event.reload
     assert_nil @event.local_group_id
     assert_equal @organisation, @event.organisation
     assert_empty LocalGroupship.and(local_group_id: @local_group.id)

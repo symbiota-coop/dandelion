@@ -5,15 +5,31 @@ class PmailsTest < ActiveSupport::TestCase
   include Rack::Test::Methods
 
   test 'creating a pmail' do
-    create_organisation
-    pmail = FactoryBot.build_stubbed(:pmail)
-    sign_in(@account)
-    visit "/o/#{@organisation.slug}/pmails"
-    click_link 'New message'
-    fill_in 'Subject', with: pmail.subject
-    execute_script %{$('#pmail_to_option').val('everyone')}
-    click_button 'Save'
-    assert page.has_content? 'The mail was saved'
+    # An organisation still within its free gift is offered New message
+    with_env('MAILGUN_FREE_SUBSCRIBER_LIMIT' => '1000') do
+      create_organisation
+      pmail = FactoryBot.build_stubbed(:pmail)
+      sign_in(@account)
+      visit "/o/#{@organisation.slug}/pmails"
+      click_link 'New message'
+      fill_in 'Subject', with: pmail.subject
+      execute_script %{$('#pmail_to_option').val('everyone')}
+      click_button 'Save'
+      assert page.has_content? 'The mail was saved'
+    end
+  end
+
+  test 'an organisation that has used its free gift and has no Mailgun account is asked to link one rather than offered a new message' do
+    covers 'organisations/free-gift-email@d1a3d1'
+    with_env('MAILGUN_FREE_SUBSCRIBER_LIMIT' => '1000') do
+      create_organisation
+      FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone', requested_send_at: Time.now, sent_at: Time.now)
+      sign_in(@account)
+      visit "/o/#{@organisation.slug}/pmails"
+      assert page.has_content? "You've used your free gift of 1 email per month for up to 1000 subscribers."
+      assert page.has_link? 'Link a Mailgun account to continue', href: "/o/#{@organisation.slug}/edit#tab-mailgun"
+      assert page.has_no_link? 'New message'
+    end
   end
 
   test 'editing a pmail' do
