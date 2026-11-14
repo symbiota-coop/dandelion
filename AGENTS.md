@@ -20,15 +20,15 @@ The rules that must never be broken, whatever the task. The section each names s
 
 ## Many agents
 
-Dandelion is built with many coding agents (Claude Code, Codex, Cursor, opencode and others), on our own machines and in the cloud, and often several at once in the same checkout. It's set up so that any of them can work on it equally well, with nothing that only works for one:
+Dandelion is built with many coding agents (Claude Code, Codex, opencode and others), on our own machines and in the cloud, and often several at once in the same checkout. It's set up so that any of them can work on it equally well, with nothing that only works for one:
 
-- Instructions: this file is the instructions for every agent. Write what an agent needs to know here, for any agent, rather than in a tool's own file (`CLAUDE.md`, `.cursor/rules`, `.github/copilot-instructions.md`...), which other agents wouldn't read and which would drift from this one. Claude Code reads this file itself when there's no `CLAUDE.md`
-- Memories: don't save what you learn to a tool's own memory (Claude Code's memory files, Cursor's or Codex's memories...), which only that tool reads, on one machine. If it's worth remembering, add it here
+- Instructions: this file is the instructions for every agent. Write what an agent needs to know here, for any agent, rather than in a tool's own file (`CLAUDE.md`, `.github/copilot-instructions.md`...), which other agents wouldn't read and which would drift from this one. Claude Code reads this file itself when there's no `CLAUDE.md`
+- Memories: don't save what you learn to a tool's own memory (Claude Code's memory files, Codex's memories...), which only that tool reads, on one machine. If it's worth remembering, add it here
 - Rules: a rule that code can check gets a check (Linting), not just a line here, so it holds whichever agent wrote the code. The checks run where every agent passes: the pre-commit hook (Linting), as every agent commits with git, and CI. Don't rely on one tool's hooks or settings to enforce a rule
 - Setup: `script/agent-env/` installs and starts everything for any environment, and each tool's own config only calls it (Cloud agents)
 - MCP servers: defined once in `.mcp.json` and copied into each tool's format by `rake mcp:sync` (MCP servers)
 - Shared checkouts: other sessions may be editing the same files, so commit only your own changes (Committing)
-- Automation: workflows in `.github/workflows` run Claude, Codex, Cursor and opencode on daily bug reviews, and Claude on new issues and on drafting replies to users' emails. Read `.github/workflows/README.md` before changing one, its prompt (`.github/prompts`) or its models (`.github/models.env`). This repo's workflow logs are public, so keep emails and query results out of anything its workflows print
+- Automation: workflows in `.github/workflows` run Claude, Codex and opencode on daily bug reviews, and Claude on new issues and on drafting replies to users' emails. Read `.github/workflows/README.md` before changing one, its prompt (`.github/prompts`) or its models (`.github/models.env`). This repo's workflow logs are public, so keep emails and query results out of anything its workflows print
 
 ## Committing
 
@@ -56,7 +56,7 @@ script/lint <files>
 
 ## MCP servers
 
-- Project MCP servers come from the committed `.mcp.json`, which Claude Code reads, its `${VAR}`s filled from your shell. Other tools don't read it, so each has its own committed copy of the same servers, with secrets read from the environment rather than written in: `.cursor/mcp.json` (`${env:VAR}`), `.codex/config.toml` (`env_vars` and `bearer_token_env_var`; Codex only reads it in trusted projects) and `.opencode/opencode.json` (`{env:VAR}`). Only edit `.mcp.json`, then run `rake mcp:sync` to write the others. Variables in `.mcp.json` can't have defaults (`${VAR:-x}`), as the others can't express them
+- Project MCP servers come from the committed `.mcp.json`, which Claude Code reads, its `${VAR}`s filled from your shell. Other tools don't read it, so each has its own committed copy of the same servers, with secrets read from the environment rather than written in: `.codex/config.toml` (`env_vars` and `bearer_token_env_var`; Codex only reads it in trusted projects) and `.opencode/opencode.json` (`{env:VAR}`). Only edit `.mcp.json`, then run `rake mcp:sync` to write the others. Variables in `.mcp.json` can't have defaults (`${VAR:-x}`), as the others can't express them
 - MongoDB MCP: `.mcp.json` runs `mongodb-atlas-mcp-remote`, a proxy to the Atlas Managed MCP Server (`https://mcp.mongodb.com`), with read-only access to production. The server lists write tools (`insert-many`, `update-many`, `delete-many`, `drop-*`, `atlas-create-*`); never call them
 
 ## Mongo
@@ -179,14 +179,13 @@ Each night `.github/workflows/package-updates.yml` runs `script/update_packages.
 
 Before adding a gem or a frontend package, check whether one we already have does the job: `Gemfile`, `frontend/package.json`.
 
-## Cloud agents (Cursor, Claude Code on the web)
+## Cloud agents (Claude Code on the web)
 
 What differs in a cloud agent's environment.
 
 Shared setup lives in `script/agent-env/`: `system-deps.sh` (apt packages, Chromium, MongoDB), `ruby.sh` (the Gemfile's Ruby, for images without it), `node.sh` (the Node in `.nvmrc`, which CI's setup-node also reads, for images without its major; installed at a prefix of its own rather than over the image's Node), `browser-path.sh` (prints the Chromium for `BROWSER_PATH`), `install.sh` (bundle install, npm ci for the linters and uv for zizmor, actionlint and ShellCheck, which only warn if they fail, `.env` files, the pre-commit hook), `start-services.sh` (starts MongoDB) and `start-web.sh` (starts Puma in the background, logging to `log/web.log`, for environments with no terminal to keep it in). A tool's own setup only calls these, plus anything that applies to that tool alone (Claude Code's proxy CA and `CLAUDE_ENV_FILE`).
 
-- Cursor: `.cursor/environment.json` and `.cursor/Dockerfile`. After boot, `start` forks Mongo; a `web` terminal keeps `foreman start -e .env web` running (Puma on port 3000, logs in that session). That terminal is a tmux session, so the Dockerfile installs tmux
 - Claude Code on the web: a `SessionStart` hook in `.claude/settings.json` runs `.claude/remote-setup.sh`
-- The web process: both cloud agents start it on boot: Cursor in its `web` terminal, and Claude Code on the web in the background (`script/agent-env/start-web.sh`) with logs in `log/web.log`. Puma takes about 20 seconds to boot, so if port 3000 isn't answering yet, check the log or wait rather than starting a second copy
-- MCP servers: Claude Code on the web fills `.mcp.json`'s `${VAR}`s from the cloud environment's variables. Cursor cloud agents don't read any repo MCP file; their MCP servers are set up in the Cursor dashboard
+- The web process: Claude Code on the web starts it on boot, in the background (`script/agent-env/start-web.sh`) with logs in `log/web.log`. Puma takes about 20 seconds to boot, so if port 3000 isn't answering yet, check the log or wait rather than starting a second copy
+- MCP servers: Claude Code on the web fills `.mcp.json`'s `${VAR}`s from the cloud environment's variables.
 - Browsing the app with Playwright (Claude Code on the web): Chromium ignores `HTTPS_PROXY`, so pass it or CDN assets (jQuery etc.) won't load and nothing works: `chromium.launch({ executablePath: process.env.BROWSER_PATH, args: ['--proxy-server=' + process.env.HTTPS_PROXY] })`. Don't use Playwright's `proxy` option: it sends localhost through the proxy too, which rejects it. The setup script trusts the proxy's CA in Chromium's NSS store (`~/.pki/nssdb`); never ignore certificate errors instead. Cuprite gets the proxy from `test/setup/capybara.rb`

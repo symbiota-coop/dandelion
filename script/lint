@@ -117,7 +117,7 @@ LINTERS = [
       \A(
         \.rubocop\.yml | \.rubocop/.+ | \.erb_lint\.yml | \.erb_linters/.+ | eslint\.config\.mjs | stylelint\.config\.mjs | \.herb\.yml |
         package(-lock)?\.json | config/bootstrap4_leftovers\.json | script/lint | test/lint_test\.rb |
-        \.github/workflows/ruby\.yml | \.mcp\.json | \.cursor/mcp\.json | \.opencode/opencode\.json | \.codex/config\.toml |
+        \.github/workflows/ruby\.yml | \.mcp\.json | \.opencode/opencode\.json | \.codex/config\.toml |
         tasks/.+\.rake | config/frontend_dependencies\.rb | frontend/(package|integrity)\.json | app/views/layouts/_dependencies\.erb | ckeditor/package\.json
       )\z
     }x,
