@@ -59,7 +59,7 @@ module AccountStripeSubscriptions
         customer = subscription.customer
         next unless customer.respond_to?(:email) && customer.email
 
-        email = customer.email.downcase
+        email = customer.email.downcase.strip
         existing_created_at = email_to_subscription_created_at[email]
         next if existing_created_at && subscription.created <= existing_created_at
 
