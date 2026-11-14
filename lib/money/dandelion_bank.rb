@@ -67,6 +67,7 @@ class DandelionBank < Money::Bank::VariableExchange
       f.options.timeout = 10
       f.options.open_timeout = 5
       f.response :json
+      f.response :raise_error # an error status falls back (or keeps the rates) like a failed connection
     end
   end
 

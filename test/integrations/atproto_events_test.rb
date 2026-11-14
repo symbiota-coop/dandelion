@@ -1,10 +1,12 @@
 require_relative '../test_config'
+require_relative '../helpers/error_reporting_helpers'
 
 # Events published to Bluesky/ATProto as community.lexicon.calendar.event records (EventAtproto), under the
 # organisation's own account once it connects one (OrganisationAtproto, /o/:slug/atproto/connect) or else Dandelion's
 # (ATPROTO_HANDLE). No network: AtprotoClient.new gives a FakeAtprotoClient for the credentials it's given
 class IntegrationsAtprotoEventsTest < ActiveSupport::TestCase
   include Rack::Test::Methods
+  include ErrorReportingHelpers
 
   COLLECTION = EventAtproto::ATPROTO_COLLECTION
   ORGANISATION_DID = 'did:plc:organisation'.freeze
@@ -94,13 +96,6 @@ class IntegrationsAtprotoEventsTest < ActiveSupport::TestCase
   # The queued jobs that would publish, update or delete a record
   def atproto_jobs
     queued_jobs(/\w*atproto\w*/).to_a
-  end
-
-  # The exceptions ErrorReporting would send to Sentry while the block runs
-  def reported_exceptions(&)
-    reported = []
-    ErrorReporting.stub(:capture_exception, ->(exception, **) { reported << exception }, &)
-    reported
   end
 
   def published_event(**attrs)
