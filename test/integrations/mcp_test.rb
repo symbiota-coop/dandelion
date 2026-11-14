@@ -310,10 +310,26 @@ class McpTest < ActiveSupport::TestCase
   test 'admin tools only read data' do
     covers 'integrations/admin-data-read-only@122ed7'
     tools = mcp_rpc('tools/list').dig('result', 'tools').index_by { |tool| tool['name'] }
+    create_event_with_order_and_ticket
+    headers = { 'Authorization' => "Bearer #{@account.api_key}" }
+    calls = {
+      'get_me_tool' => {},
+      'get_organisation_events_tool' => { slug: @organisation.slug },
+      'get_organisation_followers_tool' => { slug: @organisation.slug },
+      'get_organisation_orders_tool' => { slug: @organisation.slug },
+      'get_event_orders_tool' => { slug: @event.slug },
+      'get_event_tickets_tool' => { slug: @event.slug }
+    }
 
-    %w[get_me_tool get_organisation_events_tool get_organisation_followers_tool get_organisation_orders_tool get_event_orders_tool get_event_tickets_tool].each do |name|
+    calls.each do |name, arguments|
       assert tools[name].dig('annotations', 'readOnlyHint'), name
       refute tools[name].dig('annotations', 'destructiveHint'), name
+
+      rpc = nil
+      writes = mongo_commands_during { rpc = mcp_tool_call(name, arguments: arguments, headers: headers) }
+               .filter_map { |command| (command.keys & %w[insert update delete findAndModify]).first && command.values.first }
+      refute rpc.dig('result', 'isError'), "#{name}: #{tool_text(rpc)}"
+      assert_empty writes, "#{name} wrote to #{writes.uniq.join(', ')}"
     end
   end
 

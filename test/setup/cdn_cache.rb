@@ -5,9 +5,10 @@
 # - CACHED_HOSTS (jsDelivr, Google Fonts) are answered from tmp/cdn_cache, each file downloaded once, by URL, over one
 #   connection per host, and kept for later runs. Its URLs name versions, so a file never changes; a file with a hash in
 #   frontend/integrity.json must match it, or it isn't kept (the browser would refuse it too)
-# - BLOCKED_URLS (Maps, Turnstile, Stripe.js, Iframely) fail at once. Tests have no keys for them, and pages work
-#   without them: Maps show their could-not-load message, there's no captcha without RECAPTCHA_SITE_KEY, tests that
-#   pay replace window.Stripe (record_stripe_redirect), and rich text shows embeds as links
+# - BLOCKED_URLS (Maps, Turnstile, Stripe.js, Iframely, the analytics tags' scripts) fail at once. Tests have no keys
+#   for them, and pages work without them: Maps show their could-not-load message, there's no captcha without
+#   RECAPTCHA_SITE_KEY, tests that pay replace window.Stripe (record_stripe_redirect), rich text shows embeds as links,
+#   and the analytics tags queue their calls for scripts that never come
 #
 # Any other outside host is still reached, with a warning once per run, so add it to one or the other
 module CdnCache
@@ -21,7 +22,11 @@ module CdnCache
     %r{\Ahttps://maps\.googleapis\.com/},
     %r{\Ahttps://challenges\.cloudflare\.com/},
     %r{\Ahttps://js\.stripe\.com/},
-    %r{\Ahttps://cdn\.iframe\.ly/}
+    %r{\Ahttps://cdn\.iframe\.ly/},
+    # The marketing and analytics tags' own scripts, which the cookie consent test switches on: the tags run without them
+    %r{\Ahttps://connect\.facebook\.net/},
+    %r{\Ahttps://www\.googletagmanager\.com/},
+    %r{\Ahttps://plausible\.io/}
   ].freeze
 
   # The request headers a download passes on, so Google Fonts answers with the same CSS it gives the browser

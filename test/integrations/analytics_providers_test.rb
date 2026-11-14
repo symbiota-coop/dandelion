@@ -237,6 +237,35 @@ class AnalyticsProvidersTest < ActiveSupport::TestCase
     end
   end
 
+  test 'the marketing tags run only once marketing cookies are allowed' do
+    covers 'organisations/analytics-tags-need-marketing-consent@3bd32f'
+    create_event_with_analytics
+    tags_ran = -> { evaluate_script("typeof window.fbq === 'function' && Array.isArray(window.dataLayer)") }
+
+    # As in production, where the tags and the cookie banner render
+    Padrino.stub(:env, :production) do
+      visit "/e/#{@event.slug}"
+      assert page.has_button?('Necessary only')
+      refute tags_ran.call
+      click_button 'Necessary only'
+      assert page.has_css?('#cookie-consent', visible: :hidden)
+      refute tags_ran.call
+      visit "/e/#{@event.slug}"
+      assert page.has_content?(@event.name)
+      refute tags_ran.call
+
+      Capybara.reset_sessions!
+      visit "/e/#{@event.slug}"
+      click_button 'Accept all'
+      assert page.has_css?('#cookie-consent', visible: :hidden)
+      assert tags_ran.call
+      visit "/e/#{@event.slug}"
+      assert page.has_content?(@event.name)
+      assert page.has_no_button?('Accept all')
+      assert tags_ran.call
+    end
+  end
+
   test 'meta pixel tracks PageView and ViewContent on event pages, and a single Purchase after booking' do
     covers 'organisations/meta-pixel-events@594c53', 'events/purchase-conversions-on-thank-you-page@3746ce'
     create_event_with_analytics

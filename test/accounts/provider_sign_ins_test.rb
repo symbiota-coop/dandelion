@@ -83,6 +83,26 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
     assert_empty account.reload.provider_links
   end
 
+  test 'a sign in code lets a session connect a provider for an hour' do
+    account = FactoryBot.create(:account)
+    signed_in_at = Time.now
+    sign_in_with_rack(account)
+
+    travel_to signed_in_at + 59.minutes do
+      omniauth_callback_as(uid: 'google-uid-within-the-hour')
+      assert_includes last_response.body, 'Connect the Google account'
+      post '/accounts/providers/confirm'
+      assert_equal ['google-uid-within-the-hour'], account.reload.provider_links.map(&:provider_uid)
+    end
+
+    travel_to signed_in_at + 61.minutes do
+      omniauth_callback_as(uid: 'google-uid-after-the-hour')
+      assert_equal '/accounts/sign_in_code', last_request.path
+      post '/accounts/providers/confirm'
+      assert_equal ['google-uid-within-the-hour'], account.reload.provider_links.map(&:provider_uid)
+    end
+  end
+
   test 'signing up with Google under its verified Gmail address confirms the email' do
     sign_up_with_google(email: 'alice.example@gmail.com')
     account = Account.find_by(email: 'alice.example@gmail.com')
@@ -258,18 +278,37 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
     assert_siwe_failure 'missing_nonce'
   end
 
-  test 'siwe rejects a message signed for a different nonce or domain' do
+  test 'siwe rejects a message other than the one issued, but for the address' do
     key = OpenSSL::PKey::EC.generate('secp256k1')
-    message, = siwe_start_and_sign(key)
+    {
+      'a different nonce' => ->(message) { message.sub(/^Nonce: .*$/, "Nonce: #{Siwe.generate_nonce}") },
+      'a different domain' => ->(message) { message.sub(/\A[^ ]+/, 'evil.example') },
+      'a different URI' => ->(message) { message.sub(/^URI: .*$/, 'URI: https://evil.example/auth/ethereum/callback') },
+      'a different chain' => ->(message) { message.sub(/^Chain ID: .*$/, 'Chain ID: 137') },
+      'a later expiry' => ->(message) { message.sub(/^Expiration Time: .*$/, "Expiration Time: #{1.year.from_now.utc.iso8601}") },
+      'no expiry' => ->(message) { message.sub(/\nExpiration Time: .*$/, '') }
+    }.each do |change, forge|
+      message, = siwe_start_and_sign(key)
+      forged = forge.call(message)
+      refute_equal message, forged, change
+      post '/auth/ethereum/callback', siwe_message: forged, siwe_signature: siwe_sign(key, forged)
+      assert_siwe_failure 'message_mismatch'
+    end
 
-    forged = message.sub(/^Nonce: .*$/, "Nonce: #{Siwe.generate_nonce}")
-    post '/auth/ethereum/callback', siwe_message: forged, siwe_signature: siwe_sign(key, forged)
-    assert_siwe_failure 'nonce_mismatch'
+    message, signature = siwe_start_and_sign(key)
+    post '/auth/ethereum/callback', siwe_message: message, siwe_signature: signature
+    assert_includes last_response.body, "isn't yet connected to a Dandelion account"
+  end
 
-    message, = siwe_start_and_sign(key)
-    forged = message.sub(/\A[^ ]+/, 'evil.example')
-    post '/auth/ethereum/callback', siwe_message: forged, siwe_signature: siwe_sign(key, forged)
-    assert_siwe_failure 'domain_mismatch'
+  test 'siwe rejects the message issued once it has expired' do
+    key = OpenSSL::PKey::EC.generate('secp256k1')
+    message, signature = siwe_start_and_sign(key)
+    travel_to(6.minutes.from_now) { post '/auth/ethereum/callback', siwe_message: message, siwe_signature: signature }
+    assert_siwe_failure 'expired_message'
+
+    message, signature = siwe_start_and_sign(key)
+    travel_to(4.minutes.from_now) { post '/auth/ethereum/callback', siwe_message: message, siwe_signature: signature }
+    assert_includes last_response.body, "isn't yet connected to a Dandelion account"
   end
 
   test 'siwe rejects a signature from a different wallet' do
@@ -419,6 +458,63 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
     assert_nil last_request.session[:account_id]
   end
 
+  test 'Bluesky callback is refused a token that is not DPoP-bound or lacks the atproto scope' do
+    account = FactoryBot.create(:account)
+    account.provider_links.create!(provider: 'Bluesky', provider_uid: ATPROTO_ALICE, omniauth_hash: { 'info' => { 'did' => ATPROTO_ALICE } })
+    { { token_type: 'Bearer' } => 'Token is not DPoP-bound', { scope: 'transition:generic' } => 'Token lacks the atproto scope', {} => nil }.each do |token, error|
+      clear_cookies
+      network = atproto_network
+      network[:token] = token
+      with_atproto_network(network) do
+        state = start_atproto_sign_in('alice.test')
+        get '/auth/atproto/callback', code: network[:par][:code], state: state, iss: ATPROTO_ALICE_AS
+      end
+      if error
+        assert_atproto_failure 'invalid_credentials', error
+        assert_nil last_request.session[:account_id]
+      else
+        assert_equal account.id.to_s, last_request.session[:account_id]
+      end
+    end
+  end
+
+  test 'Bluesky callback without a code is refused before asking for a token' do
+    network = atproto_network
+    with_atproto_network(network) do
+      state = start_atproto_sign_in('alice.test')
+      get '/auth/atproto/callback', state: state, iss: ATPROTO_ALICE_AS
+    end
+    assert_atproto_failure 'invalid_credentials', 'Callback has no code'
+    assert_not_includes network[:requests], "#{ATPROTO_ALICE_AS}/oauth/token"
+  end
+
+  test 'Bluesky sign-in is refused an unknown handle, a DID with no https PDS, or authorization server metadata that is not its own' do
+    metadata_url = "#{ATPROTO_ALICE_AS}/.well-known/oauth-authorization-server"
+    breakages = [
+      ['unknown_handle', 'alice.test did not resolve to a DID', ->(network) { network[:handles].delete('alice.test') }],
+      ['missing_pds', "#{ATPROTO_ALICE} has no PDS", ->(network) { network[:pds][ATPROTO_ALICE] = 'http://pds.alice.test' }],
+      ['invalid_auth_server', 'Metadata issuer mismatch', lambda do |network|
+        network[:http][metadata_url] = JSON.parse(network[:http][metadata_url]).merge('issuer' => ATPROTO_MALLORY_AS).to_json
+      end],
+      ['invalid_auth_server', 'Metadata has no https token_endpoint', lambda do |network|
+        network[:http][metadata_url] = JSON.parse(network[:http][metadata_url]).merge('token_endpoint' => 'http://as.alice.test/oauth/token').to_json
+      end]
+    ]
+    breakages.each do |key, error, break_network|
+      network = atproto_network
+      break_network.call(network)
+      with_atproto_network(network) { get '/auth/atproto', handle: 'alice.test' }
+      assert_atproto_failure key, error
+      assert_nil last_request.session[OmniAuth::Strategies::Atproto::FLOW_KEY]
+      assert_not_includes network[:requests], "#{ATPROTO_ALICE_AS}/oauth/par", error
+    end
+
+    # Unbroken, the same sign-in starts
+    network = atproto_network
+    with_atproto_network(network) { start_atproto_sign_in('alice.test') }
+    assert_includes network[:requests], "#{ATPROTO_ALICE_AS}/oauth/par"
+  end
+
   test 'Bluesky sign-in refuses what is not a handle or DID without looking it up' do
     network = atproto_network
     with_atproto_network(network) do
@@ -433,7 +529,8 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
   private
 
   # What the stubbed network serves: handles to DIDs, DIDs to PDSs, and SsrfFilter's GET URLs to bodies (or errors).
-  # Each authorization server's PAR and token endpoints are in with_atproto_network
+  # Each authorization server's PAR and token endpoints are in with_atproto_network, and network[:token] overrides
+  # fields of the token they give
   def atproto_network
     http = {}
     [[ATPROTO_ALICE_PDS, ATPROTO_ALICE_AS], [ATPROTO_MALLORY_PDS, ATPROTO_MALLORY_AS]].each do |pds, issuer|
@@ -488,7 +585,7 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
       return reply.call({ error: 'invalid_grant' }, '400') unless verified
 
       sub = network[:token_sub] || { ATPROTO_ALICE_AS => ATPROTO_ALICE, ATPROTO_MALLORY_AS => ATPROTO_MALLORY }[issuer]
-      reply.call({ access_token: 'token', token_type: 'DPoP', expires_in: 3600, scope: 'atproto', sub: sub })
+      reply.call({ access_token: 'token', token_type: 'DPoP', expires_in: 3600, scope: 'atproto', sub: sub }.merge(network[:token] || {}))
     end
   end
 

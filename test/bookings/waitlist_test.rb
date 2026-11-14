@@ -178,21 +178,26 @@ class WaitlistTest < ActiveSupport::TestCase
 
   test 'ticket type waitlist notification triggered when tickets become available' do
     covers 'events/ticket-type-waitlist-emailed@e84fc2', 'integrations/waitlist-emailed-when-available@af5f30'
-    Delayed::Job.delete_all if defined?(Delayed::Job)
     create_ticket_type_waitlist_event
+    other_ticket_type = @event.ticket_types.create!(name: 'Other', price: 10, quantity: 0)
     sell_out_ticket_type
     account = FactoryBot.create(:account)
+    other_account = FactoryBot.create(:account)
 
     TicketTypeWaitship.create!(ticket_type: @ticket_type, account: account)
+    TicketTypeWaitship.create!(ticket_type: other_ticket_type, account: other_account)
     assert @ticket_type.reload.sold_out?, 'Ticket type should be sold out'
     assert @ticket_type.sold_out_cache?, 'Ticket type sold-out cache should be primed'
+    Delayed::Job.delete_all
 
     @ticket_type.set(quantity: 1)
     @event.refresh_sold_out_cache_and_notify_waitlist
 
     assert_not @ticket_type.reload.sold_out?, 'Ticket type should no longer be sold out'
-    assert_equal 1, queued_jobs(:send_ticket_type_waitlist_tickets_available).count,
-                 'Ticket type waitlist notification should be queued'
+    # Only the ticket type that came back: its waitlist, about it, and not the other's, still sold out
+    emails = emails_sent_by_jobs(:send_ticket_type_waitlist_tickets_available).select { |email| email.recipients.any? }
+    assert_equal [[account.email]], emails.map(&:recipients)
+    assert_equal ["Tickets now available for #{@ticket_type.name} at #{@event.name}"], emails.map(&:subject_line)
   end
 
   test "the waitlist forms refuse a waitlist that isn't open, without making an account" do

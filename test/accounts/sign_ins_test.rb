@@ -420,8 +420,19 @@ class AccountSignInsTest < ActiveSupport::TestCase
     account.generate_link_token!
     clear_cookies
     get '/', link_token: account.link_token
+    session_token = account.reload.session_token
+    assert session_token
+
     post '/accounts/sign_out_other_browsers'
     assert_equal '/accounts/sign_in_code', URI(last_response.location).path
+    assert_equal session_token, account.reload.session_token
+
+    # Signed in with a code, the same request signs them out
+    sign_in_with_rack(account)
+    session_token = account.reload.session_token
+    post '/accounts/sign_out_other_browsers'
+    assert_equal '/accounts/password', URI(last_response.location).path
+    refute_equal session_token, account.reload.session_token
   end
 
   test 'signing out of other browsers keeps this one' do
