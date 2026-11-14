@@ -101,7 +101,7 @@ GEM
       smart_properties
     erubi (1.13.1)
     event_stream_parser (1.0.0)
-    excon (1.10.0)
+    excon (1.11.0)
     factory_bot (6.6.0)
       activesupport (>= 6.1.0)
     faraday (2.15.1)
@@ -210,9 +210,9 @@ GEM
       logger
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    minitest (6.0.6)
+    minitest (6.1.0)
       drb (~> 2.0)
-      prism (~> 1.5)
+      prism (>= 1.5, < 3)
     minitest-mock (5.27.0)
     minitest-rg (5.4.0)
       minitest (>= 5.0, < 7)

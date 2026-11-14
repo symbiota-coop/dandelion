@@ -41,7 +41,7 @@ jobs:
         persist-credentials: false
 
     - name: Install Ruby
-      uses: ruby/setup-ruby@de492cf36cbab201753d720ce4f4e336cd688c94 # v1.336.0
+      uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
       with:
         ruby-version: 4.0.9
         bundler-cache: true
@@ -192,7 +192,7 @@ jobs:
         (google-chrome --headless=new --no-first-run --disable-gpu --dump-dom 'data:text/html,<p style="font-family:sans-serif">Warm</p>' > /dev/null 2>&1 &)
 
     - name: Install Ruby
-      uses: ruby/setup-ruby@de492cf36cbab201753d720ce4f4e336cd688c94 # v1.336.0
+      uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
       with:
         ruby-version: 4.0.9
         bundler-cache: true
@@ -276,7 +276,7 @@ jobs:
         persist-credentials: false
 
     - name: Install Ruby
-      uses: ruby/setup-ruby@de492cf36cbab201753d720ce4f4e336cd688c94 # v1.336.0
+      uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
       with:
         ruby-version: 4.0.9
         bundler-cache: true
