@@ -229,9 +229,9 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     assert last_response.ok?
     assert_equal [0, 2], [dome.reload.o, @space.reload.o]
     assert_equal 0, other_space.reload.o
-    post gathering_path('/tslots/order'), timetable_id: @timetable.id, tslot_ids: [other_tslot.id, afternoon.id, @tslot.id]
+    post gathering_path('/tslots/order'), timetable_id: @timetable.id, tslot_ids: [afternoon.id, other_tslot.id, @tslot.id]
     assert last_response.ok?
-    assert_equal [1, 2], [afternoon.reload.o, @tslot.reload.o]
+    assert_equal [0, 2], [afternoon.reload.o, @tslot.reload.o]
     assert_equal 0, other_tslot.reload.o
 
     post gathering_path('/spaces/order'), timetable_id: other_timetable.id, space_ids: [other_space.id]
@@ -316,9 +316,9 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     assert last_response.ok?
     assert_equal [0, 2], [washer.reload.o, @role.reload.o]
     assert_equal 0, other_role.reload.o
-    post gathering_path('/rslots/order'), rota_id: @rota.id, rslot_ids: [other_rslot.id, evening.id, @rslot.id]
+    post gathering_path('/rslots/order'), rota_id: @rota.id, rslot_ids: [evening.id, other_rslot.id, @rslot.id]
     assert last_response.ok?
-    assert_equal [1, 2], [evening.reload.o, @rslot.reload.o]
+    assert_equal [0, 2], [evening.reload.o, @rslot.reload.o]
     assert_equal 0, other_rslot.reload.o
 
     post gathering_path('/roles/order'), rota_id: other_rota.id, role_ids: [other_role.id]

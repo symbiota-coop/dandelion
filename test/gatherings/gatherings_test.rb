@@ -63,28 +63,64 @@ class GatheringsTest < ActiveSupport::TestCase
     sign_in_with_rack(@account)
     post "/g/#{@gathering.slug}/teams/#{team.id}/edit", team: { name: team.name, gathering_id: @other_gathering.id }
 
+    assert last_response.redirect?
+    assert_equal "/g/#{@gathering.slug}/teams/#{team.id}", URI(last_response.location).path
     assert_equal @gathering.id, team.reload.gathering_id
   end
 
-  test 'teamship create cannot attach a team from another gathering' do
+  test 'a gathering admin adds a member to one of its teams' do
     covers_route 'POST /g/:slug/teamships/new'
+    create_gathering
+    member = create_member
+    team = @gathering.teams.create!(name: 'Kitchen', account: @account)
+
+    sign_in_with_rack(@account)
+    post "/g/#{@gathering.slug}/teamships/new", teamship: { account_id: member.id, team_id: team.id }
+
+    assert last_response.redirect?
+    assert_equal "/g/#{@gathering.slug}/teams", URI(last_response.location).path
+    teamship = team.teamships.find_by(account: member)
+    assert teamship
+    assert_equal @gathering.id, teamship.gathering_id
+  end
+
+  test 'teamship create cannot attach a team from another gathering' do
     create_two_gatherings
     other_team = @other_gathering.teams.create!(name: 'Kitchen', account: @other_account)
 
     sign_in_with_rack(@account)
     post "/g/#{@gathering.slug}/teamships/new", teamship: { account_id: @account.id, team_id: other_team.id }
 
+    assert last_response.ok?
+    assert_includes last_response.body, 'Some errors prevented the teamship from being saved'
     refute other_team.teamships.find_by(account: @account)
   end
 
-  test 'optionship create cannot attach an option from another gathering' do
+  test 'a gathering admin adds a member to one of its options' do
     covers_route 'POST /g/:slug/optionships/new'
+    create_gathering
+    member = create_member
+    option = @gathering.options.create!(name: 'Cabin', type: 'Accommodation', account: @account)
+
+    sign_in_with_rack(@account)
+    post "/g/#{@gathering.slug}/optionships/new", optionship: { account_id: member.id, option_id: option.id }
+
+    assert last_response.redirect?
+    assert_equal "/g/#{@gathering.slug}/options", URI(last_response.location).path
+    optionship = option.optionships.find_by(account: member)
+    assert optionship
+    assert_equal @gathering.id, optionship.gathering_id
+  end
+
+  test 'optionship create cannot attach an option from another gathering' do
     create_two_gatherings
     other_option = @other_gathering.options.create!(name: 'Cabin', type: 'Accommodation', account: @other_account)
 
     sign_in_with_rack(@account)
     post "/g/#{@gathering.slug}/optionships/new", optionship: { account_id: @account.id, option_id: other_option.id }
 
+    assert last_response.ok?
+    assert_includes last_response.body, 'Some errors prevented the optionship from being saved'
     refute other_option.optionships.find_by(account: @account)
   end
 
