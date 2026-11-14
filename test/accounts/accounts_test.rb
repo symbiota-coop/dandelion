@@ -1,9 +1,11 @@
 require_relative '../test_config'
+require_relative '../helpers/recaptcha_helpers'
 
 # Signing up, profiles, avatars, notifications, signing up from an organisation, activity, local group or event, merging accounts and maps of accounts
 class AccountsTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
+  include RecaptchaHelpers
 
   # Stands in for the Places library, so places.js can be tested without a Google Maps key. places.js only asks
   # for the library as someone types, so this can replace importLibrary once the page has loaded. The setter
@@ -818,28 +820,5 @@ class AccountsTest < ActiveSupport::TestCase
       token = SecureRandom.hex(8)
       { coordinates: c, organisation_ids_public_cache: [organisation.id], email: "map-#{token}@example.com", username: "map-#{token}" }
     end)
-  end
-
-  # Configures recaptcha with a verifier that always fails, and returns the verify calls made
-  def with_recaptcha(skip_secret:, &block)
-    env = { 'RECAPTCHA_SECRET_KEY' => 'recaptcha-secret', 'RECAPTCHA_VERIFY_URL' => 'https://recaptcha.test/verify', 'RECAPTCHA_SKIP_SECRET' => skip_secret }
-
-    # Real connections (Mailgun uses Faraday too), with only posts to the verify URL intercepted
-    verify_url = env['RECAPTCHA_VERIFY_URL']
-    verify_calls = []
-    verify_response = api_object(body: { success: false }.to_json)
-    faraday_new = Faraday.method(:new)
-    stubbed_new = lambda do |*args, **kwargs, &block|
-      connection = faraday_new.call(*args, **kwargs, &block)
-      connection.define_singleton_method(:post) do |url = nil, body = nil, headers = nil, &post_block|
-        return super(url, body, headers, &post_block) unless url == verify_url
-
-        verify_calls << [url, body]
-        verify_response
-      end
-      connection
-    end
-    with_env(env) { Faraday.stub(:new, stubbed_new, &block) }
-    verify_calls
   end
 end
