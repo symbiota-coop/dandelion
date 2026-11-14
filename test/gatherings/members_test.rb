@@ -180,7 +180,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
     assert last_response.redirect?
     follow_redirect!
     assert_includes last_response.body, 'the only admin of'
-    assert own.reload
+    assert Membership.find(own.id)
     post gathering_path("/memberships/#{own.id}/unadmin")
     assert last_response.redirect?
     post gathering_path("/memberships/#{own.id}/remove")
@@ -195,7 +195,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
     # A site admin browsing has no membership to leave
     post gathering_path('/leave')
     assert last_response.redirect?
-    assert own.reload
+    assert Membership.find(own.id)
 
     # With a second admin, the first can go
     membership_of(member).set(admin: true)

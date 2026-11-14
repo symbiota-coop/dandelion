@@ -40,7 +40,7 @@ class OrganisationRoutesTest < ActiveSupport::TestCase
     assert organisationship.admin?
 
     post "/o/#{@organisation.slug}/organisationship", f: 'not_following'
-    assert organisationship.reload
+    assert Organisationship.find(organisationship.id)
   end
 
   test "following an organisation changes only one's own organisationship, and needs signing in" do
@@ -56,7 +56,7 @@ class OrganisationRoutesTest < ActiveSupport::TestCase
     post "/o/#{@organisation.slug}/organisationship", f: 'follow_without_subscribing', account_id: other.id
     refute other_organisationship.reload.unsubscribed
     post "/o/#{@organisation.slug}/organisationship", f: 'not_following', account_id: other.id
-    assert other_organisationship.reload
+    assert Organisationship.find(other_organisationship.id)
   end
 
   test "the follow button shows how one follows an organisation, and isn't offered to admins as unfollowing" do

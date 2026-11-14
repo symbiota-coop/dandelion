@@ -58,13 +58,23 @@ class AccountRoutesTest < ActiveSupport::TestCase
   test 'a site admin resets a password, which works and signs the account out' do
     covers_route 'POST /u/:username/reset_password'
     account = FactoryBot.create(:account, failed_sign_in_attempts: 5)
-    sign_in_with_rack(FactoryBot.create(:account, admin: true))
+    # The account is signed in in its own session before the reset
+    sign_in_with_rack(account)
+    get '/accounts/edit'
+    assert last_response.ok?
 
-    post "/u/#{account.username}/reset_password"
-    password = JSON.parse(last_response.body)['password']
-    assert password.present?
-    assert_equal account.id, Account.authenticate(account.email, password).id
-    assert_equal 0, account.reload.failed_sign_in_attempts.to_i
+    with_session(:admin) do
+      sign_in_with_rack(FactoryBot.create(:account, admin: true))
+      post "/u/#{account.username}/reset_password"
+      password = JSON.parse(last_response.body)['password']
+      assert password.present?
+      assert_equal account.id, Account.authenticate(account.email, password).id
+      assert_equal 0, account.reload.failed_sign_in_attempts.to_i
+    end
+
+    get '/accounts/edit'
+    assert last_response.redirect?
+    assert_nil last_request.session[:account_id]
   end
 
   test "someone who may reset passwords resets other people's, but not a site admin's" do
@@ -177,7 +187,7 @@ class AccountRoutesTest < ActiveSupport::TestCase
 
     sign_in_with_rack(FactoryBot.create(:account))
     post "/follow/#{followee.username}", f: 'not_following', follower_id: other.id
-    assert other_follow.reload
+    assert Follow.find(other_follow.id)
   end
 
   test 'the follow button shows how one follows someone' do

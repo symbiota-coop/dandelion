@@ -179,7 +179,8 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     assert page.has_no_content? @activity.name
 
     assert_nil Activity.find(@activity.id)
-    assert @event.reload
+    assert Event.find(@event.id)
+    @event.reload
     assert_nil @event.activity_id
     assert_equal @organisation, @event.organisation
     assert_empty Activityship.and(activity_id: @activity.id)
