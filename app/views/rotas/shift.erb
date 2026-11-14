@@ -1,7 +1,7 @@
 <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
 <div class="row justify-content-center">
   <div class="col-lg-8">
-    <h2><%= @shift.account.name %>'s <%= @shift.rota.name %> shift</h2>
+    <h2><%= @shift.title %></h2>
     <%= partial :'gatherings/back', locals: { to: 'rota', path: "/g/#{@gathering.slug}/rotas/#{@shift.rota_id}" } %>
     <%= partial :'rotas/shift_form' %>
   </div>
