@@ -4,30 +4,81 @@ name: Issue to PR (Claude)
 # claude/issue-<number> (ruby.yml tests claude/** branches), or comments on the issue if there's nothing to change.
 # Add the no-pr label when opening an issue to skip it.
 #
+# So do the bugs the daily bug reviews report. Their issues come from bots, which have no write access (claude[bot] is a
+# CONTRIBUTOR, github-actions[bot] NONE), and those opened with a workflow's own token start no workflows, so their
+# issues event never comes: instead, when a review on master finishes, find-bug-issues picks out the bug issues its bots
+# opened during it
+#
 # Auth: CLAUDE_CODE_OAUTH_TOKEN secret (see .github/models.env). Claude pushes and opens the pull request with the
 # Claude GitHub App's token, which the action gets with the workflow's OIDC token (id-token: write), so the pull request
 # starts CI, as one opened with the workflow's own token wouldn't. The action also refuses actors without write access
 
-concurrency:
-  group: issue-to-pr-${{ github.event.issue.number }}
-  cancel-in-progress: false
-
 on:
   issues:
     types: [opened]
+  # zizmor: ignore[dangerous-triggers] -- runs only after the scheduled or dispatched reviews on master, never a fork's or a pull request's run, and checks out master, not the run's code
+  workflow_run:
+    workflows:
+      - Daily Bug Review (Claude)
+      - Daily Bug Review (Codex)
+      - Daily Bug Review (Cursor)
+      - Daily Bug Review (opencode)
+    types: [completed]
 
 permissions: {}
 
 jobs:
-  issue-to-pr:
-    # The issue is the prompt, so only issues from people who can already push run it
+  # The open bug issues, without no-pr, that the reviews' bots opened while the review that just finished ran
+  find-bug-issues:
     if: >-
-      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.issue.author_association) &&
-      !contains(github.event.issue.labels.*.name, 'no-pr')
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.repository.full_name == github.repository &&
+      github.event.workflow_run.head_branch == 'master' &&
+      contains(fromJSON('["schedule", "workflow_dispatch"]'), github.event.workflow_run.event)
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    permissions:
+      issues: read
+    outputs:
+      issues: ${{ steps.find.outputs.issues }}
+    steps:
+      - name: Find the review's bug issues
+        id: find
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STARTED: ${{ github.event.workflow_run.run_started_at }}
+        run: |
+          ISSUES=$(gh api "repos/$GITHUB_REPOSITORY/issues?state=open&labels=bug&since=$STARTED&per_page=100" --jq '
+            [.[] | select(.pull_request == null)
+                 | select(.user.login == "github-actions[bot]" or .user.login == "claude[bot]")
+                 | select(.created_at >= env.STARTED)
+                 | select([.labels[].name] | index("no-pr") | not)
+                 | .number]')
+          echo "issues=$ISSUES" >> "$GITHUB_OUTPUT"
+
+  issue-to-pr:
+    needs: find-bug-issues
+    # An issue is the prompt, so only issues from people who can already push run it, or the reviews' bug issues
+    if: >-
+      always() && (
+        (github.event_name == 'issues' &&
+          contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.issue.author_association) &&
+          !contains(github.event.issue.labels.*.name, 'no-pr')) ||
+        (github.event_name == 'workflow_run' && needs.find-bug-issues.result == 'success' &&
+          needs.find-bug-issues.outputs.issues != '[]')
+      )
+    strategy:
+      fail-fast: false
+      matrix:
+        issue: ${{ github.event_name == 'issues' && fromJSON(format('[{0}]', github.event.issue.number)) || fromJSON(needs.find-bug-issues.outputs.issues) }}
+    concurrency:
+      group: issue-to-pr-${{ matrix.issue }}
+      cancel-in-progress: false
     runs-on: ubuntu-26.04
     timeout-minutes: 90
     permissions:
       contents: read
+      issues: read
       id-token: write
     services:
       mongodb:
@@ -41,7 +92,8 @@ jobs:
           persist-credentials: false
 
       - name: Load models
-        run: grep -E "^[A-Z_]+=" .github/models.env >> "$GITHUB_ENV"
+        run: | # zizmor: ignore[github-env] -- from master's models.env, which checkout fetches for workflow_run too, not the triggering run's code
+          grep -E "^[A-Z_]+=" .github/models.env >> "$GITHUB_ENV"
 
       - name: Install Ruby
         uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
@@ -68,24 +120,32 @@ jobs:
           git config core.hooksPath .githooks
 
       - name: Load env from .env.test.example
-        run: |
+        run: | # zizmor: ignore[github-env] -- from master's .env.test.example, which checkout fetches for workflow_run too, not the triggering run's code
           echo "CI=true" >> "$GITHUB_ENV"
           grep -v '^#' .env.test.example | grep -v '^$' | while IFS='=' read -r key value; do
             echo "$key=$value" >> "$GITHUB_ENV"
           done
 
-      # The issue as its author opened it, from the event. Claude reads this file rather than fetching the issue, as
-      # anyone can comment on a public issue, and a comment made before Claude read it would reach it as instructions
+      # The issue as its author wrote it: from the event, or for a review's bug issue, its title and body only. Claude
+      # reads this file rather than fetching the issue, as anyone can comment on a public issue, and a comment made before
+      # Claude read it would reach it as instructions
       - name: Save issue
         env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ matrix.issue }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_BODY: ${{ github.event.issue.body }}
-        run: printf '%s\n\n%s\n' "$ISSUE_TITLE" "$ISSUE_BODY" > "$RUNNER_TEMP/issue.md"
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = workflow_run ]; then
+            ISSUE_TITLE=$(gh api "repos/$GITHUB_REPOSITORY/issues/$ISSUE_NUMBER" --jq .title)
+            ISSUE_BODY=$(gh api "repos/$GITHUB_REPOSITORY/issues/$ISSUE_NUMBER" --jq .body)
+          fi
+          printf '%s\n\n%s\n' "$ISSUE_TITLE" "$ISSUE_BODY" > "$RUNNER_TEMP/issue.md"
 
       - name: Load prompt
         id: prompt
         env:
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_NUMBER: ${{ matrix.issue }}
         run: |
           PROMPT=$(<.github/prompts/issue-to-pr.md)
           PROMPT=${PROMPT//ISSUE_NUMBER/$ISSUE_NUMBER}
