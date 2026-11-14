@@ -43,6 +43,11 @@ class Shift
     "#{rota.name}: #{role.name}, #{rslot.name}"
   end
 
+  # A shift marked not needed has no one in it
+  def title
+    account ? "#{account.name}'s #{rota.name} shift" : "#{rota.name} shift (not needed)"
+  end
+
   def circle
     rota.gathering
   end
