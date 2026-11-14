@@ -259,4 +259,54 @@ class EventListingsTest < ActiveSupport::TestCase
     ['Newer recorded event', 'Unrecorded past event', 'Older recorded event'].each { |name| assert_includes body, name }
     refute_includes body, 'Upcoming event'
   end
+
+  # Five events of one organisation near Gamla Stan: one that's listed, and one each locked, past, not browsable and secret
+  def create_public_feed_events
+    create_event(as: :listed_event, name: 'Listed meditation', start_time: 10.days.from_now, end_time: 10.days.from_now + 2.hours)
+    create_event(as: :later_event, name: 'Later meditation', start_time: 40.days.from_now, end_time: 40.days.from_now + 2.hours)
+    create_event(as: :other_event, name: 'Listed dance', start_time: 12.days.from_now, end_time: 12.days.from_now + 2.hours)
+    create_event(as: :locked_event, name: 'Locked meditation', start_time: 10.days.from_now, end_time: 10.days.from_now + 2.hours)
+    create_event(as: :past_event, name: 'Past meditation', start_time: 3.days.ago, end_time: 3.days.ago + 2.hours)
+    create_event(as: :unbrowsable_event, name: 'Unbrowsable meditation', start_time: 10.days.from_now, end_time: 10.days.from_now + 2.hours)
+    create_event(as: :secret_event, name: 'Secret meditation', start_time: 10.days.from_now, end_time: 10.days.from_now + 2.hours)
+    [@listed_event, @later_event, @other_event, @locked_event, @past_event, @secret_event].each { |event| event.set(browsable: true) }
+    @unbrowsable_event.set(browsable: false)
+    @locked_event.set(locked: true)
+    @secret_event.set(secret: true)
+  end
+
+  def map_event_ids(params = {})
+    get '/events.json', { west: 17, south: 59, east: 19, north: 60 }.merge(params)
+    assert_equal 200, last_response.status
+    app = Dandelion::App.new!
+    JSON.parse(last_response.body)['points'].map { |point| app.decrypt_map_id(point['id'])[:id] }.sort
+  end
+
+  test "the events map lists only browsable, future, unlocked public events, by search and date" do
+    covers_route 'GET /events'
+    create_public_feed_events
+    assert [@listed_event, @locked_event, @past_event, @unbrowsable_event, @secret_event].all?(&:coordinates)
+
+    assert_equal [@listed_event, @later_event, @other_event].map { |event| event.id.to_s }.sort, map_event_ids
+    assert_equal [@listed_event, @later_event].map { |event| event.id.to_s }.sort, map_event_ids(q: 'meditation')
+    assert_equal [@listed_event, @other_event].map { |event| event.id.to_s }.sort, map_event_ids(to: 20.days.from_now.to_date.to_s)
+    assert_equal [@listed_event.id.to_s], map_event_ids(q: 'meditation', to: 20.days.from_now.to_date.to_s)
+    # Outside the map's box, nothing
+    assert_equal [], map_event_ids(west: 0, south: 0, east: 1, north: 1)
+  end
+
+  test 'the events ICS feed parses and lists only browsable, future, unlocked public events, by search' do
+    create_public_feed_events
+
+    get '/events.ics'
+    assert_equal 200, last_response.status
+    calendar = Icalendar::Calendar.parse(last_response.body).sole
+    assert_equal ['Dandelion'], calendar.custom_property('x_wr_calname').map(&:to_s)
+    assert_equal [@listed_event, @later_event, @other_event].map { |event| event.id.to_s }.sort, calendar.events.map { |event| event.uid.to_s }.sort
+    assert_equal "#{ENV['BASE_URI']}/e/#{@listed_event.slug}", calendar.events.detect { |event| event.uid.to_s == @listed_event.id.to_s }.description.to_s
+
+    get '/events.ics', q: 'meditation'
+    calendar = Icalendar::Calendar.parse(last_response.body).sole
+    assert_equal [@listed_event, @later_event].map { |event| event.id.to_s }.sort, calendar.events.map { |event| event.uid.to_s }.sort
+  end
 end
