@@ -9,6 +9,7 @@ class Gathering
   include GatheringAssociations
   include Geocoded
   include EvmTransactions
+  include SpringCleaning
   include StripeWebhooks
   include ImageWithValidation
   include Searchable
@@ -50,18 +51,17 @@ class Gathering
     ]
   end
 
+  # Listed and over a month old, with only the member who made it, and nothing else in any association but teams and
+  # notifications
   def self.spring_clean
-    ignore = %i[memberships teams teamships notifications_as_notifiable notifications_as_circle]
-    Gathering.and(listed: true).each do |gathering|
-      next unless Gathering.reflect_on_all_associations(:has_many).all? do |assoc|
-        gathering.send(assoc.name).empty? || ignore.include?(assoc.name)
-      end
-
-      if gathering.created_at < 1.month.ago && gathering.memberships.count == 1
-        puts gathering.slug
-        # gathering.destroy
-      end
-    end
+    candidates = without_associated(Gathering.and(listed: true, :created_at.lt => 1.month.ago),
+                                    ignore: %i[memberships teams teamships notifications_as_notifiable notifications_as_circle])
+    one_member = Membership.collection.aggregate([
+                                                   { '$match' => { gathering_id: { '$in' => candidates.pluck(:id) } } },
+                                                   { '$group' => { _id: '$gathering_id', count: { '$sum' => 1 } } },
+                                                   { '$match' => { count: 1 } }
+                                                 ]).map { |group| group['_id'] }
+    candidates.and(:id.in => one_member).order('created_at asc')
   end
 
   def self.admin?(gathering, account)

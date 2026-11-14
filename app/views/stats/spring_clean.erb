@@ -1,0 +1,42 @@
+<h2>Spring clean</h2>
+<p class="text-body-secondary">
+  Organisations and gatherings that look abandoned, oldest first, for deleting from their own pages. Nothing is deleted here.
+</p>
+
+<% [
+  ['Organisations', @organisations, 'Over a month old, with no image, and no events, followers, activities, local groups, mailings or anything else but its admins', ->(organisation) { "/o/#{organisation.slug}" }],
+  ['Gatherings', @gatherings, 'Listed and over a month old, with only the member who made it, and no options, timetables, rotas, payments or anything else but its teams', ->(gathering) { "/g/#{gathering.slug}" }]
+].each do |title, records, description, path| %>
+  <div class="mb-5">
+    <h3 class="d-flex align-items-center gap-2">
+      <%= title %>
+      <span class="badge <%= records.empty? ? 'text-bg-primary' : 'text-bg-dark' %>"><%= records.empty? ? 'None' : records.count %></span>
+    </h3>
+    <p class="text-body-secondary small"><%= description %></p>
+
+    <% if records.any? %>
+      <table class="table table-hr">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Created by</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% records.each do |record| %>
+            <tr>
+              <td><a href="<%= path.(record) %>"><%= record.name %></a></td>
+              <td>
+                <% if record.account %>
+                  <a href="/u/<%= record.account.username %>"><%= record.account.name %></a>
+                <% end %>
+              </td>
+              <td><%= record.created_at.to_date %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+<% end %>
