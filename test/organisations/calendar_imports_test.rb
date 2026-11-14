@@ -6,36 +6,6 @@ class OrganisationsCalendarImportsTest < ActiveSupport::TestCase
   include Capybara::DSL
   include CalendarImportHelpers
 
-  FEED_URL = 'https://calendar.google.com/calendar/ical/community/basic.ics'.freeze
-  OTHER_FEED_URL = 'https://outlook.office365.com/owa/calendar/other/calendar.ics'.freeze
-  LUMA_FEED_URL = 'https://api.luma.com/ics/get?entity=calendar&id=cal-test'.freeze
-
-  def ical(*vevents, name: 'Community Calendar')
-    <<~ICAL
-      BEGIN:VCALENDAR
-      VERSION:2.0
-      X-WR-CALNAME:#{name}
-      #{vevents.join("\n")}
-      END:VCALENDAR
-    ICAL
-  end
-
-  def vevent(**properties)
-    lines = properties.map { |key, value| "#{key.to_s.upcase.tr('_', '-')}#{value.start_with?(';') ? '' : ':'}#{value}" }
-    "BEGIN:VEVENT\n#{lines.join("\n")}\nEND:VEVENT"
-  end
-
-  def meetup(**overrides)
-    vevent(uid: 'meetup-1', dtstart: '20270501T180000Z', dtend: '20270501T200000Z', summary: 'Monthly meetup',
-           description: 'Bring a friend.', location: 'Hackney, London', url: 'https://events.example.com/meetup', **overrides)
-  end
-
-  def import(organisation, body, url: FEED_URL, requested_urls: nil)
-    stub_faraday({ url => { status: 200, body: body } }, requested_urls: requested_urls) do
-      organisation.sync_calendar_imports
-    end
-  end
-
   # ── Importing ─────────────────────────────────────────────────────────────
 
   test 'importing a feed creates its upcoming events for the organisation, with their times, places and descriptions' do
