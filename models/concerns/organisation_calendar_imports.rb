@@ -111,7 +111,13 @@ module OrganisationCalendarImports
       nil
     end
 
-    results = calendar_import_urls_a.map { |feed_url| sync_calendar_import_feed(feed_url) }
+    # A feed listed twice (say once as webcal://) is read once: a second read would only find its events again
+    feed_urls = calendar_import_urls_a.uniq do |u|
+      Organisation.normalize_feed_url(u)
+    rescue OrganisationCalendarImports::ConfigurationError
+      u
+    end
+    results = feed_urls.map { |feed_url| sync_calendar_import_feed(feed_url) }
     errors = results.flat_map do |result|
       [result[:error], *result[:event_errors]].compact.map { |error| "#{result[:feed_url]}: #{error}" }
     end
@@ -399,14 +405,28 @@ module OrganisationCalendarImports
     when Time
       value
     when DateTime
-      Time.at(value.to_f).utc
+      # A time with neither Z nor a TZID is floating (RFC 5545): the same clock time wherever it's read, so it's taken
+      # in the organisation's time zone, as dates are. icalendar gives it as UTC. One with a TZID has its zone's offset
+      if floating_time?(property)
+        calendar_import_time_zone.local(value.year, value.month, value.day, value.hour, value.min, value.sec)
+      else
+        Time.at(value.to_f).utc
+      end
     when Date
-      Time.find_zone!(time_zone || ENV['DEFAULT_TIME_ZONE']).parse(value.to_s)
+      calendar_import_time_zone.parse(value.to_s)
     when ->(v) { v.respond_to?(:to_datetime) }
       Time.at(value.to_datetime.to_f).utc
     when ->(v) { v.respond_to?(:to_time) }
       value.to_time
     end
+  end
+
+  def floating_time?(property)
+    !(property.respond_to?(:ical_params) && property.ical_params['tzid'].present?)
+  end
+
+  def calendar_import_time_zone
+    Time.find_zone!(time_zone || ENV['DEFAULT_TIME_ZONE'])
   end
 
   # Returns [lat, lon] or nil (iCal GEO is latitude;longitude).

@@ -83,7 +83,9 @@ Paste one or more iCal URLs on the **iCal sync** page (organisation dropdown →
 
 Imported events use the feed's event URL as their RSVP/ticket button, so people can still register on the original platform while discovering the event on Dandelion. <!-- claim: ical-feed-url-as-rsvp -->
 
-When a Luma event hides its address until you register, the imported event is placed at the venue's location from the feed and labelled with the city it's in. <!-- claim: ical-gated-venue-city -->
+All-day events, and times a feed gives without a time zone, are taken in the organisation's time zone. <!-- claim: ical-times-without-zone -->
+
+When a Luma event hides its address until you register, the imported event is placed at the venue's location from the feed and labelled with the city it's in. <!-- claim: ical-gated-venue-city --> If the city can't be found, it's labelled In person. <!-- claim: ical-gated-venue-in-person -->
 
 If one of a feed's events can't be imported, such as the same event already imported from another of your feeds, it's skipped and listed on the iCal sync page, and the rest of the feed still syncs. <!-- claim: ical-event-skipped -->
 

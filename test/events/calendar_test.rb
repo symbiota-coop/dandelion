@@ -44,7 +44,7 @@ class CalendarTest < ActiveSupport::TestCase
   LUMA_ICS_URL = 'https://api2.luma.com/ics/get?entity=calendar&id=cal-test'.freeze
   LUMA_OG_IMAGE_URL = 'https://og.luma.com/test.jpg?width=1200,height=630'.freeze
   LUMA_OG_IMAGE_URL_DEFAULT = 'https://og.luma.com/test.jpg?width=800,height=420'.freeze
-  LUMA_OG_IMAGE_FIXTURE_PATH = File.expand_path('../app/assets/images/test-event.jpg', __dir__).freeze
+  LUMA_OG_IMAGE_FIXTURE_PATH = File.expand_path('../../app/assets/images/test-event.jpg', __dir__).freeze
 
   LUMA_ICAL_LOCATION_ONLY = <<~ICAL.freeze
     BEGIN:VCALENDAR
