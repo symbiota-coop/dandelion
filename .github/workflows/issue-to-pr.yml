@@ -21,7 +21,6 @@ on:
     workflows:
       - Daily Bug Review (Claude)
       - Daily Bug Review (Codex)
-      - Daily Bug Review (Cursor)
       - Daily Bug Review (opencode)
     types: [completed]
 
