@@ -83,21 +83,28 @@ Rake::TestTask.new(:test) do |test|
 end
 
 # Collates the coverage CI's test groups recorded (COVERAGE, test/setup/coverage.rb), downloaded into coverage-groups/, into
-# one report in coverage/, and writes its totals and least-covered files to GitHub's job summary when there is one
+# one report in coverage/, and writes its line and branch totals and least-covered files to GitHub's job summary when
+# there is one
 desc 'Collate test coverage from coverage-groups/*/.resultset.json'
 task 'test:coverage' do
   require 'simplecov'
   require_relative 'setup/coverage'
   SimpleCov.collate(Dir['coverage-groups/*/.resultset.json'], &TestCoverage::CONFIG)
   result = SimpleCov.result
-  summary = ["## Test coverage: #{result.covered_percent.round(1)}% of lines\n", '| Group | Lines | Covered |',
-             '|---|--:|--:|']
+  percent = ->(statistics) { statistics ? "#{statistics.percent.round(1)}%" : '–' }
+  summary = ["## Test coverage: #{result.covered_percent.round(1)}% of lines, #{percent.call(result.coverage_statistics[:branch])} of branches\n",
+             '| Group | Lines | Lines covered | Branches covered |', '|---|--:|--:|--:|']
   result.groups.each do |name, files|
-    summary << "| #{name} | #{files.lines_of_code} | #{files.covered_percent.round(1)}% |"
+    summary << "| #{name} | #{files.lines_of_code} | #{files.covered_percent.round(1)}% | #{percent.call(files.coverage_statistics[:branch])} |"
   end
   summary += ["\n### Most uncovered lines\n", '| File | Uncovered lines | Covered |', '|---|--:|--:|']
   result.files.sort_by { |f| -f.missed_lines.count }.first(30).each do |f|
     summary << "| #{f.project_filename.delete_prefix('/')} | #{f.missed_lines.count} | #{f.covered_percent.round(1)}% |"
+  end
+  # A branch no test took is a condition that only ever went one way: often a permission check or guard
+  summary += ["\n### Most untaken branches\n", '| File | Untaken branches | Covered |', '|---|--:|--:|']
+  result.files.sort_by { |f| -f.missed_branches.count }.first(30).each do |f|
+    summary << "| #{f.project_filename.delete_prefix('/')} | #{f.missed_branches.count} | #{f.covered_percent(:branch).round(1)}% |"
   end
   puts summary
   File.write(ENV['GITHUB_STEP_SUMMARY'], "#{summary.join("\n")}\n", mode: 'a') if ENV['GITHUB_STEP_SUMMARY']

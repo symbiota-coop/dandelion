@@ -1,4 +1,4 @@
-# Line coverage of the app's Ruby and templates, when COVERAGE is set (as CI's Run workflow can): an HTML report in coverage/ and
+# Line and branch coverage of the app's Ruby and templates, when COVERAGE is set (as CI's Run workflow can): an HTML report in coverage/ and
 # its results in coverage/.resultset.json. Runs at the same time merge their results there, each under its own name,
 # so running a file again replaces its last results rather than adding to them. CI's coverage job collates its groups'
 # with `rake test:coverage`. test/test_config.rb requires this first, as SimpleCov only sees files loaded after it starts
@@ -7,6 +7,9 @@ module TestCoverage
 
   # SimpleCov runs a configuration block on itself
   CONFIG = proc do
+    # Branches too: a line runs whichever way its condition goes, so line coverage can't tell a guard (`return false
+    # unless organisation`, `|| admin?`) that only ever went one way in tests
+    enable_coverage :branch
     cover '{app,models,lib}/**/*.rb', VIEWS
     cover_views VIEWS # measures templates as they're rendered (eval coverage)
     group 'Controllers', 'app/controllers'
