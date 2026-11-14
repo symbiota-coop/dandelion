@@ -64,9 +64,18 @@ task 'test:parallel' do
     failed << run[:files] unless status.success?
   end
   # This run's times replace those it has of the same files, for the next run to split by
-  Dir['tmp/test_runs/times/*.json'].each { |path| times.merge!(JSON.parse(File.read(path))) }
+  run_times = Dir['tmp/test_runs/times/*.json'].map { |path| JSON.parse(File.read(path)) }.reduce({}, :merge)
+  times.merge!(run_times)
   FileUtils.mkdir_p(File.dirname(times_file))
   File.write(times_file, JSON.pretty_generate(times.sort.to_h))
+  # Each file's time, slowest first, in the log and, on CI, the job's summary, as the times file is only in a cache
+  slowest = run_times.sort_by { |_path, seconds| -seconds }
+  puts 'Seconds each file took:'
+  slowest.each { |path, seconds| puts format('%7.1f  %s', seconds, path) }
+  if ENV['GITHUB_STEP_SUMMARY'].present?
+    rows = slowest.map { |path, seconds| "| `#{path}` | #{seconds} |" }
+    File.write(ENV['GITHUB_STEP_SUMMARY'], ["### Test file times: #{shares.length} runs at once", '', '| File | Seconds |', '|---|---:|', *rows, ''].join("\n"), mode: 'a')
+  end
   abort "Failed: #{failed.map { |share| share.join(' ') }.join('; ')}" if failed.any?
 end
 
