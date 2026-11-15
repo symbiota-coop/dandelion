@@ -30,6 +30,22 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert_equal 2, hidden.tickets.count
   end
 
+  test "a hidden ticket type isn't offered without its secret link" do
+    create_event(prices: [0])
+    public_ticket_type = @event.ticket_types.first
+    hidden = @event.ticket_types.create!(name: 'Secret', price: 0, quantity: 10, hidden: true)
+
+    [nil, 'not-the-link', hidden.id.to_s].each do |ticket_type_id|
+      visit "/e/#{@event.slug}#{"?ticket_type_id=#{ticket_type_id}" if ticket_type_id}"
+      assert page.has_select? "quantities[#{public_ticket_type.id}]"
+      assert page.has_no_select? "quantities[#{hidden.id}]"
+      assert page.has_no_content? 'Secret'
+    end
+
+    visit "/e/#{@event.slug}?ticket_type_id=#{hidden.token}"
+    assert page.has_select? "quantities[#{hidden.id}]"
+  end
+
   test 'hidden ticket types can only be bought with their secret link' do
     covers_route 'POST /e/:slug/purchase'
     create_event(prices: [0])
