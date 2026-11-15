@@ -56,7 +56,9 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     visit @activity.path
     assert page.has_no_css? "#{activity_admins_box} .remove-role-toggle"
     within(activity_admins_box) { find('.add-role-toggle').click }
-    choose_in_lookup('activityship_account_id', person.name)
+    # The plus opens the lookup with its search focused, so you can type straight away
+    find('.select2-search__field:focus').send_keys(person.name)
+    find('.select2-results__option', text: person.name).click
     within(activity_admins_box) { click_button 'Add admin' }
     assert page.has_css? "#{activity_admins_box} img[alt='#{person.name}']"
     assert activityship.reload.admin?

@@ -11,11 +11,12 @@ class EventCohostPermissionsTest < ActiveSupport::TestCase
     "[data-pagelet-url='/e/#{@event.slug}/cohostships']"
   end
 
-  # On the event's page, adds organisation as a co-host, then waits for the box to reload with its add control showing
-  # again
+  # On the event's page, adds organisation as a co-host, typing straight into the lookup the plus opens and focuses,
+  # then waits for the box to reload with its add control showing again
   def add_cohost(organisation)
     within(cohosts_box) { find('#add-organisation').click }
-    choose_in_lookup('cohostship_organisation_id', organisation.name)
+    find('.select2-search__field:focus').send_keys(organisation.name)
+    find('.select2-results__option', text: organisation.name).click
     within(cohosts_box) { click_button 'Add co-host' }
     assert page.has_css? "#{cohosts_box} #add-organisation"
   end

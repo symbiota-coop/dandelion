@@ -284,9 +284,10 @@ module TestHelpers
     "/g/#{@gathering.slug}#{path}"
   end
 
-  # Picks an option in a lookup field, a select2 that searches as you type
+  # Picks an option in a lookup field, a select2 that searches as you type, opening it unless something (like an add
+  # and remove box's plus) already has
   def choose_in_lookup(select_id, search, option = search)
-    find("##{select_id} + .select2 .select2-selection").click
+    find("##{select_id} + .select2 .select2-selection").click unless page.has_css?("##{select_id} + .select2-container--open", wait: 0)
     # select2 puts its search and results at the end of the page
     find('.select2-search__field').send_keys(search)
     find('.select2-results__option', text: option).click
