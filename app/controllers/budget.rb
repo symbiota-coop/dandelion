@@ -26,7 +26,7 @@ Dandelion::App.controller do
     @gathering = gathering_from_params
     confirmed_membership_required!
     @spend = @gathering.spends.find(params[:id]) || not_found
-    erb :'budget/build'
+    request.xhr? ? partial(:modal_content, locals: { title: @spend.item, form: :'budget/build' }) : erb(:'budget/build')
   end
 
   post '/g/:slug/spends/:id/edit' do

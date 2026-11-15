@@ -1,2 +1,8 @@
 <%= partial :'events/nav', locals: { event: @event } %>
-<%= partial :'rpayments/build' %>
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <%= partial :back, locals: { to: 'payments', path: "/e/#{@event.slug}/rpayments" } %>
+    <h2><%= @rpayment.new_record? ? 'Add payment' : 'Edit payment' %></h2>
+    <%= partial :'rpayments/build' %>
+  </div>
+</div>

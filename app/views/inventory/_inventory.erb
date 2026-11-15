@@ -12,7 +12,7 @@
   <% @gathering.inventory_items(true).sort_by { |inventory_item| inventory_item.team.try(:name) || '' }.each { |inventory_item| %>
   <tr>
     <td>
-      <a href="/g/<%= @gathering.slug %>/inventory_items/<%= inventory_item.id %>/edit">
+      <a href="/g/<%= @gathering.slug %>/inventory_items/<%= inventory_item.id %>/edit" data-open-in-modal>
         <%= inventory_item.name %>
       </a>
       <% if inventory_item.description %>

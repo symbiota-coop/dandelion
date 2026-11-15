@@ -157,7 +157,7 @@ Dandelion::App.controller do
     @gathering = gathering_from_params
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     confirmed_membership_required!
-    erb :'timetables/tactivity_build'
+    request.xhr? ? partial(:modal_content, locals: { title: @tactivity.name, form: :'timetables/tactivity_form' }) : erb(:'timetables/tactivity_build')
   end
 
   post '/g/:slug/tactivities/:id/edit' do

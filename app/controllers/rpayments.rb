@@ -24,7 +24,7 @@ Dandelion::App.controller do
 
   get '/e/:event_slug/rpayments/:id/edit' do
     @rpayment = @event.rpayments.find(params[:id]) || not_found
-    erb :'rpayments/build'
+    request.xhr? ? partial(:modal_content, locals: { title: 'Edit payment', form: :'rpayments/build' }) : erb(:'rpayments/build')
   end
 
   post '/e/:event_slug/rpayments/:id/edit' do

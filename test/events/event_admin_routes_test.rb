@@ -339,14 +339,23 @@ class EventAdminRoutesTest < ActiveSupport::TestCase
     rpayment = @event.rpayments.first
     assert_equal ['coordinator', 25.0, @event.currency, @account.id], [rpayment.role, rpayment.amount, rpayment.currency, rpayment.account_id]
 
+    find("a[href='/e/#{@event.slug}/rpayments/#{rpayment.id}/edit']").click
+    within('#modal') do
+      fill_in 'rpayment_notes', with: 'Paid in cash'
+      click_button 'Save payment'
+    end
+    assert page.has_content?('Paid in cash')
+    assert_equal 'Paid in cash', rpayment.reload.notes
+
     find("a[href='/e/#{@event.slug}/rpayments/#{rpayment.id}/destroy']").click
     page.document.find('.popover').click_button 'Confirm'
     page.document.synchronize { raise Capybara::ExpectationNotMet, 'payment not deleted yet' if @event.rpayments.exists? }
     assert page.has_no_content?('Paid by bank transfer')
   end
 
-  test "an admin creates a ticket in a modal, opened by the orders page's Create a ticket" do
+  test "an admin creates a ticket in a modal, opened by the orders page's Create a ticket, and changes its name in one" do
     covers_route 'POST /e/:slug/create_ticket'
+    covers_route 'POST /tickets/:id/edit'
     create_event(prices: [10])
     sign_in(@account)
 
@@ -362,6 +371,15 @@ class EventAdminRoutesTest < ActiveSupport::TestCase
     guest = Account.find_by(email: 'guest@example.com')
     assert_equal 'Guest Person', guest.name
     assert_equal [@event.ticket_types.first.id], @event.tickets.and(account: guest).pluck(:ticket_type_id)
+
+    click_button 'Actions'
+    click_link 'Change name or email'
+    within('#modal') do
+      fill_in 'Name', with: 'Renamed Guest'
+      click_button 'Update ticket'
+    end
+    assert page.has_content?('The ticket was updated.')
+    assert_equal 'Renamed Guest', @event.tickets.find_by(account: guest).name
   end
 
   test "only the organisation's admins can see, record, edit or delete an event's revenue payments" do

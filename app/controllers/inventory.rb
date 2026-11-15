@@ -27,7 +27,7 @@ Dandelion::App.controller do
     @gathering = gathering_from_params
     confirmed_membership_required!
     @inventory_item = @gathering.inventory_items.find(params[:id]) || not_found
-    erb :'inventory/build'
+    request.xhr? ? partial(:modal_content, locals: { title: @inventory_item.name, form: :'inventory/build' }) : erb(:'inventory/build')
   end
 
   post '/g/:slug/inventory_items/:id/edit' do

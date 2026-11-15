@@ -27,17 +27,8 @@
     <button type="button" class="btn btn-primary mb-1" data-bs-toggle="modal" data-bs-target="#create-ticket"><i class="bi bi-plus-lg"></i> Create a ticket</button>
   </div>
 </div>
-<% create_ticket = capture_html do %>
-  <% form_for @event.tickets.new, "/e/#{@event.slug}/create_ticket" do |f| %>
-    <%= f.text_block :name %>
-    <%= f.text_block :email %>
-    <%= f.select_block :ticket_type_id, options: @event.ticket_types.map { |ticket_type| [ticket_type.name, ticket_type.id] } %>
-    <%= f.currency_block :price, money_symbol: money_symbol(@event.currency) %>
-    <%= f.submit_block %>
-  <% end %>
-<% end %>
 <%# Open as the page loads for a link that asks for it (?create_ticket=1) %>
-<%= partial :form_modal, locals: { id: 'create-ticket', title: 'Create a ticket', form_html: create_ticket, open_on_load: params[:create_ticket] } %>
+<%= partial :form_modal, locals: { id: 'create-ticket', title: 'Create a ticket', form: :'events/ticket_form', form_locals: { ticket: @event.tickets.new }, open_on_load: params[:create_ticket] } %>
 <div id="tickets-table" data-pagelet-url="/e/<%= @event.slug %>/tickets">
   <%= partial :'events/tickets_table', locals: { tickets: @tickets } %>
 </div>

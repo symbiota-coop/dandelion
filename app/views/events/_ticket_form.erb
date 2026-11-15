@@ -1,0 +1,11 @@
+<%# A ticket made by an event's admins (Create a ticket, in a modal on the tickets page), or its name or email changed
+    (Change name or email, in a modal from its Actions). ticket: the ticket %>
+<% form_for ticket, ticket.new_record? ? "/e/#{@event.slug}/create_ticket" : "/tickets/#{ticket.id}/edit" do |f| %>
+  <%= f.text_block :name %>
+  <%= f.email_block :email %>
+  <% if ticket.new_record? %>
+    <%= f.select_block :ticket_type_id, options: @event.ticket_types.map { |ticket_type| [ticket_type.name, ticket_type.id] } %>
+    <%= f.currency_block :price, money_symbol: money_symbol(@event.currency) %>
+  <% end %>
+  <%= f.submit_block %>
+<% end %>

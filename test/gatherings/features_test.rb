@@ -328,12 +328,14 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     sign_in(@account)
     visit gathering_path('/budget')
     click_link 'Vegetables'
-    fill_in 'Item', with: 'Fruit and vegetables'
-    click_button 'Update spend'
+    within('#modal') do
+      fill_in 'Item', with: 'Fruit and vegetables'
+      click_button 'Update spend'
+    end
     assert page.has_link? 'Fruit and vegetables'
 
     click_link 'Fruit and vegetables'
-    click_link_and_confirm 'Delete'
+    within('#modal') { click_link_and_confirm 'Delete' }
     assert page.has_link? 'List expense'
     assert page.has_no_content? 'Fruit and vegetables'
     assert_equal 0, @gathering.spends.count
@@ -394,11 +396,13 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
 
     # The activity's Edit, not the timetable's
     find("a[title='Edit']").click
-    fill_in 'Activity name', with: 'Morning yoga'
-    click_button 'Update activity'
+    within('#modal') do
+      fill_in 'Activity name', with: 'Morning yoga'
+      click_button 'Update activity'
+    end
     assert page.has_content? 'Morning yoga'
     find("a[title='Edit']").click
-    click_link_and_confirm 'Delete'
+    within('#modal') { click_link_and_confirm 'Delete' }
     assert page.has_link? 'Edit timetable'
     assert page.has_no_content? 'Morning yoga'
 
@@ -419,12 +423,14 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     sign_in(@account)
     visit gathering_path('/inventory')
     click_link 'Tent'
-    fill_in 'Item name', with: 'Big tent'
-    click_button 'Update inventory item'
+    within('#modal') do
+      fill_in 'Item name', with: 'Big tent'
+      click_button 'Update inventory item'
+    end
     assert page.has_link? 'Big tent'
 
     click_link 'Big tent'
-    click_link_and_confirm 'Delete'
+    within('#modal') { click_link_and_confirm 'Delete' }
     assert page.has_link? 'List item'
     assert page.has_no_content? 'Big tent'
     assert_equal 0, @gathering.inventory_items.count

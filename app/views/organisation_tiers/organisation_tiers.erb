@@ -20,7 +20,7 @@
   <% @organisation.organisation_tiers(true).order('threshold asc').each { |organisation_tier| %>
   <tr>
     <td>
-      <a href="/o/<%= @organisation.slug %>/organisation_tiers/<%= organisation_tier.id %>/edit">
+      <a href="/o/<%= @organisation.slug %>/organisation_tiers/<%= organisation_tier.id %>/edit" data-open-in-modal>
         <%= organisation_tier.name %>
       </a>
       <br>

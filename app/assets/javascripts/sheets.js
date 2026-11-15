@@ -58,6 +58,12 @@ $(function () {
     showSheet('Stats').append($list)
   })
 
+  // An item that opens in #modal (data-open-in-modal, like a ticket's Change name or email) closes the sheet, rather
+  // than leaving it open behind the modal
+  $(document).on('click', '#nav-dropdown-sheet a[data-open-in-modal]', function () {
+    bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('nav-dropdown-sheet')).hide()
+  })
+
   function showSheet (title) {
     const $sheet = $('#nav-dropdown-sheet')
     $sheet.find('.offcanvas-title').text(title)

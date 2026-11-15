@@ -109,7 +109,7 @@
       <% @gathering.spends.sort_by { |spend| [spend.reimbursed ? 1 : 0, spend.team.try(:name) || '', -spend.amount] }.each { |spend| %>
       <tr>
         <td>
-          <a href="/g/<%= @gathering.slug %>/spends/<%= spend.id %>/edit">
+          <a href="/g/<%= @gathering.slug %>/spends/<%= spend.id %>/edit" data-open-in-modal>
             <%= spend.item %>
           </a>
         </td>

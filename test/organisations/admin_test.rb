@@ -46,9 +46,11 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
     assert_equal [50, 10], [organisation_tier.threshold, organisation_tier.discount]
 
     click_link 'Gold'
-    fill_in 'Name', with: 'Platinum'
-    fill_in 'Discount', with: '20'
-    click_button 'Update organisation tier'
+    within('#modal') do
+      fill_in 'Name', with: 'Platinum'
+      fill_in 'Discount', with: '20'
+      click_button 'Update organisation tier'
+    end
     assert page.has_link? 'Platinum'
     assert_equal ['Platinum', 20], [organisation_tier.reload.name, organisation_tier.discount]
 

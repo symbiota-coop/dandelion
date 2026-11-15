@@ -206,7 +206,7 @@ Dandelion::App.controller do
     @ticket = Ticket.find(params[:id]) || not_found
     @event = @ticket.event
     event_admins_only!
-    erb :'events/ticket'
+    request.xhr? ? partial(:modal_content, locals: { title: 'Change name or email', form: :'events/ticket_form', form_locals: { ticket: @ticket } }) : erb(:'events/ticket')
   end
 
   post '/tickets/:id/edit' do
