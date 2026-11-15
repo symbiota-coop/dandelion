@@ -82,7 +82,6 @@ class EventDiscussionsTest < ActiveSupport::TestCase
   end
 
   test 'a discussion comment cannot be edited to nothing' do
-    covers_route 'POST /comments/:id/edit'
     create_event(prices: [0])
     attendee = FactoryBot.create(:account)
     @event.tickets.create!(account: attendee, ticket_type: @event.ticket_types.first, payment_completed: true)

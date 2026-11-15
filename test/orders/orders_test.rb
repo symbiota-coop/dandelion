@@ -185,6 +185,63 @@ class OrdersTest < ActiveSupport::TestCase
     refute @ticket.cancellable?
   end
 
+  test "a ticket that isn't cancellable can't be opened for cancelling by its own account" do
+    ticket = create_complimentary_ticket
+    sign_in_with_rack(@attendee)
+    get "/tickets/#{ticket.id}/confirm_cancel"
+    assert last_response.ok?
+
+    priced = @attendee.tickets.create!(event: @event, ticket_type: @event.ticket_types.first, price: 10, complimentary: true)
+    refute priced.cancellable?
+    get "/tickets/#{priced.id}/confirm_cancel"
+    assert_equal 403, last_response.status
+    post "/tickets/#{priced.id}/destroy"
+    assert_equal 403, last_response.status
+    assert Ticket.find(priced.id)
+  end
+
+  test "someone else's free order can't be cancelled" do
+    create_complete_order_with_ticket
+    sign_in_with_rack(FactoryBot.create(:account))
+    post "/orders/#{@order.id}/destroy"
+    assert_equal 403, last_response.status
+    assert Order.find(@order.id)
+    assert Ticket.find(@ticket.id)
+
+    sign_in_with_rack(@attendee)
+    post "/orders/#{@order.id}/destroy"
+    assert last_response.redirect?
+    assert_nil Order.find(@order.id)
+  end
+
+  test "someone else's ticket can't be put on or taken off resale" do
+    covers_route 'POST /tickets/:id/toggle_resale'
+    create_event(prices: [0], enable_resales: true)
+    holder = FactoryBot.create(:account)
+    ticket = @event.tickets.create!(account: holder, ticket_type: @event.ticket_types.first, payment_completed: true, price: 0)
+    other = FactoryBot.create(:account)
+
+    sign_in_with_rack(other)
+    post "/tickets/#{ticket.id}/toggle_resale"
+    assert_equal 403, last_response.status
+    assert_nil ticket.reload.made_available_at
+
+    sign_in_with_rack(holder)
+    post "/tickets/#{ticket.id}/toggle_resale"
+    assert last_response.redirect?
+    assert ticket.reload.made_available_at
+
+    sign_in_with_rack(other)
+    post "/tickets/#{ticket.id}/toggle_resale"
+    assert_equal 403, last_response.status
+    assert ticket.reload.made_available_at
+
+    sign_in_with_rack(holder)
+    post "/tickets/#{ticket.id}/toggle_resale"
+    assert last_response.redirect?
+    assert_nil ticket.reload.made_available_at
+  end
+
   test 'free orders can be cancelled by their account, which emails them and tells the waitlist a place is available' do
     covers 'events/attendees-cancel-free-rsvps@2edb4c', 'events/cancellation-emails-and-waitlist@ddd281'
     covers_route 'POST /orders/:id/destroy'

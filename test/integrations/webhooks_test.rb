@@ -233,6 +233,43 @@ class WebhooksTest < ActiveSupport::TestCase
     assert_includes discussion.comments.order('created_at desc').first.body, 'See you there'
   end
 
+  test "a signed reply is refused without an envelope sender Mailgun's SPF check passed" do
+    create_event
+    discussion = @event.discussion_post!(@account)
+    with_mailgun_signing_key('signing-key') do
+      params = inbound_reply_params(@account, 'Sent by someone else', key: 'signing-key')
+      [
+        params.merge('sender' => 'someone@example.com'),
+        params.except('sender'),
+        params.merge('message-headers' => [['From', @account.email], ['X-Mailgun-Spf', 'Fail']].to_json)
+      ].each do |forged|
+        post "/inbound/#{discussion.id}", forged
+        assert_equal 401, last_response.status
+      end
+      post "/inbound/#{discussion.id}", params
+      assert_equal 200, last_response.status
+    end
+    assert_equal 1, discussion.comments.count
+    assert_includes discussion.comments.first.body, 'Sent by someone else'
+  end
+
+  test "a reply from someone who can't see the discussion is refused and makes no comment" do
+    create_event
+    discussion = @event.discussion_post!(@account)
+    outsider = FactoryBot.create(:account)
+    with_mailgun_signing_key('signing-key') do
+      post "/inbound/#{discussion.id}", inbound_reply_params(outsider, 'Let me in', key: 'signing-key')
+      assert_equal 403, last_response.status
+      assert_equal 0, discussion.comments.count
+
+      # Once they have a ticket, they can see it, and their reply is a comment
+      @event.tickets.create!(account: outsider, ticket_type: @event.ticket_types.first, payment_completed: true)
+      post "/inbound/#{discussion.id}", inbound_reply_params(outsider, 'Thanks for having me', key: 'signing-key')
+      assert_equal 200, last_response.status
+    end
+    assert_equal [outsider], discussion.comments.map(&:account)
+  end
+
   test 'an inbound email without Mailgun\'s signature is refused' do
     create_event
     discussion = @event.discussion_post!(@account)
@@ -250,7 +287,7 @@ class WebhooksTest < ActiveSupport::TestCase
       post "/inbound/#{discussion.id}", inbound_reply_params(@account, 'No key set', key: '')
       assert_equal 401, last_response.status
     end
-    assert_equal 0, discussion.comments.and(via_email: true).count
+    assert_equal 0, discussion.comments.count
   end
 
   test 'a click webhook signed with the organisation\'s key is counted' do

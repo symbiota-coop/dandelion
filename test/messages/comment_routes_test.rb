@@ -108,6 +108,23 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
     assert @comment.reload.file_uid
   end
 
+  # Editing comments
+
+  test "only a comment's author edits it, not another member of the discussion" do
+    covers_route 'POST /comments/:id/edit'
+    team_thread
+    other_member = create_gathering_member(name: 'Other Member')
+    sign_in_with_rack(other_member)
+    post "/comments/#{@comment.id}/edit", body: 'Rewritten'
+    assert_equal 403, last_response.status
+    assert_equal 'Secret plans', @comment.reload.body
+
+    sign_in_with_rack(@member)
+    post "/comments/#{@comment.id}/edit", body: 'Rewritten'
+    assert last_response.ok?
+    assert_equal 'Rewritten', @comment.reload.body
+  end
+
   # Subscribing and unsubscribing
 
   test "a discussion's members subscribe to its threads, once each" do
@@ -171,6 +188,23 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
     assert last_response.redirect?
     assert_includes last_response.location, '/accounts/new'
     assert_equal count, @post.subscriptions.count
+  end
+
+  test "a subscription is unsubscribed only by its own account" do
+    team_thread
+    subscription = @post.subscriptions.find_by(account: @member)
+    assert subscription
+    other_member = create_gathering_member(name: 'Other Member')
+    sign_in_with_rack(other_member)
+    get "/subscriptions/#{subscription.id}/unsubscribe"
+    assert_equal 403, last_response.status
+    assert Subscription.find(subscription.id)
+
+    sign_in_with_rack(@member)
+    get "/subscriptions/#{subscription.id}/unsubscribe"
+    assert last_response.ok?
+    assert_nil Subscription.find(subscription.id)
+    assert_nil @post.subscriptions.find_by(account: @member)
   end
 
   # Photos
