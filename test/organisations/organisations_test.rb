@@ -310,4 +310,25 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert page.has_content? 'The organisation was saved'
     assert_equal 'NOK', Organisation.find_by(slug: 'toronto-circle').currency
   end
+
+  test 'destroying an organisation takes its events out of listings' do
+    create_event
+    stargazer = FactoryBot.create(:account)
+    stargazer.event_stars.create!(event: @event)
+    # Listed while the organisation exists, so the checks below can fail
+    assert_includes Event.live.pluck(:id), @event.id
+    assert_includes stargazer.upcoming_events.pluck(:id), @event.id
+    assert_includes stargazer.starred_events.pluck(:id), @event.id
+
+    @organisation.destroy
+
+    event = Event.find(@event.id)
+    assert_nil event.organisation_id
+    assert_equal false, event.has_organisation
+    assert_equal [], event.hosts_ids_cache
+    assert_not_includes Event.live.pluck(:id), @event.id
+    assert_not_includes stargazer.upcoming_events.pluck(:id), @event.id
+    assert_not_includes stargazer.starred_events.pluck(:id), @event.id
+    assert_not_includes stargazer.my_events.pluck(:id), @event.id
+  end
 end

@@ -17,7 +17,10 @@ module OrganisationAssociations
     has_many :notifications_as_notifiable, as: :notifiable, dependent: :destroy, class_name: 'Notification', inverse_of: :notifiable
     has_many :notifications_as_circle, as: :circle, dependent: :destroy, class_name: 'Notification', inverse_of: :circle
 
-    has_many :events, dependent: :nullify
+    # Not dependent: :nullify, which only clears organisation_id, without callbacks, leaving has_organisation true
+    # (and the organisation in hosts_ids_cache), so the events stayed in live and an account's upcoming events
+    has_many :events
+    before_destroy :detach_events
 
     has_many :carousels, dependent: :destroy
 
@@ -44,6 +47,11 @@ module OrganisationAssociations
       has_many_through :not_monthly_donors, conditions: { monthly_donation_method: nil }
       has_many_through :subscribed_not_monthly_donors, conditions: { monthly_donation_method: nil, unsubscribed: false }
     end
+  end
+
+  # The events' own callbacks don't run, so set what Event's before_validation would derive from organisation_id
+  def detach_events
+    events.update_all('$set' => { organisation_id: nil, has_organisation: false }, '$pull' => { hosts_ids_cache: id })
   end
 
   def subscribed_member_ids
