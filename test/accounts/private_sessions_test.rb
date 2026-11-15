@@ -220,7 +220,18 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
       assert column.evaluate_script('this.getBoundingClientRect().left > document.querySelector("#how-to-book").getBoundingClientRect().right')
       assert page.has_no_link?('Edit')
     end
+    # While it's open, the address bar shows the session's own URL; going back closes it, back on the list
+    assert page.has_current_path?(private_session.path)
+    page.go_back
+    assert page.has_no_css?('#modal.show')
     assert page.has_current_path?('/private_sessions')
+    # And closing it goes back to the list's address too
+    within('#private-sessions') { click_link 'Deep tissue massage' }
+    assert page.has_current_path?(private_session.path)
+    within('#modal') { find('.btn-close').click }
+    assert page.has_current_path?('/private_sessions')
+    assert page.has_no_css?('#modal.show')
+    within('#private-sessions') { click_link 'Deep tissue massage' }
     within('#modal') { click_link 'Deep tissue massage' }
     assert page.has_current_path?(private_session.path)
     assert page.has_css?('h1', text: 'Deep tissue massage')

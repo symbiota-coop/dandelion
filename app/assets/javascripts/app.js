@@ -109,15 +109,24 @@ $(function () {
   // Its edit form starts at its first field. Only these: other things #modal shows (an application, a profile) may
   // have a form further down, like a discussion's, which shouldn't take the focus (and bring up a phone's keyboard),
   // and a form these show that isn't what the link is for says so with data-no-autofocus (a private session's Vouch).
-  // data-modal-size="lg" (or "xl") widens it until it closes, for content in two columns, like a private session
+  // data-modal-size="lg" (or "xl") widens it until it closes, for content in two columns, like a private session.
+  // data-modal-push-url: while it's open the address bar shows the page it opened (a private session's), to copy or
+  // share, and going back closes it, as closing it goes back to the page's own address
   $(document).on('click', 'a[data-open-in-modal]', function (e) {
     e.preventDefault()
     const size = $(this).attr('data-modal-size')
+    const pushUrl = $(this).is('[data-modal-push-url]') ? $(this).attr('href') : null
     $('#modal .modal-content').load($(this).attr('href'), function () {
       const $modal = $('#modal')
       if (size) {
         $modal.find('.modal-dialog').addClass('modal-' + size)
         $modal.one('hidden.bs.modal', function () { $modal.find('.modal-dialog').removeClass('modal-' + size) })
+      }
+      if (pushUrl && !$modal.hasClass('show') && window.location.pathname !== pushUrl) {
+        history.pushState({ modalUrl: pushUrl }, '', pushUrl)
+        $modal.one('hidden.bs.modal', function () {
+          if (history.state && history.state.modalUrl === pushUrl) history.back()
+        })
       }
       const focusFirstField = function () {
         $modal.find('form').not('[data-no-autofocus]').find('input:visible, textarea:visible, select:visible').not('[type=hidden]').first().trigger('focus')
@@ -127,6 +136,12 @@ $(function () {
       else $modal.one('shown.bs.modal', focusFirstField).modal('show')
       hideTooltips()
     })
+  })
+
+  // Going back from a modal's address (data-modal-push-url) closes the modal
+  window.addEventListener('popstate', function () {
+    const $modal = $('#modal')
+    if ($modal.hasClass('show') && !(history.state && history.state.modalUrl)) $modal.modal('hide')
   })
 
   // A form with data-save-in-modal saves in #modal rather than leaving it: it posts in the background (an image too,

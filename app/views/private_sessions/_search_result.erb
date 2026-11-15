@@ -1,6 +1,6 @@
 <div class="search-result-person">
   <div class="search-result-media h-auto me-3">
-    <a href="<%= private_session.path %>" data-open-in-modal data-modal-size="lg">
+    <a href="<%= private_session.path %>" data-open-in-modal data-modal-size="lg" data-modal-push-url>
       <%# As private_sessions/_image.erb: its image, its creator's picture, or the wash %>
       <% if (image = private_session.image || private_session.account.image) %>
         <img class="d-block w-100" alt="<%= private_session.title_with_name %>" src="<%= u image.thumb('400x400#').url %>">
@@ -12,7 +12,7 @@
   <div class="search-result-content search-result-stacked">
     <div class="search-result-header">
       <h2>
-        <a class="text-body" href="<%= private_session.path %>" data-open-in-modal data-modal-size="lg"><%= private_session.title %></a> <small class="text-body-secondary">with <a class="text-reset" href="/u/<%= private_session.account.username %>"><%= private_session.account.name %></a></small>
+        <a class="text-body" href="<%= private_session.path %>" data-open-in-modal data-modal-size="lg" data-modal-push-url><%= private_session.title %></a> <small class="text-body-secondary">with <a class="text-reset" href="/u/<%= private_session.account.username %>"><%= private_session.account.name %></a></small>
       </h2>
       <div class="mb-1">
         <%= partial :'private_sessions/badges', locals: { private_session: private_session } %>
