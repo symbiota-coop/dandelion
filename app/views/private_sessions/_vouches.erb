@@ -1,0 +1,63 @@
+<%# Who vouches for the session, with what they said, then, under Vouch for this service, the form to vouch with an
+    optional testimonial (signed out, a Vouch link that asks you to sign in first). Someone who has vouched gets Edit
+    on their own vouch instead, which shows the form in its place to change or remove it %>
+<% vouches = private_session.private_session_vouches.includes(:account).order('created_at desc').to_a %>
+<% own_session = current_account && current_account.id == private_session.account_id %>
+<% own_vouch = current_account && vouches.find { |vouch| vouch.account_id == current_account.id } %>
+<%# Your own first, then everyone else's, newest first %>
+<% vouches = [own_vouch] + (vouches - [own_vouch]) if own_vouch %>
+<div id="vouches" class="mt-4">
+  <h3 class="heading-rule">Vouches</h3>
+  <% if vouches.empty? %>
+    <p class="text-body-secondary">No one has vouched for this service yet</p>
+  <% end %>
+
+  <% if vouches.any? %>
+    <ul class="list-unstyled mb-0">
+      <% vouches.each do |vouch| %>
+        <li class="d-flex gap-2 mb-3">
+          <div class="flex-shrink-0"><%= partial :'accounts/square', locals: { account: vouch.account, size: :xs } %></div>
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center justify-content-between gap-3">
+              <a href="/u/<%= vouch.account.username %>"><%= vouch.account.name %></a>
+              <% if vouch == own_vouch %>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="edit-vouch"><i class="bi bi-pencil"></i> Edit</button>
+              <% end %>
+            </div>
+            <% if vouch.testimonial %>
+              <div class="readable"<% if vouch == own_vouch %> id="own-vouch-testimonial"<% end %>><%= plain_text_html(vouch.testimonial, links: false) %></div>
+            <% end %>
+            <% if vouch == own_vouch %>
+              <div id="vouch-form" class="mt-2" style="display: none">
+                <%= partial :'private_sessions/vouch_form', locals: { private_session: private_session, own_vouch: own_vouch } %>
+              </div>
+            <% end %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <% if !own_session && !own_vouch %>
+    <h3 class="heading-rule mt-4">Vouch for this service</h3>
+    <% if current_account %>
+      <div id="vouch-form">
+        <%= partial :'private_sessions/vouch_form', locals: { private_session: private_session, own_vouch: nil } %>
+      </div>
+    <% else %>
+      <a class="btn btn-outline-primary" href="<%= private_session.path %>/vouch"><i class="bi bi-patch-check"></i> Vouch</a>
+    <% end %>
+  <% end %>
+</div>
+<% if own_vouch %>
+  <script>
+    $(function () {
+      // Edit shows the form in place of your testimonial
+      $('#edit-vouch').click(function () {
+        $(this).hide()
+        $('#own-vouch-testimonial').hide()
+        $('#vouch-form').show()
+      })
+    })
+  </script>
+<% end %>

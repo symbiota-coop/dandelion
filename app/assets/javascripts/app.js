@@ -107,7 +107,8 @@ $(function () {
   // A link with data-open-in-modal opens its page in #modal: the route answers the background request with just the
   // modal's contents (_modal_content.erb), and the link's href stays a page of its own to fall back on.
   // Its edit form starts at its first field. Only these: other things #modal shows (an application, a profile) may
-  // have a form further down, like a discussion's, which shouldn't take the focus (and bring up a phone's keyboard).
+  // have a form further down, like a discussion's, which shouldn't take the focus (and bring up a phone's keyboard),
+  // and a form these show that isn't what the link is for says so with data-no-autofocus (a private session's Vouch).
   // data-modal-size="lg" (or "xl") widens it until it closes, for content in two columns, like a private session
   $(document).on('click', 'a[data-open-in-modal]', function (e) {
     e.preventDefault()
@@ -119,7 +120,7 @@ $(function () {
         $modal.one('hidden.bs.modal', function () { $modal.find('.modal-dialog').removeClass('modal-' + size) })
       }
       const focusFirstField = function () {
-        $modal.find('form').find('input:visible, textarea:visible, select:visible').not('[type=hidden]').first().trigger('focus')
+        $modal.find('form').not('[data-no-autofocus]').find('input:visible, textarea:visible, select:visible').not('[type=hidden]').first().trigger('focus')
       }
       // Already open (a link inside the modal), it won't fire shown.bs.modal again
       if ($modal.hasClass('show')) focusFirstField()

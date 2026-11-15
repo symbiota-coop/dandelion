@@ -51,12 +51,14 @@
   border-bottom: 2px solid var(--bs-border-color);
 }
 
+/* Underlined as .heading-rule (app.css) underlines a section heading elsewhere, with the same gaps above and below
+   the line, as the title (h1) has too */
 #doc-body h2,
 .docs-deepwiki-answer h2,
 .docs-ask h2 {
   font-size: var(--font-size-xl);
   margin: var(--space-xl) 0 var(--space-sm);
-  padding-bottom: var(--space-2xs);
+  padding-bottom: var(--space-xs);
   border-bottom: 1px solid var(--bs-border-color);
 }
 

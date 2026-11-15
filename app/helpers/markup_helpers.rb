@@ -77,10 +77,12 @@ Dandelion::App.helpers do
   end
 
   # Plain text someone typed into a textarea, like a message or how to book a private session: escaped, with line
-  # breaks, and links for URLs and email addresses
-  def plain_text_html(text)
-    escaped = ERB::Util.html_escape(text.to_s)
-    Rinku.auto_link(escaped, :all, nil, nil, Rinku::AUTOLINK_SHORT_DOMAINS).gsub("\n", '<br>').html_safe
+  # breaks, and links for URLs and email addresses. links: false leaves them as text (a vouch's testimonial, where
+  # links would invite spam)
+  def plain_text_html(text, links: true)
+    html = ERB::Util.html_escape(text.to_s)
+    html = Rinku.auto_link(html, :all, nil, nil, Rinku::AUTOLINK_SHORT_DOMAINS) if links
+    html.gsub("\n", '<br>').html_safe
   end
 
   def timeago(time)

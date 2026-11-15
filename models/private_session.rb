@@ -18,6 +18,7 @@ class PrivateSession
   belongs_to_without_parent_validation :account
 
   has_many :private_session_tagships, dependent: :destroy
+  has_many :private_session_vouches, dependent: :destroy
   taggable tagships: :private_session_tagships, tag: :private_session_tag
 
   field :title, type: String
@@ -39,6 +40,8 @@ class PrivateSession
   field :image_uid, type: String
   field :has_image, type: Boolean
   field :secret, type: Boolean
+  # How many people have vouched for it, kept by PrivateSessionVouch, so lists needn't count each session's
+  field :vouches_count, type: Integer, default: 0
 
   DELIVERIES = { 'In person' => 'in_person', 'Online' => 'online', 'In person or online' => 'either' }.freeze
   # A number, or a range of two (60, or 60-90), as the form takes length in minutes and price
@@ -75,7 +78,7 @@ class PrivateSession
   end
 
   def self.protected_attributes
-    %w[coordinates has_image tag_names_cache]
+    %w[coordinates has_image tag_names_cache vouches_count]
   end
 
   # Length and price as the form takes them, a number or a range (TicketType's price_or_range does the same): stored
@@ -173,6 +176,10 @@ class PrivateSession
   # The offering account's own currency, if it has chosen one
   def default_currency
     (account.default_currency if account && account.default_currency.present?) || 'GBP'
+  end
+
+  def refresh_vouches_count
+    set(vouches_count: private_session_vouches.count)
   end
 
   def by_donation?

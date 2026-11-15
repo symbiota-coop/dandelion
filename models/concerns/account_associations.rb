@@ -96,6 +96,7 @@ module AccountAssociations
     has_many :photos, dependent: :destroy
 
     has_many :private_sessions, dependent: :destroy
+    has_many :private_session_vouches, dependent: :destroy
 
     has_many :notifications_as_notifiable, as: :notifiable, dependent: :destroy, class_name: 'Notification', inverse_of: :notifiable
     has_many :notifications_as_circle, as: :circle, dependent: :destroy, class_name: 'Notification', inverse_of: :circle

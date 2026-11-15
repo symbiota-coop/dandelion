@@ -13,7 +13,9 @@
   </div>
 <% end %>
 
-<div id="how-to-book" class="card mt-3">
-  <h3 class="card-header chill">How to book</h3>
-  <div class="card-body readable"><%= plain_text_html(private_session.how_to_book) %></div>
+<div id="how-to-book" class="mt-4">
+  <h3 class="heading-rule">How to book</h3>
+  <div class="readable"><%= plain_text_html(private_session.how_to_book) %></div>
 </div>
+
+<%= partial :'private_sessions/vouches', locals: { private_session: private_session } %>

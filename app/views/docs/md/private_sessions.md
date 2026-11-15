@@ -13,6 +13,12 @@ Your private sessions are also listed on your profile. To keep one off the Priva
 
 Only you (and Dandelion's admins) can edit or delete your private sessions. <!-- claim: only-owner-edits -->
 
+## Vouching for a private session
+
+If you know a private session is good, click Vouch on it, and add a testimonial if you like. You can vouch for a session once, and not for your own. <!-- claim: vouch-once-not-own -->
+
+Your name and picture show with your vouch and testimonial on the session, and lists show how many people have vouched for it. You can change your testimonial or remove your vouch there too. <!-- claim: vouch-shown-changed -->
+
 ## Booking a private session
 
 Private sessions aren't booked through Dandelion: each one says how to book it, with the email address, phone number or booking link the person offering it gives, and you arrange a time and payment with them directly. <!-- claim: how-to-book -->

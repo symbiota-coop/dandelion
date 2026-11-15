@@ -1,0 +1,13 @@
+<%# Vouching, with an optional testimonial, or (own_vouch) changing or removing yours. data-no-autofocus: a session opens
+    in #modal to be read, not to vouch (app.js) %>
+<% form_tag "#{private_session.path}/vouch", method: 'post', class: 'mb-3', 'data-no-autofocus': true do %>
+  <div class="mb-3">
+    <label class="form-label" for="vouch-testimonial">Testimonial (optional)</label>
+    <%= text_area_tag :testimonial, value: own_vouch&.testimonial, class: 'form-control', rows: 3, id: 'vouch-testimonial', maxlength: PrivateSessionVouch::TESTIMONIAL_MAX_LENGTH %>
+    <small class="form-text">Your name and picture show with your vouch</small>
+  </div>
+  <button type="submit" class="btn btn-primary"><%= own_vouch ? 'Save' : 'Vouch' %></button>
+  <% if own_vouch %>
+    <a class="btn btn-outline-danger" data-method="post" data-confirm="Remove your vouch for this service?" href="<%= private_session.path %>/unvouch">Remove my vouch</a>
+  <% end %>
+<% end %>

@@ -3353,6 +3353,13 @@ table.event-details td {
   margin-bottom: 0;
 }
 
+/* A section heading underlined, as the docs' headings are (docs.css): a private session's How to book and Vouches */
+.heading-rule {
+  padding-bottom: var(--space-xs);
+  margin-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
 .card-header.chill {
   background: var(--bs-white) !important;
   color: var(--bs-body-color) !important;

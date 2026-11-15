@@ -95,6 +95,37 @@ Dandelion::App.controller do
     end
   end
 
+  # Vouch, signed out: sign in, and come back to the session's vouches (kick! keeps this URL to return to)
+  get '/ps/:slug/vouch' do
+    @private_session = private_session_from_params
+    sign_in_required!(notice: 'Sign up or sign in to vouch for this session')
+    redirect "#{@private_session.path}#vouches"
+  end
+
+  # Vouching for a session, with a testimonial or none, or changing the testimonial
+  post '/ps/:slug/vouch' do
+    @private_session = private_session_from_params
+    sign_in_required!
+    halt 403 if @private_session.account_id == current_account.id
+    vouch = @private_session.private_session_vouches.find_or_initialize_by(account: current_account)
+    created = vouch.new_record?
+    vouch.testimonial = params[:testimonial]
+    if vouch.save
+      flash[:notice] = created ? 'Thanks for vouching.' : 'Your testimonial was saved.'
+    else
+      flash[:error] = "Your vouch couldn't be saved: #{vouch.errors.full_messages.to_sentence}"
+    end
+    redirect @private_session.path
+  end
+
+  post '/ps/:slug/unvouch' do
+    @private_session = private_session_from_params
+    sign_in_required!
+    @private_session.private_session_vouches.find_by(account: current_account)&.destroy
+    flash[:notice] = 'Your vouch was removed.'
+    redirect @private_session.path
+  end
+
   post '/ps/:slug/destroy' do
     @private_session = private_session_from_params
     own_private_session_only!
