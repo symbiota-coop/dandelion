@@ -18,14 +18,16 @@ if RACK_ENV == 'test'
   require 'socket'
   ENV['TEST_DATABASE'] = "dandelion_test_#{Process.pid}"
   # Capybara binds the port seconds later, so a port the OS picks now could be taken by another run by then.
-  # Instead, each run takes the first free port in its own block of 10, set by its process ID
+  # Instead, each run takes the first free port in its own block of 10, set by its process ID. The blocks stay
+  # below 32768, where Linux starts the ephemeral ports it gives the local end of outgoing connections (macOS
+  # starts at 49152): a pooled Mongo connection on the chosen port would stop Capybara's Puma binding it
   port_free = lambda do |port|
     TCPServer.new('127.0.0.1', port).close
     true
   rescue Errno::EADDRINUSE, Errno::EACCES
     false
   end
-  block = 10_000 + ((Process.pid % 4000) * 10)
+  block = 10_000 + ((Process.pid % 2000) * 10)
   port = (block...(block + 10)).find(&port_free)
   raise "No free port in #{block}-#{block + 9}" unless port
   ENV['PORT'] = port.to_s
