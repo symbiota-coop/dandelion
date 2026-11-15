@@ -1,35 +1,14 @@
 require_relative '../test_config'
+require_relative '../helpers/race_helpers'
 
 # Bookings at the same time: each checks what's left before taking it, so without the locks a booking holds
 # (OrderBuilder#booking_locks, RecordLock) two could both see the last place, a discount code's last use or the whole
 # of the buyer's credit, and both take it. Each race runs several times, as one that oversells only does so some of
 # the time
 class BookingsCapacityRacesTest < ActiveSupport::TestCase
-  ITERATIONS = 5
+  include RaceHelpers
 
-  # Runs the block in count threads at once: each sets up first (it's given a gate to wait at), and they're let through
-  # together. Gives what each returned or raised
-  def race(count, &block)
-    gate = Queue.new
-    ready = Queue.new
-    threads = Array.new(count) do |index|
-      Thread.new do
-        Thread.current.report_on_exception = false
-        wait = lambda do
-          ready << true
-          gate.pop
-        end
-        block.call(index, wait)
-      end
-    end
-    count.times { ready.pop }
-    count.times { gate << true }
-    threads.map do |thread|
-      thread.value
-    rescue StandardError => e
-      e
-    end
-  end
+  ITERATIONS = 5
 
   # A booking as the checkout form makes one, by a buyer signed out, with its own copy of the event as each request
   # has. Waits at the gate once it's ready to book

@@ -1,12 +1,18 @@
 require_relative '../test_config'
 require_relative '../helpers/gatherings_helpers'
+require_relative '../helpers/race_helpers'
 
 # A gathering's members: what its admins set on a membership (admin, paid, invitations, shift points), adding members,
-# seeing a member's answers and leaving (though not by a gathering's only admin), and who may do each
+# seeing a member's answers and leaving, and who may do each. A gathering keeps its only admin however their membership
+# would go: leaving, being unadmined or removed, their account being deleted, or two admins going at the same time
 class GatheringMembersTest < ActiveSupport::TestCase
   include Capybara::DSL
   include Rack::Test::Methods
   include GatheringsHelpers
+  include RaceHelpers
+
+  # Races run several times, as a race that gets past a check only does so some of the time
+  ITERATIONS = 10
 
   def membership_row(membership)
     find("[data-pagelet-url='#{gathering_path("/membership_row/#{membership.id}")}']")
@@ -21,6 +27,21 @@ class GatheringMembersTest < ActiveSupport::TestCase
   def create_other_gathering_with_member
     create_other_gathering
     @other_membership = @other_gathering.memberships.create!(account: FactoryBot.create(:account))
+  end
+
+  # A Rack session of its own, signed in as account, for a request racing another's
+  def session_signed_in_as(account)
+    Rack::Test::Session.new(app).tap do |session|
+      session.get '/', sign_in_code: Account.find(account.id).issue_sign_in_code!
+      session.follow_redirect! while session.last_response.redirect?
+    end
+  end
+
+  # A gathering with two admins, a new @account and a second, given
+  def create_gathering_with_two_admins
+    @account = nil
+    create_gathering(privacy: 'open')
+    create_gathering_member(name: 'Second Admin').tap { |second| membership_of(second).set(admin: true) }
   end
 
   test 'an admin records what a member paid, their invitations and the shift points they owe' do
@@ -468,5 +489,134 @@ class GatheringMembersTest < ActiveSupport::TestCase
     get gathering_path('/members.csv')
     row = CSV.parse(last_response.body, headers: true).find { |csv_row| csv_row['name'] == 'Hidden Person' }
     assert_equal 'hidden@example.com', row['email']
+  end
+
+  test "the only admin of a gathering isn't offered deleting their account until there's another admin" do
+    covers 'gatherings/only-admin-keeps-account@015714'
+    create_gathering(privacy: 'open')
+    member = create_gathering_member
+    sign_in(@account)
+    visit '/accounts/delete'
+    assert page.has_content? "You're the only admin of these gatherings"
+    assert page.has_link? @gathering.name, href: gathering_path('/members')
+    assert page.has_no_button? 'Delete account'
+
+    membership_of(member).set(admin: true)
+    visit '/accounts/delete'
+    assert page.has_content? 'To completely remove your account'
+    assert page.has_no_content? "You're the only admin of these gatherings"
+    fill_in 'email', with: @account.email
+    click_button 'Delete account'
+    assert page.has_content? 'Your account was deleted'
+    assert_nil Account.find(@account.id)
+    assert_equal [member.id], @gathering.reload.memberships.pluck(:account_id)
+    assert membership_of(member).admin
+  end
+
+  test "the only admin of a gathering can't delete their account" do
+    covers 'gatherings/only-admin-keeps-account@015714'
+    covers_route 'POST /accounts/destroy'
+    create_gathering(privacy: 'open')
+    member = create_gathering_member
+    own = membership_of(@account)
+
+    sign_in_with_rack(@account)
+    post '/accounts/destroy', email: @account.email
+    assert_equal '/accounts/delete', URI(last_response.location).path
+    follow_redirect!
+    assert_includes last_response.body, "Your account wasn't deleted"
+    assert Account.find(@account.id)
+    assert Membership.find(own.id)
+    assert own.reload.admin
+    assert_equal 2, @gathering.reload.membership_count
+
+    # With a second admin, the account goes, and its membership with it
+    membership_of(member).set(admin: true)
+    post '/accounts/destroy', email: @account.email
+    assert_equal '/', URI(last_response.location).path
+    assert_nil Account.find(@account.id)
+    assert_nil Membership.find(own.id)
+  end
+
+  test "an account that's the only admin of a gathering isn't deleted, even with no other members, until the gathering is" do
+    covers 'gatherings/only-admin-keeps-account@015714'
+    create_gathering
+    own = membership_of(@account)
+
+    refute @account.destroy
+    assert Account.find(@account.id)
+    assert Membership.find(own.id)
+    refute own.destroy, 'nor is the membership on its own'
+    assert Membership.find(own.id)
+    assert_equal [@gathering.id], @account.gatherings_as_only_admin.pluck(:id)
+
+    # Deleting the gathering takes its memberships, the only admin's too
+    @gathering.destroy
+    assert_nil Membership.find(own.id)
+    assert_empty @account.gatherings_as_only_admin
+    assert Account.find(@account.id).destroy
+    assert_nil Account.find(@account.id)
+  end
+
+  test 'two admins leaving at the same time leave one of them' do
+    covers 'gatherings/admins-going-at-once@00bcdc'
+    ITERATIONS.times do
+      second = create_gathering_with_two_admins
+      admins = [@account, second]
+      sessions = admins.map { |admin| session_signed_in_as(admin) }
+      path = gathering_path('/leave')
+      race(2) do |index, wait|
+        wait.call
+        sessions[index].post path
+      end
+      assert_equal 1, @gathering.memberships.and(admin: true).count
+      assert_equal 1, @gathering.memberships.count
+    end
+  end
+
+  test 'two admins unadmining each other at the same time leave one admin' do
+    covers 'gatherings/admins-going-at-once@00bcdc'
+    ITERATIONS.times do
+      second = create_gathering_with_two_admins
+      memberships = [membership_of(second), membership_of(@account)]
+      sessions = [@account, second].map { |admin| session_signed_in_as(admin) }
+      race(2) do |index, wait|
+        wait.call
+        sessions[index].post gathering_path("/memberships/#{memberships[index].id}/unadmin")
+      end
+      assert_equal 1, @gathering.memberships.and(admin: true).count
+    end
+  end
+
+  test 'two admins removing each other at the same time leave one of them' do
+    covers 'gatherings/admins-going-at-once@00bcdc'
+    ITERATIONS.times do
+      second = create_gathering_with_two_admins
+      memberships = [membership_of(second), membership_of(@account)]
+      sessions = [@account, second].map { |admin| session_signed_in_as(admin) }
+      race(2) do |index, wait|
+        wait.call
+        sessions[index].post gathering_path("/memberships/#{memberships[index].id}/remove")
+      end
+      assert_equal 1, @gathering.memberships.and(admin: true).count
+      assert_equal 1, @gathering.memberships.count
+    end
+  end
+
+  test "an admin deleting their account while the other admin leaves leaves one of them" do
+    covers 'gatherings/admins-going-at-once@00bcdc'
+    ITERATIONS.times do
+      second = create_gathering_with_two_admins
+      leaving = membership_of(second)
+      deleting = Account.find(@account.id)
+      race(2) do |index, wait|
+        wait.call
+        index.zero? ? deleting.destroy : Membership.find(leaving.id).destroy
+      end
+      admins = @gathering.memberships.and(admin: true)
+      assert_equal 1, admins.count
+      # Whichever stayed still has its account
+      assert Account.find(admins.first.account_id)
+    end
   end
 end

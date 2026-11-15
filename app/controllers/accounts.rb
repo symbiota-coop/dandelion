@@ -271,6 +271,7 @@ Dandelion::App.controller do
     sign_in_required!
     verification_required!(return_to: '/accounts/delete', notice: 'To delete your account, enter the code below.')
     @account = current_account
+    @gatherings_as_only_admin = @account.gatherings_as_only_admin.order_by(name: 1).to_a
     erb :'accounts/delete'
   end
 
@@ -486,8 +487,12 @@ Dandelion::App.controller do
     sign_in_required!
     verification_required!(return_to: '/accounts/delete', notice: "Your account wasn't deleted: enter the code below, then delete it again.")
     if params[:email] && (params[:email] == current_account.email)
+      # Refused while it's the only admin of a gathering (which the page lists) or a site admin
+      unless current_account.destroy
+        flash[:error] = "Your account wasn't deleted"
+        redirect '/accounts/delete'
+      end
       flash[:notice] = 'Your account was deleted'
-      current_account.destroy
       session.clear
       redirect '/'
     else

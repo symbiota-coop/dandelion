@@ -78,7 +78,7 @@ You can choose from three access modes: Anyone with the link can join, People mu
 
 Filters on the members list combine: only members matching all of them are shown. <!-- claim: member-filters --> You can filter by gender, payment, shifts, teams and chosen options, and to admins.
 
-A gathering always keeps at least one admin: its only admin can't leave the gathering, be unadmined or be removed until someone else has been made an admin. <!-- claim: only-admin-stays -->
+A gathering always keeps at least one admin: its only admin can't leave the gathering, be unadmined or be removed until someone else has been made an admin. <!-- claim: only-admin-stays --> Nor can they delete their account while they're the only admin of any gathering: they'll need to make someone else an admin of it, or delete it, first. <!-- claim: only-admin-keeps-account --> Two admins leaving, unadmining or removing each other at the same time can't both go. <!-- claim: admins-going-at-once -->
 
 ## Applications
 
