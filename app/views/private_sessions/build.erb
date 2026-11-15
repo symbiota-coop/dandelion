@@ -1,6 +1,10 @@
-<%# Once saved, back to it at its saved slug, from the URL: a failed save may have left an invalid new one on the session %>
-<%= partial :back, locals: @private_session.persisted? ? { to: @private_session.title_was, path: "/ps/#{params[:slug]}" } : { to: 'private sessions', path: '/private_sessions' } %>
-<% if @private_session.new_record? %>
-  <h1>Offer a private session</h1>
-<% end %>
-<%= partial :'private_sessions/form' %>
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <%# Once saved, back to it at its saved slug, from the URL: a failed save may have left an invalid new one on the session %>
+    <%= partial :back, locals: @private_session.persisted? ? { to: @private_session.title_was, path: "/ps/#{params[:slug]}" } : { to: 'private sessions', path: '/private_sessions' } %>
+    <% if @private_session.new_record? %>
+      <h1>Offer a private session</h1>
+    <% end %>
+    <%= partial :'private_sessions/form' %>
+  </div>
+</div>

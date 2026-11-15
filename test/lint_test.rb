@@ -309,6 +309,35 @@ class LintTest < Minitest::Test
                           'for whoever opens their URL as a page, with no modal to close'
   end
 
+  # A form, other than a search form: form_for, form_tag (not method: 'get') or a build or form partial
+  PAGE_FORM = %r{\b(?:form_for|form_tag)\b(?![^\n]*method:\s*'get')|partial :'[\w/]*/(?:build|form)'}
+
+  # Whether _back.erb, and so the page below it, sits in a centred column: its lines before it, bar ERB comments, end
+  # with a row justify-content-center and a col
+  def back_in_centred_column?(template)
+    before = template.lines.map(&:strip).take_while { |line| !line.start_with?('<%= partial :back,') }.grep_v(/\A<%#.*%>\z/)
+    before.last.to_s.match?(/\A<div class="col[^"]*">\z/) && before[-2].to_s.match?(/\A<div class="row justify-content-center[^"]*">\z/)
+  end
+
+  # A form page that starts with Return to (a subpage's form, like a rota's role or an organisation's tier) puts its way
+  # back and its form in a centred column, so they line up, as a subpage's forms all sit the same
+  def test_return_to_forms_sit_in_a_centred_column
+    centred = "<%= partial :'gatherings/nav' %>\n<div class=\"row justify-content-center\">\n  <div class=\"col-lg-8\">\n    <%= partial :back, locals: {} %>\n"
+    assert back_in_centred_column?(centred)
+    refute back_in_centred_column?("<%= partial :back, locals: {} %>\n<div class=\"container\">\n  <%= partial :'organisation_tiers/build' %>\n</div>\n")
+    refute back_in_centred_column?("<div class=\"row\">\n  <div class=\"col-lg-8\">\n    <%= partial :back, locals: {} %>\n")
+    assert_match PAGE_FORM, "<% form_for @role, '/roles' do |f| %>"
+    refute_match PAGE_FORM, "<% form_tag '', method: 'get', class: 'searchForm' do %>"
+
+    offenders = Dir[File.join(ROOT, 'app/views/**/[!_]*.erb')].select do |path|
+      template = File.read(path, encoding: 'UTF-8')
+      template.include?('<%= partial :back,') && template.match?(PAGE_FORM) && !back_in_centred_column?(template)
+    end
+    assert_empty offenders.map { |path| path.delete_prefix("#{ROOT}/") },
+                 "A form page that starts with Return to puts it and the form in a centred column, after any nav: <div class=\"row justify-content-center\">, " \
+                 "<div class=\"col-lg-8\">, then <%= partial :back, ... %>, its heading and the form"
+  end
+
   def test_icon_first
     [
       %(<a class="btn btn-primary" href="#">Star <i class="bi bi-star"></i></a>),
