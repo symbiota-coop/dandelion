@@ -130,7 +130,7 @@ jobs:
           - group: event_permissions
             files: events/permissions events/cohost_permissions
           - group: events
-            files: events/events events/drafts events/content_safety events/hosts events/creation events/event_images
+            files: events/events events/drafts events/content_safety events/hosts events/creation events/event_images events/locked
           - group: gathering_features
             files: gatherings/features gatherings/rules gatherings/joining
           - group: gatherings

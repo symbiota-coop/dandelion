@@ -79,7 +79,6 @@ class AccountSignInsTest < ActiveSupport::TestCase
   end
 
   test 'a POST from our own pages keeps the session, and a cross-site one runs signed out' do
-    covers_route 'POST /tickets/:id/toggle_resale'
     account = FactoryBot.create(:account)
     # Signed in, a ticket that isn't there is a 404; signed out, sign_in_required! sends you to sign up
     path = "/tickets/#{BSON::ObjectId.new}/toggle_resale"
