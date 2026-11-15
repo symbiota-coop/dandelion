@@ -1754,6 +1754,11 @@ input.flatpickr-mobile-empty:not(:focus)::-webkit-datetime-edit {
     display: block
   }
 
+  /* Stacked, the fields sit as far apart as the Search button sits from them */
+  .searchForm .form-group {
+    margin-bottom: var(--space-xs);
+  }
+
   .searchForm input[type=submit] {
     margin-top: var(--space-xs);
     margin-bottom: var(--space-base);
