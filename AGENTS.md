@@ -113,6 +113,20 @@ Keep each test file to one subject, in its area's folder, splitting it when it g
 
 Straight after a click or submit, assert something on the new page before checking something isn't there, or that check can pass on the old page (`Dandelion/CapybaraHasNoAfterClick`; and check with `assert page.has_no_*`, as `Dandelion/CapybaraRefuteHas` says).
 
+### Tests that can fail
+
+A test is worth what it would catch, and a test that passes with its feature broken is worse than none, as it says the feature works. An audit of this suite found tests like that (fed0f73c8, b01cd4728); these are the ways they went wrong:
+
+- Make sure it can fail: before finishing, break what it checks and see it fail. Break it in memory, not by editing the app, as other sessions share the checkout: `foreman run -e .env.test bundle exec ruby -I test -e "require './test/events/evergreen_test'; Event.prepend(Module.new { def evergreen? = false })" -- -n /made_evergreen/`
+- Stub what's outside, never what's under test: Stripe's, PayPal's or Bluesky's API, Faraday and Mailgun, not our own check. The organisation's Stripe webhook tests stubbed `construct_event`, so its signature check never ran. A fake service must also be able to say no: one that only ever answers well never tests the refusals
+- Don't hand the code its answer: a test passing in the value that decides its result (`credit: false` in a test that credit is only for the buyer) tests only that value
+- Show the allowed case too: a refusal needs the same request succeeding when allowed, or a 403 or redirect from something else (not signed in, a missing record) passes. After a refusal, check nothing changed (the record, the session token, no email sent)
+- Check what happened, not that something ran: who an email went to and what it says, not that a job was queued; the record a webhook completed, not the 200
+- Check the setup holds: a boost that starts in two hours isn't live, an `Event.new` with no organisation is refused for that reason first, and a stub on a method the code no longer calls (`find_by`, where it calls `find_one_and_update`) does nothing. Assert the precondition, or that the gate or stub was reached
+- Watch for checks that can't fail: assertions only inside a loop over what may be empty, or behind `if`, `unless` or `&.`; an absence check before the page or pagelet has loaded; a fake that raises before it records a request the app then rescues
+- Never weaken a test to make it pass: not by loosening an expectation, deleting an assertion, adding a stub or `skip`, or widening an allowlist. If the app is wrong, fix the app; if the test was wrong, say why in the commit
+- Say what you ran: which tests passed, which failed and which you didn't run, and don't call something verified that wasn't
+
 ## Conventions
 
 - Controllers are `Dandelion::App.controller` blocks with `erb` / `partial` / `cp` (`Dandelion/RailsController` checks for Rails habits)
