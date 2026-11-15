@@ -1,12 +1,21 @@
 <%= partial :'accounts/nav' %>
 <div class="container">
 
-  <p>To completely remove your account, type your email address (<%= @account.email %>) into the box below and click 'Delete account'.</p>
-  <% form_tag '/accounts/destroy' do %>
-    <div class="input-group d-inline-flex w-auto">
-      <%= email_field_tag :email, class: 'form-control', 'aria-label': 'Email' %>
-      <button type="submit" class="btn btn-danger">Delete account</button>
-    </div>
+  <% if @gatherings_as_only_admin.any? %>
+    <p>You're the only admin of these gatherings. Make someone else an admin of each, or delete it, before you delete your account:</p>
+    <ul>
+      <% @gatherings_as_only_admin.each do |gathering| %>
+        <li><a href="/g/<%= gathering.slug %>/members"><%= gathering.name %></a></li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>To completely remove your account, type your email address (<%= @account.email %>) into the box below and click 'Delete account'.</p>
+    <% form_tag '/accounts/destroy' do %>
+      <div class="input-group d-inline-flex w-auto">
+        <%= email_field_tag :email, class: 'form-control', 'aria-label': 'Email' %>
+        <button type="submit" class="btn btn-danger">Delete account</button>
+      </div>
+    <% end %>
   <% end %>
 
 </div>

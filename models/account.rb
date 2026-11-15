@@ -436,6 +436,19 @@ class Account
     throw :abort if admin
   end
 
+  # The gatherings this account is the only admin of, which would be left with none if it were deleted
+  def gatherings_as_only_admin
+    Gathering.and(:id.in => memberships.and(admin: true).select(&:only_admin?).map(&:gathering_id))
+  end
+
+  # A gathering keeps its only admin (Membership#keep_the_only_admin), so the account isn't deleted while it is one:
+  # it would go, leaving its membership behind. The gatherings it admins stay locked until its memberships are gone,
+  # so another admin can't leave meanwhile; taken in id order, like every hold on several gatherings
+  around_destroy do |_account, destroy|
+    gatherings = Gathering.and(:id.in => memberships.and(admin: true).pluck(:gathering_id)).order_by(id: 1).to_a
+    RecordLock.hold(*gatherings) { destroy.call if gatherings_as_only_admin.none? }
+  end
+
   after_create do
     notifications_as_notifiable.create! circle: self, type: 'created_profile'
   end

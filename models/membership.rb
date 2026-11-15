@@ -73,6 +73,16 @@ class Membership
     admin? && !gathering.memberships.and(admin: true, :id.ne => id).exists?
   end
 
+  # However the membership goes (leaving, being removed, the account being deleted), the gathering's only admin stays,
+  # unless the gathering itself is being deleted. The check and the delete hold the gathering's lock, so two admins
+  # going at once can't each see the other stay. destroy returns false when it refuses
+  around_destroy :keep_the_only_admin
+  def keep_the_only_admin(&)
+    return yield if gathering.nil? || gathering.flagged_for_destroy?
+
+    RecordLock.hold(gathering) { yield unless only_admin? }
+  end
+
   after_create :send_email
   def send_email
     account = self.account

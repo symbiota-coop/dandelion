@@ -102,12 +102,15 @@ Dandelion::App.controller do
     @gathering = gathering_from_params
     # A site admin browsing has no membership to leave
     membership_required!(site_admins: false)
-    if @membership.only_admin?
-      flash[:error] = "You're the only admin of #{@gathering.name}: make someone else an admin before you leave"
-      redirect "/g/#{@gathering.slug}"
+    # Under the gathering's lock, so two admins leaving at once can't each see the other stay
+    RecordLock.hold(@gathering) do
+      if @membership.only_admin?
+        flash[:error] = "You're the only admin of #{@gathering.name}: make someone else an admin before you leave"
+        redirect "/g/#{@gathering.slug}"
+      end
+      @membership.destroy
     end
     flash[:notice] = "You left #{@gathering.name}"
-    @membership.destroy
     redirect '/'
   end
 
@@ -149,13 +152,16 @@ Dandelion::App.controller do
     membership = @gathering.memberships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
-    if membership.only_admin?
-      flash[:error] = 'The gathering needs another admin before its only admin can be unadmined'
-      redirect back
+    # Under the gathering's lock, so two admins unadmining each other at once can't each see the other stay
+    RecordLock.hold(@gathering) do
+      if membership.only_admin?
+        flash[:error] = 'The gathering needs another admin before its only admin can be unadmined'
+        redirect back
+      end
+      membership.admin = false
+      membership.admin_status_changed_by = current_account
+      membership.save!
     end
-    membership.admin = false
-    membership.admin_status_changed_by = current_account
-    membership.save!
     membership.notifications.and(:type.in => %w[made_admin unadmined]).destroy_all
     membership.notifications.create! circle: @gathering, type: 'unadmined'
     redirect back
@@ -166,11 +172,14 @@ Dandelion::App.controller do
     membership = @gathering.memberships.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
-    if membership.only_admin?
-      flash[:error] = 'The gathering needs another admin before its only admin can be removed'
-      redirect back
+    # Under the gathering's lock, so two admins removing each other at once can't each see the other stay
+    RecordLock.hold(@gathering) do
+      if membership.only_admin?
+        flash[:error] = 'The gathering needs another admin before its only admin can be removed'
+        redirect back
+      end
+      membership.destroy
     end
-    membership.destroy
     redirect back
   end
 
