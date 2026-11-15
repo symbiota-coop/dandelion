@@ -281,6 +281,47 @@ class LintTest < Minitest::Test
           .flat_map { |block| block.join.scan(/\berb[ (]:'?([\w\/]+)/).flatten }.uniq
   end
 
+  # The form partials buttons open in a modal to create something (_form_modal.erb's form:)
+  def form_modal_partials(template)
+    template.scan(/partial :form_modal, locals: \{[^}]*\bform: :'([\w\/]+)'/).flatten
+  end
+
+  # The edit routes, as 'GET /path', whose page renders one of these form partials but that don't answer a background
+  # request with a modal
+  def edit_routes_shown_only_as_pages(source, partials, templates)
+    blocks = source.lines.slice_before { |line| line.match?(RouteMarks::DEFINITION) || line.match?(RouteMarks::VERBS) }
+    blocks.filter_map do |block|
+      path = block.first[RouteMarks::DEFINITION, :path]
+      next unless block.first.match?(/\A\s*get\b/) && path&.end_with?('/edit')
+      next if block.join.include?('request.xhr?') && block.join.match?(MODAL_PARTIAL)
+
+      pages = block.join.scan(/\berb[ (]:'?([\w\/]+)/).flatten
+      "GET #{path}" if pages.any? { |page| partials.any? { |partial| templates[page].to_s.include?("partial :'#{partial}'") } }
+    end
+  end
+
+  # A form that opens in a modal to create something (Create a tier, List an expense) opens in one to edit it too: the
+  # edit link takes data-open-in-modal and its route answers a background request with _modal_content.erb
+  def test_forms_created_in_a_modal_are_edited_in_one
+    assert_equal %w[budget/build], form_modal_partials("<%= partial :form_modal, locals: { id: 'add-spend', title: 'List an expense', form: :'budget/build' } %>")
+    templates = { 'budget/build' => "<%= partial :back, locals: {} %>\n<%= partial :'budget/build' %>\n" }
+    page_only = "  get '/g/:slug/spends/:id/edit' do\n    erb :'budget/build'\n  end\n"
+    in_a_modal = "  get '/g/:slug/spends/:id/edit' do\n    request.xhr? ? partial(:modal_content, locals: {}) : erb(:'budget/build')\n  end\n"
+    assert_equal ['GET /g/:slug/spends/:id/edit'], edit_routes_shown_only_as_pages(page_only, %w[budget/build], templates)
+    assert_empty edit_routes_shown_only_as_pages(in_a_modal, %w[budget/build], templates)
+
+    views = Dir[File.join(ROOT, 'app/views/**/*.erb')].to_h do |path|
+      [path.delete_prefix(File.join(ROOT, 'app/views/')).delete_suffix('.erb'), File.read(path, encoding: 'UTF-8')]
+    end
+    partials = views.values.flat_map { |template| form_modal_partials(template) }.uniq
+    assert_includes partials, 'organisation_tiers/build'
+    offenders = Dir[File.join(ROOT, 'app/controllers/*.rb')].flat_map do |path|
+      edit_routes_shown_only_as_pages(File.read(path, encoding: 'UTF-8'), partials, views)
+    end
+    assert_empty offenders, 'A form created in a modal is edited in one: answer a background request to its edit route with ' \
+                            "partial(:modal_content, locals: { title: ..., form: :'x/build' }), and give its edit link data-open-in-modal"
+  end
+
   # Whether a page starts with its way back: after any nav, ERB comments and opening divs, its first line is _back.erb
   def starts_with_a_way_back?(template)
     first = template.lines.map(&:strip).find { |line| !(line.empty? || line.match?(/\A<%#.*%>\z/) || line.match?(/\A<%= partial :'[\w\/]*nav'/) || line.match?(/\A<div\b[^>]*>\z/)) }
