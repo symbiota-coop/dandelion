@@ -11,6 +11,7 @@ module Dandelion
     use SessionCookieWrites
     use Rack::CrawlerDetect
     use Rack::Attack
+    use ListingConcurrencyLimit
     use Dragonfly::Middleware
     use OmniAuth::Builder do
       provider :account

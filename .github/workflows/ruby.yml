@@ -124,7 +124,7 @@ jobs:
           - group: accounts
             files: accounts/accounts accounts/profile_validation accounts/sign_ins accounts/password_sign_in_pauses accounts/email_confirmation accounts/provider_sign_ins accounts/privacy accounts/private_sessions accounts/private_session_vouches
           - group: calendar
-            files: events/calendar events/evergreen events/listings events/boosts messages/comments integrations/atproto_events events/organisation_listings gatherings/gathering_routes
+            files: events/calendar events/evergreen events/listings events/listing_concurrency events/boosts messages/comments integrations/atproto_events events/organisation_listings gatherings/gathering_routes
           - group: event_bookings
             files: bookings/bookings bookings/rules events/opencollective events/feedback_permissions
           - group: event_permissions
