@@ -137,5 +137,26 @@ class MolliePaymentsTest < ActiveSupport::TestCase
 
     assert_equal 200, last_response.status
     refute order.reload.payment_completed?
+
+    deliver_mollie_webhook(@organisation, stub_mollie_payment(id: order.mollie_payment_id))
+    assert_equal 200, last_response.status
+    assert order.reload.payment_completed?
+  end
+
+  test 'an organisation with no Mollie key ignores its webhook without calling Mollie' do
+    create_organisation(mollie_api_key: nil)
+    create_event(prices: [10])
+    order = create_incomplete_order(@event, mollie_payment_id: "tr_#{SecureRandom.hex(4)}")
+
+    Mollie::Payment.stub :get, ->(*) { raise 'Mollie::Payment.get should not be called' } do
+      post "/o/#{@organisation.slug}/mollie_webhook", id: order.mollie_payment_id
+    end
+    assert_equal 200, last_response.status
+    refute order.reload.payment_completed?
+
+    @organisation.set(mollie_api_key: 'test_molliekey')
+    deliver_mollie_webhook(@organisation, stub_mollie_payment(id: order.mollie_payment_id))
+    assert_equal 200, last_response.status
+    assert order.reload.payment_completed?
   end
 end

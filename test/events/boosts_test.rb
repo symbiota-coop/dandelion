@@ -185,4 +185,57 @@ class EventBoostsTest < ActiveSupport::TestCase
     assert_equal 3, @event2.event_boost_impressions.count
     assert_equal 3, @event1.event_boost_impressions.count
   end
+
+  def boost_params(hourly_amount:)
+    {
+      start_time: (Time.zone.now.beginning_of_hour + 2.hours).strftime('%Y-%m-%d %H:%M'),
+      hours: 1,
+      hourly_amount: hourly_amount,
+      currency: @event.currency_or_default
+    }
+  end
+
+  test 'a boost that fails its checks answers with the error, saving nothing and starting no checkout' do
+    create_event(prices: [0])
+    sign_in_with_rack(@account)
+    minimum = EventBoost.minimum_hourly_amount(@event.currency_or_default)
+
+    Stripe::Checkout::Session.stub :create, ->(*) { raise 'no checkout should be started' } do
+      post "/e/#{@event.slug}/boosts", event_boost: boost_params(hourly_amount: minimum * 0.9)
+    end
+    assert_equal 400, last_response.status
+    assert_match(/\AHourly amount must be at least /, JSON.parse(last_response.body)['error'])
+    assert_equal 0, @event.event_boosts.count
+
+    Stripe::Checkout::Session.stub :create, api_object(id: 'cs_boost', payment_intent: 'pi_boost') do
+      post "/e/#{@event.slug}/boosts", event_boost: boost_params(hourly_amount: minimum)
+    end
+    assert_equal 200, last_response.status
+    assert_equal 'cs_boost', JSON.parse(last_response.body)['session_id']
+    assert_equal ['cs_boost'], @event.event_boosts.pluck(:session_id)
+  end
+
+  test 'a boost whose Stripe checkout cannot be started is removed again' do
+    create_event(prices: [0])
+    sign_in_with_rack(@account)
+    minimum = EventBoost.minimum_hourly_amount(@event.currency_or_default)
+    attempted = false
+
+    Stripe::Checkout::Session.stub :create, lambda { |*|
+      attempted = true
+      raise Stripe::APIConnectionError, 'Stripe is unreachable'
+    } do
+      post "/e/#{@event.slug}/boosts", event_boost: boost_params(hourly_amount: minimum)
+    end
+    assert attempted, 'the boost never reached Stripe'
+    assert_equal 400, last_response.status
+    assert_equal 'There was an error creating the boost.', JSON.parse(last_response.body)['error']
+    assert_equal 0, @event.event_boosts.count
+
+    Stripe::Checkout::Session.stub :create, api_object(id: 'cs_boost', payment_intent: 'pi_boost') do
+      post "/e/#{@event.slug}/boosts", event_boost: boost_params(hourly_amount: minimum)
+    end
+    assert_equal 200, last_response.status
+    assert_equal 1, @event.event_boosts.count
+  end
 end
