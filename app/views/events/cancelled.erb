@@ -5,7 +5,7 @@
     <div class="alert alert-warning" id="cancellation-message">
       <h2 class="h5<%= ' mb-0' unless @event.cancellation_message %>">This event has been cancelled</h2>
       <% if @event.cancellation_message %>
-        <%== Sanitize.fragment(Rinku.auto_link(ERB::Util.h(@event.cancellation_message).gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+        <%= plain_text_html(@event.cancellation_message) %>
       <% end %>
     </div>
     <% if @organisation %>

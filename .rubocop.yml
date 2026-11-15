@@ -157,3 +157,7 @@ Dandelion/MailgunDirect:
 Dandelion/Redcarpet:
   Exclude:
     - lib/markdown_renderer.rb
+# The emails' own nl2br (email templates don't have the app's helpers), for everything else
+Dandelion/EscapedLineBreaks:
+  Exclude:
+    - lib/mail/email_helper.rb

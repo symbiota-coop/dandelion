@@ -209,11 +209,12 @@ class EventPermissionsTest < ActiveSupport::TestCase
   test 'a cancelled event page answers 410 Gone, and only as HTML' do
     covers_route 'GET /e/:slug'
     create_event(prices: [0])
-    @event.set(cancelled: true, cancellation_message: 'Cancelled, sorry')
+    @event.set(cancelled: true, cancellation_message: "Cancelled, sorry <b>really</b>\nRefunds at https://example.com/refunds")
     @event.destroy
     get "/e/#{@event.slug}"
     assert_equal 410, last_response.status
-    assert_includes last_response.body, 'Cancelled, sorry'
+    # As typed (plain_text_html): escaped, its line breaks kept, and its links made
+    assert_includes last_response.body, 'Cancelled, sorry &lt;b&gt;really&lt;/b&gt;<br>Refunds at <a href="https://example.com/refunds">https://example.com/refunds</a>'
     get "/e/#{@event.slug}.json"
     assert_equal 404, last_response.status
   end
