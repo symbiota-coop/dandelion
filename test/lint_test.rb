@@ -874,4 +874,54 @@ class LintTest < Minitest::Test
       refute_match(%r{actions/ours}, output) # the $/ self-repository syntax is fine
     end
   end
+  # rake test:coverage's table of refusals no test triggered, from SimpleCov's results for a file
+  def test_untaken_refusals_lists_refusals_in_branches_no_test_took
+    require 'simplecov'
+    require_relative 'setup/coverage'
+    source = <<~RUBY
+      halt 403 unless admin? || owner?
+      kick! if banned?
+      if missing
+        # raise in a comment
+        flash[:notice] = 'Not found'
+        not_found
+      end
+      halt 404 unless found?
+      redirect '/' unless signed_in?
+      halt 403 unless event&.public?
+    RUBY
+    branch = ->(line, end_line = line) { "[:then, #{line}, #{line}, 0, #{end_line}, 10]" }
+    branches = {
+      '[:unless, 0, 1, 0, 1, 20]' => { branch.call(1) => 0, '[:else, 1, 1, 0, 1, 20]' => 2 },
+      '[:if, 2, 2, 0, 2, 16]' => { branch.call(2) => 0 },
+      '[:if, 3, 3, 0, 7, 3]' => { branch.call(4, 6) => 0 },
+      '[:unless, 4, 8, 0, 8, 20]' => { branch.call(8) => 1 }, # taken, so the test triggers it
+      '[:unless, 5, 9, 0, 9, 20]' => { branch.call(9) => 0 }, # untaken, but not a refusal
+      # the halt ran when event was nil, so its &. never called public?
+      '[:unless, 6, 10, 0, 10, 30]' => { branch.call(10) => 1 },
+      '[:"&.", 7, 10, 16, 10, 30]' => { '[:then, 8, 10, 16, 10, 30]' => 0, '[:else, 9, 10, 16, 10, 30]' => 1 }
+    }
+    Dir.mktmpdir do |dir|
+      ['app/controllers/x.rb', 'lib/ai/x.rb'].each do |path|
+        FileUtils.mkdir_p(File.dirname("#{dir}/#{path}"))
+        File.write("#{dir}/#{path}", source)
+      end
+      SimpleCov.root(dir)
+      files = ['app/controllers/x.rb', 'lib/ai/x.rb'].map do |path|
+        SimpleCov::SourceFile.new("#{dir}/#{path}", { 'lines' => [1] * 10, 'branches' => branches })
+      end
+      refusals = TestCoverage.untaken_refusals(files)
+      assert_equal([['app/controllers/x.rb', 1, 'halt 403 unless admin? || owner?'], ['app/controllers/x.rb', 2, 'kick! if banned?'],
+                    ['app/controllers/x.rb', 6, 'not_found']], refusals.map(&:to_a))
+
+      summary = TestCoverage.untaken_refusals_summary(files, limit: 2)
+      assert_includes summary, "\n### Untaken refusals: 3\n"
+      assert_includes summary, '| app/controllers/x.rb:1 | <code>halt 403 unless admin? &#124;&#124; owner?</code> |'
+      assert_includes summary, "\n…and 1 more"
+      refute(summary.any? { |row| row.include?('x.rb:6') })
+    end
+  ensure
+    SimpleCov.root(Dir.pwd)
+  end
+
 end
