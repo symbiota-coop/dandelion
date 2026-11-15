@@ -21,6 +21,9 @@ $(function () {
   onContentLoaded(function () {
     $('textarea.wysiwyg').once('wysiwyg').each(function () {
       const textarea = this
+      // The editor hides the textarea, and the browser refuses a form whose required field it can't show without saying
+      // why, so nothing happens: the server says it's needed instead (a private session's How to book)
+      textarea.removeAttribute('required')
       ClassicEditor.create(textarea, {
         ui: {
           viewportOffset: { top: fixedHeaderHeight() }
@@ -34,9 +37,8 @@ $(function () {
       }).then(editor => {
         textarea.ckeditorInstance = editor
         editors.push(editor)
-        // Keep the textarea up to date as it's typed in: CKEditor writes it only as the form submits, after the
-        // browser has checked a required one is filled in (a private session's How to book), so it would stay empty
-        // and the form not submit
+        // Keep the textarea up to date as it's typed in, as CKEditor otherwise writes it only as a page submits (a form
+        // saved in the background reads it before then)
         editor.model.document.on('change:data', () => editor.updateSourceElement())
         offsetToolbars()
 

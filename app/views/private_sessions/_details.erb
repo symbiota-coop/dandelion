@@ -9,9 +9,11 @@
   </div>
 <% end %>
 
-<div id="how-to-book" class="mt-4">
-  <h3 class="heading-rule">How to book</h3>
-  <div class="wysiwyg readable"><%== Sanitize.fragment(Rinku.auto_link(private_session.how_to_book), Sanitize::Config::DANDELION) %></div>
-</div>
+<% if private_session.how_to_book.present? %>
+  <div id="how-to-book" class="mt-4">
+    <h3 class="heading-rule">How to book</h3>
+    <div class="wysiwyg readable"><%== Sanitize.fragment(Rinku.auto_link(private_session.how_to_book), Sanitize::Config::DANDELION) %></div>
+  </div>
+<% end %>
 
 <%= partial :'private_sessions/vouches', locals: { private_session: private_session } %>

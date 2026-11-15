@@ -47,10 +47,10 @@ class PrivateSession
   # A number, or a range of two (60, or 60-90), as the form takes length in minutes and price
   NUMBER_OR_RANGE = /\A(\d+(?:\.\d+)?)(?:-(\d+(?:\.\d+)?))?\z/
 
-  validates_presence_of :title, :slug, :delivery, :how_to_book
+  validates_presence_of :title, :slug
   validates_uniqueness_of :slug
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/
-  validates_inclusion_of :delivery, in: DELIVERIES.values
+  validates_inclusion_of :delivery, in: DELIVERIES.values, allow_nil: true
   validates_numericality_of :max_participants, only_integer: true, greater_than_or_equal_to: 1, allow_nil: true
   validates_presence_of :location, if: :in_person?
   validates_inclusion_of :currency, in: FIAT_CURRENCIES

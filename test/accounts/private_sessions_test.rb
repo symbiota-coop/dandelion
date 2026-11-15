@@ -22,6 +22,11 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     online = create_private_session(account, title: 'Guided meditation', delivery: 'online', location: 'Stockholm')
     assert_nil online.reload.location
     assert_nil online.coordinates
+
+    # Not saying in person or online is fine, and a location is then optional
+    unsaid = create_private_session(account, title: 'Reiki', delivery: nil, location: nil)
+    assert_nil unsaid.reload.delivery
+    assert_not build_private_session(account, delivery: 'somewhere').valid?
   end
 
   test 'a session is for 1 or more people, or has no maximum when no number is given' do
@@ -150,8 +155,23 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     assert page.has_link?('Unlisted massage')
   end
 
+  test 'a session can be offered with just a name, not saying how to book it or whether in person or online' do
+    account = practitioner
+    sign_in account
+    visit '/private_sessions'
+    click_link 'Offer a private session'
+    within('#modal') do
+      fill_in 'Name of the session', with: 'Reiki'
+      click_button 'Create private session'
+    end
+    assert page.has_css?('h1', text: 'Reiki')
+    assert page.has_no_css?('#how-to-book')
+    reiki = account.private_sessions.find_by(title: 'Reiki')
+    assert_equal [nil, nil], [reiki.how_to_book, reiki.delivery]
+  end
+
   test 'a session says how to book it, linking its email address and booking link, and offers no messaging' do
-    covers 'private_sessions/how-to-book@738200'
+    covers 'private_sessions/how-to-book@40a315'
     private_session = create_private_session(practitioner, how_to_book: '<p>Email sky@example.com or use <a href="https://sky.example.com/book">my booking page</a></p>' \
                                                                          '<p>More at https://sky.example.com/more<script>alert(1)</script></p>')
     sign_in FactoryBot.create(:account)

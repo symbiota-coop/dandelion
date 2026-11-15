@@ -21,6 +21,6 @@ Your name and picture show with your vouch and testimonial on the session, and l
 
 ## Booking a private session
 
-Private sessions aren't booked through Dandelion: each one says how to book it, with the email address, phone number or booking link the person offering it gives, and you arrange a time and payment with them directly. <!-- claim: how-to-book -->
+Private sessions aren't booked through Dandelion: a session can say how to book it, with the email address, phone number or booking link the person offering it gives, and you arrange a time and payment with them directly. <!-- claim: how-to-book -->
 
 You can search private sessions by name and description, filter them by tag and by in person or online (sessions offered both ways show under either), and find those near a place. <!-- claim: search-filters -->
