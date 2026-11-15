@@ -549,6 +549,64 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     end
   end
 
+  test "an event's improvement report waits for 5 answered feedbacks" do
+    covers_route 'GET /e/:slug/feedback_report'
+    create_attended_event
+    sign_in_with_rack(@account)
+    chats = []
+    OpenRouter.stub :chat, ->(prompt) { chats << prompt; '1. You could start on time.' } do
+      # None at all, then only ratings, which have no answers
+      get "/e/#{@event.slug}/feedback_report"
+      assert_equal 404, last_response.status
+      5.times { create_feedback(account: FactoryBot.create(:account), rating: 4) }
+      get "/e/#{@event.slug}/feedback_report"
+      assert_equal 404, last_response.status
+
+      4.times { |i| @event.event_feedbacks.create!(account: FactoryBot.create(:account), rating: 4, answers: [['How was it?', "Answer #{i}"]]) }
+      get "/e/#{@event.slug}/feedback_report"
+      assert_equal 404, last_response.status
+      assert_empty chats
+      assert_nil Stash.find_by(key: "/e/#{@event.slug}/feedback_report")
+
+      @event.event_feedbacks.create!(account: FactoryBot.create(:account), rating: 4, answers: [['How was it?', 'Answer 4']])
+      get "/e/#{@event.slug}/feedback_report"
+      assert_equal 200, last_response.status
+      assert_includes last_response.body, 'You could start on time.'
+      assert_equal 1, chats.length
+      (0..4).each { |i| assert_includes chats.first, "Answer #{i}" }
+    end
+  end
+
+  test "in development an event's improvement report needs only one answered feedback, but still one" do
+    covers_route 'GET /e/:slug/feedback_report'
+    create_attended_event
+    create_feedback(account: FactoryBot.create(:account), rating: 4)
+    sign_in_with_rack(@account)
+    OpenRouter.stub :chat, '1. You could start on time.' do
+      Padrino.stub :env, :development do
+        get "/e/#{@event.slug}/feedback_report"
+        assert_equal 404, last_response.status
+
+        @event.event_feedbacks.create!(account: FactoryBot.create(:account), rating: 4, answers: [['How was it?', 'Lovely']])
+        get "/e/#{@event.slug}/feedback_report"
+        assert_equal 200, last_response.status
+        assert_includes last_response.body, 'You could start on time.'
+      end
+    end
+  end
+
+  test "an event's feedback page offers no improvement report below 5 answered feedbacks" do
+    create_attended_event
+    4.times { @event.event_feedbacks.create!(account: FactoryBot.create(:account), rating: 5, answers: [['How was it?', 'Lovely']]) }
+    sign_in(@account)
+    OpenRouter.stub :chat, ->(*) { flunk 'asked OpenRouter for a report' } do
+      visit "/e/#{@event.slug}/feedback"
+      assert page.has_content?('Lovely')
+      assert page.has_no_css?('[data-pagelet-url$="/feedback_report"]')
+      assert page.has_no_content?('possible areas for improvement')
+    end
+  end
+
   test "an event's improvement report says so when the feedback points to nothing to improve" do
     create_five_answered_feedbacks
     sign_in(@account)

@@ -67,6 +67,44 @@ class GatheringRulesTest < ActiveSupport::TestCase
     assert @gathering.memberships.find_by(account: applicant)
   end
 
+  test "members aren't offered Propose until an application is the gathering's proposing delay old" do
+    create_gathering(privacy: 'closed', fixed_threshold: 2, proposing_delay: 24)
+    @gathering.mapplications.create!(account: FactoryBot.create(:account, name: 'New Applicant'), status: 'pending')
+    @gathering.mapplications.create!(account: FactoryBot.create(:account, name: 'Older Applicant'), status: 'pending').set(created_at: 25.hours.ago)
+    sign_in(create_gathering_member)
+
+    visit gathering_path('/applications')
+    within('tr', text: 'New Applicant') do
+      assert page.has_content? 'Proposers accepted in'
+      assert page.has_no_link? 'Propose'
+    end
+    within('tr', text: 'Older Applicant') do
+      assert page.has_link? 'Propose'
+      assert page.has_no_content? 'Proposers accepted in'
+    end
+  end
+
+  test 'a proposer must fill in a reason when the gathering requires one' do
+    create_gathering(privacy: 'closed', fixed_threshold: 2, require_reason_proposer: true)
+    mapplication = @gathering.mapplications.create!(account: FactoryBot.create(:account, name: 'Keen Applicant'), status: 'pending')
+    member = create_gathering_member
+    sign_in(member)
+
+    visit gathering_path('/applications')
+    click_link 'Propose'
+    reason = find_field(placeholder: 'Explain your decision (required)')
+    assert reason[:required]
+    click_button 'Submit'
+    # The browser holds the form back until there's a reason
+    assert page.has_field?(placeholder: 'Explain your decision (required)')
+    assert_equal 0, mapplication.verdicts.count
+
+    reason.fill_in with: 'I know them well'
+    click_button 'Submit'
+    assert page.has_link? 'Unpropose'
+    assert_equal 'I know them well', mapplication.verdicts.find_by(account: member).reason
+  end
+
   test 'a full gathering takes no more members, and a paused application waits' do
     covers_route 'GET /g/:slug/applications/paused'
     covers_route 'POST /g/:slug/mapplications/:id/process'
