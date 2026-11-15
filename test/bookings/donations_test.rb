@@ -234,4 +234,19 @@ class EventBookingDonationsTest < ActiveSupport::TestCase
     assert_equal Money.new(2800, 'GBP'), event.donation_revenue
     assert_equal Money.new(2500, 'GBP'), event.donation_revenue_less_application_fees_paid_to_dandelion
   end
+
+  test 'a donation is at least 0.01 of its currency, after rounding to two decimal places' do
+    create_event(prices: [10])
+    order = @event.orders.create!(account: FactoryBot.create(:account), currency: @event.currency, value: 10)
+
+    [0, 0.004, -1].each do |amount|
+      donation = order.donations.build(account: order.account, event: @event, amount: amount)
+      refute donation.save, amount.to_s
+      assert_equal ['minimum is 0.01'], donation.errors[:amount], amount.to_s
+    end
+    assert_equal 0, Donation.and(order_id: order.id).count
+
+    assert order.donations.create(account: order.account, event: @event, amount: 0.005).persisted?
+    assert_equal [0.01], Donation.and(order_id: order.id).pluck(:amount)
+  end
 end

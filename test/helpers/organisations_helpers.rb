@@ -1,5 +1,5 @@
 # Helpers the organisation test files (test/organisations, and test/events for who may make events) share: members,
-# local groups and importing followers
+# local groups, revenue sharers and importing followers
 module OrganisationsHelpers
   # A new account following org, the organisationship with these attributes (admin: true, ...)
   def add_organisation_member(org, **attrs)
@@ -10,6 +10,13 @@ module OrganisationsHelpers
 
   def add_event_manager(org)
     add_organisation_member(org, event_manager: true)
+  end
+
+  # A new account that has connected its Stripe account to organisation, so it can share an event's revenue
+  def connected_account(organisation)
+    account = FactoryBot.create(:account)
+    account.organisationships.create!(organisation: organisation, stripe_connect_json: { 'stripe_user_id' => "acct_#{account.id}" }.to_json)
+    account
   end
 
   # @local_group in @organisation, whose owner (@account) is an organisation admin and the group's admin
