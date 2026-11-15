@@ -15,7 +15,9 @@
 <% if private_session.duration_min %>
   <span class="badge text-bg-secondary"><%= private_session.duration_label %></span>
 <% end %>
-<span class="badge text-bg-secondary"><%= private_session.price_label(money_symbol(private_session.currency)) %></span>
+<% if (price_label = private_session.price_label(money_symbol(private_session.currency))) %>
+  <span class="badge text-bg-secondary"><%= price_label %></span>
+<% end %>
 <% if private_session.vouches_count.to_i > 0 %>
   <span class="badge text-bg-secondary" data-bs-toggle="tooltip" title="Vouched for by <%= pluralize(private_session.vouches_count, 'person') %>"><i class="bi bi-patch-check-fill"></i> <%= private_session.vouches_count %></span>
 <% end %>

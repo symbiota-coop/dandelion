@@ -42,8 +42,8 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     assert page.has_no_css?('.badge', text: /\A(1-1|Up to)/)
   end
 
-  test 'length and price are a number or a range, and a session with no price is by donation' do
-    covers 'private_sessions/length-and-price@e3eebb'
+  test 'length and price are a number or a range, and a session with no price shows none' do
+    covers 'private_sessions/length-and-price@623089'
     account = practitioner
     # Stored as numbers: minutes, and a price or the ends of a sliding scale
     { '60' => [60, nil], '60 – 90' => [60, 90], '60-60' => [60, nil] }.each do |text, stored|
@@ -59,16 +59,17 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
       private_session = create_private_session(account, price_or_range: text)
       assert_equal stored, [private_session.price, private_session.price_min, private_session.price_max], text
     end
-    ['£60', '80-40', 'by donation', '40 to 80'].each do |text|
+    ['£60', '80-40', 'donation', '40 to 80'].each do |text|
       private_session = build_private_session(account, price_or_range: text)
       assert_not private_session.valid?
       assert private_session.errors[:price_or_range].any?, text
     end
 
     private_session = create_private_session(account, price_or_range: nil, currency: 'EUR')
-    assert private_session.by_donation?
+    assert_nil private_session.price_label('€')
     visit private_session.path
-    assert page.has_content?('By donation')
+    assert page.has_css?('.badge', text: 'massage')
+    assert page.has_no_css?('.badge', text: '€')
     private_session.update!(price_or_range: '40-80')
     assert_equal '40-80', PrivateSession.find(private_session.id).price_or_range
     visit private_session.path

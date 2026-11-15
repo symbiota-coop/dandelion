@@ -32,7 +32,7 @@ class PrivateSession
   field :duration_min, type: Integer
   field :duration_max, type: Integer
   field :max_participants, type: Integer
-  # price for one price, or price_min and price_max for a sliding scale; none of them is by donation
+  # price for one price, or price_min and price_max for a sliding scale; none of them, no price given
   field :price, type: Float
   field :price_min, type: Float
   field :price_max, type: Float
@@ -141,7 +141,7 @@ class PrivateSession
       location: 'Where you offer it: a town or area is enough',
       max_participants: "1 for one-to-one sessions, or the most you'll see at once. Leave it blank if there's no maximum",
       duration_or_range: 'A number of minutes, like 60, or a range, like 60-90',
-      price_or_range: 'A price, like 60, or a sliding scale, like 40-80. Leave it blank for by donation.',
+      price_or_range: 'A price, like 60, or a sliding scale, like 40-80',
       image: 'Square images work best: images of other sizes will be cropped to a square. Defaults to your profile image',
       secret: 'Leave it off the list of private sessions and your profile: only people with the link see it'
     }
@@ -186,20 +186,15 @@ class PrivateSession
     set(vouches_count: private_session_vouches.count)
   end
 
-  def by_donation?
-    !price && !price_min
-  end
-
   def duration_label
     "#{number_or_range_text(duration_min, duration_max, '–')} min" if duration_min
   end
 
+  # Nothing without a price
   def price_label(symbol)
-    if by_donation?
-      'By donation'
-    elsif price
+    if price
       "#{symbol}#{number_text(price)}"
-    else
+    elsif price_min
       "#{symbol}#{number_text(price_min)}–#{symbol}#{number_text(price_max)}"
     end
   end
