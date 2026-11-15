@@ -1,9 +1,5 @@
-<% if @private_session.persisted? %>
-  <%# The saved slug, from the URL: a failed save may have left an invalid new one on the session %>
-  <a class="d-inline-block mb-3" href="/ps/<%= params[:slug] %>"><i class="bi bi-arrow-left"></i> Return to <%= @private_session.title_was %></a>
-<% else %>
-  <a class="d-inline-block mb-3" href="/private_sessions"><i class="bi bi-arrow-left"></i> Return to private sessions</a>
-<% end %>
+<%# Once saved, back to it at its saved slug, from the URL: a failed save may have left an invalid new one on the session %>
+<%= partial :back, locals: @private_session.persisted? ? { to: @private_session.title_was, path: "/ps/#{params[:slug]}" } : { to: 'private sessions', path: '/private_sessions' } %>
 <% if @private_session.new_record? %>
   <h1>Offer a private session</h1>
 <% end %>

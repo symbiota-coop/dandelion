@@ -1,4 +1,8 @@
-<a class="d-inline-block mb-3" href="/o/<%= @organisation.slug %>/tiers"><i class="bi bi-arrow-left"></i> Return to tiers</a>
-<div class="container">
-  <%= partial :'organisation_tiers/build' %>
+<%= partial :'organisations/nav', locals: { organisation: @organisation } %>
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <%= partial :back, locals: { to: 'tiers', path: "/o/#{@organisation.slug}/tiers" } %>
+    <h2><%= @organisation_tier.new_record? ? 'Create a tier' : @organisation_tier.name_was %></h2>
+    <%= partial :'organisation_tiers/build' %>
+  </div>
 </div>

@@ -1,8 +1,8 @@
 <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
 <div class="row justify-content-center">
   <div class="col-lg-8">
+    <%= partial :back, locals: { to: 'timetable', path: "/g/#{@gathering.slug}/timetables/#{@tactivity.timetable_id}" } %>
     <h2><%= @tactivity.name_was %></h2>
-    <%= partial :'gatherings/back', locals: { to: 'timetable', path: "/g/#{@gathering.slug}/timetables/#{@tactivity.timetable_id}" } %>
     <%= partial :'timetables/tactivity_form' %>
   </div>
 </div>

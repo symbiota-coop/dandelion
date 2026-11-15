@@ -1,4 +1,4 @@
-<a class="d-inline-block mb-3" href="/private_sessions"><i class="bi bi-arrow-left"></i> Return to private sessions</a>
+<%= partial :back, locals: { to: 'private sessions', path: '/private_sessions' } %>
 <div class="row gx-lg-4">
   <div class="col-12 col-lg-auto order-lg-last text-center mb-3">
     <%= partial :'private_sessions/image', locals: { private_session: @private_session } %>

@@ -1,8 +1,8 @@
 <%= partial :'gatherings/nav', locals: { gathering: @gathering, membership: @membership } %>
 <div class="row justify-content-center">
   <div class="col-lg-8">
+    <%= partial :back, locals: { to: 'budget', path: "/g/#{@gathering.slug}/budget" } %>
     <h2><%= @spend.new_record? ? 'List an expense' : @spend.item_was %></h2>
-    <%= partial :'gatherings/back', locals: { to: 'budget', path: "/g/#{@gathering.slug}/budget" } %>
     <%= partial :'budget/build' %>
   </div>
 </div>

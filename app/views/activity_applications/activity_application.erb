@@ -1,4 +1,4 @@
-<a class="d-inline-block mb-3" href="<%= @activity.path %>/applications"><i class="bi bi-arrow-left"></i> Return to <%= @activity.name %> applications</a>
+<%= partial :back, locals: { to: "#{@activity.name} applications", path: "#{@activity.path}/applications" } %>
 <div class="row">
   <div class="col-12 col-lg-auto text-center">
     <img alt="<%= @account.name %>" class="profile-photo <%= @account.avatar_class %>" title="<%= @account.name %>" src="<%= u @account.image_thumb_or_gravatar_url %>">

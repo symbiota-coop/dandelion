@@ -263,13 +263,50 @@ class LintTest < Minitest::Test
                           'at the top, or list the page in GATHERING_PAGES_WITHOUT_NAV if it is for people outside the gathering'
   end
 
-  # A gathering's subpages go back with gatherings/_back.erb, under their heading, so the links all look and sit the same
-  def test_gathering_back_links_use_the_partial
-    offenders = GATHERING_VIEW_DIRS.flat_map { |dir| Dir[File.join(ROOT, 'app/views', dir, '*.erb')] }.select do |path|
-      File.read(path, encoding: 'UTF-8').match?(/>\s*(?:<i [^>]*><\/i>\s*)?Return to /) && !path.end_with?('gatherings/_back.erb')
+  # Pages go back with _back.erb, so the links all look and sit the same
+  def test_back_links_use_the_partial
+    offenders = Dir[File.join(ROOT, 'app/views/**/*.erb')].select do |path|
+      File.read(path, encoding: 'UTF-8').match?(/>\s*(?:<i [^>]*><\/i>\s*)?Return to /) && !path.end_with?('app/views/_back.erb')
     end
     assert_empty offenders.map { |path| path.delete_prefix("#{ROOT}/") },
-                 "Gathering pages go back with <%= partial :'gatherings/back', locals: { to: 'rota', path: ... } %>, under their heading"
+                 "Pages go back with <%= partial :back, locals: { to: 'rota', path: ... } %>, at the top of the page, below any nav"
+  end
+
+  # The page a route renders for a normal request, when it answers a background one with a modal (data-open-in-modal):
+  # its xhr branch renders modal_content or a partial named for the modal
+  MODAL_PARTIAL = /partial[ (]:(?:modal_content\b|'[\w\/]*modal[\w\/]*')/
+  def modal_page_templates(source)
+    blocks = source.lines.slice_before { |line| line.match?(RouteMarks::DEFINITION) || line.match?(RouteMarks::VERBS) }
+    blocks.select { |block| block.join.include?('request.xhr?') && block.join.match?(MODAL_PARTIAL) }
+          .flat_map { |block| block.join.scan(/\berb[ (]:'?([\w\/]+)/).flatten }.uniq
+  end
+
+  # Whether a page starts with its way back: after any nav, ERB comments and opening divs, its first line is _back.erb
+  def starts_with_a_way_back?(template)
+    first = template.lines.map(&:strip).find { |line| !(line.empty? || line.match?(/\A<%#.*%>\z/) || line.match?(/\A<%= partial :'[\w\/]*nav'/) || line.match?(/\A<div\b[^>]*>\z/)) }
+    first.to_s.start_with?('<%= partial :back,')
+  end
+
+  # A profile is a page of its own, not part of the page it was opened from, so has nowhere to go back to
+  MODAL_PAGES_WITHOUT_A_WAY_BACK = %w[accounts/account].freeze
+
+  # Someone who opens the URL of something shown in a modal (shared, or opened in a new tab) gets it as a page, with no
+  # modal to close, so it starts with the way back to where the modal opens from, at the top below any nav
+  def test_modal_pages_start_with_a_way_back
+    route = "  get '/g/:slug/roles/:id' do\n    request.xhr? ? partial(:modal_content, locals: {}) : erb(:'rotas/role')\n  end\n" \
+            "  get '/g/:slug/rotas/:id' do\n    request.xhr? ? partial(:'rotas/rota') : erb(:'rotas/rota')\n  end\n" \
+            "  get '/g/:slug/mapplications/:id' do\n    if request.xhr?\n      partial :'mapplications/mapplication_modal'\n    else\n      erb :'mapplications/mapplication'\n    end\n  end\n"
+    assert_equal %w[rotas/role mapplications/mapplication], modal_page_templates(route)
+    assert starts_with_a_way_back?("<%= partial :'gatherings/nav' %>\n<div class=\"row\">\n  <div class=\"col-lg-8\">\n    <%= partial :back, locals: {} %>\n    <h2>Role</h2>\n")
+    assert starts_with_a_way_back?("<%# Back to the list %>\n<%= partial :back, locals: {} %>\n<h1>Session</h1>\n")
+    refute starts_with_a_way_back?("<%= partial :'gatherings/nav' %>\n<h2>Role</h2>\n<%= partial :back, locals: {} %>\n")
+    refute starts_with_a_way_back?("<h1>Session</h1>\n")
+
+    pages = Dir[File.join(ROOT, 'app/controllers/*.rb')].flat_map { |path| modal_page_templates(File.read(path, encoding: 'UTF-8')) }.uniq
+    assert_includes pages, 'private_sessions/private_session'
+    missing = (pages - MODAL_PAGES_WITHOUT_A_WAY_BACK).reject { |page| starts_with_a_way_back?(File.read(File.join(ROOT, "app/views/#{page}.erb"), encoding: 'UTF-8')) }
+    assert_empty missing, "Pages that also open in a modal start with <%= partial :back, locals: { to: 'rota', path: ... } %>, at the top below any nav, " \
+                          'for whoever opens their URL as a page, with no modal to close'
   end
 
   def test_icon_first
