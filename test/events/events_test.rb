@@ -77,6 +77,55 @@ class EventsTest < ActiveSupport::TestCase
     assert page.has_content? name
   end
 
+  # Deleting an organisation leaves its events without one (has_many :events, dependent: :nullify)
+  def orphan_event(event)
+    assert event.organisation.destroy
+    event = Event.unscoped.find(event.id)
+    assert_nil event.organisation
+    event
+  end
+
+  test "an event whose organisation has been deleted shows no page, even to the account that made it" do
+    create_event(prices: [0])
+    sign_in(@account)
+    visit "/e/#{@event.slug}"
+    assert page.has_content?(@event.name)
+    assert page.has_link?(href: "/e/#{@event.slug}/edit")
+
+    orphan_event(@event)
+    visit "/e/#{@event.slug}"
+    assert page.has_content?("You don't have access to that page")
+    assert page.has_current_path?('/', ignore_query: true)
+    assert page.has_no_link?(href: "/e/#{@event.slug}/edit")
+  end
+
+  test "an event whose organisation has been deleted can't be opened or edited, even by the account that made it" do
+    covers_route 'GET /e/:slug'
+    covers_route 'GET /e/:slug/edit'
+    covers_route 'POST /e/:slug/edit'
+    create_event(prices: [0])
+    name = @event.name
+    sign_in_with_rack(@account)
+    get "/e/#{@event.slug}"
+    assert last_response.ok?
+    get "/e/#{@event.slug}/edit"
+    assert last_response.ok?
+    post "/e/#{@event.slug}/edit", event: { name: 'Renamed while it had an organisation' }
+    assert_equal 'Renamed while it had an organisation', @event.reload.name
+
+    event = orphan_event(@event)
+    # Still the event's admin, as the account that made it, so it's the missing organisation that refuses them,
+    # sending them home rather than back to the event, as event_admins_only! would
+    assert Event.admin?(event, @account)
+    get "/e/#{event.slug}"
+    assert_equal '/', URI(last_response.location).path
+    get "/e/#{event.slug}/edit"
+    assert_equal '/', URI(last_response.location).path
+    post "/e/#{event.slug}/edit", event: { name: name }
+    assert_equal '/', URI(last_response.location).path
+    assert_equal 'Renamed while it had an organisation', Event.unscoped.find(event.id).name
+  end
+
   test 'ticket type slots are chosen from standard, add-on and couple' do
     create_event(prices: [0])
     ticket_type = @event.ticket_types.first
