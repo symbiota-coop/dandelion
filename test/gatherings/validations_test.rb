@@ -1,6 +1,7 @@
 require_relative '../test_config'
 
-# A gathering's member limit and its money settings, tested on the models: the forms that set them check nothing first
+# A gathering's member limit, its money settings and the rules on proposing and supporting applications, tested on the
+# models: the forms that set them check nothing first
 class GatheringValidationsTest < ActiveSupport::TestCase
   test 'a gathering at its member limit refuses a new membership, and takes one below it' do
     create_gathering(member_limit: 2)
@@ -65,5 +66,57 @@ class GatheringValidationsTest < ActiveSupport::TestCase
     assert Gathering.find(@gathering.id).update(stripe_sk: 'sk_test_abc')
     assert Gathering.find(@gathering.id).update(stripe_pk: 'pk_test_abc')
     assert_equal(%w[sk_test_abc pk_test_abc], Gathering.find(@gathering.id).then { |g| [g.stripe_sk, g.stripe_pk] })
+  end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Verdicts on applications
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  def pending_mapplication(created_at: Time.now)
+    @gathering.mapplications.create!(account: FactoryBot.create(:account), status: 'pending').tap { |mapplication| mapplication.set(created_at: created_at) }
+  end
+
+  test "a proposer can't propose until the application is the gathering's proposing delay old" do
+    create_gathering(privacy: 'closed', fixed_threshold: 2, proposing_delay: 24)
+    member = create_gathering_member
+
+    too_soon = pending_mapplication(created_at: 24.hours.ago + 1.minute)
+    verdict = too_soon.verdicts.build(account: member, type: 'proposer')
+    refute verdict.save
+    assert_equal ['is restricted by gathering.proposing_delay'], verdict.errors[:type]
+    assert_equal 0, too_soon.verdicts.count
+    # The delay is on proposing: supporting isn't held back
+    assert too_soon.verdicts.create(account: create_gathering_member, type: 'supporter').persisted?
+
+    old_enough = pending_mapplication(created_at: 24.hours.ago - 1.minute)
+    assert old_enough.verdicts.create(account: member, type: 'proposer').persisted?
+
+    # With no delay, an application can be proposed straight away
+    @gathering.set(proposing_delay: nil)
+    assert pending_mapplication.verdicts.create(account: member, type: 'proposer').persisted?
+  end
+
+  test 'a proposer or supporter gives a reason when the gathering requires one, and need not otherwise' do
+    create_gathering(privacy: 'closed', fixed_threshold: 5, enable_supporters: true, require_reason_proposer: true, require_reason_supporter: true)
+
+    %w[proposer supporter].each do |type|
+      mapplication = pending_mapplication
+      verdict = mapplication.verdicts.build(account: create_gathering_member, type: type)
+      refute verdict.save, type
+      assert_equal ['requires a reason'], verdict.errors[:type], type
+      assert_equal 0, mapplication.verdicts.count, type
+      assert mapplication.verdicts.create(account: create_gathering_member, type: type, reason: 'I know them well').persisted?, type
+    end
+
+    # Each setting is for its own kind of verdict
+    @gathering.set(require_reason_supporter: false)
+    gathering = Gathering.find(@gathering.id)
+    mapplication = gathering.mapplications.find(pending_mapplication.id)
+    assert mapplication.verdicts.create(account: create_gathering_member, type: 'supporter').persisted?
+    refute mapplication.verdicts.build(account: create_gathering_member, type: 'proposer').valid?
+
+    @gathering.set(require_reason_proposer: false)
+    mapplication = Gathering.find(@gathering.id).mapplications.find(pending_mapplication.id)
+    assert mapplication.verdicts.create(account: create_gathering_member, type: 'proposer').persisted?
   end
 end

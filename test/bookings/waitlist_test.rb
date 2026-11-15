@@ -154,6 +154,48 @@ class WaitlistTest < ActiveSupport::TestCase
            'Sales-ended ticket types should not render per-ticket waitlist buttons'
   end
 
+  test "a sold-out ticket type's waitlist can be joined while its sales are open, and not once they've ended" do
+    covers 'events/ticket-type-waitlists@ac1e0a'
+    create_ticket_type_waitlist_event
+    sell_out_ticket_type
+    assert @event.allow_ticket_type_waitlists
+
+    waitship = TicketTypeWaitship.new(ticket_type: @ticket_type, account: FactoryBot.create(:account))
+    assert waitship.valid?, waitship.errors.full_messages.inspect
+
+    @ticket_type.set(sales_end: 1.minute.ago)
+    waitship = TicketTypeWaitship.new(ticket_type: TicketType.find(@ticket_type.id), account: FactoryBot.create(:account))
+    refute waitship.save
+    assert_equal ['Sales are closed for this ticket.'], waitship.errors[:base]
+    assert_equal 0, @ticket_type.ticket_type_waitships.count
+  end
+
+  test "the ticket type waitlist form refuses a ticket type whose sales have ended, without making an account" do
+    covers 'events/ticket-type-waitlists@ac1e0a'
+    covers_route 'POST /e/:slug/ticket_type_waitships'
+    create_ticket_type_waitlist_event
+    sell_out_ticket_type
+    header 'Accept', 'application/json'
+
+    post "/e/#{@event.slug}/ticket_type_waitships", ticket_type_id: @ticket_type.id.to_s, name: 'On Time', email: 'ontime@example.com'
+    assert_equal 200, last_response.status, last_response.body
+    assert @ticket_type.ticket_type_waitships.find_by(account: Account.find_by(email: 'ontime@example.com'))
+
+    @ticket_type.set(sales_end: 1.minute.ago)
+    post "/e/#{@event.slug}/ticket_type_waitships", ticket_type_id: @ticket_type.id.to_s, name: 'Too Late', email: 'late@example.com'
+    assert_equal 400, last_response.status
+    assert_equal 'Sales are closed for this ticket.', JSON.parse(last_response.body)['error']
+    assert_nil Account.find_by(email: 'late@example.com')
+    assert_equal 1, @ticket_type.ticket_type_waitships.count
+
+    # Others joining the same way, like agents, are told why
+    error = assert_raises(WaitlistJoiner::Error) do
+      WaitlistJoiner.new(event: @event, ticket_type: TicketType.find(@ticket_type.id), account: FactoryBot.create(:account)).call
+    end
+    assert_equal 'Sales are closed for this ticket.', error.message
+    assert_equal :ticket_type_closed, error.reason
+  end
+
   test 'ticket type waitship is removed when matching ticket payment completes' do
     create_ticket_type_waitlist_event
     sell_out_ticket_type
