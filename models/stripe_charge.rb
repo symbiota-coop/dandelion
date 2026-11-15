@@ -27,13 +27,8 @@ class StripeCharge
   field :de_percentage_discount_monthly_donor, type: Float
   field :de_credit_applied, type: Float
   field :de_fixed_discount_applied, type: Float
-  field :balance_float, type: Float
-  field :fees_float, type: Float
-
-  before_validation do
-    self.balance_float = 0 unless balance_float
-    self.fees_float = 0 unless fees_float
-  end
+  field :balance_float, type: Float, default: 0
+  field :fees_float, type: Float, default: 0
 
   def summary
     Money.new(amount, currency).format(no_cents_if_whole: true)

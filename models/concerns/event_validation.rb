@@ -84,8 +84,10 @@ module EventValidation
         changed_revenue_settings.each { |attr| errors.add(attr, '- you cannot change this setting') }
       end
 
+      # rubocop:disable Dandelion/CallbackDefault -- a form can blank them, which means the default
       self.stripe_revenue_adjustment = 0 unless stripe_revenue_adjustment
       self.revenue_share_to_revenue_sharer = 0 unless revenue_share_to_revenue_sharer
+      # rubocop:enable Dandelion/CallbackDefault
       self.revenue_share_to_revenue_sharer = 0 unless revenue_sharer
       self.profit_share_to_organiser = 0 if revenue_sharer
       errors.add(:revenue_share_to_revenue_sharer, 'must be present if a revenue sharer is set') if revenue_sharer && !revenue_share_to_revenue_sharer

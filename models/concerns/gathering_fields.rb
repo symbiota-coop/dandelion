@@ -19,8 +19,8 @@ module GatheringFields
     field :fixed_threshold, type: Integer
     field :member_limit, type: Integer
     field :proposing_delay, type: Integer
-    field :processed_via_dandelion, type: Integer
-    field :balance, type: Float
+    field :processed_via_dandelion, type: Integer, default: 0
+    field :balance, type: Float, default: 0
     field :paypal_email, type: String
     field :currency, type: String
     field :invitations_granted, type: Integer

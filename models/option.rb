@@ -28,7 +28,7 @@ class Option
   end
 
   before_validation do
-    self.cost = 0 unless cost
+    self.cost = 0 unless cost # rubocop:disable Dandelion/CallbackDefault -- a form can blank it, which means the default
   end
 
   def circle

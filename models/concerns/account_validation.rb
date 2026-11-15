@@ -29,7 +29,6 @@ module AccountValidation
       # Links made before accounts' URLs used usernames name them by id, which find_by_slug_or_id tries first
       errors.add(:username, "can't look like an account id") if username_changed? && username && BSON::ObjectId.legal?(username)
       self.email = email.downcase.strip if email
-      self.sign_ins_count = 0 unless sign_ins_count
 
       if email_changed?
         e = EmailAddress.error(email)
@@ -46,7 +45,6 @@ module AccountValidation
       %w[email phone location].each do |p|
         send("#{p}_privacy=", 'People I follow') unless send("#{p}_privacy")
       end
-      self.date_of_birth_privacy ||= 'Only me' # as Account.default_privacy_level, set so the account's choice is stored
 
       errors.add(:bio, 'cannot contain links yet as an anti-spam measure, use Dandelion for a while first!') if !live_player? && (bio =~ %r{https?://})
 

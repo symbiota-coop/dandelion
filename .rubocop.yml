@@ -127,6 +127,9 @@ Dandelion/CapybaraHasNoAfterClick:
 Dandelion/MongoidIndex:
   Include:
     - models/**/*.rb
+Dandelion/CallbackDefault:
+  Include:
+    - models/**/*.rb
 Dandelion/ConcernInclude:
   Include:
     - models/concerns/**/*.rb

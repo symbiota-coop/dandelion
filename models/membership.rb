@@ -14,7 +14,7 @@ class Membership
 
   field :paid, type: Integer
   field :desired_threshold, type: Integer
-  field :requested_contribution, type: Integer
+  field :requested_contribution, type: Integer, default: 0
   field :invitations_granted, type: Integer
   field :shift_points_required, type: Float
   field :answers, type: Array
@@ -34,8 +34,7 @@ class Membership
     errors.add(:gathering, 'is full') if new_record? && gathering.member_limit && (gathering.memberships(true).count >= gathering.member_limit)
     self.desired_threshold = 0 if desired_threshold && (desired_threshold < 0)
     # Only when nothing was given: a value that isn't a number (also nil once cast) is left for the validation to refuse
-    self.paid = 0 if paid_before_type_cast.nil?
-    self.requested_contribution = 0 if requested_contribution.nil?
+    self.paid = 0 if paid_before_type_cast.nil? # rubocop:disable Dandelion/CallbackDefault -- a form can blank it, which means the default
   end
 
   before_create do

@@ -96,6 +96,12 @@ class LintTest < Minitest::Test
         "included do\n  include Mongoid::Document\nend" => 0, "class_methods do\n  include Searchable\nend" => 0, "x.included do\n  include Searchable\nend" => 0
       },
       'Dandelion/MongoidIndex' => { 'index slug: 1' => 1, 'index' => 0, 'events.index(1)' => 0 },
+      'Dandelion/CallbackDefault' => {
+        'self.x = 0 unless x' => 1, 'self.x = 0 if x.nil?' => 1, 'self.x = [] if x.blank?' => 1, 'self.x = 0 if !x' => 1, "if x.nil?\n  self.x = 0\nend" => 1,
+        'self.x ||= :a' => 1, 'self.x = 0 if y.nil?' => 0, 'self.x = 0 unless y' => 0, 'self.x = nil if x.blank?' => 0, 'self.x = y if x.nil?' => 0,
+        'self.x = 0 if x.nil? && y' => 0, 'self.x = 0 if x' => 0, 'self.x ||= 1 if new_record?' => 0, 'y.x ||= 1' => 0, 'y.x = 0 unless x' => 0,
+        "if x.nil?\n  self.x = 0\n  self.y = 1\nend" => 0
+      },
       'Dandelion/MailgunDirect' => {
         'Mailgun::Client.new(key, region)' => 1, '::Mailgun::BatchMessage.new(client, host)' => 1, 'Mailgun::Tags.new(client)' => 0,
         'Mailgun::BatchMessage.stub(:new, email) { x }' => 0, 'Mailer.deliver(:csv, to: account, subject: "x")' => 0

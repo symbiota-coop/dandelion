@@ -88,9 +88,7 @@ class Gathering
 
     self.listed = false if privacy == 'secret'
     self.welcome_email = welcome_email_default if welcome_email.nil?
-    self.balance = 0 if balance.nil?
-    self.invitations_granted = 0 if invitations_granted.nil?
-    self.processed_via_dandelion = 0 if processed_via_dandelion.nil?
+    self.invitations_granted = 0 if invitations_granted.nil? # rubocop:disable Dandelion/CallbackDefault -- a form can blank it, which means the default
     self.enable_teams = true if enable_budget
     self.member_limit = memberships.count if member_limit && (member_limit < memberships.count)
     self.fixed_threshold = nil if democratic_threshold

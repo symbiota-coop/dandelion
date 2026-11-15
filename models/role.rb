@@ -11,7 +11,7 @@ class Role
   field :worth, type: Float
 
   before_validation do
-    self.worth = 1 unless worth
+    self.worth = 1 unless worth # rubocop:disable Dandelion/CallbackDefault -- a form can blank it, which means the default
   end
 
   has_many :shifts, dependent: :destroy

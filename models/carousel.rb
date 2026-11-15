@@ -44,7 +44,7 @@ class Carousel
   end
 
   before_validation do
-    self.weeks = 8 unless weeks
+    self.weeks = 8 unless weeks # rubocop:disable Dandelion/CallbackDefault -- a form can blank it, which means the default
   end
 
   def sync_tagged_event_carousel_ids(event_tag_id)

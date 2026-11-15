@@ -17,7 +17,7 @@ module AccountFields
     field :crypted_password, type: String
     field :image_uid, type: String
     field :has_image, type: Mongoid::Boolean
-    field :sign_ins_count, type: Integer
+    field :sign_ins_count, type: Integer, default: 0
     field :link_token, type: String # the token in the links of every email; was sign_in_token
     field :sign_in_code_digest, type: String
     field :sign_in_code_nonce, type: String
@@ -60,7 +60,8 @@ module AccountFields
     end
 
     privacyables.each do |p|
-      field :"#{p}_privacy", type: String
+      # A date of birth starts shown only to its account, as default_privacy_level, stored so the account's choice is kept
+      field :"#{p}_privacy", type: String, default: ('Only me' if p == 'date_of_birth')
     end
   end
 
