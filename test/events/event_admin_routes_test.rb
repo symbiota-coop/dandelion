@@ -467,4 +467,20 @@ class EventAdminRoutesTest < ActiveSupport::TestCase
     assert_empty emails
     assert_equal 0, queued_jobs(:send_admin_notification).count
   end
+
+  test 'with no endpoint secret configured, the boosts webhook completes no boost' do
+    event_boost = create_pending_boost
+    payload = checkout_completed_payload(event_boost.session_id)
+
+    [nil, ''].each do |unset|
+      deliver_stripe_webhook('/event_boosts/stripe_webhook', payload, secret: BOOSTS_SECRET, env: { 'STRIPE_ENDPOINT_SECRET_EVENT_BOOSTS' => unset })
+      assert_equal 200, last_response.status
+    end
+    refute event_boost.reload.payment_completed?
+    assert_equal 0, queued_jobs(:send_admin_notification).count
+
+    deliver_boosts_webhook(payload)
+    assert_equal 200, last_response.status
+    assert event_boost.reload.payment_completed?
+  end
 end

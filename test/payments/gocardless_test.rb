@@ -138,6 +138,24 @@ class GocardlessPaymentsTest < ActiveSupport::TestCase
     assert order.reload.payment_completed?
   end
 
+  test 'an organisation with no GoCardless endpoint secret ignores its webhook' do
+    # Not instant bank pay, which can't be enabled without the secret: the webhook checks only for the secret
+    create_organisation(gocardless_access_token: 'sandbox_token')
+    create_event(prices: [10])
+    order = create_incomplete_order(@event, gocardless_payment_request_id: "PRQ#{SecureRandom.hex(4)}")
+    assert_nil @organisation.attributes['gocardless_endpoint_secret']
+
+    deliver_gocardless_webhook(@organisation, payment_confirmed_event(order.gocardless_payment_request_id), secret: 'webhook_secret')
+    assert_equal 200, last_response.status
+    refute order.reload.payment_completed?
+    assert_nil order.gocardless_payment_id
+
+    @organisation.set(gocardless_endpoint_secret: 'webhook_secret')
+    deliver_gocardless_webhook(@organisation, payment_confirmed_event(order.gocardless_payment_request_id))
+    assert_equal 200, last_response.status
+    assert order.reload.payment_completed?
+  end
+
   test 'instant bank pay return page says how long confirmation usually takes' do
     create_instant_event
     order = create_incomplete_order(@event, gocardless_payment_request_id: "PRQ#{SecureRandom.hex(4)}")
@@ -248,6 +266,27 @@ class GocardlessPaymentsTest < ActiveSupport::TestCase
     assert restored
     assert restored.payment_completed?
     assert restored.tickets.first
+  end
+
+  test 'a fulfilled billing request whose mandate GoCardless says is cancelled issues no tickets' do
+    create_instalment_event
+    order = create_incomplete_order(@event, value: 30, gocardless_billing_request_id: "BRQ#{SecureRandom.hex(4)}")
+    client, captured = stub_gocardless_schedule_client
+    client.instalment_schedules.define_singleton_method(:create_with_schedule) do |opts|
+      captured[:params] = opts[:params]
+      raise GoCardlessPro::InvalidStateError, { 'message' => 'The mandate has been cancelled', 'errors' => [] }
+    end
+
+    deliver_gocardless_webhook(@organisation, billing_request_event(order.gocardless_billing_request_id), client)
+    assert_equal 200, last_response.status
+    assert captured[:params], 'the schedule was never asked for'
+    refute order.reload.payment_completed?
+    refute order.tickets.first.reload.payment_completed?
+
+    client, = stub_gocardless_schedule_client
+    deliver_gocardless_webhook(@organisation, billing_request_event(order.gocardless_billing_request_id), client)
+    assert_equal 200, last_response.status
+    assert order.reload.payment_completed?
   end
 
   test 'gocardless instalment count must be between 2 and 24' do

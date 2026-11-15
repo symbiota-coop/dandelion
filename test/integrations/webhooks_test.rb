@@ -38,6 +38,50 @@ class WebhooksTest < ActiveSupport::TestCase
     assert order.reload.payment_completed?
   end
 
+  test 'an organisation on Stripe Connect ignores its own Stripe webhook, as its payments come through the Connect one' do
+    create_organisation(stripe_endpoint_secret: 'whsec_test', stripe_connect_json: { 'stripe_user_id' => 'acct_connect' }.to_json)
+    create_event(prices: [10])
+    order = create_incomplete_order(@event, value: 10, session_id: "cs_#{SecureRandom.hex(4)}")
+    payload = checkout_completed_payload(order.session_id)
+
+    deliver_stripe_event(@organisation, payload)
+    assert_equal 200, last_response.status
+    refute order.reload.payment_completed?
+    assert_nil order.completing_at
+
+    @organisation.unset(:stripe_connect_json)
+    deliver_stripe_event(@organisation, payload)
+    assert_equal 200, last_response.status
+    assert order.reload.payment_completed?
+  end
+
+  test 'a paid checkout completes only its own organisation\'s order, and nothing when no order has its session' do
+    create_organisation(stripe_endpoint_secret: 'whsec_test')
+    create_event(prices: [10])
+    order = create_incomplete_order(@event, value: 10, session_id: "cs_#{SecureRandom.hex(4)}")
+    other_organisation = FactoryBot.create(:organisation, account: FactoryBot.create(:account), stripe_endpoint_secret: 'whsec_other')
+    other_event = FactoryBot.create(:event, organisation: other_organisation, prices: [10])
+    other_order = create_incomplete_order(other_event, value: 10, session_id: "cs_#{SecureRandom.hex(4)}")
+    other_deleted_order = create_incomplete_order(other_event, value: 10, session_id: "cs_#{SecureRandom.hex(4)}")
+    other_deleted_order.destroy
+
+    [other_order.session_id, other_deleted_order.session_id, 'cs_unknown'].each do |session_id|
+      deliver_stripe_event(@organisation, checkout_completed_payload(session_id))
+      assert_equal 200, last_response.status
+    end
+    refute order.reload.payment_completed?
+    refute other_order.reload.payment_completed?
+    assert_nil Order.find(other_deleted_order.id)
+
+    deliver_stripe_event(other_organisation, checkout_completed_payload(other_order.session_id))
+    assert other_order.reload.payment_completed?
+    deliver_stripe_event(other_organisation, checkout_completed_payload(other_deleted_order.session_id))
+    assert Order.find(other_deleted_order.id).payment_completed?
+    refute order.reload.payment_completed?
+    deliver_stripe_event(@organisation, checkout_completed_payload(order.session_id))
+    assert order.reload.payment_completed?
+  end
+
   # Posts payload to organisation's Stripe webhook as Stripe would, signed with its endpoint secret (or secret)
   def deliver_stripe_event(organisation, payload, secret: organisation.stripe_endpoint_secret)
     deliver_stripe_webhook("/o/#{organisation.slug}/stripe_webhook", payload, secret: secret)
