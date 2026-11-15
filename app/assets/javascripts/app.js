@@ -93,6 +93,17 @@ $(function () {
     })
   })
 
+  // Opening a modal hides the page's scrollbar and pads the body to make up for it, in two steps: in between, the
+  // content is briefly wider, its text reflows shorter, and the browser's scroll anchoring moves the page to keep
+  // what's in view in place, which it then isn't (a profile scrolled down moved 26px). So no anchoring while a modal
+  // opens or closes; afterwards it's back, for content that loads in above where someone is reading
+  $(document).on('show.bs.modal hide.bs.modal', function () {
+    document.documentElement.style.overflowAnchor = 'none'
+  })
+  $(document).on('shown.bs.modal hidden.bs.modal', function () {
+    document.documentElement.style.overflowAnchor = ''
+  })
+
   // A link with data-open-in-modal opens its page in #modal: the route answers the background request with just the
   // modal's contents (gatherings/_modal_content.erb), and the link's href stays a page of its own to fall back on.
   // Its edit form starts at its first field. Only these: other things #modal shows (an application, a profile) may
