@@ -177,4 +177,44 @@ class EventValidationsTest < ActiveSupport::TestCase
     assert Event.find(@event.id).update(feedback_hours_after: 0)
     assert_equal 0, Event.find(@event.id).feedback_hours_after
   end
+
+  test "an event's tax rate starts with txr_" do
+    create_event
+    ['tax_123', 'TXR_123', '123'].each do |tax_rate_id|
+      refused(Event.find(@event.id).tap { |event| event.tax_rate_id = tax_rate_id }, :tax_rate_id, 'must start with txr_')
+    end
+    assert_nil Event.find(@event.id).tax_rate_id
+
+    assert Event.find(@event.id).update(tax_rate_id: 'txr_123')
+    assert_equal 'txr_123', Event.find(@event.id).tax_rate_id
+  end
+
+  test "an event's Open Collective slug can't be set until its organisation's is" do
+    create_event
+    refused(Event.find(@event.id).tap { |event| event.oc_slug = 'agm-2026' }, :oc_slug, "cannot be set until the organisation's Open Collective slug is set")
+    assert_nil Event.find(@event.id).oc_slug
+
+    @organisation.set(oc_slug: 'grain-network')
+    assert Event.find(@event.id).update(oc_slug: 'agm-2026')
+    assert_equal 'agm-2026', Event.find(@event.id).oc_slug
+  end
+
+  test "an event's sessions start no earlier than the event and end no later, each after it starts" do
+    create_event
+    start_time = @event.start_time
+    end_time = @event.end_time
+    session = ->(starts, ends) { @event.event_sessions.new(start_time: starts, end_time: ends) }
+
+    refused(session.call(start_time - 1.minute, start_time + 1.hour), :start_time, 'must be after event start time')
+    refused(session.call(end_time - 1.hour, end_time + 1.minute), :end_time, 'must be before event end time')
+    [start_time + 1.hour, start_time + 30.minutes].each do |ends|
+      refused(session.call(start_time + 1.hour, ends), :end_time, 'must be after the start time')
+    end
+    assert_equal 0, EventSession.count
+
+    # From the event's very start to its very end
+    session.call(start_time, end_time).save!
+    session.call(start_time + 1.hour, start_time + 1.hour + 1.minute).save!
+    assert_equal 2, @event.event_sessions.count
+  end
 end

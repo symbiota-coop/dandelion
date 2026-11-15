@@ -81,6 +81,23 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     assert page.has_content?('€40–€80')
   end
 
+  # Set directly, as price_or_range can't give a negative number: '-60' isn't a number or a range
+  test "a private session's price, minimum and maximum can't be negative" do
+    account = practitioner
+    [{ price: -1 }, { price_min: -10, price_max: 20 }, { price_min: -20, price_max: -10 }].each do |prices|
+      private_session = build_private_session(account, **prices)
+      assert_not private_session.save, prices.inspect
+      assert_includes private_session.errors[:price_or_range], 'must not be below 0', prices.inspect
+    end
+    assert_equal 0, account.private_sessions.count
+
+    [{ price: 0 }, { price_min: 0, price_max: 20 }].each do |prices|
+      private_session = create_private_session(account, **prices)
+      stored = PrivateSession.find(private_session.id)
+      assert_equal(prices.values, prices.keys.map { |field| stored.send(field) })
+    end
+  end
+
   test 'someone offers a private session from the sidebar, and it is listed and on their profile' do
     covers_route 'GET /private_sessions'
     covers_route 'GET /private_sessions/new'

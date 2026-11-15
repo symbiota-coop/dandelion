@@ -104,4 +104,31 @@ class BookingsTicketValidationsTest < ActiveSupport::TestCase
     assert TicketType.find(ticket_type.id).update(price_or_range_submitted: true, price_or_range: '0')
     assert_equal 0, TicketType.find(ticket_type.id).price
   end
+
+  test "a ticket group stays with its event once saved, and its capacity can't be negative" do
+    create_event
+    other_event = create_event(as: :other_event)
+    ticket_group = @event.ticket_groups.create!(name: 'Weekend', capacity: 10)
+
+    moved = TicketGroup.find(ticket_group.id)
+    moved.event = other_event
+    refute moved.save
+    assert_equal ['cannot be changed'], moved.errors[:event]
+    assert_equal @event.id, TicketGroup.find(ticket_group.id).event_id
+
+    # Before it's saved, it can go with any event
+    unsaved = @event.ticket_groups.new(name: 'Weekday', capacity: 5)
+    unsaved.event = other_event
+    assert unsaved.save, unsaved.errors.full_messages.to_sentence
+    assert_equal other_event.id, TicketGroup.find(unsaved.id).event_id
+
+    negative = TicketGroup.find(ticket_group.id)
+    negative.capacity = -1
+    refute negative.save
+    assert_equal ['must not be < 0'], negative.errors[:capacity]
+    assert_equal 10, TicketGroup.find(ticket_group.id).capacity
+
+    assert TicketGroup.find(ticket_group.id).update(capacity: 0)
+    assert_equal 0, TicketGroup.find(ticket_group.id).capacity
+  end
 end

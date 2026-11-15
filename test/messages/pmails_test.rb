@@ -550,6 +550,21 @@ class PmailsTest < ActiveSupport::TestCase
     assert_equal 'utm_source=dandelion', pmail.link_params
   end
 
+  test "a mail's link params can't contain spaces" do
+    create_organisation
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone')
+    ['utm_source=dandelion news', ' utm_source=dandelion'].each do |link_params|
+      mail = Pmail.find(pmail.id)
+      mail.link_params = link_params
+      assert_not mail.save, link_params
+      assert_equal ['cannot contain spaces'], mail.errors[:link_params], link_params
+    end
+    assert_nil Pmail.find(pmail.id).link_params
+
+    assert Pmail.find(pmail.id).update(link_params: 'utm_source=dandelion&utm_medium=email')
+    assert_equal 'utm_source=dandelion&utm_medium=email', Pmail.find(pmail.id).link_params
+  end
+
   test "a click on a link whose token survives taking it out of the query records no link, and a click on another link does" do
     create_organisation(mailgun_webhook_signing_key: 'organisation-key')
     pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone')
