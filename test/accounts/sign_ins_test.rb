@@ -52,6 +52,35 @@ class AccountSignInsTest < ActiveSupport::TestCase
     assert_includes last_response.body, "That sign in code isn't valid any longer"
   end
 
+  test 'a sign in code another request uses first, after this one found it, does not sign in' do
+    account = FactoryBot.create(:account)
+    account.set(email_confirmed: true)
+
+    visit "/?sign_in_code=#{Account.find(account.id).issue_sign_in_code!}"
+    assert page.has_content?('Signed in with a sign in code')
+    assert_equal 1, account.sign_ins.count
+
+    Capybara.reset_sessions!
+    code = Account.find(account.id).issue_sign_in_code!
+    original = Account.method(:with_sign_in_code)
+    raced = false
+    # The other request redeems the code after this one has looked it up, before this one redeems it
+    Account.define_singleton_method(:with_sign_in_code) do |c|
+      original.call(c).tap { |found| raced = Account.find(found.id).redeem_sign_in_code!(c) if found }
+    end
+    visit "/?sign_in_code=#{code}"
+    assert raced
+    assert page.has_content?("That sign in code isn't valid any longer")
+    assert page.has_current_path?('/accounts/sign_in')
+    assert_equal 1, account.sign_ins.count
+
+    # Signed out, the profile page sends you to sign up
+    visit '/accounts/edit'
+    assert page.has_current_path?('/accounts/new')
+  ensure
+    Account.define_singleton_method(:with_sign_in_code, original) if original
+  end
+
   test 'a GET sends the session cookie back only when it changes the session or is a page' do
     account = FactoryBot.create(:account)
     xhr = { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }

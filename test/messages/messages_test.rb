@@ -54,6 +54,29 @@ class MessagesTest < ActiveSupport::TestCase
     assert Message.new(body: 'Hi again', messenger: sender, messengee: recipients.first).valid?
   end
 
+  # Messages limit - 1 people, spread from start to finish ago, so no shorter window is over its limit; then one more person
+  # just under the limit can be messaged, and the next can't
+  def assert_caps_distinct_recipients_within(limit, start:, finish:)
+    sender = create_messenger
+    step = (start - finish) / (limit - 2)
+    (limit - 1).times { |i| create_message(messenger: sender, messengee: create_messenger, at: start.ago + (i * step)) }
+    assert Message.and(messenger: sender, :created_at.gte => 10.minutes.ago).none?
+
+    assert Message.create(body: 'Just under', messenger: sender, messengee: create_messenger).persisted?
+    refused = Message.create(body: 'Over', messenger: sender, messengee: create_messenger)
+    refute refused.persisted?
+    assert_includes refused.errors[:base].join, "You're sending messages too quickly"
+    assert_equal limit, Message.and(messenger: sender).count
+  end
+
+  test 'caps distinct recipients in an hour' do
+    assert_caps_distinct_recipients_within(Message::MESSENGER_RATE_1_HOUR, start: 55.minutes, finish: 15.minutes)
+  end
+
+  test 'caps distinct recipients in 24 hours' do
+    assert_caps_distinct_recipients_within(Message::MESSENGER_RATE_24_HOURS, start: 23.hours, finish: 2.hours)
+  end
+
   # ═══════════════════════════════════════════════════════════════════════════
   # Threads
   # ═══════════════════════════════════════════════════════════════════════════
