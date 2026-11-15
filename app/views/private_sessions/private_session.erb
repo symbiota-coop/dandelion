@@ -1,0 +1,15 @@
+<a class="d-inline-block mb-3" href="/private_sessions"><i class="bi bi-arrow-left"></i> Return to private sessions</a>
+<div class="row gx-lg-4">
+  <div class="col-12 col-lg-auto order-lg-last text-center mb-3">
+    <%= partial :'private_sessions/image', locals: { private_session: @private_session } %>
+  </div>
+  <div class="col-12 col-lg">
+    <div class="d-flex align-items-start justify-content-between gap-3">
+      <h1><%= @private_session.title %></h1>
+      <% if private_session_admin? %>
+        <a class="btn btn-outline-primary flex-shrink-0 mt-1" href="<%= @private_session.path %>/edit" data-open-in-modal data-modal-size="lg"><i class="bi bi-pencil"></i> Edit</a>
+      <% end %>
+    </div>
+    <%= partial :'private_sessions/details', locals: { private_session: @private_session } %>
+  </div>
+</div>

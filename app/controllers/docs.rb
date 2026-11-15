@@ -37,7 +37,7 @@ Dandelion::App.controller do
     redirect '/docs/integrations' if %w[zapier mcp].include?(params[:slug])
 
     names = { 'integrations' => 'Zapier & MCP' }
-    pages = %w[events organisations gatherings mailer integrations].filter_map do |slug|
+    pages = %w[events organisations gatherings mailer integrations private_sessions].filter_map do |slug|
       path = File.expand_path("app/views/docs/md/#{slug}.md", Padrino.root)
       next unless File.exist?(path)
 

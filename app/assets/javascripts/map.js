@@ -33,7 +33,8 @@ window.DandelionMap = {
     { name: 'Event', color: 'var(--color-red-400)', icon: 'bi bi-calendar-event' },
     { name: 'Gathering', color: 'var(--color-green-500)', icon: 'bi bi-people-fill' },
     { name: 'Organisation', color: 'var(--color-red-400)', icon: 'bi bi-flag-fill' },
-    { name: 'Organisationship', color: 'var(--color-green-500)', icon: 'bi bi-person-fill' }
+    { name: 'Organisationship', color: 'var(--color-green-500)', icon: 'bi bi-person-fill' },
+    { name: 'PrivateSession', color: 'var(--color-green-500)', icon: 'bi bi-person-hearts' }
   ],
 
   dynamicLoadingTimeout: 500,

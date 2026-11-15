@@ -1,0 +1,77 @@
+<h1>Private sessions</h1>
+<p class="text-body-secondary">
+  One-to-one and small group sessions people offer by arrangement: bodywork, meditation, coaching and more. Each one says how to book it.
+</p>
+
+<%# In #modal once signed in: signed out, the page asks them to sign in first %>
+<a class="btn btn-primary mb-3" href="/private_sessions/new"<% if current_account %> data-open-in-modal data-modal-size="lg"<% end %>><i class="bi bi-plus-lg"></i> Offer a private session</a>
+
+<script>
+  $(function () {
+    placeAutocomplete('#private-sessions-search-near')
+  })
+</script>
+
+<%# The search well, as on events and facilitators: in map view, shut behind its Filter toggle, so the map has the room %>
+<% map = params[:display] == 'map' %>
+<div class="search border rounded mb-3">
+  <% if map %>
+    <%= partial :'events/toggle_search_well', locals: { search_open: false } %>
+  <% end %>
+  <div class="search-body"<% if map %> style="display: none"<% end %>>
+    <% form_tag '/private_sessions', method: 'get', class: 'submitOnChange searchForm mb-3', id: 'private-sessions-search-form' do %>
+      <%= hidden_field_tag :display, value: params[:display] %>
+      <%# As events search has them: the fields, then Online and In person (either or, forms.js) and Search %>
+      <div class="row gx-2 align-items-end">
+        <div class="form-group col-12 col-sm-auto">
+          <label for="private-sessions-search-q">Search private sessions</label>
+          <%= text_field_tag :q, class: 'form-control', value: params[:q], id: 'private-sessions-search-q' %>
+        </div>
+        <div class="form-group col-12 col-sm-auto">
+          <label for="private-sessions-search-near">near</label>
+          <%= text_field_tag :near, class: 'form-control', value: params[:near], id: 'private-sessions-search-near' %>
+        </div>
+        <% if (tag_names = PrivateSessionTag.in_use.pluck(:name)).any? %>
+          <div class="form-group col-12 col-sm-auto">
+            <label for="private-sessions-search-tag">tagged</label>
+            <%= select_tag :tag, options: [''] + tag_names, selected: params[:tag], class: 'form-select', id: 'private-sessions-search-tag' %>
+          </div>
+        <% end %>
+      </div>
+      <div class="row gx-2 align-items-end mt-1">
+        <%= checkbox 'Online', form_group_class: 'col-auto col-sm-auto either-or' %>
+        <%= checkbox 'In person', form_group_class: 'col-auto col-sm-auto either-or' %>
+        <div class="form-group col-12 col-sm-auto">
+          <%= submit_tag 'Search', class: 'btn btn-primary' %>
+        </div>
+      </div>
+    <% end %>
+
+    <% view_options = [
+         { key: 'list', label: 'List', icon: 'bi-list-task', active: !map },
+         { key: 'map', label: 'Map', icon: 'bi-geo-alt-fill', active: map }
+       ] %>
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+      <%= partial :view_as, locals: { view_options: view_options } %>
+    </div>
+  </div>
+</div>
+
+<% if map %>
+  <%# Sessions offered in person, where they're offered: online ones aren't anywhere %>
+  <%= partial :'maps/map', locals: { url: '/private_sessions', bounding_box: @bounding_box&.flatten, fill_screen: true } %>
+<% elsif @private_sessions.empty? %>
+  <p class="text-body-secondary">No private sessions found.</p>
+<% else %>
+  <ul class="search-result-list" id="private-sessions">
+    <% @private_sessions.each do |private_session| %>
+      <li>
+        <%= partial :'private_sessions/search_result', locals: { private_session: private_session } %>
+      </li>
+    <% end %>
+  </ul>
+
+  <div class="mt-3">
+    <%= will_paginate @private_sessions, page_links: false, renderer: WillPaginate::ViewHelpers::BootstrapRenderer %>
+  </div>
+<% end %>

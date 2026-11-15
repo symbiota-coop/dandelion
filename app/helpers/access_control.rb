@@ -295,6 +295,15 @@ Dandelion::App.helpers do
     halt 403 unless (current_account && record.account_id == current_account.id) || gathering_admin?
   end
 
+  # A private session can be changed by the account offering it, and by site admins
+  def private_session_admin?(private_session = @private_session)
+    current_account && (private_session.account_id == current_account.id || admin?)
+  end
+
+  def own_private_session_only!(private_session = @private_session)
+    kick!(redirect_url: private_session.path) unless private_session_admin?(private_session)
+  end
+
   def comment_admin?(comment = nil, account = current_account)
     comment ||= @comment
     cached_permission(:@comment_admin_cache, comment, account) do

@@ -3,7 +3,7 @@ Dandelion::App.controller do
     decrypted = decrypt_map_id(params[:id])
     halt 400 unless decrypted
     halt 400 unless decrypted[:model_name] == params[:model]
-    halt 400 unless %w[Account ActivityApplication Event Gathering Organisation Organisationship].include?(decrypted[:model_name])
+    halt 400 unless %w[Account ActivityApplication Event Gathering Organisation Organisationship PrivateSession].include?(decrypted[:model_name])
 
     object = decrypted[:model_name].constantize.find(decrypted[:id]) || not_found
 
@@ -11,6 +11,9 @@ Dandelion::App.controller do
     # profile (a private profile is visible only to its own account)
     account = decrypted[:model_name] == 'Account' ? object : (object.account if %w[ActivityApplication Organisationship].include?(decrypted[:model_name]))
     halt 403 if account && !admin? && (account.location_privacy != 'Public' || !profile_viewable?(account))
+
+    # Only listed private sessions are on the map
+    not_found if object.is_a?(PrivateSession) && object.secret
 
     partial :"points/#{decrypted[:model_name].underscore}", object: object
   end

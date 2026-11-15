@@ -1,7 +1,7 @@
 <%# Someone's avatar (or name, in a names view) on a gathering's record of them, a shift, a team or an option: clicked, a
     menu to Edit it or Remove it, for whoever may (the person themself or an admin). edit_url, remove_url: either or
     both, or neither for the plain avatar; edit_in_modal: the avatar itself opens the edit form in #modal (its route
-    answers with gatherings/_modal_content.erb), with no menu, as that form has its own Delete; remove_confirm: the
+    answers with _modal_content.erb), with no menu, as that form has its own Delete; remove_confirm: the
     question Remove asks; names: show the name, not the avatar %>
 <% edit_url = nil unless defined?(edit_url) %>
 <% remove_url = nil unless defined?(remove_url) %>

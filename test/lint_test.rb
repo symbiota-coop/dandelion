@@ -924,4 +924,13 @@ class LintTest < Minitest::Test
     SimpleCov.root(Dir.pwd)
   end
 
+
+  # The map draws each point's pin from map.js's models, with its colour and icon: a model the /points route shows
+  # popups for (app/controllers/map.rb) but map.js doesn't list puts no pin on the map at all
+  def test_every_model_on_maps_has_a_pin
+    points_models = File.read(File.join(ROOT, 'app/controllers/map.rb'))[/%w\[([^\]]+)\]\.include\?\(decrypted\[:model_name\]\)/, 1].split
+    pin_models = File.read(File.join(ROOT, 'app/assets/javascripts/map.js')).scan(/\{ name: '(\w+)', color:/).flatten
+    assert_includes points_models, 'Event'
+    assert_empty points_models - pin_models, 'Add these models to the models in app/assets/javascripts/map.js, with a colour and icon for their pins'
+  end
 end

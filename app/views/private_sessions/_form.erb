@@ -1,0 +1,43 @@
+<%# The form for offering or editing a private session: on its own page (build.erb), or in #modal from a session's modal %>
+<script>
+  $(function () {
+    placeAutocomplete('#private_session_location')
+    $('#private_session_delivery').change(function () {
+      $('#private_session_location').closest('.mb-3').toggle($(this).val() !== 'online')
+    }).change()
+    $('#change-currency').click(function () {
+      $(this).hide()
+      $('#private-session-currency').show()
+      $('#private_session_currency').trigger('focus')
+    })
+    $('#private_session_currency').change(function () {
+      $('.money-symbol').text($.currencySymbol($(this).val()))
+      $('#private-session-currency').hide()
+      $('#change-currency').show()
+    })
+  })
+</script>
+<%# In #modal (Offer a private session, or Edit), it saves there: data-save-in-modal (app.js) %>
+<% form_for @private_session, @private_session.new_record? ? '/private_sessions/new' : "/ps/#{params[:slug]}/edit",
+            id: 'private-session-form', 'data-save-in-modal': true do |f| %>
+  <%= f.text_block :title %>
+  <div class="slugify">
+    <%= f.shorturl_block :slug, stem: "#{ENV['BASE_URI']}/ps/" %>
+  </div>
+  <%= f.number_block :max_participants, min: 1, step: 1 %>
+  <%= f.select_block :delivery %>
+  <%= f.text_block :location %>
+  <%= f.text_block :duration_or_range %>
+  <% choosing_currency = @private_session.errors[:currency].any? %>
+  <%= f.price_range_block :price_or_range, money_symbol: money_symbol(@private_session.currency),
+                                           hint: %(#{ERB::Util.html_escape(PrivateSession.new_hints[:price_or_range])} <a href="javascript:;" id="change-currency"#{' style="display: none"' if choosing_currency}>Change currency</a>) %>
+  <div id="private-session-currency"<% unless choosing_currency %> style="display: none"<% end %>>
+    <%= f.select_block :currency %>
+  </div>
+  <%= partial :tags_select, locals: { object: @private_session, tag_class: PrivateSessionTag } %>
+  <%= f.wysiwyg_block :description %>
+  <%= f.text_area_block :how_to_book, rows: 3 %>
+  <%= f.image_block :image %>
+  <%= f.check_box_block :secret %>
+  <%= f.submit_block destroy_url: "/ps/#{params[:slug]}/destroy" %>
+<% end %>

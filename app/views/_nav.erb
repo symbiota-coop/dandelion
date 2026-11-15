@@ -86,6 +86,12 @@
       <span>Facilitators</span>
     </a>
   </li>
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if ['/private_sessions', '/ps/'].any? { |path| request.path.starts_with?(path) } %>" href="/private_sessions" data-bs-toggle="tooltip" title="Private sessions" data-bs-placement="right">
+      <i class="bi bi-person-hearts"></i>
+      <span>Private sessions</span>
+    </a>
+  </li>
   <% if !current_account %>
     <li class="nav-item">
       <a class="nav-link d-flex align-items-center gap-2 <%= 'active' if ['/gatherings', '/g/'].any? { |path| request.path.starts_with?(path) } %>" href="/gatherings" data-bs-toggle="tooltip" title="Gatherings" data-bs-placement="right">

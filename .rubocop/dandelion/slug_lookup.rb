@@ -1,7 +1,7 @@
 module RuboCop
   module Cop
     module Dandelion
-      # URLs name organisations, gatherings, events, activities and local groups by slug, and accounts by username:
+      # URLs name organisations, gatherings, events, activities, local groups and private sessions by slug, and accounts by username:
       # find them with the `*_from_params` helpers (app/helpers/helpers.rb), which 404 when there's none, or with
       # `find_by_slug_or_id`, which also takes the id in older links. Ids from forms and query strings
       # (`params[:organisation_id]`) are fine. A route for an old URL that named one by id (/events/:id/...) redirects
@@ -26,11 +26,12 @@ module RuboCop
         MSG = 'Find %<model>s from a URL with `find_by_slug_or_id` (or redirect an old id URL with `redirect_to_slug_url`).'
         HELPER_MSG = 'Find %<model>s from the URL with `%<helper>s`, which 404s when there is none.'
         REDUNDANT_MSG = '`%<helper>s` already 404s when there is none: drop `|| not_found`.'
-        MODELS = %w[Event Organisation Gathering Activity LocalGroup Account].freeze
+        MODELS = %w[Event Organisation Gathering Activity LocalGroup Account PrivateSession].freeze
         # The models a helper finds from the URL, and the param it reads
         HELPERS = {
           'Event' => ['event_from_params', %i[slug event_slug]], 'Organisation' => ['organisation_from_params', %i[slug organisation_slug]],
-          'Gathering' => ['gathering_from_params', %i[slug]], 'Account' => ['account_from_params', %i[username]]
+          'Gathering' => ['gathering_from_params', %i[slug]], 'Account' => ['account_from_params', %i[username]],
+          'PrivateSession' => ['private_session_from_params', %i[slug]]
         }.freeze
         RESTRICT_ON_SEND = %i[find find_by].freeze
 

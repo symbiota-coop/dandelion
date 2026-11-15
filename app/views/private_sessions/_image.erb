@@ -1,0 +1,9 @@
+<%# The session's image, or without one a square of the lavender wash image-less tiles have (.block-fill). fill: as wide
+    as its container (the modal), from a larger thumbnail %>
+<% fill = defined?(fill) && fill %>
+<% style = fill ? 'width: 100%' : 'width: 400px; max-width: 100%' %>
+<% if private_session.image %>
+  <img class="<%= klass if defined?(klass) %>" alt="<%= private_session.title %>" src="<%= u private_session.image.thumb(fill ? '800x800#' : '400x400#').url %>" style="<%= style %>">
+<% else %>
+  <div class="<%= klass if defined?(klass) %> block-fill ratio ratio-1x1" style="<%= style %>"></div>
+<% end %>

@@ -1840,6 +1840,15 @@ label.remove-image input {
   }
 }
 
+/* Bootstrap's wider sizes keep their own width, like a private session from a list (modal-lg, app.js) */
+@media (min-width: 992px) {
+  .modal-dialog.modal-lg,
+  .modal-dialog.modal-xl {
+    width: auto;
+    max-width: var(--bs-modal-width);
+  }
+}
+
 /* ==========================================================================
    Nav tabs and pills
    ========================================================================== */
@@ -2373,6 +2382,11 @@ body .table > tfoot > tr > th {
 
 .search-bar-autocomplete.ui-autocomplete {
   z-index: 1050;
+}
+
+/* Above modals (Bootstrap's 1055), as jQuery UI puts the menu at the end of the body: a location field in a modal, like a private session's edit form */
+.places-autocomplete.ui-autocomplete {
+  z-index: 1060;
 }
 
 .ui-menu .ui-menu-item a,

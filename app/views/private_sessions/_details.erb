@@ -1,0 +1,19 @@
+<%# A session's badges, who offers it, its description and how to book it: on its page and in #modal %>
+<div class="mb-3">
+  <%= partial :'private_sessions/badges', locals: { private_session: private_session } %>
+</div>
+<p>
+  <%= partial :'accounts/square', locals: { account: private_session.account, size: :xs } %>
+  <a href="/u/<%= private_session.account.username %>"><%= private_session.account.name %></a>
+</p>
+
+<% if private_session.description.present? %>
+  <div class="wysiwyg readable mt-3">
+    <%== Sanitize.fragment(private_session.description, Sanitize::Config::DANDELION) %>
+  </div>
+<% end %>
+
+<div id="how-to-book" class="card mt-3">
+  <h3 class="card-header chill">How to book</h3>
+  <div class="card-body readable"><%= plain_text_html(private_session.how_to_book) %></div>
+</div>

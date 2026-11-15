@@ -1,0 +1,20 @@
+<% if private_session.secret %>
+  <span class="badge text-bg-warning">Secret</span>
+<% end %>
+<span class="badge text-bg-secondary"><%= private_session.group_size_label %></span>
+<%# Where it's offered says it's in person, so In person shows only without a location %>
+<% if private_session.location.present? %>
+  <span class="badge text-bg-secondary"><i class="bi bi-geo-alt-fill"></i> <%= private_session.location %></span>
+<% elsif private_session.in_person? %>
+  <span class="badge text-bg-secondary">In person</span>
+<% end %>
+<% if private_session.online? %>
+  <span class="badge text-bg-secondary">Online</span>
+<% end %>
+<% if private_session.duration_min %>
+  <span class="badge text-bg-secondary"><%= private_session.duration_label %></span>
+<% end %>
+<span class="badge text-bg-secondary"><%= private_session.price_label(money_symbol(private_session.currency)) %></span>
+<% private_session.tags.each do |tag_name| %>
+  <a class="badge text-bg-primary text-decoration-none"<% if defined?(target) && target %> target="<%= target %>"<% end %> href="/private_sessions?<%= Rack::Utils.build_query(tag: tag_name) %>"><%= tag_name %></a>
+<% end %>

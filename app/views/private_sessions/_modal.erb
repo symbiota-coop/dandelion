@@ -1,0 +1,24 @@
+<%# The session in #modal, opened from a list (app.js, data-open-in-modal, at data-modal-size lg): its page's two columns, the
+    picture on the right filling its column %>
+<%# data-saved-path: where the session is now, which opens once it's saved in the modal (data-save-in-modal, app.js) %>
+<div class="modal-header" data-saved-path="<%= @private_session.path %>">
+  <h3 class="modal-title">
+    <a class="text-body" href="<%= @private_session.path %>"><%= @private_session.title %></a>
+  </h3>
+  <div class="ms-auto d-flex align-items-center gap-3">
+    <% if private_session_admin? %>
+      <a class="btn btn-sm btn-outline-primary" href="<%= @private_session.path %>/edit" data-open-in-modal><i class="bi bi-pencil"></i> Edit</a>
+    <% end %>
+    <button type="button" class="btn-close m-0" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+</div>
+<div class="modal-body">
+  <div class="row gx-lg-4">
+    <div id="private-session-picture" class="col-12 col-lg-4 order-lg-last mb-3">
+      <%= partial :'private_sessions/image', locals: { private_session: @private_session, klass: 'd-block', fill: true } %>
+    </div>
+    <div class="col-12 col-lg-8">
+      <%= partial :'private_sessions/details', locals: { private_session: @private_session } %>
+    </div>
+  </div>
+</div>

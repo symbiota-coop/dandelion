@@ -73,7 +73,13 @@ Dandelion::App.helpers do
   # someone types shows as typed, < and all, and no markup, however deeply nested, reaches the HTML parser. Then line
   # breaks, and links for URLs and email addresses (Rinku, with no target, onto http(s) and mailto only)
   def message_html(message)
-    escaped = ERB::Util.html_escape(message.body.to_s)
+    plain_text_html(message.body)
+  end
+
+  # Plain text someone typed into a textarea, like a message or how to book a private session: escaped, with line
+  # breaks, and links for URLs and email addresses
+  def plain_text_html(text)
+    escaped = ERB::Util.html_escape(text.to_s)
     Rinku.auto_link(escaped, :all, nil, nil, Rinku::AUTOLINK_SHORT_DOMAINS).gsub("\n", '<br>').html_safe
   end
 

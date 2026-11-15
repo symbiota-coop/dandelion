@@ -105,13 +105,19 @@ $(function () {
   })
 
   // A link with data-open-in-modal opens its page in #modal: the route answers the background request with just the
-  // modal's contents (gatherings/_modal_content.erb), and the link's href stays a page of its own to fall back on.
+  // modal's contents (_modal_content.erb), and the link's href stays a page of its own to fall back on.
   // Its edit form starts at its first field. Only these: other things #modal shows (an application, a profile) may
-  // have a form further down, like a discussion's, which shouldn't take the focus (and bring up a phone's keyboard)
+  // have a form further down, like a discussion's, which shouldn't take the focus (and bring up a phone's keyboard).
+  // data-modal-size="lg" (or "xl") widens it until it closes, for content in two columns, like a private session
   $(document).on('click', 'a[data-open-in-modal]', function (e) {
     e.preventDefault()
+    const size = $(this).attr('data-modal-size')
     $('#modal .modal-content').load($(this).attr('href'), function () {
       const $modal = $('#modal')
+      if (size) {
+        $modal.find('.modal-dialog').addClass('modal-' + size)
+        $modal.one('hidden.bs.modal', function () { $modal.find('.modal-dialog').removeClass('modal-' + size) })
+      }
       const focusFirstField = function () {
         $modal.find('form').find('input:visible, textarea:visible, select:visible').not('[type=hidden]').first().trigger('focus')
       }
@@ -119,6 +125,24 @@ $(function () {
       if ($modal.hasClass('show')) focusFirstField()
       else $modal.one('shown.bs.modal', focusFirstField).modal('show')
       hideTooltips()
+    })
+  })
+
+  // A form with data-save-in-modal saves in #modal rather than leaving it: it posts in the background (an image too,
+  // and CKEditor's text, which it otherwise writes back only as a page submits). With errors, the form comes back in
+  // the modal; saved, the route's answer says where the record now is (data-saved-path), and that page opens, with
+  // the route's flash saying it was saved
+  $(document).on('submit', '#modal form[data-save-in-modal]', function (e) {
+    e.preventDefault()
+    const form = this
+    $(form).find('textarea.wysiwyg').each(function () {
+      if (this.ckeditorInstance) this.ckeditorInstance.updateSourceElement()
+    })
+    $.ajax({ url: form.action, method: 'POST', data: new FormData(form), processData: false, contentType: false }).done(function (html) {
+      // Looked for in the answer unparsed into the page, where its scripts would run
+      const savedPath = $('<div>').append($.parseHTML(html)).find('[data-saved-path]').attr('data-saved-path')
+      if (savedPath) window.location.href = savedPath
+      else $('#modal .modal-content').html(html)
     })
   })
 

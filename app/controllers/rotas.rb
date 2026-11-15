@@ -140,7 +140,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @role = @gathering.roles.find(params[:id]) || not_found
-    request.xhr? ? partial(:'gatherings/modal_content', locals: { title: @role.name, form: :'rotas/role_form' }) : erb(:'rotas/role')
+    request.xhr? ? partial(:modal_content, locals: { title: @role.name, form: :'rotas/role_form' }) : erb(:'rotas/role')
   end
 
   post '/g/:slug/roles/:id/edit' do
@@ -191,7 +191,7 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     gathering_admins_only!
     @rslot = @gathering.rslots.find(params[:id]) || not_found
-    request.xhr? ? partial(:'gatherings/modal_content', locals: { title: @rslot.name, form: :'rotas/rslot_form' }) : erb(:'rotas/rslot')
+    request.xhr? ? partial(:modal_content, locals: { title: @rslot.name, form: :'rotas/rslot_form' }) : erb(:'rotas/rslot')
   end
 
   post '/g/:slug/rslots/:id/edit' do
@@ -232,7 +232,7 @@ Dandelion::App.controller do
     confirmed_membership_required! unless gathering_admin?
     @shift = @gathering.shifts.find(params[:id]) || not_found
     own_or_gathering_admins_only!(@shift)
-    request.xhr? ? partial(:'gatherings/modal_content', locals: { title: @shift.title, form: :'rotas/shift_form' }) : erb(:'rotas/shift')
+    request.xhr? ? partial(:modal_content, locals: { title: @shift.title, form: :'rotas/shift_form' }) : erb(:'rotas/shift')
   end
 
   post '/g/:slug/shifts/:id/edit' do

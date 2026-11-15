@@ -192,6 +192,16 @@ module Padrino
           end
         end
 
+        # A currency_block whose amount is text, so it takes a range as well as a number, like 40-80
+        def price_range_block(fieldname, money_symbol: '$', placeholder: nil, **block_options)
+          input_block(fieldname, 'form-control', **block_options) do |attrs|
+            %(<div class="input-group">
+            <span class="input-group-text money-symbol">#{ERB::Util.html_escape(money_symbol)}</span>) +
+              text_field(fieldname, placeholder: placeholder, inputmode: 'decimal', **attrs) +
+              %(</div>)
+          end
+        end
+
         def percentage_block(fieldname, placeholder: nil, **block_options)
           input_block(fieldname, 'form-control', **block_options) do |attrs|
             %(<div class="input-group">) +

@@ -205,6 +205,10 @@ Dandelion::App.helpers do
     organisation_from_params.local_groups.find_by_slug_or_id(slug: params[:slug]) || not_found
   end
 
+  def private_session_from_params
+    PrivateSession.find_by_slug_or_id(slug: params[:slug]) || not_found
+  end
+
   def gathering_from_params
     Gathering.find_by_slug_or_id(slug: params[:slug]) || not_found
   end
