@@ -260,6 +260,28 @@ class EventListingsTest < ActiveSupport::TestCase
     refute_includes body, 'Upcoming event'
   end
 
+  test 'a search near a place ticks In person and unticks Online, and ticking Online empties near, as an event is near one only in person' do
+    create_event(as: :in_person_event, name: 'Breathwork in Gamla Stan')
+    create_event(as: :online_event, name: 'Breathwork online', location: 'Online')
+    [@in_person_event, @online_event].each { |event| event.set(browsable: true) }
+    # Geocoding in tests puts everywhere at Gamla Stan
+    Location.stub(:bounds_for, [[18.0, 59.3], [18.1, 59.4]]) do
+      visit '/events?near=Stockholm&online=1'
+      assert page.has_checked_field?('In person')
+      assert page.has_unchecked_field?('Online')
+      assert page.has_content?('Breathwork in Gamla Stan')
+      assert page.has_no_content?('Breathwork online')
+      # And Online isn't near anywhere, so ticking it empties Near
+      check 'Online'
+      assert page.has_current_path?(/online=1/)
+      assert page.has_field?('near', with: '')
+      assert page.has_content?('Breathwork online')
+    end
+    # near=online is the online events, as before
+    visit '/events?near=online'
+    assert page.has_unchecked_field?('In person')
+  end
+
   # Five events of one organisation near Gamla Stan: one that's listed, and one each locked, past, not browsable and secret
   def create_public_feed_events
     create_event(as: :listed_event, name: 'Listed meditation', start_time: 10.days.from_now, end_time: 10.days.from_now + 2.hours)

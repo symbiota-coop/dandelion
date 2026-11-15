@@ -103,6 +103,12 @@ $(function () {
     if (this.checked) $('.either-or input[type="checkbox"]').not(this).prop('checked', false)
   })
 
+  // Online isn't near anywhere, so ticking it empties the form's Near, which would tick In person again
+  // (near_place_ticks_in_person). Also before the submitOnChange handler
+  $(document).on('change', '.either-or input[name="online"]', function () {
+    if (this.checked) $(this.form).find('input[name="near"]').val('')
+  })
+
   $(document).on('change', 'form.submitOnChange select, form.submitOnChange .flatpickr-input, form.submitOnChange input[type=checkbox], form.submitOnChange input[type=month]', function () {
     $(this.form).submit()
   })

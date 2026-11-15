@@ -31,6 +31,7 @@ Dandelion::App.helpers do
   end
 
   def apply_online_in_person_filter(events)
+    near_place_ticks_in_person
     if params[:online]
       events = events.online
       params[:in_person] = false
@@ -40,6 +41,15 @@ Dandelion::App.helpers do
       params[:online] = false
     end
     events
+  end
+
+  # Near a place (not near=online) is somewhere to meet in person: a search near one ticks In person, and unticks
+  # Online, as events and private sessions are near a place only in person
+  def near_place_ticks_in_person
+    return unless params[:near] && params[:near] != 'online'
+
+    params[:in_person] = '1'
+    params[:online] = nil
   end
 
   def apply_event_stats_date_filter(events, from:, to:, start_or_end:, include_evergreen:)

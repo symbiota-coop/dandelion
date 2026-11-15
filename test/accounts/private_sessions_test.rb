@@ -304,8 +304,16 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
 
     # Geocoding in tests puts everywhere at Gamla Stan, so sessions with a location are near it and online ones aren't
     Location.stub(:bounds_for, [[18.0, 59.3], [18.1, 59.4]]) do
-      visit '/private_sessions?near=Stockholm'
+      visit '/private_sessions?near=Stockholm&online=1'
       assert_equal ['Deep tissue massage', 'Shiatsu'], titles.call
+      # A place to be near is somewhere to meet in person
+      assert page.has_checked_field?('In person')
+      assert page.has_unchecked_field?('Online')
+      # And Online isn't near anywhere, so ticking it empties Near
+      check 'Online'
+      assert page.has_current_path?(/online=1/)
+      assert page.has_field?('near', with: '')
+      assert_equal ['Guided meditation', 'Shiatsu'], titles.call
     end
     Location.stub(:bounds_for, [[-0.2, 51.4], [0.0, 51.6]]) do
       visit '/private_sessions?near=London'

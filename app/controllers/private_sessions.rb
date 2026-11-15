@@ -9,7 +9,9 @@ Dandelion::App.controller do
       tag = PrivateSessionTag.find_by(name: params[:tag].downcase)
       @private_sessions = @private_sessions.and(:id.in => tag ? tag.private_session_tagships.pluck(:private_session_id) : [])
     end
-    # Online or In person, as events search has them: either or, and a session offered both ways under each
+    # Online or In person, as events search has them: either or, and a session offered both ways under each. Near a
+    # place ticks In person (near_place_ticks_in_person)
+    near_place_ticks_in_person
     if params[:online]
       @private_sessions = @private_sessions.and(:delivery.in => %w[online either])
     elsif params[:in_person]
