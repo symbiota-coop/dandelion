@@ -4,10 +4,11 @@
     <%= partial :'private_sessions/image', locals: { private_session: @private_session } %>
   </div>
   <div class="col-12 col-lg">
+    <%# Edit beside the title from 576px, and under the badges below that (private_sessions/_details.erb) %>
     <div class="d-flex align-items-start justify-content-between gap-3">
       <h1><%= @private_session.title %> <small class="text-body-secondary">with <a class="text-reset" href="/u/<%= @private_session.account.username %>"><%= @private_session.account.name %></a></small></h1>
       <% if private_session_admin? %>
-        <a class="btn btn-outline-primary flex-shrink-0 mt-1" href="<%= @private_session.path %>/edit" data-open-in-modal data-modal-size="lg"><i class="bi bi-pencil"></i> Edit</a>
+        <a class="btn btn-outline-primary flex-shrink-0 mt-1 d-none d-sm-inline-block" href="<%= @private_session.path %>/edit" data-open-in-modal data-modal-size="lg"><i class="bi bi-pencil"></i> Edit</a>
       <% end %>
     </div>
     <%= partial :'private_sessions/details', locals: { private_session: @private_session } %>

@@ -2,6 +2,10 @@
 <div class="mb-3">
   <%= partial :'private_sessions/badges', locals: { private_session: private_session } %>
 </div>
+<%# Below 576px, Edit is here, under the badges, rather than beside the title (on its page and in #modal) %>
+<% if private_session_admin?(private_session) %>
+  <a class="btn btn-sm btn-outline-primary d-sm-none mb-3" href="<%= private_session.path %>/edit" data-open-in-modal data-modal-size="lg"><i class="bi bi-pencil"></i> Edit</a>
+<% end %>
 
 <% if private_session.description.present? %>
   <div class="wysiwyg readable mt-3">

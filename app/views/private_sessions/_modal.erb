@@ -7,7 +7,8 @@
   </h3>
   <div class="ms-auto d-flex align-items-center gap-3">
     <% if private_session_admin? %>
-      <a class="btn btn-sm btn-outline-primary" href="<%= @private_session.path %>/edit" data-open-in-modal><i class="bi bi-pencil"></i> Edit</a>
+      <%# Here from 576px; below that, under the badges (private_sessions/_details.erb), so the title has the header's width %>
+      <a class="btn btn-sm btn-outline-primary text-nowrap d-none d-sm-inline-block" href="<%= @private_session.path %>/edit" data-open-in-modal><i class="bi bi-pencil"></i> Edit</a>
     <% end %>
     <button type="button" class="btn-close m-0" data-bs-dismiss="modal" aria-label="Close"></button>
   </div>
