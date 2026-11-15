@@ -558,12 +558,6 @@ class EventPermissionsTest < ActiveSupport::TestCase
     facilitator
   end
 
-  def connected_account(organisation)
-    account = FactoryBot.create(:account)
-    account.organisationships.create!(organisation: organisation, stripe_connect_json: { 'stripe_user_id' => "acct_#{account.id}" }.to_json)
-    account
-  end
-
   def organisation_admin_pages(organisation)
     {
       'settings' => "/o/#{organisation.slug}/edit",
