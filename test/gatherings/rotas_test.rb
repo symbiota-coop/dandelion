@@ -100,4 +100,56 @@ class GatheringRotasTest < ActiveSupport::TestCase
     get gathering_path("/rotas/#{@rota.id}.csv")
     assert_equal ['Morning', 'Hidden Person +447700900123'], CSV.parse(last_response.body).last
   end
+
+  # A gathering that demands payment confirms a member once they've paid. A shift they took before then is still theirs,
+  # but not theirs to change until they've paid
+  def create_unpaid_member_with_shift
+    create_gathering(privacy: 'open', demand_payment: true)
+    create_rota
+    @member = create_gathering_member
+    @shift = Shift.create!(account: @member, role: @role, rslot: @rslot, rota: @rota)
+    @other_rslot = Rslot.create!(name: 'Evening', rota: @rota)
+    refute membership_of(@member).confirmed?
+  end
+
+  test "a member who hasn't paid isn't shown the rota or their shift's edit link, until they pay" do
+    create_unpaid_member_with_shift
+    sign_in(@member)
+    visit gathering_path("/rotas/#{@rota.id}")
+    assert page.has_content?('You must make a payment before accessing that page.')
+    assert page.has_current_path?(gathering_path, ignore_query: true)
+    assert page.has_no_css?("a[href='#{gathering_path("/shifts/#{@shift.id}/edit")}']", visible: :all)
+
+    membership_of(@member).set(paid: 10)
+    visit gathering_path("/rotas/#{@rota.id}")
+    assert page.has_css?("a[href='#{gathering_path("/shifts/#{@shift.id}/edit")}']", visible: :all)
+  end
+
+  test "a member who hasn't paid can't open, change or drop their own shift, and can once they've paid" do
+    covers_route 'GET /g/:slug/shifts/:id/edit'
+    covers_route 'POST /g/:slug/shifts/:id/edit'
+    covers_route 'POST /g/:slug/shifts/:id/destroy'
+    create_unpaid_member_with_shift
+    sign_in_with_rack(@member)
+
+    get gathering_path("/shifts/#{@shift.id}/edit")
+    assert_equal gathering_path, URI(last_response.location).path
+    post gathering_path("/shifts/#{@shift.id}/edit"), shift: { rslot_id: @other_rslot.id }
+    assert_equal gathering_path, URI(last_response.location).path
+    post gathering_path("/shifts/#{@shift.id}/destroy")
+    assert_equal gathering_path, URI(last_response.location).path
+    follow_redirect!
+    assert_includes last_response.body, 'You must make a payment before accessing that page.'
+    assert_equal @rslot.id, Shift.find(@shift.id).rslot_id
+
+    membership_of(@member).set(paid: 10)
+    get gathering_path("/shifts/#{@shift.id}/edit")
+    assert last_response.ok?
+    assert_includes last_response.body, 'Update shift'
+    post gathering_path("/shifts/#{@shift.id}/edit"), shift: { rslot_id: @other_rslot.id }
+    assert_equal gathering_path("/rotas/#{@rota.id}"), URI(last_response.location).path
+    assert_equal @other_rslot.id, @shift.reload.rslot_id
+    post gathering_path("/shifts/#{@shift.id}/destroy")
+    assert_nil Shift.find(@shift.id)
+  end
 end

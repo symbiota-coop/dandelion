@@ -455,6 +455,40 @@ class AccountSignInsTest < ActiveSupport::TestCase
     end
   end
 
+  test "signed out, an account's own pages that name it email it a sign in code rather than showing them" do
+    covers_route 'GET /accounts/edit'
+    covers_route 'GET /accounts/subscriptions'
+    account = FactoryBot.create(:account)
+    clear_cookies
+
+    %w[/accounts/edit /accounts/subscriptions].each do |path|
+      email = recorded_email { get path, account_id: account.id }
+      location = URI(last_response.location)
+      assert_equal ['/accounts/sign_in_code', "account_id=#{account.id}"], [location.path, location.query]
+      assert_equal [account.email], email.recipients
+      assert_equal 'Sign in code for Dandelion', email.subject_line
+      assert_nil last_request.session[:account_id]
+    end
+
+    # Without an account to email, it's the usual sign up or sign in
+    emails = recorded_emails { get '/accounts/edit', account_id: BSON::ObjectId.new }
+    assert_equal '/accounts/new', URI(last_response.location).path
+    assert_empty emails
+
+    # Past the limit, no code is sent, and the page says so
+    RecipientLimit::LIMITS[:sign_in_code][:limit].times { account.send_sign_in_code }
+    emails = recorded_emails { get '/accounts/edit', account_id: account.id }
+    assert_empty emails
+    follow_redirect!
+    assert_includes last_response.body, RecipientLimit::SIGN_IN_CODE_WITHHELD
+
+    # Signed in, the page shows, and nothing is emailed
+    sign_in_with_rack(account)
+    emails = recorded_emails { get '/accounts/edit', account_id: account.id }
+    assert last_response.ok?
+    assert_empty emails
+  end
+
   test 'a session from before session tokens is kept until the account revokes its sessions' do
     covers_route 'GET /accounts/edit'
     account = FactoryBot.create(:account)

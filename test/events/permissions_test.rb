@@ -159,6 +159,39 @@ class EventPermissionsTest < ActiveSupport::TestCase
     refute event.reload.deleted?
   end
 
+  test "the destroy route refuses an event manager deleting another account's event, and anyone signed out" do
+    covers 'organisations/table-delete-events@f21a92'
+    covers_route 'POST /e/:slug/destroy'
+    org = FactoryBot.create(:organisation)
+    manager = add_event_manager(org)
+    event = FactoryBot.create(:event, organisation: org)
+    own_event = FactoryBot.create(:event, organisation: org, account: manager, last_saved_by: manager)
+
+    signed_out = recorded_emails { post "/e/#{event.slug}/destroy", outcome: 'delete' }
+    assert_equal "/e/#{event.slug}", URI(last_response.location).path
+    assert_empty signed_out
+
+    sign_in_with_rack(manager)
+    # The manager admins the event, so it's the delete rule refusing them, not the event's admins
+    get "/e/#{event.slug}/delete"
+    assert last_response.ok?
+    emails = recorded_emails do
+      post "/e/#{event.slug}/destroy", outcome: 'delete'
+      assert_equal "/e/#{event.slug}", URI(last_response.location).path
+      post "/e/#{event.slug}/destroy", outcome: 'cancel'
+      assert_equal "/e/#{event.slug}", URI(last_response.location).path
+    end
+    assert_empty emails
+    event = Event.unscoped.find(event.id)
+    refute event.deleted?
+    refute event.cancelled?
+
+    emails = recorded_emails { post "/e/#{own_event.slug}/destroy", outcome: 'delete' }
+    assert_equal "/o/#{org.slug}/events", URI(last_response.location).path
+    assert Event.unscoped.find(own_event.id).deleted?
+    assert_equal ["#{manager.name} deleted the event #{own_event.name}"], emails.map(&:subject_line)
+  end
+
   test 'org admin can delete any organisation event' do
     covers 'organisations/org-admins-managers-activity-admins-are-event-admins@a32f62', 'organisations/table-delete-events@f21a92'
     org = FactoryBot.create(:organisation)

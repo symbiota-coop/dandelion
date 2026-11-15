@@ -20,6 +20,26 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
     FactoryBot.create(:account, admin: true)
   end
 
+  # Posting comments
+
+  test 'comments go only on the kinds of discussion there are, however the request names another' do
+    covers_route 'POST /comment'
+    team_thread
+    sign_in_with_rack(@member)
+
+    # Gathering is a model a constantize would find, and was once a kind of discussion; Kernel isn't a model at all
+    { 'Gathering' => @gathering.id, 'Account' => @member.id, 'Kernel' => @gathering.id }.each do |type, id|
+      post '/comment', comment: { commentable_type: type, commentable_id: id, body: 'Forged' }
+      assert_equal 403, last_response.status, type
+    end
+    assert_equal 0, Comment.and(body: 'Forged').count
+    assert_equal 1, Post.count
+
+    post '/comment', comment: { commentable_type: 'Team', commentable_id: @team.id, post_id: @post.id, body: 'Allowed' }
+    assert last_response.redirect?
+    assert_equal ['Secret plans', 'Allowed'], @post.comments.order(created_at: :asc).pluck(:body)
+  end
+
   # Deleting comments
 
   test "a comment's author deletes a reply, and deleting the comment that opened a thread deletes the thread" do
