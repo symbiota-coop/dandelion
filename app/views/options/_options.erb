@@ -49,9 +49,7 @@
         <% if !gathering_admin? && option.hide_members? %>
           <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
         <% else %>
-          <a href="javascript:;" onclick="$('#modal .modal-content').load(<%= "/g/#{@gathering.slug}/options/#{option.id}".to_json %>, function () {
-                    $('#modal').modal('show')
-                  });">
+          <a href="/g/<%= @gathering.slug %>/options/<%= option.id %>" data-open-in-modal>
             <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
           </a>
         <% end %>

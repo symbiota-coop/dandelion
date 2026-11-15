@@ -4,9 +4,7 @@
     <%= membership.created_at %>
   </a>
 <% elsif membership.answers %>
-  <a href="javascript:;" onclick="$('#modal .modal-content').load(<%= "/g/#{@gathering.slug}/memberships/#{membership.id}".to_json %>, function () {
-          $('#modal').modal('show')
-        });">
+  <a href="/g/<%= @gathering.slug %>/memberships/<%= membership.id %>" data-open-in-modal>
     <%= membership.created_at %>
   </a>
 <% else %>

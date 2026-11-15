@@ -281,6 +281,21 @@ class LintTest < Minitest::Test
           .flat_map { |block| block.join.scan(/\berb[ (]:'?([\w\/]+)/).flatten }.uniq
   end
 
+  # Loading #modal by hand, from a link's onclick
+  MODAL_LOAD = /#modal \.modal-content['"]?\)\.load\(/
+
+  # Links open #modal with data-open-in-modal (app.js), not their own onclick code, so every modal gets its focus,
+  # size, scroll and address bar handling
+  def test_modals_open_with_data_open_in_modal
+    assert_match MODAL_LOAD, %(<a href="javascript:;" onclick="$('#modal .modal-content').load('/g/x/options/1', function () { $('#modal').modal('show') })">)
+    refute_match MODAL_LOAD, %(<a href="/g/x/options/1" data-open-in-modal>)
+
+    offenders = Dir[File.join(ROOT, 'app/views/**/*.erb')].select { |path| File.read(path, encoding: 'UTF-8').match?(MODAL_LOAD) }
+    assert_empty offenders.map { |path| path.delete_prefix("#{ROOT}/") },
+                 'Open #modal with <a href="/the/route" data-open-in-modal>, its route answering a background request with the ' \
+                 "modal's contents, rather than loading it in an onclick"
+  end
+
   # The form partials buttons open in a modal to create something (_form_modal.erb's form:)
   def form_modal_partials(template)
     template.scan(/partial :form_modal, locals: \{[^}]*\bform: :'([\w\/]+)'/).flatten
