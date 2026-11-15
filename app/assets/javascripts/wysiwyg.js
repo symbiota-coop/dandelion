@@ -27,6 +27,10 @@ $(function () {
       }).then(editor => {
         textarea.ckeditorInstance = editor
         editors.push(editor)
+        // Keep the textarea up to date as it's typed in: CKEditor writes it only as the form submits, after the
+        // browser has checked a required one is filled in (a private session's How to book), so it would stay empty
+        // and the form not submit
+        editor.model.document.on('change:data', () => editor.updateSourceElement())
         offsetToolbars()
 
         textarea.dispatchEvent(new CustomEvent('wysiwyg:ready', {

@@ -86,7 +86,9 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     fill_in 'Location', with: 'Stockholm'
     fill_in 'Maximum number of people', with: '2'
     fill_in 'Length (minutes)', with: '60 – 90'
-    fill_in 'How to book', with: 'Email sky@example.com'
+    # How to book is rich text, in CKEditor
+    assert page.has_css?('#private_session_how_to_book ~ .ck-editor')
+    execute_script "document.getElementById('private_session_how_to_book').ckeditorInstance.setData(#{'<p>Email sky@example.com</p>'.to_json})"
     fill_in 'Price', with: '40-80'
     assert page.has_no_select?('Currency')
     click_link 'Change currency'
@@ -140,14 +142,15 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
 
   test 'a session says how to book it, linking its email address and booking link, and offers no messaging' do
     covers 'private_sessions/how-to-book@738200'
-    private_session = create_private_session(practitioner, how_to_book: "Email sky@example.com\nor book at https://sky.example.com/book <b>today</b>")
+    private_session = create_private_session(practitioner, how_to_book: '<p>Email sky@example.com or use <a href="https://sky.example.com/book">my booking page</a></p>' \
+                                                                         '<p>More at https://sky.example.com/more<script>alert(1)</script></p>')
     sign_in FactoryBot.create(:account)
     visit private_session.path
     within('#how-to-book') do
       assert page.has_link?('sky@example.com', href: 'mailto:sky@example.com')
-      assert page.has_link?('https://sky.example.com/book', href: 'https://sky.example.com/book')
-      assert page.has_content?('<b>today</b>')
-      assert page.has_no_css?('b')
+      assert page.has_link?('my booking page', href: 'https://sky.example.com/book')
+      assert page.has_link?('https://sky.example.com/more', href: 'https://sky.example.com/more')
+      assert page.has_no_css?('script', visible: :all)
     end
     assert page.has_no_link?(href: %r{/messages/})
   end

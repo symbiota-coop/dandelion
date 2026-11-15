@@ -36,7 +36,7 @@
   </div>
   <%= partial :tags_select, locals: { object: @private_session, tag_class: PrivateSessionTag } %>
   <%= f.wysiwyg_block :description %>
-  <%= f.text_area_block :how_to_book, rows: 3 %>
+  <%= f.wysiwyg_block :how_to_book, rows: 3 %>
   <%= f.image_block :image %>
   <%= f.check_box_block :secret %>
   <%= f.submit_block destroy_url: "/ps/#{params[:slug]}/destroy" %>
