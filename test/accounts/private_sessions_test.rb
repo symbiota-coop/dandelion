@@ -89,7 +89,7 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     sign_in account
     visit '/'
     within('#sidebar') { click_link 'Private sessions' }
-    assert page.has_css?('h1', text: 'Private sessions')
+    assert page.has_current_path?('/private_sessions')
     click_link 'Offer a private session'
     fill_in 'Name of the session', with: 'Thai massage'
     find('#private_session_tag_names + .select2').click
@@ -147,7 +147,8 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     visit unlisted.path
     assert page.has_css?('h1', text: 'Unlisted massage')
     click_link 'Return to private sessions'
-    assert page.has_css?('h1', text: 'Private sessions')
+    assert page.has_current_path?('/private_sessions')
+    assert page.has_link?('Listed massage')
 
     sign_in account
     visit "/u/#{account.username}"
