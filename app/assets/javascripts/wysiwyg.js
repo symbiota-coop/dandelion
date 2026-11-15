@@ -2,6 +2,13 @@
 $(function () {
   const editors = []
 
+  // CKEditor's balloons (the link form, from Cmd-K or the link button) are at the end of the body, outside an open
+  // modal, whose focus trap would pull the focus back into it as one opens: to the modal's first button, scrolling it
+  // to the top and closing the balloon. So focus moving into one doesn't reach the trap (a listener on document)
+  window.addEventListener('focusin', function (e) {
+    if (e.target.closest && e.target.closest('.ck-body-wrapper') && document.querySelector('.modal.show')) e.stopImmediatePropagation()
+  }, true)
+
   function offsetToolbars () {
     const headerHeight = fixedHeaderHeight()
     editors.forEach(function (editor) {

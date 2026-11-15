@@ -7,6 +7,13 @@
   --ck-border-radius: var(--bs-border-radius);
 }
 
+/* Its balloons (the link form) and dropdowns sit at the end of the body, above Bootstrap's modal (1055) while one is open,
+   for an editor in a modal, rather than hidden behind it */
+.modal-open .ck {
+  --ck-z-panel: 1060;
+  --ck-z-modal: 1060;
+}
+
 .ck-heading_paragraph_lead {
   font-size: var(--font-size-base) !important
 }
