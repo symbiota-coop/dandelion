@@ -83,8 +83,8 @@ Rake::TestTask.new(:test) do |test|
 end
 
 # Collates the coverage CI's test groups recorded (COVERAGE, test/setup/coverage.rb), downloaded into coverage-groups/, into
-# one report in coverage/, and writes its line and branch totals and least-covered files to GitHub's job summary when
-# there is one
+# one report in coverage/, and writes its line and branch totals, least-covered files and untaken refusals to GitHub's
+# job summary when there is one
 desc 'Collate test coverage from coverage-groups/*/.resultset.json'
 task 'test:coverage' do
   require 'simplecov'
@@ -106,6 +106,7 @@ task 'test:coverage' do
   result.files.sort_by { |f| -f.missed_branches.count }.first(30).each do |f|
     summary << "| #{f.project_filename.delete_prefix('/')} | #{f.missed_branches.count} | #{f.covered_percent(:branch).round(1)}% |"
   end
+  summary += TestCoverage.untaken_refusals_summary(result.files)
   puts summary
   File.write(ENV['GITHUB_STEP_SUMMARY'], "#{summary.join("\n")}\n", mode: 'a') if ENV['GITHUB_STEP_SUMMARY']
 end
