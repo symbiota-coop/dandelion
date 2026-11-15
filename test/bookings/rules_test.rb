@@ -370,4 +370,73 @@ class EventBookingRulesTest < ActiveSupport::TestCase
     refute_includes last_response.body, 'id="select-tickets"'
     assert_includes last_response.body, 'monthly donor'
   end
+
+  test "an email the organisation has banned can't book, and nothing is left behind" do
+    covers_route 'POST /e/:slug/purchase'
+    create_event(prices: [0])
+    # The event's own emails, like its organisation's first-event congratulations
+    run_jobs
+    banned = FactoryBot.create(:account)
+    @organisation.set(banned_emails: "someone@example.com\n #{banned.email.upcase} \nnew.banned@example.com")
+    allowed = FactoryBot.create(:account)
+
+    emails = recorded_emails { post_purchase(@event, banned) } + emails_sent_by_jobs
+    assert_equal 403, last_response.status
+    assert_equal OrderBuilder::BannedEmail::MESSAGE, JSON.parse(last_response.body)['error']
+    # A guest typing a banned address that has no account yet, in another case (details_form's account replaces banned's)
+    emails += recorded_emails do
+      post_purchase(@event, banned, details_form: { payment_method: 'rsvp', account: { name: 'New Banned', email: 'New.Banned@Example.com' } })
+    end + emails_sent_by_jobs
+    assert_equal 403, last_response.status
+    assert_equal 0, @event.orders.count
+    assert_equal 0, @event.tickets.count
+    assert_empty emails.flat_map(&:recipients)
+
+    emails = recorded_emails { post_purchase(@event, allowed) } + emails_sent_by_jobs
+    assert_equal 200, last_response.status
+    assert_equal [allowed.id], @event.orders.pluck(:account_id)
+    assert_equal 1, @event.tickets.count
+    assert_includes emails.flat_map(&:recipients), allowed.email
+  end
+
+  test 'someone whose email the organisation has banned is told they cannot book' do
+    create_event(prices: [0])
+    banned = FactoryBot.create(:account)
+    @organisation.set(banned_emails: banned.email)
+
+    sign_in(banned)
+    visit "/e/#{@event.slug}"
+    message = accept_alert { click_button 'RSVP' }
+    assert_equal OrderBuilder::BannedEmail::MESSAGE, message
+    # Back at the form, to book with another email
+    assert page.has_button? 'RSVP'
+    assert page.has_no_content? 'Thanks for booking'
+    assert_equal 0, @event.orders.count
+
+    sign_in(FactoryBot.create(:account))
+    visit "/e/#{@event.slug}"
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
+    assert_equal 1, @event.orders.count
+  end
+
+  test "a ticket type whose sales have ended isn't offered, nor any once the event has ended without sales after it" do
+    create_event(prices: [0])
+    on_sale = @event.ticket_types.first
+    on_sale.set(name: 'Still on sale')
+    ended = @event.ticket_types.create!(name: 'Sales over', price: 0, quantity: 10, sales_end: 1.hour.ago)
+
+    visit "/e/#{@event.slug}"
+    assert page.has_select? "quantities[#{on_sale.id}]"
+    within(:xpath, "//tr[.//*[contains(@class, 'ticket-type-name')][normalize-space()='Sales over']]") do
+      assert page.has_content? 'Sales closed'
+    end
+    assert page.has_no_select? "quantities[#{ended.id}]"
+
+    @event.set(start_time: 2.days.ago, end_time: 1.day.ago, no_sales_after_end_time: true)
+    visit "/e/#{@event.slug}"
+    assert page.has_content? 'Sales have ended for this event'
+    assert page.has_no_select? "quantities[#{on_sale.id}]"
+    assert page.has_no_select? "quantities[#{ended.id}]"
+  end
 end
