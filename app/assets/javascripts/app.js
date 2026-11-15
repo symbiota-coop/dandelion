@@ -83,6 +83,23 @@ $(function () {
     $('<form>', { method: 'post', action: link.href }).hide().appendTo(document.body)[0].submit()
   }, true)
 
+  // While #modal shows something with a page of its own (a private session, a gathering application), the
+  // address bar shows that page's URL, to copy or share: going back closes the modal, as closing it goes back to the
+  // page's own address
+  function pushModalUrl (url) {
+    if (window.location.pathname === url) return
+    history.pushState({ modalUrl: url }, '', url)
+    $('#modal').one('hidden.bs.modal', function () {
+      if (history.state && history.state.modalUrl === url) history.back()
+    })
+  }
+
+  // Going back from a modal's address closes the modal
+  window.addEventListener('popstate', function () {
+    const $modal = $('#modal')
+    if ($modal.hasClass('show') && !(history.state && history.state.modalUrl)) $modal.modal('hide')
+  })
+
   // Open a person's profile in #modal, from an avatar or name with data-account-username. Not from inside the modal,
   // which would replace the profile being shown
   $(document).on('click', '[data-account-username]', function () {
@@ -108,13 +125,14 @@ $(function () {
   // modal's contents (_modal_content.erb), and the link's href stays a page of its own to fall back on.
   // Its edit form starts at its first field. Only these: other things #modal shows (an application, a profile) may
   // have a form further down, like a discussion's, which shouldn't take the focus (and bring up a phone's keyboard),
-  // and a form these show that isn't what the link is for says so with data-no-autofocus (a private session's Vouch).
+  // and a form these show that isn't what the link is for says so with data-no-autofocus (a private session's Vouch),
+  // as does a link whose page isn't a form to fill in (a gathering application, which has a discussion further down).
   // data-modal-size="lg" (or "xl") widens it until it closes, for content in two columns, like a private session.
-  // data-modal-push-url: while it's open the address bar shows the page it opened (a private session's), to copy or
-  // share, and going back closes it, as closing it goes back to the page's own address
+  // data-modal-push-url: while it's open the address bar shows the page it opened (pushModalUrl)
   $(document).on('click', 'a[data-open-in-modal]', function (e) {
     e.preventDefault()
     const size = $(this).attr('data-modal-size')
+    const autofocus = !$(this).is('[data-no-autofocus]')
     const pushUrl = $(this).is('[data-modal-push-url]') ? $(this).attr('href') : null
     $('#modal .modal-content').load($(this).attr('href'), function () {
       const $modal = $('#modal')
@@ -122,13 +140,9 @@ $(function () {
         $modal.find('.modal-dialog').addClass('modal-' + size)
         $modal.one('hidden.bs.modal', function () { $modal.find('.modal-dialog').removeClass('modal-' + size) })
       }
-      if (pushUrl && !$modal.hasClass('show') && window.location.pathname !== pushUrl) {
-        history.pushState({ modalUrl: pushUrl }, '', pushUrl)
-        $modal.one('hidden.bs.modal', function () {
-          if (history.state && history.state.modalUrl === pushUrl) history.back()
-        })
-      }
+      if (pushUrl && !$modal.hasClass('show')) pushModalUrl(pushUrl)
       const focusFirstField = function () {
+        if (!autofocus) return
         $modal.find('form').not('[data-no-autofocus]').find('input:visible, textarea:visible, select:visible').not('[type=hidden]').first().trigger('focus')
       }
       // Already open (a link inside the modal), it won't fire shown.bs.modal again
@@ -136,12 +150,6 @@ $(function () {
       else $modal.one('shown.bs.modal', focusFirstField).modal('show')
       hideTooltips()
     })
-  })
-
-  // Going back from a modal's address (data-modal-push-url) closes the modal
-  window.addEventListener('popstate', function () {
-    const $modal = $('#modal')
-    if ($modal.hasClass('show') && !(history.state && history.state.modalUrl)) $modal.modal('hide')
   })
 
   // A form with data-save-in-modal saves in #modal rather than leaving it: it posts in the background (an image too,

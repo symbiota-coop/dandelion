@@ -584,16 +584,21 @@ class GatheringsTest < ActiveSupport::TestCase
     assert mapplication.reload.meets_threshold
   end
 
-  test "an application opened in the modal doesn't focus its discussion form" do
+  test "an application opened in the modal shows its URL and doesn't focus its discussion form" do
     covers_route 'GET /g/:slug/mapplications/:id'
     create_gathering(privacy: 'closed')
     mapplication = @gathering.mapplications.create!(account: FactoryBot.create(:account), status: 'pending')
     sign_in(@account)
     visit "/g/#{@gathering.slug}/applications"
-    find("a[onclick*='mapplications/#{mapplication.id}']").click
+    find("a[href='/g/#{@gathering.slug}/mapplications/#{mapplication.id}']").click
     within('#modal') { assert page.has_field? 'Subject' }
     # Bootstrap focuses the modal once it's shown, just before shown.bs.modal, which used to move it to Subject
     assert page.has_css?('#modal:focus')
+    # The address bar shows the application's own page while it's open, and going back closes it
+    assert page.has_current_path?("/g/#{@gathering.slug}/mapplications/#{mapplication.id}")
+    page.go_back
+    assert page.has_current_path?("/g/#{@gathering.slug}/applications")
+    assert page.has_no_css?('#modal.show')
   end
 
   test 'an edit form opened in the modal starts at its first field' do
