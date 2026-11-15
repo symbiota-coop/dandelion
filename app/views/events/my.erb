@@ -84,7 +84,7 @@
                                           <%== Sanitize.fragment(Rinku.auto_link(q), Sanitize::Config::DANDELION) %>
                                         </strong>
                                         <br>
-                                        <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+                                        <%= plain_text_html(a) %>
                                       </p>
                                     <% end %>
                                     <% } if event_feedback.answers %>

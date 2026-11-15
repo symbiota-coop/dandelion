@@ -7,7 +7,7 @@
     <%= partial :'timetables/tactivity', object: @tactivity %>
     <% if @tactivity.description %>
       <p class="fs-5">
-        <%== Sanitize.fragment(Rinku.auto_link(@tactivity.description.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+        <%= plain_text_html(@tactivity.description) %>
       </p>
     <% end %>
     <div data-pagelet-url="/commentable?commentable_type=Tactivity&commentable_id=<%= @tactivity.id %>">

@@ -265,6 +265,20 @@ class GatheringMembersTest < ActiveSupport::TestCase
     assert page.has_css? '#modal', text: 'Why are you joining?'
   end
 
+  test "a member's answer shows as they typed it, markup and all, with its line breaks and links" do
+    create_gathering(privacy: 'open')
+    answer = "To build the <b>dome</b>\nPlans at https://example.com/dome"
+    create_gathering_member(name: 'Answering Person').then { |account| membership_of(account).set(answers: [['Why are you joining?', answer]]) }
+    sign_in(create_gathering_member(name: 'Curious Person'))
+    visit gathering_path('/members')
+    membership_row(membership_of(Account.find_by(name: 'Answering Person'))).find("a[onclick*='/memberships/']").click
+    assert page.has_css? '#modal p', text: "To build the <b>dome</b>\nPlans at https://example.com/dome"
+    answer_p = find('#modal p', text: 'To build the <b>dome</b>')
+    assert answer_p.has_css? 'br'
+    assert answer_p.has_link? 'https://example.com/dome', href: 'https://example.com/dome'
+    assert answer_p.has_no_css? 'b'
+  end
+
   test "a member's answers are for the gathering's confirmed members, and opened directly go to the members page" do
     covers_route 'GET /g/:slug/memberships/:id'
     create_gathering(privacy: 'open', demand_payment: true)

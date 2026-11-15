@@ -34,8 +34,9 @@
   account = event_feedback.account
   next if account.name.include?('_')
   next if !event_feedback.event || event_feedback.event.secret?
-  quote = event_feedback.public_answers.map { |q,a| a if a.present? }.compact.join('<br /><br />').gsub("\n", '<br />')
-  next if quote.empty? || quote.length > 500
+  answers = event_feedback.public_answers.map { |q,a| a if a.present? }.compact
+  next if answers.empty? || answers.join("\n\n").length > 500
+  quote = answers.map { |a| plain_text_html(a, links: false) }.join('<br><br>')
   %>
   <div class="feedback-columns-item" style="display: none">
 
@@ -48,7 +49,7 @@
           </div>
           <div class="col">
             <a class="home-feedback readable" href="/e/<%= event_feedback.event.slug %>">
-              <%== Sanitize.fragment(quote, Sanitize::Config::DANDELION) %>
+              <%== quote %>
             </a>
 
             <div class="my-2 text-nowrap fs-2">

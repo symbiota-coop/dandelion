@@ -7,7 +7,7 @@
       </strong>
     </p>
     <p class="fs-5">
-      <%== Sanitize.fragment(Rinku.auto_link(a.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+      <%= plain_text_html(a) %>
     </p>
   <% } %>
 </div>
@@ -34,7 +34,7 @@
         </small>
         <% if verdict.reason %>
           <div>
-            <%== Sanitize.fragment(Rinku.auto_link(verdict.reason.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+            <%= plain_text_html(verdict.reason) %>
           </div>
         <% end %>
       </div>

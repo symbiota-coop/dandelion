@@ -31,7 +31,7 @@
       </strong>
       <% if option.description %>
         <br>
-        <%== Sanitize.fragment(Rinku.auto_link(option.description.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %>
+        <%= plain_text_html(option.description) %>
       <% end %>
     </td>
     <td>

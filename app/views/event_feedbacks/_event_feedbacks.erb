@@ -18,7 +18,7 @@
       <small class="text-body-secondary"><%= timeago event_feedback.created_at %></small>
     </div>
     <% if answers.any? %>
-      <div class="readable mb-2"><%== Sanitize.fragment(answers.join('<br /><br />').gsub("\n", '<br />'), Sanitize::Config::DANDELION) %></div>
+      <div class="readable mb-2"><%== answers.map { |a| plain_text_html(a, links: false) }.join('<br><br>') %></div>
     <% end %>
     <div class="small">
       <% if !account || event_feedback.anonymous? %>
@@ -35,7 +35,7 @@
     <% if answers.any? && event_feedback.response && event_feedback.respondable? %>
       <div class="feedback-reply mt-2">
         <div class="small fw-semibold mb-1"><i class="bi bi-reply-fill"></i> <%= event_feedback.event.organisation.name %> replied</div>
-        <div class="readable read-more"><%== Sanitize.fragment(Rinku.auto_link(event_feedback.response.gsub("\n", '<br />')), Sanitize::Config::DANDELION) %></div>
+        <div class="readable read-more"><%= plain_text_html(event_feedback.response) %></div>
       </div>
     <% end %>
   </article>
