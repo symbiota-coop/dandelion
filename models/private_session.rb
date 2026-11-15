@@ -51,12 +51,11 @@ class PrivateSession
   validates_uniqueness_of :slug
   validates_format_of :slug, with: /\A[a-z0-9-]+\z/
   validates_inclusion_of :delivery, in: DELIVERIES.values
-  validates_numericality_of :max_participants, only_integer: true, greater_than_or_equal_to: 1
+  validates_numericality_of :max_participants, only_integer: true, greater_than_or_equal_to: 1, allow_nil: true
   validates_presence_of :location, if: :in_person?
   validates_inclusion_of :currency, in: FIAT_CURRENCIES
 
   before_validation do
-    self.max_participants ||= 1
     self.currency ||= default_currency
     self.location = nil if delivery == 'online'
     assign_duration_or_range if @duration_or_range_given
@@ -140,10 +139,10 @@ class PrivateSession
       how_to_book: 'Your email address, phone number or booking link, and anything people should know when booking',
       description: 'What happens in a session, who it suits and anything people should know beforehand',
       location: 'Where you offer it: a town or area is enough',
-      max_participants: "1 for one-to-one sessions, or the most you'll see at once",
+      max_participants: "1 for one-to-one sessions, or the most you'll see at once. Leave it blank if there's no maximum",
       duration_or_range: 'A number of minutes, like 60, or a range, like 60-90',
       price_or_range: 'A price, like 60, or a sliding scale, like 40-80. Leave it blank for by donation.',
-      image: 'Square images work best: images of other sizes will be cropped to a square',
+      image: 'Square images work best: images of other sizes will be cropped to a square. Defaults to your profile image',
       secret: 'Leave it off the list of private sessions and your profile: only people with the link see it'
     }
   end
@@ -154,6 +153,11 @@ class PrivateSession
 
   def path
     "/ps/#{slug}"
+  end
+
+  # Coaching with Stephen Reid
+  def title_with_name
+    "#{title} with #{account.name}"
   end
 
   def in_person?
@@ -200,7 +204,10 @@ class PrivateSession
     end
   end
 
+  # Nothing without a maximum
   def group_size_label
+    return unless max_participants
+
     one_to_one? ? '1-1' : "Up to #{max_participants} people"
   end
 

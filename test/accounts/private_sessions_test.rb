@@ -24,16 +24,22 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     assert_nil online.coordinates
   end
 
-  test 'a session is for 1 or more people, and one-to-one when no number is given' do
-    covers 'private_sessions/group-size@d1c3dd'
+  test 'a session is for 1 or more people, or has no maximum when no number is given' do
+    covers 'private_sessions/group-size@8f1322'
     account = practitioner
-    assert_equal 1, create_private_session(account, max_participants: nil).max_participants
+    no_maximum = create_private_session(account, max_participants: nil)
+    assert_nil no_maximum.reload.max_participants
     assert create_private_session(account, max_participants: 30).persisted?
     [0, -1, 1.5].each do |max_participants|
       private_session = build_private_session(account, max_participants: max_participants)
       assert_not private_session.valid?
       assert private_session.errors[:max_participants].any?, "#{max_participants} people should be refused"
     end
+
+    # With no maximum, no badge says how many
+    visit no_maximum.path
+    assert page.has_css?('.badge', text: 'massage')
+    assert page.has_no_css?('.badge', text: /\A(1-1|Up to)/)
   end
 
   test 'length and price are a number or a range, and a session with no price is by donation' do
@@ -100,6 +106,9 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
 
     assert page.has_css?('h1', text: 'Thai massage')
     assert page.has_current_path?('/ps/thai-massage')
+    # Who offers it is in its title
+    assert page.has_css?('h1', text: 'Thai massage with Sky Practitioner')
+    assert page.has_link?('Sky Practitioner', href: "/u/#{account.username}")
     assert page.has_content?('Up to 2')
     assert page.has_content?('60–90 min')
     assert page.has_content?('€40–€80')
@@ -155,17 +164,24 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     assert page.has_no_link?(href: %r{/messages/})
   end
 
-  test "a session without an image shows the wash image-less tiles have, and one with an image shows its own" do
-    private_session = create_private_session(practitioner, title: 'Thai massage')
+  test "a session without an image shows its creator's picture, or the wash image-less tiles have, and one with an image its own" do
+    account = practitioner
+    private_session = create_private_session(account, title: 'Thai massage')
+    picture = "img[alt='Thai massage with Sky Practitioner']"
     visit private_session.path
     assert page.has_css?('.row .block-fill.ratio-1x1')
-    assert page.has_no_css?("img[alt='Thai massage']")
+    assert page.has_no_css?(picture)
 
-    private_session.image = File.new('app/assets/images/test-event.jpg')
+    account.image = File.new('app/assets/images/test-event.jpg')
+    account.save!
+    visit private_session.path
+    assert page.has_css?("#{picture}[src*='#{account.reload.image.thumb('400x400#').url.split('?').first}']")
+    assert page.has_no_css?('.block-fill')
+
+    private_session.image = File.new('app/assets/images/coop.png')
     private_session.save!
     visit private_session.path
-    assert page.has_css?("img[alt='Thai massage']")
-    assert page.has_no_css?('.block-fill')
+    assert page.has_css?("#{picture}[src*='#{private_session.reload.image.thumb('400x400#').url.split('?').first}']")
   end
 
   test 'a session in the list opens in a modal, whose title links to its page, and its owner edits it there' do
@@ -270,7 +286,7 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     create_private_session(account, title: 'Deep tissue massage')
     create_private_session(account, title: 'Shiatsu', tag_names: %w[bodywork shiatsu], delivery: 'either', description: '<p>Pressure along the meridians</p>')
     create_private_session(account, title: 'Guided meditation', tag_names: %w[meditation], delivery: 'online', location: nil)
-    titles = -> { page.all('#private-sessions h2').map(&:text).sort }
+    titles = -> { page.all('#private-sessions h2 > a:first-child').map(&:text).sort }
 
     visit '/private_sessions?q=meridians'
     assert_equal ['Shiatsu'], titles.call

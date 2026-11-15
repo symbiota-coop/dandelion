@@ -7,7 +7,7 @@ Private sessions are one-to-one or small group sessions you offer by arrangement
 - Enter where you offer it, the maximum number of people (1 for one-to-one), and optionally its length in minutes and price
 - Click 'Create private session'
 
-Its URL fills in from its name as you type it, like /ps/thai-massage, and you can change it, as long as no other session has it. <!-- claim: slug-from-name --> A session offered in person needs a location; an online one has none. <!-- claim: in-person-needs-location --> A session is for one person or more, up to the most you'll see at once. <!-- claim: group-size --> Its length is a number of minutes or a range, like 60-90, and its price a number or a range for a sliding scale, like 40-80; a session with no price is by donation. <!-- claim: length-and-price -->
+Its URL fills in from its name as you type it, like /ps/thai-massage, and you can change it, as long as no other session has it. <!-- claim: slug-from-name --> A session offered in person needs a location; an online one has none. <!-- claim: in-person-needs-location --> A session is for one person or more, up to the most you'll see at once, or as many as come if you leave the number blank. <!-- claim: group-size --> Its length is a number of minutes or a range, like 60-90, and its price a number or a range for a sliding scale, like 40-80; a session with no price is by donation. <!-- claim: length-and-price -->
 
 Your private sessions are also listed on your profile. To keep one off the Private sessions page and your profile, tick 'Secret': only people with its link will see it. <!-- claim: unlisted -->
 

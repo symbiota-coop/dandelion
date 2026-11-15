@@ -1,11 +1,7 @@
-<%# A session's badges, who offers it, its description and how to book it: on its page and in #modal %>
+<%# A session's badges, description and how to book it: on its page and in #modal %>
 <div class="mb-3">
   <%= partial :'private_sessions/badges', locals: { private_session: private_session } %>
 </div>
-<p class="d-flex align-items-center gap-2 fs-5">
-  <%= partial :'accounts/square', locals: { account: private_session.account, size: :sm } %>
-  <a href="/u/<%= private_session.account.username %>"><%= private_session.account.name %></a>
-</p>
 
 <% if private_session.description.present? %>
   <div class="wysiwyg readable mt-3">

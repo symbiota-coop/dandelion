@@ -1,7 +1,9 @@
 <% if private_session.secret %>
   <span class="badge text-bg-warning">Secret</span>
 <% end %>
-<span class="badge text-bg-secondary"><%= private_session.group_size_label %></span>
+<% if private_session.group_size_label %>
+  <span class="badge text-bg-secondary"><%= private_session.group_size_label %></span>
+<% end %>
 <%# Where it's offered says it's in person, so In person shows only without a location; offered both ways, one badge %>
 <% if private_session.location.present? %>
   <span class="badge text-bg-secondary"><i class="bi bi-geo-alt-fill"></i> <%= private_session.location %><% if private_session.online? %> &amp; Online<% end %></span>

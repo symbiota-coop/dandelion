@@ -59,7 +59,7 @@ Dandelion::App.controller do
 
   get '/ps/:slug' do
     @private_session = private_session_from_params
-    @title = @private_session.title
+    @title = @private_session.title_with_name
     # From a list, it opens in #modal (app.js, data-open-in-modal)
     request.xhr? ? partial(:'private_sessions/modal') : erb(:'private_sessions/private_session')
   end

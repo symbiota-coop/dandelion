@@ -3,7 +3,7 @@
 <%# data-saved-path: where the session is now, which opens once it's saved in the modal (data-save-in-modal, app.js) %>
 <div class="modal-header" data-saved-path="<%= @private_session.path %>">
   <h3 class="modal-title">
-    <a class="text-body" href="<%= @private_session.path %>"><%= @private_session.title %></a>
+    <a class="text-body" href="<%= @private_session.path %>"><%= @private_session.title %></a> <small class="text-body-secondary">with <a class="text-reset" href="/u/<%= @private_session.account.username %>"><%= @private_session.account.name %></a></small>
   </h3>
   <div class="ms-auto d-flex align-items-center gap-3">
     <% if private_session_admin? %>

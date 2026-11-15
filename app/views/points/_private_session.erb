@@ -1,9 +1,4 @@
-<h4 class="mt-0"><a target="_parent" href="<%= private_session.path %>"><%= private_session.title %></a></h4>
+<h4 class="mt-0"><a target="_parent" href="<%= private_session.path %>"><%= private_session.title %></a> <small class="text-body-secondary">with <a class="text-reset" target="_parent" href="/u/<%= private_session.account.username %>"><%= private_session.account.name %></a></small></h4>
 <div class="mb-2">
   <%= partial :'private_sessions/badges', locals: { private_session: private_session, target: '_parent' } %>
 </div>
-<%# A bare <img>: accounts/square opens the profile in #modal, which the popup doesn't have %>
-<p class="mb-0">
-  <img class="avatar avatar-xs <%= private_session.account.avatar_class %>" alt="<%= private_session.account.name %>" src="<%= u private_session.account.image_thumb_or_gravatar_url %>">
-  <%= private_session.account.name %>
-</p>
