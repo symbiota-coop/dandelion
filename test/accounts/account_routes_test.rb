@@ -204,6 +204,35 @@ class AccountRoutesTest < ActiveSupport::TestCase
     assert_equal "/u/#{followee.username}", URI(last_response.location).path
   end
 
+  test "someone's own profile offers no Follow, unlike another person's" do
+    account = public_account
+    other = public_account
+    sign_in(account)
+
+    visit "/u/#{other.username}"
+    assert page.has_link?('Follow', href: "/follow/#{other.username}?f=follow_and_subscribe")
+
+    visit "/u/#{account.username}"
+    assert page.has_content?(account.name)
+    assert page.has_no_link?('Follow')
+  end
+
+  test "no one can follow themselves, though they can follow someone else" do
+    account = public_account
+    followee = public_account
+    sign_in_with_rack(account)
+
+    %w[follow_and_subscribe follow_without_subscribing].each do |f|
+      post "/follow/#{account.username}", f: f
+      assert_equal 0, Follow.count, f
+    end
+    refute Follow.new(follower: account, followee: account).valid?
+
+    post "/follow/#{followee.username}", f: 'follow_and_subscribe'
+    assert_equal "/u/#{followee.username}", URI(last_response.location).path
+    assert_equal [[account.id, followee.id]], Follow.pluck(:follower_id, :followee_id)
+  end
+
   test 'someone stars and unstars a person they follow' do
     covers_route 'GET /follow/starred/:id'
     covers_route 'POST /follow/star/:id'

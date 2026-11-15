@@ -9,6 +9,8 @@ class PmailLink
     'tablet' => :tablet_clicks
   }.freeze
 
+  LINK_TOKEN = /(link|sign_in)_token=/
+
   belongs_to_without_parent_validation :pmail
 
   field :url, type: String
@@ -23,7 +25,7 @@ class PmailLink
   before_validation do
     if url
       errors.add(:url, 'is invalid') unless HttpUrl.valid?(url)
-      errors.add(:url, 'cannot contain a link token') if url.match?(/(link|sign_in)_token=/)
+      errors.add(:url, 'cannot contain a link token') if url.match?(LINK_TOKEN)
     end
   end
 

@@ -518,4 +518,65 @@ class PmailsTest < ActiveSupport::TestCase
     assert_includes body, 'View analytics on Mailgun'
     assert_includes body, 'https://app.mailgun.com/mg/reporting/metrics?'
   end
+
+  test "a mail can't link with a link token, which would sign every recipient in as its owner, in its body or its link params" do
+    create_organisation
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone', markdown: true, body: 'Hi')
+    pasted_link = "#{ENV['BASE_URI']}/o/#{@organisation.slug}?link_token=#{@account.link_token}"
+    sign_in(@account)
+    visit "/pmails/#{pmail.id}/edit?organisation_id=#{@organisation.id}"
+
+    fill_in 'Body', with: "[Our page](#{pasted_link})"
+    click_button 'Save'
+    assert page.has_content? 'Body cannot contain a link token'
+    assert_equal 'Hi', pmail.reload.body
+
+    fill_in 'Body', with: "[Our page](#{pasted_link.sub('link_token', 'sign_in_token')})"
+    click_button 'Save'
+    assert page.has_content? 'Body cannot contain a link token'
+    assert_equal 'Hi', pmail.reload.body
+
+    fill_in 'Body', with: "[Our page](#{ENV['BASE_URI']}/o/#{@organisation.slug})"
+    fill_in 'Parameters to add to links', with: "link_token=#{@account.link_token}"
+    click_button 'Save'
+    assert page.has_content? 'Parameters to add to links cannot contain a link token'
+    assert_equal 'Hi', pmail.reload.body
+    assert_nil pmail.link_params
+
+    fill_in 'Parameters to add to links', with: 'utm_source=dandelion'
+    click_button 'Save'
+    assert page.has_content? 'The mail was saved'
+    assert_equal "[Our page](#{ENV['BASE_URI']}/o/#{@organisation.slug})", pmail.reload.body
+    assert_equal 'utm_source=dandelion', pmail.link_params
+  end
+
+  test "a click on a link whose token survives taking it out of the query records no link, and a click on another link does" do
+    create_organisation(mailgun_webhook_signing_key: 'organisation-key')
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone')
+    webhook = "/o/#{@organisation.slug}/mailgun_webhook"
+
+    post webhook, mailgun_click_event(pmail, url: 'https://example.com/page#link_token=secret', key: 'organisation-key'), 'CONTENT_TYPE' => 'application/json'
+    assert_equal 200, last_response.status
+    assert_equal 0, pmail.pmail_links.count
+
+    post webhook, mailgun_click_event(pmail, url: 'https://example.com/page#section', key: 'organisation-key'), 'CONTENT_TYPE' => 'application/json'
+    assert_equal 200, last_response.status
+    assert_equal ['https://example.com/page#section'], pmail.pmail_links.pluck(:url)
+    assert_equal 1, pmail.pmail_links.first.clicks
+  end
+
+  test 'a tracked link must be an http or https URL with no link token' do
+    create_organisation
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, recipient_kind: 'everyone')
+
+    { 'https://example.com/page?link_token=secret' => 'cannot contain a link token',
+      'https://example.com/page?sign_in_token=secret' => 'cannot contain a link token',
+      'javascript:alert(1)' => 'is invalid',
+      'https://example.com/a page' => 'is invalid' }.each do |url, error|
+      link = pmail.pmail_links.build(url: url)
+      refute link.valid?, url
+      assert_includes link.errors[:url], error, url
+    end
+    assert pmail.pmail_links.build(url: 'https://example.com/page?a=1').valid?
+  end
 end

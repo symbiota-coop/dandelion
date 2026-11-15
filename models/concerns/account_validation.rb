@@ -50,11 +50,11 @@ module AccountValidation
 
       errors.add(:bio, 'cannot contain links yet as an anti-spam measure, use Dandelion for a while first!') if !live_player? && (bio =~ %r{https?://})
 
-      errors.add(:name, 'must not contain $') if name && name.include?('$')
-      errors.add(:name, 'must not contain @') if name && name.include?('@')
-      errors.add(:name, 'must not contain www.') if name && name.include?('www.')
-      errors.add(:name, 'must not contain http://') if name && name.include?('http://')
-      errors.add(:name, 'must not contain https://') if name && name.include?('https://')
+      # As NFKC, so lookalikes (＠, ＄, ｈｔｔｐｓ：／／) count too. An ASCII @ was cut off above
+      normalized_name = name&.unicode_normalize(:nfkc)
+      %w[$ @ www. http:// https://].each do |s|
+        errors.add(:name, "must not contain #{s}") if normalized_name&.include?(s)
+      end
       # errors.add(:name, 'must not contain digits') if self.name and self.name =~ /\d/
 
       # If there's no password, just set one. Nobody is given it, so it's hashed at BCrypt's minimum cost

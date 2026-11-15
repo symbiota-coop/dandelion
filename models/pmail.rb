@@ -115,6 +115,11 @@ class Pmail
     errors.add(:to_option, 'is not permitted') if (changed & Pmail.recipient_fields).any? && !recipients_admin?(editor || account)
     errors.add(:event, 'must belong to the same organisation') if event && organisation && event.organisation_id != organisation_id && !Array(event.cohosts_ids_cache).include?(organisation_id)
     errors.add(:link_params, 'cannot contain spaces') if link_params && link_params.include?(' ')
+    # Mails give recipients no token of their own, so a link token in one (pasted from a link in someone's email) signs
+    # every recipient in as that person
+    %i[body link_params].each do |f|
+      errors.add(f, 'cannot contain a link token (link_token= or sign_in_token=)') if send(f)&.match?(PmailLink::LINK_TOKEN)
+    end
   end
 
   def assign_recipients_from_to_option

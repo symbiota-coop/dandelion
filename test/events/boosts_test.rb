@@ -238,4 +238,34 @@ class EventBoostsTest < ActiveSupport::TestCase
     assert_equal 200, last_response.status
     assert_equal 1, @event.event_boosts.count
   end
+
+  test "a boost can't be bought for an event that's locked or secret, or to start before this hour, and nothing is made" do
+    create_event(prices: [0])
+    sign_in_with_rack(@account)
+    this_hour = Time.zone.now.beginning_of_hour
+    buy = lambda do |start_time|
+      post "/e/#{@event.slug}/boosts", event_boost: { start_time: start_time.strftime('%Y-%m-%d %H:%M'), hours: 1, hourly_amount: 10, currency: @event.currency_or_default }
+    end
+
+    @event.set(locked: true)
+    buy.call(this_hour + 1.hour)
+    assert_equal 400, last_response.status
+    assert_equal 'Event must be live', JSON.parse(last_response.body)['error']
+    @event.set(locked: false, secret: true)
+    buy.call(this_hour + 1.hour)
+    assert_equal 400, last_response.status
+    assert_equal 'Event must be publicly visible', JSON.parse(last_response.body)['error']
+    @event.set(secret: false)
+    buy.call(this_hour - 1.hour)
+    assert_equal 400, last_response.status
+    assert_equal 'Start time must be this hour or later', JSON.parse(last_response.body)['error']
+    assert_equal 0, @event.event_boosts.count
+
+    Stripe::Checkout::Session.stub :create, api_object(id: 'cs_this_hour', payment_intent: 'pi_test') do
+      buy.call(this_hour)
+    end
+    assert last_response.ok?
+    assert_equal 'cs_this_hour', JSON.parse(last_response.body)['session_id']
+    assert_equal [this_hour], @event.event_boosts.pluck(:start_time)
+  end
 end
