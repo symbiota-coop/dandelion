@@ -12,7 +12,7 @@
   <a class="btn btn-sm btn-outline-primary" href="/g/<%= @gathering.slug %>/rotas/<%= @rota.id %>.csv"><i class="bi bi-download"></i> Export as CSV</a>
 </div>
 <% if gathering_admin? %>
-  <%= partial :'gatherings/form_modal', locals: { id: 'add-shift', title: 'Add someone to a shift', form: :'rotas/create_shift' } %>
+  <%= partial :form_modal, locals: { id: 'add-shift', title: 'Add someone to a shift', form: :'rotas/create_shift' } %>
   <script src="<%= cachebust('/javascripts/ext/jquery-ui-interactions.min.js') %>" defer></script>
   <%= partial :reorder, locals: {
         grid: 'rota-grid',

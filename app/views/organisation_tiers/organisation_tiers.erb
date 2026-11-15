@@ -5,11 +5,9 @@
 </p>
 
 <div class="my-2">
-  <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="bi bi-plus-lg"></i> Create a tier</a>
-  <div style="display: none" class="tier-form">
-    <%= partial :'organisation_tiers/build' %>
-  </div>
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create-tier"><i class="bi bi-plus-lg"></i> Create a tier</button>
 </div>
+<%= partial :form_modal, locals: { id: 'create-tier', title: 'Create a tier', form: :'organisation_tiers/build' } %>
 <table class="table">
   <thead>
     <tr>

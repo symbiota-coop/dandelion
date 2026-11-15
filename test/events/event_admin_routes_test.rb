@@ -327,12 +327,14 @@ class EventAdminRoutesTest < ActiveSupport::TestCase
     sign_in(@account)
 
     visit "/e/#{@event.slug}/rpayments"
-    click_link 'Add payment'
-    select 'coordinator', from: 'rpayment_role'
-    fill_in 'rpayment_amount', with: '25'
-    select @event.currency, from: 'rpayment_currency'
-    fill_in 'rpayment_notes', with: 'Paid by bank transfer'
-    click_button 'Create payment'
+    click_button 'Add payment'
+    within('#add-payment') do
+      select 'coordinator', from: 'rpayment_role'
+      fill_in 'rpayment_amount', with: '25'
+      select @event.currency, from: 'rpayment_currency'
+      fill_in 'rpayment_notes', with: 'Paid by bank transfer'
+      click_button 'Create payment'
+    end
     assert page.has_content?('Paid by bank transfer')
     rpayment = @event.rpayments.first
     assert_equal ['coordinator', 25.0, @event.currency, @account.id], [rpayment.role, rpayment.amount, rpayment.currency, rpayment.account_id]
@@ -341,6 +343,25 @@ class EventAdminRoutesTest < ActiveSupport::TestCase
     page.document.find('.popover').click_button 'Confirm'
     page.document.synchronize { raise Capybara::ExpectationNotMet, 'payment not deleted yet' if @event.rpayments.exists? }
     assert page.has_no_content?('Paid by bank transfer')
+  end
+
+  test "an admin creates a ticket in a modal, opened by the orders page's Create a ticket" do
+    covers_route 'POST /e/:slug/create_ticket'
+    create_event(prices: [10])
+    sign_in(@account)
+
+    visit "/e/#{@event.slug}/orders"
+    click_link 'Create a ticket'
+    # The link asks for the form (?create_ticket=1), so the modal opens as the tickets page loads
+    within('#create-ticket.show') do
+      fill_in 'Name', with: 'Guest Person'
+      fill_in 'Email', with: 'guest@example.com'
+      click_button 'Create ticket'
+    end
+    assert page.has_content?('Guest Person')
+    guest = Account.find_by(email: 'guest@example.com')
+    assert_equal 'Guest Person', guest.name
+    assert_equal [@event.ticket_types.first.id], @event.tickets.and(account: guest).pluck(:ticket_type_id)
   end
 
   test "only the organisation's admins can see, record, edit or delete an event's revenue payments" do

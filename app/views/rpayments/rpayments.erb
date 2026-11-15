@@ -1,13 +1,10 @@
 <%= partial :'events/nav', locals: { event: @event } %>
 
 <div class="mb-3">
-  <% unless params[:create] %>
-    <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide().next().show()"><i class="bi bi-plus-lg"></i> Add payment</a>
-  <% end %>
-  <div <% unless params[:create] %> style="display: none " <% end %>>
-    <%= partial :'rpayments/build' %>
-  </div>
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-payment"><i class="bi bi-plus-lg"></i> Add payment</button>
 </div>
+<%# Open as the page loads from an event's stats, whose link to a role's remaining amount fills in the form (?create=1) %>
+<%= partial :form_modal, locals: { id: 'add-payment', title: 'Add payment', form: :'rpayments/build', open_on_load: params[:create] } %>
 
 <table class="table">
   <thead>

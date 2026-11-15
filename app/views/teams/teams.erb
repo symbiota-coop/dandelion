@@ -4,7 +4,7 @@
   <a class="btn btn-sm btn-outline-primary" href="javascript:;" data-bs-toggle="modal" data-bs-target="#add-teamship"><i class="bi bi-person-fill-add"></i> Add someone to a team</a>
   <%= partial :'gatherings/names_toggle', locals: { grid: 'teams-grid', url: "/g/#{@gathering.slug}/teams" } %>
 </div>
-<%= partial :'gatherings/form_modal', locals: { id: 'add-teamship', title: 'Add someone to a team', form: :'teams/teamship' } %>
+<%= partial :form_modal, locals: { id: 'add-teamship', title: 'Add someone to a team', form: :'teams/teamship' } %>
 <div id="teams-grid" data-pagelet-url="/g/<%= @gathering.slug %>/teams">
   <%= partial :'teams/teams' %>
 </div>

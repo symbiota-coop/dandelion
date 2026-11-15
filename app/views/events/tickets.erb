@@ -24,21 +24,20 @@
     <% end %>
   </div>
   <div class="col-12 mb-3 col-lg-auto mb-lg-0">
-    <a id="create-ticket-button" class="btn btn-primary mb-1" href="javascript:;" onclick="$(this).hide(); $('#create-ticket').show().find('input').first().focus()"><i class="bi bi-plus-lg"></i> Create a ticket</a>
+    <button type="button" class="btn btn-primary mb-1" data-bs-toggle="modal" data-bs-target="#create-ticket"><i class="bi bi-plus-lg"></i> Create a ticket</button>
   </div>
 </div>
-<% if params[:create_ticket] %>
-  <script>
-    $(function() { $('#create-ticket-button').click() })
-  </script>
+<% create_ticket = capture_html do %>
+  <% form_for @event.tickets.new, "/e/#{@event.slug}/create_ticket" do |f| %>
+    <%= f.text_block :name %>
+    <%= f.text_block :email %>
+    <%= f.select_block :ticket_type_id, options: @event.ticket_types.map { |ticket_type| [ticket_type.name, ticket_type.id] } %>
+    <%= f.currency_block :price, money_symbol: money_symbol(@event.currency) %>
+    <%= f.submit_block %>
+  <% end %>
 <% end %>
-<% form_for @event.tickets.new, "/e/#{@event.slug}/create_ticket", id: 'create-ticket', style: 'display: none', class: 'mb-5' do |f| %>
-  <%= f.text_block :name %>
-  <%= f.text_block :email %>
-  <%= f.select_block :ticket_type_id, options: @event.ticket_types.map { |ticket_type| [ticket_type.name, ticket_type.id] } %>
-  <%= f.currency_block :price, money_symbol: money_symbol(@event.currency) %>
-  <%= f.submit_block %>
-<% end %>
+<%# Open as the page loads for a link that asks for it (?create_ticket=1) %>
+<%= partial :form_modal, locals: { id: 'create-ticket', title: 'Create a ticket', form_html: create_ticket, open_on_load: params[:create_ticket] } %>
 <div id="tickets-table" data-pagelet-url="/e/<%= @event.slug %>/tickets">
   <%= partial :'events/tickets_table', locals: { tickets: @tickets } %>
 </div>

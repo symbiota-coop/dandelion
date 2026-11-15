@@ -6,7 +6,7 @@
 flatpickr.l10ns.default.firstDayOfWeek = 1
 
 $(function () {
-  // A form in a modal (gatherings/_form_modal.erb) starts at its first field, as one shown in place did
+  // A form in a modal (_form_modal.erb) starts at its first field, as one shown in place did
   $(document).on('shown.bs.modal', '.form-modal', function () {
     $(this).find('input:visible, textarea:visible, select:visible').not('[type=hidden]').first().trigger('focus')
   })

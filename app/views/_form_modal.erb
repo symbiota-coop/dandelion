@@ -1,0 +1,26 @@
+<%# A form a page opens from a button, in a modal rather than shown in place (a create or edit form isn't revealed in
+    place, test_create_and_edit_forms_open_in_modals): the button takes data-bs-toggle="modal" data-bs-target="#<id>".
+    form: the form's partial, with form_locals if it takes any, or form_html: a short form, from capture_html. open_on_load: open it
+    as the page loads, for a link that asks for the form (?create_ticket=1) %>
+<div class="modal fade form-modal" id="<%= id %>" tabindex="-1" aria-labelledby="<%= id %>-title" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="<%= id %>-title"><%= title %></h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <% if defined?(form_html) && form_html %>
+          <%= form_html %>
+        <% else %>
+          <%= partial form, locals: (defined?(form_locals) && form_locals) || {} %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+<% if defined?(open_on_load) && open_on_load %>
+  <script>
+    $(function () { bootstrap.Modal.getOrCreateInstance(document.getElementById(<%== id.to_json %>)).show() })
+  </script>
+<% end %>

@@ -11,7 +11,7 @@
     <% end %>
   <% end %>
 </div>
-<%= partial :'gatherings/form_modal', locals: { id: 'propose-activity', title: 'Propose an activity', form: :'timetables/tactivity_form', form_locals: { timetable: @timetable } } %>
+<%= partial :form_modal, locals: { id: 'propose-activity', title: 'Propose an activity', form: :'timetables/tactivity_form', form_locals: { timetable: @timetable } } %>
 <% if gathering_admin? && !@timetable.hide_schedule? %>
   <%= partial :reorder, locals: {
         grid: 'timetable-grid',

@@ -34,11 +34,13 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
     create_organisation
     sign_in(@account)
     visit "/o/#{@organisation.slug}/tiers"
-    click_link 'Create a tier'
-    fill_in 'Name', with: 'Gold'
-    fill_in 'Threshold', with: '50'
-    fill_in 'Discount', with: '10'
-    click_button 'Create organisation tier'
+    click_button 'Create a tier'
+    within('#create-tier') do
+      fill_in 'Name', with: 'Gold'
+      fill_in 'Threshold', with: '50'
+      fill_in 'Discount', with: '10'
+      click_button 'Create organisation tier'
+    end
     assert page.has_link? 'Gold'
     organisation_tier = @organisation.organisation_tiers.find_by(name: 'Gold')
     assert_equal [50, 10], [organisation_tier.threshold, organisation_tier.discount]
@@ -52,7 +54,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
 
     click_link 'Platinum'
     click_link_and_confirm 'Delete'
-    assert page.has_link? 'Create a tier'
+    assert page.has_button? 'Create a tier'
     assert page.has_no_link? 'Platinum'
     assert_empty @organisation.organisation_tiers
   end

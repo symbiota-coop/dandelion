@@ -7,9 +7,9 @@
   <%# The People column only shows from lg %>
   <%= partial :'gatherings/names_toggle', locals: { grid: 'options-grid', url: "/g/#{@gathering.slug}/options", klass: 'd-none d-lg-inline-block' } %>
 </div>
-<%= partial :'gatherings/form_modal', locals: { id: 'add-option', title: 'Add an option', form: :'options/build' } %>
+<%= partial :form_modal, locals: { id: 'add-option', title: 'Add an option', form: :'options/build' } %>
 <% if gathering_admin? %>
-  <%= partial :'gatherings/form_modal', locals: { id: 'add-optionship', title: 'Add someone to an option', form: :'options/optionship' } %>
+  <%= partial :form_modal, locals: { id: 'add-optionship', title: 'Add someone to an option', form: :'options/optionship' } %>
 <% end %>
 <div id="options-grid" data-pagelet-url="/g/<%= @gathering.slug %>/options">
   <%= partial :'options/options' %>

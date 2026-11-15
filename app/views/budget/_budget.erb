@@ -97,7 +97,7 @@
     <div class="d-flex flex-wrap gap-2 mb-3">
       <a class="btn btn-sm btn-primary" href="javascript:;" data-bs-toggle="modal" data-bs-target="#add-spend"><i class="bi bi-plus-lg"></i> List expense</a>
     </div>
-    <%= partial :'gatherings/form_modal', locals: { id: 'add-spend', title: 'List an expense', form: :'budget/build' } %>
+    <%= partial :form_modal, locals: { id: 'add-spend', title: 'List an expense', form: :'budget/build' } %>
     <table class="table">
       <tr>
         <th class="w-50">Item</th>

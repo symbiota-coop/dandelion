@@ -338,6 +338,29 @@ class LintTest < Minitest::Test
                  "<div class=\"col-lg-8\">, then <%= partial :back, ... %>, its heading and the form"
   end
 
+  # A create or edit form, hidden until a click shows it: form_for or a build or form partial, itself display: none or
+  # straight inside a div that is
+  HIDDEN_FORM = %r{(?:form_for\b[^\n]*display: ?none|<div[^>]*display: ?none[^>]*>\s*(?:<%\s*form_for\b|<%= partial :'[\w/]*/(?:build|form)'))}
+  # Not yet moved to modals: they're in pagelets, which reload after their forms save, replacing a modal still open
+  CREATE_AND_EDIT_FORMS_SHOWN_IN_PLACE = %w[accounts/_add.erb organisations/_add.erb events/_add_event_session.erb mapplications/_verdicts.erb].freeze
+
+  # A button that opens a create or edit form opens it in a modal (_form_modal.erb, or data-open-in-modal for a form
+  # with a page of its own), rather than revealing it in place
+  def test_create_and_edit_forms_open_in_modals
+    assert_match HIDDEN_FORM, %(<div style="display: none" class="tier-form">\n  <%= partial :'organisation_tiers/build' %>\n</div>)
+    assert_match HIDDEN_FORM, %(<% form_for @event.tickets.new, "/create_ticket", id: 'create-ticket', style: 'display: none' do |f| %>)
+    refute_match HIDDEN_FORM, %(<%= partial :form_modal, locals: { id: 'create-tier', title: 'Create a tier', form: :'organisation_tiers/build' } %>)
+    refute_match HIDDEN_FORM, %(<% form_tag "/tickets/1/price", style: 'display:none' do %>)
+
+    offenders = Dir[File.join(ROOT, 'app/views/**/*.erb')].filter_map do |path|
+      page = path.delete_prefix(File.join(ROOT, 'app/views/'))
+      page if File.read(path, encoding: 'UTF-8').match?(HIDDEN_FORM) && !CREATE_AND_EDIT_FORMS_SHOWN_IN_PLACE.include?(page)
+    end
+    assert_empty offenders, 'A button that opens a create or edit form opens it in a modal rather than showing it in place: ' \
+                            "<%= partial :form_modal, locals: { id: 'create-tier', title: 'Create a tier', form: :'organisation_tiers/build' } %>, " \
+                            'opened by a button with data-bs-toggle="modal" data-bs-target="#create-tier"'
+  end
+
   def test_icon_first
     [
       %(<a class="btn btn-primary" href="#">Star <i class="bi bi-star"></i></a>),
