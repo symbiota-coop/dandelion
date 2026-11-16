@@ -43,8 +43,10 @@ class Comment
 
   after_create do
     post.subscriptions.create account: account
+    # Only those who can see the discussion: the email quotes the whole thread, so mentioning anyone else would send
+    # them what they can't see
     mentioned_accounts.each_value do |mentioned|
-      post.subscriptions.create account: mentioned
+      post.subscriptions.create account: mentioned if Post.viewer?(post.commentable, mentioned)
     end
   end
 
