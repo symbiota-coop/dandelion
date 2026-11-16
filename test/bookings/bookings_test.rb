@@ -82,7 +82,7 @@ class EventBookingsTest < ActiveSupport::TestCase
 
   test 'a GoCardless purchase error names the rejected field in the email and the locked error' do
     covers 'events/payment-error-locks-event@a6adde'
-    create_event(prices: [0.5])
+    create_event(prices: [5])
     @organisation.set(gocardless_instant_bank_pay: true, gocardless_access_token: 'test')
     buyer = FactoryBot.create(:account)
     purchase = lambda do |error|
