@@ -48,8 +48,8 @@
               '50' => 'crumbs, newsfeed icons, date tile months, docs transcripts',
               '100' => 'alert, toast and badge background, crumb hover, unread messages, themed AI well start',
               '200' => 'progress tracks, alert, toast, blockquote and transcript borders',
-              '300' => nil,
-              '400' => 'themed AI well end, Stripe Connect fees in the contributions chart',
+              '300' => 'themed AI well end',
+              '400' => 'Stripe Connect fees in the contributions chart',
               '500' => nil,
               '600' => 'hover',
               '800' => 'text on tints'
@@ -65,8 +65,8 @@
               '50' => '.lavender-wash, image-less tiles (.block-fill), onboarding callout, features page section wash',
               '100' => 'AI well gradient start',
               '200' => 'not used yet',
-              '300' => 'not used yet',
-              '400' => 'AI well gradient end',
+              '300' => 'AI well gradient end',
+              '400' => 'not used yet',
               '500' => 'onboarding callout icon and done steps',
               '600' => 'features and Luma pages: purple divider end, call-to-action glow',
               '800' => 'onboarding checklist: the current step'
@@ -1558,7 +1558,7 @@
       <div class="spec">One card cut into cells by 1px gaps over --hairline: a --hairline border, radius lg, --bs-box-shadow-sm · laid out by its own width with container queries, so it fits beside the sidebar: two cells to a row, an odd last cell taking the full width, then one row of all of them from 48rem · each cell white, padding 1rem (1.5rem from 36rem), --theme-50 on hover over --transition-fast · the figure in the header font, bold, --font-size-2xl (3xl from 60rem), tabular figures, over a semibold label, a 2rem visual and a small line of context (ticket sales has no context line) in --bs-secondary-color · visuals: an illustrative sparkline, not real figures: a fixed shape rising in uneven steps, different for tickets and events, hidden from screen readers (a 2px --theme-500 line over --theme-100), a --theme-50 pill in --theme-800 on one line, --font-size-xs (base from 36rem) (0% platform fees), or the rating's stars in --color-orange-400 (half from .25, whole from .75) · ticket sales are in the visitor's currency, in m or k · a cell whose figure is zero is left out · figures count up (countUp in utils.js) as the band scrolls into view, not under prefers-reduced-motion</div>
     <% end %>
 
-    <% design_subsection 'AI well and ask box', "The AI well is the only sheen, so the gradient itself marks AI: 135°, <code>--ai-well-from</code> flat to halfway, then to <code>--ai-well-to</code>. That's --color-lavender-100 to --color-lavender-400 on the default site, and the theme's 100 to 400 on themed pages (theme.css). Padding 1rem, radius lg." do %>
+    <% design_subsection 'AI well and ask box', "The AI well is the only sheen, so the gradient itself marks AI: 135°, <code>--ai-well-from</code> flat to halfway, then to <code>--ai-well-to</code>. That's --color-lavender-100 to --color-lavender-300 on the default site, and the theme's 100 to 300 on themed pages (theme.css). Padding 1rem, radius lg." do %>
       <div class="row g-4 align-items-start">
         <div class="col-lg-6">
           <div class="ai-well"><b>Suggested description</b><br>A gentle evening of breathwork and sound for all levels.</div>

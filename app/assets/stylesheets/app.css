@@ -57,7 +57,7 @@
   --color-lavender-800: oklch(from var(--color-lavender-500) min(calc(l - 0.2), 0.48) calc(c * 0.9) h);
   /* The default site's own accent, which themed pages switch to the theme (theme.css) */
   --ai-well-from: var(--color-lavender-100);
-  --ai-well-to: var(--color-lavender-400);
+  --ai-well-to: var(--color-lavender-300);
   --color-paper: #FFFAF3;
   --body-font-family: "Plus Jakarta Sans", sans-serif;
   --header-font-family: "Hanken Grotesk", "Plus Jakarta Sans", sans-serif;
@@ -3619,7 +3619,7 @@ td .tactivity-accept {
    Misc
    ========================================================================== */
 
-/* The only sheen, so it marks AI: 135°, its 100 flat to halfway, then to its 400. Lavender on the default site, the theme on themed pages */
+/* The only sheen, so it marks AI: 135°, its 100 flat to halfway, then to its 300. Lavender on the default site, the theme on themed pages */
 .ai-well {
   background-image: linear-gradient(135deg, var(--ai-well-from) 50%, var(--ai-well-to));
   padding: var(--space-base);
