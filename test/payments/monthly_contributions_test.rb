@@ -155,16 +155,20 @@ class PaymentsMonthlyContributionsTest < ActiveSupport::TestCase
     (0...months).map { |i| [MonthlyContributionsCalculator.month_label(first_month + i.months), 5, {}] }
   end
 
-  test 'calculate leaves Stripe alone when the fragment already holds every month in the range' do
+  test 'calculate asks Stripe only for the last three months when the fragment already holds every month in the range' do
     travel_to Time.local(2026, 11, 12, 2) do
       data = range_data(Date.new(2024, 11, 1))
       fragment = contributions_fragment(data)
-      with_stripe do |calls|
+      with_stripe(charges: [charge_object(amount: 1000)]) do |calls|
         MonthlyContributionsCalculator.calculate
-        assert_empty calls[:charges]
-        assert_empty calls[:fees]
+        months = [Date.new(2026, 9, 1), Date.new(2026, 10, 1), Date.new(2026, 11, 1), Date.new(2026, 12, 1)]
+        expected = months.each_cons(2).map { |from, to| { gte: Time.utc(from.year, from.month).to_i, lt: Time.utc(to.year, to.month).to_i } }
+        assert_equal(expected, calls[:charges].map { |params| params[:created] })
+        assert_equal(expected, calls[:fees].map { |params| params[:created] })
       end
-      assert_equal data, JSON.parse(fragment.reload.value)
+      recent = { 'direct_stripe_charges' => 10, 'stripe_connect_application_fees' => 0 }
+      assert_equal data.first(22) + [['September 2026', 10, recent], ['October 2026', 10, recent], ['November 2026', 10, recent]],
+                   JSON.parse(fragment.reload.value)
     end
   end
 
