@@ -40,12 +40,10 @@ class EventsTest < ActiveSupport::TestCase
     page.execute_script('window.notReloaded = true')
 
     box = "[data-pagelet-url='/e/#{@event.slug}/event_facilitations']"
-    within(box) do
-      find('.add-role-toggle').click
-      find('.select2-selection').click
-    end
-    # select2 puts its search and results at the end of the page, outside the box
-    find('.select2-search__field').send_keys('Maya')
+    within(box) { find('.add-role-toggle').click }
+    # The plus opens the lookup with its search focused. select2 puts its search and results at the end of the page,
+    # outside the box
+    find('.select2-search__field:focus').send_keys('Maya')
     find('.select2-results__option', text: facilitator.name).click
     within(box) { click_button 'Add event facilitator' }
 
