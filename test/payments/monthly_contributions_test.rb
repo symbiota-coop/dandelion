@@ -150,6 +150,50 @@ class PaymentsMonthlyContributionsTest < ActiveSupport::TestCase
     end
   end
 
+  # Every month in the range, as calculate would cache it
+  def range_data(first_month, months: 25)
+    (0...months).map { |i| [MonthlyContributionsCalculator.month_label(first_month + i.months), 5, {}] }
+  end
+
+  test 'calculate leaves Stripe alone when the fragment already holds every month in the range' do
+    travel_to Time.local(2026, 11, 12, 2) do
+      data = range_data(Date.new(2024, 11, 1))
+      fragment = contributions_fragment(data)
+      with_stripe do |calls|
+        MonthlyContributionsCalculator.calculate
+        assert_empty calls[:charges]
+        assert_empty calls[:fees]
+      end
+      assert_equal data, JSON.parse(fragment.reload.value)
+    end
+  end
+
+  test 'on the 1st the range moves on, so calculate asks Stripe for every month again' do
+    travel_to Time.local(2026, 11, 1, 2) do
+      # Last month's range, with this month added by the hourly update
+      fragment = contributions_fragment(range_data(Date.new(2024, 10, 1), months: 26))
+      with_stripe(charges: [charge_object(amount: 1000)]) do |calls|
+        MonthlyContributionsCalculator.calculate
+        assert_equal 25, calls[:charges].length
+        assert_equal 25, calls[:fees].length
+      end
+      data = JSON.parse(fragment.reload.value)
+      assert_equal (0..24).map { |i| MonthlyContributionsCalculator.month_label(Date.new(2024, 11, 1) + i.months) }, data.map(&:first)
+      assert_equal ['November 2024', 10, { 'direct_stripe_charges' => 10, 'stripe_connect_application_fees' => 0 }], data.first
+    end
+  end
+
+  test 'calculate asks Stripe again for every month when the fragment is missing some, as after a run that failed' do
+    travel_to Time.local(2026, 11, 12, 2) do
+      fragment = contributions_fragment([['November 2026', 5, {}]])
+      with_stripe(charges: [charge_object(amount: 1000)]) do |calls|
+        MonthlyContributionsCalculator.calculate
+        assert_equal 25, calls[:charges].length
+      end
+      assert_equal 25, JSON.parse(fragment.reload.value).length
+    end
+  end
+
   test "updating the current month replaces its entry and keeps the other months'" do
     travel_to Time.local(2026, 11, 12, 12) do
       fragment = contributions_fragment([['October 2026', 50, {}], ['November 2026', 1, {}]])
