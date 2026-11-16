@@ -54,6 +54,13 @@ module ERBLint
       SHOW = /(?<![\w-])show(?![\w-])/
       BUTTON_SHOW = '`.show` on a `.btn` is Bootstrap\'s open-dropdown state, which fills it in like `.active`: hook scripts on a class of our own (`form-toggle`).'
 
+      # Hint text under a field (.form-text, and .field-note for a note or link written in the template) has the hints'
+      # size and colour from app.css, so every note under a field reads the same: classes setting its own (a
+      # field-note in text-body-secondary at body size) are how one came out bigger than the hints beside it
+      HINT = /(?<![\w-])(?:form-text|field-note)(?![\w-])/
+      HINT_RESTYLED = /(?<![\w-])(?:text-body-secondary|text-muted|text-secondary|small|fs-[1-6])(?![\w-])/
+      HINT_RESTYLE = '`.form-text` and `.field-note` are hint text, in its size and colour (app.css): drop classes that set their own.'
+
       def run(processed_source)
         source = processed_source.file_content
 
@@ -66,6 +73,7 @@ module ERBLint
           classes = match[2].gsub(/<%.*?%>/m) { |erb| ' ' * erb.length } # Ruby inside the attribute isn't a class
           check_classes(processed_source, classes, match.begin(2), label: true)
           check_button_show(processed_source, classes, match.begin(2))
+          check_hint(processed_source, classes, match.begin(2))
         end
 
         source.scan(SELECTS) do
@@ -103,6 +111,12 @@ module ERBLint
         return unless classes.match?(BUTTON) && (match = classes.match(SHOW))
 
         add(processed_source, (offset + match.begin(0))...(offset + match.end(0)), BUTTON_SHOW)
+      end
+
+      def check_hint(processed_source, classes, offset)
+        return unless classes.match?(HINT) && (match = classes.match(HINT_RESTYLED))
+
+        add(processed_source, (offset + match.begin(0))...(offset + match.end(0)), HINT_RESTYLE)
       end
 
       def add(processed_source, range, message)

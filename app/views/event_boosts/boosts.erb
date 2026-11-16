@@ -85,7 +85,7 @@
           <div class="mb-3">
             <label for="event_boost_start_time">Start at</label>
             <%= text_field_tag :'event_boost[start_time]', value: (@event_boost.start_time&.to_fs(:db_local)), class: 'form-control datetimepicker', id: 'event_boost_start_time', required: true %>
-            <small class="form-text text-body-secondary">Start time must be on the hour</small>
+            <small class="form-text">Start time must be on the hour</small>
           </div>
 
           <div class="row gx-2">
@@ -99,7 +99,7 @@
                 <span class="input-group-text"><%= money_symbol(@event_boost.currency) %></span>
                 <%= number_field_tag :'event_boost[hourly_amount]', value: compact_amount_for_input(@event_boost.hourly_amount), min: @min_hourly_boost, step: 0.01, class: 'form-control', id: 'event_boost_hourly_amount', required: true %>
               </div>
-              <small class="form-text text-body-secondary">Minimum <%= m(@min_hourly_boost, @event_boost.currency) %> per hour</small>
+              <small class="form-text">Minimum <%= m(@min_hourly_boost, @event_boost.currency) %> per hour</small>
             </div>
           </div>
 
