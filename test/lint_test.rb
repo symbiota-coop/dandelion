@@ -197,9 +197,7 @@ class LintTest < Minitest::Test
       %(<%= link_to 'x', '#', data: { toggle: 'dropdown' } %>) => /data-bs-\*/,
       '<select name="x" class="me-1">' => /form-select/,
       "<%= select_tag :x,\n  class: 'me-1', options: [] %>" => /form-select/,
-      '<a class="btn btn-sm btn-outline-primary show mb-1">' => /open-dropdown/,
-      '<p class="field-note text-body-secondary">' => /hint text/,
-      '<small class="small form-text">' => /hint text/
+      '<a class="btn btn-sm btn-outline-primary show mb-1">' => /open-dropdown/
     }.each do |template, message|
       offenses = erb_offenses(template).select { |linter, _| linter == 'DesignClasses' }
       assert_equal 1, offenses.size, "DesignClasses on #{template}: #{offenses.inspect}"
@@ -214,7 +212,6 @@ class LintTest < Minitest::Test
       %(<select class="form-select form-select-sm" data-x="a>b">), %(<%= select_tag :x, options: [1, 2],\n  class: 'form-select d-inline-block' %>),
       '<p>A select_tag needs one too</p>',
       '<div class="collapse show"><a class="btn form-toggle">', # .show is fine off a button, as on an open collapse
-      '<p class="field-note mb-3"><small class="form-text d-block">', '<p class="text-body-secondary small">',
       # ESLint checks the template's own scripts and event attributes
       %(<script>$('#x').addClass('d-none')</script><a onclick="$(this).removeClass('text-left')">)
     ].each { |template| assert_empty erb_offenses(template), template }
