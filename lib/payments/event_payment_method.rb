@@ -1,6 +1,15 @@
 class EventPaymentMethod
   @all = []
 
+  # The least each provider takes, below which it refuses the payment: Stripe's minimum charge amounts
+  # (https://docs.stripe.com/currencies#minimum-and-maximum-charge-amounts), and GoCardless's per payment
+  # (https://support.gocardless.com/hc/en-gb/articles/115000309245-Transaction-limits)
+  STRIPE_MINIMUM_CHARGES = {
+    'USD' => 0.5, 'AUD' => 0.5, 'CAD' => 0.5, 'CHF' => 0.5, 'DKK' => 2.5, 'EUR' => 0.5, 'GBP' => 0.3,
+    'MXN' => 10, 'NOK' => 3, 'NZD' => 0.5, 'PLN' => 2, 'SEK' => 3, 'SGD' => 0.5
+  }.freeze
+  GOCARDLESS_MINIMUM_PAYMENTS = { 'GBP' => 1, 'EUR' => 1 }.freeze
+
   class << self
     attr_accessor :all
   end
@@ -37,6 +46,8 @@ class EventPaymentMethod
     @dashboard_help = options[:dashboard_help]
     @contribution_reminder = options[:contribution_reminder]
     @contribution_reminder_label = options[:contribution_reminder_label]
+    # ->(event, currency) { the least the provider takes for event's orders, or nil }
+    @minimum_amount = options[:minimum_amount]
     self.class.all << self
   end
 
@@ -112,6 +123,13 @@ class EventPaymentMethod
     message
   end
 
+  # GoCardless refusing a payment's amount (an order Quote let through, as its minimum changed) is no fault of the
+  # organisation's setup, so the failed purchase email doesn't send them to their dashboard
+  def self.gocardless_validation_error(error)
+    amount = error.errors.any? { |err| err['request_pointer'].to_s.end_with?('/amount') }
+    amount ? [:notify, false] : :notify
+  end
+
   # The advice purchase_error_for gives with a provider's errors that lock an event, for the locked alert, which has only the provider's name
   def self.dashboard_help_for(provider_name)
     all.find { |pm| pm.provider_name == provider_name }&.dashboard_help
@@ -146,6 +164,11 @@ class EventPaymentMethod
 
   def process_payment(order:, event:, account: nil, cohost: nil, utm: {})
     process.call(order: order, event: event, account: account, cohost: cohost, utm: utm)
+  end
+
+  # The least an order for event in currency can come to and be paid this way, or nil for no minimum
+  def minimum_amount(event, currency)
+    @minimum_amount&.call(event, currency)
   end
 
   def order_currency_for(event)
@@ -203,6 +226,9 @@ EventPaymentMethod.new('stripe',
                        event_condition: ->(event) { FIAT_CURRENCIES.include?(event.currency) },
                        process: ->(**kwargs) { EventPaymentMethod::Stripe.call(**kwargs) },
                        refund: ->(record, **kwargs) { EventPaymentMethod::Stripe.refund(record, **kwargs) },
+                       minimum_amount: ->(_event, currency) { EventPaymentMethod::STRIPE_MINIMUM_CHARGES[currency] },
+                       # Quote refuses orders under the minimum, but an order converted to the account's settlement
+                       # currency must meet that currency's minimum too
                        purchase_errors: {
                          Stripe::InvalidRequestError => lambda { |e|
                            e.message&.include?('must add up to at least') ? [:notify, false] : :lock
@@ -252,9 +278,10 @@ EventPaymentMethod.new('gocardless_instant',
                        dashboard_help: 'Also, make sure your access token has read-write access.',
                        process: ->(**kwargs) { EventPaymentMethod::GoCardlessInstantBankPay.call(**kwargs) },
                        refund: ->(record, **kwargs) { EventPaymentMethod::GoCardlessInstantBankPay.refund(record, **kwargs) },
+                       minimum_amount: ->(_event, currency) { EventPaymentMethod::GOCARDLESS_MINIMUM_PAYMENTS[currency] },
                        purchase_errors: {
                          GoCardlessPro::InvalidApiUsageError => :lock,
-                         GoCardlessPro::ValidationError => :notify
+                         GoCardlessPro::ValidationError => ->(e) { EventPaymentMethod.gocardless_validation_error(e) }
                        })
 
 EventPaymentMethod.new('gocardless_instalment',
@@ -269,9 +296,13 @@ EventPaymentMethod.new('gocardless_instalment',
                        },
                        dashboard_help: 'Also, make sure your access token has read-write access.',
                        process: ->(**kwargs) { EventPaymentMethod::GoCardlessInstalment.call(**kwargs) },
+                       # Each instalment is a payment of its own, taken once the schedule is set up after checkout
+                       minimum_amount: lambda { |event, currency|
+                         EventPaymentMethod::GOCARDLESS_MINIMUM_PAYMENTS[currency]&.*(event.gocardless_instalment_count.to_i)
+                       },
                        purchase_errors: {
                          GoCardlessPro::InvalidApiUsageError => :lock,
-                         GoCardlessPro::ValidationError => :notify
+                         GoCardlessPro::ValidationError => ->(e) { EventPaymentMethod.gocardless_validation_error(e) }
                        })
 
 EventPaymentMethod.new('opencollective',

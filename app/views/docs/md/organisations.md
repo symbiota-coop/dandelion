@@ -55,6 +55,8 @@ See [Mollie](/docs/events#taking-payments-with-mollie), [PayPal](/docs/events#ta
 
 GoCardless Instant Bank Pay and instalments are only offered at checkout for **GBP** and **EUR** events (UK and supported Eurozone countries). <!-- claim: gocardless-gbp-eur-only --> For other currencies, use Stripe, Mollie, PayPal, or another processor.
 
+Each processor has a smallest payment it takes: £1 or €1 with GoCardless, which with instalments is £1 or €1 for each instalment, and with Stripe £0.30, €0.50 or $0.50 (more in some currencies, such as SEK 3). A booking that comes to less can't be paid that way, and the buyer is asked to choose another way to pay or a higher price or donation. <!-- claim: payment-minimums -->
+
 ## Analytics
 
 In organisation settings under **Analytics**, you can add a Meta/Facebook Pixel ID (digits only) and a Google Ads conversion ID and label. <!-- claim: analytics-ids --> With marketing cookie consent, Dandelion loads those tags on organisation and event pages. <!-- claim: analytics-tags-need-marketing-consent -->

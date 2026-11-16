@@ -72,6 +72,17 @@ class Quote
     self
   end
 
+  # Refuses a total under the least the payment method's provider takes (EventPaymentMethod#minimum_amount), which it
+  # would refuse itself, once the order was made. Not part of validate!, as it needs the buyer's credit, which can bring
+  # the total to nothing, needing no payment
+  def check_payment_amount!
+    pm = payment_method_object
+    minimum = pm.minimum_amount(@event, currency) if pm && payment_required?
+    raise OrderBuilder::PaymentTooSmall.new(pm.provider_name, minimum, currency) if minimum && (total * 100).round < (minimum * 100).round
+
+    self
+  end
+
   def currency
     @currency ||= payment_method_object&.order_currency_for(@event) || @event.currency
   end

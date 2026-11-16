@@ -95,6 +95,14 @@ class OrderBuilder
     end
   end
 
+  # The order comes to less than its payment method's provider takes (EventPaymentMethod#minimum_amount)
+  class PaymentTooSmall < Error
+    def initialize(provider, minimum, currency)
+      minimum = Money.new((minimum * 100).round, currency).format(no_cents_if_whole: true)
+      super("Payments with #{provider} must be at least #{minimum}. Choose another way to pay, or a higher price or donation.")
+    end
+  end
+
   # Other bookings held the event, its discount code or the buyer's credit for longer than RecordLock waits
   class Busy < Error
     MESSAGE = 'Lots of people are booking at once. Please try again.'.freeze
@@ -231,7 +239,7 @@ class OrderBuilder
     RecordLock.hold(*booking_locks) do
       # Worked out now, before the order counts as a use of its discount code, and checked again: another booking may
       # have used up the code since check_choices
-      @quote = build_quote(account: @account, credit: signed_in_as_buyer?).validate!.tap(&:total)
+      @quote = build_quote(account: @account, credit: signed_in_as_buyer?).validate!.tap(&:total).check_payment_amount!
       create_order
       create_tickets
       apply_donation_and_discounts
