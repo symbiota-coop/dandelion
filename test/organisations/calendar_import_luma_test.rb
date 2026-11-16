@@ -108,6 +108,24 @@ class OrganisationsCalendarImportLumaTest < ActiveSupport::TestCase
     assert_equal '#1A2B3C', event.reload.theme_color
   end
 
+  test "a Luma event's cover image is fetched from Luma's image CDN, larger" do
+    create_organisation(calendar_import_urls: LUMA_FEED_URL)
+    cdn_image = 'https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=1,anim=false,background=white,quality=75,%s/event-social/uy/cover.png'
+    fetched_images = []
+
+    MiniMagick::Image.stub(:open, ->(_path) { fake_minimagick_image([26, 43, 60], []) }) do
+      stub_luma_images(fetched_images) do
+        stub_faraday(LUMA_FEED_URL => { status: 200, body: ical(luma_event) },
+                     'https://luma.com/event/evt-abc' => { status: 200, body: luma_page(format(cdn_image, 'width=800,height=420')) }) do
+          @organisation.sync_calendar_imports
+        end
+      end
+    end
+
+    assert_equal [format(cdn_image, 'width=1200,height=630')], fetched_images
+    assert @organisation.events.find_by(calendar_import_uid: 'evt-abc@events.lu.ma').image.present?
+  end
+
   test "an event whose Luma image the organisation's image rules refuse is imported without it" do
     create_organisation(calendar_import_urls: LUMA_FEED_URL, event_image_required_width: 500)
     fetched_images = []

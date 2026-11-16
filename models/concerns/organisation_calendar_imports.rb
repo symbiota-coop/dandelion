@@ -9,6 +9,8 @@ module OrganisationCalendarImports
 
   LUMA_PAGE_HOSTS = %w[luma.com lu.ma].freeze
   LUMA_FEED_HOSTS = %w[api.luma.com api2.luma.com].freeze
+  # Luma's own image hosts, the only ones a cover image is fetched from: og.luma.com until July 2026, then its CDN
+  LUMA_IMAGE_HOSTS = %w[og.luma.com images.lumacdn.com].freeze
   ALLOWED_FEED_HOSTS = [
     *LUMA_FEED_HOSTS,
     'calendar.google.com',
@@ -309,7 +311,7 @@ module OrganisationCalendarImports
                           .reject(&:blank?)
                           .uniq
           luma_composite = candidates.find do |candidate|
-            URI.parse(candidate).host.to_s.casecmp('og.luma.com').zero?
+            LUMA_IMAGE_HOSTS.include?(URI.parse(candidate).host.to_s.downcase)
           rescue URI::InvalidURIError
             false
           end
