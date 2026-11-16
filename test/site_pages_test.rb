@@ -179,6 +179,36 @@ class SitePagesTest < ActiveSupport::TestCase
     assert page.has_no_content?('Secret Sound Bath')
   end
 
+  test 'recommended events load their people and what they share in a few queries, however many there are' do
+    create_event(name: 'Breathwork Circle', start_time: 2.weeks.ago, end_time: 2.weeks.ago + 2.hours, prices: [0])
+    create_event(name: 'Sound Bath', prices: [0], as: :sound_bath)
+    create_event(name: 'Ecstatic Dance', prices: [0], as: :ecstatic_dance)
+    alice = FactoryBot.create(:account, name: 'Alice Attendee', has_signed_in: true)
+    others = %w[Bob Carol Dave Erin].map { |name| FactoryBot.create(:account, name: "#{name} Attendee", has_signed_in: true) }
+    ([alice] + others).each { |account| @event.tickets.create!(account: account, ticket_type: @event.ticket_types.first, payment_completed: true) }
+    [@sound_bath, @ecstatic_dance].each do |event|
+      others.each { |account| event.tickets.create!(account: account, ticket_type: event.ticket_types.first, payment_completed: true) }
+    end
+    alice.recommend_people!
+    alice.recommend_events!
+    assert_equal 2, alice.recommended_events.size
+
+    sign_in(alice)
+    commands = mongo_commands_during do
+      visit '/recommendations/events'
+      assert page.has_link?('Ecstatic Dance', href: "/e/#{@ecstatic_dance.slug}")
+      assert page.has_link?('Sound Bath', href: "/e/#{@sound_bath.slug}")
+    end
+
+    assert_equal 2, page.all(:link, 'Erin Attendee').size
+    assert page.has_css?('.d-none', text: 'Breathwork Circle', visible: :all)
+    # Leaving out the signed-in account, which each request (the page's pagelets too) looks up
+    account_finds = commands.count { |c| c['find'] == 'accounts' && c['filter'] != { '_id' => alice.id } }
+    event_finds = commands.count { |c| c['find'] == 'events' && !c['filter'].key?('slug') }
+    assert_operator account_finds, :<=, 3, "#{account_finds} account finds"
+    assert_operator event_finds, :<=, 2, "#{event_finds} event finds"
+  end
+
   test 'a referrer claims the reward for an organisation that has given enough to Dandelion, once' do
     covers_route 'GET /referrals', 'POST /referrals/:id/claim'
     admin = FactoryBot.create(:account, admin: true)

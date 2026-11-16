@@ -1,22 +1,36 @@
 <%
 recommended_events = @account.recommended_events || []
 events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_includes.index_by { |e| e.id.to_s }
+
+# The first 20 events to show, checking what's in memory (event_facilitations come with with_key_includes) before
+# sold_out?, which queries, so events skipped anyway cost nothing
+recommended_events = recommended_events.lazy.filter_map { |event_id, people|
+  event = events_by_id[event_id.to_s]
+  next unless event
+  next if event.created_at < 1.year.ago
+  next if event.event_facilitations.any? { |event_facilitation| event_facilitation.account_id == current_account.id }
+  next if event.locked? && !event_admin?(event)
+  next if event.sold_out?
+
+  [event, people]
+}.first(20)
+
+# The people, and the events and gatherings they share with this account, for all the cards at once
+accounts_by_id = Account.and(:id.in => recommended_events.flat_map { |_event, people| people.map(&:first) }.uniq).index_by { |a| a.id.to_s }
+connections = recommended_events.flat_map { |_event, people| people.flat_map { |_k, v| v } }
+connection_ids = ->(type) { connections.select { |connection| connection['type'] == type }.map { |connection| connection['id'] }.uniq }
+connected_events_by_id = Event.and(:id.in => connection_ids.call('Event')).only(:name, :start_time).index_by { |e| e.id.to_s }
+connected_gatherings_by_id = Gathering.and(:id.in => connection_ids.call('Gathering')).only(:name).index_by { |g| g.id.to_s }
 %>
 
 <%= partial :'recommendations/nav' %>
-<% r = 0 %>
 
 <% if recommended_events.empty? %>
   <span class="text-body-secondary">No recommended events</span>
 <% else %>
   <div class="mb-3">
     <div class="row" id="events">
-      <% recommended_events.each { |event_id, people| event = events_by_id[event_id.to_s]; next unless event;
-        next if event.locked? && !event_admin?(event)
-        next if event.sold_out?
-        next if event.created_at < 1.year.ago
-        next if event.event_facilitations.find_by(account: current_account);
-        r = r + 1; %>
+      <% recommended_events.each { |event, people| %>
       <div class="col-12 <%= block_class if defined?(block_class) %>" id="<%= event.id %>">
         <div class="mb-4">
 
@@ -34,13 +48,13 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_inc
                     <div class="row justify-content-between">
                       <div class="col ms-1 p-lg-3">
                         <% extra_items = capture_html do %>
-                          <% people_accounts = Account.and(:id.in => people.map(&:first)) %>
+                          <% people_accounts = people.filter_map { |k, _v| accounts_by_id[k.to_s] } %>
                           <% private_account_ids = people_accounts.select(&:private?).map { |a| a.id.to_s } %>
                           <% private_count = private_account_ids.count %>
                           <% private_events_count = people.select { |k, _v| private_account_ids.include?(k.to_s) }.sum { |_k, v| v.count } %>
                           <% public_count = people_accounts.count - private_count %>
                           <li><i data-bs-toggle="tooltip" title="People" class="bi bi-person-fill"></i>
-                            <% people.each { |k,v| account = people_accounts.find { |a| a.id.to_s == k.to_s }; next unless account;
+                            <% people.each { |k,v| account = accounts_by_id[k.to_s]; next unless account;
                             next if account.private? %>
                             <a href="/u/<%= account.username %>"><%= account.name %></a>,
                             <span data-bs-toggle="tooltip">
@@ -51,8 +65,8 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_inc
                                 event_ids = v.select { |connection| connection['type'] == 'Event' }.map { |connection| connection['id'] }
                                 gathering_ids = v.select { |connection| connection['type'] == 'Gathering' }.map { |connection| connection['id'] }
 
-                                events = event_ids.any? ? Event.and(:id.in => event_ids).order('start_time desc') : []
-                                gatherings = gathering_ids.any? ? Gathering.and(:id.in => gathering_ids) : []
+                                events = connected_events_by_id.values_at(*event_ids.map(&:to_s)).compact.sort_by(&:start_time).reverse
+                                gatherings = connected_gatherings_by_id.values_at(*gathering_ids.map(&:to_s)).compact
                               %>
                               <% events.each { |event| %>
                               <%= event.name %><br>
@@ -84,7 +98,6 @@ events_by_id = Event.and(:id.in => recommended_events.map(&:first)).with_key_inc
 
       </div>
     </div>
-    <% break if r == 20 %>
     <% } %>
   </div>
 </div>
