@@ -18,11 +18,11 @@
 <% form_for @organisation, "/o/#{@organisation.slug}/calendar_import" do |f| %>
   <%= f.text_area_block :calendar_import_urls %>
   <% if @organisation.calendar_import_last_synced_at %>
-    <div class="text-body-secondary mb-0">
+    <div class="field-note mb-3">
       Last synced on <%= @organisation.calendar_import_last_synced_at.strftime('%d %b %Y %H:%M %Z') %>
       <% feeds = @organisation.calendar_import_feeds_in_url_order %>
       <% if feeds.any? %>
-        <ul class="mb-3 mt-1">
+        <ul class="mb-0 mt-1">
           <% feeds.each do |feed_url, cal_name| %>
             <li>
               <%= ERB::Util.html_escape(cal_name.to_s.strip) %>

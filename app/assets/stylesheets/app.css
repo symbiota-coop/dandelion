@@ -1601,6 +1601,13 @@ label {
   display: block;
 }
 
+/* Hint text under a field: the form builder's hints, form-text written by hand, and .field-note all read the same */
+.form-text,
+.field-note {
+  font-size: var(--font-size-xs);
+  color: var(--bs-secondary-color);
+}
+
 label .form-text {
   font-weight: 500
 }
@@ -2767,11 +2774,6 @@ body[contenteditable] {
   color: var(--theme-500) !important
 }
 
-small.form-text {
-  font-size: var(--font-size-xs);
-  color: var(--bs-secondary-color);
-}
-
 .readable {
   font-size: var(--font-size-md);
   line-height: 1.5;
@@ -3728,7 +3730,8 @@ td .tactivity-accept {
   top: var(--sticky-top);
 }
 
-/* A note or link under a form field (an f.*_block), pulled up into the field's mb-3 so it reads as the field's own */
+/* A note or link under a form field (an f.*_block), pulled up into the field's mb-3 and in hint text (.form-text, above)
+   so it reads as the field's own */
 .field-note {
   margin-top: calc(-1 * var(--space-base));
 }
