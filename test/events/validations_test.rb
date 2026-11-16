@@ -113,19 +113,55 @@ class EventValidationsTest < ActiveSupport::TestCase
     assert Event.find(@event.id).update(revenue_sharer: connected_account(@organisation), revenue_share_to_revenue_sharer: 10)
   end
 
-  test "the revenue sharer's share is between 1 and 100" do
+  test "the revenue sharer's share is between 0 and 100" do
     create_event
     sharer = connected_account(@organisation)
 
     [-5, 101].each do |share|
       event = Event.find(@event.id)
       event.assign_attributes(revenue_sharer: sharer, revenue_share_to_revenue_sharer: share)
-      refused(event, :revenue_share_to_revenue_sharer, 'must be between 1 and 100')
+      refused(event, :revenue_share_to_revenue_sharer, 'must be between 0 and 100')
     end
-    [1, 100].each do |share|
+    [0, 1, 100].each do |share|
       event = Event.find(@event.id)
       event.assign_attributes(revenue_sharer: sharer, revenue_share_to_revenue_sharer: share)
-      assert event.valid?, event.errors.full_messages.to_sentence
+      assert event.save, event.errors.full_messages.to_sentence
+      assert_equal share, Event.find(@event.id).revenue_share_to_revenue_sharer
+    end
+  end
+
+  test "a revenue sharer's share can't be left blank, as blank isn't 0%" do
+    create_event
+    sharer = connected_account(@organisation)
+
+    # A blank form field casts to nil
+    event = Event.find(@event.id)
+    event.assign_attributes(revenue_sharer: sharer, revenue_share_to_revenue_sharer: '')
+    refused(event, :revenue_share_to_revenue_sharer, 'must be present if a revenue sharer is set')
+    assert_nil Event.find(@event.id).revenue_sharer_id
+
+    # Without a revenue sharer, a blank share is 0
+    event = Event.find(@event.id)
+    event.assign_attributes(revenue_share_to_revenue_sharer: '')
+    assert event.save, event.errors.full_messages.to_sentence
+    assert_equal 0, Event.find(@event.id).revenue_share_to_revenue_sharer
+  end
+
+  test "a revenue sharer's share can't be 0% with direct charges, which would leave them paying Stripe's fees" do
+    create_event
+    sharer = connected_account(@organisation)
+    message = "can't be 0 with direct charges, as the revenue sharer would pay Stripe's fees on money they don't keep"
+
+    event = Event.find(@event.id)
+    event.assign_attributes(revenue_sharer: sharer, revenue_share_to_revenue_sharer: 0, direct_charges: true)
+    refused(event, :revenue_share_to_revenue_sharer, message)
+
+    # A share above 0 with direct charges, and 0 without them, are allowed
+    [[1, true], [0, false]].each do |share, direct_charges|
+      event = Event.find(@event.id)
+      event.assign_attributes(revenue_sharer: sharer, revenue_share_to_revenue_sharer: share, direct_charges: direct_charges)
+      assert event.save, event.errors.full_messages.to_sentence
+      assert_equal([share, direct_charges], Event.find(@event.id).then { |saved| [saved.revenue_share_to_revenue_sharer, saved.direct_charges] })
     end
   end
 

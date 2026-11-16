@@ -86,8 +86,8 @@ module EventValidation
 
       # rubocop:disable Dandelion/CallbackDefault -- a form can blank them, which means the default
       self.stripe_revenue_adjustment = 0 unless stripe_revenue_adjustment
-      self.revenue_share_to_revenue_sharer = 0 unless revenue_share_to_revenue_sharer
       # rubocop:enable Dandelion/CallbackDefault
+      # A blank share isn't 0: with a revenue sharer it's refused just below, so a 0% share is one typed on purpose
       self.revenue_share_to_revenue_sharer = 0 unless revenue_sharer
       self.profit_share_to_organiser = 0 if revenue_sharer
       errors.add(:revenue_share_to_revenue_sharer, 'must be present if a revenue sharer is set') if revenue_sharer && !revenue_share_to_revenue_sharer
@@ -113,7 +113,9 @@ module EventValidation
       errors.add(:revenue_sharer, 'or organiser must be set for this organisation') if organisation && organisation.require_organiser_or_revenue_sharer && !revenue_sharer && !organiser
       errors.add(:revenue_sharer, 'is not connected to this organisation') if revenue_sharer && !revenue_sharer_organisationship
       self.location = 'Online' if location && location.downcase == 'online'
-      errors.add(:revenue_share_to_revenue_sharer, 'must be between 1 and 100') if revenue_share_to_revenue_sharer && revenue_share_to_revenue_sharer != 0 && (revenue_share_to_revenue_sharer < 1 || revenue_share_to_revenue_sharer > 100)
+      errors.add(:revenue_share_to_revenue_sharer, 'must be between 0 and 100') if revenue_share_to_revenue_sharer && (revenue_share_to_revenue_sharer.negative? || revenue_share_to_revenue_sharer > 100)
+      # With direct charges the charge is on the revenue sharer's own account, so Stripe takes its fee from them
+      errors.add(:revenue_share_to_revenue_sharer, "can't be 0 with direct charges, as the revenue sharer would pay Stripe's fees on money they don't keep") if revenue_sharer && direct_charges && revenue_share_to_revenue_sharer&.zero?
       errors.add(:capacity, 'must be greater than 0') if capacity && capacity < 1
       errors.add(:suggested_donation, 'cannot be less than the minimum donation') if suggested_donation && minimum_donation && suggested_donation < minimum_donation
       errors.add(:oc_slug, "cannot be set until the organisation's Open Collective slug is set") if oc_slug && organisation && !organisation.oc_slug
