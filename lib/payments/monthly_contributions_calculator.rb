@@ -10,15 +10,23 @@ module MonthlyContributionsCalculator
     'stripe_connect_application_fees' => 'var(--theme-400)'
   }.freeze
 
-  # Asks Stripe for every month in the range, which takes minutes, so only when the fragment's months aren't the range's:
-  # the 1st of a month, when the range moves on and last month is finished, or after a run that failed. Otherwise
-  # update_current_month (hourly) keeps this month up to date and the earlier months stay as they were
+  # Months recalculated each night, so a refund a few weeks after its charge still comes off the month of the charge
+  RECENT_MONTHS = 3
+
+  # Asks Stripe for every month in the range, which takes minutes, only when the fragment's months aren't the range's:
+  # the 1st of a month, when the range moves on, or after a run that failed. Otherwise only the RECENT_MONTHS, and the
+  # earlier months stay as they were
   def self.calculate
     d = generate_month_range
     fragment = Fragment.find_or_create_by(key: 'monthly_contributions')
-    return if fragment.value && JSON.parse(fragment.value).map(&:first) == d.map { |month| month_label(month) }
+    existing_data = JSON.parse(fragment.value) if fragment.value
 
-    monthly_data = d.map { |month| calculate_month_data(month) }
+    monthly_data = if existing_data && existing_data.map(&:first) == d.map { |month| month_label(month) }
+                     d.last(RECENT_MONTHS).each { |month| update_month_in_data(existing_data, calculate_month_data(month)) }
+                     existing_data
+                   else
+                     d.map { |month| calculate_month_data(month) }
+                   end
     fragment.update_attributes expires: 2.days.from_now, value: monthly_data.to_json
   end
 
