@@ -13,8 +13,8 @@
           </div>
           <% @member_filters[:selects].each do |param, label, options| %>
             <div class="form-group col-12 col-sm-auto">
-              <%# The select names its filter until one is chosen, and choosing the name again clears it %>
-              <%= select_tag param, id: param, class: 'form-select', 'aria-label': label, selected: params[param], options: [[label, '', { 'data-placeholder': true }]] + options.map { |value, option_label, r| ["#{option_label} (#{r.count})", value] } %>
+              <%# The select names its filter until one is chosen (Any gender...), and choosing that again clears it: it reads as a choice too, in a phone's picker %>
+              <%= select_tag param, id: param, class: 'form-select', 'aria-label': label, selected: params[param], options: [["Any #{label.downcase}", '', { 'data-placeholder': true }]] + options.map { |value, option_label, r| ["#{option_label} (#{r.count})", value] } %>
             </div>
           <% end %>
           <% @member_filters[:checkboxes].each do |param, label, r| %>

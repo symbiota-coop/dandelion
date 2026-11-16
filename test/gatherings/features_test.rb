@@ -67,8 +67,8 @@ class GatheringFeaturesTest < ActiveSupport::TestCase
     assert page.has_checked_field? 'admin'
     assert page.has_no_content? 'Wendy Woman'
 
-    select 'Gender', from: 'gender'
-    assert page.has_select? 'gender', selected: 'Gender'
+    select 'Any gender', from: 'gender'
+    assert page.has_select? 'gender', selected: 'Any gender'
     assert page.has_content? @account.name
     assert page.has_no_content? 'Manfred Man'
   end

@@ -288,7 +288,7 @@ class Gathering
     selects = []
     checkboxes = []
 
-    selects << [:paid, 'Paid', [
+    selects << [:paid, 'Payment', [
       [:paid_something, 'Paid something', memberships.and(:paid.gt => 0)],
       [:paid_nothing, 'Paid nothing', memberships.and(paid: 0)]
     ]]
