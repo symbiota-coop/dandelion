@@ -1,5 +1,5 @@
 <%# Tiles without an image get a wash (.block-fill) and dark text in place of the darkened photo (.tile-image) and white text.
-    The whole tile links to view_url through the title's .stretched-link; .tile-above keeps other links and icons clickable over it %>
+    The whole tile links to view_url through the title's .stretched-link; .tile-above keeps other links clickable over it %>
 <% block_class = 'p-2 d-block block tile'
    title_class = image ? 'text-white' : 'text-body'
    block_style = 'height: 10rem; overflow: hidden;'
@@ -15,10 +15,8 @@
       <td class="align-top">
         <div class="row justify-content-between">
           <div class="col">
-            <% icon = defined?(icon) ? icon.to_s.strip : '' %>
             <h4 class="block-title <%= title_class %>">
-              <%# the icon follows the title with no space between them but a &nbsp;, so it stays on the line with the title's last word %>
-              <a class="<%= title_class %> tile-link stretched-link" target="_parent" href="<%= view_url %>"><%= title %></a><% unless icon.empty? %>&nbsp;<span class="<%= title_class %> tile-above"><%== icon %></span><% end %>
+              <a class="<%= title_class %> tile-link stretched-link" target="_parent" href="<%= view_url %>"><%= title %></a>
               <% if admin %>
                 <a class="<%= title_class %> block-edit tile-above" href="<%= edit_url %>">
                   <i class="bi bi-pencil-fill"></i>

@@ -2076,8 +2076,8 @@ ul.pagination {
   hyphens: auto;
 }
 
-/* The whole tile is a link: the title's .stretched-link covers it, and the links and icons
-   that should stay clickable or keep their tooltip (.tile-above) sit over that.
+/* The whole tile is a link: the title's .stretched-link covers it, and the links
+   that should stay clickable (.tile-above) sit over that.
    Hovered, or with its link keyboard focused, a tile takes a shadow and its photo lightens */
 .tile {
   position: relative;

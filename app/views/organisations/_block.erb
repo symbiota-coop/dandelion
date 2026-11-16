@@ -1,6 +1,5 @@
 <%= partial :block, locals: {
       title: organisation.name,
-      icon: partial(:'organisations/check', locals: {organisation: organisation}),
       image: organisation.image,
       view_url: request.path == '/events' ? "/o/#{organisation.slug}/events" : (defined?(most_recent) && most_recent ? "/o/#{organisation.slug}/events?search=1&order=created_at" : "/o/#{organisation.slug}"),
       edit_url: "/o/#{organisation.slug}/edit",
