@@ -271,7 +271,8 @@ $(function () {
   })
   $(document).on('click', '.quantity-select-container', function () {
     if ($(this).find('select[name^=quantities]').prop('disabled')) {
-      const message = $(this).closest('tr').find('.select-a-price-first').text().trim()
+      const $label = $(this).closest('tr').find('.select-a-price-first')
+      const message = $label.data('message') || $label.text().trim()
       showPurchaseAlert(message)
     }
   })
