@@ -7,8 +7,7 @@
   <h2 class="mt-5">Upcoming events <% if @account.following_starred.exists? %>featuring <%= @account.firstname %> and <%= @account.pronoun %> stars<% end %></h2>
   <%= partial :'events/blocks', locals: { events: events } %>
 <% end %>
-<% own_profile = current_account && current_account.id == @account.id %>
-<% if (private_sessions = (own_profile ? @account.private_sessions : @account.private_sessions.listed).order('created_at desc').to_a).any? %>
+<% if (private_sessions = @account.private_sessions.listed.order('created_at desc').to_a).any? %>
   <h2 id="private-sessions" class="mt-5">Private sessions</h2>
   <ul class="search-result-list">
     <% private_sessions.each do |private_session| %>

@@ -1,6 +1,8 @@
 Dandelion::App.controller do
   get '/private_sessions', provides: %i[html json] do
-    @private_sessions = PrivateSession.listed.order('created_at desc')
+    # My private sessions (_scope_toggle.erb): the account's own, secret ones too
+    @private_sessions = current_account && params[:my_private_sessions] ? current_account.private_sessions : PrivateSession.listed
+    @private_sessions = @private_sessions.order('created_at desc')
     if params[:q]
       q = /#{Regexp.escape(params[:q])}/i
       @private_sessions = @private_sessions.and('$or' => [{ title: q }, { description: q }, { tag_names_cache: q }])

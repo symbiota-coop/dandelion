@@ -107,6 +107,10 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     visit '/'
     within('#sidebar') { click_link 'Private sessions' }
     assert page.has_current_path?('/private_sessions')
+    # Offering none, they have no My private sessions to switch to
+    assert page.has_link?('Offer a private session')
+    assert page.has_no_link?('All')
+    assert page.has_no_link?(text: /My private sessions/)
     click_link 'Offer a private session'
     fill_in 'Name of the session', with: 'Thai massage'
     find('#private_session_tag_names + .select2').click
@@ -142,13 +146,14 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
 
     visit '/private_sessions'
     assert page.has_link?('Thai massage', href: private_session.path)
+    assert page.has_link?('My private sessions · 1')
     visit "/u/#{account.username}"
     assert page.has_css?('#private-sessions')
     assert page.has_link?('Thai massage', href: private_session.path)
   end
 
-  test "a session that isn't listed is off the list and its owner's profile for others, but opens from its link" do
-    covers 'private_sessions/unlisted@c3f395'
+  test "a session that isn't listed is off the list and its owner's profile for others, but opens from its link, and its owner sees it only under My private sessions" do
+    covers 'private_sessions/unlisted@271652'
     covers_route 'GET /ps/:slug'
     account = practitioner
     create_private_session(account, title: 'Listed massage')
@@ -170,7 +175,20 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     sign_in account
     visit "/u/#{account.username}"
     assert page.has_link?('Listed massage')
+    assert page.has_no_link?('Unlisted massage')
+    visit '/private_sessions'
+    assert page.has_link?('Listed massage')
+    assert page.has_no_link?('Unlisted massage')
+    click_link 'My private sessions · 2'
     assert page.has_link?('Unlisted massage')
+    assert page.has_link?('Listed massage')
+    assert page.has_css?('.badge', text: 'Secret')
+    # Searching keeps to their own
+    fill_in 'Search private sessions', with: 'Unlisted'
+    click_button 'Search'
+    assert page.has_field?('Search private sessions', with: 'Unlisted')
+    assert page.has_link?('Unlisted massage')
+    assert page.has_no_link?('Listed massage')
   end
 
   test 'a session can be offered with just a name, not saying how to book it or whether in person or online' do
@@ -275,7 +293,7 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     assert_equal 'Sports massage', private_session.reload.title
   end
 
-  test "the map shows listed sessions offered in person within its box, with the list's filters, and each opens a popup" do
+  test "the map shows listed sessions offered in person within its box, and its creator's secret ones under My private sessions, with the list's filters, and each opens a popup" do
     account = practitioner
     massage = create_private_session(account)
     create_private_session(account, title: 'Secret massage', secret: true)
@@ -299,6 +317,16 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     secret = account.private_sessions.find_by(title: 'Secret massage')
     get "/points/PrivateSession/#{TokenEncryptor.encrypt("map:PrivateSession:#{secret.id}")}"
     assert_equal 404, last_response.status
+
+    # Its creator sees their secret session on the map of My private sessions, and its popup
+    sign_in_with_rack account
+    get '/private_sessions.json', box.merge(display: 'map')
+    assert_equal([massage.id.to_s], JSON.parse(last_response.body)['points'].map { |point| TokenEncryptor.decrypt(point['id']).split(':').last })
+    get '/private_sessions.json', box.merge(display: 'map', my_private_sessions: 1)
+    assert_equal([massage.id.to_s, secret.id.to_s].sort, JSON.parse(last_response.body)['points'].map { |point| TokenEncryptor.decrypt(point['id']).split(':').last }.sort)
+    get "/points/PrivateSession/#{TokenEncryptor.encrypt("map:PrivateSession:#{secret.id}")}"
+    assert last_response.ok?
+    assert_includes last_response.body, %(href="#{secret.path}")
   end
 
   test 'the list of private sessions switches to a map' do

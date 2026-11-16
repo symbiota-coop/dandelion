@@ -12,8 +12,8 @@ Dandelion::App.controller do
     account = decrypted[:model_name] == 'Account' ? object : (object.account if %w[ActivityApplication Organisationship].include?(decrypted[:model_name]))
     halt 403 if account && !admin? && (account.location_privacy != 'Public' || !profile_viewable?(account))
 
-    # Only listed private sessions are on the map
-    not_found if object.is_a?(PrivateSession) && object.secret
+    # Only listed private sessions are on the map, and secret ones on their creator's (My private sessions)
+    not_found if object.is_a?(PrivateSession) && object.secret && object.account_id != current_account&.id
 
     partial :"points/#{decrypted[:model_name].underscore}", object: object
   end

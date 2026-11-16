@@ -14,6 +14,12 @@
   })
 </script>
 
+<%# Above the search well rather than in it, so it shows in map view too, where the well is shut %>
+<% if current_account %>
+  <div class="mb-3">
+    <%= partial :scope_toggle, locals: { path: '/private_sessions', page_param: :page, scopes: [['My private sessions', :my_private_sessions, current_account.private_sessions.count]] } %>
+  </div>
+<% end %>
 <%# The search well, as on events and facilitators: in map view, shut behind its Filter toggle, so the map has the room %>
 <% map = params[:display] == 'map' %>
 <div class="search border rounded mb-3">
@@ -23,6 +29,7 @@
   <div class="search-body"<% if map %> style="display: none"<% end %>>
     <% form_tag '/private_sessions', method: 'get', class: 'submitOnChange searchForm mb-3', id: 'private-sessions-search-form' do %>
       <%= hidden_field_tag :display, value: params[:display] %>
+      <%= hidden_field_tag :my_private_sessions, value: params[:my_private_sessions] %>
       <%# As events search has them: the fields, then Online and In person (either or, forms.js) and Search %>
       <div class="row gx-2 align-items-end">
         <div class="form-group col-12 col-sm-auto">

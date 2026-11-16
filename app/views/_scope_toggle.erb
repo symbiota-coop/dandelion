@@ -1,4 +1,4 @@
-<%# Switches a list between everything and the current account's own (organisations they follow or admin, gatherings they're in), at the start of its search row. scopes are [label, param, count]; one with a count of 0 is hidden unless it's showing, and the toggle with it when none is left %>
+<%# Switches a list between everything and the current account's own (organisations they follow or admin, gatherings they're in, private sessions they offer), at the start of its search row, or above its search well (private sessions). scopes are [label, param, count]; one with a count of 0 is hidden unless it's showing, and the toggle with it when none is left %>
 <% params_to_drop = scopes.map { |_, param, _| param.to_s } + [page_param.to_s] %>
 <% base = view_base_params.reject { |k, _| params_to_drop.include?(k) } %>
 <% shown = scopes.select { |_, param, count| params[:"#{param}"] || count > 0 } %>
