@@ -249,6 +249,30 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     assert_empty queued_jobs(:import_from_csv)
   end
 
+  test 'only the admins of a locked activity find it in the activity lookup' do
+    covers_route 'GET /o/:slug/activities'
+    create_activity(name: 'Hidden retreat', locked: true)
+    FactoryBot.create(:activity, organisation: @organisation, name: 'Open circle')
+    activity_admin = activity_follower
+    @activity.activityships.find_by(account: activity_admin).set(admin: true)
+    lookup = lambda do
+      get "/o/#{@organisation.slug}/activities.json"
+      assert last_response.ok?
+      JSON.parse(last_response.body)['results'].map { |result| result['text'].sub(/ \(id:\w+\)\z/, '') }
+    end
+
+    activity_outsiders.each do |account|
+      sign_in_as(account)
+      names = lookup.call
+      assert_includes names, 'Open circle'
+      refute_includes names, 'Hidden retreat'
+    end
+    [activity_admin, @account].each do |account|
+      sign_in_as(account)
+      assert_empty ['Hidden retreat', 'Open circle'] - lookup.call
+    end
+  end
+
   test 'organisation admins who are not the activity\'s admins manage it, as its own admins do' do
     create_activity
     organisation_admin = FactoryBot.create(:account)

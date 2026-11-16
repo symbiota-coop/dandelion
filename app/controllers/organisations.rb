@@ -47,6 +47,11 @@ Dandelion::App.controller do
         erb :'organisations/activities'
       end
     when :json
+      # A locked activity is only for its admins, as its own page is (locked_activity_admins_only!)
+      unless organisation_admin?
+        admin_of = current_account ? current_account.activityships.and(admin: true).pluck(:activity_id) : []
+        @activities = @activities.and('$or' => [{ locked: false }, { _id: { '$in' => admin_of } }])
+      end
       {
         results: @activities.only(:name).map { |activity| { id: activity.id.to_s, text: "#{activity.name} (id:#{activity.id})" } }
       }.to_json
