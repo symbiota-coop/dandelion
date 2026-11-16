@@ -157,10 +157,17 @@ class Organisation
     total > 0 ? total.format(no_cents: true) : total
   end
 
-  # Over a month old, with no image and nothing in any association but its organisationships and notifications
+  # Over a year old, with no image, no more than one follower (the account that made it), and nothing else in any
+  # association but notifications
   def self.spring_clean
-    without_associated(Organisation.and(:created_at.lt => 1.month.ago, :image_uid.in => [nil, '']),
-                       ignore: %i[organisationships notifications_as_notifiable]).order('created_at asc')
+    candidates = without_associated(Organisation.and(:created_at.lt => 1.year.ago, :image_uid.in => [nil, '']),
+                                    ignore: %i[organisationships notifications_as_notifiable])
+    more_followers = Organisationship.collection.aggregate([
+                                                             { '$match' => { organisation_id: { '$in' => candidates.pluck(:id) } } },
+                                                             { '$group' => { _id: '$organisation_id', count: { '$sum' => 1 } } },
+                                                             { '$match' => { count: { '$gt' => 1 } } }
+                                                           ]).map { |group| group['_id'] }
+    candidates.and(:id.nin => more_followers).order('created_at asc')
   end
 
   def self.currencies

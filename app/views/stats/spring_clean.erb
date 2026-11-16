@@ -4,7 +4,7 @@
 </p>
 
 <% [
-  ['Organisations', @organisations, 'Over a month old, with no image, and no events, followers, activities, local groups, mailings or anything else but its admins', ->(organisation) { "/o/#{organisation.slug}" }],
+  ['Organisations', @organisations, 'Over a year old, with no image, only the follower who made it, and no events, activities, local groups, mailings or anything else', ->(organisation) { "/o/#{organisation.slug}" }],
   ['Gatherings', @gatherings, 'Listed and over a month old, with only the member who made it, and no options, timetables, rotas, payments or anything else but its teams', ->(gathering) { "/g/#{gathering.slug}" }]
 ].each do |title, records, description, path| %>
   <div class="mb-5">

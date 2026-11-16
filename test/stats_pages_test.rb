@@ -125,9 +125,10 @@ class StatsPagesTest < ActiveSupport::TestCase
     assert page.has_content?('find events')
   end
 
-  test 'Spring clean lists the organisations and gatherings over a month old that nobody uses, and deletes nothing' do
+  test 'Spring clean lists the organisations over a year old and gatherings over a month old that nobody uses, and deletes nothing' do
     covers_route 'GET /stats/spring_clean'
     old = 2.months.ago
+    older = 2.years.ago
     unused_organisation = FactoryBot.create(:organisation, name: 'Unused Organisation')
     with_event = FactoryBot.create(:organisation, name: 'With An Event')
     FactoryBot.create(:event, organisation: with_event)
@@ -136,8 +137,10 @@ class StatsPagesTest < ActiveSupport::TestCase
     with_code.discount_codes.create!(code: 'SPRING', percentage_discount: 10)
     with_image = FactoryBot.create(:organisation, name: 'With An Image')
     with_image.set(image_uid: 'image')
-    [unused_organisation, with_event, with_code, with_image].each { |organisation| organisation.set(created_at: old) }
-    FactoryBot.create(:organisation, name: 'New Organisation')
+    with_follower = FactoryBot.create(:organisation, name: 'With Another Follower')
+    with_follower.organisationships.create!(account: FactoryBot.create(:account))
+    [unused_organisation, with_event, with_code, with_image, with_follower].each { |organisation| organisation.set(created_at: older) }
+    FactoryBot.create(:organisation, name: 'Months Old Organisation').set(created_at: old)
 
     unused_gathering = FactoryBot.create(:gathering, name: 'Unused Gathering')
     with_member = FactoryBot.create(:gathering, name: 'With Another Member')
@@ -152,7 +155,7 @@ class StatsPagesTest < ActiveSupport::TestCase
     visit '/stats/spring_clean'
     assert page.has_link? 'Unused Organisation', href: "/o/#{unused_organisation.slug}"
     assert page.has_link? 'Unused Gathering', href: "/g/#{unused_gathering.slug}"
-    ['With An Event', 'With A Discount Code', 'With An Image', 'New Organisation',
+    ['With An Event', 'With A Discount Code', 'With An Image', 'With Another Follower', 'Months Old Organisation',
      'With Another Member', 'With An Option', 'Unlisted Gathering', 'New Gathering'].each do |name|
       assert page.has_no_link?(name), name
     end
