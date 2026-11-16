@@ -96,6 +96,7 @@ class EventDiscussionsTest < ActiveSupport::TestCase
   test 'comment mentions link to profiles and subscribe the people mentioned' do
     create_event(prices: [0])
     mentioned = FactoryBot.create(:account, name: 'Ada Lovelace', username: 'ada.lovelace')
+    @event.tickets.create!(account: mentioned, ticket_type: @event.ticket_types.first, payment_completed: true)
     discussion = @event.discussion_post!(@account)
     comment = discussion.comments.create!(account: @account, commentable: @event,
                                           body: "Thanks @Ada.Lovelace. Write to me@example.com, or ask @nobody_here <b>now</b>. See https://example.com/a?b=1&c=2.")
@@ -117,11 +118,32 @@ class EventDiscussionsTest < ActiveSupport::TestCase
     create_event(prices: [0])
     jo = FactoryBot.create(:account, username: 'jo')
     jo_dot = FactoryBot.create(:account, username: 'jo.')
+    [jo, jo_dot].each { |account| @event.tickets.create!(account: account, ticket_type: @event.ticket_types.first, payment_completed: true) }
     discussion = @event.discussion_post!(@account)
     comment = discussion.comments.create!(account: @account, commentable: @event, body: 'Over to @jo. today')
 
     assert discussion.subscriptions.and(account: jo_dot).exists?
     assert_not discussion.subscriptions.and(account: jo).exists?
     assert_includes comment.body_html, '<a href="/u/jo.">'
+  end
+
+  test "mentioning someone who can't see the discussion neither subscribes nor emails them" do
+    create_event(prices: [0])
+    attendee = FactoryBot.create(:account, username: 'attendee', has_signed_in: true)
+    @event.tickets.create!(account: attendee, ticket_type: @event.ticket_types.first, payment_completed: true)
+    outsider = FactoryBot.create(:account, username: 'outsider', has_signed_in: true)
+    discussion = @event.discussion_post!(@account)
+    discussion.comments.create!(account: @account, commentable: @event, body: 'Earlier, private words')
+    Delayed::Job.delete_all
+
+    discussion.comments.create!(account: @account, commentable: @event, body: 'Over to @attendee and @outsider')
+    assert discussion.subscriptions.and(account: attendee).exists?
+    assert_not discussion.subscriptions.and(account: outsider).exists?
+
+    emails = emails_sent_by_jobs(:send_comment)
+    assert_equal 1, emails.length
+    assert_includes emails.first.recipients, attendee.email
+    refute_includes emails.first.recipients, outsider.email
+    assert_includes emails.first.html, 'Earlier, private words'
   end
 end
