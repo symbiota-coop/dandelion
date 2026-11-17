@@ -43,7 +43,7 @@ jobs:
           git_log_cmd: ${{ steps.setup.outputs.git_log_cmd }}
           review_window: ${{ steps.setup.outputs.review_window }}
 
-      - uses: anthropics/claude-code-action@61a9c274fa7110a66dfafc1bbbced03833eb25fe # v1.0.269
+      - uses: anthropics/claude-code-action@4fa93a88de49bbef68b10eb15aabedf28ca0e1ed # v1.0.271
         if: steps.setup.outputs.has_commits == 'true'
         with:
           show_full_output: true
