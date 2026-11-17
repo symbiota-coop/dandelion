@@ -207,13 +207,16 @@ Dandelion::App.controller do
     @event = event_from_params(Event.unscoped)
     event_revenue_admins_only!
     not_found if @event.organisation.stripe_client_id || !@event.organisation.stripe_connect_json
+    # The page loads at once, and fetches the report from Stripe, which can take a while, in a pagelet
+    return erb :'events/stripe_report' unless request.xhr?
+
     begin
       @stripe_report = @event.stripe_report
       @orders = Order.unscoped.and(:id.in => @stripe_report[:charges].map { |charge| charge[:order_id] }.compact).index_by { |order| order.id.to_s }
     rescue Stripe::StripeError => e
       @stripe_error = e.message
     end
-    erb :'events/stripe_report'
+    partial :'events/stripe_report'
   end
 
   get '/e/:slug/waitlist' do

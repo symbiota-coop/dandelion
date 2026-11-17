@@ -88,19 +88,31 @@ class EventAdminReportsTest < ActiveSupport::TestCase
     @event.event_facilitations.create!(account: facilitator)
     charges = [stripe_report_charge(id: 'ch_paid', amount: 3000, fee: 120, name: 'Secret Buyer', email: 'secret-buyer@example.com')]
 
+    xhr = { 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest' }
+
     with_stripe_report_charges(charges) do |queries|
       [facilitator, admin_of_another_event, nil].each do |account|
         account ? sign_in_with_rack(account) : clear_cookies
         get "/e/#{@event.slug}/stripe_report"
         assert last_response.redirect?, account&.email
         assert_equal "/e/#{@event.slug}", URI(last_response.location).path
+        # The pagelet, which fetches from Stripe
+        get "/e/#{@event.slug}/stripe_report", {}, xhr
+        assert_equal 403, last_response.status, account&.email
         refute_includes last_response.body, 'Secret Buyer'
       end
       assert_empty queries
 
+      # The page itself loads without waiting for Stripe, and its pagelet fetches the report
       sign_in_with_rack(@account)
       get "/e/#{@event.slug}/stripe_report"
       assert last_response.ok?
+      assert_includes last_response.body, %(data-pagelet-url="/e/#{@event.slug}/stripe_report")
+      assert_empty queries
+      get "/e/#{@event.slug}/stripe_report", {}, xhr
+      assert last_response.ok?
+      assert_includes last_response.body, 'Secret Buyer'
+      assert_equal 1, queries.length
     end
   end
 
