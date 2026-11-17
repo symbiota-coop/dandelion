@@ -98,6 +98,51 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     end
   end
 
+  # Set directly, as price_or_range and duration_or_range always give both ends of a range, or neither
+  test "a private session's range has both ends, and isn't beside a single price" do
+    account = practitioner
+    [{ price_min: 10 }, { price_max: 20 }, { price: 10, price_min: 10, price_max: 20 }, { price: 10, price_max: 20 }].each do |prices|
+      private_session = build_private_session(account, **prices)
+      assert_not private_session.save, prices.inspect
+      assert private_session.errors[:price_or_range].any?, prices.inspect
+    end
+    private_session = build_private_session(account, duration_max: 90)
+    assert_not private_session.save
+    assert private_session.errors[:duration_or_range].any?
+    assert_equal 0, account.private_sessions.count
+
+    assert create_private_session(account, price_min: 10, price_max: 20, duration_min: 60, duration_max: 90).persisted?
+    assert create_private_session(account, price: 10, duration_min: 60).persisted?
+  end
+
+  test "a form can only set a session's length and price as a number or a range" do
+    sign_in_with_rack practitioner
+    %w[price price_min price_max duration_min duration_max].each do |field|
+      error = assert_raises(RuntimeError) do
+        post '/private_sessions/new', private_session: { title: 'Broken range', slug: 'broken-range', currency: 'GBP', field => '10' }
+      end
+      assert_match(/are protected/, error.message)
+    end
+    assert_equal 0, PrivateSession.count
+
+    post '/private_sessions/new', private_session: { title: 'Sliding scale', slug: 'sliding-scale', currency: 'GBP', price_or_range: '10-20' }
+    assert_redirected_to '/ps/sliding-scale'
+    sliding_scale = PrivateSession.find_by(slug: 'sliding-scale')
+    assert_equal [nil, 10.0, 20.0], [sliding_scale.price, sliding_scale.price_min, sliding_scale.price_max]
+  end
+
+  test 'a session saved with half a price range is still listed, showing the end it has' do
+    private_session = create_private_session(practitioner, title: 'Half a range', currency: 'GBP')
+    # Skipping validation, as a session saved before ranges were checked
+    private_session.set(price_min: 10.0)
+    assert_nil private_session.reload.price_max
+    visit '/private_sessions'
+    assert page.has_link?('Half a range')
+    assert page.has_css?('.badge', text: /\A£10\z/)
+    visit private_session.path
+    assert page.has_css?('.badge', text: /\A£10\z/)
+  end
+
   test 'someone offers a private session from the sidebar, and it is listed and on their profile' do
     covers_route 'GET /private_sessions'
     covers_route 'GET /private_sessions/new'
