@@ -17,14 +17,18 @@
     worth = 8_740_000
     symbol = '€'
   end
-  # Ticket sales in millions or thousands: [figure, decimal places, suffix]
-  worth_value, worth_decimals, worth_suffix = if worth >= 1_000_000
-                                                [(worth / 1_000_000).round(1), 1, 'm']
-                                              elsif worth >= 1000
-                                                [(worth / 1000).round, 0, 'k']
-                                              else
-                                                [worth.round, 0, '']
-                                              end
+  # Ticket sales in millions or thousands, to at most three figures (8.74m, 72.4m, 102m), rounded down as the
+  # figure is followed by a +: [figure, decimal places, suffix]
+  worth_scaled, worth_suffix = if worth >= 1_000_000
+                                 [worth / 1_000_000, 'm']
+                               elsif worth >= 1000
+                                 [worth / 1000, 'k']
+                               else
+                                 [worth, '']
+                               end
+  worth_decimals = worth_suffix.empty? ? 0 : [3 - worth_scaled.floor.digits.length, 0].max
+  worth_value = worth_scaled.floor(worth_decimals)
+  worth_value = worth_value.to_i if worth_decimals.zero?
   # The sparkline is illustrative, not real figures: running totals only ever look like a straight line up, so
   # this rises in uneven steps, as months do, that grow as it goes
   ticket_sparkline = [100, 106, 106, 116, 117, 130, 130, 147, 149, 171, 172, 202, 242]
@@ -134,7 +138,7 @@
 
   <% if worth_value.positive? %>
     <div class="stats-band-cell">
-      <div class="stats-band-value"><%= symbol %><span data-count-up="<%= worth_value %>" data-decimals="<%= worth_decimals %>"><%= worth_decimals.zero? ? worth_value.to_fs(:delimited) : worth_value %></span><%= worth_suffix %>+</div>
+      <div class="stats-band-value"><%= symbol %><span data-count-up="<%= worth_value %>" data-decimals="<%= worth_decimals %>"><%= worth_decimals.zero? ? worth_value.to_fs(:delimited) : format("%.#{worth_decimals}f", worth_value) %></span><%= worth_suffix %>+</div>
       <div class="stats-band-label">in ticket sales</div>
       <div class="stats-band-visual"><span class="zero">0% platform fees</span></div>
     </div>
