@@ -119,5 +119,6 @@
 </div>
 <%# The table loads in a request of its own (this page with table=1), so the page shows before its rows are worked out %>
 <div data-with-placeholder data-pagelet-url="<%= request.path %>?<%= request.query_string.empty? ? 'table=1' : "#{request.query_string}&table=1" %>">
-  <%= partial :'events/event_stats_placeholder', locals: { rows: [events_count, 10].min } %>
+  <%# A row for each event, up to 10, with the name column wider %>
+  <%= partial :table_placeholder, locals: { columns: [14, 8, 7, 7, 6, 6, 6, 5, 5, 5], rows: [events_count, 10].min, table_class: 'table-striped small' } %>
 </div>

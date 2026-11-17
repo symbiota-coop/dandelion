@@ -6,5 +6,8 @@
 </p>
 
 <div data-with-placeholder data-pagelet-url="/e/<%= @event.slug %>/stripe_report">
-  <p class="text-body-secondary"><i class="pagelet-loading bi bi-spin bi-slash-lg"></i> Fetching charges from Stripe…</p>
+  <%# The totals, then a few charges %>
+  <%= partial :table_placeholder, locals: { columns: [5, 6, 6, 6, 6, 6], rows: 1 } %>
+  <h2 class="mt-4">Charges</h2>
+  <%= partial :table_placeholder, locals: { columns: [8, 10, 5, 5, 5, 5, 5, 1], rows: 5, table_class: 'table-striped' } %>
 </div>
