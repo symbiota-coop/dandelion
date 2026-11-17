@@ -46,7 +46,7 @@ Dandelion::App.helpers do
   # Near a place (not near=online) is somewhere to meet in person: a search near one ticks In person, and unticks
   # Online, as events and private sessions are near a place only in person
   def near_place_ticks_in_person
-    return unless params[:near] && params[:near] != 'online'
+    return unless params[:near].is_a?(String) && params[:near] != 'online'
 
     params[:in_person] = '1'
     params[:online] = nil

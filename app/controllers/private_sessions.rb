@@ -3,11 +3,12 @@ Dandelion::App.controller do
     # My private sessions (_scope_toggle.erb): the account's own, secret ones too
     @private_sessions = current_account && params[:my_private_sessions] ? current_account.private_sessions : PrivateSession.listed
     @private_sessions = @private_sessions.order('created_at desc')
-    if params[:q]
+    # ?q[x]=1 or ?tag[]=x give a hash or an array, which isn't a filter, so the list shows unfiltered rather than a 500
+    if params[:q].is_a?(String)
       q = /#{Regexp.escape(params[:q])}/i
       @private_sessions = @private_sessions.and('$or' => [{ title: q }, { description: q }, { tag_names_cache: q }])
     end
-    if params[:tag]
+    if params[:tag].is_a?(String)
       tag = PrivateSessionTag.find_by(name: params[:tag].downcase)
       @private_sessions = @private_sessions.and(:id.in => tag ? tag.private_session_tagships.pluck(:private_session_id) : [])
     end
