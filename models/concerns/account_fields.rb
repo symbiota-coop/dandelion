@@ -120,6 +120,13 @@ module AccountFields
       self.and(:date_of_birth_privacy.in => privacy_levels - ['Only me'])
     end
 
+    # Accounts in a list of birthdays for viewer: those not hidden with a date of birth, and whose age others may see,
+    # unless viewer is a site admin, who sees every age (viewable?)
+    def birthdays_shown_to(viewer)
+      with_date_of_birth = self.and(:hidden => false, :date_of_birth.ne => nil)
+      viewer&.admin? ? with_date_of_birth : with_date_of_birth.age_shown_to_others
+    end
+
     def genders
       [''] + %(Woman
   Man

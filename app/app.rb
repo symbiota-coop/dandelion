@@ -227,7 +227,7 @@ module Dandelion
       sign_in_required!
       case content_type
       when :html
-        @account_ids = current_account.following.ids_by_next_birthday
+        @account_ids = current_account.following.ids_by_next_birthday(current_account)
         @account_ids = @account_ids.paginate(page: params[:page], per_page: 20)
         erb :birthdays
       when :ics

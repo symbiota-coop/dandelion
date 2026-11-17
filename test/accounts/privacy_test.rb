@@ -409,6 +409,38 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
     hidden.each_key { |name| refute_includes last_response.body, name }
   end
 
+  test "a site admin sees the birthdays of everyone they follow whatever their age's privacy, but not of hidden profiles" do
+    admin = FactoryBot.create(:account, admin: true)
+    olly = profiled_account(name: 'Olly Only Me', date_of_birth_privacy: 'Only me')
+    dee = profiled_account(name: 'Dee Default')
+    dee.unset(:date_of_birth_privacy) # as an account from before age was hidden by default
+    hal = profiled_account(name: 'Hal Hidden', hidden: true, date_of_birth_privacy: 'Public')
+    [olly, dee, hal].each { |followee| Follow.create!(follower: admin, followee: followee) }
+    assert_equal 'Only me', dee.reload.privacy_level(:date_of_birth)
+
+    sign_in(admin)
+    visit '/birthdays'
+    assert page.has_content?('Olly Only Me')
+    assert page.has_content?('Dee Default')
+    assert page.has_no_content?('Hal Hidden')
+    visit '/'
+    within(:xpath, "//div[contains(@class, 'card')][h3[normalize-space()='Upcoming birthdays']]") do
+      assert page.has_content?('Olly Only Me')
+      assert page.has_content?('Dee Default')
+      assert page.has_no_content?('Hal Hidden')
+    end
+
+    # Not an admin, following the same people, they see none of them, nor the card
+    admin.set(admin: false)
+    visit '/birthdays'
+    assert page.has_content?('Birthdays')
+    assert page.has_no_content?('Olly Only Me')
+    assert page.has_no_content?('Dee Default')
+    visit '/'
+    assert page.has_css?('#newsfeed')
+    assert page.has_no_content?('Upcoming birthdays')
+  end
+
   test "the feedback on a facilitator who hid their profile, and its embeds, are refused to others but not to them" do
     facilitator = profiled_account(name: 'Hana Hidden', hidden: true, feedback_summary: 'Wonderfully clear facilitator')
     facilitated_event_with_feedback(facilitator)

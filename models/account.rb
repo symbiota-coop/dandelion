@@ -94,9 +94,9 @@ class Account
     [''] + CURRENCY_OPTIONS
   end
 
-  def self.ids_by_next_birthday
+  def self.ids_by_next_birthday(viewer)
     today = Date.today
-    age_shown_to_others.and(:hidden => false, :date_of_birth.ne => nil).pluck(:id, :date_of_birth)
+    birthdays_shown_to(viewer).pluck(:id, :date_of_birth)
         .sort_by { |_, dob| (((dob.month * 100) + dob.day) - ((today.month * 100) + today.day)) % (12 * 100) }
         .map { |id, _| id }
   end
