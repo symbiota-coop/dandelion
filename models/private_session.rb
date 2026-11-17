@@ -64,6 +64,10 @@ class PrivateSession
     errors.add(:price_or_range, 'must not be below 0') if [price, price_min, price_max].compact.any?(&:negative?)
     errors.add(:duration_or_range, 'must go from the lower to the higher number') if duration_min && duration_max && duration_max <= duration_min
     errors.add(:price_or_range, 'must go from the lower to the higher number') if price_min && price_max && price_max <= price_min
+    # However they were set: a range has both ends, and isn't beside a single price
+    errors.add(:duration_or_range, 'must give the lower number of a range') if duration_max && !duration_min
+    errors.add(:price_or_range, 'must give both ends of a range') if price_min.nil? != price_max.nil?
+    errors.add(:price_or_range, 'must be a price or a range, not both') if price && (price_min || price_max)
   end
 
   after_validation do
@@ -77,7 +81,8 @@ class PrivateSession
   end
 
   def self.protected_attributes
-    %w[coordinates has_image tag_names_cache vouches_count]
+    # Length and price are set through duration_or_range and price_or_range
+    %w[coordinates has_image tag_names_cache vouches_count duration_min duration_max price price_min price_max]
   end
 
   # Length and price as the form takes them, a number or a range (TicketType's price_or_range does the same): stored
@@ -190,13 +195,10 @@ class PrivateSession
     "#{number_or_range_text(duration_min, duration_max, '–')} min" if duration_min
   end
 
-  # Nothing without a price
+  # Nothing without a price. A range missing an end, which validation refuses, shows the end it has
   def price_label(symbol)
-    if price
-      "#{symbol}#{number_text(price)}"
-    elsif price_min
-      "#{symbol}#{number_text(price_min)}–#{symbol}#{number_text(price_max)}"
-    end
+    prices = price ? [price] : [price_min, price_max].compact
+    prices.map { |n| "#{symbol}#{number_text(n)}" }.join('–') if prices.any?
   end
 
   # Nothing without a maximum
