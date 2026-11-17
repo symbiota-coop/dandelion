@@ -1,3 +1,4 @@
+<%# A count of 0 shows blank: events that started before views were counted have 0, which would read as nobody viewing them %>
 <td data-sort="<%= event.page_views_count %>">
-  <%= event.page_views_count %>
+  <%= event.page_views_count if event.page_views_count.positive? %>
 </td>
