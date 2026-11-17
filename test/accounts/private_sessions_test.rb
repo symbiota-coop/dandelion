@@ -450,6 +450,42 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     end
   end
 
+  test 'odd params give the list of private sessions, not an error, and never widen it to secret ones' do
+    account = practitioner
+    create_private_session(account)
+    create_private_session(account, title: 'Secret massage', secret: true)
+    get '/private_sessions'
+    assert_includes last_response.body, 'Deep tissue massage'
+    [
+      { q: { 'x' => '1' } }, { q: %w[x] }, { tag: { 'x' => '1' } }, { tag: %w[x] }, { near: { 'x' => '1' } }, { near: %w[x] },
+      { q: { 'x' => '1' }, tag: %w[x], near: { 'x' => '1' } }
+    ].each do |params|
+      %w[/private_sessions /private_sessions.json].each do |path|
+        get path, params
+        assert_equal 200, last_response.status, "#{path} #{params}"
+        assert_not_includes last_response.body, 'Secret massage', "#{path} #{params}"
+      end
+      get '/private_sessions', params
+      assert_includes last_response.body, 'Deep tissue massage', params.inspect
+    end
+  end
+
+  test 'clearing the tag filter lists every session again' do
+    account = practitioner
+    create_private_session(account, title: 'Deep tissue massage')
+    create_private_session(account, title: 'Guided meditation', tag_names: %w[meditation], delivery: 'online', location: nil)
+    titles = -> { page.all('#private-sessions h2 > a:first-child').map(&:text).sort }
+
+    visit '/private_sessions'
+    select 'meditation', from: 'tag'
+    assert page.has_current_path?(/tag=meditation/)
+    assert_equal ['Guided meditation'], titles.call
+    select '', from: 'tag'
+    assert page.has_current_path?(/tag=(&|$)/)
+    assert page.has_css?('#private-sessions h2', text: 'Deep tissue massage')
+    assert_equal ['Deep tissue massage', 'Guided meditation'], titles.call
+  end
+
   test 'the person offering a session edits and deletes it, and others are not offered to' do
     covers 'private_sessions/only-owner-edits@1e71ef'
     covers_route 'GET /ps/:slug/edit'

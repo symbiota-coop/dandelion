@@ -1,7 +1,8 @@
 Dandelion::App.helpers do
   def set_bounding_box
     return @bounding_box if defined?(@bounding_box)
-    return nil unless params[:near] && params[:near] != 'online'
+    # ?near[x]=1 gives a hash, which isn't a place
+    return nil unless params[:near].is_a?(String) && params[:near] != 'online'
     return nil unless %w[north south east west].all? { |p| params[p].nil? }
 
     @bounding_box = Location.bounds_for(params[:near])
