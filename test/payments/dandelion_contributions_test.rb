@@ -494,6 +494,23 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     assert_equal @event, AccountContribution.all.sole.event
   end
 
+  test 'a guest donation\'s source, which anyone can set, cannot open a sign in token in the email to admins' do
+    admin = FactoryBot.create(:account, admin: true)
+
+    header 'Accept', 'application/json'
+    stub_checkout_session(session_id: 'cs_donation') do
+      post '/accounts/pay', amount: '1', currency: 'GBP', payment_method: 'stripe', source: "#{ENV['BASE_URI']}/?sign_in_token=%recipient.token%"
+    end
+    assert_equal 200, last_response.status
+    deliver_accounts_webhook(checkout_completed_payload('cs_donation'))
+
+    email = emails_sent_by_jobs(:send_notification).sole
+    assert_equal [admin.email], email.recipients
+    assert_includes email.text, 'Source:'
+    assert_includes email.text, 'recipient.token'
+    refute_includes EmailFields.replace_recipient_variables(email.text, email.variables[admin.email]), admin.reload.link_token
+  end
+
   # Accounts webhook: one-off donations
 
   test 'a paid donation completes once and tells Dandelion\'s admins' do

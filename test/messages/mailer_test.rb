@@ -94,6 +94,15 @@ class MailerTest < ActiveSupport::TestCase
     end
   end
 
+  test 'a plain text body, which carries others\' text, cannot open a recipient token but keeps public variables' do
+    _, _, email = delivery(to: ['someone@example.com', { 'firstname' => 'Ada', 'token' => 'SECRET' }],
+                           html: nil, text: "Hi %recipient.firstname%, source: /?token=%recipient.token%")
+    sent = EmailFields.replace_recipient_variables(email.text, { 'firstname' => 'Ada', 'token' => 'SECRET' })
+
+    assert_includes sent, 'Hi Ada,'
+    refute_includes sent, 'SECRET'
+  end
+
   test 'the Microsoft workaround sends to Microsoft addresses from its own domain, only where asked and only when it is on' do
     on = { 'MICROSOFT_EMAIL_WORKAROUND' => '1' }
 

@@ -4,7 +4,9 @@
 #   Mailer.deliver(:order, to: event.event_facilitators, subject: "New order for #{event.name}", locals: { order:, event:, account: })
 #
 # - The body is a template in app/views/emails rendered in the email layout (with locals:), or content: (HTML put in
-#   the layout), html: (a finished body) or text: (a plain text body)
+#   the layout), html: (a finished body) or text: (a plain text body). text: is made untrusted (EmailHelper.untrusted),
+#   as it carries others' text (a donation's source, event and account names) to admins whose variables hold a sign
+#   in token, so it can use public variables (%recipient.firstname%) but never Dandelion's own %recipient.token% links
 # - to: an Account, a list or criteria of them, an email, or [email, variables] pairs, each sent as Mailgun's :to. An
 #   account gets Account#mail_variables; an email given alone gets no variables, which Mailgun numbers itself
 # - stream: picks the Mailgun domain and the default sender (STREAMS); microsoft_workaround: true sends from
@@ -51,7 +53,7 @@ module Mailer
                html
              end
       batch_message.body_html body if body
-      batch_message.body_text text if text
+      batch_message.body_text EmailHelper.untrusted(text) if text
 
       with_attachments(batch_message, attachments) do
         recipients.each { |email, variables| batch_message.add_recipient(:to, email, variables) }
