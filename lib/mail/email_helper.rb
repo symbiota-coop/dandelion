@@ -54,9 +54,11 @@ module EmailHelper
 
   # A %recipient.x% value, e.g. a name: zero-width non-joiners on both sides of every % so it can neither open nor
   # close a variable with the text or values around it ('% recipient.token%' gives a firstname of '%' and a lastname
-  # of 'recipient.token%'). Tokens, ids and Dandelion's own strings have no % so are unchanged
+  # of 'recipient.token%'). Tokens, ids and Dandelion's own strings have no % so are unchanged.
+  # Mailgun fills values into the HTML body unescaped, so < and > are dropped too, whatever path stored the value
+  # (sanitize_fields drops them from names, but only on a save that validates); no value of Dandelion's carries markup
   def self.recipient_value(value)
-    value.to_s.gsub(/\u200C?%\u200C?/, "\u200C%\u200C")
+    value.to_s.delete('<>').gsub(/\u200C?%\u200C?/, "\u200C%\u200C")
   end
 
   # Every sender's Mailgun recipient variables, subject, From and Reply-To pass through here. Subjects interpolate

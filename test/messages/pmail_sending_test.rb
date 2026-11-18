@@ -231,6 +231,31 @@ class MessagesPmailSendingTest < ActiveSupport::TestCase
     assert_not_includes recipients, other_attendee.email
   end
 
+  test "a ticket holder's name reaches a mail without markup however it was stored, and Dandelion's own variables are unchanged" do
+    create_event
+    ticket_type = FactoryBot.create(:ticket_type, event: @event, quantity: 10)
+    attendee = FactoryBot.create(:account)
+    Ticket.create!(event: @event, account: attendee, ticket_type: ticket_type, price: 0)
+    guest_ticket = Ticket.create!(event: @event, ticket_type: ticket_type, price: 0, email: 'guest@example.com')
+    guest_ticket.set(name: '<img/src=https://example.com/i.png>Ada') # set skips validation, so sanitize_fields doesn't run
+    assert_includes guest_ticket.reload.firstname, '<img'
+    pmail = FactoryBot.create(:pmail, organisation: @organisation, to_option: "event:#{@event.id}", body: '<p>Hi %recipient.firstname%</p>')
+
+    email = Mailgun::BatchMessage.new(Mailgun::Client.new('key'), 'example.com') # rubocop:disable Dandelion/MailgunDirect -- tests EmailHelper::RecipientVariables on a real BatchMessage, which sends nothing
+    Mailgun::BatchMessage.stub(:new, email) { pmail.send_pmail }
+    html = Array(email.message[:html]).last
+    assert_includes html, 'Hi %recipient.firstname%'
+
+    sent = EmailFields.replace_recipient_variables(html, email.recipient_variables['guest@example.com'])
+    assert_includes sent, 'Hi img/src=https://example.com/i.pngada'
+    assert_not_includes sent, '<img/src'
+
+    variables = email.recipient_variables[attendee.email]
+    assert_equal 'Activate your account', variables['view_or_activate']
+    assert_equal attendee.id.to_s, variables['id']
+    assert_equal attendee.firstname, variables['firstname']
+  end
+
   test 'a mail can leave out the attendees of an event and the members of a local group' do
     create_event
     link_mailgun
