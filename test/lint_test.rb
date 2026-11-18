@@ -1,5 +1,5 @@
 # Tests our own checks (AGENTS.md, Linting): the Dandelion cops, the erb_lint linters, the ESLint, Stylelint and
-# Herb rules, and script/lint. It doesn't boot the app, so it runs without foreman or Mongo:
+# Herb rules, and script/lint. It doesn't boot the app, so it runs without script/env or Mongo:
 #
 #   bundle exec ruby -I test test/lint_test.rb
 #

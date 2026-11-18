@@ -1,10 +1,11 @@
 {
   "private": true,
-  "description": "Linting for app/assets/javascripts (ESLint) and app/assets/stylesheets (Stylelint), the JavaScript and CSS in app/views, and the HTML of its templates (Herb). The app itself loads its JavaScript from a CDN (config/frontend_dependencies.rb)",
+  "description": "Development tools: linting for app/assets/javascripts (ESLint) and app/assets/stylesheets (Stylelint), the JavaScript and CSS in app/views, and the HTML of its templates (Herb); and dotenvx, which script/env runs to decrypt .env files. The app itself loads its JavaScript from a CDN (config/frontend_dependencies.rb)",
   "scripts": {
     "lint": "eslint && stylelint \"app/assets/stylesheets/**/*.css\" \"app/views/**/*.erb\""
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "2.38.2",
     "@eslint/js": "10.0.1",
     "@herb-tools/linter": "0.11.1",
     "eslint": "10.13.0",

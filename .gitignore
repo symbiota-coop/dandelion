@@ -9,6 +9,7 @@ vendor/gems/*
 nbproject
 .env
 .env.test
+.env.keys
 dragonfly.log
 capybara
 node_modules

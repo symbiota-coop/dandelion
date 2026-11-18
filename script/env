@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Runs a command with .env (or, with --test, .env.test) loaded into its environment by dotenvx, which decrypts
+# the values encrypted in it: script/env bundle exec puma -C config/puma.rb, script/env --test bundle exec ruby -I test ...
+# The private keys are in the OS secret store (macOS Keychain), or else in .env.keys or DOTENV_PRIVATE_KEY(_TEST);
+# a file of plain values (as install.sh copies from the examples) needs none. Values in the file win over the
+# shell's, as they did with foreman's -e. Dotenvx Armor (its cloud service) is off, so keys never leave the machine.
+set -euo pipefail
+
+root="$(cd "$(dirname "$0")/.." && pwd)"
+file=.env
+if [ "${1:-}" = --test ]; then
+  file=.env.test
+  shift
+fi
+
+if [ ! -x "$root/node_modules/.bin/dotenvx" ]; then
+  echo "dotenvx isn't installed: run npm ci" >&2
+  exit 1
+fi
+
+export DOTENVX_NO_ARMOR=true
+exec "$root/node_modules/.bin/dotenvx" --quiet run --strict --overload --no-1password --no-bitwarden -f "$root/$file" -- "$@"
