@@ -117,8 +117,12 @@ Dandelion::App.controller do
     @order = Order.find(params[:id]) || not_found
     @event = @order.event
     event_admins_only!
-    @order.send_tickets
-    flash[:notice] = 'The tickets for the order were resent.'
+    if @order.account
+      @order.send_tickets
+      flash[:notice] = 'The tickets for the order were resent.'
+    else
+      flash[:notice] = "The order's buyer has deleted their account, so there's no one to send the tickets to."
+    end
     redirect back
   end
 

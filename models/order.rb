@@ -376,6 +376,9 @@ class Order
   end
 
   def create_order_notification
+    # A removed order restored after its buyer deleted their account has no one to say booked
+    return unless account
+
     send_notification if event.send_order_notifications
     Notification.and(type: 'created_order').and(:notifiable_id.in => event.orders.and(account: account).pluck(:id)).destroy_all
     return unless account.publicly_visible? && event.live? && event.publicly_visible?

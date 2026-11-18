@@ -51,6 +51,28 @@ class OrdersAdminTest < ActiveSupport::TestCase
     assert_equal [[@attendee.email]], emails_sent_by_jobs(:send_tickets, on: 'Order').map(&:recipients)
   end
 
+  test "an admin restores and completes a deleted order whose buyer has deleted their account, sending nothing" do
+    create_deleted_incomplete_order
+    @event.set(send_order_notifications: true)
+    @attendee.destroy
+    # nullify skips removed orders, so this one keeps the id of an account that's gone
+    assert_nil Order.deleted.find(@order.id).account
+    sign_in(@account)
+
+    visit "/e/#{@event.slug}/orders?deleted=1"
+    assert page.has_content? '(deleted account)'
+    click_button 'Actions'
+    click_link 'Restore and complete'
+    assert page.has_content? 'No orders found'
+
+    order = Order.find(@order.id)
+    assert order.payment_completed
+    assert order.restored
+    assert_equal 1, queued_ticket_emails
+    assert_empty emails_sent_by_jobs(:send_tickets, on: 'Order')
+    assert_equal 0, queued_jobs(:send_notification, on: 'Order').count
+  end
+
   test 'a restored ticket counts against the event capacity' do
     create_complete_order_with_ticket
     @ticket.set(payment_completed: true)
@@ -133,6 +155,32 @@ class OrdersAdminTest < ActiveSupport::TestCase
     assert_equal [[@attendee.email]], emails_sent_by_jobs(:send_tickets, on: 'Order').map(&:recipients)
   end
 
+  test 'an admin transfers an order whose buyer has deleted their account, sending nothing' do
+    create_complete_order_with_ticket
+    @attendee.destroy
+    assert_nil Order.find(@order.id).account_id
+    create_event(prices: [0], as: :new_event)
+    sign_in(@account)
+
+    visit "/e/#{@event.slug}/orders"
+    assert page.has_content? '(deleted account)'
+    click_button 'Actions'
+    click_link 'Transfer to another event'
+    assert page.has_content? 'Transfer this order'
+    select @new_event.summary, from: 'order_event_id'
+    click_button 'Update order'
+    assert page.has_content? 'The order was transferred.'
+
+    order = Order.find(@order.id)
+    assert_equal @new_event.id, order.event_id
+    assert order.transferred
+    ticket = Ticket.find(@ticket.id)
+    assert_equal @new_event.id, ticket.event_id
+    assert ticket.transferred
+    assert_equal 1, queued_ticket_emails
+    assert_empty emails_sent_by_jobs(:send_tickets, on: 'Order')
+  end
+
   test "the transfer page offers only the organisation's other events the account admins" do
     covers_route 'GET /orders/:id/transfer'
     create_complete_order
@@ -190,6 +238,19 @@ class OrdersAdminTest < ActiveSupport::TestCase
 
     emails = emails_sent_by_jobs(:send_tickets, on: 'Order')
     assert_equal [[@attendee.email]], emails.map(&:recipients)
+  end
+
+  test 'resending the tickets for an order whose buyer has deleted their account says there is no one to send them to' do
+    create_complete_order_with_ticket
+    @attendee.destroy
+    sign_in(@account)
+
+    visit "/e/#{@event.slug}/orders"
+    assert page.has_content? '(deleted account)'
+    click_button 'Actions'
+    click_link 'Resend order confirmation'
+    assert page.has_content? "The order's buyer has deleted their account, so there's no one to send the tickets to."
+    assert_equal 0, queued_ticket_emails
   end
 
   test "an event admin can't resend another event's tickets" do
