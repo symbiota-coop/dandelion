@@ -75,6 +75,10 @@ class LintTest < Minitest::Test
         'refute has_css?(".x")' => 1, 'assert_equal false, page.has_sibling?("x")' => 1, 'assert_equal true, page.has_css?(".x")' => 0,
         'assert page.has_css?(".x")' => 0, 'refute page.has_no_css?(".x")' => 0, 'refute foo.valid?' => 0
       },
+      'Dandelion/RefuteNot' => {
+        'assert_not x, "y"' => 1, 'assert !x.y?' => 1, 'assert !!x' => 1, 'assert_not !x' => 1, 'assert((not x))' => 1,
+        'assert !(a && b), "y"' => 1, 'assert x' => 0, 'refute x' => 0, 'assert !x == y' => 0
+      },
       'Dandelion/MongoidWhere' => { "where('this.a < this.b')" => 1, 'where(a: 1)' => 1, 'x&.where(a: 1)' => 1 },
       'Dandelion/MongoidOr' => { 'x.or(a: 1)' => 1, 'a or b' => 0 },
       'Dandelion/ErrorReporting' => { 'Sentry.capture_message("x")' => 1, '::Sentry.capture_exception(e)' => 1, 'ErrorReporting.capture_exception(e)' => 0 },
@@ -576,7 +580,7 @@ class LintTest < Minitest::Test
                     "Only #{MAX_CI_TEST_GROUPS} CI test jobs fit in one wave: add a new test file to an existing group in .github/workflows/ruby.yml, one that runs quickly, rather than a group of its own"
   end
 
-  # AGENTS.md: only edit .mcp.json, then run rake mcp:sync to write the copies other tools read
+  # The copies other tools read are written from .mcp.json by rake mcp:sync, so none is edited on its own
   def test_mcp_copies_match_mcp_json
     load File.join(ROOT, 'tasks/mcp.rake')
     McpConfigFiles.files.each do |path, content|
@@ -584,7 +588,7 @@ class LintTest < Minitest::Test
     end
   end
 
-  # AGENTS.md, Dependencies: versions are exact, so a release can't arrive unchosen (and inside its 7-day cooldown)
+  # Versions are exact, so a release can't arrive unchosen (and inside its 7-day cooldown: AGENTS.md, Dependencies)
   EXACT = /\A\d+\.\d+\.\d+\z/
 
   def test_dependency_versions_are_exact
@@ -717,7 +721,7 @@ class LintTest < Minitest::Test
     end
   end
 
-  # AGENTS.md, Tests: a helper copied under another name is as able to drift apart as one copied under the same name
+  # A helper copied under another name is as able to drift apart as one copied under the same name
   # (test_test_helpers_are_defined_once), so no two helpers have the same body. Bodies too short to be worth sharing
   # (a line calling another helper, say) don't count
   def test_test_helper_bodies_are_written_once

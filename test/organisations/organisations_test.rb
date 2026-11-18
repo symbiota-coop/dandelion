@@ -26,11 +26,11 @@ class OrganisationsTest < ActiveSupport::TestCase
     assert_equal 'mg.example.com', @organisation.mailgun_domain
 
     @organisation.mailgun_domain = 'https://api.mailgun.net'
-    assert !@organisation.valid?
+    refute @organisation.valid?
     assert_includes @organisation.errors[:mailgun_domain], "must be your sending domain from Mailgun's Domains page, not Mailgun's API address"
 
     @organisation.mailgun_domain = 'not a domain'
-    assert !@organisation.valid?
+    refute @organisation.valid?
     assert_includes @organisation.errors[:mailgun_domain], 'must be a domain like mg.example.com'
   end
 
@@ -51,7 +51,7 @@ class OrganisationsTest < ActiveSupport::TestCase
     # One mistyped character, and one letter in the wrong case
     ['0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAee', '0x5aaeb6053F3E94C9b9A09f33669435E7Ef1BeAed'].each do |address|
       @organisation.evm_address = address
-      assert !@organisation.valid?, address
+      refute @organisation.valid?, address
       assert_includes @organisation.errors[:evm_address], "doesn't match its checksum, so a character may be mistyped: copy it from your wallet again"
     end
   end

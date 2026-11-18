@@ -7,7 +7,7 @@ class AccountPasswordSignInPausesTest < ActiveSupport::TestCase
   test 'wrong passwords pause password sign in, the right one included, until the pause ends' do
     account = FactoryBot.create(:account)
     Account::FREE_FAILED_SIGN_INS.times { assert_nil Account.authenticate(account.email, 'wrong password') }
-    assert_not account.reload.password_sign_in_paused?
+    refute account.reload.password_sign_in_paused?
     assert_equal account.id, Account.authenticate(account.email, account.password).id
     assert_equal 0, account.reload.failed_sign_in_attempts
 
@@ -63,7 +63,7 @@ class AccountPasswordSignInPausesTest < ActiveSupport::TestCase
 
     visit "/?sign_in_code=#{Account.find(account.id).issue_sign_in_code!}"
     assert page.has_content?('Signed in')
-    assert_not account.reload.password_sign_in_paused?
+    refute account.reload.password_sign_in_paused?
     assert_equal 0, account.failed_sign_in_attempts
   end
 end

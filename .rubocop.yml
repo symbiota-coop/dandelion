@@ -21,7 +21,8 @@ Naming:
   Enabled: false
 Metrics:
   Enabled: false
-# Only the cops below that catch tests that don't test what they seem to; the rest are assertion style
+# Only the cops below: those that catch tests that don't test what they seem to, and those whose assertion says what
+# it checks without changing what passes
 Minitest:
   Enabled: false
 Layout/BeginEndAlignment:
@@ -91,6 +92,80 @@ Minitest/AssertRaisesCompoundBody:
   Enabled: true
   Severity: warning
 
+# One way to write each assertion, the one whose failure message shows the values: assert_empty x over
+# assert x.empty?, assert_includes over include?... Only those whose fix passes and fails on the same values. Not:
+# - AssertPredicate and RefutePredicate: assert_predicate x, :valid? reads worse than assert x.valid?, and its message
+#   inspects a whole Mongoid document
+# - AssertTruthy and RefuteFalse: assert_equal true, x to assert x would pass on any truthy value, and false to refute
+#   on nil
+# - AssertEmptyLiteral: assert_equal [], x to assert_empty x would pass on {} or ''
+# - AssertInDelta and RefuteInDelta: assert_in_delta's 0.001 would pass a total of 23.3304 where 23.33 was expected,
+#   and our amounts are exact to the cent
+# - AssertEqual: assert(a == b) to assert_equal a, b fails when both are nil, as assert_equal refuses an expected nil
+Minitest/AssertEmpty:
+  Enabled: true
+  Severity: warning
+Minitest/AssertIncludes:
+  Enabled: true
+  Severity: warning
+Minitest/AssertInstanceOf:
+  Enabled: true
+  Severity: warning
+Minitest/AssertKindOf:
+  Enabled: true
+  Severity: warning
+Minitest/AssertMatch:
+  Enabled: true
+  Severity: warning
+Minitest/AssertNil:
+  Enabled: true
+  Severity: warning
+Minitest/AssertOperator:
+  Enabled: true
+  Severity: warning
+Minitest/AssertPathExists:
+  Enabled: true
+  Severity: warning
+Minitest/AssertRespondTo:
+  Enabled: true
+  Severity: warning
+Minitest/AssertSame:
+  Enabled: true
+  Severity: warning
+Minitest/RefuteEmpty:
+  Enabled: true
+  Severity: warning
+Minitest/RefuteEqual:
+  Enabled: true
+  Severity: warning
+Minitest/RefuteIncludes:
+  Enabled: true
+  Severity: warning
+Minitest/RefuteInstanceOf:
+  Enabled: true
+  Severity: warning
+Minitest/RefuteKindOf:
+  Enabled: true
+  Severity: warning
+Minitest/RefuteMatch:
+  Enabled: true
+  Severity: warning
+Minitest/RefuteNil:
+  Enabled: true
+  Severity: warning
+Minitest/RefuteOperator:
+  Enabled: true
+  Severity: warning
+Minitest/RefutePathExists:
+  Enabled: true
+  Severity: warning
+Minitest/RefuteRespondTo:
+  Enabled: true
+  Severity: warning
+Minitest/RefuteSame:
+  Enabled: true
+  Severity: warning
+
 # Our tests save screenshots on purpose (each test's last page, in capybara/<pid>/, and the how-to videos' frames), so
 # save_screenshot isn't a debugging leftover; the rest of Capybara's list (save_and_open_page...) still is
 Lint/Debugger:
@@ -122,6 +197,9 @@ Dandelion/AssertReload:
   Include:
     - test/**/*.rb
 Dandelion/CapybaraHasNoAfterClick:
+  Include:
+    - test/**/*.rb
+Dandelion/RefuteNot:
   Include:
     - test/**/*.rb
 Dandelion/MongoidIndex:

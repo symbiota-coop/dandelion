@@ -125,6 +125,6 @@ class PaymentsStripeSubscriptionsTest < ActiveSupport::TestCase
     end
 
     assert_equal 'sub_donor', donor.reload.stripe_subscription_id
-    assert_not Account.and(stripe_subscription_id: 'sub_stranger').exists?
+    refute Account.and(stripe_subscription_id: 'sub_stranger').exists?
   end
 end

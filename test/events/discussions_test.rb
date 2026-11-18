@@ -28,7 +28,7 @@ class EventDiscussionsTest < ActiveSupport::TestCase
 
     click_link 'Email notifications on'
     assert page.has_link?('Email notifications off')
-    assert_not @event.discussion_post.subscriptions.and(account: attendee).exists?
+    refute @event.discussion_post.subscriptions.and(account: attendee).exists?
   end
 
   test 'the unsubscribe link in older discussion emails unsubscribes' do
@@ -41,7 +41,7 @@ class EventDiscussionsTest < ActiveSupport::TestCase
     get "/e/#{@event.slug}", link_token: attendee.link_token
     get "/e/#{@event.slug}/unsubscribe_discussion"
     assert last_response.redirect?
-    assert_not @event.discussion_post.subscriptions.and(account: attendee).exists?
+    refute @event.discussion_post.subscriptions.and(account: attendee).exists?
   end
 
   test 'people who are not attendees are not shown the discussion' do
@@ -60,7 +60,7 @@ class EventDiscussionsTest < ActiveSupport::TestCase
 
     get "/e/#{@event.slug}", link_token: outsider.link_token
     post "/e/#{@event.slug}/subscribe_discussion"
-    assert_not last_response.ok?
+    refute last_response.ok?
     assert_nil @event.discussion_post
   end
 
@@ -72,7 +72,7 @@ class EventDiscussionsTest < ActiveSupport::TestCase
     click_button 'Post'
     # The discussion reloads once the comment is sent, with the box empty again
     assert page.has_field?('comment_body', with: '')
-    assert_not @event.comments.exists?
+    refute @event.comments.exists?
     assert_nil @event.discussion_post
 
     fill_in 'comment_body', with: 'Hello'
@@ -123,7 +123,7 @@ class EventDiscussionsTest < ActiveSupport::TestCase
     comment = discussion.comments.create!(account: @account, commentable: @event, body: 'Over to @jo. today')
 
     assert discussion.subscriptions.and(account: jo_dot).exists?
-    assert_not discussion.subscriptions.and(account: jo).exists?
+    refute discussion.subscriptions.and(account: jo).exists?
     assert_includes comment.body_html, '<a href="/u/jo.">'
   end
 
@@ -138,7 +138,7 @@ class EventDiscussionsTest < ActiveSupport::TestCase
 
     discussion.comments.create!(account: @account, commentable: @event, body: 'Over to @attendee and @outsider')
     assert discussion.subscriptions.and(account: attendee).exists?
-    assert_not discussion.subscriptions.and(account: outsider).exists?
+    refute discussion.subscriptions.and(account: outsider).exists?
 
     emails = emails_sent_by_jobs(:send_comment)
     assert_equal 1, emails.length

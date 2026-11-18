@@ -90,7 +90,7 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     { 5 => 1, 4 => 1, 3 => 0, 2 => 1, 1 => 0 }.each do |stars, count|
       assert page_html.has_css?(".rating-breakdown-row[title='#{count} #{stars}-star #{count == 1 ? 'rating' : 'ratings'}']"), "#{stars} stars"
     end
-    assert last_response.body.index('rating-breakdown') < last_response.body.index('feedback-entry')
+    assert_operator last_response.body.index('rating-breakdown'), :<, last_response.body.index('feedback-entry')
 
     entries = feedback_entries
     reviewer_names = entries.map { |entry| entry.find('a[href^="/u/"]').text }

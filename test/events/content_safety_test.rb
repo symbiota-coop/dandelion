@@ -290,8 +290,8 @@ class EventContentSafetyTest < ActiveSupport::TestCase
   test 'non-ASCII http urls are accepted' do
     assert HttpUrl.valid?('https://example.com/café')
     assert HttpUrl.valid?('https://bücher.de/')
-    assert_not HttpUrl.valid?('javascript:alert("é")')
-    assert_not HttpUrl.valid?('https://example.com/a b')
+    refute HttpUrl.valid?('javascript:alert("é")')
+    refute HttpUrl.valid?('https://example.com/a b')
     assert_equal 'bücher.de', HttpUrl.host('https://www.bücher.de/x')
 
     create_organisation
@@ -300,6 +300,6 @@ class EventContentSafetyTest < ActiveSupport::TestCase
     assert_equal 'https://example.com/café', @organisation.website
 
     @organisation.website = 'coming soon'
-    assert_not @organisation.valid?
+    refute @organisation.valid?
   end
 end

@@ -150,7 +150,7 @@ class MailerTest < ActiveSupport::TestCase
     end
 
     assert_equal 3, paths.size
-    paths.each { |path| refute File.exist?(path), "#{path} is left behind" }
+    paths.each { |path| refute_path_exists path, "#{path} is left behind" }
     assert_empty Dir.glob('*.{pdf,ics,csv}')
   end
 end

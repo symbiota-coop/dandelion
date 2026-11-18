@@ -72,7 +72,7 @@ class AdminPagesTest < ActiveSupport::TestCase
     create_records
     problems = problems_as(FactoryBot.create(:account, admin: true), site_admin: true).map { |problem| ['site admin:', *problem] }
     problems += problems_as(@own_admin, site_admin: false).map { |problem| ['own admin:', *problem] }
-    assert problems.empty?, problems.map { |problem| problem.join(' ') }.join("\n")
+    assert_empty problems, problems.map { |problem| problem.join(' ') }.join("\n")
   end
 
   test "an admin's check-in switch for a ticket that's gone, cancelled after the list loaded, is a 404" do

@@ -37,7 +37,7 @@ class SearchTest < ActiveSupport::TestCase
 
   def assert_ajax_includes(term, type, value)
     json_response = JSON.parse(ajax_search(term, type))
-    assert json_response.is_a?(Array)
+    assert_kind_of Array, json_response
     assert(json_response.any? { |r| r['value'].include?(value) })
   end
 
@@ -196,7 +196,7 @@ class SearchTest < ActiveSupport::TestCase
     create_event(name: 'Test Event', prices: [0])
 
     json_response = JSON.parse(ajax_search('Test'))
-    assert json_response.is_a?(Array)
+    assert_kind_of Array, json_response
     assert(json_response.any? { |r| r['value'].include?('Test Event') })
     assert(json_response.any? { |r| r['value'].include?('Test Account') })
     assert(json_response.any? { |r| r['value'].include?('Test Organisation') })
@@ -204,18 +204,18 @@ class SearchTest < ActiveSupport::TestCase
   end
 
   test 'ajax search rejects queries shorter than 3 characters' do
-    assert ajax_search('ab').empty?
+    assert_empty ajax_search('ab')
     # Verify boundary: 3 characters should work
     FactoryBot.create(:account, name: 'ABC Test User', has_signed_in: true)
     assert_ajax_includes('ABC', 'accounts', 'ABC Test User')
   end
 
   test 'ajax search rejects queries longer than 200 characters' do
-    assert ajax_search('a' * 201).empty?
+    assert_empty ajax_search('a' * 201)
     # Verify boundary: 200 characters should work
     FactoryBot.create(:account, name: 'Boundary Test Account', has_signed_in: true)
     json_response = JSON.parse(ajax_search('Boundary' + ('x' * 192), 'accounts'))
-    assert json_response.is_a?(Array)
+    assert_kind_of Array, json_response
   end
 
   test 'ajax search returns plain text labels without html' do
@@ -258,7 +258,7 @@ class SearchTest < ActiveSupport::TestCase
     assert_includes equals_filters(filter), ['show_after_start_time', true]
     assert_includes equals_filters(filter), ['evergreen', true]
 
-    refute suffix_match.keys.map(&:to_s).include?('$or')
+    refute_includes suffix_match.keys.map(&:to_s), '$or'
     assert_equal({ 'deleted_at' => nil }, stringify_keys(suffix_match))
   end
 
@@ -275,7 +275,7 @@ class SearchTest < ActiveSupport::TestCase
     suffix_match = suffix_match_for(collection.pipelines.first)
 
     refute_includes equals_filters(filter), ['organisation_id', organisation_id]
-    assert suffix_match.keys.map(&:to_s).include?('$or')
+    assert_includes suffix_match.keys.map(&:to_s), '$or'
   end
 
   test 'falls back to text search when mongot times out' do

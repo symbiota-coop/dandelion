@@ -12,11 +12,11 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     covers 'private_sessions/in-person-needs-location@236503'
     account = practitioner
     in_person = build_private_session(account, location: nil)
-    assert_not in_person.valid?
+    refute in_person.valid?
     assert in_person.errors[:location].any?
 
     either = build_private_session(account, delivery: 'either', location: nil)
-    assert_not either.valid?
+    refute either.valid?
     assert either.errors[:location].any?
 
     online = create_private_session(account, title: 'Guided meditation', delivery: 'online', location: 'Stockholm')
@@ -26,7 +26,7 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     # Not saying in person or online is fine, and a location is then optional
     unsaid = create_private_session(account, title: 'Reiki', delivery: nil, location: nil)
     assert_nil unsaid.reload.delivery
-    assert_not build_private_session(account, delivery: 'somewhere').valid?
+    refute build_private_session(account, delivery: 'somewhere').valid?
   end
 
   test 'a session is for 1 or more people, or has no maximum when no number is given' do
@@ -37,7 +37,7 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     assert create_private_session(account, max_participants: 30).persisted?
     [0, -1, 1.5].each do |max_participants|
       private_session = build_private_session(account, max_participants: max_participants)
-      assert_not private_session.valid?
+      refute private_session.valid?
       assert private_session.errors[:max_participants].any?, "#{max_participants} people should be refused"
     end
 
@@ -57,7 +57,7 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     end
     ['an hour', '90-60', '0', '45.5', '60-', '-60', '60-90-120'].each do |text|
       private_session = build_private_session(account, duration_or_range: text)
-      assert_not private_session.valid?
+      refute private_session.valid?
       assert private_session.errors[:duration_or_range].any?, text
     end
     { '60' => [60.0, nil, nil], '40-80' => [nil, 40.0, 80.0], '12.50' => [12.5, nil, nil] }.each do |text, stored|
@@ -66,7 +66,7 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     end
     ['£60', '80-40', 'donation', '40 to 80'].each do |text|
       private_session = build_private_session(account, price_or_range: text)
-      assert_not private_session.valid?
+      refute private_session.valid?
       assert private_session.errors[:price_or_range].any?, text
     end
 
@@ -86,7 +86,7 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     account = practitioner
     [{ price: -1 }, { price_min: -10, price_max: 20 }, { price_min: -20, price_max: -10 }].each do |prices|
       private_session = build_private_session(account, **prices)
-      assert_not private_session.save, prices.inspect
+      refute private_session.save, prices.inspect
       assert_includes private_session.errors[:price_or_range], 'must not be below 0', prices.inspect
     end
     assert_equal 0, account.private_sessions.count
@@ -103,11 +103,11 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     account = practitioner
     [{ price_min: 10 }, { price_max: 20 }, { price: 10, price_min: 10, price_max: 20 }, { price: 10, price_max: 20 }].each do |prices|
       private_session = build_private_session(account, **prices)
-      assert_not private_session.save, prices.inspect
+      refute private_session.save, prices.inspect
       assert private_session.errors[:price_or_range].any?, prices.inspect
     end
     private_session = build_private_session(account, duration_max: 90)
-    assert_not private_session.save
+    refute private_session.save
     assert private_session.errors[:duration_or_range].any?
     assert_equal 0, account.private_sessions.count
 
@@ -388,8 +388,8 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     covers 'private_sessions/slug-from-name@7bfebc'
     account = practitioner
     taken = create_private_session(account, title: 'Thai massage', slug: 'thai-massage')
-    assert_not build_private_session(account, slug: 'thai-massage').valid?
-    assert_not build_private_session(account, slug: 'Thai Massage').valid?
+    refute build_private_session(account, slug: 'thai-massage').valid?
+    refute build_private_session(account, slug: 'Thai Massage').valid?
 
     sign_in account
     visit '/private_sessions/new'

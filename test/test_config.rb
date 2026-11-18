@@ -10,8 +10,12 @@ require 'capybara/cuprite'
 require 'factory_bot'
 require 'minitest/autorun'
 require 'minitest/mock'
-require 'minitest/rg'
 require 'rack/test'
+# Minitest 6 loads only the plugins it's told to (requiring minitest/rg would load every installed one): red/green
+# output, and SimpleCov's, which loading every plugin brought in before, so coverage runs as it did
+Minitest.load :rg
+Minitest.load :simplecov if defined?(SimpleCov)
+Minitest::RG.rg! color: $stdout.tty?
 require_relative 'helpers/test_helpers'
 
 %w[outside_services fake_imagemagick capybara cdn_cache cleanup route_recording test_times].each { |file| require_relative "setup/#{file}" }

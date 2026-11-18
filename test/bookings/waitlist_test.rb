@@ -88,7 +88,7 @@ class WaitlistTest < ActiveSupport::TestCase
     assert waitship1.persisted?, 'First waitship should be created'
 
     waitship2 = Waitship.new(account: buyer, event: @event)
-    assert_not waitship2.valid?, "Duplicate waitship should not be valid. Errors: #{waitship2.errors.full_messages}"
+    refute waitship2.valid?, "Duplicate waitship should not be valid. Errors: #{waitship2.errors.full_messages}"
     assert waitship2.errors[:account_id].present? || waitship2.errors[:account].present?,
            "Should have uniqueness error. All errors: #{waitship2.errors.full_messages}"
   end
@@ -235,7 +235,7 @@ class WaitlistTest < ActiveSupport::TestCase
     @ticket_type.set(quantity: 1)
     @event.refresh_sold_out_cache_and_notify_waitlist
 
-    assert_not @ticket_type.reload.sold_out?, 'Ticket type should no longer be sold out'
+    refute @ticket_type.reload.sold_out?, 'Ticket type should no longer be sold out'
     # Only the ticket type that came back: its waitlist, about it, and not the other's, still sold out
     emails = emails_sent_by_jobs(:send_ticket_type_waitlist_tickets_available).select { |email| email.recipients.any? }
     assert_equal [[account.email]], emails.map(&:recipients)

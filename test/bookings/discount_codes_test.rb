@@ -242,7 +242,7 @@ class BookingsDiscountCodesTest < ActiveSupport::TestCase
     assert_equal ['EARLY BIRD'], @event.discount_codes.pluck(:code)
 
     duplicate = @event.discount_codes.build(code: 'Early Bird', percentage_discount: 20)
-    assert !duplicate.valid?
+    refute duplicate.valid?
     assert duplicate.errors[:code].any?
 
     # The same code on another event, or the organisation, is fine
@@ -256,7 +256,7 @@ class BookingsDiscountCodesTest < ActiveSupport::TestCase
     assert_equal %w[early student], discount_code.filters
     assert discount_code.applies_to_ticket_type?(TicketType.new(name: 'Early bird'))
     assert discount_code.applies_to_ticket_type?(TicketType.new(name: 'STUDENT concession'))
-    assert !discount_code.applies_to_ticket_type?(TicketType.new(name: 'Standard'))
+    refute discount_code.applies_to_ticket_type?(TicketType.new(name: 'Standard'))
 
     unfiltered = @event.discount_codes.create!(code: 'ANY', percentage_discount: 10)
     assert_equal [], unfiltered.filters
@@ -269,11 +269,11 @@ class BookingsDiscountCodesTest < ActiveSupport::TestCase
     unlimited = @event.discount_codes.create!(code: 'ALWAYS', percentage_discount: 10)
     first = @event.orders.create!(account: FactoryBot.create(:account), currency: 'GBP', discount_code: discount_code)
     first.payment_completed!
-    assert !discount_code.exhausted?
+    refute discount_code.exhausted?
     second = @event.orders.create!(account: FactoryBot.create(:account), currency: 'GBP', discount_code: discount_code)
     assert discount_code.exhausted?
-    assert !discount_code.exhausted?(excluding: second)
-    assert !discount_code.exhausted?(excluding: first)
+    refute discount_code.exhausted?(excluding: second)
+    refute discount_code.exhausted?(excluding: first)
 
     # A third order doesn't get the code
     third = @event.orders.create!(account: FactoryBot.create(:account), currency: 'GBP', discount_code: discount_code)
@@ -286,7 +286,7 @@ class BookingsDiscountCodesTest < ActiveSupport::TestCase
     assert_equal discount_code, first.reload.discount_code
 
     3.times { @event.orders.create!(account: FactoryBot.create(:account), currency: 'GBP', discount_code: unlimited) }
-    assert !unlimited.exhausted?
+    refute unlimited.exhausted?
   end
 
   test 'a paid order goes on using up a code however long ago it was made' do
@@ -295,7 +295,7 @@ class BookingsDiscountCodesTest < ActiveSupport::TestCase
     order.payment_completed!
     order.set(created_at: 1.month.ago)
     assert discount_code.exhausted?
-    assert !discount_code.exhausted?(excluding: order)
+    refute discount_code.exhausted?(excluding: order)
     # and re-saving it keeps its code
     order.save!
     assert_equal discount_code, order.reload.discount_code
@@ -317,8 +317,8 @@ class BookingsDiscountCodesTest < ActiveSupport::TestCase
 
     [event_code, organisation_code, activity_code, local_group_code].each { |code| assert code.applies_to?(@event), "#{code.code} should apply" }
     assert organisation_code.applies_to?(sibling)
-    [event_code, activity_code, local_group_code].each { |code| assert !code.applies_to?(sibling), "#{code.code} shouldn't apply to another event" }
-    [event_code, organisation_code, activity_code, local_group_code].each { |code| assert !code.applies_to?(stranger) }
+    [event_code, activity_code, local_group_code].each { |code| refute code.applies_to?(sibling), "#{code.code} shouldn't apply to another event" }
+    [event_code, organisation_code, activity_code, local_group_code].each { |code| refute code.applies_to?(stranger) }
   end
 
   test "an order on another event can't keep a code that doesn't apply to it" do

@@ -16,12 +16,12 @@ class BookingTicketPricesTest < ActiveSupport::TestCase
 
     [nil, 'abc', Float::INFINITY, -Float::INFINITY, Float::NAN].each do |price|
       ticket = build_ticket(price: price)
-      assert !ticket.valid?, "#{price.inspect} should be refused"
+      refute ticket.valid?, "#{price.inspect} should be refused"
       assert_includes ticket.errors[:price], 'must be a number'
     end
 
     ticket = build_ticket(price: -1)
-    assert !ticket.valid?
+    refute ticket.valid?
     assert_includes ticket.errors[:price], 'is too low'
 
     [0, 7.5].each do |price|
@@ -31,7 +31,7 @@ class BookingTicketPricesTest < ActiveSupport::TestCase
     end
     # Nothing to pay for a price of nothing
     assert build_ticket(price: 0).tap(&:valid?).payment_completed
-    assert !build_ticket(price: 7.5).tap(&:valid?).payment_completed
+    refute build_ticket(price: 7.5).tap(&:valid?).payment_completed
   end
 
   test 'a range ticket clamps its price to the ends of the range, but refuses one that is not a number' do
@@ -45,7 +45,7 @@ class BookingTicketPricesTest < ActiveSupport::TestCase
 
     [nil, Float::INFINITY, Float::NAN].each do |price|
       ticket = build_ticket(price: price)
-      assert !ticket.valid?, "#{price.inspect} should be refused"
+      refute ticket.valid?, "#{price.inspect} should be refused"
       assert_includes ticket.errors[:price], 'must be a number'
     end
   end
@@ -69,7 +69,7 @@ class BookingTicketPricesTest < ActiveSupport::TestCase
     ticket = build_ticket
     assert ticket.valid?, ticket.errors.full_messages.to_sentence
     assert_equal 10.0, ticket.price
-    assert !ticket.payment_completed
+    refute ticket.payment_completed
   end
 
   test 'a purchase with a negative, non-numeric or out-of-range chosen price is refused, leaving no order or tickets' do

@@ -98,6 +98,6 @@ class AdminPagesBrowserTest < ActiveSupport::TestCase
       path, = visits(route, file, events: [@event]).first
       (problem = problem_visiting(route, code, path)) && [route, path, problem]
     end
-    assert problems.empty?, problems.map { |problem| problem.join(' ') }.join("\n")
+    assert_empty problems, problems.map { |problem| problem.join(' ') }.join("\n")
   end
 end

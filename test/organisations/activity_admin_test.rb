@@ -430,7 +430,7 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     assert last_response.redirect?
     @activity.reload
     assert_nil @activity.feedback_summary
-    assert @activity.feedback_summary_last_refreshed_at > 1.minute.ago
+    assert_operator @activity.feedback_summary_last_refreshed_at, :>, 1.minute.ago
   end
 
   test "a locked activity's feedback and its summary are for its admins only, as its page is" do

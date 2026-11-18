@@ -87,10 +87,10 @@ class AccountPrivateSessionVouchesTest < ActiveSupport::TestCase
     assert page.has_no_css?('#vouches h3', text: 'Vouch for this service')
     assert page.has_no_link?('Vouch')
 
-    assert_not private_session.private_session_vouches.new(account: owner).valid?
+    refute private_session.private_session_vouches.new(account: owner).valid?
     client = FactoryBot.create(:account)
     private_session.private_session_vouches.create!(account: client)
-    assert_not private_session.private_session_vouches.new(account: client).valid?
+    refute private_session.private_session_vouches.new(account: client).valid?
   end
 
   test 'the routes refuse a vouch for your own session, give each person one vouch, and remove only your own' do

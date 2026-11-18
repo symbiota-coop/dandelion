@@ -223,7 +223,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert FactoryBot.build(:discount_code, codeable: @event, code: 'UNLIMITED', percentage_discount: 10).valid?
     assert FactoryBot.build(:discount_code, codeable: @event, code: 'ONCE', percentage_discount: 10, maximum_uses: 1).valid?
     discount_code = FactoryBot.build(:discount_code, codeable: @event, code: 'NEVER', percentage_discount: 10, maximum_uses: 0)
-    assert !discount_code.valid?
+    refute discount_code.valid?
     assert discount_code.errors[:maximum_uses].any?
   end
 
@@ -419,7 +419,7 @@ class EventBookingsTest < ActiveSupport::TestCase
     # Verify account was created with location, but geocoded in the background rather than during checkout
     new_account = Account.find_by(email: 'gamlastan@example.com')
     assert new_account.present?, 'Account should be created'
-    assert new_account.location.include?('111 28'), "Location should include postcode, got: #{new_account.location}"
+    assert_includes new_account.location, '111 28', "Location should include postcode, got: #{new_account.location}"
     assert_nil new_account.coordinates, 'Checkout should leave geocoding to a background job'
 
     organisationship = @organisation.organisationships.find_by(account: new_account)

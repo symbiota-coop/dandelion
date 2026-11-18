@@ -71,7 +71,7 @@ class EventValidationsTest < ActiveSupport::TestCase
     event = Event.find(@event.id)
     event.organiser = nil
     refused(event, :revenue_sharer, 'or organiser must be set for this organisation')
-    refute Event.find(@event.id).organiser_id.nil?
+    refute_nil Event.find(@event.id).organiser_id
 
     event.revenue_sharer = connected_account(@organisation)
     event.revenue_share_to_revenue_sharer = 10

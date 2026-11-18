@@ -457,6 +457,6 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
     assert last_response.redirect?
     @organisation.reload
     assert_nil @organisation.feedback_summary
-    assert @organisation.feedback_summary_last_refreshed_at > 1.minute.ago
+    assert_operator @organisation.feedback_summary_last_refreshed_at, :>, 1.minute.ago
   end
 end

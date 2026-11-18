@@ -126,10 +126,10 @@ class PmailsTest < ActiveSupport::TestCase
 
     %w[everyone monthly_donors not_monthly_donors facilitators].each do |to_option|
       pmail.to_option = to_option
-      assert_not pmail.valid?, to_option
+      refute pmail.valid?, to_option
     end
     pmail.to_option = "event:#{@event2.id}"
-    assert_not pmail.valid?
+    refute pmail.valid?
     pmail.to_option = "event:#{@event.id}"
     assert pmail.valid?
 
@@ -556,7 +556,7 @@ class PmailsTest < ActiveSupport::TestCase
     ['utm_source=dandelion news', ' utm_source=dandelion'].each do |link_params|
       mail = Pmail.find(pmail.id)
       mail.link_params = link_params
-      assert_not mail.save, link_params
+      refute mail.save, link_params
       assert_equal ['cannot contain spaces'], mail.errors[:link_params], link_params
     end
     assert_nil Pmail.find(pmail.id).link_params

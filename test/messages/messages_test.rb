@@ -142,7 +142,7 @@ class MessagesTest < ActiveSupport::TestCase
     assert Message.unread?(@account1, @account)
 
     bumped = MessageReceipt.mark_read!(messenger: @account1, messengee: @account)
-    assert bumped.reload.received_at > received_at
+    assert_operator bumped.reload.received_at, :>, received_at
     assert Message.read?(@account1, @account)
   end
 
