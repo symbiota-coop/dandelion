@@ -3,11 +3,13 @@
   <div class="flex-grow-1">
     <a href="/u/<%= account.username %>"><%= account.name %></a>
     <% viewer_in_network = current_account && account.network.find(current_account.id) %>
-    <% if viewable?(account, :date_of_birth, viewer_in_network: viewer_in_network) %>
+    <%# next_birthday is nil for a February 29 birthday in a year without one, as on the birthdays page %>
+    <% show_birthday = viewable?(account, :date_of_birth, viewer_in_network: viewer_in_network) && account.next_birthday %>
+    <% if show_birthday %>
       <div class="text-body-secondary small"><%= account.next_birthday.strftime('%a') %> <%= account.next_birthday.to_fs(:birthday) %></div>
     <% end %>
   </div>
-  <% if viewable?(account, :date_of_birth, viewer_in_network: viewer_in_network) %>
+  <% if show_birthday %>
     <%= partial :'accounts/birthday_when', locals: { account: account } %>
   <% end %>
 </div>

@@ -441,6 +441,22 @@ class AccountsPrivacyTest < ActiveSupport::TestCase
     assert page.has_no_content?('Upcoming birthdays')
   end
 
+  test "a site admin's homepage lists a followed account's private February 29 birthday in a year without one" do
+    admin = FactoryBot.create(:account, admin: true)
+    leapling = profiled_account(name: 'Lee Leapling', date_of_birth: Date.new(1992, 2, 29), date_of_birth_privacy: 'Only me')
+    Follow.create!(follower: admin, followee: leapling)
+    travel_to Time.utc(2026, 11, 18, 12) do
+      assert_nil leapling.reload.next_birthday # 2026 has no February 29
+
+      sign_in(admin)
+      visit '/'
+      assert page.has_css?('#newsfeed')
+      within(:xpath, "//div[contains(@class, 'card')][h3[normalize-space()='Upcoming birthdays']]") do
+        assert page.has_link?('Lee Leapling')
+      end
+    end
+  end
+
   test "the feedback on a facilitator who hid their profile, and its embeds, are refused to others but not to them" do
     facilitator = profiled_account(name: 'Hana Hidden', hidden: true, feedback_summary: 'Wonderfully clear facilitator')
     facilitated_event_with_feedback(facilitator)
