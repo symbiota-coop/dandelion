@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "description": "The MCP servers .mcp.json runs locally, pinned with their dependencies in package-lock.json so none is a version released inside the 7-day cooldown (AGENTS.md, Dependencies). script/mcp-server installs them with npm ci and runs them",
+  "dependencies": {
+    "@mailgun/mcp-server": "2.3.1",
+    "mongodb-atlas-mcp-remote": "1.0.0"
+  }
+}

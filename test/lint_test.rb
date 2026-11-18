@@ -588,12 +588,34 @@ class LintTest < Minitest::Test
     end
   end
 
+  # A server .mcp.json starts locally inherits every credential in the agent's environment, and npx -y would fetch it,
+  # and its dependencies, at their newest releases. script/mcp-server runs it from mcp/package-lock.json, passing on
+  # only the variables named with --keep: the ones the server's env gives it
+  def test_local_mcp_servers_run_pinned_and_scrubbed
+    require 'json'
+    load File.join(ROOT, 'tasks/mcp.rake')
+    bins = JSON.parse(File.read(File.join(ROOT, 'mcp/package.json')))['dependencies'].keys.flat_map do |package|
+      bin = JSON.parse(File.read(File.join(ROOT, 'mcp/package-lock.json')))['packages']["node_modules/#{package}"]['bin']
+      bin.is_a?(Hash) ? bin.keys : [package.split('/').last]
+    end
+    local = McpConfigFiles.servers.reject { |_, server| server['url'] }
+    refute_empty local
+    local.each do |name, server|
+      assert_equal 'script/mcp-server', server['command'], ".mcp.json: run #{name} with script/mcp-server, not #{server['command']}"
+      args = server['args'].dup
+      kept = []
+      kept << args.shift(2).last while args.first == '--keep'
+      assert_equal (server['env'] || {}).keys.sort, kept.sort, ".mcp.json: #{name}'s --keep args should name exactly the variables in its env"
+      assert_includes bins, args.first, ".mcp.json: #{name} runs #{args.first}, which no package in mcp/package.json provides: add it there and run npm install --before=<a week ago> in mcp"
+    end
+  end
+
   # Versions are exact, so a release can't arrive unchosen (and inside its 7-day cooldown: AGENTS.md, Dependencies)
   EXACT = /\A\d+\.\d+\.\d+\z/
 
   def test_dependency_versions_are_exact
     # ckeditor/ installs from its yarn.lock, which pins every version
-    %w[package.json frontend/package.json].each do |manifest|
+    %w[package.json frontend/package.json mcp/package.json].each do |manifest|
       JSON.parse(File.read(File.join(ROOT, manifest))).values_at('dependencies', 'devDependencies').compact.reduce({}, :merge).each do |name, version|
         assert_match EXACT, version, "#{manifest}: pin #{name} to an exact version"
       end

@@ -97,10 +97,10 @@ LINTERS = [
     uv: true
   },
   {
-    # Shell scripts: the setup scripts and the pre-commit hook. shellcheck-py packages ShellCheck's binary, so uvx runs
+    # Shell scripts: the setup scripts, the pre-commit hook and script/mcp-server. shellcheck-py packages ShellCheck's binary, so uvx runs
     # this exact version too
     name: 'ShellCheck',
-    files: %r{\A(.+\.sh|\.githooks/.+)\z},
+    files: %r{\A(.+\.sh|\.githooks/.+|script/mcp-server)\z},
     configs: /\A\.shellcheckrc\z/,
     command: %w[uvx --from shellcheck-py==0.11.0.1 shellcheck],
     # It doesn't search directories, so it's given the scripts git knows

@@ -8,9 +8,12 @@ url = "https://mcp.render.com/mcp"
 bearer_token_env_var = "RENDER_AUTH_TOKEN"
 
 [mcp_servers.mongodb]
-command = "npx"
+command = "script/mcp-server"
 args = [
-  "-y",
+  "--keep",
+  "MDB_MCP_API_CLIENT_ID",
+  "--keep",
+  "MDB_MCP_API_CLIENT_SECRET",
   "mongodb-atlas-mcp-remote",
 ]
 env_vars = [
@@ -31,10 +34,13 @@ url = "https://mcp.cloudflare.com/mcp"
 bearer_token_env_var = "CLOUDFLARE_API_TOKEN"
 
 [mcp_servers.mailgun]
-command = "npx"
+command = "script/mcp-server"
 args = [
-  "-y",
-  "@mailgun/mcp-server",
+  "--keep",
+  "MAILGUN_API_KEY",
+  "--keep",
+  "MAILGUN_API_REGION",
+  "mailgun-mcp-server",
 ]
 env_vars = [
   "MAILGUN_API_KEY",

@@ -48,3 +48,6 @@ ckeditor/build
 
 # The Claude desktop app's dev-server config for its browser pane; Claude-only, so kept local (AGENTS.md: Many agents)
 .claude/launch.json
+
+# script/mcp-server's lock while it installs mcp/package-lock.json
+mcp/.install-lock

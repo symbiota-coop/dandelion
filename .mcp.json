@@ -15,9 +15,12 @@
       }
     },
     "mongodb": {
-      "command": "npx",
+      "command": "script/mcp-server",
       "args": [
-        "-y",
+        "--keep",
+        "MDB_MCP_API_CLIENT_ID",
+        "--keep",
+        "MDB_MCP_API_CLIENT_SECRET",
         "mongodb-atlas-mcp-remote"
       ],
       "env": {
@@ -47,10 +50,13 @@
       }
     },
     "mailgun": {
-      "command": "npx",
+      "command": "script/mcp-server",
       "args": [
-        "-y",
-        "@mailgun/mcp-server"
+        "--keep",
+        "MAILGUN_API_KEY",
+        "--keep",
+        "MAILGUN_API_REGION",
+        "mailgun-mcp-server"
       ],
       "env": {
         "MAILGUN_API_KEY": "${MAILGUN_API_KEY}",

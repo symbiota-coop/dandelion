@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# Runs one of the MCP servers .mcp.json starts locally, from mcp/package-lock.json, in an environment holding only
+# what it needs:
+#
+#   script/mcp-server [--keep VAR]... <bin> [args...]
+#
+# - Pinned: npx -y <package> resolves the newest release of it and of every dependency each time, inside the 7-day
+#   cooldown (AGENTS.md, Dependencies). This installs the locked tree (npm ci, without install scripts) whenever
+#   mcp/package-lock.json changes, and runs the bin from it
+# - Scrubbed: a server inherits the agent's whole environment, which in a cloud environment holds the Render, Stripe,
+#   Mailgun, Cloudflare, GitHub and Sentry tokens and more. This passes on only the basics (PATH, HOME, locale, the
+#   proxy and its CA) and the variables named with --keep
+set -euo pipefail
+
+dir="$(cd "$(dirname "$0")/../mcp" && pwd)"
+
+keep=(PATH HOME USER LANG LC_ALL TMPDIR TERM
+  HTTPS_PROXY HTTP_PROXY NO_PROXY https_proxy http_proxy no_proxy
+  NODE_EXTRA_CA_CERTS SSL_CERT_FILE SSL_CERT_DIR)
+while [ "${1:-}" = "--keep" ]; do
+  keep+=("$2")
+  shift 2
+done
+bin="${1:?usage: script/mcp-server [--keep VAR]... <bin> [args...]}"
+shift
+
+if [ -z "${MCP_SERVER_SCRUBBED:-}" ]; then
+  vars=(MCP_SERVER_SCRUBBED=1)
+  for var in "${keep[@]}"; do
+    [ -n "${!var+set}" ] && vars+=("$var=${!var}")
+  done
+  exec env -i "${vars[@]}" "$0" "$bin" "$@"
+fi
+unset MCP_SERVER_SCRUBBED
+
+# Install when the lockfile has changed since the last install. Servers start at once, so one installs at a time,
+# and stdout is the MCP connection, so npm's output goes to stderr
+stamp="$dir/node_modules/.installed-package-lock.json"
+if ! cmp -s "$dir/package-lock.json" "$stamp"; then
+  lock="$dir/.install-lock"
+  for _ in $(seq 300); do
+    mkdir "$lock" 2>/dev/null && break
+    sleep 1
+  done
+  trap 'rmdir "$lock" 2>/dev/null || true' EXIT
+  if ! cmp -s "$dir/package-lock.json" "$stamp"; then
+    npm ci --prefix "$dir" --ignore-scripts --no-audit --no-fund >&2
+    cp "$dir/package-lock.json" "$stamp"
+  fi
+  rmdir "$lock"
+  trap - EXIT
+fi
+
+exec "$dir/node_modules/.bin/$bin" "$@"
