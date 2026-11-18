@@ -66,3 +66,9 @@ end
 Rack::Attack.throttle('throttle bots', limit: 1, period: 1.hour) do |request|
   "#{request.user_agent}:#{request.path}" if throttled_path.call(request) && bot_request.call(request)
 end
+
+# Splitting a Stripe CSV can take seconds of a web process, so each IP gets a few at a time
+STRIPE_ROW_SPLITTER_LIMIT = { limit: 10, period: 10.minutes }.freeze
+Rack::Attack.throttle('stripe row splitter', **STRIPE_ROW_SPLITTER_LIMIT) do |request|
+  real_ip.call(request) if request.post? && request.path == '/stripe_row_splitter'
+end

@@ -2,9 +2,17 @@
 # description (Order#description), so that a payment's rows add up to what was charged. Amounts taken off the whole
 # order (a fixed discount, credit applied) are spread across the ticket rows in proportion to each row's amount. A row
 # whose description can't be read, or doesn't add up to the row's Amount, is kept as it is, so no payment is lost.
+#
+# Reading a description tries each ': ' in it as where the order's parts start, so its cost grows with the square of
+# its length: descriptions longer than any order writes, or with more ': ' than an event's name and location would
+# have, are kept as they are rather than read.
 class StripeRowSplitter
   # Order#description joins its parts with ', '; a comma inside an amount (£1,000, €2,50) is never followed by a space
   PART_SEPARATOR = ', '.freeze
+  MAX_DESCRIPTION_LENGTH = 1_000
+  MAX_SEPARATORS = 10
+  # Rows at those limits take a few milliseconds each, so a file this size takes at most several seconds
+  MAX_UPLOAD_SIZE = 5.megabytes
 
   def self.split(csv_string)
     csv = CSV.parse(csv_string, headers: true)
@@ -30,11 +38,13 @@ class StripeRowSplitter
   # The split rows, or nil if the row should be kept as it is
   def rows
     description = @row['Description']
-    return if description.blank?
+    return if description.blank? || description.length > MAX_DESCRIPTION_LENGTH
     return unless (patterns = part_patterns)
 
     # The event's name or location may contain ': ', so try each until what follows reads as an order's parts
     separators = description.enum_for(:scan, ': ').map { Regexp.last_match.begin(0) }
+    return if separators.length > MAX_SEPARATORS
+
     separators.each do |index|
       order = parse_parts(description[(index + 2)..].split(PART_SEPARATOR).map(&:strip), patterns)
       next unless order
@@ -76,10 +86,11 @@ class StripeRowSplitter
 
   # Reads every part, or returns nil if any part isn't one Order#description_elements writes
   def parse_parts(parts, patterns)
-    matches = parts.map do |part|
+    # Stops at the first part that isn't one, rather than reading the rest
+    matches = parts.lazy.map do |part|
       patterns.lazy.map { |kind, pattern| [kind, part.match(pattern)] }.find { |_kind, match| match }
-    end
-    return if matches.any?(nil)
+    end.take_while(&:itself).to_a
+    return if matches.length < parts.length
 
     order = { tickets: [], percentages: [], donations: [], dandelion_donations: 0, deductions: 0, deduction_parts: [] }
     parts.zip(matches).each do |part, (kind, match)|

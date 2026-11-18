@@ -232,6 +232,32 @@ class PaymentsStripeRowSplitterTest < ActiveSupport::TestCase
     assert_equal [header] + unsplit, split(*unsplit)
   end
 
+  # An event name with a ': ' in each of its parts, so that the order's parts start after the last of them
+  def colon_event(colons)
+    "#{(1..colons).map { |i| "Part: #{i}" }.join(', ')}, London"
+  end
+
+  # Reading a description costs the square of its length, so longer ones, or ones with more ': ' to try, aren't read
+  test 'keeps a description longer than an order writes, or with more colons than an event has, as it is' do
+    long = "#{'B' * StripeRowSplitter::MAX_DESCRIPTION_LENGTH}: Standard £10x1, Concession £5x1"
+    many_colons = "#{colon_event(StripeRowSplitter::MAX_SEPARATORS)}: Standard £10x1, Concession £5x1"
+    unsplit = [['ch_1', long, '15.00', 'gbp'], ['ch_2', many_colons, '15.00', 'gbp']]
+    assert_equal [header] + unsplit, split(*unsplit)
+  end
+
+  test 'still reads a description at the limits' do
+    parts = ': Standard £10x1, Concession £5x1'
+    [colon_event(StripeRowSplitter::MAX_SEPARATORS - 1), 'B' * (StripeRowSplitter::MAX_DESCRIPTION_LENGTH - parts.length)].each do |base|
+      description = base + parts
+      assert_operator description.length, :<=, StripeRowSplitter::MAX_DESCRIPTION_LENGTH
+      assert_equal [
+        header,
+        ['ch_1', "#{base}: Standard £10x1", '10.00', 'gbp'],
+        ['ch_1', "#{base}: Concession £5x1", '5.00', 'gbp']
+      ], split(['ch_1', description, '15.00', 'gbp'])
+    end
+  end
+
   test 'writes amounts with two decimal places, as Stripe does' do
     rows = split(['ch_1', "#{EVENT}: Standard £10x1, £2.50 donation ", '12.50', 'gbp'])
     assert_equal [

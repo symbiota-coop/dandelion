@@ -334,8 +334,9 @@ class SiteRoutesTest < ActiveSupport::TestCase
 
   # The Stripe row splitter
 
-  test 'the Stripe row splitter takes a CSV, with no sign in, and gives back its rows split by ticket type' do
+  test 'the Stripe row splitter takes a CSV from someone signed in, and gives back its rows split by ticket type' do
     covers_route 'GET /stripe_row_splitter', 'POST /stripe_row_splitter'
+    sign_in_with_rack(FactoryBot.create(:account))
     get '/stripe_row_splitter'
     assert_equal 200, last_response.status
     assert_includes last_response.body, 'name="csv"'
@@ -351,6 +352,46 @@ class SiteRoutesTest < ActiveSupport::TestCase
 
     post '/stripe_row_splitter', csv: 'not a file'
     assert_equal 400, last_response.status
+  end
+
+  def stripe_row_splitter_csv
+    description = 'Bach Cantatas, Tue 3 Feb 2026, 19:00 at St Mary, London: Standard £10x2, Concession £5x1'
+    CSV.generate { |rows| rows << %w[id Description Amount Currency] << ['ch_1', description, '25.00', 'gbp'] }
+  end
+
+  test 'the Stripe row splitter needs someone signed in' do
+    covers_route 'GET /stripe_row_splitter', 'POST /stripe_row_splitter'
+    get '/stripe_row_splitter'
+    assert_equal 302, last_response.status
+    assert_equal '/accounts/new', URI(last_response.location).path
+
+    post '/stripe_row_splitter', csv: uploaded_file(stripe_row_splitter_csv, 'payments.csv', 'text/csv')
+    assert_equal 302, last_response.status
+    assert_equal '/accounts/new', URI(last_response.location).path
+    refute_includes last_response.body, 'Concession £5x1'
+  end
+
+  test 'the Stripe row splitter refuses a CSV over 5 MB' do
+    covers_route 'POST /stripe_row_splitter'
+    sign_in_with_rack(FactoryBot.create(:account))
+    filler = CSV.generate_line(['ch_2', 'x' * 1000, '1.00', 'gbp'])
+    csv = stripe_row_splitter_csv + (filler * ((StripeRowSplitter::MAX_UPLOAD_SIZE / filler.bytesize) + 1))
+    post '/stripe_row_splitter', csv: uploaded_file(csv, 'payments.csv', 'text/csv')
+    assert_equal 413, last_response.status
+
+    post '/stripe_row_splitter', csv: uploaded_file(stripe_row_splitter_csv, 'payments.csv', 'text/csv')
+    assert_equal 200, last_response.status
+  end
+
+  test 'the Stripe row splitter takes a few CSVs at a time from each IP' do
+    covers_route 'POST /stripe_row_splitter'
+    sign_in_with_rack(FactoryBot.create(:account))
+    STRIPE_ROW_SPLITTER_LIMIT[:limit].times do
+      post '/stripe_row_splitter', csv: uploaded_file(stripe_row_splitter_csv, 'payments.csv', 'text/csv')
+      assert_equal 200, last_response.status
+    end
+    post '/stripe_row_splitter', csv: uploaded_file(stripe_row_splitter_csv, 'payments.csv', 'text/csv')
+    assert_equal 429, last_response.status
   end
 
   # Feedback, questions and referrals

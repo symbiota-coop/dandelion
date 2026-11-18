@@ -289,11 +289,14 @@ module Dandelion
     end
 
     get '/stripe_row_splitter' do
+      sign_in_required!
       erb :stripe_row_splitter
     end
 
     post '/stripe_row_splitter', provides: :csv do
+      sign_in_required!
       halt 400 unless params[:csv].is_a?(Tempfile)
+      halt 413, 'That CSV is over 5 MB: split it into smaller files' if params[:csv].size > StripeRowSplitter::MAX_UPLOAD_SIZE
       StripeRowSplitter.split(File.read(params[:csv].path))
     end
 
