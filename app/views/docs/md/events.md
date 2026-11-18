@@ -202,6 +202,8 @@ Locked events are hidden from the public. Anyone who can view the event page (ev
 
 If your payment provider returns an error that means no one can buy tickets (an unverified account, say), Dandelion locks the event and emails the organisation's admins. <!-- claim: payment-error-locks-event --> The error also shows on the event page until you fix it with your provider and unlock the event.
 
+An error caused by what one buyer entered, like a name or answer too long for the provider, fails only their purchase and doesn't lock the event. <!-- claim: buyer-error-does-not-lock-event -->
+
 ## Reminders
 
 Dandelion can send event attendees a reminder email before the event starts. <!-- claim: reminder-before-event --> Set **Hours before the event to send the reminder email** in the event's Emails tab (default: 24). Leave blank to skip the reminder. <!-- claim: reminder-default-and-blank --> You can also customise the reminder subject and body in your organisation or event settings. <!-- claim: reminder-custom-subject-body -->

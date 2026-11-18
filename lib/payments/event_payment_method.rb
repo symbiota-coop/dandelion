@@ -130,6 +130,22 @@ class EventPaymentMethod
     amount ? [:notify, false] : :notify
   end
 
+  # The parameters of a Stripe Checkout session that carry what the buyer entered (their name and answers in the
+  # metadata, their email, the utm values in the success URL)
+  STRIPE_BUYER_PARAMS = %w[metadata payment_intent_data[metadata] success_url cancel_url customer_email].freeze
+  STRIPE_BUYER_CODES = %w[email_invalid url_invalid].freeze
+
+  # Stripe refusing one buyer's values, or an order under the settlement currency's minimum, fails only that purchase,
+  # so one checkout can't lock the event for everyone. Its other invalid requests (no such account, destination or tax
+  # rate, an account that can't take charges) mean the organisation's setup is broken, so they lock it
+  def self.stripe_invalid_request_error(error)
+    return [:notify, false] if error.message&.include?('must add up to at least')
+
+    param = error.param.to_s
+    buyer_param = STRIPE_BUYER_PARAMS.any? { |p| param == p || param.start_with?("#{p}[") }
+    buyer_param || STRIPE_BUYER_CODES.include?(error.code) ? [:notify, false] : :lock
+  end
+
   # The advice purchase_error_for gives with a provider's errors that lock an event, for the locked alert, which has only the provider's name
   def self.dashboard_help_for(provider_name)
     all.find { |pm| pm.provider_name == provider_name }&.dashboard_help
@@ -230,9 +246,7 @@ EventPaymentMethod.new('stripe',
                        # Quote refuses orders under the minimum, but an order converted to the account's settlement
                        # currency must meet that currency's minimum too
                        purchase_errors: {
-                         Stripe::InvalidRequestError => lambda { |e|
-                           e.message&.include?('must add up to at least') ? [:notify, false] : :lock
-                         }
+                         Stripe::InvalidRequestError => ->(e) { EventPaymentMethod.stripe_invalid_request_error(e) }
                        })
 
 EventPaymentMethod.new('mollie',
