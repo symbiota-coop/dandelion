@@ -11,7 +11,7 @@
     "bootstrap-icons": "1.13.2",
     "chart.js": "4.6.1",
     "chartjs-plugin-datalabels": "2.2.0",
-    "cytoscape": "3.34.4",
+    "cytoscape": "3.35.0",
     "cytoscape-cola": "2.5.1",
     "datatables.net": "3.1.5",
     "datatables.net-bs5": "3.1.5",

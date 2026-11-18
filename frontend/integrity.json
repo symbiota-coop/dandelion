@@ -12,7 +12,7 @@
   "https://cdn.jsdelivr.net/npm/chart.js@4.6.1/dist/chart.umd.min.js": "sha384-Emf5ZVIUiarAdhkgtqK+5/Z5qIvM6QoVrS+qAVtfyZVuD5lIHrac0me485+Antp0",
   "https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js": "sha384-y49Zu59jZHJL/PLKgZPv3k2WI9c0Yp3pWB76V8OBVCb0QBKS8l4Ff3YslzHVX76Y",
   "https://cdn.jsdelivr.net/npm/cytoscape-cola@2.5.1/cytoscape-cola.js": "sha384-hS0F3AnUYl+EBC3wCT4+d6MKdLR27UlifwZZYJi5oRCNhKA1ptaEWExH6BqyfMeW",
-  "https://cdn.jsdelivr.net/npm/cytoscape@3.34.4/dist/cytoscape.min.js": "sha384-lyd1lDWZ623YSUJ/wMQH50y+T81dWKJk7ZoFdYWXQS83b0+QpW0pgdfXEnQnXL/X",
+  "https://cdn.jsdelivr.net/npm/cytoscape@3.35.0/dist/cytoscape.min.js": "sha384-kp3V5E6ICGTVK17un/PMnK9szzrW0dQW+dEyUb3B7dKhimb1EVzqm1wZ/Ulo7BJf",
   "https://cdn.jsdelivr.net/npm/datatables.net-bs5@3.1.5/css/dataTables.bootstrap5.min.css": "sha384-OZKa6QSlaaq/LGR1sBFkYhC0c/nacIFh1chsblhDUxggC9Zb0XLEEMs95i1Kydnt",
   "https://cdn.jsdelivr.net/npm/datatables.net-bs5@3.1.5/js/dataTables.bootstrap5.min.js": "sha384-2JCJ65zPWIsFF9Flk2ZSwukEbtRkZygX6+sTerFFqbL7dwPDVsMf2FR3r3XDAub0",
   "https://cdn.jsdelivr.net/npm/datatables.net@3.1.5/js/dataTables.min.js": "sha384-RhzIACKRVYIyijzmm7bA1mSofISYiTQ/KsnClfUSGSHu6ZeRsTQVWL4LqPHTrJcT",
