@@ -200,6 +200,20 @@ class OrderTokensTest < ActiveSupport::TestCase
     wait_until('email not saved') { @ticket.reload.email == 'holder@example.com' }
   end
 
+  test 'a ticketholder name is saved without markup, and an ordinary one as typed' do
+    create_complete_order_with_ticket
+
+    visit "/e/#{@event.slug}?order_id=#{@order.token}&success=true"
+    assert page.has_content? 'Thanks for booking'
+    change_ticketholder_field 'name', '<img/src=https://example.com/i.png>Ada<b>Lovelace</b>'
+    wait_until('name not saved') { @ticket.reload.name.present? }
+    assert_equal 'AdaLovelace', @ticket.name
+
+    change_ticketholder_field 'name', "Zoë O'Brien & Co"
+    wait_until('name not saved') { @ticket.reload.name != 'AdaLovelace' }
+    assert_equal "Zoë O'Brien & Co", @ticket.name
+  end
+
   test 'ticketholder fields are served with the order token kept from referrers' do
     covers_route 'GET /e/:slug/orders/:order_id/ticketholders/:ticket_id/name'
     create_complete_order_with_ticket
