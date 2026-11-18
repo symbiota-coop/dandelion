@@ -9,7 +9,19 @@
 
   <h2 class="h5 mt-5"><label for="ics_key">Calendar key</label></h2>
   <p>Your calendar key is in the links to your calendar feeds, like <a href="/events/my">your events</a> and <a href="/birthdays">birthdays</a>, so calendar apps can show them. Anyone with it can see those feeds. If someone else might have it, replace it: calendars subscribed to your feeds need subscribing to again.</p>
-  <input type="text" id="ics_key" class="form-control mb-3" value="<%= @account.ensure_ics_key! %>" readonly onclick="this.select()">
+  <% ics_key = @account.ensure_ics_key! %>
+  <input type="text" id="ics_key" class="form-control mb-3" value="<%= ics_key %>" readonly onclick="this.select()">
+  <div id="calendar-feeds">
+    <p>To subscribe in a calendar app, add one of these links:</p>
+    <div class="mb-3">
+      <label for="events_feed" class="form-label">Your events</label>
+      <input type="text" id="events_feed" class="form-control" value="<%= ENV['BASE_URI'] %>/events/my.ics?ics_key=<%= ics_key %>" readonly onclick="this.select()">
+    </div>
+    <div class="mb-3">
+      <label for="birthdays_feed" class="form-label">Birthdays</label>
+      <input type="text" id="birthdays_feed" class="form-control" value="<%= ENV['BASE_URI'] %>/birthdays.ics?ics_key=<%= ics_key %>" readonly onclick="this.select()">
+    </div>
+  </div>
   <% form_tag '/accounts/ics_key' do %>
     <button type="submit" class="btn btn-outline-primary" data-confirm="Replace your calendar key? Calendars subscribed to your feeds need subscribing to again." data-confirm-label="Replace calendar key">Replace calendar key</button>
   <% end %>

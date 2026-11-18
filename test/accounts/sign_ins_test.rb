@@ -316,6 +316,29 @@ class AccountSignInsTest < ActiveSupport::TestCase
     refute_includes last_response.body, account.api_key
   end
 
+  test 'a session from an email link sees the calendar feed links only after a sign in code' do
+    account = FactoryBot.create(:account)
+    account.set(email_confirmed: true)
+    ics_key = account.ensure_ics_key!
+    account.generate_link_token!
+    visit "/?link_token=#{account.link_token}"
+    assert page.has_content?('Signed in via a link')
+
+    %w[/events/my /birthdays].each do |path|
+      visit path
+      assert page.has_css?('#ical')
+      assert_not_includes page.html, ics_key, "#{path} shows the calendar key"
+    end
+
+    find('#ical').click
+    assert page.has_content?("We've emailed you a sign in code to confirm it's you")
+    assert_not_includes page.html, ics_key
+    enter_sign_in_code(account)
+    assert page.has_current_path?('/accounts/api_key')
+    assert page.has_field?('events_feed', with: "#{ENV['BASE_URI']}/events/my.ics?ics_key=#{ics_key}")
+    assert page.has_field?('birthdays_feed', with: "#{ENV['BASE_URI']}/birthdays.ics?ics_key=#{ics_key}")
+  end
+
   test 'a session from an email link needs a sign in code to delete the account' do
     covers_route 'GET /accounts/delete'
     covers_route 'POST /accounts/destroy'

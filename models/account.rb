@@ -191,7 +191,8 @@ class Account
 
   # Signs out every browser, and ends the links and code already sent, which would otherwise sign one back in. It leaves the
   # API key and calendar feed key, which integrations and calendar apps hold: only a session that entered a code sees
-  # them (/accounts/api_key), and its owner can replace them there
+  # them (/accounts/api_key, which lists the calendar feeds' links too, so no other page prints the calendar key), and
+  # its owner can replace them there
   def revoke_sessions!
     end_sessions!
     generate_link_token!
