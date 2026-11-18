@@ -177,7 +177,18 @@ class Ticket
     claim_tickets_on_resale_replaced.each { |resold_ticket| complete_resale(resold_ticket) }
     event.waitships.find_by(account: account).try(:destroy)
     ticket_type.ticket_type_waitships.find_by(account: account).try(:destroy) if ticket_type && account
-    event.gathering.memberships.create(account: account, unsubscribed: true, joined_by_ticket: true) if event.gathering
+    join_gathering
+  end
+
+  # Buying a ticket to an event linked to a gathering makes the buyer a member. Joining waits for the gathering's lock,
+  # which another request can hold for longer than that wait (an admin's account being deleted): then the buyer joins a
+  # minute later instead, rather than the order whose payment completed being left half-complete or destroyed
+  def join_gathering
+    return unless event.gathering
+
+    event.gathering.memberships.create(account: account, unsubscribed: true, joined_by_ticket: true)
+  rescue RecordLock::Busy
+    delay(run_at: 1.minute.from_now).join_gathering
   end
 
   after_save do

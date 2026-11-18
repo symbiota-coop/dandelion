@@ -1,8 +1,11 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
+require_relative 'helpers/checkout_webhook_helpers'
 
 # RecordLock, and what holds one: bookings of an event, its discount codes and a buyer's credit, and joining an option
 # or a gathering. Each holds the lock in another thread, as a request would, to show the code waits for it
 class RecordLockTest < ActiveSupport::TestCase
+  include CheckoutWebhookHelpers
+
   # Holds record's lock in another thread while the block runs
   def held_elsewhere(record)
     taken = Queue.new
@@ -81,6 +84,46 @@ class RecordLockTest < ActiveSupport::TestCase
 
     book_holding_locks(buyer, signed_in: true)
     assert_equal 10, @event.orders.first.credit_applied
+  end
+
+  test 'a free booking whose buyer can’t join the event’s gathering yet is still completed, and they join later' do
+    create_gathering(privacy: 'open')
+    create_event(prices: [0], gathering: @gathering)
+    buyer = FactoryBot.create(:account)
+
+    waiting_briefly do
+      held_elsewhere(@gathering) { book_holding_locks(buyer) }
+    end
+
+    order = @event.orders.first
+    assert_equal true, order.payment_completed
+    assert_equal 1, order.tickets.count
+    assert_equal true, order.tickets.first.payment_completed
+    refute @gathering.memberships.find_by(account: buyer)
+    assert_equal 1, queued_jobs(:join_gathering).count
+
+    run_jobs(:join_gathering)
+    membership = @gathering.memberships.find_by(account: buyer)
+    assert membership
+    assert_equal true, membership.unsubscribed
+  end
+
+  test 'a paid order whose buyer can’t join the event’s gathering yet is still completed, with its tickets sent' do
+    create_gathering(privacy: 'open')
+    create_event(prices: [10], gathering: @gathering)
+    order = create_incomplete_order(@event)
+
+    waiting_briefly do
+      held_elsewhere(@gathering) { order.complete_or_restore }
+    end
+
+    assert_equal true, order.reload.payment_completed
+    assert_equal true, order.tickets.first.payment_completed
+    assert_equal 1, queued_jobs(:send_tickets, on: Order).count
+    refute @gathering.memberships.find_by(account: order.account)
+
+    run_jobs(:join_gathering)
+    assert @gathering.memberships.find_by(account: order.account)
   end
 
   test 'joining an option or a gathering waits for others joining it, and a full option takes no one' do
