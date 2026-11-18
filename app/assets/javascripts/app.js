@@ -123,8 +123,9 @@ $(function () {
 
   // A link with data-open-in-modal opens its page in #modal: the route answers the background request with just the
   // modal's contents (_modal_content.erb), and the link's href stays a page of its own to fall back on.
-  // Its edit form starts at its first field. Only these: other things #modal shows (an application, a profile) may
-  // have a form further down, like a discussion's, which shouldn't take the focus (and bring up a phone's keyboard),
+  // On a desktop its edit form starts at its first field. Not on a touch screen (pointer: coarse, as in confirm.js),
+  // where a focused field brings up the keyboard over the form. Only these: other things #modal shows (an application,
+  // a profile) may have a form further down, like a discussion's, which shouldn't take the focus,
   // and a form these show that isn't what the link is for says so with data-no-autofocus (a private session's Vouch),
   // as does a link whose page isn't a form to fill in (a gathering application, which has a discussion further down).
   // data-modal-size="lg" (or "xl") widens it until it closes, for content in two columns, like a private session.
@@ -132,7 +133,7 @@ $(function () {
   $(document).on('click', 'a[data-open-in-modal]', function (e) {
     e.preventDefault()
     const size = $(this).attr('data-modal-size')
-    const autofocus = !$(this).is('[data-no-autofocus]')
+    const autofocus = !$(this).is('[data-no-autofocus]') && !window.matchMedia('(pointer: coarse)').matches
     const pushUrl = $(this).is('[data-modal-push-url]') ? $(this).attr('href') : null
     $('#modal .modal-content').load($(this).attr('href'), function () {
       const $modal = $('#modal')

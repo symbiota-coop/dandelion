@@ -612,6 +612,24 @@ class GatheringsTest < ActiveSupport::TestCase
     within('#modal') { assert page.has_css?('input[name="rslot[name]"]:focus') }
   end
 
+  test "on a touch screen an edit form opened in the modal doesn't focus its first field" do
+    create_gathering(privacy: 'open')
+    rota = @gathering.rotas.create!(name: 'Kitchen', account: @account)
+    Rslot.create!(name: 'Morning', rota: rota)
+    sign_in(@account)
+    visit "/g/#{@gathering.slug}/rotas/#{rota.id}"
+    # A phone's main pointer is a finger
+    page.execute_script(<<~JS)
+      const matchMedia = window.matchMedia.bind(window)
+      window.matchMedia = (query) => query === '(pointer: coarse)' ? { matches: true } : matchMedia(query)
+    JS
+    click_link 'Morning'
+    within('#modal') { assert page.has_field?('rslot[name]', with: 'Morning') }
+    # Bootstrap focuses the modal itself, and nothing moves it to the field
+    assert page.has_css?('#modal:focus')
+    assert page.has_no_css?('input[name="rslot[name]"]:focus')
+  end
+
   test 'an application is accepted at the magic number of proposers plus supporters, with at least one proposer' do
     covers 'gatherings/video-magic-number@7fc314', 'gatherings/magic-number@66775d', 'gatherings/median-magic-number@bbe05c'
     create_gathering(privacy: 'closed', fixed_threshold: 2, enable_supporters: true)
