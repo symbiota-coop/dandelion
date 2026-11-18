@@ -236,21 +236,24 @@ class OrderBuilder
     # Checking what's left and taking it aren't one step, so bookings at once take turns from the quote to the order's
     # discounts: otherwise two could each see the last place, the code's last use or the whole of the buyer's credit,
     # and each take it. The payment provider is called after, once the order and its tickets hold what they took
-    RecordLock.hold(*booking_locks) do
-      # Worked out now, before the order counts as a use of its discount code, and checked again: another booking may
-      # have used up the code since check_choices
-      @quote = build_quote(account: @account, credit: signed_in_as_buyer?).validate!.tap(&:total).check_payment_amount!
-      create_order
-      create_tickets
-      apply_donation_and_discounts
+    begin
+      RecordLock.hold(*booking_locks) do
+        # Worked out now, before the order counts as a use of its discount code, and checked again: another booking may
+        # have used up the code since check_choices
+        @quote = build_quote(account: @account, credit: signed_in_as_buyer?).validate!.tap(&:total).check_payment_amount!
+        create_order
+        create_tickets
+        apply_donation_and_discounts
+      end
+    # Only waiting for the booking's own locks: by the time process_payment runs, a free order may be complete
+    rescue RecordLock::Busy
+      @order.try(:destroy)
+      raise Busy
     end
     @event.refresh_sold_out_cache_and_notify_waitlist
     process_payment
   rescue Error
     raise
-  rescue RecordLock::Busy
-    @order.try(:destroy)
-    raise Busy
   rescue StandardError => e
     info = EventPaymentMethod.purchase_error_for(e)
     if info && @order
