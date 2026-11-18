@@ -42,10 +42,12 @@ module OrderNotifications
 
   def send_tickets
     order = self
+    account = order.account
+    # The buyer may have deleted their account (Account's orders are dependent: :nullify), leaving no one to send them to
+    return unless account
+
     event = order.event
     header_image_url, from_email = sender_info
-
-    account = order.account
 
     attachments = []
     attachments << ["#{tickets.count == 1 ? 'ticket' : 'tickets'}-#{event.name.parameterize}-#{order.id}.pdf", order.tickets_pdf.render] unless event.no_tickets_pdf
