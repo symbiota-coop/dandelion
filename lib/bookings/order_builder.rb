@@ -10,6 +10,9 @@
 # The order's credit, fixed discount and donation are the Quote's, the one the checkout form showed the buyer. Its
 # tickets are priced as they're created (Ticket, Order), and the order is refused unless they come to the quote's.
 class OrderBuilder
+  # utm_source, utm_medium and utm_campaign are short labels; longer ones are cut
+  UTM_MAX_LENGTH = 200
+
   # Each error's message says what went wrong, for whoever is booking. The details of an unexpected error or a payment
   # provider's go to Sentry or the failed purchase email instead
   class Error < StandardError
@@ -218,7 +221,8 @@ class OrderBuilder
     @confirmed_duplicate = confirmed_duplicate
     @confirmed_email = confirmed_email
     @default_dandelion_donation = default_dandelion_donation
-    @utm = utm || {}
+    # Only the success URL carries them, and a buyer can make them any length
+    @utm = (utm || {}).transform_values { |value| value && value.to_s[0, UTM_MAX_LENGTH] }
     @idempotency_key = idempotency_key
   end
 
