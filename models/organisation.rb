@@ -204,6 +204,15 @@ class Organisation
     Order.complete.and(:event_id.in => events_including_cohosted.hinted(Event::HOSTS_INDEX).pluck(:id)).includes(:account, :event).order(completed_at: :desc, created_at: :desc).limit(limit)
   end
 
+  # A local group's option in the events page's Location select, which is also what's geocoded when it's picked:
+  # near_select_suffix (e.g. ', UK') narrows a place's name to the organisation's country, but a group named after a
+  # country (Portugal) already says where it is, and 'Portugal, UK' is somewhere else
+  def near_select_option(local_group_name)
+    return local_group_name if ISO3166::Country.find_country_by_any_name(local_group_name)
+
+    "#{local_group_name}#{near_select_suffix}"
+  end
+
   def recent_followers
     organisationships.only(:account_id, :created_at).includes(:account).and(:created_at.gte => 1.day.ago).order('created_at desc')
   end

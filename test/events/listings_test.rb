@@ -282,6 +282,19 @@ class EventListingsTest < ActiveSupport::TestCase
     assert page.has_unchecked_field?('In person')
   end
 
+  test "an organisation's Location select adds its suffix to local groups, but not to one named after a country" do
+    create_organisation(near_select_suffix: ', UK')
+    # The select is shown with the carousel buttons
+    @organisation.carousels.create!(name: 'Retreats', button: true)
+    %w[Bristol Portugal].each do |name|
+      local_group = FactoryBot.create(:local_group, organisation: @organisation, account: @account, name: name)
+      create_event(as: :"#{name.downcase}_event", local_group: local_group)
+    end
+    visit "/o/#{@organisation.slug}/events"
+    assert page.has_select?('near', with_options: ['Bristol, UK', 'Portugal'])
+    assert page.has_no_select?('near', with_options: ['Portugal, UK'])
+  end
+
   # Five events of one organisation near Gamla Stan: one that's listed, and one each locked, past, not browsable and secret
   def create_public_feed_events
     create_event(as: :listed_event, name: 'Listed meditation', start_time: 10.days.from_now, end_time: 10.days.from_now + 2.hours)
