@@ -54,6 +54,24 @@ class BookingPaymentErrorsTest < ActiveSupport::TestCase
     assert_equal false, @event.reload.locked?
   end
 
+  test 'answers to two questions whose metadata keys cut to the same 40 characters both reach Stripe' do
+    create_stripe_checkout_event
+    questions = ['Accessibility requirements for wheelchair users', 'Accessibility requirements for the hearing loop']
+    @event.update_attributes!(questions: questions.join("\n"))
+    @organisation.set(event_questions_to_include_in_metadata: questions)
+
+    sessions = []
+    with_fake_stripe(sessions) do
+      post_purchase(@event, payment_method: 'stripe', details_form: { answers: { '0' => 'wheelchair user', '1' => 'hearing loop' } })
+    end
+
+    assert_equal 200, last_response.status
+    [sessions.last[:metadata], sessions.last[:payment_intent_data][:metadata]].each do |metadata|
+      answers = metadata.select { |key, _| key.to_s.start_with?('de_question_') }
+      assert_equal({ de_question_accessibility_requirements_f: 'wheelchair user', de_question_accessibility_requirements_2: 'hearing loop' }, answers)
+    end
+  end
+
   test 'Stripe refusing a value the buyer entered fails only their purchase' do
     covers 'events/buyer-error-does-not-lock-event@b1a837'
     create_stripe_checkout_event
