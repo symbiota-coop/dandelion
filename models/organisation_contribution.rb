@@ -13,6 +13,8 @@ class OrganisationContribution
   field :payment_completed, type: Boolean
 
   validates_presence_of :amount, :currency
+  # Money's subunits must match Stripe's for amount * 100 to be what was paid, so only the currencies we take
+  validates_inclusion_of :currency, in: FIAT_CURRENCIES
 
   after_save do
     organisation.update_paid_up

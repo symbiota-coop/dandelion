@@ -133,6 +133,42 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
     assert_equal 0, @organisation.organisation_contributions.count
   end
 
+  # In HUF and ISK Stripe counts hundredths but Money whole units, so 47.50 HUF paid would count as 4,750 HUF
+  test 'paying an organisation\'s contribution needs a currency Dandelion takes' do
+    create_contributing_organisation
+    sign_in_with_rack(@account)
+
+    header 'Accept', 'application/json'
+    calls = stub_checkout_session do
+      ['HUF', 'ISK', 'XYZ', '', nil].each do |currency|
+        post "/o/#{@organisation.slug}/pay", { amount: '4750', currency: currency, payment_method: 'stripe' }.compact
+        assert_equal 400, last_response.status, currency.inspect
+      end
+    end
+    assert_empty calls
+    assert_equal 0, @organisation.organisation_contributions.count
+
+    calls = stub_checkout_session { post "/o/#{@organisation.slug}/pay", amount: '10', currency: 'SEK', payment_method: 'stripe' }
+    assert_equal 200, last_response.status
+    assert_equal 'SEK', calls.sole.first[:line_items].sole[:currency]
+    assert_equal 'SEK', @organisation.organisation_contributions.sole.currency
+  end
+
+  test 'a contribution is only in a currency Dandelion takes' do
+    organisation = create_organisation
+    contribution = organisation.organisation_contributions.build(amount: 10, currency: 'HUF')
+    assert_equal false, contribution.valid?
+    assert contribution.errors[:currency].any?
+    contribution.currency = 'GBP'
+    assert_equal true, contribution.valid?
+
+    donation = AccountContribution.new(amount: 10, currency: 'ISK')
+    assert_equal false, donation.valid?
+    assert donation.errors[:currency].any?
+    donation.currency = 'EUR'
+    assert_equal true, donation.valid?
+  end
+
   test 'only an organisation\'s admins can pay its contribution or see its Contribute page' do
     create_contributing_organisation
     member = FactoryBot.create(:account)
@@ -482,6 +518,23 @@ class PaymentsDandelionContributionsTest < ActiveSupport::TestCase
 
     assert_empty calls
     assert_equal 0, AccountContribution.count
+  end
+
+  test 'a donation needs a currency Dandelion takes' do
+    header 'Accept', 'application/json'
+    calls = stub_checkout_session do
+      ['HUF', 'ISK', 'XYZ', '', nil].each do |currency|
+        post '/accounts/pay', { amount: '5', currency: currency, payment_method: 'stripe' }.compact
+        assert_equal 400, last_response.status, currency.inspect
+      end
+    end
+    assert_empty calls
+    assert_equal 0, AccountContribution.count
+
+    calls = stub_checkout_session { post '/accounts/pay', amount: '5', currency: 'NOK', payment_method: 'stripe' }
+    assert_equal 200, last_response.status
+    assert_equal 'NOK', calls.sole.first[:line_items].sole[:currency]
+    assert_equal ['NOK'], AccountContribution.pluck(:currency)
   end
 
   test 'a donation from an event\'s page is linked to the event' do

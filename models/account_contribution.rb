@@ -42,6 +42,8 @@ class AccountContribution
   end
 
   validates_presence_of :amount, :currency
+  # Money's subunits must match Stripe's for amount * 100 to be what was paid, so only the currencies we take
+  validates_inclusion_of :currency, in: FIAT_CURRENCIES
 
   def send_notification
     Mailer.deliver(

@@ -81,6 +81,8 @@ Dandelion::App.controller do
     organisation_admins_only!
 
     halt 400 unless params[:amount] && params[:amount].to_f > 0
+    # Only the currencies we take: in others (HUF, ISK...) Stripe's subunits differ from Money's, so it'd count 100x
+    halt 400 unless FIAT_CURRENCIES.include?(params[:currency])
 
     case params[:payment_method]
     when 'stripe'

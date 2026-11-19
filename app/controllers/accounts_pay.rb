@@ -31,6 +31,8 @@ Dandelion::App.controller do
   post '/accounts/pay', provides: :json do
     halt 400 unless params[:amount].to_f > 0
     halt 400 unless params[:payment_method] == 'stripe'
+    # Only the currencies we take: in others (HUF, ISK...) Stripe's subunits differ from Money's, so it'd count 100x
+    halt 400 unless FIAT_CURRENCIES.include?(params[:currency])
 
     account = current_account if current_account && params[:account_id] == current_account.id.to_s
 
