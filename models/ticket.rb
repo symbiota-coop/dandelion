@@ -182,13 +182,25 @@ class Ticket
 
   # Buying a ticket to an event linked to a gathering makes the buyer a member. Joining waits for the gathering's lock,
   # which another request can hold for longer than that wait (an admin's account being deleted): then the buyer joins a
-  # minute later instead, rather than the order whose payment completed being left half-complete or destroyed
-  def join_gathering
-    return unless event.gathering
+  # minute later instead, rather than the order whose payment completed being left half-complete or destroyed. The
+  # later join is for the gathering, event and buyer the ticket had when it was paid for: if by then the ticket has
+  # gone, been transferred to another event or given to another buyer, or the event's gathering has changed, no one
+  # joins, rather than joining a gathering the booking was never for
+  def join_gathering(booked = gathering_booked_for)
+    return unless booked[:gathering_id] && booked == gathering_booked_for
 
     event.gathering.memberships.create(account: account, unsubscribed: true, joined_by_ticket: true)
   rescue RecordLock::Busy
-    delay(run_at: 1.minute.from_now).join_gathering
+    Ticket.delay(run_at: 1.minute.from_now).join_gathering_later(id.to_s, booked)
+  end
+
+  # Found again by id, so a ticket deleted in the meantime ends the job rather than failing it
+  def self.join_gathering_later(ticket_id, booked)
+    Ticket.find(ticket_id)&.join_gathering(booked)
+  end
+
+  def gathering_booked_for
+    { gathering_id: event&.gathering_id&.to_s, event_id: event_id&.to_s, account_id: account_id&.to_s }
   end
 
   after_save do
