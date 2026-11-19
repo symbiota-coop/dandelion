@@ -308,11 +308,11 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
     assert_equal 0, Photo.count
   end
 
-  test "a photo that isn't a JPEG, PNG, GIF, WebP or HEIC is refused before ImageMagick sees it, saying why" do
+  test "a photo that isn't a JPEG, PNG, GIF, WebP or HEIC is refused before libvips sees it, saying why" do
     create_gathering
     sign_in_with_rack(@account)
 
-    without_imagemagick do
+    without_libvips do
       post '/photos/new', photoable_type: 'Gathering', photoable_id: @gathering.id, image: svg_upload
     end
     # Back to the gathering rather than an error page

@@ -1,8 +1,8 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 require 'vips'
 
-# The libvips plugin for Dragonfly (lib/dragonfly_vips.rb), on an app of its own, as Dragonfly.app still runs
-# ImageMagick: it takes the ImageMagick plugin's arguments and gives its answers, so derivative URLs keep working
+# The libvips plugin for Dragonfly (lib/dragonfly_vips.rb), on an app of its own, without Dragonfly.app's datastore and
+# URLs: it takes the ImageMagick plugin's arguments and gives its answers, so derivative URLs keep working
 class DragonflyVipsTest < ActiveSupport::TestCase
   def app
     @app ||= Dragonfly.app(:vips_test).tap { |app| app.configure { plugin DragonflyVips::Plugin.new } }

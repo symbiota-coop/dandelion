@@ -16,12 +16,12 @@ module ImageWithValidation
             @image_too_large = true
             attachment.assign(nil)
           elsif !ImageSignature.allowed?(attachment)
-            # Before anything runs ImageMagick on it (image? and format run identify)
+            # Before libvips reads it (image? and format read its header)
             @image_format_not_allowed = true
             attachment.assign(nil)
           elsif attachment.image?
-            # Always written as a JPEG: ImageMagick writes the format of the output's extension, and without 'format'
-            # that's the name's, so a JPEG named .png (as Luma's image CDN serves them) or .heic was written as one
+            # Always written as a JPEG, whatever its name says: a JPEG named .png (as Luma's image CDN serves them) or
+            # .heic is one
             attachment.process!(:thumb, '1920x1920>', 'format' => 'jpeg')
             attachment.name = "#{SecureRandom.uuid}.jpeg"
           end
@@ -52,13 +52,13 @@ module ImageWithValidation
     image_changed? || image_uid_changed?
   end
 
-  # Reading an image's width, height or format downloads the original from S3 and runs identify (about half a second
-  # for a 1920px JPEG), so validations do it only for a new image, or one not measured yet
+  # Reading an image's width, height or format downloads the original from S3 (libvips then reads only its header),
+  # so validations do it only for a new image, or one not measured yet
   def measure_image?
     image && (image_new? || !image_width_unmagic || !image_height_unmagic)
   end
 
-  # ImageMagick (identify and convert) and S3 run outside Mongo and Net::HTTP, so they don't make spans of their own:
+  # libvips and S3 run outside Mongo and Net::HTTP, so they don't make spans of their own:
   # these show where an image upload's time goes in a trace
   def image_span(action, &)
     Sentry.with_child_span(op: "image.#{action}", description: "#{self.class.name} image", &)

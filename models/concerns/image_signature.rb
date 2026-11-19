@@ -1,6 +1,6 @@
-# Which uploads may reach ImageMagick, by their first bytes rather than their name or declared type: ImageMagick picks
-# a format from a file's contents, and SVG, PostScript, MSL and the like can read files, fetch URLs or run Ghostscript.
-# config/imagemagick/policy.xml denies those too; this keeps them from reaching identify at all
+# Which uploads may reach libvips (Dragonfly's, lib/dragonfly_vips.rb), by their first bytes rather than their name or
+# declared type: an image library picks a format from a file's contents, and SVG, PDF and the like can read files or
+# fetch URLs. DragonflyVips refuses any other loader too; this keeps them from reaching libvips at all
 module ImageSignature
   FORMATS = 'JPEG, PNG, GIF, WebP or HEIC'.freeze
 

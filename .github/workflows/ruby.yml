@@ -213,11 +213,15 @@ jobs:
         key: cdn-cache-${{ hashFiles('frontend/integrity.json', 'app/views/layouts/_head.erb') }}
         restore-keys: cdn-cache-
 
-    # Production's Dragonfly runs ImageMagick, and images_test.rb checks our policy against it; dragonfly_vips_test.rb
-    # runs the libvips plugin that's to replace it. The runner has neither
-    - name: Install ImageMagick and libvips
+    # Dragonfly runs libvips (lib/dragonfly_vips.rb), which the app loads as it boots, so every group needs it. The
+    # runner has none
+    - name: Install libvips
+      run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends libvips-tools
+
+    # MiniMagick runs ImageMagick, and images_test.rb checks our policy against it; the runner has none
+    - name: Install ImageMagick
       if: contains(format(' {0} ', matrix.files), ' images ')
-      run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends imagemagick libvips-tools
+      run: sudo apt-get install -y --no-install-recommends imagemagick
 
     # How long each of the group's files took in its last run, which rake test:parallel splits them by, and saves after.
     # A cache entry can't be overwritten, so each run saves its own and the next restores the newest; files with no time

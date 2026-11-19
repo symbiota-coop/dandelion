@@ -253,7 +253,7 @@ module Dandelion
     post '/upload' do
       sign_in_required!
       upload = current_account.uploads.new(file: params[:upload])
-      # image? runs identify, so only on the bytes of an image ImageMagick may read (ImageSignature)
+      # image? reads the header with libvips, so only on the bytes of an image it may read (ImageSignature)
       halt 422, { error: { message: 'Only images can be uploaded' } }.to_json unless upload.file && ImageSignature.allowed?(upload.file) && upload.file.image?
       upload.save
       halt 422, { error: { message: 'Upload failed' } }.to_json unless upload.persisted?

@@ -13,7 +13,7 @@ class Upload
 
   dragonfly_accessor :file do
     after_assign do |attachment|
-      # Other files are kept as they are, never run through ImageMagick (image? runs identify)
+      # Other files are kept as they are, never read by libvips (image? reads the header)
       # Always written as a JPEG, whatever the name's extension says (ImageWithValidation)
       if ImageSignature.allowed?(attachment) && attachment.image?
         attachment.process!(:thumb, '1920x1920>', 'format' => 'jpeg')

@@ -1,19 +1,13 @@
-# Tests fake ImageMagick, so they don't need it installed and stay fast: Dragonfly only runs identify (format and size)
-# and convert, which the fake answers from the file's header and by copying it, and refuses a file that isn't an image
-# as ImageMagick's policy would. MiniMagick is refused: stub it. Only a test of ImageMagick itself runs the real one,
-# inside with_imagemagick (TestHelpers), in the CI group that installs it (with images)
+# Tests refuse MiniMagick (the avatar, YouTube thumbnails and imports' theme colours), so they don't need ImageMagick
+# installed: stub it. Only a test of ImageMagick itself runs it, inside with_imagemagick (TestHelpers), in the CI group
+# that installs it (with images). Dragonfly runs libvips (lib/dragonfly_vips.rb), in this process, which tests run
+# for real, as it's fast
 module FakeImageMagick
   class << self
     attr_accessor :real
   end
 
-  def self.identify(path)
-    format, width, height = header(File.binread(path, 65_536))
-    raise Dragonfly::Shell::CommandFailed, "identify: no decode delegate for #{path}" unless format
-
-    "#{format} #{width} #{height}"
-  end
-
+  # An image's format and size, from its first bytes, for a test stubbing MiniMagick
   def self.header(data)
     data = data.b
     if data.start_with?("\x89PNG".b) then ['PNG', *data[16, 8].unpack('NN')]
@@ -22,34 +16,6 @@ module FakeImageMagick
     elsif data[0, 4] == 'RIFF' && data[8, 4] == 'WEBP' then ['WEBP', 100, 100]
     elsif data[4, 8].to_s.match?(/\Aftyp(heic|heix|mif1)/) then ['HEIC', 100, 100]
     end
-  end
-
-  # Copies the input to the output, or writes a JPEG or PNG of its size when asked for the other (-format, or the
-  # output's extension, as ImageMagick does: a JPEG written to a .png becomes a PNG)
-  def self.convert(args)
-    input = args[1...-1].map { |arg| arg.sub(/\A\w+:/, '').sub(/\[\d+\]\z/, '') }.find { |arg| File.file?(arg) }
-    format, width, height = header(File.binread(input, 65_536))
-    raise Dragonfly::Shell::CommandFailed, "convert: no decode delegate for #{input}" unless format
-
-    target = args.include?('-format') ? args[args.index('-format') + 1] : File.extname(args.last).delete('.')
-    if %w[jpeg jpg].include?(target.to_s.downcase) && format != 'JPEG'
-      File.binwrite(args.last, jpeg(width, height))
-    elsif target.to_s.casecmp?('png') && format != 'PNG'
-      File.binwrite(args.last, png(width, height))
-    else
-      FileUtils.cp(input, args.last)
-    end
-    ''
-  end
-
-  # The start and frame header of a JPEG, all identify reads
-  def self.jpeg(width, height)
-    "\xFF\xD8\xFF\xC0".b + [17, 8, height, width, 3].pack('nCnnC') + "\x01\x22\x00\x02\x11\x01\x03\x11\x01\xFF\xD9".b
-  end
-
-  # The signature and header chunk of a PNG, all identify reads
-  def self.png(width, height)
-    "\x89PNG\r\n\x1A\n".b + [13].pack('N') + 'IHDR' + [width, height, 8, 2, 0, 0, 0].pack('NNCCCCC')
   end
 
   # From the frame header (SOFn), after the segments before it
@@ -64,21 +30,6 @@ module FakeImageMagick
     [1, 1]
   end
 
-  # Dragonfly::Shell
-  module Shell
-    def run(command, opts = {})
-      return super if FakeImageMagick.real
-
-      args = command.shellsplit
-      args.shift if File.basename(args.first) == 'magick'
-      case File.basename(args.first)
-      when 'identify' then FakeImageMagick.identify(args.last)
-      when 'convert' then FakeImageMagick.convert(args)
-      else raise "The fake ImageMagick doesn't run #{args.first}: check ImageMagick itself inside with_imagemagick"
-      end
-    end
-  end
-
   # MiniMagick::Shell
   module RefuseMiniMagick
     def run(*, **)
@@ -88,5 +39,4 @@ module FakeImageMagick
     end
   end
 end
-Dragonfly::Shell.prepend(FakeImageMagick::Shell)
 MiniMagick::Shell.prepend(FakeImageMagick::RefuseMiniMagick)
