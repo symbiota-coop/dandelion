@@ -15,7 +15,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
 
   # Each kind of discussion, with someone who may read it and someone who may not
 
-  test "a gathering's team, timetable activity and application discussions are its confirmed members'" do
+  test "a gathering's team, timetable activity and application discussions are its members'" do
     team_thread
     timetable = @gathering.timetables.create!(name: 'Main', account: @account)
     tactivity = @gathering.tactivities.create!(name: 'Yoga', account: @member, timetable: timetable,
@@ -37,20 +37,6 @@ class MessagesCommentsTest < ActiveSupport::TestCase
       xhr :get, '/commentable', commentable_type: commentable.class.name, commentable_id: commentable.id
       assert_refused "About #{commentable.class}"
     end
-  end
-
-  test 'members who have not paid where a gathering demands it cannot read its discussions' do
-    team_thread
-    @gathering.set(demand_payment: true)
-
-    sign_in_with_rack(@member)
-    xhr :get, '/commentable', commentable_type: 'Team', commentable_id: @team.id
-    assert_refused 'Secret plans'
-
-    @gathering.memberships.find_by(account: @member).set(paid: 10)
-    xhr :get, '/commentable', commentable_type: 'Team', commentable_id: @team.id
-    assert last_response.ok?
-    assert_includes last_response.body, 'Secret plans'
   end
 
   test "an event's chat is its attendees' and admins', unless its discussion is hidden" do

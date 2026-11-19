@@ -1,14 +1,14 @@
 Dandelion::App.controller do
   get '/g/:slug/teams/new' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @team = Team.new
     erb :'teams/build'
   end
 
   post '/g/:slug/teams/new' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @team = @gathering.teams.build(mass_assigning(params[:team], Team))
     @team.account = current_account
     if @team.save
@@ -21,7 +21,7 @@ Dandelion::App.controller do
 
   get '/g/:slug/teams' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     if request.xhr?
       partial :'teams/teams'
     else
@@ -31,7 +31,7 @@ Dandelion::App.controller do
 
   get '/g/:slug/teams/:id' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
     if request.xhr?
       partial :'teams/team'
@@ -42,14 +42,14 @@ Dandelion::App.controller do
 
   get '/g/:slug/teams/:id/edit' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
     erb :'teams/build'
   end
 
   post '/g/:slug/teams/:id/edit' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
     if @team.update_attributes(mass_assigning(params[:team], Team))
       redirect "/g/#{@gathering.slug}/teams/#{@team.id}"
@@ -60,7 +60,7 @@ Dandelion::App.controller do
 
   post '/g/:slug/teams/:id/destroy' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
     @team.destroy
     redirect "/g/#{@gathering.slug}/teams"
@@ -69,7 +69,7 @@ Dandelion::App.controller do
   post '/g/:slug/teamships/create' do
     @gathering = gathering_from_params
     @team = @gathering.teams.find(params[:team_id]) || not_found
-    confirmed_membership_required!
+    membership_required!
     Teamship.create(account: current_account, team: @team, gathering: @gathering)
     redirect back
   end
@@ -77,7 +77,7 @@ Dandelion::App.controller do
   post '/g/:slug/teamships/:id/destroy' do
     @gathering = gathering_from_params
     @teamship = @gathering.teamships.find(params[:id]) || not_found
-    confirmed_membership_required!
+    membership_required!
     own_or_gathering_admins_only!(@teamship)
     @teamship.destroy
     redirect back
@@ -98,7 +98,7 @@ Dandelion::App.controller do
 
   get '/g/:slug/teams/:id/unsubscribe' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @team = @gathering.teams.find(params[:id]) || not_found
     @teamship = @team.teamships.find_by(account: current_account)
     redirect(@teamship ? "/g/#{@gathering.slug}/teamships/#{@teamship.id}/unsubscribe" : "/g/#{@gathering.slug}/teams/#{@team.id}")
@@ -108,7 +108,7 @@ Dandelion::App.controller do
     @gathering = gathering_from_params
     @teamship = @gathering.teamships.find(params[:id]) || not_found
     @team = @teamship.team
-    confirmed_membership_required!
+    membership_required!
     own_or_gathering_admins_only!(@teamship)
     partial :'teams/subscribe', locals: { teamship: @teamship }
   end
@@ -117,7 +117,7 @@ Dandelion::App.controller do
     @gathering = gathering_from_params
     @teamship = @gathering.teamships.find(params[:id]) || not_found
     @team = @teamship.team
-    confirmed_membership_required!
+    membership_required!
     own_or_gathering_admins_only!(@teamship)
     @teamship.set(unsubscribed: false)
     if request.xhr?
@@ -132,7 +132,7 @@ Dandelion::App.controller do
     @gathering = gathering_from_params
     @teamship = @gathering.teamships.find(params[:id]) || not_found
     @team = @teamship.team
-    confirmed_membership_required!
+    membership_required!
     own_or_gathering_admins_only!(@teamship)
     @teamship.set(unsubscribed: true)
     @team.subscriptions.and(account: @teamship.account).destroy_all

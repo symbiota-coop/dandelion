@@ -383,16 +383,4 @@ Dandelion::App.helpers do
       redirect_url: ("/g/#{gathering.slug}" if %w[open closed].include?(gathering.privacy))
     )
   end
-
-  def confirmed_membership_required!(gathering = nil, account = current_account, site_admins: true)
-    gathering ||= @gathering
-    membership = find_membership(gathering, account)
-    return if membership&.confirmed?
-    return if !membership && site_admin_browsing_gathering?(gathering, account, site_admins: site_admins)
-
-    kick!(
-      notice: (membership ? 'You must make a payment before accessing that page.' : 'You must be a member of the gathering to access that page.'),
-      redirect_url: ("/g/#{gathering.slug}" if %w[open closed].include?(gathering.privacy))
-    )
-  end
 end

@@ -37,7 +37,7 @@ module GatheringFields
       field :"enable_#{x}", type: Mongoid::Boolean
     end
 
-    %w[enable_supporters clear_up_optionships anonymise_supporters democratic_threshold require_reason_proposer require_reason_supporter demand_payment hide_members_on_application_form hide_invitations listed hide_paid].each do |b|
+    %w[enable_supporters clear_up_optionships anonymise_supporters democratic_threshold require_reason_proposer require_reason_supporter hide_members_on_application_form hide_invitations listed hide_paid].each do |b|
       field b.to_sym, type: Mongoid::Boolean
     end
   end
@@ -60,7 +60,6 @@ module GatheringFields
         democratic_threshold: 'Allow all gathering members to suggest a magic number, and use the median',
         require_reason_proposer: 'Proposers must provide a reason',
         require_reason_supporter: 'Supporters must provide a reason',
-        demand_payment: 'Members must make a payment to access gathering content',
         hide_members_on_application_form: "Don't show existing members on the application form",
         invitations_granted: 'People may invite this many others by default',
         hide_invitations: 'Make the number of invitations granted visible to admins only',
@@ -97,7 +96,6 @@ module GatheringFields
         enable_budget: "Show a live and transparent budget of the gathering's finances",
         enable_partial_payments: 'Allow people to pay just a part of any outstanding payment requests',
         enable_shift_worth: 'Show the points value of shifts',
-        demand_payment: 'Require members to make a payment before accessing features like teams or timetables',
         clear_up_optionships: 'Remove people from any unpaid tiers, accommodation and transport options every hour',
         hide_paid: 'Hides the Requested contribution/Paid columns in the member list from non-admins'
       }

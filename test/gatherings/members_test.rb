@@ -300,20 +300,19 @@ class GatheringMembersTest < ActiveSupport::TestCase
     assert answer_p.has_no_css? 'b'
   end
 
-  test "a member's answers are for the gathering's confirmed members, and opened directly go to the members page" do
+  test "a member's answers are for the gathering's members, and opened directly go to the members page" do
     covers_route 'GET /g/:slug/memberships/:id'
-    create_gathering(privacy: 'open', demand_payment: true)
+    create_gathering(privacy: 'open')
     create_other_gathering_with_member
     answering = create_gathering_member(name: 'Answering Person')
     membership = membership_of(answering)
-    membership.set(answers: [['Why are you joining?', 'To build the dome']], paid: 10)
-    unpaid = create_gathering_member(name: 'Unpaid Person')
+    membership.set(answers: [['Why are you joining?', 'To build the dome']])
     path = gathering_path("/memberships/#{membership.id}")
 
     get path, {}, 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'
     assert_equal 403, last_response.status
 
-    [unpaid, @other_gathering.account, FactoryBot.create(:account)].each do |account|
+    [@other_gathering.account, FactoryBot.create(:account)].each do |account|
       sign_in_with_rack(account)
       get path, {}, 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'
       assert_equal 403, last_response.status, account.name
@@ -352,7 +351,7 @@ class GatheringMembersTest < ActiveSupport::TestCase
     assert page.has_no_link? 'Add member'
   end
 
-  test 'nobody adds members without an invitation left, confirmed membership or being an admin' do
+  test 'nobody adds members without an invitation left, membership or being an admin' do
     covers_route 'POST /g/:slug/add_member'
     create_gathering(privacy: 'open')
     create_other_gathering_with_member
@@ -364,13 +363,6 @@ class GatheringMembersTest < ActiveSupport::TestCase
     assert last_response.redirect?
     follow_redirect!
     assert_includes last_response.body, 'You have run out of invitations'
-    assert_nil Account.find_by(email: 'uninvited@example.com')
-
-    # Invitations granted, but not yet paid where payment is demanded
-    membership_of(member).set(invitations_granted: 5)
-    @gathering.set(demand_payment: true)
-    post path, email: 'uninvited@example.com'
-    assert last_response.redirect?
     assert_nil Account.find_by(email: 'uninvited@example.com')
 
     existing = FactoryBot.create(:account)

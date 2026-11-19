@@ -1,7 +1,7 @@
 Dandelion::App.controller do
   get '/g/:slug/members', provides: %i[html csv] do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @memberships = @gathering.memberships
     @member_filters = @gathering.member_filters
     chosen = @member_filters[:selects].filter_map { |param, _label, options| options.find { |value, _l, _r| value.to_s == params[param] } }
@@ -15,7 +15,7 @@ Dandelion::App.controller do
     when :html
       erb :'gatherings/members'
     when :csv
-      # By design, any confirmed member (not just admins) can export the member list: gatherings are intentionally intimate. But
+      # By design, any member (not just admins) can export the member list: gatherings are intentionally intimate. But
       # anyone can join an open gathering, so there the CSV hides what the members page hides from non-admins: emails their
       # accounts' email privacy doesn't show the viewer, the financial columns under hide_paid, and options under hide_members
       private_shown = gathering_admin? || @gathering.privacy != 'open'
@@ -117,7 +117,7 @@ Dandelion::App.controller do
   post '/g/:slug/add_member' do
     @gathering = gathering_from_params
     @membership = @gathering.memberships.find_by(account: current_account)
-    confirmed_membership_required! unless gathering_admin?
+    membership_required! unless gathering_admin?
 
     if !gathering_admin? && @membership.invitations_remaining <= 0
       flash[:error] = 'You have run out of invitations'
@@ -219,13 +219,13 @@ Dandelion::App.controller do
   get '/g/:slug/membership_row/:id' do
     @gathering = gathering_from_params
     membership = @gathering.memberships.find(params[:id]) || not_found
-    confirmed_membership_required!
+    membership_required!
     partial :'gatherings/membership_row', locals: { membership: membership }
   end
 
   get '/g/:slug/memberships/:id' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @membership = @gathering.memberships.find(params[:id]) || not_found
     # It opens in a modal on the members page; visited directly, it goes to that page
     request.xhr? ? partial(:'gatherings/membership_modal', locals: { membership: @membership }) : redirect("/g/#{@gathering.slug}/members")

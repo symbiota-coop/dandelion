@@ -1,7 +1,7 @@
 Dandelion::App.controller do
   get '/g/:slug/mapplications/:id' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @mapplication = @gathering.mapplications.find(params[:id]) || not_found
     if request.xhr?
       partial :'mapplications/mapplication_modal', locals: { mapplication: @mapplication }
@@ -13,7 +13,7 @@ Dandelion::App.controller do
   get '/g/:slug/mapplication_row/:id' do
     @gathering = gathering_from_params
     @mapplication = @gathering.mapplications.find(params[:id]) || not_found
-    confirmed_membership_required!
+    membership_required!
     partial :'mapplications/mapplication_row', locals: { mapplication: @mapplication }
   end
 
@@ -75,7 +75,7 @@ Dandelion::App.controller do
 
   get '/g/:slug/applications' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @mapplications = @gathering.mapplications.pending
     @mapplications = @mapplications.and(:account_id.in => Account.search(params[:q], child_scope: @mapplications, regex_search: true).pluck(:id)) if params[:q]
     erb :'mapplications/pending'
@@ -83,13 +83,13 @@ Dandelion::App.controller do
 
   get '/g/:slug/threshold' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     partial :'mapplications/threshold'
   end
 
   post '/g/:slug/threshold' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @membership.desired_threshold = params[:desired_threshold]
     @membership.save!
     200
@@ -97,7 +97,7 @@ Dandelion::App.controller do
 
   get '/g/:slug/applications/paused' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @mapplications = @gathering.mapplications.paused
     erb :'mapplications/paused'
   end
@@ -105,7 +105,7 @@ Dandelion::App.controller do
   post '/g/:slug/mapplications/:id/verdicts/create' do
     @gathering = gathering_from_params
     @mapplication = @gathering.mapplications.find(params[:id]) || not_found
-    confirmed_membership_required!
+    membership_required!
     verdict = @mapplication.verdicts.build(mass_assigning(params[:verdict], Verdict))
     verdict.account = current_account
     verdict.save

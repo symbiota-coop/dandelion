@@ -23,7 +23,7 @@ Dandelion::App.controller do
 
   get '/g/:slug/timetables' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     erb :'timetables/timetables'
   end
 
@@ -31,7 +31,7 @@ Dandelion::App.controller do
     @gathering = gathering_from_params
     @membership = @gathering.memberships.find_by(account: current_account)
     @timetable = @gathering.timetables.find(params[:id]) || not_found
-    confirmed_membership_required!
+    membership_required!
     if request.xhr?
       partial :'timetables/timetable', locals: { timetable: @timetable }
     else
@@ -132,7 +132,7 @@ Dandelion::App.controller do
   post '/g/:slug/tactivities/create' do
     @gathering = gathering_from_params
     @timetable = @gathering.timetables.find(params[:timetable_id]) || not_found
-    confirmed_membership_required!
+    membership_required!
     @tactivity = Tactivity.new(tactivity_params(@timetable))
     @tactivity.timetable = @timetable
     @tactivity.account = current_account
@@ -149,21 +149,21 @@ Dandelion::App.controller do
     @membership = @gathering.memberships.find_by(account: current_account)
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @timetable = @tactivity.timetable
-    confirmed_membership_required!
+    membership_required!
     erb :'timetables/tactivity'
   end
 
   get '/g/:slug/tactivities/:id/edit' do
     @gathering = gathering_from_params
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
-    confirmed_membership_required!
+    membership_required!
     request.xhr? ? partial(:modal_content, locals: { title: @tactivity.name, form: :'timetables/tactivity_form' }) : erb(:'timetables/tactivity_build')
   end
 
   post '/g/:slug/tactivities/:id/edit' do
     @gathering = gathering_from_params
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
-    confirmed_membership_required!
+    membership_required!
     if @tactivity.update_attributes(tactivity_params(@tactivity.timetable))
       redirect "/g/#{@gathering.slug}/timetables/#{@tactivity.timetable_id}"
     else
@@ -185,7 +185,7 @@ Dandelion::App.controller do
     @gathering = gathering_from_params
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
-    confirmed_membership_required! unless gathering_admin?
+    membership_required! unless gathering_admin?
     halt 403 unless gathering_admin? || @tactivity.timetable.scheduling_by_all
     @tactivity.tslot_id = params[:tslot_id]
     @tactivity.space_id = params[:space_id]
@@ -201,7 +201,7 @@ Dandelion::App.controller do
     @gathering = gathering_from_params
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
     @membership = @gathering.memberships.find_by(account: current_account)
-    confirmed_membership_required! unless gathering_admin?
+    membership_required! unless gathering_admin?
     halt 403 unless gathering_admin? || @tactivity.timetable.scheduling_by_all
     @tactivity.tslot_id = nil
     @tactivity.space_id = nil
@@ -219,14 +219,14 @@ Dandelion::App.controller do
   get '/g/:slug/tactivities/:id/attendees' do
     @gathering = gathering_from_params
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
-    confirmed_membership_required!
+    membership_required!
     partial :'timetables/attendees', locals: { tactivity: @tactivity }
   end
 
   post '/g/:slug/tactivities/:id/attend' do
     @gathering = gathering_from_params
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
-    confirmed_membership_required!
+    membership_required!
     @tactivity.attendances.create account: current_account
     request.xhr? ? 200 : redirect(back)
   end
@@ -234,7 +234,7 @@ Dandelion::App.controller do
   post '/g/:slug/tactivities/:id/unattend' do
     @gathering = gathering_from_params
     @tactivity = @gathering.tactivities.find(params[:id]) || not_found
-    confirmed_membership_required!
+    membership_required!
     @tactivity.attendances.find_by(account: current_account).try(:destroy)
     request.xhr? ? 200 : redirect(back)
   end

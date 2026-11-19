@@ -90,21 +90,6 @@ class GatheringPaymentsTest < ActiveSupport::TestCase
     assert_equal 0, membership_of(member).paid
   end
 
-  test 'a member not yet confirmed, as the gathering demands a payment, can pay, and is confirmed once it\'s paid' do
-    create_paying_gathering(demand_payment: true)
-    member = create_gathering_member
-    refute membership_of(member).confirmed?
-    sign_in_with_rack(member)
-
-    start_card_payment('10')
-    assert_equal 200, last_response.status, last_response.body
-    payment = membership_of(member).payments.first
-
-    deliver_gathering_webhook(checkout_completed_payload(payment.session_id))
-
-    assert membership_of(member).confirmed?
-  end
-
   test 'someone signed out, not a member, or a member of another gathering cannot start a payment' do
     covers_route 'POST /g/:slug/pay'
     create_paying_gathering

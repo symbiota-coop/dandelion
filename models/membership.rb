@@ -166,10 +166,6 @@ class Membership
     requested_contribution.to_i.positive? && paid.to_i < requested_contribution
   end
 
-  def confirmed?
-    !gathering.demand_payment or paid > 0 or admin?
-  end
-
   def self.protected_attributes
     %w[admin]
   end

@@ -15,7 +15,7 @@ module RuboCop
       #   # good
       #   get '/g/:slug/rotas' do
       #     @gathering = gathering_from_params
-      #     confirmed_membership_required!
+      #     membership_required!
       #     erb :'rotas/rotas'
       #   end
       #   post '/g/:slug/shifts/:id/destroy' do
@@ -28,9 +28,9 @@ module RuboCop
       #     redirect "/g/#{params[:slug]}/options"
       #   end
       class GatheringPermission < Base
-        MSG = 'Say who may use this gathering route: `confirmed_membership_required!`, `membership_required!`, ' \
+        MSG = 'Say who may use this gathering route: `membership_required!`, ' \
               '`gathering_admins_only!`, `own_or_gathering_admins_only!` or `halt 403` (or, for a public page, disable this, saying why).'.freeze
-        CHECKS = %i[confirmed_membership_required! membership_required! gathering_admins_only! own_or_gathering_admins_only!].to_set.freeze
+        CHECKS = %i[membership_required! gathering_admins_only! own_or_gathering_admins_only!].to_set.freeze
         VERBS = %i[get post put patch delete].to_set.freeze
 
         def_node_matcher :route, '(block (send nil? %VERBS (str $_) ...) _ $_)'

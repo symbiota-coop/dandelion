@@ -33,7 +33,7 @@ class Post
     case commentable
     when Team, Tactivity, Mapplication
       gathering = commentable.gathering
-      (membership = gathering.memberships.find_by(account: account)) && membership.confirmed?
+      gathering.memberships.exists?(account: account)
     when Event
       !commentable.hide_discussion && (event_participant || (event_participant.nil? && Event.participant?(commentable, account)))
     when ActivityApplication

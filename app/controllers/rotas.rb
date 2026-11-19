@@ -23,14 +23,14 @@ Dandelion::App.controller do
 
   get '/g/:slug/rotas' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     redirect "/g/#{@gathering.slug}/rotas/#{@gathering.rotas.first.id}" if @gathering.rotas.count == 1
     erb :'rotas/rotas'
   end
 
   get '/g/:slug/rotas/:id', provides: [:html, :csv] do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @rota = @gathering.rotas.find(params[:id]) || not_found
 
     if request.xhr?
@@ -40,7 +40,7 @@ Dandelion::App.controller do
       when :html
         erb :'rotas/rota'
       when :csv
-        # By design, any confirmed member gets every shift's phone number, whatever its account's phone_privacy: gatherings are
+        # By design, any member gets every shift's phone number, whatever its account's phone_privacy: gatherings are
         # intentionally intimate. But anyone can join an open gathering, so there non-admins get only the numbers it shows them
         private_shown = gathering_admin? || @gathering.privacy != 'open'
         CSV.generate do |csv|
@@ -218,7 +218,7 @@ Dandelion::App.controller do
 
   post '/g/:slug/shifts/create' do
     @gathering = gathering_from_params
-    confirmed_membership_required!
+    membership_required!
     @rota = @gathering.rotas.find(params[:rota_id]) || not_found
     role = (@rota.roles.find(params[:role_id]) if params[:role_id]) || not_found
     rslot = (@rota.rslots.find(params[:rslot_id]) if params[:rslot_id]) || not_found
@@ -229,7 +229,7 @@ Dandelion::App.controller do
   get '/g/:slug/shifts/:id/edit' do
     @gathering = gathering_from_params
     @membership = @gathering.memberships.find_by(account: current_account)
-    confirmed_membership_required! unless gathering_admin?
+    membership_required! unless gathering_admin?
     @shift = @gathering.shifts.find(params[:id]) || not_found
     own_or_gathering_admins_only!(@shift)
     request.xhr? ? partial(:modal_content, locals: { title: @shift.title, form: :'rotas/shift_form' }) : erb(:'rotas/shift')
@@ -238,7 +238,7 @@ Dandelion::App.controller do
   post '/g/:slug/shifts/:id/edit' do
     @gathering = gathering_from_params
     @membership = @gathering.memberships.find_by(account: current_account)
-    confirmed_membership_required! unless gathering_admin?
+    membership_required! unless gathering_admin?
     @shift = @gathering.shifts.find(params[:id]) || not_found
     own_or_gathering_admins_only!(@shift)
     shift_params = (params[:shift] || {}).dup
@@ -254,7 +254,7 @@ Dandelion::App.controller do
   post '/g/:slug/shifts/:id/destroy' do
     @gathering = gathering_from_params
     @membership = @gathering.memberships.find_by(account: current_account)
-    confirmed_membership_required! unless gathering_admin?
+    membership_required! unless gathering_admin?
     @shift = @gathering.shifts.find(params[:id]) || not_found
     own_or_gathering_admins_only!(@shift)
     @shift.destroy

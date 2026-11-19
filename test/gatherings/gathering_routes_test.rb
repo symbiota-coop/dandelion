@@ -395,15 +395,9 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     assert page.has_content? 'Tent'
     assert page.has_content? '1/∞'
     assert page.has_no_link? '1/∞'
-
-    option.set(hide_members: false)
-    @gathering.set(demand_payment: true)
-    visit gathering_path('/options')
-    assert page.has_content? 'Tent'
-    assert page.has_no_link? '1/∞'
   end
 
-  test "who selected an option that hides its members is for admins, and every list for members who've paid" do
+  test "who selected an option that hides its members is for admins" do
     create_gathering(privacy: 'open')
     option = @gathering.options.create!(name: 'Tent', type: 'Accommodation', account: @account, hide_members: true)
     open_option = @gathering.options.create!(name: 'Cabin', type: 'Accommodation', account: @account)
@@ -417,11 +411,6 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     refute_includes last_response.body, 'Other Person'
     get gathering_path("/options/#{open_option.id}")
     assert_includes last_response.body, 'Other Person'
-
-    @gathering.set(demand_payment: true)
-    get gathering_path("/options/#{open_option.id}")
-    assert last_response.redirect?
-    refute_includes last_response.body, 'Other Person'
 
     sign_in_with_rack(@account)
     get gathering_path("/options/#{option.id}")

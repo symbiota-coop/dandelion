@@ -6,7 +6,7 @@
       <th>Cost</th>
       <th>Places</th>
       <th></th>
-      <% if @membership&.confirmed? || gathering_admin? %>
+      <% if @membership || gathering_admin? %>
         <th style="width: 33%" class="d-none d-lg-table-cell">People</th>
       <% end %>
     </tr>
@@ -45,7 +45,7 @@
       <% end %>
     </td>
     <td nowrap>
-      <% if @membership&.confirmed? || gathering_admin? %>
+      <% if @membership || gathering_admin? %>
         <% if !gathering_admin? && option.hide_members? %>
           <%= option.optionships.count %>/<%== (option.capacity || '&infin;').to_s %>
         <% else %>
@@ -73,7 +73,7 @@
         <% end %>
       <% end %>
     </td>
-    <% if @membership&.confirmed? || gathering_admin? %>
+    <% if @membership || gathering_admin? %>
       <td class="d-none d-lg-table-cell">
         <% if !gathering_admin? && option.hide_members? %>
           <%= pluralize option.optionships.count, 'person' %>
