@@ -47,6 +47,21 @@ class ZapierTest < ActiveSupport::TestCase
     assert last_response.redirect?
   end
 
+  # The API key is in the query string, so a page view would keep it
+  test 'Zapier requests, /z itself included, are not saved as page views' do
+    create_event(prices: [0])
+    get '/'
+    assert_equal 1, PageView.count
+
+    zapier_get('/z')
+    assert_equal 200, last_response.status
+    zapier_get('/z/organisation_events', slug: @organisation.slug)
+    assert_equal 200, last_response.status
+
+    assert_equal 1, PageView.count
+    assert_equal 0, PageView.and(query_string: /#{Regexp.escape(@account.api_key)}/).count
+  end
+
   test 'Zapier endpoints only read data' do
     covers 'integrations/admin-data-read-only@122ed7'
     create_event(prices: [0])

@@ -23,6 +23,17 @@ class SiteRoutesTest < ActiveSupport::TestCase
     assert_equal 0, PageView.count
   end
 
+  test 'a page view keeps its query and referrer, less the values of tokens, keys and codes' do
+    get '/events', { q: 'yoga', feedback_token: 'secret-token', api_key: 'secret-key', page: '2' },
+        'HTTP_REFERER' => 'https://example.org/e/x?sign_in_code=123456&ref=mail'
+
+    assert_equal 1, PageView.count
+    page_view = PageView.first
+    assert_equal '/events', page_view.path
+    assert_equal 'q=yoga&feedback_token=[Filtered]&api_key=[Filtered]&page=2', page_view.query_string
+    assert_equal 'https://example.org/e/x?sign_in_code=[Filtered]&ref=mail', page_view.referrer
+  end
+
   test 'the error and not found pages render, and a path no route matches is a 404 with the not found page' do
     covers_route 'GET /error', 'GET /not_found'
     get '/error'
