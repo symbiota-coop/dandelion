@@ -15,7 +15,7 @@ module ImageWithValidation
           if attachment.size.to_i > MAX_IMAGE_BYTES
             @image_too_large = true
             attachment.assign(nil)
-          elsif !ImageSignature.allowed?(attachment)
+          elsif !ImageSignature.pin_format!(attachment)
             # Before anything runs ImageMagick on it (image? and format run identify)
             @image_format_not_allowed = true
             attachment.assign(nil)

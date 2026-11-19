@@ -20,7 +20,7 @@ module FakeImageMagick
     elsif data.start_with?('GIF8') then ['GIF', *data[6, 4].unpack('vv')]
     elsif data.start_with?("\xFF\xD8".b) then ['JPEG', *jpeg_size(data)]
     elsif data[0, 4] == 'RIFF' && data[8, 4] == 'WEBP' then ['WEBP', 100, 100]
-    elsif data[4, 8].to_s.match?(/\Aftyp(heic|heix|mif1)/) then ['HEIC', 100, 100]
+    elsif data[4, 8].to_s.match?(/\Aftyp(heic|heix|mif1|avif)/) then ['HEIC', 100, 100]
     end
   end
 
