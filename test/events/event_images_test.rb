@@ -4,7 +4,7 @@ require_relative '../test_config'
 class EventImagesTest < ActiveSupport::TestCase
   include Rack::Test::Methods
 
-  # Stored directly, as an earlier upload would have left it, so the test doesn't need ImageMagick
+  # Stored directly, as an earlier upload would have left it, so the test needs no image processing
   def store_image(record)
     record.set(image_uid: Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg')), image_width_unmagic: 1920, image_height_unmagic: 1080)
     # A fresh copy: the one in hand has already read its image as nil

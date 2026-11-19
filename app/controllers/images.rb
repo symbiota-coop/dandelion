@@ -32,33 +32,29 @@ Dandelion::App.controller do
   get '/youtube_thumb/:id' do
     halt 400 unless params[:id] =~ /\A[A-Za-z0-9_-]{11}\z/
 
-    begin
-      base_image = MiniMagick::Image.open("https://i.ytimg.com/vi/#{params[:id]}/sddefault.jpg")
-    rescue OpenURI::HTTPError
-      begin
-        base_image = MiniMagick::Image.open("https://i.ytimg.com/vi/#{params[:id]}/hqdefault.jpg")
-      rescue OpenURI::HTTPError
-        halt 404
+    # The larger thumbnail (640x480), or the smaller (480x360) for videos without one
+    response = %w[sddefault hqdefault].lazy.map do |size|
+      Faraday.get("https://i.ytimg.com/vi/#{params[:id]}/#{size}.jpg") do |request|
+        request.options.open_timeout = 5
+        request.options.timeout = 10
       end
+    end.find(&:success?)
+    halt 404 unless response
+
+    thumbnail = begin
+      Vips::Image.new_from_buffer(response.body, '')
+    rescue Vips::Error
+      nil
     end
-    base_image = base_image.crop('640x360+0+60')
+    # Only a JPEG, as YouTube serves them
+    halt 404 unless thumbnail&.get('vips-loader') == 'jpegload_buffer'
 
-    overlay_image = MiniMagick::Image.open('app/assets/images/youtube.png')
-
-    x_coordinate = (base_image.width - overlay_image.width) / 2
-    y_coordinate = (base_image.height - overlay_image.height) / 2
-
-    result = base_image.composite(overlay_image) do |c|
-      c.compose 'Over' # OverCompositeOp
-      c.geometry "+#{x_coordinate}+#{y_coordinate}"
-    end
+    # 16:9, from 60px down, with the play button in the middle
+    thumbnail = thumbnail.crop(0, 60, [640, thumbnail.width].min, [360, thumbnail.height - 60].min)
+    play = Vips::Image.new_from_file(Padrino.root('app/assets/images/youtube.png').to_s)
+    thumbnail = thumbnail.composite2(play, :over, x: (thumbnail.width - play.width) / 2, y: (thumbnail.height - play.height) / 2)
 
     content_type 'image/jpeg'
-    blob = result.to_blob
-
-    # Clean up temp files (only remote images, not local overlay)
-    [base_image, result].each { |img| img.destroy! if img.respond_to?(:destroy!) }
-
-    blob
+    thumbnail.flatten.write_to_buffer('.jpg', Q: 90, strip: true)
   end
 end

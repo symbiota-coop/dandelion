@@ -1,7 +1,6 @@
 # Dragonfly's image analysers and processors on libvips (ruby-vips), in place of its ImageMagick plugin: an app takes
 # it with `plugin DragonflyVips::Plugin.new`. libvips runs in this process, reads only the header to analyse, streams
-# when it resizes, and has no delegates, coders that read files or fetch URLs, or Ghostscript, which
-# config/imagemagick/policy.xml has to deny ImageMagick.
+# when it resizes, and has none of ImageMagick's delegates, coders that read files or fetch URLs, or Ghostscript.
 #
 # It takes the same arguments as the ImageMagick plugin, as each derivative's URL and its DragonflyJob signature are
 # made from them: thumb('400x400'), thumb('1920x1920>') and thumb('500x500#'), and encode('jpg', '-quality 90'). So

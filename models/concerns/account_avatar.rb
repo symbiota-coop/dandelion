@@ -21,30 +21,18 @@ module AccountAvatar
       initials if initials.match?(INITIALS)
     end
 
+    # White, opaque at WASH, with the letters clear, drawn by libvips (Pango) and centred by their ink
     def avatar_png(initials = nil)
-      Tempfile.create(['avatar', '.png']) do |file|
-        MiniMagick.convert do |c|
-          c.size "#{SIZE}x#{SIZE}"
-          c << 'xc:white'
-          # The alpha: the letters in black (clear) on grey at WASH
-          c.stack do |mask|
-            mask.size "#{SIZE}x#{SIZE}"
-            mask << "xc:gray(#{(WASH * 100).round}%)"
-            if initials
-              mask.font FONT
-              mask.fill 'black'
-              mask.pointsize(initials.length > 1 ? 150 : 180)
-              mask.gravity 'center'
-              mask.annotate '+0+0', initials
-            end
-          end
-          c.alpha 'off'
-          c.compose 'CopyOpacity'
-          c.composite
-          c << file.path
-        end
-        File.binread(file.path)
+      alpha = Vips::Image.black(SIZE, SIZE) + (WASH * 255).round
+      if initials
+        size = initials.length > 1 ? 150 : 180
+        # How much of each pixel the letters cover, 0 to 255; at 72 dpi, a point is a pixel
+        letters = Vips::Image.text(initials, fontfile: FONT.to_s, font: "Plus Jakarta Sans SemiBold #{size}", dpi: 72)
+        letters = letters.embed((SIZE - letters.width) / 2, (SIZE - letters.height) / 2, SIZE, SIZE)
+        alpha *= (letters * (-1.0 / 255)) + 1
       end
+      (Vips::Image.black(SIZE, SIZE, bands: 3) + 255).bandjoin(alpha).cast(:uchar).copy(interpretation: :srgb)
+                                                     .write_to_buffer('.png')
     end
   end
 

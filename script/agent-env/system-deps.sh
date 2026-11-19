@@ -19,7 +19,6 @@ $SUDO apt-get install -y --no-install-recommends \
   curl \
   fonts-liberation \
   git \
-  imagemagick \
   libvips-tools \
   libffi-dev \
   libssl-dev \

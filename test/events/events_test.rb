@@ -496,7 +496,7 @@ class EventsTest < ActiveSupport::TestCase
 
   test 'saving an event does not read an image that is not new' do
     create_event
-    # Stored and measured directly, as an earlier upload would have left it, so the test doesn't need ImageMagick
+    # Stored and measured directly, as an earlier upload would have left it, so the test needs no image processing
     uid = Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg'))
     @event.set(image_uid: uid, image_width_unmagic: 1920, image_height_unmagic: 1080)
 

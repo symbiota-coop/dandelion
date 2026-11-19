@@ -18,7 +18,7 @@ Minitest.load :simplecov if defined?(SimpleCov)
 Minitest::RG.rg! color: $stdout.tty?
 require_relative 'helpers/test_helpers'
 
-%w[outside_services fake_imagemagick capybara cdn_cache cleanup route_recording test_times].each { |file| require_relative "setup/#{file}" }
+%w[outside_services capybara cdn_cache cleanup route_recording test_times].each { |file| require_relative "setup/#{file}" }
 
 module ActiveSupport
   class TestCase

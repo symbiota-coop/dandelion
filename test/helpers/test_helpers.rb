@@ -140,15 +140,6 @@ module TestHelpers
     previous&.each { |key, value| ENV[key] = value }
   end
 
-  # Real ImageMagick through MiniMagick, for a test of ImageMagick itself (test/setup/fake_imagemagick.rb refuses it
-  # for the rest)
-  def with_imagemagick
-    FakeImageMagick.real = true
-    yield
-  ensure
-    FakeImageMagick.real = false
-  end
-
   # Fails the test if the block hands a file to libvips, which reads every image Dragonfly analyses or processes
   def without_libvips(&)
     refuse = ->(path, *) { flunk "libvips read #{path}" }

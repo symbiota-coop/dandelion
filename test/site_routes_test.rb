@@ -274,57 +274,44 @@ class SiteRoutesTest < ActiveSupport::TestCase
 
   # YouTube thumbnails
 
-  # A MiniMagick image as the YouTube thumbnail route uses one, without ImageMagick: crop and composite record what
-  # they were asked to do, and to_blob gives that back
-  FakeThumbnail = Struct.new(:width, :height, :steps) do
-    def crop(geometry)
-      width, height = geometry[/\A\d+x\d+/].split('x').map(&:to_i)
-      FakeThumbnail.new(width, height, steps + ["crop #{geometry}"])
+  # YouTube's thumbnails: the app's test image for the sizes served, and a 404 for others. Gives the URLs asked for
+  def stub_youtube(served, body: File.binread('app/assets/images/test-event.jpg'), &)
+    requested = []
+    response = Struct.new(:status, :body) do
+      def success? = status == 200
     end
-
-    def composite(overlay)
-      options = []
-      settings = Object.new
-      %i[compose geometry].each { |option| settings.define_singleton_method(option) { |value| options << "#{option} #{value}" } }
-      yield settings
-      FakeThumbnail.new(width, height, steps + ["composite #{overlay.width}x#{overlay.height} #{options.join(' ')}"])
+    fetch = lambda do |url, *|
+      requested << url
+      served.any? { |size| url.end_with?("/#{size}.jpg") } ? response.new(200, body) : response.new(404, 'Not Found')
     end
-
-    def to_blob
-      "#{width}x#{height}: #{steps.join('; ')}"
-    end
-
-    def destroy!; end
+    Faraday.stub(:get, fetch, &)
+    requested
   end
 
-  # MiniMagick fetching YouTube's thumbnails: served, as the app's test image, for the sizes listed, and a 404 for
-  # others. Gives the URLs asked for
-  def stub_youtube(served)
-    requested = []
-    opener = lambda do |path, *|
-      if path.start_with?('https://')
-        requested << path
-        raise OpenURI::HTTPError.new('404 Not Found', StringIO.new) unless served.any? { |size| path.end_with?("/#{size}.jpg") }
-
-        path = 'app/assets/images/test-event.jpg'
-      end
-      _, width, height = FakeImageMagick.header(File.binread(path))
-      FakeThumbnail.new(width, height, [File.basename(path)])
-    end
-    MiniMagick::Image.stub(:open, opener) { yield }
-    requested
+  # Within a few levels, as JPEG moves them
+  def assert_colour(expected, actual, message = nil)
+    assert expected.zip(actual).all? { |e, a| (e - a).abs <= 12 }, "#{message}: expected #{expected.inspect}, got #{actual.inspect}"
   end
 
   test "YouTube thumbnails are the video's thumbnail, cropped to 16:9 with a play button, falling back to the smaller one" do
     covers_route 'GET /youtube_thumb/:id'
-    requested = stub_youtube(%w[sddefault hqdefault]) { get '/youtube_thumb/dQw4w9WgXcQ' }
+    # A 640x480 thumbnail, as YouTube's sddefault is, red across its top 60 rows and grey below
+    frame = (Vips::Image.black(640, 480, bands: 3) + 120).draw_rect([200, 40, 40], 0, 0, 640, 60, fill: true)
+    requested = stub_youtube(%w[sddefault hqdefault], body: frame.cast(:uchar).write_to_buffer('.jpg', Q: 95)) do
+      get '/youtube_thumb/dQw4w9WgXcQ'
+    end
     assert_equal 200, last_response.status
     assert_equal 'image/jpeg', last_response.media_type
-    _, button_width, button_height = FakeImageMagick.header(File.binread('app/assets/images/youtube.png'))
-    play_button = "+#{(640 - button_width) / 2}+#{(360 - button_height) / 2}"
-    assert_equal "640x360: test-event.jpg; crop 640x360+0+60; composite #{button_width}x#{button_height} compose Over geometry #{play_button}",
-                 last_response.body
     assert_equal ['https://i.ytimg.com/vi/dQw4w9WgXcQ/sddefault.jpg'], requested
+
+    thumbnail = Vips::Image.new_from_buffer(last_response.body, '')
+    assert_equal [640, 360, 3], [thumbnail.width, thumbnail.height, thumbnail.bands]
+    play = Vips::Image.new_from_file('app/assets/images/youtube.png')
+    # The video's thumbnail from 60px down, and the play button in the middle
+    assert_colour [120, 120, 120], thumbnail.getpoint(10, 10), 'corner'
+    assert_colour play.getpoint(play.width / 2, play.height / 2).first(3), thumbnail.getpoint(320, 180), 'middle'
+    assert_colour play.getpoint(play.width / 4, play.height / 2).first(3),
+                  thumbnail.getpoint(((640 - play.width) / 2) + (play.width / 4), 180), 'button'
 
     requested = stub_youtube(%w[hqdefault]) { get '/youtube_thumb/dQw4w9WgXcQ' }
     assert_equal 200, last_response.status
@@ -332,6 +319,12 @@ class SiteRoutesTest < ActiveSupport::TestCase
 
     stub_youtube([]) { get '/youtube_thumb/dQw4w9WgXcQ' }
     assert_equal 404, last_response.status
+
+    # Nor anything but a JPEG
+    [File.binread('app/assets/images/coop.png'), 'not an image'].each do |body|
+      stub_youtube(%w[sddefault], body:) { get '/youtube_thumb/dQw4w9WgXcQ' }
+      assert_equal 404, last_response.status
+    end
   end
 
   test "YouTube thumbnails refuse anything that isn't a video id, fetching nothing" do

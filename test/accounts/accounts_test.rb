@@ -108,18 +108,19 @@ class AccountsTest < ActiveSupport::TestCase
   test 'generated avatars are PNGs, for initials of one or two Latin letters' do
     covers_route 'GET /avatar/v2'
     covers_route 'GET /avatar/v2/:initials'
-    # ImageMagick, which draws them, isn't on CI's runner, so this checks the routes, not the drawing
+    drawn = {}
     { '/avatar/v2.png' => nil, '/avatar/v2/SR.png' => 'SR', '/avatar/v2/%C3%89Z.png' => 'ÉZ' }.each do |path, initials|
-      drawn = :not_drawn
-      draw = lambda do |i = nil|
-        drawn = i
-        'png'
-      end
-      Account.stub(:avatar_png, draw) { get path }
+      get path
       assert last_response.ok?, "expected #{path} to be served, got #{last_response.status}"
       assert_equal 'image/png', last_response.media_type
-      assert_equal initials.to_s, drawn.to_s
+      png = Vips::Image.new_from_buffer(last_response.body, '')
+      assert_equal [400, 400, 4], [png.width, png.height, png.bands]
+      # White, at WASH, but where the letters are cut out
+      assert_equal [255, 255, 255, 204], png.getpoint(5, 5).map(&:round)
+      assert_equal initials ? 0 : 204, png.extract_band(3).min.round, path
+      drawn[initials] = last_response.body
     end
+    refute_equal drawn['SR'], drawn['ÉZ']
 
     ['/avatar/v2/ABC.png', '/avatar/v2/12.png'].each do |path|
       get path

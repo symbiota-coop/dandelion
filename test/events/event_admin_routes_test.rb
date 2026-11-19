@@ -144,7 +144,7 @@ class EventAdminRoutesTest < ActiveSupport::TestCase
     get "/e/#{@event.slug}/linked_image", organisation_id: @organisation.id
     assert_equal 404, last_response.status # no image yet
 
-    # Stored directly, as an upload would have left it, so the test doesn't need ImageMagick
+    # Stored directly, as an upload would have left it, so the test needs no image processing
     @event.set(image_uid: Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg')))
     get "/e/#{@event.slug}/linked_image", organisation_id: @organisation.id
     assert_equal 200, last_response.status

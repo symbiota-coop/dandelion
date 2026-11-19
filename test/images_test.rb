@@ -1,8 +1,7 @@
 require File.expand_path("#{File.dirname(__FILE__)}/test_config.rb")
 
 # Which uploaded files reach libvips, which Dragonfly runs: only JPEG, PNG, GIF, WebP and HEIC, known by their first
-# bytes, and libvips refusing any other format. And the ImageMagick policy (config/imagemagick/policy.xml), for what
-# MiniMagick still runs, refusing the formats that read files, fetch URLs or run Ghostscript
+# bytes, and libvips refusing any other format
 class ImagesTest < ActiveSupport::TestCase
   SVG = '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10"/></svg>'.freeze
   POSTSCRIPT = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 10 10\nshowpage\n".freeze
@@ -96,13 +95,4 @@ class ImagesTest < ActiveSupport::TestCase
     assert_equal 'png', Dragonfly.app.create(File.binread('app/assets/images/coop.png')).analyse(:format)
   end
 
-  test 'ImageMagick, which MiniMagick runs, refuses SVG and PostScript under our policy' do
-    assert_includes ENV.fetch('MAGICK_CONFIGURE_PATH'), File.expand_path('../config/imagemagick', __dir__)
-    with_imagemagick do
-      [SVG, POSTSCRIPT].each do |data|
-        assert_raises(MiniMagick::Error, MiniMagick::Invalid) { MiniMagick::Image.read(data).type }
-      end
-      assert_equal 'PNG', MiniMagick::Image.open('app/assets/images/coop.png').type
-    end
-  end
 end

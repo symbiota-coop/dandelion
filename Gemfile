@@ -96,4 +96,3 @@ gem 'rack-utf8_sanitizer'
 #  Everything else
 gem 'haikunator' # for generating random names
 gem 'keccak' # for EIP-55 checksums on EVM addresses
-gem 'mini_magick' # for image processing

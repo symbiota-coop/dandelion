@@ -19,22 +19,22 @@ class OrganisationsCalendarImportLumaTest < ActiveSupport::TestCase
            location: 'Kreuzberg, Berlin', **overrides)
   end
 
-  # Serves Luma's image CDN from the app's test image, recording each image URL fetched
+  # A cover whose left half is #1A2B3B (a colour JPEG keeps as it is) and right half white
+  def cover_path
+    @cover ||= Tempfile.new(['cover', '.jpg']).tap do |file|
+      left = Vips::Image.black(600, 630, bands: 3) + [0x1A, 0x2B, 0x3B]
+      left.join(Vips::Image.black(600, 630, bands: 3) + 255, :horizontal).cast(:uchar).copy(interpretation: :srgb)
+          .write_to_file(file.path, Q: 95)
+    end
+    @cover.path
+  end
+
+  # Serves Luma's image CDN from the cover, recording each image URL fetched
   def stub_luma_images(fetched_images = [], &)
     Dragonfly.app.stub(:fetch_url, lambda { |url, *|
       fetched_images << url.to_s
-      Dragonfly.app.fetch_file(IMAGE_PATH)
+      Dragonfly.app.fetch_file(cover_path)
     }, &)
-  end
-
-  # A MiniMagick image whose top-left pixel is the given colour, recording whether it was cleaned up
-  def fake_minimagick_image(rgb, destroyed)
-    image = Object.new
-    image.define_singleton_method(:crop) { |_geometry| self }
-    image.define_singleton_method(:get_pixels) { |_map| [[rgb]] }
-    image.define_singleton_method(:tempfile) { true }
-    image.define_singleton_method(:destroy!) { destroyed << true }
-    image
   end
 
   # ── Which links are Luma event pages ──────────────────────────────────────
@@ -82,30 +82,26 @@ class OrganisationsCalendarImportLumaTest < ActiveSupport::TestCase
   test "a Luma event's cover image is fetched from Luma's image host, larger, and its theme colour taken from its top-left pixel" do
     create_organisation(calendar_import_urls: LUMA_FEED_URL)
     fetched_images = []
-    destroyed = []
     page_url = 'https://luma.com/event/evt-abc'
     requested_urls = []
     responses = { LUMA_FEED_URL => { status: 200, body: ical(luma_event) },
                   # A malformed og:image is passed over, as is one off Luma's image host
                   page_url => { status: 200, body: luma_page('https://og.luma.com/a cover.jpg', 'https://example.com/cover.jpg', OG_IMAGE_URL) } }
 
-    MiniMagick::Image.stub(:open, ->(_path) { fake_minimagick_image([26, 43, 60], destroyed) }) do
-      stub_luma_images(fetched_images) do
-        stub_faraday(responses, requested_urls: requested_urls) { @organisation.sync_calendar_imports }
-      end
+    stub_luma_images(fetched_images) do
+      stub_faraday(responses, requested_urls: requested_urls) { @organisation.sync_calendar_imports }
     end
 
     event = @organisation.events.find_by(calendar_import_uid: 'evt-abc@events.lu.ma')
     assert_equal [OG_IMAGE_URL_LARGE], fetched_images
     assert event.image.present?
-    assert_equal '#1A2B3C', event.theme_color
-    assert_equal [true], destroyed, "MiniMagick's copy of the image is removed"
+    assert_equal '#1A2B3B', event.theme_color
 
     # Once it has an image, later syncs don't fetch the page or recolour the event
     requested_urls.clear
     stub_faraday(responses, requested_urls: requested_urls) { @organisation.sync_calendar_imports }
     assert_equal [LUMA_FEED_URL], requested_urls
-    assert_equal '#1A2B3C', event.reload.theme_color
+    assert_equal '#1A2B3B', event.reload.theme_color
   end
 
   test "a Luma event's cover image is fetched from Luma's image CDN, larger" do
@@ -113,12 +109,10 @@ class OrganisationsCalendarImportLumaTest < ActiveSupport::TestCase
     cdn_image = 'https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=1,anim=false,background=white,quality=75,%s/event-social/uy/cover.png'
     fetched_images = []
 
-    MiniMagick::Image.stub(:open, ->(_path) { fake_minimagick_image([26, 43, 60], []) }) do
-      stub_luma_images(fetched_images) do
-        stub_faraday(LUMA_FEED_URL => { status: 200, body: ical(luma_event) },
-                     'https://luma.com/event/evt-abc' => { status: 200, body: luma_page(format(cdn_image, 'width=800,height=420')) }) do
-          @organisation.sync_calendar_imports
-        end
+    stub_luma_images(fetched_images) do
+      stub_faraday(LUMA_FEED_URL => { status: 200, body: ical(luma_event) },
+                   'https://luma.com/event/evt-abc' => { status: 200, body: luma_page(format(cdn_image, 'width=800,height=420')) }) do
+        @organisation.sync_calendar_imports
       end
     end
 
@@ -134,12 +128,10 @@ class OrganisationsCalendarImportLumaTest < ActiveSupport::TestCase
       jpeg_named_png.write(File.binread(IMAGE_PATH))
       jpeg_named_png.flush
 
-      MiniMagick::Image.stub(:open, ->(_path) { fake_minimagick_image([26, 43, 60], []) }) do
-        Dragonfly.app.stub(:fetch_url, ->(*) { Dragonfly.app.fetch_file(jpeg_named_png.path) }) do
-          stub_faraday(LUMA_FEED_URL => { status: 200, body: ical(luma_event) },
-                       'https://luma.com/event/evt-abc' => { status: 200, body: luma_page(cdn_image) }) do
-            @organisation.sync_calendar_imports
-          end
+      Dragonfly.app.stub(:fetch_url, ->(*) { Dragonfly.app.fetch_file(jpeg_named_png.path) }) do
+        stub_faraday(LUMA_FEED_URL => { status: 200, body: ical(luma_event) },
+                     'https://luma.com/event/evt-abc' => { status: 200, body: luma_page(cdn_image) }) do
+          @organisation.sync_calendar_imports
         end
       end
     end
@@ -154,12 +146,10 @@ class OrganisationsCalendarImportLumaTest < ActiveSupport::TestCase
     create_organisation(calendar_import_urls: LUMA_FEED_URL, event_image_required_width: 500)
     fetched_images = []
 
-    result = MiniMagick::Image.stub(:open, ->(_path) { fake_minimagick_image([26, 43, 60], []) }) do
-      stub_luma_images(fetched_images) do
-        stub_faraday(LUMA_FEED_URL => { status: 200, body: ical(luma_event) },
-                     'https://luma.com/event/evt-abc' => { status: 200, body: luma_page(OG_IMAGE_URL) }) do
-          @organisation.sync_calendar_imports
-        end
+    result = stub_luma_images(fetched_images) do
+      stub_faraday(LUMA_FEED_URL => { status: 200, body: ical(luma_event) },
+                   'https://luma.com/event/evt-abc' => { status: 200, body: luma_page(OG_IMAGE_URL) }) do
+        @organisation.sync_calendar_imports
       end
     end
 

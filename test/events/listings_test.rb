@@ -135,8 +135,8 @@ class EventListingsTest < ActiveSupport::TestCase
   test 'events stats page loads its table in a request of its own, which renders every row with the same queries however many events there are' do
     create_stats_event(:event1)
     # Every row shows the coordinator's avatar, whose url's Dragonfly job is found once for the table. Stored, and its
-    # thumbnail's job recorded, directly, as an earlier upload and page view would have left them, so the test doesn't
-    # need ImageMagick
+    # thumbnail's job recorded, directly, as an earlier upload and page view would have left them, so the test needs no
+    # image processing
     coordinator = @event1.coordinator
     coordinator.set(image_uid: Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg')))
     DragonflyJob.create!(signature: coordinator.image.thumb('400x400#').signature, uid: Dragonfly.app.store(File.binread('app/assets/images/test-event.jpg')))

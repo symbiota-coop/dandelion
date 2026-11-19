@@ -1,5 +1,4 @@
 require 'faraday/follow_redirects'
-require 'mini_magick'
 require 'nokogiri'
 
 module OrganisationCalendarImports
@@ -330,16 +329,12 @@ module OrganisationCalendarImports
       begin
         path = event.image.path
         if path && File.exist?(path)
-          image = MiniMagick::Image.open(path)
-          image.crop('1x1+0+0')
-          pixel = image.get_pixels('RGB')[0][0]
-          hex = format('#%02X%02X%02X', *pixel)
-          event.theme_color = hex
+          # The top-left pixel, as RGB whatever the image's colour space
+          pixel = Vips::Image.new_from_file(path).colourspace(:srgb).getpoint(0, 0).first(3)
+          event.theme_color = format('#%02X%02X%02X', *pixel.map(&:round))
         end
       rescue StandardError
         nil
-      ensure
-        image&.destroy! if image&.tempfile
       end
     end
 
