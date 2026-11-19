@@ -7,12 +7,16 @@ module TicketNotifications
 
   def send_ticket
     ticket = self
-    order = event.orders.new
     account = if email
                 Account.new(name: ticket.name)
               else
+                # The buyer may have deleted their account (Account's tickets are dependent: :nullify), leaving no one to
+                # send the ticket to
+                return unless ticket.account
+
                 ticket.account
               end
+    order = event.orders.new
     order.tickets = [ticket]
     order.account = account
 
