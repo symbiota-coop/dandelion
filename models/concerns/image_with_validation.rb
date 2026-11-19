@@ -20,12 +20,10 @@ module ImageWithValidation
             @image_format_not_allowed = true
             attachment.assign(nil)
           elsif attachment.image?
-            if attachment.format != 'jpeg'
-              attachment.convert('-format jpeg')
-              attachment.name = "#{SecureRandom.uuid}.jpeg"
-            end
-
-            attachment.process!(:thumb, '1920x1920>')
+            # Always written as a JPEG: ImageMagick writes the format of the output's extension, and without 'format'
+            # that's the name's, so a JPEG named .png (as Luma's image CDN serves them) or .heic was written as one
+            attachment.process!(:thumb, '1920x1920>', 'format' => 'jpeg')
+            attachment.name = "#{SecureRandom.uuid}.jpeg"
           end
         end
       end

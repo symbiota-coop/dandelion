@@ -14,13 +14,10 @@ class Upload
   dragonfly_accessor :file do
     after_assign do |attachment|
       # Other files are kept as they are, never run through ImageMagick (image? runs identify)
+      # Always written as a JPEG, whatever the name's extension says (ImageWithValidation)
       if ImageSignature.allowed?(attachment) && attachment.image?
-        if attachment.format != 'jpeg'
-          attachment.convert('-format jpeg')
-          attachment.name = "#{SecureRandom.uuid}.jpeg"
-        end
-
-        attachment.process!(:thumb, '1920x1920>')
+        attachment.process!(:thumb, '1920x1920>', 'format' => 'jpeg')
+        attachment.name = "#{SecureRandom.uuid}.jpeg"
       end
     end
   end

@@ -24,7 +24,8 @@ module FakeImageMagick
     end
   end
 
-  # Copies the input to the output, or writes a JPEG of its size when asked for one (-format jpeg, or a .jpg output)
+  # Copies the input to the output, or writes a JPEG or PNG of its size when asked for the other (-format, or the
+  # output's extension, as ImageMagick does: a JPEG written to a .png becomes a PNG)
   def self.convert(args)
     input = args[1...-1].map { |arg| arg.sub(/\A\w+:/, '').sub(/\[\d+\]\z/, '') }.find { |arg| File.file?(arg) }
     format, width, height = header(File.binread(input, 65_536))
@@ -33,6 +34,8 @@ module FakeImageMagick
     target = args.include?('-format') ? args[args.index('-format') + 1] : File.extname(args.last).delete('.')
     if %w[jpeg jpg].include?(target.to_s.downcase) && format != 'JPEG'
       File.binwrite(args.last, jpeg(width, height))
+    elsif target.to_s.casecmp?('png') && format != 'PNG'
+      File.binwrite(args.last, png(width, height))
     else
       FileUtils.cp(input, args.last)
     end
@@ -42,6 +45,11 @@ module FakeImageMagick
   # The start and frame header of a JPEG, all identify reads
   def self.jpeg(width, height)
     "\xFF\xD8\xFF\xC0".b + [17, 8, height, width, 3].pack('nCnnC') + "\x01\x22\x00\x02\x11\x01\x03\x11\x01\xFF\xD9".b
+  end
+
+  # The signature and header chunk of a PNG, all identify reads
+  def self.png(width, height)
+    "\x89PNG\r\n\x1A\n".b + [13].pack('N') + 'IHDR' + [width, height, 8, 2, 0, 0, 0].pack('NNCCCCC')
   end
 
   # From the frame header (SOFn), after the segments before it

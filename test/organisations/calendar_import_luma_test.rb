@@ -126,6 +126,30 @@ class OrganisationsCalendarImportLumaTest < ActiveSupport::TestCase
     assert @organisation.events.find_by(calendar_import_uid: 'evt-abc@events.lu.ma').image.present?
   end
 
+  test "a Luma cover image served as a JPEG under a .png name is stored as a JPEG" do
+    create_organisation(calendar_import_urls: LUMA_FEED_URL)
+    # Luma's image CDN answers its .png URLs with JPEGs
+    cdn_image = 'https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,width=800,height=420/event-social/uy/cover.png'
+    Tempfile.create(['cover', '.png'], binmode: true) do |jpeg_named_png|
+      jpeg_named_png.write(File.binread(IMAGE_PATH))
+      jpeg_named_png.flush
+
+      MiniMagick::Image.stub(:open, ->(_path) { fake_minimagick_image([26, 43, 60], []) }) do
+        Dragonfly.app.stub(:fetch_url, ->(*) { Dragonfly.app.fetch_file(jpeg_named_png.path) }) do
+          stub_faraday(LUMA_FEED_URL => { status: 200, body: ical(luma_event) },
+                       'https://luma.com/event/evt-abc' => { status: 200, body: luma_page(cdn_image) }) do
+            @organisation.sync_calendar_imports
+          end
+        end
+      end
+    end
+
+    event = @organisation.events.find_by(calendar_import_uid: 'evt-abc@events.lu.ma')
+    assert event.image.present?
+    assert_equal 'jpeg', event.image.format
+    assert event.image_uid.end_with?('.jpeg'), event.image_uid
+  end
+
   test "an event whose Luma image the organisation's image rules refuse is imported without it" do
     create_organisation(calendar_import_urls: LUMA_FEED_URL, event_image_required_width: 500)
     fetched_images = []

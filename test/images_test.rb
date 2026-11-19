@@ -41,6 +41,39 @@ class ImagesTest < ActiveSupport::TestCase
     end
   end
 
+  test 'image fields store a JPEG named .png or .heic as a JPEG, not in the format its name says' do
+    create_organisation
+    with_imagemagick do
+      %w[.png .heic].each do |ext|
+        with_file(File.binread('app/assets/images/test-event.jpg'), ext) do |file|
+          organisation = Organisation.find(@organisation.id)
+          organisation.image = file
+
+          assert organisation.save, organisation.errors.full_messages.to_sentence
+          organisation.reload
+          assert_equal 'jpeg', organisation.image.format
+          assert organisation.image_uid.end_with?('.jpeg'), organisation.image_uid
+        end
+      end
+    end
+  end
+
+  test 'uploads store images as JPEGs, including a JPEG named .png' do
+    account = FactoryBot.create(:account)
+    with_imagemagick do
+      { 'coop.png' => '.png', 'test-event.jpg' => '.png' }.each do |name, ext|
+        with_file(File.binread("app/assets/images/#{name}"), ext) do |file|
+          upload = Upload.new(account: account, file: file)
+
+          assert upload.save, upload.errors.full_messages.to_sentence
+          upload.reload
+          assert_equal 'jpeg', upload.file.format
+          assert upload.file_uid.end_with?('.jpeg'), upload.file_uid
+        end
+      end
+    end
+  end
+
   test 'uploads keep files that are not images as they are, and refuse SVGs' do
     account = FactoryBot.create(:account)
     with_file(SVG, '.txt') do |file|
