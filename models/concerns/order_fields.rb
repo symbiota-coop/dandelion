@@ -87,13 +87,22 @@ module OrderFields
   end
 
   # Stripe refuses metadata keys over 40 characters and values over 500, and the buyer's name and answers have no such
-  # limit, so they're cut to fit rather than failing the checkout
+  # limit, so they're cut to fit rather than failing the checkout. Two long keys can cut to the same one (questions
+  # that start alike), so a key that's taken ends _2, _3... instead, rather than one answer overwriting the other
   STRIPE_METADATA_MAX_KEY_LENGTH = 40
   STRIPE_METADATA_MAX_VALUE_LENGTH = 500
 
   def stripe_metadata(hash)
-    hash.to_h do |key, value|
-      [key.to_s[0, STRIPE_METADATA_MAX_KEY_LENGTH].to_sym, value.is_a?(String) ? value[0, STRIPE_METADATA_MAX_VALUE_LENGTH] : value]
+    hash.each_with_object({}) do |(key, value), metadata|
+      cut = key.to_s[0, STRIPE_METADATA_MAX_KEY_LENGTH]
+      key = cut
+      n = 1
+      while metadata.key?(key.to_sym)
+        n += 1
+        suffix = "_#{n}"
+        key = cut[0, STRIPE_METADATA_MAX_KEY_LENGTH - suffix.length] + suffix
+      end
+      metadata[key.to_sym] = value.is_a?(String) ? value[0, STRIPE_METADATA_MAX_VALUE_LENGTH] : value
     end
   end
 end
