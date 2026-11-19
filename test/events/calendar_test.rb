@@ -442,6 +442,25 @@ class CalendarTest < ActiveSupport::TestCase
     assert_equal 302, last_response.status
   end
 
+  test 'the birthdays ics leaves out a February 29 birthday in a year without one, and lists the others' do
+    account = FactoryBot.create(:account)
+    leapling = FactoryBot.create(:account, name: 'Lee Leapling', date_of_birth: Date.new(1992, 2, 29), date_of_birth_privacy: 'Public')
+    followee = FactoryBot.create(:account, name: 'Jan January', date_of_birth: Date.new(1990, 1, 1), date_of_birth_privacy: 'Public')
+    Follow.create!(follower: account, followee: leapling)
+    Follow.create!(follower: account, followee: followee)
+
+    travel_to Time.utc(2026, 11, 18, 12) do
+      assert_nil leapling.reload.next_birthday # 2026 has no February 29
+
+      get "/birthdays.ics?ics_key=#{account.ics_key}"
+      assert_equal 200, last_response.status
+      assert_includes last_response.body, 'BEGIN:VCALENDAR'
+      assert_includes last_response.body, 'Jan January'
+      assert_includes last_response.body, 'DTSTART;VALUE=DATE:20270101'
+      refute_includes last_response.body, 'Lee Leapling'
+    end
+  end
+
   test 'ics key grants access to my events ics but not my events html' do
     covers_route 'GET /events/my'
     create_organisation
