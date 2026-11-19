@@ -4,6 +4,7 @@ require_relative 'helpers/checkout_webhook_helpers'
 # RecordLock, and what holds one: bookings of an event, its discount codes and a buyer's credit, and joining an option
 # or a gathering. Each holds the lock in another thread, as a request would, to show the code waits for it
 class RecordLockTest < ActiveSupport::TestCase
+  include Rack::Test::Methods
   include CheckoutWebhookHelpers
 
   # Holds record's lock in another thread while the block runs
@@ -100,9 +101,9 @@ class RecordLockTest < ActiveSupport::TestCase
     assert_equal 1, order.tickets.count
     assert_equal true, order.tickets.first.payment_completed
     refute @gathering.memberships.find_by(account: buyer)
-    assert_equal 1, queued_jobs(:join_gathering).count
+    assert_equal 1, queued_jobs(:join_gathering_later).count
 
-    run_jobs(:join_gathering)
+    run_jobs(:join_gathering_later)
     membership = @gathering.memberships.find_by(account: buyer)
     assert membership
     assert_equal true, membership.unsubscribed
@@ -122,8 +123,63 @@ class RecordLockTest < ActiveSupport::TestCase
     assert_equal 1, queued_jobs(:send_tickets, on: Order).count
     refute @gathering.memberships.find_by(account: order.account)
 
-    run_jobs(:join_gathering)
+    run_jobs(:join_gathering_later)
     assert @gathering.memberships.find_by(account: order.account)
+  end
+
+  test 'a buyer whose order is transferred before they join the event’s gathering doesn’t join the new event’s gathering' do
+    create_gathering(privacy: 'open')
+    create_event(prices: [0], gathering: @gathering)
+    other_gathering = FactoryBot.create(:gathering, account: @account, privacy: 'secret')
+    other_event = create_event(prices: [0], gathering: other_gathering, as: :other_event)
+    buyer = FactoryBot.create(:account)
+
+    waiting_briefly do
+      held_elsewhere(@gathering) { book_holding_locks(buyer) }
+    end
+    order = @event.orders.first
+    assert_equal true, order.payment_completed
+    assert_equal 1, queued_jobs(:join_gathering_later).count
+
+    sign_in_with_rack(@account)
+    post "/orders/#{order.id}/transfer", order: { event_id: other_event.id }
+    assert_equal 302, last_response.status
+    assert_equal other_event.id, Ticket.find(order.tickets.first.id).event_id
+
+    run_jobs(:join_gathering_later)
+    refute other_gathering.memberships.find_by(account: buyer)
+    refute @gathering.memberships.find_by(account: buyer)
+    assert_equal 0, queued_jobs(:join_gathering_later).count
+  end
+
+  test 'no one joins later if the ticket is deleted, given to another buyer or its event’s gathering changes first' do
+    create_gathering(privacy: 'open')
+    create_event(prices: [0], gathering: @gathering)
+    other_gathering = FactoryBot.create(:gathering, account: @account, privacy: 'secret')
+    other_buyer = FactoryBot.create(:account)
+    changes = {
+      deleted: ->(ticket) { ticket.destroy },
+      given_to_another_buyer: ->(ticket) { ticket.set(account_id: other_buyer.id) },
+      gathering_changed: ->(_ticket) { @event.set(gathering_id: other_gathering.id) }
+    }
+
+    changes.each do |change, make|
+      @event.set(gathering_id: @gathering.id)
+      buyer = FactoryBot.create(:account)
+      waiting_briefly do
+        held_elsewhere(@gathering) { book_holding_locks(buyer) }
+      end
+      ticket = @event.tickets.find_by(account: buyer)
+      assert ticket, change
+      assert_equal 1, queued_jobs(:join_gathering_later).count, change
+
+      make.call(ticket)
+      run_jobs(:join_gathering_later)
+      [buyer, other_buyer].each do |account|
+        refute @gathering.memberships.find_by(account: account), change
+        refute other_gathering.memberships.find_by(account: account), change
+      end
+    end
   end
 
   test 'joining an option or a gathering waits for others joining it, and a full option takes no one' do
