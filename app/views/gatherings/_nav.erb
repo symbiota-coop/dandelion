@@ -7,7 +7,7 @@
 <% timetables = gathering.timetables.to_a if gathering.enable_timetables %>
 <% rotas = gathering.rotas.to_a if gathering.enable_rotas %>
 <% owed = membership&.owes_contribution? %>
-<% pay_badge = ->(colour) { next unless membership; %(<span class="contribution-label badge #{owed ? 'text-bg-danger' : colour}" data-colour="#{colour}">#{m (membership.paid or 0), gathering.currency}/#{m membership.requested_contribution, gathering.currency}</span>) } %>
+<% pay_badge = ->(colour) { next unless membership; %(<span class="contribution-label badge #{owed ? 'text-bg-danger' : colour}" data-colour="#{colour}">#{m (membership.paid || 0), gathering.currency}/#{m membership.requested_contribution, gathering.currency}</span>) } %>
 <%# Pills on desktop, and on mobile the same pill-and-sheet nav as organisations and events %>
 <div id="gathering-nav" class="mb-3 bg-dark p-1 rounded d-none d-md-block">
   <%= ul_nav [

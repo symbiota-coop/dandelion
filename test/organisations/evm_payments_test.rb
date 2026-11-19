@@ -27,7 +27,7 @@ class OrganisationEvmPaymentsTest < ActiveSupport::TestCase
       def success? = status.between?(200, 299)
     end
     responder = lambda do |url|
-      chain = %w[gnosis base celo].find { |name| url == blockscout_url(name, address) } or raise "Unexpected Faraday.get for #{url}"
+      chain = %w[gnosis base celo].find { |name| url == blockscout_url(name, address) } || raise("Unexpected Faraday.get for #{url}")
       response = responses.fetch(chain, [])
       raise response if response.is_a?(Exception)
       next response_class.new(response, '') if response.is_a?(Integer)

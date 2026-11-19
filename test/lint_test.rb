@@ -736,7 +736,8 @@ class LintTest < Minitest::Test
         next unless owner&.match?(/(Test|Helpers|TestCase)\z/) && line =~ /\A  def (?:self\.)?(\w+[?!=]?)(?!.*\) = |.* = )/
 
         name = Regexp.last_match(1)
-        last = ((index + 1)...lines.size).find { |i| lines[i].start_with?('  end') } or next
+        last = ((index + 1)...lines.size).find { |i| lines[i].start_with?('  end') }
+        next unless last
         body = lines[(index + 1)...last].reject { |body_line| body_line.strip.start_with?('#') }.join.split.join(' ')
         [name, path.delete_prefix("#{ROOT}/"), index + 1, body]
       end

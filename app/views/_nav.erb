@@ -111,7 +111,7 @@
             ['Create a gathering', '/g/new'],
             ['All gatherings', '/gatherings']
           ] +
-        current_account.memberships.includes(:gathering).select { |membership| membership.gathering == @gathering or !membership.hide_from_sidebar }.sort_by { |membership| membership.gathering.name }.map { |membership| [membership.gathering.name, "/g/#{membership.gathering.slug}"] }),
+        current_account.memberships.includes(:gathering).select { |membership| membership.gathering == @gathering || !membership.hide_from_sidebar }.sort_by { |membership| membership.gathering.name }.map { |membership| [membership.gathering.name, "/g/#{membership.gathering.slug}"] }),
                  ul_class: "sub-menu list-unstyled collapse #{'show' if active}",
                  ul_id: 'sidebar-gatherings',
                  li_class: '',

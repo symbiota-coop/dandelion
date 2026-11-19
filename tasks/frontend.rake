@@ -26,7 +26,7 @@ namespace :frontend do
       # compromised release time to be found and pulled first. Only npm packages' files have a release date to check
       if (match = url.match(%r{\Ahttps://cdn\.jsdelivr\.net/npm/((?:@[^/]+/)?[^@/]+)@([^/]+)/}))
         package, version = match.captures
-        released = release_times[package][version] or raise "#{package}@#{version}: not on the npm registry"
+        released = release_times[package][version] || raise("#{package}@#{version}: not on the npm registry")
         age = Time.now - Time.parse(released)
         raise "#{package}@#{version}: released #{format("%.1f", age / 86_400)} days ago, under the 7-day cooldown" if age < 7 * 86_400
       end

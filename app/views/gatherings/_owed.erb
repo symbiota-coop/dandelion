@@ -3,7 +3,7 @@
   <div id="owed" class="card text-bg-danger mb-3">
     <div class="card-body">
       You owe <%= m (@membership.requested_contribution - @membership.paid), @gathering.currency %>.
-      (You've paid <%= m (@membership.paid or 0), @gathering.currency %> of a requested contribution of <%= m @membership.requested_contribution, @gathering.currency %>.)
+      (You've paid <%= m (@membership.paid || 0), @gathering.currency %> of a requested contribution of <%= m @membership.requested_contribution, @gathering.currency %>.)
       <div class="mt-2">
         <%= partial :'gatherings/pay', locals: { amount: (@membership.requested_contribution - @membership.paid) } %>
       </div>
@@ -35,7 +35,7 @@
 <script>
   $(function() {
     const owed = <%== @membership.owes_contribution?.to_json %>
-    $('.contribution-label').text(<%== %(#{m (@membership.paid or 0), @gathering.currency}/#{m @membership.requested_contribution, @gathering.currency}).to_json %>).each(function () {
+    $('.contribution-label').text(<%== %(#{m (@membership.paid || 0), @gathering.currency}/#{m @membership.requested_contribution, @gathering.currency}).to_json %>).each(function () {
       $(this).removeClass('text-bg-danger ' + $(this).attr('data-colour')).addClass(owed ? 'text-bg-danger' : $(this).attr('data-colour'))
     })
   })

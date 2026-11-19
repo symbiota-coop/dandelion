@@ -13,7 +13,8 @@ module Refundable
   end
 
   def refund_payment(amount: nil, **)
-    pm = payment_method or return
+    pm = payment_method
+    return unless pm
 
     failed = false
     result = pm.refund.call(

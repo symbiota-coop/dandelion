@@ -56,7 +56,8 @@ task 'test:parallel' do
   failed = []
   until runs.empty?
     pid, status = Process.wait2
-    run = runs.find { |r| r[:pid] == pid } or next
+    run = runs.find { |r| r[:pid] == pid }
+    next unless run
     runs.delete(run)
     puts "━━ #{run[:files].join(' ')}: #{status.success? ? 'passed' : 'failed'}"
     puts File.read(run[:log])

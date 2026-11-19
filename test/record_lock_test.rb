@@ -60,7 +60,7 @@ class RecordLockTest < ActiveSupport::TestCase
         release = Queue.new
         thread = Thread.new { RecordLock.hold(@event) { release.pop } }
         sleep 0.1 until RecordLock.collection.count_documents(_id: "Event:#{@event.id}") == 1
-        Thread.new { sleep 0.4 and release << true }
+        Thread.new { sleep 0.4; release << true }
         started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         assert_raises(RecordLock::Busy) { RecordLock.hold(@event, @organisation) { flunk 'held twice' } }
         assert_operator Process.clock_gettime(Process::CLOCK_MONOTONIC) - started, :<, 0.9

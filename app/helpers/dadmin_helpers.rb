@@ -76,14 +76,16 @@ Dandelion::App.helpers do
   def dadmin_criterion(model, fieldname, operator, value)
     if fieldname.include?('.')
       collection, fieldname = fieldname.split('.', 2)
-      collection_assoc = dadmin_assoc(model, collection, relationship: :has_many) or return
+      collection_assoc = dadmin_assoc(model, collection, relationship: :has_many)
+      return unless collection_assoc
       collection_model = collection_assoc.class_name.constantize
       key = collection_assoc.foreign_key.to_sym
     else
       collection_model = model
       key = :id
     end
-    options = dadmin_fields(collection_model)[fieldname.to_sym] or return
+    options = dadmin_fields(collection_model)[fieldname.to_sym]
+    return unless options
     type = options[:type]
     return unless type == :lookup || dadmin_persisted_field?(collection_model, fieldname)
 
@@ -133,7 +135,8 @@ Dandelion::App.helpers do
   end
 
   def dadmin_lookup_record(model, fieldname, resource)
-    id = resource.send(fieldname) or return
+    id = resource.send(fieldname)
+    return unless id
     dadmin_assoc(model, fieldname).class_name.constantize.find(id)
   end
 

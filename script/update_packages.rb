@@ -67,7 +67,8 @@ end
 
 # The newest of releases ({ name => release time }) out of the cooldown, newer than current and on a held major
 def newest(name, current, releases)
-  current_version = version(current) or return
+  current_version = version(current)
+  return unless current_version
   releases.filter_map do |release, released_at|
     v = version(release)
     next unless v && !v.prerelease? && v > current_version && released_at && Time.now - released_at >= COOLDOWN
@@ -111,7 +112,8 @@ def update_frontend
   json['dependencies'].each do |name, current|
     registry = get_json("https://registry.npmjs.org/#{name.sub('/', '%2F')}")
     times = registry['time'].to_h { |v, time| [v, Time.parse(time)] }.slice(*registry['versions'].keys)
-    to = newest(name, current, times) or next
+    to = newest(name, current, times)
+    next unless to
 
     log "  #{name} #{current} -> #{to}"
     missing = urls.grep(%r{/npm/#{Regexp.escape(name)}@#{Regexp.escape(current)}/}).filter_map do |url|
@@ -141,7 +143,8 @@ def update_actions
     tags = releases.to_h { |release| [release['tag_name'], Time.parse(release['published_at'])] }
     current = ACTION_FILES.flat_map { |file| File.read(file, encoding: 'UTF-8').scan(ACTION_PIN) }.select { |match| match[1] == repo }.map(&:last)
     oldest = current.min_by { |tag| version(tag) || Gem::Version.new('0') }
-    to = newest(repo, oldest, tags) or next
+    to = newest(repo, oldest, tags)
+    next unless to
 
     log "  #{repo} #{oldest} -> #{to}"
     [repo, oldest, to, github("repos/#{repo}/commits/#{to}")['sha']]

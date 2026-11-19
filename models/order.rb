@@ -271,7 +271,8 @@ class Order
   # contact_ids is nil for jobs queued before it was passed
   def self.refund_destroyed(order_id, contact_ids = nil)
     Event.unscoped do
-      order = Order.unscoped.find(order_id) or return
+      order = Order.unscoped.find(order_id)
+      return unless order
       order.refund_contacts = Account.in(id: contact_ids).to_a if contact_ids
       order.refund
     end

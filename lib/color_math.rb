@@ -5,7 +5,7 @@ module ColorMath
 
   # [r, g, b] from 0 to 255, from #rgb or #rrggbb
   def self.rgb(hex)
-    digits = hex[HEX, 1] or raise ArgumentError, "not a hex colour: #{hex.inspect}"
+    digits = hex[HEX, 1] || raise(ArgumentError, "not a hex colour: #{hex.inspect}")
     digits = digits.chars.map { |c| c * 2 }.join if digits.length == 3
     digits.scan(/../).map(&:hex)
   end

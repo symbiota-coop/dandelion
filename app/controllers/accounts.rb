@@ -415,7 +415,8 @@ Dandelion::App.controller do
         partial :'accounts/modal'
       end
     elsif @account.private? && (!current_account || (current_account.id != @account.id))
-      flash[:error] = 'That profile is private' and redirect back
+      flash[:error] = 'That profile is private'
+      redirect back
     else
       erb :'accounts/account'
     end
