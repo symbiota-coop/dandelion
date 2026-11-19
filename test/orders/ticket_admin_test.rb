@@ -128,6 +128,47 @@ class OrdersTicketAdminTest < ActiveSupport::TestCase
     assert_equal @order.id, Ticket.find(@ticket.id).order_id
   end
 
+  test "resending a single ticket whose buyer has deleted their account says there is no one to send it to" do
+    create_paid_ticket
+    assert_nil @ticket.email
+    @attendee.destroy
+    assert_nil Ticket.find(@ticket.id).account
+    sign_in(create_facilitator(@event))
+
+    visit "/e/#{@event.slug}/tickets"
+    assert page.has_content? '(deleted account)'
+    click_button 'Actions'
+    click_link 'Resend single ticket'
+    assert page.has_content? "The ticket's buyer has deleted their account, so there's no one to send the ticket to."
+    assert_equal 0, queued_jobs(:send_ticket).count
+  end
+
+  test "a single ticket ordered for someone else still goes to their email after the buyer deletes their account" do
+    create_paid_ticket
+    @ticket.update_attributes!(name: 'Ticket Holder', email: 'holder@example.com')
+    @attendee.destroy
+    assert_nil Ticket.find(@ticket.id).account
+    sign_in(create_facilitator(@event))
+
+    visit "/e/#{@event.slug}/tickets"
+    click_button 'Actions'
+    click_link 'Resend single ticket'
+    assert page.has_content? 'The ticket was resent.'
+
+    emails = emails_sent_by_jobs(:send_ticket)
+    assert_equal [['holder@example.com']], emails.map(&:recipients)
+  end
+
+  test 'a queued ticket email whose buyer has since deleted their account sends nothing, rather than failing' do
+    create_paid_ticket
+    @ticket.send_ticket
+    assert_equal 1, queued_jobs(:send_ticket).count
+    @attendee.destroy
+
+    assert_empty emails_sent_by_jobs(:send_ticket)
+    assert_equal 0, queued_jobs(:send_ticket).count
+  end
+
   test "someone who isn't an admin of a ticket's event can't resend it" do
     create_paid_ticket
     _, _, other_admin = create_other_event_ticket

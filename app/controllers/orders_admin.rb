@@ -201,8 +201,12 @@ Dandelion::App.controller do
     @ticket = Ticket.find(params[:id]) || not_found
     @event = @ticket.event
     event_admins_only!
-    @ticket.send_ticket
-    flash[:notice] = 'The ticket was resent.'
+    if @ticket.email || @ticket.account
+      @ticket.send_ticket
+      flash[:notice] = 'The ticket was resent.'
+    else
+      flash[:notice] = "The ticket's buyer has deleted their account, so there's no one to send the ticket to."
+    end
     redirect back
   end
 
