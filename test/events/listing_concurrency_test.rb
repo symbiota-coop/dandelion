@@ -67,6 +67,31 @@ class EventListingConcurrencyTest < ActiveSupport::TestCase
     assert_equal 200, last_response.status
   end
 
+  test 'a page a browser opens is turned away with a page that reloads itself, and scripts and feeds with text' do
+    create_event
+    browser = { 'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,*/*;q=0.8' }
+    while_listings_are_full do
+      ['/events', "/o/#{@organisation.slug}/events", "/o/#{@organisation.slug}/events.html", '/events/'].each do |path|
+        get path, {}, browser
+        assert_equal 503, last_response.status, path
+        assert_equal ListingConcurrencyLimit::RETRY_AFTER_SECONDS.to_s, last_response.headers['retry-after'], path
+        assert_includes last_response.content_type, 'text/html', path
+        assert_includes last_response.body, %(<meta http-equiv="refresh" content="#{ListingConcurrencyLimit::RETRY_AFTER_SECONDS}">), path
+        assert_includes last_response.body, ListingConcurrencyLimit::BUSY_MESSAGE, path
+      end
+
+      # A pagelet's XHR asks for HTML too, but isn't a page to reload
+      get "/o/#{@organisation.slug}/events", {}, browser.merge('HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest')
+      assert_equal 503, last_response.status
+      assert_equal ListingConcurrencyLimit::BUSY_MESSAGE, last_response.body
+      ["/o/#{@organisation.slug}/events.ics", '/events.json'].each do |path|
+        get path, {}, browser
+        assert_equal 503, last_response.status, path
+        assert_equal ListingConcurrencyLimit::BUSY_MESSAGE, last_response.body, path
+      end
+    end
+  end
+
   test 'signed-in sessions are not turned away when listings are full' do
     create_event
     sign_in_with_rack(@account)
