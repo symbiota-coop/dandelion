@@ -206,8 +206,10 @@ class Paypal
     token
   end
 
+  # With the secret, as client ids aren't secret: keyed by host and client id alone, anyone who gave an organisation
+  # another's client id and any secret would get that one's cached token. A digest, so the key doesn't hold it
   def token_cache_key
-    "#{@host}:#{@client_id}"
+    "#{@host}:#{@client_id}:#{Digest::SHA256.hexdigest(@secret.to_s)}"
   end
 
   def paypal_headers(request_id)

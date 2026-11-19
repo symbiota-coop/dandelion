@@ -237,6 +237,40 @@ class PaymentsPaypalCheckoutTest < ActiveSupport::TestCase
     assert order.tickets.first.payment_completed?
   end
 
+  test 'a cached PayPal token is only used with the secret it was got with, not just the same client id' do
+    requests = []
+    stubs = Faraday::Adapter::Test::Stubs.new do |stub|
+      stub.post('/v1/oauth2/token') do |env|
+        requests << env
+        if env.request_headers['Authorization'] == "Basic #{Base64.strict_encode64('shared_client:real_secret')}"
+          [200, JSON_HEADERS, { access_token: 'real-token', expires_in: 3600 }.to_json]
+        else
+          [401, JSON_HEADERS, { error: 'invalid_client' }.to_json]
+        end
+      end
+      stub.get('/v1/notifications/webhooks') do |env|
+        requests << env
+        [200, JSON_HEADERS, { webhooks: [] }.to_json]
+      end
+    end
+
+    Faraday.stub :default_adapter, :test do
+      Faraday::Adapter::Test::Stubs.stub :new, stubs do
+        Paypal.new(client_id: 'shared_client', secret: 'real_secret').list_webhooks
+        Paypal.new(client_id: 'shared_client', secret: 'real_secret').list_webhooks
+        assert_equal 1, requests_to(requests, :post, '/v1/oauth2/token').size
+
+        error = assert_raises(Paypal::RequestError) { Paypal.new(client_id: 'shared_client', secret: 'any_secret').list_webhooks }
+        assert_equal 401, error.status
+      end
+    end
+
+    assert_equal 2, requests_to(requests, :post, '/v1/oauth2/token').size
+    webhook_requests = requests_to(requests, :get, '/v1/notifications/webhooks')
+    assert_equal 2, webhook_requests.size
+    assert(webhook_requests.all? { |env| env.request_headers['Authorization'] == 'Bearer real-token' })
+  end
+
   test 'a PayPal order captured already completes the order without capturing it again' do
     covers_route 'GET /e/:slug/orders/:order_id/payment_completed'
     create_paypal_organisation
