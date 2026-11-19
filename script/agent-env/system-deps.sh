@@ -20,6 +20,7 @@ $SUDO apt-get install -y --no-install-recommends \
   fonts-liberation \
   git \
   imagemagick \
+  libvips-tools \
   libffi-dev \
   libssl-dev \
   libtool \

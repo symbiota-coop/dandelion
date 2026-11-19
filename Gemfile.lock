@@ -121,6 +121,9 @@ GEM
       base64 (~> 0.2)
       concurrent-ruby (~> 1.1)
       websocket-driver (~> 0.7)
+    ffi (1.17.4-aarch64-linux-gnu)
+    ffi (1.17.4-arm64-darwin)
+    ffi (1.17.4-x86_64-linux-gnu)
     fog-aws (3.33.5)
       base64 (>= 0.2, < 0.4)
       fog-core (~> 2.6)
@@ -209,7 +212,6 @@ GEM
     mini_magick (5.4.0)
       logger
     mini_mime (1.1.5)
-    mini_portile2 (2.8.9)
     minitest (6.1.0)
       drb (~> 2.0)
       prism (>= 1.5, < 3)
@@ -251,10 +253,11 @@ GEM
     net-smtp (0.5.2)
       net-protocol
     nio4r (2.7.5)
-    nokogiri (1.19.7)
-      mini_portile2 (~> 2.8.2)
+    nokogiri (1.19.7-aarch64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.19.7-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.19.7-x86_64-linux-gnu)
       racc (~> 1.4)
     oauth2 (2.1.0)
       anonymous_loader (~> 0.1, >= 0.1.5)
@@ -334,7 +337,9 @@ GEM
       css_parser (>= 3.1.0)
     prettyprint (0.2.1)
     prism (2.1.0)
+    prism (2.1.0-aarch64-linux-gnu)
     prism (2.1.0-arm64-darwin)
+    prism (2.1.0-x86_64-linux-gnu)
     public_suffix (7.0.5)
     puma (8.0.2)
       nio4r (~> 2.0)
@@ -416,6 +421,9 @@ GEM
       faraday (>= 1)
       faraday-multipart (>= 1)
     ruby-progressbar (1.13.0)
+    ruby-vips (2.3.0)
+      ffi (~> 1.12)
+      logger
     sanitize (7.0.2)
       crass (~> 1.0.8)
       nokogiri (>= 1.19.7)
@@ -476,8 +484,10 @@ GEM
     zstd-ruby (2.0.10)
 
 PLATFORMS
+  aarch64-linux
   arm64-darwin-23
-  ruby
+  arm64-darwin-25
+  x86_64-linux
 
 DEPENDENCIES
   activemodel
@@ -537,6 +547,7 @@ DEPENDENCIES
   rubocop
   rubocop-minitest
   ruby-openai
+  ruby-vips
   sanitize
   sentry-delayed_job
   sentry-ruby

@@ -136,7 +136,7 @@ jobs:
           - group: gatherings
             files: gatherings/gatherings gatherings/members notifications
           - group: general
-            files: dadmin admin_pages_browser design images search errands record_lock sentry stats_database stats_pages organisations/activity_applications messages/markup site_pages site_routes
+            files: dadmin admin_pages_browser design images dragonfly_vips search errands record_lock sentry stats_database stats_pages organisations/activity_applications messages/markup site_pages site_routes
           - group: integrations
             files: admin_pages integrations/mcp integrations/mcp_checkout integrations/whatsapp integrations/zapier integrations/webhooks integrations/analytics_providers events/admin_reports events/my_events accounts/account_routes organisations/organisation_routes
           - group: messages
@@ -213,10 +213,11 @@ jobs:
         key: cdn-cache-${{ hashFiles('frontend/integrity.json', 'app/views/layouts/_head.erb') }}
         restore-keys: cdn-cache-
 
-    # Production's Dragonfly runs ImageMagick, and images_test.rb checks our policy against it; the runner has none
-    - name: Install ImageMagick
+    # Production's Dragonfly runs ImageMagick, and images_test.rb checks our policy against it; dragonfly_vips_test.rb
+    # runs the libvips plugin that's to replace it. The runner has neither
+    - name: Install ImageMagick and libvips
       if: contains(format(' {0} ', matrix.files), ' images ')
-      run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends imagemagick
+      run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends imagemagick libvips-tools
 
     # How long each of the group's files took in its last run, which rake test:parallel splits them by, and saves after.
     # A cache entry can't be overwritten, so each run saves its own and the next restores the newest; files with no time

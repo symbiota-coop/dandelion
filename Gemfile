@@ -14,6 +14,7 @@ gem 'activemodel'
 gem 'delayed_job_mongoid'
 gem 'dragonfly'
 gem 'dragonfly-s3_data_store'
+gem 'ruby-vips', require: false # for Dragonfly's image processing (lib/dragonfly_vips.rb), which requires it
 gem 'mongoid'
 gem 'mongoid_paranoia'
 gem 'redis'
