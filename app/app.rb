@@ -236,10 +236,12 @@ module Dandelion
         # As the page does: not private profiles (Account.ids_by_next_birthday), nor birthdays hidden from this account
         current_account.following.and(hidden: false).each do |account|
           next unless viewable?(account, :date_of_birth)
+          # nil for a February 29 birthday in a year without one, as on the birthdays page
+          next unless (next_birthday = account.next_birthday)
 
           cal.event do |e|
             e.summary = "#{account.name}'s #{(account.age + 1).ordinalize} birthday"
-            e.dtstart = Icalendar::Values::Date.new(account.next_birthday.to_date)
+            e.dtstart = Icalendar::Values::Date.new(next_birthday.to_date)
             e.description = %(#{ENV['BASE_URI']}/u/#{account.username})
             e.uid = account.id.to_s
           end
