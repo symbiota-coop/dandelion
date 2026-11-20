@@ -32,7 +32,7 @@ class AccountPrivateSessionVouchesTest < ActiveSupport::TestCase
 
     visit '/private_sessions'
     assert page.has_css?('#private-sessions .badge', text: '1')
-    assert page.has_css?('#private-sessions .private-session-vouchers img[title="Robin Client"]')
+    assert page.has_css?('#private-sessions .private-session-vouchers img.avatar-sm[title="Vouched for by Robin Client"]')
   end
 
   test "the list shows each session's vouchers, newest first, and none on a session no one has vouched for" do

@@ -1,7 +1,8 @@
-<%# cors: loads the image with CORS, so a script can read its pixels. The image CDN only sends CORS headers when asked,
+<%# tooltip: the image's tooltip in place of the account's name (and content)
+    cors: loads the image with CORS, so a script can read its pixels. The image CDN only sends CORS headers when asked,
     without Vary: Origin, so the image gets a URL of its own (?cors) rather than reusing a copy cached without them %>
 <% src = account.image_thumb_or_gravatar_url %>
 <% src = "#{src}#{src.include?('?') ? '&' : '?'}cors" if defined?(cors) && cors %>
 <a class="text-decoration-none" href="javascript:;" data-account-username="<%= account.username %>">
-  <img alt="<%= account.name %>"<% if defined?(cors) && cors %> crossorigin="anonymous"<% end %> class="avatar avatar-<%= defined?(size) && size ? size : :sm %> <%= klass if defined?(klass) %> <%= account.avatar_class %> <%= 'private' if account.private? %>" data-bs-toggle="tooltip" title="<%= account.name %><% if defined?(content) && content %>: <%= content %><% end %>" src="<%= u src %>">
+  <img alt="<%= account.name %>"<% if defined?(cors) && cors %> crossorigin="anonymous"<% end %> class="avatar avatar-<%= defined?(size) && size ? size : :sm %> <%= klass if defined?(klass) %> <%= account.avatar_class %> <%= 'private' if account.private? %>" data-bs-toggle="tooltip" title="<% if defined?(tooltip) && tooltip %><%= tooltip %><% else %><%= account.name %><% if defined?(content) && content %>: <%= content %><% end %><% end %>" src="<%= u src %>">
 </a>
