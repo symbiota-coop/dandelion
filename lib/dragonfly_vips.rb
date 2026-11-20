@@ -101,9 +101,9 @@ module DragonflyVips
     format = 'jpeg' if format == 'jpg'
     suffix = SAVERS.fetch(format) { raise UnsupportedFormat, "can't write #{format}" }
     image = srgb(image)
-    # No EXIF (a phone photo's GPS position among it), XMP or ICC profile: the pixels are sRGB now. strip rather than
-    # keep, which needs libvips 8.15, and Debian bookworm's (Render's) is 8.14
-    options = { strip: true }
+    # No EXIF (a phone photo's GPS position among it), XMP or ICC profile: the pixels are sRGB now. keep (libvips 8.15,
+    # which Render has) in place of strip, which it deprecates
+    options = { keep: :none }
     if %w[jpeg webp heic].include?(format)
       options[:Q] = quality || DEFAULT_QUALITY
       # As ImageMagick does: about a fifth smaller, and the same pixels

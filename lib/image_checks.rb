@@ -6,8 +6,8 @@
 module ImageChecks
   Check = Struct.new(:group, :name, :ok, :detail, :ms, keyword_init: true)
 
-  # Block untrusted loaders (Vips.block_untrusted) needs 8.13; Render's Debian bookworm has 8.14
-  MINIMUM_VERSION = Gem::Version.new('8.13')
+  # Saving with keep (DragonflyVips.write) needs 8.15, which Render has (8.15.3), as do CI's Ubuntu and Homebrew
+  MINIMUM_VERSION = Gem::Version.new('8.15')
   HEIC_SAMPLE = File.expand_path('image_checks/sample.heic', __dir__)
   FORMATS = { 'jpeg' => '.jpg', 'png' => '.png', 'gif' => '.gif', 'webp' => '.webp', 'heic' => '.heic' }.freeze
   SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10"/></svg>'.freeze

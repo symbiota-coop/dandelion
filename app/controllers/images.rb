@@ -55,6 +55,6 @@ Dandelion::App.controller do
     thumbnail = thumbnail.composite2(play, :over, x: (thumbnail.width - play.width) / 2, y: (thumbnail.height - play.height) / 2)
 
     content_type 'image/jpeg'
-    thumbnail.flatten.write_to_buffer('.jpg', Q: 90, strip: true)
+    thumbnail.flatten.write_to_buffer('.jpg', Q: 90, keep: :none)
   end
 end
