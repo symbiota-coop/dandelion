@@ -1,0 +1,37 @@
+<%# A set of ServerChecks::Check, as /stats/atlas and /stats/images show them: how many passed, then each by group %>
+<% passed = checks.count(&:ok) %>
+<p>
+  <span class="badge <%= passed == checks.size ? 'text-bg-primary' : 'text-bg-danger' %>"><%= passed %> of <%= checks.size %> passed</span>
+</p>
+
+<table class="table table-hr">
+  <thead>
+    <tr>
+      <th>Check</th>
+      <th>Result</th>
+      <th>Detail</th>
+      <th class="text-end">Time</th>
+    </tr>
+  </thead>
+  <% checks.group_by(&:group).each do |group, checks| %>
+    <tbody>
+      <tr>
+        <th colspan="4"><%= group %></th>
+      </tr>
+      <% checks.each do |check| %>
+        <tr>
+          <td><%= check.name %></td>
+          <td>
+            <% if check.ok %>
+              <span class="badge text-bg-primary"><i class="bi bi-check-lg"></i> Passed</span>
+            <% else %>
+              <span class="badge text-bg-danger"><i class="bi bi-x-lg"></i> Failed</span>
+            <% end %>
+          </td>
+          <td class="small"><%= check.detail %></td>
+          <td class="text-end text-body-secondary small"><%= check.ms %> ms</td>
+        </tr>
+      <% end %>
+    </tbody>
+  <% end %>
+</table>

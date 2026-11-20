@@ -3,44 +3,10 @@
   Checks that libvips, as installed on this server, reads, draws and writes images the way uploads and pages need it to: each format, an upload stored as a JPEG, the thumbnails pages ask for, and an avatar's initials. They work in memory and store nothing. The production checks look at what's been stored in the last <%= @hours %> hours.
 </p>
 
-<% passed = @checks.count(&:ok) %>
-<p class="d-flex align-items-center gap-3">
-  <span class="badge <%= passed == @checks.size ? 'text-bg-primary' : 'text-bg-danger' %>"><%= passed %> of <%= @checks.size %> passed</span>
-  <span class="small">
-    <% [24, 24 * 7].each do |hours| %>
-      <a class="<%= 'fw-bold' if hours == @hours %>" href="/stats/images?hours=<%= hours %>"><%= hours == 24 ? 'Last day' : 'Last week' %></a>
-    <% end %>
-  </span>
+<p class="small">
+  <% [24, 24 * 7].each do |hours| %>
+    <a class="<%= 'fw-bold' if hours == @hours %>" href="/stats/images?hours=<%= hours %>"><%= hours == 24 ? 'Last day' : 'Last week' %></a>
+  <% end %>
 </p>
 
-<table class="table table-hr">
-  <thead>
-    <tr>
-      <th>Check</th>
-      <th>Result</th>
-      <th>Detail</th>
-      <th class="text-end">Time</th>
-    </tr>
-  </thead>
-  <% @checks.group_by(&:group).each do |group, checks| %>
-    <tbody>
-      <tr>
-        <th colspan="4"><%= group %></th>
-      </tr>
-      <% checks.each do |check| %>
-        <tr>
-          <td><%= check.name %></td>
-          <td>
-            <% if check.ok %>
-              <span class="badge text-bg-primary"><i class="bi bi-check-lg"></i> Passed</span>
-            <% else %>
-              <span class="badge text-bg-danger"><i class="bi bi-x-lg"></i> Failed</span>
-            <% end %>
-          </td>
-          <td class="small"><%= check.detail %></td>
-          <td class="text-end text-body-secondary small"><%= check.ms %> ms</td>
-        </tr>
-      <% end %>
-    </tbody>
-  <% end %>
-</table>
+<%= partial :'stats/checks', locals: { checks: @checks } %>

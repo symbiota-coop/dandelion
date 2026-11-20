@@ -1,10 +1,12 @@
+require_relative 'server_checks' # extended as the module is defined, before Padrino would load it
+
 # The checks /stats/images runs on the images libvips reads, draws and writes on this server, which CI can't vouch for:
 # Render's libvips is Debian's, not the one CI or a laptop has, and a format it was built without (HEIC needs libheif,
 # the avatar Pango and its font) only fails when someone uploads one. Each check works in memory on images made here
 # (and a small HEIC and AVIF, in lib/image_checks), through Dragonfly.app as uploads and pages use it, storing nothing.
 # The production checks read what's been stored lately: the thumbnails made, by format, and new events' images
 module ImageChecks
-  Check = Struct.new(:group, :name, :ok, :detail, :ms, keyword_init: true)
+  extend ServerChecks
 
   # Saving with keep (DragonflyVips.write) needs 8.15, which Render has (8.15.3), as do CI's Ubuntu and Homebrew
   MINIMUM_VERSION = Gem::Version.new('8.15')
@@ -180,16 +182,6 @@ module ImageChecks
 
     def loader(image)
       image.get('vips-loader').delete_suffix('_buffer').delete_suffix('load')
-    end
-
-    def check(group, name)
-      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      ok, detail = begin
-        yield
-      rescue StandardError => e
-        [false, "#{e.class}: #{e.message.truncate(200)}"]
-      end
-      Check.new(group: group, name: name, ok: ok, detail: detail, ms: ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).round)
     end
   end
 end

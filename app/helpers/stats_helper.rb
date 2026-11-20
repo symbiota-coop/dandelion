@@ -14,9 +14,8 @@ Dandelion::App.helpers do
         description: "Each event's hosts_ids_cache against its organisation and cohosts_ids_cache",
         run: -> { Event.check_hosts_cache_sync(fix: fix) } }
     ].map do |check|
-      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      out_of_sync = check[:run].()
-      check.except(:run).merge(out_of_sync: out_of_sync, ms: ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).round)
+      out_of_sync, ms = ServerChecks.timed { check[:run].() }
+      check.except(:run).merge(out_of_sync:, ms:)
     end
   end
 

@@ -1,9 +1,11 @@
+require_relative 'server_checks' # extended as the module is defined, before Padrino would load it
+
 # The checks /stats/atlas runs on the features only Atlas has, which CI can't test as it runs on plain MongoDB (and dev
 # and the tests search with regex): each searchable model's Atlas Search index, and searches through Searchable that use
 # it, by whole word (phrase), by the start of a field (autocomplete) and with embeddings ($vectorSearch and $rankFusion).
 # Each search is of a real record, narrowed to it by id, so it passes only if that record comes back
 module AtlasChecks
-  Check = Struct.new(:group, :name, :ok, :detail, :ms, keyword_init: true)
+  extend ServerChecks
 
   # $rankFusion, which combines vector and text search, needs MongoDB 8.0
   RANK_FUSION_VERSION = Gem::Version.new('8.0')
@@ -128,16 +130,6 @@ module AtlasChecks
     def found(model, record, query, **)
       ids = model.search(query, model.and(id: record.id), regex_search: false, **).pluck(:id)
       [ids.include?(record.id), %("#{query}")]
-    end
-
-    def check(group, name)
-      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      ok, detail = begin
-        yield
-      rescue StandardError => e
-        [false, "#{e.class}: #{e.message.truncate(200)}"]
-      end
-      Check.new(group: group, name: name, ok: ok, detail: detail, ms: ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).round)
     end
   end
 end
