@@ -195,7 +195,7 @@ Dandelion::App.controller do
     @organisation = organisation_from_params
     organisation_admins_only!
     @organisationships = @organisation.organisationships.includes(:account).order('created_at desc')
-    @organisationships = @organisationships.and(:account_id.in => Account.search(params[:q], @organisation.members).pluck(:id)) if params[:q]
+    @organisationships = @organisationships.and(:account_id.in => Account.search(params[:q], @organisation.members, emails: true).pluck(:id)) if params[:q]
     case params[:monthly_donor]
     when 'All' then @organisationships = @organisationships.and(:monthly_donation_method.ne => nil)
     when 'None' then @organisationships = @organisationships.and(monthly_donation_method: nil)

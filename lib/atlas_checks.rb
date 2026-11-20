@@ -2,8 +2,8 @@ require_relative 'server_checks' # extended as the module is defined, before Pad
 
 # The checks /stats/atlas runs on the features only Atlas has, which CI can't test as it runs on plain MongoDB (and dev
 # and the tests search with regex): each searchable model's Atlas Search index, and searches through Searchable that use
-# it, by whole word (phrase), by the start of a field (autocomplete) and with embeddings ($vectorSearch and $rankFusion).
-# Each search is of a real record, narrowed to it by id, so it passes only if that record comes back
+# it, by whole word (phrase), by the start of a field (autocomplete) and with embeddings ($vectorSearch and $rankFusion),
+# and that an email, or the part of one from its @, finds its account only for those who can see emails. Each search is of a real record, narrowed to it by id, so it passes only if that record comes back
 module AtlasChecks
   extend ServerChecks
 
@@ -71,7 +71,30 @@ module AtlasChecks
           found(model, record, word[0, AUTOCOMPLETE_PREFIX], autocomplete: [field])
         end
       end
+      checks += email_checks(model, group) if model.search_fields.include?('email')
       checks
+    end
+
+    # Searches leave email out unless the viewer can see emails (Searchable's emails:), so neither a recent record's email
+    # nor the part of it from its @ (a fragment, which only Atlas Search would match) finds it then; for an email viewer,
+    # both do, so the refusal isn't passing because the search can't match emails at all
+    def email_checks(model, group)
+      record = model.and(:email.nin => [nil, '']).only(:_id, :email).order('created_at desc').first
+      queries = [record&.email, record&.email&.then { |email| email[email.index('@')..] }].compact
+      [
+        check(group, 'Email search refused to those who can\'t see emails') do
+          raise 'no record with an email' unless record
+
+          matched = queries.select { |query| model.search(query, model.and(id: record.id), regex_search: false).pluck(:id).include?(record.id) }
+          [matched.empty?, matched.any? ? "found by #{matched.map { |query| %("#{query}") }.join(' and ')}" : 'the email and the part from its @']
+        end,
+        check(group, 'Email search for those who can see emails') do
+          raise 'no record with an email' unless record
+
+          missed = queries.reject { |query| model.search(query, model.and(id: record.id), regex_search: false, emails: true).pluck(:id).include?(record.id) }
+          [missed.empty?, missed.any? ? "not found by #{missed.map { |query| %("#{query}") }.join(' and ')}" : 'the email and the part from its @']
+        end
+      ]
     end
 
     def vector_checks

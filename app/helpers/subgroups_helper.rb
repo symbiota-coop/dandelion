@@ -24,7 +24,7 @@ Dandelion::App.helpers do
   # Its followers, newest first, filtered by the search above the list
   def subgroup_followers(subgroup)
     followers = subgroup.subgroupships.includes(:account).order('created_at desc')
-    followers = followers.and(:account_id.in => Account.search(params[:q], child_scope: followers).pluck(:id)) if params[:q]
+    followers = followers.and(:account_id.in => Account.search(params[:q], child_scope: followers, emails: organisation_admin?(subgroup.organisation)).pluck(:id)) if params[:q]
     followers = followers.and(unsubscribed: false, :account_id.nin => subgroup.organisation.mailer_unsubscribed_member_ids) if params[:subscribed_to_mailer]
     followers
   end

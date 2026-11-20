@@ -16,7 +16,7 @@ module Searchable
   RANGE_OPERATORS = %w[$gt $gte $lt $lte].freeze
 
   class_methods do
-    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, autocomplete: autocomplete_fields, vector_weight: nil, query_vector: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil)
+    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, autocomplete: autocomplete_fields, vector_weight: nil, query_vector: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil, emails: false)
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
@@ -27,11 +27,14 @@ module Searchable
         scope = scope.and(:id.in => child_scope.pluck(foreign_key))
       end
 
-      return scope.and(email: query) if query.match?(EMAIL_REGEX) && fields.key?('email')
+      # Email is searched only for callers whose viewer can see the emails (emails: true), so that an email, or fragments
+      # of one, can't find whose it is
+      searched_fields = emails ? search_fields : search_fields - %w[email]
+      return scope.and(email: query) if searched_fields.include?('email') && query.match?(EMAIL_REGEX)
 
       if regex_search
         pattern = Regexp.escape(query).gsub(APOSTROPHE_VARIANTS, APOSTROPHE_CHAR_CLASS)
-        results = scope.and('$or': search_fields.map { |field| { field => /#{pattern}/i } })
+        results = scope.and('$or': searched_fields.map { |field| { field => /#{pattern}/i } })
         results = results.limit(limit) if limit
         results
       else
@@ -68,11 +71,11 @@ module Searchable
         end
 
         should_clauses = query_variants.map do |variant|
-          { phrase: { query: variant, path: search_fields, score: { boost: { value: phrase_boost } } } }
+          { phrase: { query: variant, path: searched_fields, score: { boost: { value: phrase_boost } } } }
         end
         if fuzzy_text
           should_clauses.concat(query_variants.map do |variant|
-            { text: { query: variant, path: search_fields, fuzzy: { maxEdits: 2, prefixLength: 2 } } }
+            { text: { query: variant, path: searched_fields, fuzzy: { maxEdits: 2, prefixLength: 2 } } }
           end)
         end
         # autocomplete (autocomplete_fields unless given): fields the model's Atlas Search index also maps as autocomplete

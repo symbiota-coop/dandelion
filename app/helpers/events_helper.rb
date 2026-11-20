@@ -287,7 +287,7 @@ Dandelion::App.helpers do
   end
 
   # The event's tickets the tickets and check-in lists show: those of params[:ticket_type_id] or params[:ticket_group_id]
-  # if given, filtered by the list's checkboxes and searched by params[:q] (id, token, name, email or account)
+  # if given, filtered by the list's checkboxes and searched by params[:q] (id, token, name or account, and email for those who can see emails)
   def event_tickets_from_params(*includes)
     tickets = if params[:ticket_type_id]
                 (@event.ticket_types.find(params[:ticket_type_id]) || not_found).tickets
@@ -303,8 +303,11 @@ Dandelion::App.helpers do
     return tickets unless params[:q]
 
     q = /#{Regexp.escape(params[:q])}/i
+    emails = event_email_viewer?
+    conditions = [{ id_string: q }, { token: q }, { name: q }]
+    conditions << { email: q } if emails
     tickets.and(:id.in =>
-      tickets.and(:$or => [{ id_string: q }, { token: q }, { name: q }, { email: q }]).pluck(:id) +
-      tickets.and(:account_id.in => Account.search(params[:q], child_scope: tickets, regex_search: true).pluck(:id)).pluck(:id))
+      tickets.and(:$or => conditions).pluck(:id) +
+      tickets.and(:account_id.in => Account.search(params[:q], child_scope: tickets, regex_search: true, emails: emails).pluck(:id)).pluck(:id))
   end
 end

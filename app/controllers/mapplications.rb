@@ -77,7 +77,7 @@ Dandelion::App.controller do
     @gathering = gathering_from_params
     membership_required!
     @mapplications = @gathering.mapplications.pending
-    @mapplications = @mapplications.and(:account_id.in => Account.search(params[:q], child_scope: @mapplications, regex_search: true).pluck(:id)) if params[:q]
+    @mapplications = @mapplications.and(:account_id.in => Account.search(params[:q], child_scope: @mapplications, regex_search: true, emails: gathering_admin?).pluck(:id)) if params[:q]
     erb :'mapplications/pending'
   end
 

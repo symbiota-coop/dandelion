@@ -360,6 +360,33 @@ class SearchTest < ActiveSupport::TestCase
     assert_equal [older, 'Bartholomew'], AtlasChecks.send(:sample, Account, 'name')
   end
 
+  # Atlas Search as far as email goes: a search finds the record only if it searches the email field. Other queries
+  # go to the collection
+  class EmailMatchingCollection < SimpleDelegator
+    def initialize(collection, id)
+      super(collection)
+      @id = id
+    end
+
+    def aggregate(pipeline, **)
+      should = pipeline.first.dig(:$search, :compound, :should)
+      should.any? { |clause| Array(clause.dig(:phrase, :path)).include?('email') } ? [{ _id: @id }] : []
+    end
+  end
+
+  test "the Atlas checks check that an account's email, or the part of it from its @, finds it only for email viewers" do
+    FactoryBot.create(:account, email: 'older@example.org', created_at: 1.day.ago)
+    account = FactoryBot.create(:account, name: 'Robin Recent', email: 'robin.recent@example.com')
+
+    checks = Account.stub(:collection, EmailMatchingCollection.new(Account.collection, account.id)) { AtlasChecks.send(:email_checks, Account, 'Account') }
+
+    refused, viewer = checks
+    assert_equal "Email search refused to those who can't see emails", refused.name
+    assert_equal true, refused.ok, refused.detail
+    assert_equal 'Email search for those who can see emails', viewer.name
+    assert_equal true, viewer.ok, viewer.detail
+  end
+
   test 'the Atlas checks page checks each searchable model, and fails them on plain MongoDB' do
     covers_route 'GET /stats/atlas'
     assert_equal %w[Account Activity Event Gathering LocalGroup Organisation Pmail], AtlasChecks.searchable_models.map(&:name)

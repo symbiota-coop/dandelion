@@ -1,6 +1,6 @@
 <h2>Atlas</h2>
 <p class="text-body-secondary">
-  CI runs on plain MongoDB, and dev and the tests search with regex, so these check the features only Atlas has, on this database: each searchable model's Atlas Search index, and searches through <code>Searchable</code> for a recent record by a whole word, by the start of a word (autocomplete) and with its embedding (<code>$vectorSearch</code> with <code>$rankFusion</code>).
+  CI runs on plain MongoDB, and dev and the tests search with regex, so these check the features only Atlas has, on this database: each searchable model's Atlas Search index, and searches through <code>Searchable</code> for a recent record by a whole word, by the start of a word (autocomplete) and with its embedding (<code>$vectorSearch</code> with <code>$rankFusion</code>), and that an account's email, or the part of it from its @, finds it only for those who can see emails.
 </p>
 
 <%= partial :'stats/checks', locals: { checks: @checks } %>
