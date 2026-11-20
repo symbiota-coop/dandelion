@@ -319,13 +319,19 @@ module CoreExtensions
       value = send(field)
       next unless value.present?
 
-      # Angle brackets are dropped outright: these values reach Mailgun as %recipient.*% variables,
-      # which are substituted into HTML after rendering with no escaping step.
-      sanitized_value = EmailHelper.untrusted(Nokogiri::HTML.fragment(value.to_s).text, strip: true).delete('<>').squish
+      sanitized_value = CoreExtensions.sanitized(value)
       next if sanitized_value == value.to_s
 
       send("#{field}=", sanitized_value)
     end
+  end
+
+  # A name, title or subject as sanitize_fields saves it: tags stripped, and angle brackets dropped outright, as these
+  # values reach Mailgun as %recipient.*% variables, which are substituted into HTML after rendering with no escaping step
+  def self.sanitized(value)
+    return value unless value.present?
+
+    EmailHelper.untrusted(Nokogiri::HTML.fragment(value.to_s).text, strip: true).delete('<>').squish
   end
 
   # Merging victim into this record (Account#merge, Membership#absorb_duplicate!): moves each of victim's has_many rows
