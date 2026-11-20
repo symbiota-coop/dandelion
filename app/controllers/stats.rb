@@ -84,8 +84,7 @@ Dandelion::App.controller do
   end
 
   get '/stats/images' do
-    @hours = params[:hours] ? params[:hours].to_i.clamp(1, 24 * 30) : ImageChecks::DEFAULT_HOURS
-    @checks = ImageChecks.run(hours: @hours)
+    @checks = ImageChecks.run
     erb :'stats/images'
   end
 

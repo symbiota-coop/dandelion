@@ -1,12 +1,6 @@
 <h2>Images</h2>
 <p class="text-body-secondary">
-  Checks that libvips, as installed on this server, reads, draws and writes images the way uploads and pages need it to: each format, an upload stored as a JPEG, the thumbnails pages ask for, and an avatar's initials. They work in memory and store nothing. The production checks look at what's been stored in the last <%= @hours %> hours.
-</p>
-
-<p class="small">
-  <% [24, 24 * 7].each do |hours| %>
-    <a class="<%= 'fw-bold' if hours == @hours %>" href="/stats/images?hours=<%= hours %>"><%= hours == 24 ? 'Last day' : 'Last week' %></a>
-  <% end %>
+  Checks that libvips, as installed on this server, reads, draws and writes images the way uploads and pages need it to: each format, an upload stored as a JPEG, the thumbnails pages ask for, and an avatar's initials. They work in memory and store nothing. The production checks look at what's been stored in the last <%= ImageChecks::DEFAULT_HOURS %> hours.
 </p>
 
 <%= partial :'stats/checks', locals: { checks: @checks } %>
