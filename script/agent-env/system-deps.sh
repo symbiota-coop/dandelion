@@ -23,8 +23,6 @@ $SUDO apt-get install -y --no-install-recommends \
   libffi-dev \
   libssl-dev \
   libtool \
-  libxml2-dev \
-  libxslt1-dev \
   libyaml-dev \
   libzstd-dev \
   pkg-config \

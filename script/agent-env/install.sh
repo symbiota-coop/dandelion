@@ -5,8 +5,6 @@ BUNDLER_VERSION="$(grep -A1 '^BUNDLED WITH' Gemfile.lock | tail -1 | tr -d ' ')"
 gem list -i bundler -v "$BUNDLER_VERSION" >/dev/null || gem install bundler -v "$BUNDLER_VERSION"
 command -v foreman >/dev/null || gem install foreman
 
-bundle config set build.nokogiri "--use-system-libraries"
-
 # Bundler's cached local git clone can become invalid under Docker/OverlayFS
 # when copying git-sourced gems from cache/bundler/git into bundler/gems.
 # Clear both sides and retry after a failed attempt.
