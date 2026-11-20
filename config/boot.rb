@@ -63,7 +63,9 @@ require_relative 'frontend_dependencies'
 # Fetch the library's books and films as the app boots, so no request waits on GitHub for them
 Library.books && Library.films unless Padrino.env == :test
 
-OmniAuth.config.allowed_request_methods = [:get]
+# POST too, so Bluesky's request phase can take only a POST: OmniAuth checks a POST's authenticity_token first
+# (its default request_validation_phase), and its other providers' links stay GETs
+OmniAuth.config.allowed_request_methods = %i[get post]
 OmniAuth.config.logger = Logger.new(IO::NULL)
 
 Delayed::Worker.max_attempts = 1

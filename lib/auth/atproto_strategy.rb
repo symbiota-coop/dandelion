@@ -11,9 +11,13 @@ module OmniAuth
 
       option :name, 'atproto'
 
-      # Forgets any earlier sign-in before anything can fail, so a failed one never leaves a flow behind
+      # Forgets any earlier sign-in before anything can fail, so a failed one never leaves a flow behind.
+      # Only a POST, which OmniAuth has checked for our authenticity_token: whoever runs the authorization server
+      # can send the browser straight back signed in as their identity, so a link from another site mustn't start one
       def request_phase
         session.delete(FLOW_KEY)
+        return fail!(:invalid_request, AtprotoOAuth::Error.new(:invalid_request, 'Sign-in must be started by our form')) unless request.post?
+
         flow, authorization_url = AtprotoOAuth.start(request.params['handle'])
         session[FLOW_KEY] = flow
         redirect authorization_url

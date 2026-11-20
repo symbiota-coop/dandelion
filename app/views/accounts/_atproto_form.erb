@@ -1,5 +1,6 @@
 <div id="<%= id %>" style="display: none"<%= " class=\"#{wrapper_class}\"" if defined?(wrapper_class) && wrapper_class %>>
-  <% form_tag '/auth/atproto', method: 'get', class: form_class do %>
+  <% form_tag '/auth/atproto', method: 'post', class: form_class do %>
+    <%= hidden_field_tag :authenticity_token, value: Rack::Protection::AuthenticityToken.token(session) %>
     <div class="input-group" style="max-width: 20rem">
       <%= text_field_tag :handle, class: 'form-control', placeholder: 'handle.bsky.social', 'aria-label': 'Bluesky handle', required: true %>
       <%= submit_tag button_text, class: 'btn btn-primary' %>

@@ -54,7 +54,9 @@ Dandelion::App.controller do
         flash[:notice] = 'Signed in!'
         redirect session.delete(:return_to) || '/'
       else
-        flash.now[:notice] = "<i class=\"#{@provider.icon}\"></i> That #{@provider.display_name} #{@provider.display_name == 'Ethereum' ? 'address' : 'account'} isn't yet connected to a Dandelion account. Let's create a new Dandelion account for you!"
+        # Named, so someone sent here by another's sign-in sees whose account they'd be linking
+        identity = @provider.nickname.call(env['omniauth.auth']) || provider_uid
+        flash.now[:notice] = "<i class=\"#{@provider.icon}\"></i> That #{@provider.display_name} #{@provider.display_name == 'Ethereum' ? 'address' : 'account'}, <strong>#{escape_html(identity)}</strong>, isn't yet connected to a Dandelion account. Let's create a new Dandelion account for you!"
         session['omniauth.auth'] = env['omniauth.auth']
         @account = Account.new
         @account.name = env['omniauth.auth']['info']['name']

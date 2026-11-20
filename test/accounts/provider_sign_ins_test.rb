@@ -381,7 +381,7 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
         start_atproto_sign_in('alice.test')
         network.replace(atproto_network)
         break_discovery.call
-        get '/auth/atproto', handle: 'mallory.test'
+        submit_atproto_form('mallory.test')
 
         assert_atproto_failure 'invalid_auth_server'
         assert_nil last_request.session[OmniAuth::Strategies::Atproto::FLOW_KEY]
@@ -503,7 +503,7 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
     breakages.each do |key, error, break_network|
       network = atproto_network
       break_network.call(network)
-      with_atproto_network(network) { get '/auth/atproto', handle: 'alice.test' }
+      with_atproto_network(network) { submit_atproto_form('alice.test') }
       assert_atproto_failure key, error
       assert_nil last_request.session[OmniAuth::Strategies::Atproto::FLOW_KEY]
       assert_not_includes network[:requests], "#{ATPROTO_ALICE_AS}/oauth/par", error
@@ -519,11 +519,46 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
     network = atproto_network
     with_atproto_network(network) do
       ['', 'localhost', 'alice.test/../x', 'did:key:z6Mk'].each do |identifier|
-        get '/auth/atproto', handle: identifier
+        submit_atproto_form(identifier)
         assert_atproto_failure 'invalid_handle'
       end
     end
     assert_empty network[:requests]
+  end
+
+  # Whoever runs the authorization server can send the browser straight back as their identity, so only our form starts one
+  test 'Bluesky sign-in is not started by a link or a form on another site' do
+    network = atproto_network
+    with_atproto_network(network) do
+      get '/auth/atproto', handle: 'mallory.test'
+      assert_atproto_failure 'invalid_request'
+
+      clear_cookies
+      post '/auth/atproto', handle: 'mallory.test'
+      assert_atproto_failure 'authenticity_error'
+
+      get '/accounts/sign_in'
+      post '/auth/atproto', handle: 'mallory.test', authenticity_token: 'forged'
+      assert_atproto_failure 'authenticity_error'
+    end
+    assert_nil last_request.session[OmniAuth::Strategies::Atproto::FLOW_KEY]
+    assert_empty network[:requests]
+
+    # Our own form starts it
+    with_atproto_network(network) { start_atproto_sign_in('mallory.test') }
+    assert_includes network[:requests], "#{ATPROTO_MALLORY_AS}/oauth/par"
+  end
+
+  test 'Bluesky sign-up names the Bluesky account it would connect' do
+    network = atproto_network
+    network[:profiles] = { ATPROTO_MALLORY => { 'handle' => 'mallory.test', 'displayName' => 'Mallory' } }
+    with_atproto_network(network) do
+      state = start_atproto_sign_in('mallory.test')
+      get '/auth/atproto/callback', code: network[:par][:code], state: state, iss: ATPROTO_MALLORY_AS
+    end
+    assert last_response.ok?
+    assert_includes last_response.body, "That Bluesky account, <strong>mallory.test</strong>, isn't yet connected to a Dandelion account"
+    assert_equal ATPROTO_MALLORY, last_request.session['omniauth.auth']['info']['did']
   end
 
   private
@@ -609,7 +644,7 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
       atproto_token_endpoint(network, url, options, client_key)
     end
     profile_client = Object.new
-    profile_client.define_singleton_method(:get_profile) { |_actor| nil }
+    profile_client.define_singleton_method(:get_profile) { |actor| network.fetch(:profiles, {})[actor] }
 
     DIDKit::Resolver.stub(:new, resolver) do
       SsrfFilter.stub(:get, ssrf_get) do
@@ -633,9 +668,17 @@ class AccountProviderSignInsTest < ActiveSupport::TestCase
     assert_equal error, last_request.env['omniauth.error'].message if error
   end
 
+  # Sends the sign in page's Bluesky form, with its authenticity_token, as the browser would
+  def submit_atproto_form(handle)
+    get '/accounts/sign_in'
+    token = last_response.body[%r{<form[^>]*action="/auth/atproto"[^>]*method="post".*?name="authenticity_token" value="([^"]+)"}m, 1]
+    assert token, "The sign in page's Bluesky form has no authenticity_token"
+    post '/auth/atproto', handle: handle, authenticity_token: token
+  end
+
   # Starts signing in with handle, returning the OAuth state it pushed to the authorization server
   def start_atproto_sign_in(handle)
-    get '/auth/atproto', handle: handle
+    submit_atproto_form(handle)
     network_state = last_request.session[OmniAuth::Strategies::Atproto::FLOW_KEY]&.dig('state')
     assert network_state, "Sign-in with #{handle} didn't start: #{last_response.location}"
     network_state
