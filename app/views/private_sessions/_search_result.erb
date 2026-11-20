@@ -18,14 +18,5 @@
         <%= partial :'private_sessions/badges', locals: { private_session: private_session } %>
       </div>
     </div>
-    <%# Who vouched for it, newest first, each with "Vouched for by" and their name on hover: the list loads its page's vouches at once %>
-    <% vouches = private_session.private_session_vouches.includes(:account).order('created_at desc').to_a unless defined?(vouches) && vouches %>
-    <% if vouches.any? %>
-      <div class="image-wall mt-1 private-session-vouchers">
-        <% vouches.each do |vouch| %>
-          <%= partial :'accounts/square', locals: { account: vouch.account, size: :sm, tooltip: "Vouched for by #{vouch.account.name}" } %>
-        <% end %>
-      </div>
-    <% end %>
   </div>
 </div>

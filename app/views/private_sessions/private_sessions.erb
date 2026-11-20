@@ -75,7 +75,7 @@
   <ul class="search-result-list" id="private-sessions">
     <% @private_sessions.each do |private_session| %>
       <li>
-        <%= partial :'private_sessions/search_result', locals: { private_session: private_session, vouches: @vouches_by_session[private_session.id] || [] } %>
+        <%= partial :'private_sessions/search_result', locals: { private_session: private_session } %>
       </li>
     <% end %>
   </ul>

@@ -24,9 +24,6 @@ Dandelion::App.controller do
     case content_type
     when :html
       @private_sessions = @private_sessions.includes(:account).paginate(page: params[:page], per_page: 20)
-      # Who vouched for each session on the page, newest first, in one query rather than one per session
-      @vouches_by_session = PrivateSessionVouch.and(:private_session_id.in => @private_sessions.map(&:id))
-                                               .includes(:account).order('created_at desc').group_by(&:private_session_id)
       @title = 'Private sessions'
       erb :'private_sessions/private_sessions'
     when :json

@@ -17,7 +17,7 @@ Only you (and Dandelion's admins) can edit or delete your private sessions. <!--
 
 If you know a private session is good, click Vouch on it, and add a testimonial if you like. You can vouch for a session once, and not for your own. <!-- claim: vouch-once-not-own -->
 
-Your name and picture show with your vouch and testimonial on the session, and lists show how many people have vouched for it, with their pictures. You can change your testimonial or remove your vouch there too. <!-- claim: vouch-shown-changed -->
+Your name and picture show with your vouch and testimonial on the session, and lists show how many people have vouched for it. You can change your testimonial or remove your vouch there too. <!-- claim: vouch-shown-changed -->
 
 ## Booking a private session
 
