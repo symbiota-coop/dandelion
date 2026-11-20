@@ -34,6 +34,8 @@ Dandelion is built with many coding agents (Claude Code, Codex, opencode and oth
 
 Commit only the changes you made: other sessions may be editing the same checkout, so stage your files by name rather than with `git add -A` or `git commit -a`.
 
+To find a pushed commit's CI runs, give `gh run list --commit` the full SHA (`gh run list --commit "$(git rev-parse HEAD)"`). It matches only the full 40 characters, and a short SHA lists nothing rather than failing, so a script that waits for runs to appear or finish waits forever while CI fails unnoticed.
+
 ## Linting
 
 `script/lint` runs our linters, each on the files of its kind: RuboCop, with our own cops (`.rubocop/dandelion/`), also on the Ruby in templates through erb_lint; erb_lint (`.erb_linters/`); ESLint (`eslint.config.mjs`) and Stylelint (`stylelint.config.mjs`), also on the scripts and styles in templates; Herb (`.herb.yml`); zizmor and actionlint (`.github/actionlint.yaml`) on `.github`; ShellCheck; and `test/lint_test.rb`, which tests our checks and the rules no linter covers. Each rule's message says what to do instead, and its config or code says why. CI's lint job runs it, so it is the one place their commands and flags are set. Run it on the files you add or change as you go, and fix what it reports:
