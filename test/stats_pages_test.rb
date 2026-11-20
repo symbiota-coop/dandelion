@@ -8,7 +8,7 @@ class StatsPagesTest < ActiveSupport::TestCase
   include Rack::Test::Methods
 
   PAGES = %w[
-    /stats/charts /stats/comments /stats/contributions /stats/delivery /stats/files /stats/icons /stats/messages
+    /stats/charts /stats/comments /stats/contributions /stats/delivery /stats/files /stats/icons /stats/images /stats/messages
     /stats/openrouter /stats/orders /stats/organisations /stats/packages /stats/packages?tab=frontend
     /stats/packages?tab=actions /stats/referrals /stats/routes /stats/sentry_spans /stats/spring_clean /stats/transactions
     /stats/traces

@@ -83,6 +83,12 @@ Dandelion::App.controller do
     erb :'stats/atlas'
   end
 
+  get '/stats/images' do
+    @hours = params[:hours] ? params[:hours].to_i.clamp(1, 24 * 30) : ImageChecks::DEFAULT_HOURS
+    @checks = ImageChecks.run(hours: @hours)
+    erb :'stats/images'
+  end
+
   get '/stats/caches' do
     @checks = cache_checks
     erb :'stats/caches'
