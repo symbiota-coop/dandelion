@@ -214,9 +214,9 @@ jobs:
         restore-keys: cdn-cache-
 
     # Dragonfly runs libvips (lib/dragonfly_vips.rb), which the app loads as it boots, so every group needs it. The
-    # runner has none
+    # runner has none. libheif's HEVC decoder and encoder, for HEIC, are plugins it only recommends
     - name: Install libvips
-      run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends libvips-tools
+      run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends libvips-tools libheif-plugin-libde265 libheif-plugin-x265
 
     # How long each of the group's files took in its last run, which rake test:parallel splits them by, and saves after.
     # A cache entry can't be overwritten, so each run saves its own and the next restores the newest; files with no time
