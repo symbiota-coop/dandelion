@@ -360,6 +360,16 @@ class SearchTest < ActiveSupport::TestCase
     assert_equal [older, 'Bartholomew'], AtlasChecks.send(:sample, Account, 'name')
   end
 
+  test "an email finds nothing for those who can't see emails, not those whose name its first word starts" do
+    account = FactoryBot.create(:account, name: 'Tatiana Example', email: 'tatiana@example.nl')
+    collection = CapturingCollection.new(documents: [{ _id: account.id }])
+
+    assert_equal [account.id], Account.stub(:collection, collection) { Account.search('Tatiana', Account.all, regex_search: false).pluck(:id) }
+    assert_empty Account.stub(:collection, collection) { Account.search('tatiana@example.nl', Account.all, regex_search: false).pluck(:id) }
+    assert_equal 1, collection.pipelines.length
+    assert_equal [account.id], Account.search('tatiana@example.nl', Account.all, regex_search: false, emails: true).pluck(:id)
+  end
+
   # Atlas Search as far as email goes: a search finds the record only if it searches the email field. Other queries
   # go to the collection
   class EmailMatchingCollection < SimpleDelegator

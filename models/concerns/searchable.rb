@@ -28,9 +28,10 @@ module Searchable
       end
 
       # Email is searched only for callers whose viewer can see the emails (emails: true), so that an email, or fragments
-      # of one, can't find whose it is
+      # of one, can't find whose it is. Without it an email finds nothing, rather than those whose name or username its
+      # first word starts (autocomplete), which would point a guessed email at its owner
       searched_fields = emails ? search_fields : search_fields - %w[email]
-      return scope.and(email: query) if searched_fields.include?('email') && query.match?(EMAIL_REGEX)
+      return emails ? scope.and(email: query) : none if search_fields.include?('email') && query.match?(EMAIL_REGEX)
 
       if regex_search
         pattern = Regexp.escape(query).gsub(APOSTROPHE_VARIANTS, APOSTROPHE_CHAR_CLASS)
