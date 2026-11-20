@@ -32,6 +32,25 @@ class AccountPrivateSessionVouchesTest < ActiveSupport::TestCase
 
     visit '/private_sessions'
     assert page.has_css?('#private-sessions .badge', text: '1')
+    assert page.has_css?('#private-sessions .private-session-vouchers img[title="Robin Client"]')
+  end
+
+  test "the list shows each session's vouchers, newest first, and none on a session no one has vouched for" do
+    covers 'private_sessions/vouch-shown-changed@b986e1'
+    vouched = create_private_session(practitioner, title: 'Shiatsu')
+    unvouched = create_private_session(practitioner, title: 'Reiki')
+    vouched.private_session_vouches.create!(account: FactoryBot.create(:account, name: 'First Voucher'), created_at: 1.day.ago)
+    vouched.private_session_vouches.create!(account: FactoryBot.create(:account, name: 'Second Voucher'))
+
+    visit '/private_sessions'
+    assert page.has_link?(unvouched.title)
+    within(:xpath, "//li[.//a[text()='Shiatsu']]") do
+      assert_equal(['Second Voucher', 'First Voucher'], page.all('.private-session-vouchers img', minimum: 2).map { |img| img['alt'] })
+    end
+    within(:xpath, "//li[.//a[text()='Reiki']]") do
+      assert page.has_link?('Reiki')
+      assert page.has_no_css?('.private-session-vouchers')
+    end
   end
 
   test "a session opened in the modal doesn't put the cursor in the testimonial" do
@@ -44,7 +63,7 @@ class AccountPrivateSessionVouchesTest < ActiveSupport::TestCase
   end
 
   test 'a voucher changes their testimonial and removes their vouch' do
-    covers 'private_sessions/vouch-shown-changed@ed4fb9'
+    covers 'private_sessions/vouch-shown-changed@b986e1'
     covers_route 'POST /ps/:slug/unvouch'
     private_session = create_private_session(practitioner)
     client = FactoryBot.create(:account, name: 'Robin Client', has_signed_in: true)
