@@ -33,7 +33,13 @@ module DragonflyVips
   # Animated GIFs and WebPs keep their frames
   ANIMATED = %w[gif webp].freeze
 
+  # Wider, taller or bigger than an upload resized to 1920px could need: refused from the header, before decoding, as
+  # libvips has no limits of its own, so a small file declaring a vast image can't take the host's memory
+  MAX_SIDE = 32 * 1024
+  MAX_PIXELS = 128_000_000
+
   class UnsupportedFormat < ArgumentError; end
+  class TooLarge < UnsupportedFormat; end
 
   class Plugin
     def call(app, _opts = {})
@@ -87,7 +93,18 @@ module DragonflyVips
   def self.load(content, **)
     image = Vips::Image.new_from_file(content.path, **)
     format_of(image)
+    # Every frame of an animation counts, as thumb decodes them all
+    frame_height = image.get_typeof('page-height').positive? ? image.get('page-height') : image.height
+    frames = image.get_typeof('n-pages').positive? ? image.get('n-pages') : 1
+    if too_large?(image.width, frame_height, frames)
+      raise TooLarge, "#{image.width}x#{frame_height}#{" x #{frames} frames" if frames > 1} is too large"
+    end
+
     image
+  end
+
+  def self.too_large?(width, frame_height, frames = 1)
+    [width, frame_height].max > MAX_SIDE || width * frame_height * frames > MAX_PIXELS
   end
 
   def self.format_of(image)

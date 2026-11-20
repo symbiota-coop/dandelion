@@ -116,4 +116,27 @@ class DragonflyVipsTest < ActiveSupport::TestCase
     thumb = Vips::Image.new_from_buffer(job.thumb('20x20').apply.data, '', n: -1)
     assert_equal [4, 20, 15], [thumb.get('n-pages'), thumb.width, thumb.get('page-height')]
   end
+
+  test 'refuses an image too big to decode from its header, counting every frame of an animation' do
+    # A small file that says it's 40000px wide
+    wide = app.create(Vips::Image.black(40_000, 2).cast(:uchar).write_to_buffer('.png'))
+    assert_operator wide.size, :<, 10_000
+    assert_equal false, wide.image?
+    assert_raises(DragonflyVips::TooLarge) { wide.thumb('400x400').apply }
+    assert_raises(DragonflyVips::TooLarge) { wide.encode('jpg').apply }
+    assert_equal true, image(4_000, 2, '.png').image?
+
+    assert_equal [true, false, true], [DragonflyVips.too_large?(12_000, 12_000), DragonflyVips.too_large?(8_000, 8_000),
+                                       DragonflyVips.too_large?(8_000, 8_000, 3)]
+    frames = [[255, 0, 0], [0, 0, 255]].map { |colour| Vips::Image.black(40, 30) + colour }
+    gif = Vips::Image.arrayjoin(frames, across: 1).cast(:uchar).copy(interpretation: :srgb)
+    gif.set_type(GObject::GINT_TYPE, 'page-height', 30)
+    measured = []
+    record = lambda do |*sizes|
+      measured << sizes
+      false
+    end
+    DragonflyVips.stub(:too_large?, record) { app.create(gif.write_to_buffer('.gif')).width }
+    assert_equal [[40, 30, 2]], measured
+  end
 end

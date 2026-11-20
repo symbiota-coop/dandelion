@@ -1,7 +1,7 @@
 # The checks /stats/images runs on the images libvips reads, draws and writes on this server, which CI can't vouch for:
 # Render's libvips is Debian's, not the one CI or a laptop has, and a format it was built without (HEIC needs libheif,
 # the avatar Pango and its font) only fails when someone uploads one. Each check works in memory on images made here
-# (and a small HEIC, lib/image_checks/sample.heic), through Dragonfly.app as uploads and pages use it, storing nothing.
+# (and a small HEIC and AVIF, in lib/image_checks), through Dragonfly.app as uploads and pages use it, storing nothing.
 # The production checks read what's been stored lately: the thumbnails made, by format, and new events' images
 module ImageChecks
   Check = Struct.new(:group, :name, :ok, :detail, :ms, keyword_init: true)
@@ -9,6 +9,7 @@ module ImageChecks
   # Saving with keep (DragonflyVips.write) needs 8.15, which Render has (8.15.3), as do CI's Ubuntu and Homebrew
   MINIMUM_VERSION = Gem::Version.new('8.15')
   HEIC_SAMPLE = File.expand_path('image_checks/sample.heic', __dir__)
+  AVIF_SAMPLE = File.expand_path('image_checks/sample.avif', __dir__)
   FORMATS = { 'jpeg' => '.jpg', 'png' => '.png', 'gif' => '.gif', 'webp' => '.webp', 'heic' => '.heic' }.freeze
   SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10"/></svg>'.freeze
   PDF = "%PDF-1.4\n1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n2 0 obj << /Type /Pages /Kids [] /Count 0 >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF\n".freeze
@@ -93,10 +94,33 @@ module ImageChecks
          exif = image.get_fields.grep(/\Aexif-/)
          [[image.width, image.height] == [200, 300] && exif.empty?, "#{image.width}x#{image.height}, #{exif.empty? ? 'no EXIF' : "EXIF: #{exif.first(3).join(', ')}"}"]
        end,
+       check('Uploads', 'AVIF stored as a JPEG') do
+         # libheif reads AV1 only with a decoder (dav1d or aom), on some systems a plugin package of its own
+         image = vips(Dragonfly.app.create(File.binread(AVIF_SAMPLE)).thumb('1920x1920>', 'format' => 'jpeg'))
+         [loader(image) == 'jpeg' && [image.width, image.height] == [64, 36], "#{loader(image)} #{image.width}x#{image.height}"]
+       end,
        check('Uploads', 'SVG and PDF refused') do
          images = { 'SVG' => SVG, 'PDF' => PDF }.select { |_, data| Dragonfly.app.create(data).image? }
          [images.empty?, images.empty? ? 'neither read as an image' : "read as images: #{images.keys.join(', ')}"]
+       end,
+       check('Uploads', 'An image too big to decode refused from its header') do
+         # A 3 KB PNG that says it's 40000x2: past DragonflyVips::MAX_SIDE
+         job = Dragonfly.app.create(huge_png(40_000, 2))
+         refused = !job.image?
+         [refused, refused ? 'refused' : "read as #{job.width}x#{job.height}"]
        end]
+    end
+
+    # A PNG of one black row after another, deflated a row at a time, so it's small however large it says it is
+    def huge_png(width, height)
+      chunk = ->(type, data) { [data.bytesize].pack('N') + type + data + [Zlib.crc32(type + data)].pack('N') }
+      deflate = Zlib::Deflate.new
+      row = "\x00".b * (width + 1)
+      pixels = +''.b
+      height.times { pixels << deflate.deflate(row) }
+      pixels << deflate.finish
+      "\x89PNG\r\n\x1A\n".b + chunk.call('IHDR', [width, height, 8, 0, 0, 0, 0].pack('NNC5')) +
+        chunk.call('IDAT', pixels) + chunk.call('IEND', '')
     end
 
     # The derivatives pages ask for

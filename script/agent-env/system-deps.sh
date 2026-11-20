@@ -32,9 +32,9 @@ $SUDO apt-get install -y --no-install-recommends \
   tzdata \
   xz-utils \
   zlib1g-dev
-# libheif's HEVC decoder and encoder, for HEIC: plugins of their own on newer Debian and Ubuntu, which libheif only
-# recommends, and part of libheif itself on older ones, where these packages don't exist
-for plugin in libheif-plugin-libde265 libheif-plugin-x265; do
+# libheif's HEVC decoder and encoder (HEIC) and AV1 decoder (AVIF): plugins of their own on newer Debian and Ubuntu,
+# which libheif only recommends, and part of libheif itself on older ones, where these packages don't exist
+for plugin in libheif-plugin-libde265 libheif-plugin-x265 libheif-plugin-dav1d; do
   if apt-cache show "$plugin" >/dev/null 2>&1; then
     $SUDO apt-get install -y --no-install-recommends "$plugin"
   fi

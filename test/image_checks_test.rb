@@ -56,6 +56,8 @@ class ImageChecksTest < ActiveSupport::TestCase
       assert_equal false, results['HEIC'].ok
       assert_equal false, results['HEIC stored as a JPEG'].ok
       assert_equal false, results['SVG and PDF refused'].ok
+      assert_equal false, results['AVIF stored as a JPEG'].ok
+      assert_equal false, results['An image too big to decode refused from its header'].ok
     end
 
     opaque = (Vips::Image.black(400, 400, bands: 4) + 255).cast(:uchar).write_to_buffer('.png')

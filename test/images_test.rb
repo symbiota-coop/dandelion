@@ -28,6 +28,18 @@ class ImagesTest < ActiveSupport::TestCase
     end
   end
 
+  test 'image fields refuse an image too big to decode, from what its header says' do
+    create_organisation
+    { [4_000, 2] => true, [40_000, 2] => false }.each do |(width, height), allowed|
+      with_file(Vips::Image.black(width, height).cast(:uchar).write_to_buffer('.png'), '.png') do |file|
+        organisation = Organisation.find(@organisation.id)
+        organisation.image = file
+
+        assert_equal allowed, organisation.valid?, "#{width}x#{height}: #{organisation.errors.full_messages.to_sentence}"
+      end
+    end
+  end
+
   test 'image fields still take JPEGs and PNGs, stored as JPEGs' do
     create_organisation
     %w[test-event.jpg coop.png].each do |name|
