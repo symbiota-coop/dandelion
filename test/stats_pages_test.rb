@@ -8,7 +8,7 @@ class StatsPagesTest < ActiveSupport::TestCase
   include Rack::Test::Methods
 
   PAGES = %w[
-    /stats/charts /stats/comments /stats/contributions /stats/delivery /stats/files /stats/icons /stats/images /stats/messages
+    /stats/charts /stats/comments /stats/contributions /stats/delivery /stats/donations /stats/files /stats/icons /stats/images /stats/messages
     /stats/openrouter /stats/orders /stats/organisations /stats/packages /stats/packages?tab=frontend
     /stats/packages?tab=actions /stats/referrals /stats/routes /stats/sentry_spans /stats/spring_clean /stats/transactions
     /stats/traces
@@ -46,7 +46,7 @@ class StatsPagesTest < ActiveSupport::TestCase
     covers_route 'GET /stats/files', 'GET /stats/icons', 'GET /stats/messages', 'GET /stats/openrouter'
     covers_route 'GET /stats/orders', 'GET /stats/organisations', 'GET /stats/packages', 'GET /stats/referrals'
     covers_route 'GET /stats/routes', 'GET /stats/sentry_spans', 'GET /stats/spring_clean', 'GET /stats/transactions'
-    covers_route 'GET /stats/traces'
+    covers_route 'GET /stats/traces', 'GET /stats/donations'
     covers_route 'GET /stats/traces/:id', 'GET /stats/traces/slowest'
     create_trace_indexes
     trace = create_trace
@@ -123,6 +123,40 @@ class StatsPagesTest < ActiveSupport::TestCase
     assert_includes page.html, 'November 2026'
     visit "/stats/traces/#{trace.id}"
     assert page.has_content?('find events')
+  end
+
+  def donate_at_checkout(event, amount, to_dandelion: true, paid: true, at: Time.now)
+    donor = FactoryBot.create(:account)
+    order = event.orders.create!(account: donor, currency: 'GBP', value: amount, payment_completed: paid, application_fee_paid_to_dandelion: to_dandelion)
+    event.donations.create!(account: donor, order: order, amount: amount, payment_completed: paid).tap { |donation| donation.set(created_at: at) }
+  end
+
+  test 'Donations lists the events whose checkouts raised the most for Dandelion in the dates chosen, the past three months by default' do
+    covers_route 'GET /stats/donations'
+    create_event(name: 'Smaller Event', as: :smaller)
+    create_event(name: 'Bigger Event', as: :bigger)
+    create_event(name: 'Older Event', as: :older)
+    create_event(name: 'Other Event', as: :other)
+    donate_at_checkout(@smaller, 5)
+    donate_at_checkout(@bigger, 12)
+    donate_at_checkout(@bigger, 8, at: 1.month.ago)
+    donate_at_checkout(@older, 50, at: 4.months.ago)
+    # Donations to the event's organisers, and unpaid ones
+    donate_at_checkout(@other, 100, to_dandelion: false)
+    donate_at_checkout(@other, 100, paid: false)
+    sign_in(FactoryBot.create(:account, admin: true))
+
+    visit '/stats/donations'
+    assert page.has_content?('2 events raised £25 in 3 donations to Dandelion at checkout')
+    assert_equal ['Bigger Event', 'Smaller Event'], all('#donations tbody td:first-child a').map(&:text)
+    assert page.has_css?('#donations tr', text: /Bigger Event.*2\s+£20/)
+    assert page.has_no_link?('Older Event')
+    assert page.has_no_link?('Other Event')
+
+    execute_script "document.querySelector('[name=from]')._flatpickr.setDate(#{5.months.ago.to_date.iso8601.to_json})"
+    click_on 'Search'
+    assert page.has_content?('3 events raised £75 in 4 donations to Dandelion at checkout')
+    assert_equal ['Older Event', 'Bigger Event', 'Smaller Event'], all('#donations tbody td:first-child a').map(&:text)
   end
 
   test 'Spring clean lists the organisations over a year old and gatherings over a month old that nobody uses, and deletes nothing' do

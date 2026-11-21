@@ -67,6 +67,33 @@ Dandelion::App.controller do
     erb :'stats/organisations'
   end
 
+  get '/stats/donations' do
+    @from = params[:from] ? parse_date(params[:from]) : 3.months.ago.to_date
+    @to = params[:to] ? parse_date(params[:to]) : Date.today
+    created_at = { '$gte' => @from.to_time(:utc), '$lt' => (@to + 1.day).to_time(:utc) }
+
+    # Donations to Dandelion made at checkout, summed by event in the database (raw aggregations skip the paranoia scope, so exclude deleted donations here)
+    sums = Donation.collection.aggregate([
+                                           { '$match' => { created_at: created_at, deleted_at: nil, payment_completed: true, application_fee_paid_to_dandelion: true,
+                                                           event_id: { '$ne' => nil }, currency: { '$in' => FIAT_CURRENCIES } } },
+                                           { '$group' => { _id: { event_id: '$event_id', currency: '$currency' }, amount: { '$sum' => '$amount' }, count: { '$sum' => 1 } } }
+                                         ]).to_a
+
+    @rows = Hash.new { |h, k| h[k] = { donations: 0, amount: Money.new(0, 'GBP') } }
+    sums.each do |r|
+      row = @rows[r['_id']['event_id']]
+      row[:donations] += r['count']
+      row[:amount] += Money.new(r['amount'] * 100, r['_id']['currency'])
+    end
+    @rows.each_value { |row| row[:amount] = row[:amount].exchange_to('GBP') }
+
+    @donations_count = @rows.values.sum { |row| row[:donations] }
+    @total = @rows.values.sum(Money.new(0, 'GBP')) { |row| row[:amount] }
+    @events = Event.unscoped.and(:id.in => @rows.keys).includes(:organisation).only(:id, :name, :slug, :start_time, :organisation_id, :deleted_at)
+                   .sort_by { |event| -@rows[event.id][:amount].cents }
+    erb :'stats/donations'
+  end
+
   get '/stats/comments' do
     @comments = Comment.includes(:account, :post).and(:body.ne => nil).order('created_at desc').paginate(page: params[:page], per_page: 20)
     erb :'stats/comments'

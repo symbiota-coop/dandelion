@@ -1,0 +1,52 @@
+<% form_tag '', method: 'get', class: 'searchForm form-inline' do %>
+  <div class="form-group">
+    <label>Donations between</label>
+    <%= text_field_tag :from, class: 'form-control datepicker mx-1', value: (@from.to_fs(:db_local) if @from) %>
+  </div>
+  <div class="form-group">
+    <label>and</label>
+    <%= text_field_tag :to, class: 'form-control datepicker mx-1', value: (@to.to_fs(:db_local) if @to) %>
+  </div>
+  <%= submit_tag 'Search', class: 'btn btn-primary' %>
+<% end %>
+
+<p class="lead mt-3">
+  <%= pluralize(@events.count, 'event') %> raised
+  <%= @total.format(no_cents: true) %>
+  in <%= pluralize(@donations_count, 'donation') %> to Dandelion at checkout
+</p>
+
+<div class="mt-3">
+  <script>
+    $(function () {
+      var colIndex = $("#donations th").toArray().indexOf($("th[data-col-name='amount']")[0])
+      $('#donations').DataTable({info: false, paging: false, searching: false, order: [[colIndex, "desc"]]});
+    })
+  </script>
+  <table class="table" id="donations">
+    <thead>
+      <tr>
+        <th>Event</th>
+        <th>Organisation</th>
+        <th data-col-name="start_time">Start time</th>
+        <th data-col-name="donations">Donations</th>
+        <th data-col-name="amount">Amount</th>
+      </tr>
+    </thead>
+    <% @events.each do |event| %>
+      <% row = @rows[event.id] %>
+      <tr>
+        <td>
+          <a href="/e/<%= event.slug %>"><%= event.name %></a>
+          <% if event.deleted_at %><span class="badge text-bg-secondary">Deleted</span><% end %>
+        </td>
+        <td>
+          <% if event.organisation %><a href="/o/<%= event.organisation.slug %>"><%= event.organisation.name %></a><% end %>
+        </td>
+        <td data-sort="<%= event.start_time&.to_fs(:db_local) %>"><%= event.start_time&.to_date %></td>
+        <td><%= row[:donations] %></td>
+        <td data-sort="<%= row[:amount].to_f %>"><%= row[:amount].format(no_cents_if_whole: true) %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
