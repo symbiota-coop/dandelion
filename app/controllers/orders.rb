@@ -97,8 +97,9 @@ Dandelion::App.controller do
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
     headers['Referrer-Policy'] = 'no-referrer'
-    # Cleaned as sanitize_fields would, before it reaches emails as %recipient.firstname%, and written alone
-    @ticket.set(name: CoreExtensions.sanitized(params[:name]))
+    # Saved through validation, so sanitize_fields cleans the name before it reaches emails as %recipient.firstname%
+    @ticket.name = params[:name]
+    halt 400 unless @ticket.save
     200
   end
 
