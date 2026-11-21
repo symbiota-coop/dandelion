@@ -259,11 +259,14 @@ Dandelion::App.controller do
 
   get '/event_sessions/:id', provides: %i[ics], access: :public do
     @event_session = EventSession.find(params[:id]) || not_found
+    @event = @event_session.event || not_found
+    locked_event_admins_only!
     @event_session.ical.to_ical
   end
 
   post '/e/:slug/ticket_type_waitships', provides: :json, access: :public do
     @event = event_from_params
+    locked_event_admins_only!
 
     validate_recaptcha(json: true)
 
@@ -276,6 +279,7 @@ Dandelion::App.controller do
 
   post '/e/:slug/waitship/new', access: :public do
     @event = event_from_params
+    locked_event_admins_only!
 
     validate_recaptcha
 

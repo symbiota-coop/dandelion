@@ -125,6 +125,12 @@ Dandelion::App.helpers do
     kick!(redirect_url: "/e/#{@event.slug}") unless event_admin?
   end
 
+  # A locked event is visible to its admins only: its page (which checks this itself), its sessions' calendar files and
+  # its waitlists
+  def locked_event_admins_only!
+    kick!(redirect_url: ("/o/#{@event.organisation.slug}/events" if @event.organisation)) if @event.locked? && !event_admin?
+  end
+
   def can_delete_event?(event = nil, account = current_account)
     event ||= @event
     return false unless event && account

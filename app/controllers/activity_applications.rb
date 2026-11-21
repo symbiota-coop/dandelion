@@ -1,6 +1,7 @@
 Dandelion::App.controller do
   get '/o/:organisation_slug/a/:slug/apply', access: :public do
     @activity = activity_from_params
+    locked_activity_admins_only!
     @activityship = @activity.activityships.find_by(account: current_account)
     #  redirect "#{@activity.path}/join" if @activity.privacy == 'open'
     @account = current_account || Account.new
@@ -9,6 +10,7 @@ Dandelion::App.controller do
 
   post '/o/:organisation_slug/a/:slug/apply', access: :public do
     @activity = activity_from_params
+    locked_activity_admins_only!
 
     if (account = Account.find_by(email: params[:account][:email].downcase.strip))
       @account = account

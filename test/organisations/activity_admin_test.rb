@@ -273,6 +273,31 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     end
   end
 
+  test "a locked activity's application form is for its admins only, as its page is" do
+    covers_route 'GET /o/:organisation_slug/a/:slug/apply', 'POST /o/:organisation_slug/a/:slug/apply'
+    create_activity(name: 'Hidden retreat', locked: true)
+    application = { account: { name: 'Applicant Person', email: 'applicant@example.com' } }
+
+    activity_outsiders.each do |account|
+      sign_in_as(account)
+      get "#{@activity.path}/apply"
+      assert_redirected_to "/o/#{@organisation.slug}"
+      refute_includes last_response.body, 'Hidden retreat'
+      post "#{@activity.path}/apply", application
+      assert_redirected_to "/o/#{@organisation.slug}"
+    end
+    assert_equal 0, @activity.activity_applications.count
+    assert_nil Account.find_by(email: 'applicant@example.com')
+
+    sign_in_with_rack(@account)
+    get "#{@activity.path}/apply"
+    assert last_response.ok?
+    assert_includes last_response.body, 'Hidden retreat'
+    post "#{@activity.path}/apply", application
+    assert_redirected_to "#{@activity.path}/apply"
+    assert_equal 1, @activity.activity_applications.count
+  end
+
   test 'organisation admins who are not the activity\'s admins manage it, as its own admins do' do
     create_activity
     organisation_admin = FactoryBot.create(:account)
