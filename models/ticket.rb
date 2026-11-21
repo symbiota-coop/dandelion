@@ -49,9 +49,13 @@ class Ticket
 
     self.id_string = id.to_s if id && !id_string
 
-    self.price = ticket_type.price if !price && !complimentary && ticket_type && ticket_type.price
+    # A ticket's price is worked out when it's booked, and again only when a save changes it or the ticket's type. Any
+    # other save (a new name or email, putting it on resale) keeps the price it was booked at, even if its type's price
+    # or range has changed since, and the discounted price the organiser may have set since (POST /tickets/:id/price)
+    reprice = new_record? || price_changed? || ticket_type_id_changed?
+    self.price = ticket_type.price if reprice && !price && !complimentary && ticket_type && ticket_type.price
     variable_price_ticket = ticket_type && (ticket_type.range || ticket_type.price.nil?)
-    if variable_price_ticket && !complimentary
+    if reprice && variable_price_ticket && !complimentary
       if !price&.finite?
         errors.add(:price, 'must be a number')
       elsif ticket_type.range
@@ -69,7 +73,7 @@ class Ticket
     self.percentage_discount = order.try(:percentage_discount) unless percentage_discount
     self.percentage_discount_monthly_donor = order.try(:percentage_discount_monthly_donor) unless percentage_discount_monthly_donor
 
-    self.discounted_price = calculate_discounted_price
+    self.discounted_price = calculate_discounted_price if reprice || percentage_discount_changed? || percentage_discount_monthly_donor_changed?
 
     if new_record? && !complimentary
       errors.add(:ticket_type, 'is full') if ticket_type && (ticket_type.number_of_tickets_available_in_single_purchase < 1)

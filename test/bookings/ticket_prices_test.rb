@@ -72,6 +72,28 @@ class BookingTicketPricesTest < ActiveSupport::TestCase
     refute ticket.payment_completed
   end
 
+  test "a booked ticket keeps its price through saves that don't change it, and is priced again by those that do" do
+    create_event(prices: ['10-30'], suggested_donation: 0)
+    range = @event.ticket_types.first
+    ticket = build_ticket(price: 10, payment_completed: true)
+    ticket.save!
+    assert_equal 10.0, ticket.discounted_price
+    # The organiser sets the ticket's price on the Tickets page, then raises the range's minimum
+    ticket.set(discounted_price: 7.5)
+    range.update!(range_min: 15)
+
+    ticket = Ticket.find(ticket.id)
+    ticket.update!(email: 'holder@example.com')
+    ticket = Ticket.find(ticket.id)
+    assert_equal 10.0, ticket.price
+    assert_equal 7.5, ticket.discounted_price
+
+    ticket.update!(price: 12)
+    ticket = Ticket.find(ticket.id)
+    assert_equal 15.0, ticket.price
+    assert_equal 15.0, ticket.discounted_price
+  end
+
   test 'a purchase with a negative, non-numeric or out-of-range chosen price is refused, leaving no order or tickets' do
     covers_route 'POST /e/:slug/purchase'
     create_event(prices: [nil, '10-100'], suggested_donation: 0)

@@ -333,6 +333,8 @@ The original ticket PDF will still work, so you can simply forward it to the new
 
 **Event organisers that have received a request to transfer a ticket:** Click the event dropdown, go to the Tickets page, and select 'Change name or email' in the Actions menu for the ticket(s).
 
+Changing a ticket's name or email, by either of these ways, keeps its price: the one it was booked at, and any you've set on the Tickets page since, even if its ticket type's price has changed. <!-- claim: transfer-keeps-ticket-price -->
+
 If you want to resend the ticket PDF to the new email address, after entering the new email, select 'Resend single ticket' in the Actions menu.
 
 ## Refunds
