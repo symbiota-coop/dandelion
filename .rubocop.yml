@@ -194,6 +194,10 @@ Dandelion/GatheringScope:
 Dandelion/GatheringPermission:
   Include:
     - app/controllers/**/*.rb
+Dandelion/RouteAccess:
+  Include:
+    - app/app.rb
+    - app/controllers/**/*.rb
 Dandelion/AssertReload:
   Include:
     - test/**/*.rb

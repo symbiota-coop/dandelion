@@ -12,7 +12,7 @@ Dandelion::App.controller do
     }.to_json
   end
 
-  get '/o/:slug/events_block' do
+  get '/o/:slug/events_block', access: :public do
     # A pagelet: the organisation page loads it, and pagelets.js loads its pagination links, both by XHR.
     # Crawlers follow those links directly, so turn them away before doing any work
     halt 400 unless request.xhr?
@@ -22,7 +22,7 @@ Dandelion::App.controller do
     partial :'organisations/events_block'
   end
 
-  get '/o/:slug/events', provides: %i[html ics json] do
+  get '/o/:slug/events', provides: %i[html ics json], access: :public do
     @organisation = organisation_from_params
     @events = @organisation.events_including_cohosted.hinted(Event::HOSTS_INDEX).publicly_visible
     @from = params[:from] ? parse_date(params[:from]) : Date.today

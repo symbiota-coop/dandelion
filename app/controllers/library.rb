@@ -1,11 +1,11 @@
 Dandelion::App.controller do
-  get '/books' do
+  get '/books', access: :public do
     @title = 'Books'
     @books = Library.books.sort_by { |b| -b[:original_publication_year_or_year_published].to_i }
     erb :'books/books'
   end
 
-  get '/books/:slug', provides: [:html, :jpg] do
+  get '/books/:slug', provides: [:html, :jpg], access: :public do
     @book = Library.books.find { |b| b[:slug] == params[:slug] } || not_found
 
     case content_type
@@ -16,13 +16,13 @@ Dandelion::App.controller do
     end
   end
 
-  get '/films' do
+  get '/films', access: :public do
     @title = 'Films'
     @films = Library.films.sort_by { |f| -f[:year].to_i }
     erb :'films/films'
   end
 
-  get '/films/:slug', provides: :jpg do
+  get '/films/:slug', provides: :jpg, access: :public do
     @film = Library.films.find { |f| f[:slug] == params[:slug] } || not_found
     redirect library_image_url(@film[:image])
   end

@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/icons/calendar/:month/:day' do
+  get '/icons/calendar/:month/:day', access: :public do
     content_type 'image/svg+xml'
 
     month = params[:month].to_s.upcase
@@ -13,7 +13,7 @@ Dandelion::App.controller do
     partial :'icons/calendar', locals: { month: month, day: day }
   end
 
-  get '/icons/image/:image' do
+  get '/icons/image/:image', access: :public do
     image = params[:image].to_s
     # Only names of the icons in app/assets/images/icons, so the parameter can't reach other files
     halt 404 unless image.match?(/\A[a-z0-9-]+\z/) && File.exist?(Padrino.root('app', 'assets', 'images', 'icons', "#{image}.svg"))

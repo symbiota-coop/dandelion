@@ -30,8 +30,7 @@ Dandelion::App.controller do
     partial :'comments/chat', locals: { commentable: @commentable }
   end
 
-  post '/comment' do
-    sign_in_required!
+  post '/comment', access: :signed_in do
     halt 403 unless Post.commentable_types.include?(params[:comment][:commentable_type])
     @commentable = params[:comment][:commentable_type].constantize.find(params[:comment][:commentable_id]) || not_found
     commentable_viewers_only!
@@ -62,8 +61,7 @@ Dandelion::App.controller do
     end
   end
 
-  post '/comments/:id/edit' do
-    sign_in_required!
+  post '/comments/:id/edit', access: :signed_in do
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
     halt 403 unless @comment.account.id == current_account.id
@@ -73,8 +71,7 @@ Dandelion::App.controller do
     200
   end
 
-  post '/comments/:id/file' do
-    sign_in_required!
+  post '/comments/:id/file', access: :signed_in do
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
     halt 403 unless @comment.account.id == current_account.id
@@ -88,8 +85,7 @@ Dandelion::App.controller do
     end
   end
 
-  post '/comments/:id/file/destroy' do
-    sign_in_required!
+  post '/comments/:id/file/destroy', access: :signed_in do
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
     halt 403 unless @comment.account.id == current_account.id
@@ -99,8 +95,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  post '/comments/:id/destroy' do
-    sign_in_required!
+  post '/comments/:id/destroy', access: :signed_in do
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
     halt 403 unless @comment.account.id == current_account.id
@@ -127,8 +122,7 @@ Dandelion::App.controller do
     partial :'comments/read_receipts', locals: { comment: @comment }
   end
 
-  post '/comments/:id/react' do
-    sign_in_required!
+  post '/comments/:id/react', access: :signed_in do
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
     commentable_viewers_only!
@@ -136,8 +130,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/comments/:id/unreact' do
-    sign_in_required!
+  get '/comments/:id/unreact', access: :signed_in do
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
     commentable_viewers_only!
@@ -145,8 +138,7 @@ Dandelion::App.controller do
     200
   end
 
-  post '/comments/:id/send' do
-    sign_in_required!
+  post '/comments/:id/send', access: :signed_in do
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
     halt 403 unless comment_admin?(@comment)
@@ -161,8 +153,7 @@ Dandelion::App.controller do
     partial :'comments/post', locals: { post: @post }
   end
 
-  get '/posts/:id/unsubscribe' do
-    sign_in_required!
+  get '/posts/:id/unsubscribe', access: :signed_in do
     @post = Post.find(params[:id]) || not_found
     @commentable = @post.commentable
     @post.subscriptions.find_by(account: current_account).try(:destroy)
@@ -184,8 +175,7 @@ Dandelion::App.controller do
     partial :'comments/voptions', locals: { comment: @comment }
   end
 
-  post '/voptions/create' do
-    sign_in_required!
+  post '/voptions/create', access: :signed_in do
     @comment = Comment.find(params[:comment_id]) || not_found
     @commentable = @comment.commentable
     commentable_viewers_only!
@@ -194,8 +184,7 @@ Dandelion::App.controller do
     200
   end
 
-  post '/voptions/:id/vote' do
-    sign_in_required!
+  post '/voptions/:id/vote', access: :signed_in do
     @voption = Voption.find(params[:id]) || not_found
     @commentable = @voption.comment.commentable
     commentable_viewers_only!
@@ -207,8 +196,7 @@ Dandelion::App.controller do
     200
   end
 
-  post '/voptions/:id/destroy' do
-    sign_in_required!
+  post '/voptions/:id/destroy', access: :signed_in do
     @voption = Voption.find(params[:id]) || not_found
     @commentable = @voption.comment.commentable
     commentable_viewers_only!
@@ -217,8 +205,7 @@ Dandelion::App.controller do
     200
   end
 
-  post '/subscriptions/create' do
-    sign_in_required!
+  post '/subscriptions/create', access: :signed_in do
     @post = Post.find(params[:post_id]) || not_found
     @commentable = @post.commentable
     commentable_viewers_only!
@@ -226,8 +213,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/subscriptions/:id/unsubscribe' do
-    sign_in_required!
+  get '/subscriptions/:id/unsubscribe', access: :signed_in do
     @subscription = Subscription.find(params[:id]) || not_found
     halt 403 unless @subscription.account.id == current_account.id
     @subscription.destroy

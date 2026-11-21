@@ -1,10 +1,10 @@
 Dandelion::App.controller do
-  get '/atproto/oauth-client-metadata.json', provides: :json do
+  get '/atproto/oauth-client-metadata.json', provides: :json, access: :public do
     content_type 'application/json'
     AtprotoKeyManager.client_metadata.to_json
   end
 
-  get '/auth/failure' do
+  get '/auth/failure', access: :public do
     @body_class = 'lavender-wash'
     paused_until = session.delete('sign_in_paused_until')
     flash.now[:error] = if params[:message] == 'sign_in_paused' && paused_until
@@ -68,8 +68,7 @@ Dandelion::App.controller do
     end
   end
 
-  post '/accounts/providers/confirm' do
-    sign_in_required!
+  post '/accounts/providers/confirm', access: :signed_in do
     verification_required!(return_to: '/accounts/providers', notice: 'To connect an account, enter the code below, then connect it again.')
     omniauth_data = session.delete('omniauth.connect') || redirect('/accounts/providers')
     @provider = Provider.object(omniauth_data['provider']) || redirect('/accounts/providers')
@@ -87,7 +86,7 @@ Dandelion::App.controller do
     redirect '/accounts/providers'
   end
 
-  post '/accounts/providers/cancel' do
+  post '/accounts/providers/cancel', access: :public do
     session.delete('omniauth.connect')
     redirect '/accounts/providers'
   end

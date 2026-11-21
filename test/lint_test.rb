@@ -127,6 +127,16 @@ class LintTest < Minitest::Test
         "post '/g/:slug/x' do\n  halt 403 unless y\n  z\nend" => 0, "get '/g/:slug/x' do\n  membership_required!\n  erb :x\nend" => 0,
         "get '/events/:slug' do\n  erb :x\nend" => 0, "get '/g/new' do\n  erb :x\nend" => 0
       },
+      'Dandelion/RouteAccess' => {
+        "get '/x' do\n  erb :x\nend" => 1, "get '/x', access: :public do\nend" => 0, "get '/x', provides: :json, access: :signed_in do\nend" => 0,
+        "get '/x', access: level do\nend" => 1, "get '/x', access: :everyone do\nend" => 1, "get '/x' do\n  halt 403 unless y\nend" => 0,
+        "get '/x' do\n  halt 404 unless y\nend" => 1, "get '/x' do\n  sign_in_required!(notice: 'y')\nend" => 0, "get :index, map: '/x' do\nend" => 1,
+        "get :index, map: '/x', access: :admin do\nend" => 0, "head '/' do\n  200\nend" => 1, "post '/x' do\n  y.kick!\nend" => 1,
+        "%w[get post].each do |verb|\n  send(verb, '/x') do\n  end\nend" => 1, "%w[get post].each do |verb|\n  send(verb, '/x', access: :public) do\n  end\nend" => 0,
+        "Dandelion::App.controller do\n  before do\n    @x = 1\n  end\n\n  get '/x' do\n  end\nend" => 1,
+        "Dandelion::App.controller do\n  before do\n    admins_only!\n  end\n\n  get '/x' do\n  end\nend" => 0,
+        "class App\n  before do\n    kick! unless y\n  end\n\n  get '/x' do\n  end\nend" => 1, "x.get '/x' do\nend" => 0, "get 'x' do\nend" => 0
+      },
       'Dandelion/RailsController' => {
         'params[:event].permit(:name)' => 1, 'skip_before_action :x' => 1, 'pdf.render' => 0, 'EmailHelper.render(:x)' => 0,
         'require "x"' => 0, 'x.respond_to?(:y)' => 0, 'event.permit(:x)' => 0
@@ -145,6 +155,51 @@ class LintTest < Minitest::Test
   def test_gathering_permission_only_checks_controllers
     cop = RuboCop::Cop::Registry.global.find_by_cop_name('Dandelion/GatheringPermission')
     assert_empty cop_offenses(cop, "get '/g/:slug/x' do\n  erb :x\nend", 'lib/x.rb')
+  end
+
+  def test_route_access_only_checks_routes_files
+    cop = RuboCop::Cop::Registry.global.find_by_cop_name('Dandelion/RouteAccess')
+    assert_empty cop_offenses(cop, "get '/x' do\n  erb :x\nend", 'lib/x.rb')
+    assert_equal 1, cop_offenses(cop, "get '/x' do\n  erb :x\nend", 'app/app.rb').size
+  end
+
+  # 'VERB /path' for each route a route block of Dandelion/RouteAccess's defines
+  def route_access_keys(block)
+    send_node = block.send_node
+    if send_node.method_name == :send
+      verbs = block.each_ancestor(:block).first.send_node.receiver.values.map(&:value)
+      verbs.map { |verb| "#{verb.upcase} #{send_node.arguments[1].value}" }
+    else
+      path = send_node.first_argument.str_type? ? send_node.first_argument.value : send_node.arguments.last.pairs.find { |pair| pair.key.value == :map }.value.value
+      ["#{send_node.method_name.upcase} #{path}"]
+    end
+  end
+
+  # AGENTS.md, Conventions: Dandelion/RouteAccess checks every route RouteMarks reads, those a loop defines too, so no route
+  # escapes it by how it's written
+  def test_route_access_checks_every_route
+    cop = RuboCop::Cop::Dandelion::RouteAccess
+    checked = [File.join(ROOT, 'app/app.rb'), *Dir[File.join(ROOT, 'app/controllers/*.rb')]].flat_map do |path|
+      ast = RuboCop::ProcessedSource.new(File.read(path, encoding: 'UTF-8'), RUBOCOP_CONFIG.target_ruby_version, path).ast
+      cop.route_blocks(ast).flat_map { |block| route_access_keys(block) }
+    end
+    assert_includes checked, 'POST /events/:id/*', 'a route a loop defines'
+    assert_empty RouteMarks.routes.keys - checked, 'Dandelion/RouteAccess misses these routes: define them as get/post... or send(verb, ...) in a loop'
+  end
+
+  # A real route that says who may use it fails once it doesn't: its access: option taken out, or its guard
+  def test_route_access_fails_a_route_whose_declaration_is_removed
+    cop = RuboCop::Cop::Registry.global.find_by_cop_name('Dandelion/RouteAccess')
+    {
+      'app/app.rb' => ["get '/terms', access: :public do", "get '/terms' do"],
+      'app/controllers/events.rb' => ["send(verb, '/events/:id/*', access: :public) do", "send(verb, '/events/:id/*') do"],
+      'app/controllers/organisations_admin.rb' => ["    organisation_admins_only!\n    @organisation.set(feedback_summary: nil)", '    @organisation.set(feedback_summary: nil)']
+    }.each do |path, (declared, undeclared)|
+      code = File.read(File.join(ROOT, path), encoding: 'UTF-8')
+      assert_includes code, declared
+      assert_empty cop_offenses(cop, code, path), "#{path} has a route that doesn't say who may use it"
+      assert_operator cop_offenses(cop, code.sub(declared, undeclared), path).size, :>=, 1, "#{path} without #{declared.strip}"
+    end
   end
 
   def test_slug_lookup_only_checks_controllers

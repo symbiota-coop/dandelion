@@ -1,18 +1,17 @@
 Dandelion::App.controller do
-  get '/docs/question' do
+  get '/docs/question', access: :public do
     @sent = true
     partial :'docs/question'
   end
 
-  get '/docs/ask' do
+  get '/docs/ask', access: :public do
     @question = params[:q].to_s.strip
     @question = @question.empty? ? nil : @question[0, 2000]
     @title = @question || 'Ask DeepWiki'
     erb :'docs/ask'
   end
 
-  post '/docs/question' do
-    sign_in_required!
+  post '/docs/question', access: :signed_in do
     halt 400 unless params[:question]
 
     EmailHelper.send_to_founder(
@@ -29,11 +28,11 @@ Dandelion::App.controller do
     200
   end
 
-  get '/docs' do
+  get '/docs', access: :public do
     redirect '/docs/events'
   end
 
-  get '/docs/:slug' do
+  get '/docs/:slug', access: :public do
     redirect '/docs/integrations' if %w[zapier mcp].include?(params[:slug])
 
     names = { 'integrations' => 'Zapier & MCP' }

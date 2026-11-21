@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/facilitators', provides: %i[html json] do
+  get '/facilitators', provides: %i[html json], access: :public do
     @accounts = Account.and(:event_feedbacks_as_facilitator_count.gt => 0).order('event_feedbacks_as_facilitator_count desc')
     if params[:q]
       ids_from_search = Account.search(params[:q], @accounts).pluck(:id)

@@ -1,6 +1,5 @@
 Dandelion::App.controller do
-  get '/u/:username/unsubscribe' do
-    sign_in_required!
+  get '/u/:username/unsubscribe', access: :signed_in do
     @account = account_from_params
     # A GET can be triggered cross-site (e.g. an <img> in a message), so only touch an existing follow, never create one
     if (@follow = current_account.follows_as_follower.find_by(followee: @account))
@@ -10,14 +9,12 @@ Dandelion::App.controller do
     redirect "/u/#{@account.username}"
   end
 
-  get '/follow/:username' do
-    sign_in_required!
+  get '/follow/:username', access: :signed_in do
     @account = account_from_params
     request.xhr? ? (partial :'accounts/follow', locals: { account: @account, btn_class: params[:btn_class] }) : redirect("/u/#{@account.username}")
   end
 
-  post '/follow/:username' do
-    sign_in_required!
+  post '/follow/:username', access: :signed_in do
     @account = account_from_params
     case params[:f]
     when 'not_following'
@@ -32,21 +29,18 @@ Dandelion::App.controller do
     request.xhr? ? 200 : redirect("/u/#{@account.username}")
   end
 
-  get '/follow/starred/:id' do
-    sign_in_required!
+  get '/follow/starred/:id', access: :signed_in do
     follow = current_account.follows_as_follower.find(params[:id]) || not_found
     partial :'accounts/star', locals: { follow: follow, btn_class: params[:btn_class] }
   end
 
-  post '/follow/star/:id' do
-    sign_in_required!
+  post '/follow/star/:id', access: :signed_in do
     follow = current_account.follows_as_follower.find(params[:id]) || not_found
     follow.set(starred: true)
     200
   end
 
-  post '/follow/unstar/:id' do
-    sign_in_required!
+  post '/follow/unstar/:id', access: :signed_in do
     follow = current_account.follows_as_follower.find(params[:id]) || not_found
     follow.set(starred: false)
     200

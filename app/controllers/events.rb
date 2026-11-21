@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/events', provides: %i[html ics json] do
+  get '/events', provides: %i[html ics json], access: :public do
     @events = Event.live.publicly_visible
     @from = params[:from] ? parse_date(params[:from]) : Date.today
     @to = params[:to] ? parse_date(params[:to]) : nil
@@ -100,8 +100,7 @@ Dandelion::App.controller do
     end
   end
 
-  post '/events/new' do
-    sign_in_required!
+  post '/events/new', access: :signed_in do
     @event = Event.new(mass_assigning(params[:event], Event))
     @event.organisation_id = params.dig(:event, :organisation_id)
     unless @event.organisation
@@ -129,8 +128,7 @@ Dandelion::App.controller do
     end
   end
 
-  post '/events/draft' do
-    sign_in_required!
+  post '/events/draft', access: :signed_in do
     halt 400 unless params[:event] && params[:event][:name]
 
     attrs = {
@@ -151,20 +149,19 @@ Dandelion::App.controller do
     { draft_id: draft.id.to_s }.to_json
   end
 
-  post '/drafts/:id/destroy' do
-    sign_in_required!
+  post '/drafts/:id/destroy', access: :signed_in do
     draft = current_account.drafts.find(params[:id]) || not_found
     draft.destroy
     200
   end
 
   # Event URLs named events by id before they used slugs: /events/:id/... is now /e/:slug/...
-  get '/events/:id', provides: %i[html ics json] do
+  get '/events/:id', provides: %i[html ics json], access: :public do
     redirect_to_slug_url(Event.without_heavy_fields, '/events') { |event| "/e/#{event.slug}" }
   end
 
   %i[get post].each do |verb|
-    send(verb, '/events/:id/*') do
+    send(verb, '/events/:id/*', access: :public) do
       redirect_to_slug_url(Event.unscoped, '/events') { |event| "/e/#{event.slug}" }
     end
   end
@@ -260,12 +257,12 @@ Dandelion::App.controller do
     end
   end
 
-  get '/event_sessions/:id', provides: %i[ics] do
+  get '/event_sessions/:id', provides: %i[ics], access: :public do
     @event_session = EventSession.find(params[:id]) || not_found
     @event_session.ical.to_ical
   end
 
-  post '/e/:slug/ticket_type_waitships', provides: :json do
+  post '/e/:slug/ticket_type_waitships', provides: :json, access: :public do
     @event = event_from_params
 
     validate_recaptcha(json: true)
@@ -277,7 +274,7 @@ Dandelion::App.controller do
     halt 400, { error: e.message }.to_json
   end
 
-  post '/e/:slug/waitship/new' do
+  post '/e/:slug/waitship/new', access: :public do
     @event = event_from_params
 
     validate_recaptcha
@@ -290,8 +287,7 @@ Dandelion::App.controller do
   end
 
   # Email notifications for the discussion, before anyone has written in it: makes its post to subscribe to
-  post '/e/:slug/subscribe_discussion' do
-    sign_in_required!
+  post '/e/:slug/subscribe_discussion', access: :signed_in do
     @event = event_from_params
     @commentable = @event
     commentable_viewers_only!
@@ -300,47 +296,42 @@ Dandelion::App.controller do
   end
 
   # Discussion emails sent before 2026-10-15 link here to unsubscribe
-  get '/e/:slug/unsubscribe_discussion' do
-    sign_in_required!
+  get '/e/:slug/unsubscribe_discussion', access: :signed_in do
     @event = event_from_params
     @event.discussion_post&.subscriptions&.and(account: current_account)&.destroy_all
     flash[:notice] = "You unsubscribed from the discussion of #{@event.name}"
     redirect "/e/#{@event.slug}"
   end
 
-  get '/e/:slug/star' do
-    sign_in_required!
+  get '/e/:slug/star', access: :signed_in do
     @event = event_from_params
     @event_star = @event.event_stars.find_by(account: current_account)
     partial :'events/star', locals: { event: @event, event_star: @event_star, block_edit: params[:block_edit] }
   end
 
-  get '/e/:slug/block_controls' do
-    sign_in_required!
+  get '/e/:slug/block_controls', access: :signed_in do
     @event = event_from_params
     partial :'events/block_controls', locals: { event: @event, event_star: @event.event_stars.find_by(account: current_account) }
   end
 
-  post '/e/:slug/do_star' do
-    sign_in_required!
+  post '/e/:slug/do_star', access: :signed_in do
     @event = event_from_params
     @event.event_stars.create(account: current_account)
     200
   end
 
-  post '/e/:slug/unstar' do
-    sign_in_required!
+  post '/e/:slug/unstar', access: :signed_in do
     @event = event_from_params
     @event_star = @event.event_stars.find_by(account: current_account)
     @event_star.try(:destroy)
     200
   end
 
-  get '/e/:slug/questions' do
+  get '/e/:slug/questions', access: :public do
     partial :'questions/questions', locals: { questions: params[:questions], preview: true }
   end
 
-  get '/e/:slug/feedback_questions' do
+  get '/e/:slug/feedback_questions', access: :public do
     partial :'events/feedback_questions', locals: { questions: params[:questions] }
   end
 end

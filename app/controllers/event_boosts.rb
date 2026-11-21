@@ -70,7 +70,7 @@ Dandelion::App.controller do
     halt 400, { error: 'There was an error creating the boost.' }.to_json
   end
 
-  post '/event_boosts/stripe_webhook' do
+  post '/event_boosts/stripe_webhook', access: :public do
     endpoint_secret = ENV['STRIPE_ENDPOINT_SECRET_EVENT_BOOSTS']
     halt 200 unless endpoint_secret.present?
 

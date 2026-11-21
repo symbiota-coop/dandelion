@@ -392,7 +392,7 @@ Dandelion::App.controller do
     request.xhr? ? 200 : redirect(back('#feedback'))
   end
 
-  get '/o/:slug/feedback_summary' do
+  get '/o/:slug/feedback_summary', access: :public do
     @organisation = organisation_from_params
     partial :'event_feedbacks/feedback_summary', locals: { contents_only: true }
   end

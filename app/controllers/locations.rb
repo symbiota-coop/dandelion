@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/locations/:name' do
+  get '/locations/:name', access: :public do
     @location = Location.find_by(name: params[:name]) || not_found
 
     @title = @location.name

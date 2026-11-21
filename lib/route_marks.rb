@@ -7,7 +7,7 @@ module RouteMarks
   DEFINITION = %r{\A\s*(?<verb>get|post|put|patch|delete)\s+(?:(?<q>['"])(?<path>/[^'"]*)\k<q>|:\w+,\s*map:\s*(?<mq>['"])(?<map>/[^'"]*)\k<mq>)}
   # A route for several verbs: %w[get post].each do |verb| ... send(verb, '/path') do
   VERBS = /\A\s*%[wi]\[(?<verbs>[a-z ]+)\]\.each do \|\w+\|/
-  SENT = %r{\A\s*send\(\w+, (?<q>['"])(?<path>/[^'"]*)\k<q>\)}
+  SENT = %r{\A\s*send\(\w+, (?<q>['"])(?<path>/[^'"]*)\k<q>[,)]}
   MARK = /\A\s*covers_route ('.+)/
 
   # 'VERB /path' => where it's defined, as file:line

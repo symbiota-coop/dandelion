@@ -7,7 +7,7 @@
 module AdminPagesHelpers
   # A guard of the record's admins or members, or of site admins only
   RECORD_GUARD = /\b\w+_admins\w*_only!|\b(?:confirmed_)?membership_required!/
-  SITE_ADMIN_GUARD = /\badmins_only!/
+  SITE_ADMIN_GUARD = /\badmins_only!|\baccess: :admin\b/
   # Controllers whose pages are about no one record (site admins'), or answer programs (Zapier) rather than people
   UNVISITED_FILES = %w[dadmin messages recommendations stats zapier].map { |name| "app/controllers/#{name}.rb" }.freeze
   # Controllers whose before filter finds the record from a query string, so their pages are visited for each kind of
@@ -64,7 +64,8 @@ module AdminPagesHelpers
       next if !route.start_with?('GET ') || UNVISITED_FILES.include?(file) || SKIP.key?(route)
 
       lines = File.readlines(file, encoding: 'UTF-8')
-      body = lines[line.to_i..].take_while { |code| !code.match?(RouteMarks::DEFINITION) && !code.match?(RouteMarks::VERBS) }.join
+      # From its definition, whose access: option may say it's for site admins, to the next route
+      body = lines[line.to_i - 1] + lines[line.to_i..].take_while { |code| !code.match?(RouteMarks::DEFINITION) && !code.match?(RouteMarks::VERBS) }.join
       before = lines.join[/^  before do\n.*?^  end\n/m].to_s
       [route, file, body, before] if (before + body).match?(Regexp.union(RECORD_GUARD, SITE_ADMIN_GUARD))
     end

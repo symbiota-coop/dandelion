@@ -5,7 +5,7 @@ Dandelion::App.controller do
     erb :'organisations/contribute'
   end
 
-  post '/organisations/stripe_webhook' do
+  post '/organisations/stripe_webhook', access: :public do
     payload = request.body.read
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
     begin

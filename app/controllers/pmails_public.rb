@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/pmails/:pmail_id' do
+  get '/pmails/:pmail_id', access: :public do
     pass if params[:pmail_id] == 'new'
     @pmail = Pmail.find_by_id_or_token(params[:pmail_id]) || not_found
     not_found unless @pmail.sent_at

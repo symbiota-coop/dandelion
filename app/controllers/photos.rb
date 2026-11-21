@@ -1,12 +1,10 @@
 Dandelion::App.controller do
-  get '/photos/:id' do
+  get '/photos/:id', access: :public do
     @photo = Photo.find(params[:id]) || not_found
     redirect @photo.url
   end
 
-  post '/photos/new' do
-    sign_in_required!
-
+  post '/photos/new', access: :signed_in do
     photoable_type = params[:photoable_type].to_s
     halt(403) unless Photo.photoable_types.include?(photoable_type)
 
@@ -18,8 +16,7 @@ Dandelion::App.controller do
     redirect @photo.url
   end
 
-  post '/photos/:id/destroy' do
-    sign_in_required!
+  post '/photos/:id/destroy', access: :signed_in do
     @photo = Photo.find(params[:id]) || not_found
     halt(403) unless admin? || @photo.account_id == current_account.id
     @photo.destroy

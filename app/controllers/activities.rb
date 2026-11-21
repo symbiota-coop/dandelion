@@ -18,12 +18,12 @@ Dandelion::App.controller do
 
   # Activity URLs named activities by id before they used slugs: /activities/:id/... is now
   # /o/:organisation_slug/a/:slug/...
-  get '/activities/:id' do
+  get '/activities/:id', access: :public do
     redirect_to_slug_url(Activity, '/activities', &:path)
   end
 
   %i[get post].each do |verb|
-    send(verb, '/activities/:id/*') do
+    send(verb, '/activities/:id/*', access: :public) do
       redirect_to_slug_url(Activity, '/activities', &:path)
     end
   end
@@ -130,43 +130,37 @@ Dandelion::App.controller do
     redirect "/o/#{@activity.organisation.slug}/activities"
   end
 
-  get '/o/:organisation_slug/a/:slug/unsubscribe' do
-    sign_in_required!
+  get '/o/:organisation_slug/a/:slug/unsubscribe', access: :signed_in do
     @activity = activity_from_params
     erb :'activities/unsubscribe'
   end
 
   # Unlike a local group's, this doesn't make someone who doesn't follow the activity a follower
-  post '/o/:organisation_slug/a/:slug/unsubscribe' do
-    sign_in_required!
+  post '/o/:organisation_slug/a/:slug/unsubscribe', access: :signed_in do
     @activity = activity_from_params
     unsubscribe_from_subgroup(@activity, @activity.activityships.find_by(account: current_account))
   end
 
-  get '/o/:organisation_slug/a/:slug/activityship' do
-    sign_in_required!
+  get '/o/:organisation_slug/a/:slug/activityship', access: :signed_in do
     @activity = activity_from_params
     subgroupship_button(@activity)
   end
 
-  post '/o/:organisation_slug/a/:slug/activityship' do
-    sign_in_required!
+  post '/o/:organisation_slug/a/:slug/activityship', access: :signed_in do
     @activity = activity_from_params
     # Only open activities can be joined without an admin
     set_own_subgroupship(@activity, params[:f]) if @activity.activityships.find_by(account: current_account) || @activity.privacy == 'open'
     request.xhr? ? 200 : redirect(@activity.path)
   end
 
-  post '/o/:organisation_slug/a/:slug/hide_membership' do
-    sign_in_required!
+  post '/o/:organisation_slug/a/:slug/hide_membership', access: :signed_in do
     @activity = activity_from_params
     @activityship = @activity.activityships.find_by(account: current_account) || not_found
     @activityship.set(hide_membership: true)
     redirect back
   end
 
-  post '/o/:organisation_slug/a/:slug/show_membership' do
-    sign_in_required!
+  post '/o/:organisation_slug/a/:slug/show_membership', access: :signed_in do
     @activity = activity_from_params
     @activityship = @activity.activityships.find_by(account: current_account) || not_found
     @activityship.set(hide_membership: false)

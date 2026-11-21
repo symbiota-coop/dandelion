@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  post '/accounts/stripe_webhook' do
+  post '/accounts/stripe_webhook', access: :public do
     payload = request.body.read
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
     begin
@@ -28,7 +28,7 @@ Dandelion::App.controller do
     halt 200
   end
 
-  post '/accounts/pay', provides: :json do
+  post '/accounts/pay', provides: :json, access: :public do
     halt 400 unless params[:amount].to_f > 0
     halt 400 unless params[:payment_method] == 'stripe'
     # Only the currencies we take: in others (HUF, ISK...) Stripe's subunits differ from Money's, so it'd count 100x

@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/private_sessions', provides: %i[html json] do
+  get '/private_sessions', provides: %i[html json], access: :public do
     # My private sessions (_scope_toggle.erb): the account's own, secret ones too
     @private_sessions = current_account && params[:my_private_sessions] ? current_account.private_sessions : PrivateSession.listed
     @private_sessions = @private_sessions.order('created_at desc')
@@ -32,8 +32,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/private_sessions/new' do
-    sign_in_required!
+  get '/private_sessions/new', access: :signed_in do
     @private_session = current_account.private_sessions.new(max_participants: 1)
     @private_session.currency = @private_session.default_currency
     @title = 'Offer a private session'
@@ -41,8 +40,7 @@ Dandelion::App.controller do
     request.xhr? ? partial(:modal_content, locals: { title: @title, form: :'private_sessions/form' }) : erb(:'private_sessions/build')
   end
 
-  post '/private_sessions/new' do
-    sign_in_required!
+  post '/private_sessions/new', access: :signed_in do
     @private_session = current_account.private_sessions.new(mass_assigning(params[:private_session], PrivateSession))
     saved = @private_session.save
     flash[:notice] = 'The private session was created.' if saved
@@ -60,7 +58,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/ps/:slug' do
+  get '/ps/:slug', access: :public do
     @private_session = private_session_from_params
     @title = @private_session.title_with_name
     # From a list, it opens in #modal (app.js, data-open-in-modal)

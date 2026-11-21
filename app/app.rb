@@ -3,6 +3,8 @@ module Dandelion
     register Padrino::Rendering
     register Padrino::Helpers
     register WillPaginate::Sinatra
+    # Routes say who may use them with access: (lib/route_access.rb)
+    extend RouteAccess
 
     use Sentry::Rack::CaptureExceptions
 
@@ -114,7 +116,7 @@ module Dandelion
       erb :error, layout: :application
     end
 
-    get '/error' do
+    get '/error', access: :public do
       erb :error, layout: :application
     end
 
@@ -126,20 +128,20 @@ module Dandelion
       erb :not_found, layout: :application
     end
 
-    get '/not_found' do
+    get '/not_found', access: :public do
       erb :not_found, layout: :application
     end
 
-    head '/' do
+    head '/', access: :public do
       200
     end
 
     # Render's health check: only route traffic to an instance once it's serving
-    get '/health' do
+    get '/health', access: :public do
       200
     end
 
-    get '/' do
+    get '/', access: :public do
       if current_account
         # signed in
         if request.xhr?
@@ -161,13 +163,12 @@ module Dandelion
       end
     end
 
-    post '/sidebar' do
+    post '/sidebar', access: :public do
       session[:sidebar_minified] = params[:minified] == 'true' ? 'minified' : 'unminified'
       { sidebar_minified: session[:sidebar_minified] }.to_json
     end
 
-    get '/notifications' do
-      sign_in_required!
+    get '/notifications', access: :signed_in do
       if request.xhr?
         cp(:notifications, key: "/notifications?account_id=#{current_account.id}", expires: 1.minute.from_now)
       else
@@ -175,26 +176,23 @@ module Dandelion
       end
     end
 
-    post '/checked_notifications' do
-      sign_in_required!
+    post '/checked_notifications', access: :signed_in do
       Fragment.find_by(key: "/notifications?account_id=#{current_account.id}").try(:destroy)
       current_account.set(last_checked_notifications: Time.now)
       200
     end
 
-    post '/checked_messages' do
-      sign_in_required!
+    post '/checked_messages', access: :signed_in do
       current_account.set(last_checked_messages: Time.now)
       200
     end
 
-    get '/feedback' do
+    get '/feedback', access: :public do
       @sent = true
       partial :feedback
     end
 
-    post '/feedback' do
-      sign_in_required!
+    post '/feedback', access: :signed_in do
       halt 400 unless params[:feedback]
 
       EmailHelper.send_to_founder(
@@ -211,8 +209,7 @@ module Dandelion
       200
     end
 
-    get '/network', provides: :json do
-      sign_in_required!
+    get '/network', provides: :json, access: :signed_in do
       if (@q = params[:q])
         @accounts = current_account.network
         @accounts = @accounts.and(:id.in => Account.search(@q, @accounts).pluck(:id))
@@ -250,8 +247,7 @@ module Dandelion
       end
     end
 
-    post '/upload' do
-      sign_in_required!
+    post '/upload', access: :signed_in do
       upload = current_account.uploads.new(file: params[:upload])
       # image? reads the header with libvips, so only on the bytes of an image it may read (ImageSignature)
       halt 422, { error: { message: 'Only images can be uploaded' } }.to_json unless upload.file && ImageSignature.allowed?(upload.file) && upload.file.image?
@@ -260,14 +256,12 @@ module Dandelion
       { default: upload.file.url }.to_json
     end
 
-    get '/referrals' do
-      sign_in_required!
+    get '/referrals', access: :signed_in do
       @organisations = current_account.organisations_as_referrer
       erb :referrals
     end
 
-    post '/referrals/:id/claim' do
-      sign_in_required!
+    post '/referrals/:id/claim', access: :signed_in do
       @organisation = current_account.organisations_as_referrer.find(params[:id]) || not_found
       revenue = @organisation.referral_revenue
 
@@ -290,61 +284,59 @@ module Dandelion
       redirect '/referrals'
     end
 
-    get '/stripe_row_splitter' do
-      sign_in_required!
+    get '/stripe_row_splitter', access: :signed_in do
       erb :stripe_row_splitter
     end
 
-    post '/stripe_row_splitter', provides: :csv do
-      sign_in_required!
+    post '/stripe_row_splitter', provides: :csv, access: :signed_in do
       halt 400 unless params[:csv].is_a?(Tempfile)
       halt 413, 'That CSV is over 5 MB: split it into smaller files' if params[:csv].size > StripeRowSplitter::MAX_UPLOAD_SIZE
       StripeRowSplitter.split(File.read(params[:csv].path))
     end
 
-    get '/donate' do
+    get '/donate', access: :public do
       erb :donate
     end
 
-    get '/code' do
+    get '/code', access: :public do
       erb :'code/code'
     end
 
-    get '/privacy' do
+    get '/privacy', access: :public do
       erb :privacy
     end
 
-    get '/cookies' do
+    get '/cookies', access: :public do
       erb :cookies
     end
 
-    get '/terms' do
+    get '/terms', access: :public do
       erb :terms
     end
 
-    get '/contact' do
+    get '/contact', access: :public do
       erb :contact
     end
 
-    get '/design' do
+    get '/design', access: :public do
       @title = 'Design guide'
       @og_image = "#{ENV['BASE_URI']}/images/design.png"
       @og_desc = 'The visual language of Dandelion: colour, type, spacing and components, rendered from the live CSS'
       erb :design
     end
 
-    get '/wheel-of-the-year.json', provides: :json do
+    get '/wheel-of-the-year.json', provides: :json, access: :public do
       wheel_of_the_year.to_json
     end
 
-    get '/features' do
+    get '/features', access: :public do
       @no_content_padding_bottom = true
       @title = 'Features'
       @og_image = "#{ENV['BASE_URI']}/images/features.png"
       erb :features
     end
 
-    get '/dandelion-vs-luma' do
+    get '/dandelion-vs-luma', access: :public do
       @no_content_padding_bottom = true
       @title = 'Dandelion vs Luma'
       @og_image = "#{ENV['BASE_URI']}/images/dandelion_vs_luma.png"
@@ -352,7 +344,7 @@ module Dandelion
       erb :dandelion_vs_luma
     end
 
-    get '/search' do
+    get '/search', access: :public do
       if request.xhr?
         @type = params[:type]
         @q = params[:term]
@@ -369,13 +361,13 @@ module Dandelion
     end
 
     %w[get post delete].each do |method|
-      send(method, '/mcp') do
+      send(method, '/mcp', access: :public) do
         status, headers, body = Dandelion::MCP.handle_http_request(request)
         [status, headers, body]
       end
     end
 
-    get '/theme.css' do
+    get '/theme.css', access: :public do
       content_type 'text/css'
       theme_color = DEFAULT_THEME_COLOR
       if params[:theme_color]

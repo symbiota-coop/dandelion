@@ -375,22 +375,20 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/e/:slug/hide_from_homepage' do
+  # Site admins moderate the homepage (as below): an event admin could undo a hide
+  get '/e/:slug/hide_from_homepage', access: :admin do
     @event = event_from_params
-    admins_only! # Site admins moderate the homepage (as below): an event admin could undo a hide
     partial :'events/hide_from_homepage', locals: { event: @event, block_edit: params[:block_edit] }
   end
 
-  post '/e/:slug/do_hide_from_homepage' do
+  post '/e/:slug/do_hide_from_homepage', access: :admin do
     @event = event_from_params
-    admins_only!
     @event.set(hidden_from_homepage: true)
     200
   end
 
-  post '/e/:slug/unhide_from_homepage' do
+  post '/e/:slug/unhide_from_homepage', access: :admin do
     @event = event_from_params
-    admins_only!
     @event.set(hidden_from_homepage: false)
     200
   end

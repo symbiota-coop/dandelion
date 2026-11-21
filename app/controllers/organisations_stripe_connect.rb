@@ -1,6 +1,5 @@
 Dandelion::App.controller do
-  get '/organisations/stripe_connect' do
-    sign_in_required!
+  get '/organisations/stripe_connect', access: :signed_in do
     unless (@organisation = organisation_from_stripe_connect_oauth_state(params[:state]))
       flash[:error] = 'Stripe connection failed security check. Please try again.'
       redirect '/'
@@ -34,8 +33,7 @@ Dandelion::App.controller do
     redirect "/o/#{@organisation.slug}/edit#tab-payments"
   end
 
-  get '/o/:slug/stripe_connect' do
-    sign_in_required!
+  get '/o/:slug/stripe_connect', access: :signed_in do
     @organisation = organisation_from_params
     unless organisation_from_stripe_connect_oauth_state(params[:state], personal: true) == @organisation
       flash[:error] = 'Stripe connection failed security check. Please try again.'
@@ -63,15 +61,14 @@ Dandelion::App.controller do
     redirect "/o/#{@organisation.slug}"
   end
 
-  post '/o/:slug/stripe_disconnect' do
-    sign_in_required!
+  post '/o/:slug/stripe_disconnect', access: :signed_in do
     @organisation = organisation_from_params
     @organisationship = current_account.organisationships.find_by(organisation: @organisation) || not_found
     @organisationship.set(stripe_connect_json: nil, stripe_account_json: nil)
     redirect "/o/#{@organisation.slug}"
   end
 
-  post '/organisations/stripe_connect_webhook' do
+  post '/organisations/stripe_connect_webhook', access: :public do
     payload = request.body.read
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
     begin

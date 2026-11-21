@@ -18,17 +18,17 @@ Dandelion::App.controller do
 
   # Local group URLs named local groups by id before they used slugs: /local_groups/:id/... is now
   # /o/:organisation_slug/lg/:slug/...
-  get '/local_groups/:id' do
+  get '/local_groups/:id', access: :public do
     redirect_to_slug_url(LocalGroup, '/local_groups', &:path)
   end
 
   %i[get post].each do |verb|
-    send(verb, '/local_groups/:id/*') do
+    send(verb, '/local_groups/:id/*', access: :public) do
       redirect_to_slug_url(LocalGroup, '/local_groups', &:path)
     end
   end
 
-  get '/o/:organisation_slug/lg/:slug', prerender: true do
+  get '/o/:organisation_slug/lg/:slug', prerender: true, access: :public do
     @local_group = local_group_from_params
     @title = @local_group.name
     erb :'local_groups/local_group'
@@ -101,42 +101,36 @@ Dandelion::App.controller do
     redirect "/o/#{@local_group.organisation.slug}/local_groups"
   end
 
-  get '/o/:organisation_slug/lg/:slug/unsubscribe' do
-    sign_in_required!
+  get '/o/:organisation_slug/lg/:slug/unsubscribe', access: :signed_in do
     @local_group = local_group_from_params
     erb :'local_groups/unsubscribe'
   end
 
   # Someone who doesn't follow the local group is made an unsubscribed follower
-  post '/o/:organisation_slug/lg/:slug/unsubscribe' do
-    sign_in_required!
+  post '/o/:organisation_slug/lg/:slug/unsubscribe', access: :signed_in do
     @local_group = local_group_from_params
     unsubscribe_from_subgroup(@local_group, @local_group.local_groupships.find_or_create_by(account: current_account))
   end
 
-  get '/o/:organisation_slug/lg/:slug/local_groupship' do
-    sign_in_required!
+  get '/o/:organisation_slug/lg/:slug/local_groupship', access: :signed_in do
     @local_group = local_group_from_params
     subgroupship_button(@local_group)
   end
 
-  post '/o/:organisation_slug/lg/:slug/local_groupship' do
-    sign_in_required!
+  post '/o/:organisation_slug/lg/:slug/local_groupship', access: :signed_in do
     @local_group = local_group_from_params
     set_own_subgroupship(@local_group, params[:f])
     request.xhr? ? 200 : redirect(@local_group.path)
   end
 
-  post '/o/:organisation_slug/lg/:slug/hide_membership' do
-    sign_in_required!
+  post '/o/:organisation_slug/lg/:slug/hide_membership', access: :signed_in do
     @local_group = local_group_from_params
     @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found
     @local_groupship.set(hide_membership: true)
     redirect back
   end
 
-  post '/o/:organisation_slug/lg/:slug/show_membership' do
-    sign_in_required!
+  post '/o/:organisation_slug/lg/:slug/show_membership', access: :signed_in do
     @local_group = local_group_from_params
     @local_groupship = @local_group.local_groupships.find_by(account: current_account) || not_found
     @local_groupship.set(hide_membership: false)

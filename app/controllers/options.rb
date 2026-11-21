@@ -13,15 +13,15 @@ Dandelion::App.controller do
     end
   end
 
-  get '/g/:slug/tiers' do
+  get '/g/:slug/tiers', access: :public do
     redirect "/g/#{params[:slug]}/options"
   end
 
-  get '/g/:slug/accoms' do
+  get '/g/:slug/accoms', access: :public do
     redirect "/g/#{params[:slug]}/options"
   end
 
-  get '/g/:slug/transports' do
+  get '/g/:slug/transports', access: :public do
     redirect "/g/#{params[:slug]}/options"
   end
 

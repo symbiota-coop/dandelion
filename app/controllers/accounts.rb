@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/accounts', provides: :json do
+  get '/accounts', provides: :json, access: :public do
     halt 400 unless params[:q] || params[:id]
 
     @accounts = Account.publicly_visible
@@ -20,16 +20,14 @@ Dandelion::App.controller do
     end
   end
 
-  post '/confirm_email' do
-    sign_in_required!
+  post '/confirm_email', access: :signed_in do
     current_account.send_confirmation_email
     flash[:notice] = 'Please click the link in the email to confirm your email address.'
     redirect '/accounts/edit'
   end
 
   # The link signs in (sign_in_via_link_token) but confirms only with the button, which a mail scanner opening the link won't press
-  get '/confirm_email/:link_token' do
-    sign_in_required!
+  get '/confirm_email/:link_token', access: :signed_in do
     if !@signed_in_via_email
       flash[:error] = "That confirmation link isn't valid. Please request a new one."
       redirect '/accounts/edit'
@@ -45,23 +43,20 @@ Dandelion::App.controller do
 
   # Where sign_in_from_email sends the first link sign in to an unconfirmed account in a browser that didn't set it up,
   # which signed out other browsers
-  get '/accounts/confirm_email' do
-    sign_in_required!
+  get '/accounts/confirm_email', access: :signed_in do
     redirect '/accounts/edit' unless session[:confirming_email] == current_account.email && !current_account.email_confirmed?
     @confirm_email_later = session[:confirm_email_later] || '/'
     erb :'accounts/confirm_email'
   end
 
   # Not now: stop asking at each link sign in (Account#end_sessions_for_first_email_sign_in!)
-  post '/accounts/confirm_email/later' do
-    sign_in_required!
+  post '/accounts/confirm_email/later', access: :signed_in do
     confirming_email = session.delete(:confirming_email)
     current_account.set(confirm_email_prompt_owed: false) if confirming_email && confirming_email == current_account.email
     redirect session.delete(:confirm_email_later) || '/'
   end
 
-  post '/accounts/confirm_email' do
-    sign_in_required!
+  post '/accounts/confirm_email', access: :signed_in do
     session.delete(:confirm_email_later)
     confirming_email = session.delete(:confirming_email)
     unless confirming_email && confirming_email == current_account.email
@@ -76,12 +71,12 @@ Dandelion::App.controller do
     redirect '/accounts/edit'
   end
 
-  get '/accounts/sign_in' do
+  get '/accounts/sign_in', access: :public do
     @body_class = 'lavender-wash'
     erb :'accounts/sign_in'
   end
 
-  get '/accounts/ethereum' do
+  get '/accounts/ethereum', access: :public do
     # Taken, not read, so a reload or Back goes through /auth/ethereum for a fresh nonce rather than signing a spent or expired one
     @siwe_template = session.delete(OmniAuth::Strategies::Ethereum::TEMPLATE_SESSION_KEY)
     redirect '/auth/ethereum' unless @siwe_template
@@ -90,14 +85,14 @@ Dandelion::App.controller do
     erb :'accounts/ethereum'
   end
 
-  get '/accounts/sign_in_code' do
+  get '/accounts/sign_in_code', access: :public do
     @body_class = 'lavender-wash'
     not_found unless params[:account_id]
     @account = Account.find(params[:account_id]) || not_found
     erb :'accounts/requested_sign_in_code'
   end
 
-  post '/accounts/sign_in_code' do
+  post '/accounts/sign_in_code', access: :public do
     @body_class = 'lavender-wash'
     if params[:email] && (@account = Account.find_by(email: params[:email].downcase.strip))
       flash.now[:notice] = RecipientLimit::SIGN_IN_CODE_WITHHELD unless @account.send_sign_in_code
@@ -111,20 +106,19 @@ Dandelion::App.controller do
     end
   end
 
-  get '/accounts/sign_out' do
+  get '/accounts/sign_out', access: :public do
     session.clear
     redirect '/'
   end
 
   # Old emails' links to unsubscribe from everything. A GET can be triggered from any page or message (an <img>), so it
   # changes nothing: opting out is the subscriptions form's, a POST
-  get '/accounts/unsubscribe' do
-    sign_in_required!
+  get '/accounts/unsubscribe', access: :signed_in do
     flash[:notice] = 'To stop all emails from Dandelion, tick Opt out of all emails from Dandelion and save.'
     redirect '/accounts/subscriptions'
   end
 
-  get '/accounts/new' do
+  get '/accounts/new', access: :public do
     session.delete('omniauth.auth')
     @body_class = 'lavender-wash'
     @account = Account.new
@@ -133,7 +127,7 @@ Dandelion::App.controller do
     erb :'accounts/new'
   end
 
-  post '/accounts/new' do
+  post '/accounts/new', access: :public do
     @account = Account.new(mass_assigning(params[:account], Account))
     @account.password = Account.generate_password # not used
     @account.default_currency ||= visitor_currency
@@ -193,22 +187,19 @@ Dandelion::App.controller do
     erb :'accounts/subscriptions'
   end
 
-  get '/accounts/providers' do
-    sign_in_required!
+  get '/accounts/providers', access: :signed_in do
     @account = current_account
     erb :'accounts/providers'
   end
 
   # Asks for a code before showing the form, so what's typed into it isn't lost
-  get '/accounts/password' do
-    sign_in_required!
+  get '/accounts/password', access: :signed_in do
     verification_required!(return_to: '/accounts/password', notice: 'To change your password, enter the code below.')
     @account = current_account
     erb :'accounts/password'
   end
 
-  post '/accounts/password' do
-    sign_in_required!
+  post '/accounts/password', access: :signed_in do
     verification_required!(return_to: '/accounts/password', notice: "Your password wasn't changed: enter the code below, then change it again.")
     @account = current_account
     error = if !params[:password]
@@ -230,8 +221,7 @@ Dandelion::App.controller do
   end
 
   # Asks for a code, as the password tab it's on does, so a session from a forwarded link can't sign out the account's owner
-  post '/accounts/sign_out_other_browsers' do
-    sign_in_required!
+  post '/accounts/sign_out_other_browsers', access: :signed_in do
     verification_required!(return_to: '/accounts/password', notice: "Your other browsers weren't signed out: enter the code below, then sign them out again.")
     current_account.revoke_sessions!
     start_session!(current_account)
@@ -242,23 +232,20 @@ Dandelion::App.controller do
   # The API key signs in to the API and MCP (sign_in_via_api_key), and the calendar key to the account's calendar feeds
   # (sign_in_via_ics_key), until they're replaced, so they're shown only to a session that entered a sign in code, not one
   # from a link in a forwarded email
-  get '/accounts/api_key' do
-    sign_in_required!
+  get '/accounts/api_key', access: :signed_in do
     verification_required!(return_to: '/accounts/api_key', notice: 'To see your API and calendar keys, enter the code below.')
     @account = current_account
     erb :'accounts/api_key'
   end
 
-  post '/accounts/api_key' do
-    sign_in_required!
+  post '/accounts/api_key', access: :signed_in do
     verification_required!(return_to: '/accounts/api_key', notice: "Your API key wasn't replaced: enter the code below, then replace it again.")
     current_account.replace_api_key!
     flash[:notice] = 'Your API key was replaced. Anything using the old one, like Zapier or an AI assistant, needs the new one.'
     redirect '/accounts/api_key'
   end
 
-  post '/accounts/ics_key' do
-    sign_in_required!
+  post '/accounts/ics_key', access: :signed_in do
     verification_required!(return_to: '/accounts/api_key', notice: "Your calendar key wasn't replaced: enter the code below, then replace it again.")
     current_account.replace_ics_key!
     flash[:notice] = 'Your calendar key was replaced. Calendars subscribed to your feeds need subscribing to again.'
@@ -267,16 +254,14 @@ Dandelion::App.controller do
 
   # Deleting the account can't be undone, so like changing its email or password it needs a sign in code: a session from a
   # link in a forwarded email mustn't be able to delete it (the page shows the email it asks for)
-  get '/accounts/delete' do
-    sign_in_required!
+  get '/accounts/delete', access: :signed_in do
     verification_required!(return_to: '/accounts/delete', notice: 'To delete your account, enter the code below.')
     @account = current_account
     @gatherings_as_only_admin = @account.gatherings_as_only_admin.order_by(name: 1).to_a
     erb :'accounts/delete'
   end
 
-  post '/accounts/subscriptions' do
-    sign_in_required!
+  post '/accounts/subscriptions', access: :signed_in do
     @account = current_account
     # Only the notification settings: changing the email goes through /accounts/edit, which checks it's you
     if @account.update_attributes(mass_assigning((params[:account] || {}).slice(*Account.subscription_attributes), Account))
@@ -288,8 +273,7 @@ Dandelion::App.controller do
     end
   end
 
-  post '/accounts/edit' do
-    sign_in_required!
+  post '/accounts/edit', access: :signed_in do
     @account = current_account
     load_context
 
@@ -331,15 +315,13 @@ Dandelion::App.controller do
     end
   end
 
-  get '/accounts/privacyable/:p' do
-    sign_in_required!
+  get '/accounts/privacyable/:p', access: :signed_in do
     @account = current_account
     halt 403 unless Account.privacyables.include?(params[:p])
     partial :'accounts/privacyable', locals: { p: params[:p] }
   end
 
-  post '/accounts/set_privacyable/:p' do
-    sign_in_required!
+  post '/accounts/set_privacyable/:p', access: :signed_in do
     @account = current_account
     halt 403 unless Account.privacyables.include?(params[:p])
     halt 400 unless Account.privacy_levels.include?(params[:level]) # none would make the field public
@@ -347,8 +329,7 @@ Dandelion::App.controller do
     200
   end
 
-  post '/accounts/unhide' do
-    sign_in_required!
+  post '/accounts/unhide', access: :signed_in do
     current_account.set(hidden: false)
     unless current_account.has_signed_in?
       current_account.set(sign_ins_count: 1)
@@ -358,12 +339,12 @@ Dandelion::App.controller do
   end
 
   # Account URLs named accounts by id before they used usernames: /accounts/:id/... is now /u/:username/...
-  get '/accounts/:id' do
+  get '/accounts/:id', access: :public do
     redirect_to_slug_url(Account, '/accounts') { |account| "/u/#{account.username}" }
   end
 
   %i[get post].each do |verb|
-    send(verb, '/accounts/:id/*') do
+    send(verb, '/accounts/:id/*', access: :public) do
       pass unless BSON::ObjectId.legal?(params[:id]) # /accounts/privacyable/:p and the like
       redirect_to_slug_url(Account, '/accounts') { |account| "/u/#{account.username}" }
     end
@@ -406,7 +387,7 @@ Dandelion::App.controller do
     { password: @account.password }.to_json
   end
 
-  get '/u/:username', prerender: true do
+  get '/u/:username', prerender: true, access: :public do
     @account = account_from_params
     if request.xhr?
       if @account.private?
@@ -422,8 +403,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/u/:username/feedback_summary_email_preview' do
-    sign_in_required!
+  get '/u/:username/feedback_summary_email_preview', access: :signed_in do
     account = account_from_params
     kick! unless admin? || account == current_account
     email_html_csp!
@@ -470,8 +450,7 @@ Dandelion::App.controller do
     partial :'accounts/following', locals: { accounts: @account.followers }
   end
 
-  post '/accounts/disconnect/:provider' do
-    sign_in_required!
+  post '/accounts/disconnect/:provider', access: :signed_in do
     verification_required!(return_to: '/accounts/providers', notice: 'Nothing was disconnected: enter the code below, then disconnect it again.')
     @provider = Provider.object(params[:provider]) || not_found
     @account = current_account
@@ -484,8 +463,7 @@ Dandelion::App.controller do
     end
   end
 
-  post '/accounts/destroy' do
-    sign_in_required!
+  post '/accounts/destroy', access: :signed_in do
     verification_required!(return_to: '/accounts/delete', notice: "Your account wasn't deleted: enter the code below, then delete it again.")
     if params[:email] && (params[:email] == current_account.email)
       # Refused while it's the only admin of a gathering (which the page lists) or a site admin

@@ -1,6 +1,5 @@
 Dandelion::App.controller do
-  get '/z', provides: :json do
-    sign_in_required!
+  get '/z', provides: :json, access: :signed_in do
     current_account.api_hash.to_json
   end
 

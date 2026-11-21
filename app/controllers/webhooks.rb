@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  post '/o/:slug/stripe_webhook' do
+  post '/o/:slug/stripe_webhook', access: :public do
     @organisation = organisation_from_params
     halt 200 if @organisation.stripe_connect_json
 
@@ -22,7 +22,7 @@ Dandelion::App.controller do
     200
   end
 
-  post '/o/:slug/gocardless_webhook' do
+  post '/o/:slug/gocardless_webhook', access: :public do
     @organisation = organisation_from_params
     webhook_endpoint_secret = @organisation.gocardless_endpoint_secret
     halt 200 unless webhook_endpoint_secret
@@ -60,7 +60,7 @@ Dandelion::App.controller do
     200
   end
 
-  post '/o/:slug/mollie_webhook' do
+  post '/o/:slug/mollie_webhook', access: :public do
     @organisation = organisation_from_params
     halt 200 unless @organisation.mollie_api_key
 
@@ -83,7 +83,7 @@ Dandelion::App.controller do
     halt 200
   end
 
-  post '/o/:slug/paypal_webhook' do
+  post '/o/:slug/paypal_webhook', access: :public do
     @organisation = organisation_from_params
     halt 200 unless @organisation.paypal_client_id && @organisation.paypal_secret
 

@@ -41,8 +41,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/event_feedbacks/report' do
-    sign_in_required!
+  get '/event_feedbacks/report', access: :signed_in do
     if request.xhr?
       cp(:'event_feedbacks/report', locals: { feedback: current_account.event_feedbacks_as_facilitator.and(:created_at.gte => 1.year.ago).joined, subject: 'this facilitator', intro: 'Based on feedback from the past year, here are up to 5 possible areas for improvement' }, key: "/event_feedbacks/#{current_account.id}/report", expires: 7.days.from_now)
     else
@@ -50,8 +49,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/event_feedbacks/feedback', provides: :txt do
-    sign_in_required!
+  get '/event_feedbacks/feedback', provides: :txt, access: :signed_in do
     current_account.event_feedbacks_as_facilitator.joined
   end
 
@@ -72,15 +70,14 @@ Dandelion::App.controller do
     redirect back
   end
 
-  post '/event_feedbacks/:id/hard_destroy' do
+  post '/event_feedbacks/:id/hard_destroy', access: :admin do
     @event_feedback = EventFeedback.unscoped.find(params[:id]) || not_found
     @event = @event_feedback.event
-    admins_only!
     @event_feedback.destroy!
     redirect "/e/#{@event.slug}/feedback"
   end
 
-  get '/e/:slug/give_feedback' do
+  get '/e/:slug/give_feedback', access: :public do
     @event = event_from_params
     @preview = @event.valid_feedback_preview_token?(params[:token])
     resolve_feedback_account! unless @preview

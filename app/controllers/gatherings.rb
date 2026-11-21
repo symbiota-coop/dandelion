@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/gatherings', provides: %i[html json] do
+  get '/gatherings', provides: %i[html json], access: :public do
     @gatherings = if current_account && params[:my_gatherings]
                     Gathering.and(:id.in => current_account.memberships.pluck(:gathering_id))
                   elsif admin?
@@ -22,8 +22,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/gatherings/autocomplete', provides: :json do
-    sign_in_required!
+  get '/gatherings/autocomplete', provides: :json, access: :signed_in do
     @gatherings = Gathering.and(:id.in => current_account.memberships.pluck(:gathering_id))
     @gatherings = @gatherings.and(:id.in => Gathering.search(params[:q], @gatherings).pluck(:id)) if params[:q]
     @gatherings = @gatherings.and(id: params[:id]) if params[:id]
@@ -32,8 +31,7 @@ Dandelion::App.controller do
     }.to_json
   end
 
-  get '/g/new' do
-    sign_in_required!
+  get '/g/new', access: :signed_in do
     @gathering = Gathering.new(currency: preferred_currency)
     @gathering.welcome_email = @gathering.welcome_email_default
     Gathering.enablable.each do |x|
@@ -43,8 +41,7 @@ Dandelion::App.controller do
     erb :'gatherings/build'
   end
 
-  post '/g/new' do
-    sign_in_required!
+  post '/g/new', access: :signed_in do
     @gathering = Gathering.new(mass_assigning(params[:gathering], Gathering))
     @gathering.account = current_account
     if @gathering.save
@@ -55,7 +52,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/g/:slug', prerender: true do # rubocop:disable Dandelion/GatheringPermission -- it checks itself: members and admins see the page, and anyone else is sent to join or apply
+  get '/g/:slug', prerender: true, access: :public do # rubocop:disable Dandelion/GatheringPermission -- it checks itself: members and admins see the page, and anyone else is sent to join or apply
     @gathering = gathering_from_params
     @membership = @gathering.memberships.find_by(account: current_account)
     if @membership || gathering_admin?

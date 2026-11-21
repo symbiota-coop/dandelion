@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/qr', provides: [:png, :pdf] do
+  get '/qr', provides: [:png, :pdf], access: :public do
     halt 400 unless params[:url]
     case content_type
     when :pdf
@@ -18,18 +18,18 @@ Dandelion::App.controller do
   # Gravatar's fallback for accounts with no image (see Account#gravatar_url): the initials are in the path rather
   # than looked up, so it needs no query, and a new name is a new URL, which Gravatar hasn't cached. Gravatar and
   # browsers keep these for a year, so when the image changes, bump the version here and in Account#generated_avatar_path
-  get '/avatar/v2', provides: :png do
+  get '/avatar/v2', provides: :png, access: :public do
     cache_control :public, max_age: 1.year.to_i
     Account.avatar_png
   end
 
-  get '/avatar/v2/:initials', provides: :png do
+  get '/avatar/v2/:initials', provides: :png, access: :public do
     halt 404 unless params[:initials].match?(AccountAvatar::INITIALS)
     cache_control :public, max_age: 1.year.to_i
     Account.avatar_png(params[:initials])
   end
 
-  get '/youtube_thumb/:id' do
+  get '/youtube_thumb/:id', access: :public do
     halt 400 unless params[:id] =~ /\A[A-Za-z0-9_-]{11}\z/
 
     # The larger thumbnail (640x480), or the smaller (480x360) for videos without one

@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/orders/:id', provides: %i[html pdf ics] do
+  get '/orders/:id', provides: %i[html pdf ics], access: :public do
     @order = Order.complete.find_by_id_or_token(params[:id]) || not_found
     @event = @order.event
     account = @order.account || not_found
@@ -23,7 +23,7 @@ Dandelion::App.controller do
     end
   end
 
-  post '/e/:slug/purchase', provides: :json do
+  post '/e/:slug/purchase', provides: :json, access: :public do
     @event = event_from_params
     builder = OrderBuilder.new(**order_builder_args)
     result = JSON.parse(builder.call)
@@ -41,7 +41,7 @@ Dandelion::App.controller do
 
   # What the checkout form's choices cost (Quote), which the form shows as the buyer chooses. It takes the ticket form's
   # fields as the purchase does, and refuses what the purchase would refuse of them
-  post '/e/:slug/quote', provides: :json do
+  post '/e/:slug/quote', provides: :json, access: :public do
     @event = event_from_params
     restriction = @event.booking_restriction(current_account)
     raise OrderBuilder::NotAllowed.new(restriction) if restriction
@@ -66,7 +66,7 @@ Dandelion::App.controller do
     halt 400, { error: OrderBuilder::Error.new.message }.to_json
   end
 
-  get '/e/:slug/orders/:order_id/payment_completed', provides: :json do
+  get '/e/:slug/orders/:order_id/payment_completed', provides: :json, access: :public do
     @event = event_from_params
     @order = @event.orders.find_by_id_or_token(params[:order_id]) || not_found
     @event.organisation.check_evm_account if @order.evm_secret && @event.organisation.evm_address
@@ -84,7 +84,7 @@ Dandelion::App.controller do
     { payment_completed: @order.payment_completed }.to_json
   end
 
-  get '/e/:slug/orders/:order_id/ticketholders/:ticket_id/name' do
+  get '/e/:slug/orders/:order_id/ticketholders/:ticket_id/name', access: :public do
     @event = event_from_params
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
@@ -92,7 +92,7 @@ Dandelion::App.controller do
     partial :'events/ticketholder_name', locals: { ticket: @ticket }
   end
 
-  post '/e/:slug/orders/:order_id/ticketholders/:ticket_id/name' do
+  post '/e/:slug/orders/:order_id/ticketholders/:ticket_id/name', access: :public do
     @event = event_from_params
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
@@ -103,7 +103,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/e/:slug/orders/:order_id/ticketholders/:ticket_id/email' do
+  get '/e/:slug/orders/:order_id/ticketholders/:ticket_id/email', access: :public do
     @event = event_from_params
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
@@ -111,7 +111,7 @@ Dandelion::App.controller do
     partial :'events/ticketholder_email', locals: { ticket: @ticket, success: params[:success] }
   end
 
-  post '/e/:slug/orders/:order_id/ticketholders/:ticket_id/email' do
+  post '/e/:slug/orders/:order_id/ticketholders/:ticket_id/email', access: :public do
     @event = event_from_params
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
@@ -124,8 +124,7 @@ Dandelion::App.controller do
     200
   end
 
-  post '/tickets/:id/toggle_resale' do
-    sign_in_required!
+  post '/tickets/:id/toggle_resale', access: :signed_in do
     @ticket = Ticket.find(params[:id]) || not_found
     halt 403 unless @ticket.account == current_account
     @event = @ticket.event
@@ -148,13 +147,12 @@ Dandelion::App.controller do
   end
 
   # Old ticket emails and notifications link here; keep redirecting to confirm_cancel.
-  get '/orders/:id/confirm_destroy' do
+  get '/orders/:id/confirm_destroy', access: :public do
     qs = request.query_string
     redirect "/orders/#{params[:id]}/confirm_cancel#{"?#{qs}" if qs.present?}"
   end
 
-  get '/orders/:id/confirm_cancel' do
-    sign_in_required!
+  get '/orders/:id/confirm_cancel', access: :signed_in do
     @order = Order.find(params[:id]) || not_found
     @event = @order.event
     halt 403 unless @order.account == current_account
@@ -163,8 +161,7 @@ Dandelion::App.controller do
     erb :'orders/confirm_cancel'
   end
 
-  post '/orders/:id/destroy' do
-    sign_in_required!
+  post '/orders/:id/destroy', access: :signed_in do
     @order = Order.find(params[:id]) || not_found
     halt 403 unless @order.account == current_account
     halt 403 unless @order.value.nil? || @order.value.zero?
@@ -177,8 +174,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/tickets/:id/confirm_cancel' do
-    sign_in_required!
+  get '/tickets/:id/confirm_cancel', access: :signed_in do
     @ticket = Ticket.find(params[:id]) || not_found
     @event = @ticket.event
     halt 403 unless @ticket.account == current_account
@@ -187,8 +183,7 @@ Dandelion::App.controller do
     erb :'orders/confirm_cancel'
   end
 
-  post '/tickets/:id/destroy' do
-    sign_in_required!
+  post '/tickets/:id/destroy', access: :signed_in do
     @ticket = Ticket.find(params[:id]) || not_found
     @event = @ticket.event
     halt 403 unless @ticket.account == current_account

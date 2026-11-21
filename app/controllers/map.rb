@@ -19,7 +19,7 @@ Dandelion::App.controller do
   end
 
   # The accounts in an organisation, activity or local group, for the maps on its pages: how many are in each cell
-  get '/map', provides: :json do
+  get '/map', provides: :json, access: :public do
     accounts = if params[:organisation_id]
                  organisation = Organisation.find(params[:organisation_id]) || not_found
                  Account.and(organisation_ids_public_cache: organisation.id)
@@ -35,11 +35,11 @@ Dandelion::App.controller do
     account_cells_map_json(accounts)
   end
 
-  get '/map/trigger' do
+  get '/map/trigger', access: :public do
     200
   end
 
-  get '/map/home' do
+  get '/map/home', access: :public do
     partial :'maps/map', locals: { url: '/events', fill_screen: true, start_on_interaction: false }
   end
 end

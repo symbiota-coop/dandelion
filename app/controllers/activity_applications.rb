@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/o/:organisation_slug/a/:slug/apply' do
+  get '/o/:organisation_slug/a/:slug/apply', access: :public do
     @activity = activity_from_params
     @activityship = @activity.activityships.find_by(account: current_account)
     #  redirect "#{@activity.path}/join" if @activity.privacy == 'open'
@@ -7,7 +7,7 @@ Dandelion::App.controller do
     erb :'activity_applications/apply'
   end
 
-  post '/o/:organisation_slug/a/:slug/apply' do
+  post '/o/:organisation_slug/a/:slug/apply', access: :public do
     @activity = activity_from_params
 
     if (account = Account.find_by(email: params[:account][:email].downcase.strip))
@@ -78,8 +78,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:organisation_slug/a/:slug/activity_applications/latest' do
-    sign_in_required!
+  get '/o/:organisation_slug/a/:slug/activity_applications/latest', access: :signed_in do
     @activity = activity_from_params
     @activity_application = @activity.activity_applications.order('created_at desc').and(account_id: current_account.id).first || not_found
     @account = @activity_application.account

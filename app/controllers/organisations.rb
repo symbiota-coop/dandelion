@@ -1,5 +1,5 @@
 Dandelion::App.controller do
-  get '/organisations', provides: %i[html json] do
+  get '/organisations', provides: %i[html json], access: :public do
     @organisations = Organisation.all
     @organisations = params[:order] == 'created_at' ? @organisations.order('created_at desc') : @organisations.order('followers_count desc')
     @organisations = @organisations.and(:id.in => current_account.organisations_following.pluck(:id)) if current_account && params[:following]
@@ -15,7 +15,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/organisations/autocomplete', provides: :json do
+  get '/organisations/autocomplete', provides: :json, access: :public do
     @organisations = Organisation.all.order('created_at desc')
     @organisations = @organisations.and(:id.in => Organisation.search(params[:q], @organisations).pluck(:id)) if params[:q]
     @organisations = @organisations.and(id: params[:id]) if params[:id]
@@ -26,12 +26,12 @@ Dandelion::App.controller do
 
   # Organisation URLs that named organisations by id: /organisations/:id/... is now /o/:slug/...
   %i[get post].each do |verb|
-    send(verb, '/organisations/:id/*') do
+    send(verb, '/organisations/:id/*', access: :public) do
       redirect_to_slug_url(Organisation, '/organisations') { |organisation| "/o/#{organisation.slug}" }
     end
   end
 
-  get '/o/:slug/activities', provides: %i[html json] do
+  get '/o/:slug/activities', provides: %i[html json], access: :public do
     @organisation = organisation_from_params
     @activities = @organisation.activities.order('name asc')
     @activities = @activities.and(:id.in => Activity.search(params[:q], @activities).pluck(:id)) if params[:q]
@@ -58,7 +58,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/local_groups', provides: %i[html json] do
+  get '/o/:slug/local_groups', provides: %i[html json], access: :public do
     @organisation = organisation_from_params
     @local_groups = @organisation.local_groups.without_heavy_fields.order('name asc')
     @local_groups = @local_groups.and(:id.in => LocalGroup.search(params[:q], @local_groups).pluck(:id)) if params[:q]
@@ -77,7 +77,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/news' do
+  get '/o/:slug/news', access: :public do
     @organisation = organisation_from_params
     @pmails = @organisation.news
     if request.xhr?
@@ -87,34 +87,32 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/news/latest' do
+  get '/o/:slug/news/latest', access: :public do
     @organisation = organisation_from_params
     pmail = @organisation.news.first || not_found
     redirect "/pmails/#{pmail.public_id}"
   end
 
-  get '/o/:slug/subscribe' do
+  get '/o/:slug/subscribe', access: :public do
     @organisation = organisation_from_params
     @skip_minimal_head = true
     partial :'accounts/minimal_subscribe', layout: 'minimal'
   end
 
-  get '/invite/:username' do
+  get '/invite/:username', access: :public do
     account = account_from_params
     session[:organisation_referrer_id] = account.id.to_s
     redirect '/o/new'
   end
 
-  get '/o/new' do
-    sign_in_required!
+  get '/o/new', access: :signed_in do
     @organisation = Organisation.new
     @organisation.account = current_account
     @organisation.currency ||= preferred_currency
     erb :'organisations/build'
   end
 
-  post '/o/new' do
-    sign_in_required!
+  post '/o/new', access: :signed_in do
     @organisation = Organisation.new(mass_assigning(params[:organisation], Organisation))
     @organisation.account = current_account
     @organisation.currency ||= preferred_currency
@@ -136,13 +134,13 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug', prerender: true do
+  get '/o/:slug', prerender: true, access: :public do
     @organisation = organisation_from_params
     @title = @organisation.name
     erb :'organisations/organisation'
   end
 
-  get '/o/:slug/carousels/:id' do
+  get '/o/:slug/carousels/:id', access: :public do
     @organisation = organisation_from_params
     if params[:id] == 'featured'
       partial :'events/carousel', locals: { title: 'Featured', events: @organisation.featured_events, hide_featured_title: params[:hide_featured_title], skip_margin: true }
@@ -152,8 +150,7 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/organisationship' do
-    sign_in_required!
+  get '/o/:slug/organisationship', access: :signed_in do
     @organisation = organisation_from_params
     if request.xhr?
       partial :'organisations/organisationship', locals: { organisation: @organisation, membership_toggle: params[:membership_toggle], create_event: params[:create_event], btn_class: params[:btn_class] }
@@ -162,8 +159,7 @@ Dandelion::App.controller do
     end
   end
 
-  post '/o/:slug/organisationship' do
-    sign_in_required!
+  post '/o/:slug/organisationship', access: :signed_in do
     @organisation = organisation_from_params
     case params[:f]
     when 'not_following'
@@ -199,23 +195,22 @@ Dandelion::App.controller do
     end
   end
 
-  get '/o/:slug/subscribed_accounts_count' do
+  get '/o/:slug/subscribed_accounts_count', access: :public do
     @organisation = organisation_from_params
     @organisation.subscribed_accounts_count.to_s
   end
 
-  get '/o/:slug/monthly_donors_count' do
+  get '/o/:slug/monthly_donors_count', access: :public do
     @organisation = organisation_from_params
     @organisation.monthly_donors_count.to_s
   end
 
-  get '/o/:slug/monthly_donations_count' do
+  get '/o/:slug/monthly_donations_count', access: :public do
     @organisation = organisation_from_params
     @organisation.monthly_donations_count.to_s
   end
 
-  post '/o/:slug/show_membership/:f' do
-    sign_in_required!
+  post '/o/:slug/show_membership/:f', access: :signed_in do
     @organisation = organisation_from_params
     @organisationship = @organisation.organisationships.find_by(account: current_account) || not_found
     @organisationship.set(hide_membership: params[:f].to_i == 0)
@@ -223,7 +218,7 @@ Dandelion::App.controller do
     redirect back
   end
 
-  get '/o/:slug/show_feedback' do
+  get '/o/:slug/show_feedback', access: :public do
     @organisation = organisation_from_params
     if request.xhr? || params[:minimal]
       partial :'event_feedbacks/event_feedbacks', locals: { event_feedbacks: @organisation.public_event_feedbacks }, layout: (params[:minimal] ? 'minimal' : false)
