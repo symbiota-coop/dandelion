@@ -26,6 +26,14 @@ module RouteRecording
         REQUESTS[@test] << route if ENV['RECORD_ROUTES'].present?
       end
     end
+
+    # 'VERB /path' as the controller writes it. Padrino adds (.:format)? to the path the controller wrote, and keeps / as
+    # ''. HEAD is the GET route's
+    def route_name(route)
+      path = route.original_path.delete_suffix('(.:format)?')
+      path = '/' if path == ''
+      "#{route.verb.sub('HEAD', 'GET')} #{path}"
+    end
   end
 end
 
@@ -37,10 +45,7 @@ Dandelion::App.before do
   route = request.route_obj
   next Padrino::Filter::SKIPPED unless route
 
-  # Padrino adds (.:format)? to the path the controller wrote, and keeps / as ''. HEAD is the GET route's
-  path = route.original_path.delete_suffix('(.:format)?')
-  path = '/' if path == ''
-  RouteRecording.record("#{route.verb.sub('HEAD', 'GET')} #{path}")
+  RouteRecording.record(RouteRecording.route_name(route))
   Padrino::Filter::SKIPPED
 end
 

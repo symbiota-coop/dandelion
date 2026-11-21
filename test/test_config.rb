@@ -18,7 +18,7 @@ Minitest.load :simplecov if defined?(SimpleCov)
 Minitest::RG.rg! color: $stdout.tty?
 require_relative 'helpers/test_helpers'
 
-%w[outside_services capybara cdn_cache cleanup route_recording test_times].each { |file| require_relative "setup/#{file}" }
+%w[outside_services get_writes capybara cdn_cache cleanup route_recording test_times].each { |file| require_relative "setup/#{file}" }
 
 module ActiveSupport
   class TestCase
@@ -50,6 +50,7 @@ module ActiveSupport
     setup do
       puts "\n🧪 Running: #{name}"
       RouteRecording.start("#{self.class.instance_method(name).source_location.join(':')} #{name}")
+      GetWrites.start(self)
       @covered_routes = []
       reset!
       if ENV['CREATE_VIDEO']
@@ -61,6 +62,7 @@ module ActiveSupport
 
     teardown do
       check_covered_routes_were_requested
+      check_get_writes
       # Only once the test has used the page (Capybara's own flag, with no reader): a screenshot starts Chrome, which
       # model and Rack tests otherwise never need, and which can't start in some agents' sandboxes (Codex's on macOS)
       save_screenshot if !ENV['CI'] && respond_to?(:save_screenshot) && page.instance_variable_get(:@touched)
@@ -84,6 +86,25 @@ module ActiveSupport
 
       unrequested = @covered_routes - RouteRecording.requested.to_a
       flunk "covers_route #{unrequested.map { |route| "'#{route}'" }.join(', ')}, but the test never requested it: request it, or move the mark to a test that does" if unrequested.any?
+    end
+
+    # A GET or HEAD that changed the database (test/setup/get_writes.rb). Only once the test has passed, so a test that
+    # fails early fails for its own reason
+    def check_get_writes
+      return unless failures.empty?
+
+      writes = GetWrites.disallowed
+      return if writes.empty?
+
+      if ENV['GET_WRITES_REPORT_ONLY'] || GetWrites::REPORT_ONLY
+        writes.each { |write| puts "GET WRITE: #{self.class}##{name} #{write}" }
+        return
+      end
+
+      flunk "A GET or HEAD request changed the database, which a link or an <img> on any page can make a viewer's browser send:\n" \
+            "#{writes.map { |write| "  #{write}" }.join("\n")}\n" \
+            'Make the route a POST (and its links data-method="post", or a form), or if the write is one a GET should make ' \
+            '(a page view, a cache filled on read), add it to GetWrites::ALLOWED in test/setup/get_writes.rb, as narrowly as you can, with the reason'
     end
 
     def reset!
