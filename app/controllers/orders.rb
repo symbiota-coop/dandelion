@@ -97,9 +97,7 @@ Dandelion::App.controller do
     @order = @event.orders.complete.find_by_id_or_token(params[:order_id]) || not_found
     @ticket = @order.tickets.find_by_id_or_token(params[:ticket_id]) || not_found
     headers['Referrer-Policy'] = 'no-referrer'
-    # Cleaned as sanitize_fields would, before it reaches emails as %recipient.firstname%, and written alone: a full save
-    # validates the ticket again, which works its price out afresh from the ticket type as it is now, overwriting the
-    # price it was booked at and any price the organiser has set since
+    # Cleaned as sanitize_fields would, before it reaches emails as %recipient.firstname%, and written alone
     @ticket.set(name: CoreExtensions.sanitized(params[:name]))
     200
   end

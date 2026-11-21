@@ -284,6 +284,31 @@ class OrdersAdminTest < ActiveSupport::TestCase
     assert_equal 'holder@example.com', ticket.email
   end
 
+  test "an admin changing a ticket's name and email keeps its booked price and the price they set" do
+    covers 'events/transfer-keeps-ticket-price@cea9e2'
+    create_complete_order
+    sliding_scale = @event.ticket_types.create!(name: 'Sliding scale', range_min: 10, range_max: 30, quantity: 10)
+    ticket = @order.tickets.create!(event: @event, account: @attendee, ticket_type: sliding_scale, price: 10, payment_completed: true)
+    assert_equal 10.0, ticket.discounted_price
+    # The admin sets the ticket's price on the Tickets page (POST /tickets/:id/price), then raises the type's minimum
+    ticket.set(discounted_price: 7.5)
+    sliding_scale.update!(range_min: 15)
+    sign_in(@account)
+
+    visit "/e/#{@event.slug}/tickets"
+    click_button 'Actions'
+    click_link 'Change name or email'
+    fill_in 'ticket_name', with: 'Ticket Holder'
+    fill_in 'ticket_email', with: 'holder@example.com'
+    click_button 'Update ticket'
+    assert page.has_content? 'The ticket was updated.'
+
+    ticket = Ticket.find(ticket.id)
+    assert_equal 'holder@example.com', ticket.email
+    assert_equal 10.0, ticket.price
+    assert_equal 7.5, ticket.discounted_price
+  end
+
   test "an event admin can't see or change another event's ticket" do
     covers_route 'GET /tickets/:id/edit'
     covers_route 'POST /tickets/:id/edit'

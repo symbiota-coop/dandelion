@@ -215,6 +215,7 @@ class OrderTokensTest < ActiveSupport::TestCase
   end
 
   test "renaming a ticketholder keeps the ticket's booked price and the price the organiser set" do
+    covers 'events/transfer-keeps-ticket-price@cea9e2'
     create_complete_order
     sliding_scale = @event.ticket_types.create!(name: 'Sliding scale', range_min: 10, range_max: 30, quantity: 10)
     ticket = @order.tickets.create!(event: @event, account: @attendee, ticket_type: sliding_scale, price: 10, payment_completed: true)
@@ -228,6 +229,25 @@ class OrderTokensTest < ActiveSupport::TestCase
     change_ticketholder_field 'name', '<b>Ada</b> Lovelace'
     wait_until('name not saved') { ticket.reload.name.present? }
     assert_equal 'Ada Lovelace', ticket.name
+    assert_equal 10.0, ticket.price
+    assert_equal 7.5, ticket.discounted_price
+  end
+
+  test "changing a ticketholder's email keeps the ticket's booked price and the price the organiser set" do
+    covers 'events/transfer-keeps-ticket-price@cea9e2'
+    create_complete_order
+    sliding_scale = @event.ticket_types.create!(name: 'Sliding scale', range_min: 10, range_max: 30, quantity: 10)
+    ticket = @order.tickets.create!(event: @event, account: @attendee, ticket_type: sliding_scale, price: 10, payment_completed: true)
+    assert_equal 10.0, ticket.discounted_price
+    # The organiser sets the ticket's price on the Tickets page (POST /tickets/:id/price), then raises the type's minimum
+    ticket.set(discounted_price: 7.5)
+    sliding_scale.update!(range_min: 15)
+
+    visit "/e/#{@event.slug}?order_id=#{@order.token}&success=true"
+    assert page.has_content? 'Thanks for booking'
+    change_ticketholder_field 'email', 'Holder@Example.com '
+    wait_until('email not saved') { ticket.reload.email.present? }
+    assert_equal 'holder@example.com', ticket.email
     assert_equal 10.0, ticket.price
     assert_equal 7.5, ticket.discounted_price
   end
