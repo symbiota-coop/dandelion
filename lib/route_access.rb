@@ -4,7 +4,8 @@
 # admins, a gathering's members...) are the guards in app/helpers/access_control.rb, called in the route's body once
 # it has found the record. Dandelion/RouteAccess fails a route that has neither (AGENTS.md, Conventions)
 module RouteAccess
-  # public: anyone, said explicitly; signed_in: sign_in_required!; admin: admins_only! (site admins)
+  # public: anyone, said explicitly; signed_in: sign_in_required!; admin: admins_only! (site admins, in a session not
+  # started only from an emailed link)
   LEVELS = %i[public signed_in admin].freeze
 
   def access(level)

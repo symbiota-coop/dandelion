@@ -39,8 +39,15 @@ Dandelion::App.helpers do
     account && account.admin?
   end
 
+  # Site admins, in a session that was started by signing up, a password, a provider or a sign in code, not only by an
+  # emailed link, which anyone the email is forwarded to can open (account_set_up_in_this_session?). An admin whose
+  # session came from a link is emailed a sign in code, as verification_required! does, and comes back once they enter it
   def admins_only!
     kick! unless admin?
+    return if account_set_up_in_this_session?(current_account)
+
+    halt 403 if request.xhr?
+    verification_required!(return_to: (request.get? ? request.url : (request.referer || '/')), notice: 'Enter it to use the admin pages.')
   end
 
   def cached_permission(cache_name, record, account)
