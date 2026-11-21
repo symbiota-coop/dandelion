@@ -563,9 +563,10 @@ class AccountSignInsTest < ActiveSupport::TestCase
     clear_cookies
     env 'rack.session', { 'account_id' => account.id.to_s }
     original = Account.instance_method(:session_token!)
-    # The revocation lands after the request has read the account, before it gives the session a token
+    # The revocation lands after the request has read the account, before it gives the session a token. It's another
+    # request's, a POST's, so not this GET's write
     Account.define_method(:session_token!) do
-      Account.find(id).revoke_sessions!
+      GetWrites.outside_request { Account.find(id).revoke_sessions! }
       original.bind_call(self)
     end
     get '/accounts/edit'

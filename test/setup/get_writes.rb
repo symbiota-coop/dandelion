@@ -50,6 +50,9 @@ module GetWrites
     # design: the token or code is unguessable and is what authorises it, not the session (app/helpers/sign_in.rb)
     { collection: 'accounts', fields: SIGN_IN_FIELDS, params: %w[link_token sign_in_token sign_in_code], reason: 'Signing in by a link token or sign in code' },
     { collection: %w[sign_ins provider_links], params: %w[link_token sign_in_token sign_in_code], reason: 'Signing in by a link token or sign in code' },
+    # The email confirmation link, whose token is in its path: it signs in, and only its button confirms
+    { collection: 'accounts', fields: SIGN_IN_FIELDS, route: 'GET /confirm_email/:link_token', reason: 'Signing in by the link token in the path' },
+    { collection: %w[sign_ins provider_links], route: 'GET /confirm_email/:link_token', reason: 'Signing in by the link token in the path' },
     # OAuth providers send people back with a GET, and OmniAuth checks the state it sent
     { collection: 'accounts', fields: SIGN_IN_FIELDS, route: 'GET /auth/:provider/callback', reason: 'Signing in with a provider' },
     { collection: %w[sign_ins provider_links], route: 'GET /auth/:provider/callback', reason: 'Signing in with a provider' },
@@ -99,6 +102,16 @@ module GetWrites
 
     def current_test
       LOCK.synchronize { @test }
+    end
+
+    # Writes a test makes in the middle of a request on another request's behalf (a stub standing in for a revocation
+    # that lands at the same moment), which aren't the request's own
+    def outside_request
+      request = Thread.current.thread_variable_get(THREAD_KEY)
+      Thread.current.thread_variable_set(THREAD_KEY, nil)
+      yield
+    ensure
+      Thread.current.thread_variable_set(THREAD_KEY, request)
     end
 
     def record(write)

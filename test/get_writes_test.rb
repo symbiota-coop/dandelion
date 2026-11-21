@@ -69,6 +69,16 @@ class GetWritesTest < ActiveSupport::TestCase
     assert_includes get_writes_failure, 'update accounts (sign_ins_count)'
   end
 
+  test "a write a test makes on another request's behalf, in the middle of a GET, isn't the GET's" do
+    request_through_middleware do
+      GetWrites.outside_request { Stash.create!(key: 'by another request', value: 'x') }
+      Stash.create!(key: 'by the GET', value: 'x')
+    end
+    assert_equal ['GET /somewhere (no route): insert stashes'], GetWrites.disallowed.map(&:to_s)
+    assert_equal 1, GetWrites.writes.length
+    GetWrites.start(self)
+  end
+
   # Browser tests run the app on Capybara's server threads while the test thread talks to Mongo too
   test "the test thread's writes during a GET on another thread aren't the GET's, and the GET's own are" do
     started = Queue.new
