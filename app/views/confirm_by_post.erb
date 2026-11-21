@@ -1,0 +1,9 @@
+<div class="container">
+  <p class="lead"><%= @question %></p>
+  <% form_tag request.path do %>
+    <div class="d-flex flex-wrap gap-2">
+      <button type="submit" class="btn btn-primary"><%= @button %></button>
+      <a class="btn btn-outline-primary" href="<%= @cancel_path %>">Cancel</a>
+    </div>
+  <% end %>
+</div>

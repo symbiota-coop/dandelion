@@ -303,6 +303,12 @@ Dandelion::App.controller do
   get '/e/:slug/unsubscribe_discussion' do
     sign_in_required!
     @event = event_from_params
+    confirm_by_post("Stop emails about the discussion of #{@event.name}?", button: 'Unsubscribe', cancel_path: "/e/#{@event.slug}")
+  end
+
+  post '/e/:slug/unsubscribe_discussion' do
+    sign_in_required!
+    @event = event_from_params
     @event.discussion_post&.subscriptions&.and(account: current_account)&.destroy_all
     flash[:notice] = "You unsubscribed from the discussion of #{@event.name}"
     redirect "/e/#{@event.slug}"

@@ -54,7 +54,9 @@ Dandelion::App.helpers do
              generate_subnav_href_and_ul: false)
     s = ''
     s << %(<ul class="#{ul_class}" id="#{ul_id}">)
-    items.each do |name, path|
+    # An item is [name, path], [name, subitems], nil for a divider, or [name, path, attributes] for the link's own
+    # attributes (data-method: post)
+    items.each do |name, path, attributes|
       if path.is_a? Array
         if generate_subnav_href_and_ul
           uuid = SecureRandom.uuid
@@ -73,7 +75,7 @@ Dandelion::App.helpers do
         s << %(<li)
         s << %( class="#{li_class} #{li_active_class if request.path == path}" )
         s << %(>)
-        s << %(<a class="#{a_active_class if request.path == path} #{a_class}" href="#{path}">#{name}</a>)
+        s << %(<a class="#{a_active_class if request.path == path} #{a_class}" href="#{path}"#{attributes&.map { |key, value| %( #{key}="#{ERB::Util.html_escape(value)}") }&.join}>#{name}</a>)
         s << %(</li>)
       end
     end

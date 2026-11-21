@@ -131,7 +131,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
 
     xhr :post, "/comments/#{@comment.id}/react", body: '👍'
     assert_refused
-    xhr :get, "/comments/#{@comment.id}/unreact"
+    xhr :post, "/comments/#{@comment.id}/unreact"
     assert_refused
     xhr :post, "/voptions/#{voption.id}/vote", vote: true
     assert_refused
@@ -150,7 +150,7 @@ class MessagesCommentsTest < ActiveSupport::TestCase
 
   test 'members react to a comment once each, with one word, and unreact only their own reaction' do
     covers_route 'GET /comments/:id/reactions'
-    covers_route 'GET /comments/:id/unreact'
+    covers_route 'POST /comments/:id/unreact'
     team_thread
     other_member = create_gathering_member(name: 'Other Member')
     sign_in_with_rack(other_member)
@@ -170,13 +170,22 @@ class MessagesCommentsTest < ActiveSupport::TestCase
 
     # Someone with no reaction of their own unreacting leaves others' alone
     sign_in_with_rack(@member)
-    xhr :get, "/comments/#{@comment.id}/unreact"
+    xhr :post, "/comments/#{@comment.id}/unreact"
     assert last_response.ok?
     assert_equal ['🙌'], @comment.comment_reactions.pluck(:body)
 
     sign_in_with_rack(other_member)
-    xhr :get, "/comments/#{@comment.id}/unreact"
+    xhr :post, "/comments/#{@comment.id}/unreact"
     assert_equal 0, @comment.comment_reactions.count
+  end
+
+  test 'a member takes back their reaction by clicking it' do
+    team_thread
+    @comment.comment_reactions.create!(account: @member, body: '🎉')
+    sign_in(@member)
+    visit "/g/#{@gathering.slug}/teams/#{@team.id}"
+    find("a[href='/comments/#{@comment.id}/unreact']").click
+    wait_until('the reaction was taken back') { @comment.comment_reactions.count.zero? }
   end
 
   test "an event's attendees can react to its chat" do

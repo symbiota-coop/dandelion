@@ -111,7 +111,14 @@ Dandelion::App.controller do
     end
   end
 
+  # A POST: an <img src="/accounts/sign_out"> in an event's description or a bio would sign out everyone who saw it.
+  # Links people kept to the GET get a page with the button
   get '/accounts/sign_out' do
+    redirect '/' unless current_account
+    confirm_by_post('Sign out of Dandelion in this browser?', button: 'Sign out')
+  end
+
+  post '/accounts/sign_out' do
     session.clear
     redirect '/'
   end

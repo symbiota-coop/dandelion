@@ -149,6 +149,12 @@ Dandelion::App.controller do
     subgroup_followers_page(@local_group, :'local_groups/followers')
   end
 
+  post '/o/:organisation_slug/lg/:slug/followers/csv' do
+    @local_group = local_group_from_params
+    local_group_admins_only!
+    send_subgroup_followers_csv(@local_group)
+  end
+
   post '/o/:organisation_slug/lg/:slug/followers' do
     @local_group = local_group_from_params
     local_group_admins_only!

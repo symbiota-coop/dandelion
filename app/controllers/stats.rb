@@ -351,14 +351,20 @@ Dandelion::App.controller do
     end
   end
 
-  get '/raise_job' do
+  post '/raise_job' do
     msg = params[:message] || 'Test job error'
     Kernel.delay.raise(msg)
     flash[:notice] = 'Test job enqueued - it will fail when the worker processes it'
     redirect back
   end
 
+  # AGENTS.md has admins open this after a deploy that changes what a cached partial needs: it asks, and the button POSTs
   get '/fragments/delete/:q' do
+    count = Fragment.and(key: /#{Regexp.escape(params[:q])}/i).count
+    confirm_by_post("Delete #{pluralize(count, 'cached fragment')} whose keys contain “#{params[:q]}”?", button: 'Delete')
+  end
+
+  post '/fragments/delete/:q' do
     if params[:q]
       count = Fragment.and(key: /#{Regexp.escape(params[:q])}/i).delete_all
       flash[:notice] = "Deleted #{pluralize(count, 'fragment')}"

@@ -96,11 +96,6 @@ module ActiveSupport
       writes = GetWrites.disallowed
       return if writes.empty?
 
-      if ENV['GET_WRITES_REPORT_ONLY'] || GetWrites::REPORT_ONLY
-        writes.each { |write| puts "GET WRITE: #{self.class}##{name} #{write}" }
-        return
-      end
-
       flunk "A GET or HEAD request changed the database, which a link or an <img> on any page can make a viewer's browser send:\n" \
             "#{writes.map { |write| "  #{write}" }.join("\n")}\n" \
             'Make the route a POST (and its links data-method="post", or a form), or if the write is one a GET should make ' \

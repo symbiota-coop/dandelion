@@ -12,7 +12,7 @@
       <div class="flex-grow-1 comment" data-comment-id="<%= comment.id %>">
         <span class="float-end">
           <% if (subscription = comment.post.subscriptions.find_by(account: current_account)) %>
-            <a title="Email notifications on; click to turn off" class="pagelet-trigger me-1" href="/subscriptions/<%= subscription.id %>/unsubscribe"><i class="bi bi-eye"></i></a>
+            <a title="Email notifications on; click to turn off" class="pagelet-trigger me-1" data-method="post" href="/subscriptions/<%= subscription.id %>/unsubscribe"><i class="bi bi-eye"></i></a>
           <% else %>
             <a title="Email notifications off; click to turn on" class="pagelet-trigger me-1 opacity-25" data-method="post" href="/subscriptions/create?post_id=<%= comment.post_id %>"><i class="bi bi-eye-slash"></i></a>
           <% end %>

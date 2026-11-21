@@ -180,14 +180,14 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
   end
 
   test "unsubscribing from a thread removes only one's own subscription" do
-    covers_route 'GET /posts/:id/unsubscribe'
+    covers_route 'POST /posts/:id/unsubscribe'
     team_thread
     other_member = create_gathering_member(name: 'Other Member')
     @post.subscriptions.find_or_create_by!(account: other_member)
     assert @post.subscriptions.find_by(account: @member)
     sign_in_with_rack(@member)
 
-    get "/posts/#{@post.id}/unsubscribe"
+    post "/posts/#{@post.id}/unsubscribe"
     assert last_response.redirect?
     assert_equal @post.url, last_response.location
     assert_nil @post.subscriptions.find_by(account: @member)
@@ -195,7 +195,7 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
 
     # Someone with no subscription to the thread removes nothing
     sign_in_with_rack(FactoryBot.create(:account))
-    get "/posts/#{@post.id}/unsubscribe"
+    post "/posts/#{@post.id}/unsubscribe"
     assert last_response.redirect?
     assert @post.subscriptions.find_by(account: other_member)
   end
@@ -204,7 +204,7 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
     team_thread
     count = @post.subscriptions.count
 
-    get "/posts/#{@post.id}/unsubscribe"
+    post "/posts/#{@post.id}/unsubscribe"
     assert last_response.redirect?
     assert_includes last_response.location, '/accounts/new'
     assert_equal count, @post.subscriptions.count
@@ -216,12 +216,12 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
     assert subscription
     other_member = create_gathering_member(name: 'Other Member')
     sign_in_with_rack(other_member)
-    get "/subscriptions/#{subscription.id}/unsubscribe"
+    post "/subscriptions/#{subscription.id}/unsubscribe"
     assert_equal 403, last_response.status
     assert Subscription.find(subscription.id)
 
     sign_in_with_rack(@member)
-    get "/subscriptions/#{subscription.id}/unsubscribe"
+    post "/subscriptions/#{subscription.id}/unsubscribe"
     assert last_response.ok?
     assert_nil Subscription.find(subscription.id)
     assert_nil @post.subscriptions.find_by(account: @member)
@@ -439,28 +439,28 @@ class MessagesCommentRoutesTest < ActiveSupport::TestCase
   # Cached fragments
 
   test "site admins clear cached fragments whose keys match, and others can't clear any" do
-    covers_route 'GET /fragments/delete/:q'
+    covers_route 'POST /fragments/delete/:q'
     keys = ['homepage/events', 'HOMEPAGE/stats', 'sidebar', 'home.page']
     keys.each { |key| Fragment.create!(key: key, value: 'cached', expires: 1.hour.from_now) }
     # Pages the requests render cache fragments of their own
     left = -> { Fragment.and(:key.in => keys).pluck(:key).sort }
 
-    get '/fragments/delete/homepage'
+    post '/fragments/delete/homepage'
     assert last_response.redirect?
     assert_equal keys.sort, left.call
 
     sign_in_with_rack(FactoryBot.create(:account))
-    get '/fragments/delete/homepage'
+    post '/fragments/delete/homepage'
     assert last_response.redirect?
     assert_equal keys.sort, left.call
 
     sign_in_with_rack(site_admin)
-    get '/fragments/delete/homepage'
+    post '/fragments/delete/homepage'
     assert last_response.redirect?
     assert_equal ['home.page', 'sidebar'], left.call
 
     # The text is matched as it is, not as a pattern
-    get '/fragments/delete/home.page'
+    post '/fragments/delete/home.page'
     assert_equal ['sidebar'], left.call
   end
 end

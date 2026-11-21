@@ -175,12 +175,12 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'unsubscribe link does not follow an account you do not already follow' do
-    covers_route 'GET /u/:username/unsubscribe'
+    covers_route 'POST /u/:username/unsubscribe'
     victim = FactoryBot.create(:account)
     attacker = FactoryBot.create(:account)
     sign_in_with_rack(victim)
 
-    get "/u/#{attacker.username}/unsubscribe"
+    post "/u/#{attacker.username}/unsubscribe"
 
     assert last_response.redirect?
     assert_nil Follow.find_by(follower: victim, followee: attacker)
@@ -242,7 +242,7 @@ class AccountsTest < ActiveSupport::TestCase
     follow = Follow.create!(follower: account, followee: followee)
     sign_in_with_rack(account)
 
-    get "/u/#{followee.username}/unsubscribe"
+    post "/u/#{followee.username}/unsubscribe"
 
     assert follow.reload.unsubscribed
   end
@@ -327,7 +327,7 @@ class AccountsTest < ActiveSupport::TestCase
   end
 
   test 'return_to is cleared after signup redirect' do
-    covers_route 'GET /accounts/sign_out'
+    covers_route 'POST /accounts/sign_out'
     referrer = FactoryBot.create(:account, username: 'refclear', has_signed_in: true)
     account = FactoryBot.build_stubbed(:account)
 
@@ -336,6 +336,8 @@ class AccountsTest < ActiveSupport::TestCase
     assert page.has_current_path?(%r{/o/new}, ignore_query: true)
 
     visit '/accounts/sign_out'
+    click_on 'Sign out'
+    assert page.has_link?('Sign in')
     account2 = FactoryBot.build_stubbed(:account)
     visit '/accounts/new'
     fill_signup_form(account2)

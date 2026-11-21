@@ -29,7 +29,7 @@
           alert('CSV, two columns, with headers: name, email');
           $('#member-upload').show().find('input').click()
          ">Upload CSV</a>
-  <a class="btn btn-primary" href="/o/<%= @organisation.slug %>/followers.csv?<%= request.query_string %>">Download CSV</a>
+  <a class="btn btn-primary" data-method="post" href="/o/<%= @organisation.slug %>/followers/csv">Download CSV</a>
   <a class="btn btn-primary" href="javascript:;" onclick="$(this).hide();$('#add-follower-form').show().find('input[name=email]').focus()"><i class="bi bi-plus-lg"></i> Add a follower</a>
 </div>
 

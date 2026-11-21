@@ -179,6 +179,12 @@ Dandelion::App.controller do
     subgroup_followers_page(@activity, :'activities/followers')
   end
 
+  post '/o/:organisation_slug/a/:slug/followers/csv' do
+    @activity = activity_from_params
+    activity_admins_only!
+    send_subgroup_followers_csv(@activity)
+  end
+
   post '/o/:organisation_slug/a/:slug/followers' do
     @activity = activity_from_params
     activity_admins_only!

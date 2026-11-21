@@ -53,6 +53,26 @@ class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
     assert page.has_button? 'Update local group'
   end
 
+  test 'an admin asks for the followers CSV, which is emailed to them' do
+    covers_route 'POST /o/:organisation_slug/lg/:slug/followers/csv'
+    create_local_group
+    sign_in(@account)
+    visit "#{@local_group.path}/followers"
+    click_link 'Download CSV'
+    assert page.has_content? 'You will receive the CSV via email shortly'
+    emails = emails_sent_by_jobs(:send_followers_csv)
+    assert_equal [[@account.email]], emails.map(&:recipients)
+  end
+
+  # The link from before the export was a POST: a GET, which an <img> could send, only goes to the page
+  test 'a GET of the old followers CSV URL emails nothing' do
+    create_local_group
+    sign_in_with_rack(@account)
+    get "#{@local_group.path}/followers.csv"
+    assert_redirected_to "#{@local_group.path}/followers"
+    assert_empty queued_jobs(:send_followers_csv)
+  end
+
   test 'an admin uploads a CSV of followers, who are added in the background, new accounts made for new emails' do
     covers_route 'POST /o/:organisation_slug/lg/:slug/followers'
     create_local_group
@@ -155,6 +175,7 @@ class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
       [
         ["#{path}/local_groupships/admin", { local_groupship: { account_id: (account || person).id } }],
         ["#{path}/followers", { csv: csv_upload("name,email\nIntruder,intruder@example.com\n") }],
+        ["#{path}/followers/csv", {}],
         ["#{path}/destroy", {}]
       ].each do |url, params|
         post url, params
@@ -164,7 +185,7 @@ class OrganisationsLocalGroupRoutesTest < ActiveSupport::TestCase
 
     assert LocalGroup.find(@local_group.id)
     assert_equal [@account.id], @local_group.admins.pluck(:id)
-    assert_empty queued_jobs(:import_from_csv)
+    assert_empty queued_jobs(/import_from_csv|send_followers_csv/)
   end
 
   test "organisation admins who are not the group's admins make admins, and making an admin under another group's URL makes them that group's admin only" do

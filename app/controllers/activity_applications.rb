@@ -71,11 +71,18 @@ Dandelion::App.controller do
     case content_type
     when :html
       erb :'activity_applications/activity_applications'
-    when :csv
-      @activity.send_applications_csv(current_account)
-      flash[:notice] = 'You will receive the CSV via email shortly.'
-      redirect back
+    when :csv # links from before the export was a POST
+      redirect "#{@activity.path}/applications"
     end
+  end
+
+  # A POST: it emails the CSV, so a GET could send it from an <img> on any page
+  post '/o/:organisation_slug/a/:slug/applications/csv' do
+    @activity = activity_from_params
+    activity_admins_only!
+    @activity.send_applications_csv(current_account)
+    flash[:notice] = 'You will receive the CSV via email shortly.'
+    redirect back
   end
 
   get '/o/:organisation_slug/a/:slug/activity_applications/latest' do

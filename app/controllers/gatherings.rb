@@ -127,7 +127,14 @@ Dandelion::App.controller do
     request.xhr? ? 200 : redirect('/accounts/subscriptions')
   end
 
+  # Gathering emails link here
   get '/g/:slug/unsubscribe' do
+    @gathering = gathering_from_params
+    membership_required!(site_admins: false)
+    confirm_by_post("Stop emails from #{@gathering.name}?", button: 'Unsubscribe', cancel_path: "/g/#{@gathering.slug}")
+  end
+
+  post '/g/:slug/unsubscribe' do
     @gathering = gathering_from_params
     membership_required!(site_admins: false)
     @membership.set(unsubscribed: true)

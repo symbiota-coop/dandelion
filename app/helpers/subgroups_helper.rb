@@ -29,6 +29,7 @@ Dandelion::App.helpers do
     followers
   end
 
+  # A POST: it emails the CSV, so a GET could send it from an <img> on any page
   def send_subgroup_followers_csv(subgroup)
     subgroup.send_followers_csv(current_account, subgroup.subgroupships_name)
     flash[:notice] = 'You will receive the CSV via email shortly.'
@@ -108,8 +109,8 @@ Dandelion::App.helpers do
     when :html
       @subgroupships = subgroup_followers(subgroup).paginate(page: params[:page], per_page: 25)
       erb template
-    when :csv
-      send_subgroup_followers_csv(subgroup)
+    when :csv # links from before the export was a POST (send_subgroup_followers_csv)
+      redirect "#{subgroup.path}/followers"
     end
   end
 

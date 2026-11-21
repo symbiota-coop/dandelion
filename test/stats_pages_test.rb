@@ -55,13 +55,38 @@ class StatsPagesTest < ActiveSupport::TestCase
     [nil, FactoryBot.create(:account)].each do |account|
       account ? sign_in_with_rack(account) : clear_cookies
       without_package_registries do
-        (PAGES + ["/stats/traces/#{trace.id}", '/stats/traces/slowest?name=GET+/e/:slug', '/raise', '/raise_job', '/geolocate']).each do |path|
+        (PAGES + ["/stats/traces/#{trace.id}", '/stats/traces/slowest?name=GET+/e/:slug', '/raise', '/geolocate']).each do |path|
           get path
           assert last_response.redirect?, "#{path} for #{account ? 'an account' : 'someone signed out'}"
           refute_includes last_response.body, 'A private message', path
         end
+        post '/raise_job'
+        assert last_response.redirect?
       end
     end
+  end
+
+  # The URL AGENTS.md has admins open: a GET, which an <img> could send, so it only asks
+  test 'a site admin opening a fragments delete URL is asked, and the button deletes them' do
+    covers_route 'GET /fragments/delete/:q'
+    Fragment.create!(key: 'homepage/events', value: 'cached', expires: 1.hour.from_now)
+    Fragment.create!(key: 'sidebar', value: 'cached', expires: 1.hour.from_now)
+    sign_in(FactoryBot.create(:account, admin: true))
+    visit '/fragments/delete/homepage'
+    assert page.has_content?('Delete 1 cached fragment whose keys contain “homepage”?')
+    assert Fragment.find_by(key: 'homepage/events')
+    click_on 'Delete'
+    assert page.has_content?('Deleted 1 fragment')
+    assert_nil Fragment.find_by(key: 'homepage/events')
+    assert Fragment.find_by(key: 'sidebar')
+  end
+
+  test 'a GET of a fragments delete URL deletes nothing' do
+    Fragment.create!(key: 'homepage/events', value: 'cached', expires: 1.hour.from_now)
+    sign_in_with_rack(FactoryBot.create(:account, admin: true))
+    get '/fragments/delete/homepage'
+    assert_equal 200, last_response.status
+    assert Fragment.find_by(key: 'homepage/events')
   end
 
   test "only a site admin deletes old traces, and only those of releases before the one chosen" do
@@ -221,7 +246,7 @@ class StatsPagesTest < ActiveSupport::TestCase
   end
 
   test 'a site admin raises a test error, in a request or a job, to check errors are reported' do
-    covers_route 'GET /raise', 'GET /raise_job'
+    covers_route 'GET /raise', 'POST /raise_job'
     sign_in_with_rack(FactoryBot.create(:account, admin: true))
 
     error = assert_raises(RuntimeError) { get '/raise', message: 'Checking error reporting' }
@@ -235,7 +260,7 @@ class StatsPagesTest < ActiveSupport::TestCase
     assert_equal [['Checking context', { detail: 'more' }]], reported
 
     # Tests run jobs as they're enqueued, so the job's error comes straight back
-    error = assert_raises(RuntimeError) { get '/raise_job', message: 'Checking the worker' }
+    error = assert_raises(RuntimeError) { post '/raise_job', message: 'Checking the worker' }
     assert_equal 'Checking the worker', error.message
     assert_includes error.backtrace.join, 'delayed'
   end

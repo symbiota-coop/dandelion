@@ -16,11 +16,44 @@ module GetWrites
   # The writes a GET should make, each with why. Keep them narrow (collection, and route, fields or params where they
   # matter) so an entry can't hide another write to the same collection. Never add one to make a test pass: an entry is
   # right only when the write is one a GET should make. Otherwise make the route a POST
-  #   collection: what's written; command: optional, one of WRITE_COMMANDS
-  #   route: 'GET /path' as the controller writes it, or a Regexp, optional
+  #   collection: what's written, or a list; command: optional, one of WRITE_COMMANDS
+  #   route: 'GET /path' as the controller writes it (HEAD is the GET's), a Regexp, or a list, optional
   #   fields: for updates, every field the update sets must be one of these, optional
-  #   params: the request must have one of these query params, optional
-  ALLOWED = [].freeze
+  #   params: the request's query must have one of these, optional
+
+  # What signing someone in writes (sign_in_from_email, start_session!, Account#confirm_email!)
+  SIGN_IN_FIELDS = %w[failed_sign_in_attempts password_sign_in_paused_until has_signed_in sign_ins_count link_token session_token
+                      legacy_sessions_revoked sign_in_code_digest sign_in_code_nonce sign_in_code_expires_at
+                      ended_sessions_for_email_sign_in email_confirmed confirm_email_prompt_owed crypted_password api_key ics_key].freeze
+  SIGN_IN_CODE_FIELDS = %w[sign_in_code_digest sign_in_code_nonce sign_in_code_expires_at].freeze
+
+  ALLOWED = [
+    { collection: 'page_views', command: 'insert', reason: 'Counting a page view is what viewing the page does' },
+    { collection: 'accounts', fields: %w[last_active], reason: 'When the account was last seen, which a page load is' },
+    { collection: 'accounts', fields: %w[session_token], reason: 'session_token! makes the token on first use, for sessions from before tokens (session_account)' },
+    { collection: 'fragments', command: %w[insert delete], reason: "cp's cache of a partial, filled when it's read, and an expired one removed" },
+    { collection: 'account_notification_caches', route: ['GET /', 'GET /notifications'], reason: 'The newsfeed cache, filled when it is read' },
+    { collection: 'account_recommendation_caches', route: ['GET /', 'GET /recommendations/events', 'GET /recommendations/people'],
+      reason: 'The recommendations cache, filled when it is read' },
+    { collection: 'locks', route: ['GET /recommendations/events', 'GET /recommendations/people'],
+      reason: 'RecordLock, so one request at a time fills the recommendations cache' },
+    { collection: 'stashes', command: 'insert', route: 'GET /e/:slug/feedback_report', reason: 'The feedback report, cached when it is read' },
+    { collection: 'events', fields: %w[sold_out_cache sold_out_due_to_sales_end_cache], reason: 'Whether the event is sold out, cached when it is read' },
+    { collection: 'events', fields: %w[page_views_count], route: 'GET /e/:slug', reason: "Counting a view of the event's page" },
+    { collection: 'locations', fields: %w[events_count], route: 'GET /locations/:name', reason: "The location's count of events, cached when it is read" },
+    { collection: 'event_boost_impressions', command: 'insert', route: 'GET /events', reason: 'Counting that a boosted event was shown' },
+    { collection: 'dragonfly_jobs', command: 'insert', reason: "An image URL's job, saved when the URL is first made, so the URL can name it" },
+    { collection: 'read_receipts', command: 'insert', reason: 'Seeing a comment is what the "N people read this" it shows counts' },
+    { collection: 'message_receipts', route: 'GET /messages/:username', reason: 'Opening a thread is reading its messages, which the sender sees as Read' },
+    { collection: 'accounts', fields: %w[seen_intro_tour], route: 'GET /', reason: 'The intro tour shows once, so showing it is what marks it seen' },
+    # Signing in by a link in an email (link_token, or sign_in_token in old emails) or by a sign in code is a GET by
+    # design: the token or code is unguessable and is what authorises it, not the session (app/helpers/sign_in.rb)
+    { collection: 'accounts', fields: SIGN_IN_FIELDS, params: %w[link_token sign_in_token sign_in_code], reason: 'Signing in by a link token or sign in code' },
+    { collection: %w[sign_ins provider_links], params: %w[link_token sign_in_token sign_in_code], reason: 'Signing in by a link token or sign in code' },
+    # OAuth providers send people back with a GET, and OmniAuth checks the state it sent
+    { collection: 'accounts', fields: SIGN_IN_FIELDS, route: 'GET /auth/:provider/callback', reason: 'Signing in with a provider' },
+    { collection: %w[sign_ins provider_links], route: 'GET /auth/:provider/callback', reason: 'Signing in with a provider' }
+  ].freeze
 
   Write = Struct.new(:test, :route, :collection, :command, :fields, :params, keyword_init: true) do
     def to_s
@@ -29,7 +62,6 @@ module GetWrites
   end
 
   LOCK = Mutex.new
-  REPORT_ONLY = true
 
   class << self
     attr_reader :writes
@@ -58,9 +90,9 @@ module GetWrites
     end
 
     def matches?(entry, write)
-      return false unless entry[:collection] == write.collection
-      return false if entry[:command] && entry[:command] != write.command
-      return false if entry[:route] && !(entry[:route] === write.route)
+      return false unless Array(entry[:collection]).include?(write.collection)
+      return false if entry[:command] && !Array(entry[:command]).include?(write.command)
+      return false if entry[:route] && Array(entry[:route]).none? { |route| route === write.route }
       return false if entry[:fields] && !(write.fields && (write.fields - entry[:fields]).empty?)
       return false if entry[:params] && !entry[:params].intersect?(write.params)
 
@@ -131,26 +163,19 @@ module GetWrites
 
     private
 
+    # The route the app matched, which Padrino sets before the app's own before filters run (they can redirect before a
+    # later filter would see it)
     def report(env, test, writes)
-      route = env[ROUTE_KEY] || "#{env['REQUEST_METHOD']} #{env['PATH_INFO']} (no route)"
+      app = Thread.current['padrino.instance']
+      route = app.request.route_obj if app.respond_to?(:request) && app.request&.env.equal?(env)
+      route = route ? RouteRecording.route_name(route) : "#{env['REQUEST_METHOD']} #{env['PATH_INFO']} (no route)"
       params = Rack::Utils.parse_query(env['QUERY_STRING'].to_s).keys
       writes.each do |write|
         GetWrites.record(Write.new(test: test, route: route, params: params, **write))
       end
     end
   end
-
-  ROUTE_KEY = 'get_writes.route'.freeze
 end
 
 Mongoid.default_client.subscribe(Mongo::Monitoring::COMMAND, GetWrites)
 Padrino.use GetWrites::Middleware
-
-# The route handling the request, as route recording names it. Each route tried sets it, so the last is the one that ran
-Dandelion::App.before do
-  route = request.route_obj
-  next Padrino::Filter::SKIPPED unless route
-
-  request.env[GetWrites::ROUTE_KEY] = RouteRecording.route_name(route)
-  Padrino::Filter::SKIPPED
-end

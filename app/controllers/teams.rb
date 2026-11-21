@@ -128,7 +128,17 @@ Dandelion::App.controller do
     end
   end
 
+  # Where team emails' links end up (/g/:slug/teams/:id/unsubscribe)
   get '/g/:slug/teamships/:id/unsubscribe' do
+    @gathering = gathering_from_params
+    @teamship = @gathering.teamships.find(params[:id]) || not_found
+    @team = @teamship.team
+    membership_required!
+    own_or_gathering_admins_only!(@teamship)
+    confirm_by_post("Stop emails about #{@team.name}?", button: 'Unsubscribe', cancel_path: "/g/#{@gathering.slug}/teams/#{@team.id}")
+  end
+
+  post '/g/:slug/teamships/:id/unsubscribe' do
     @gathering = gathering_from_params
     @teamship = @gathering.teamships.find(params[:id]) || not_found
     @team = @teamship.team

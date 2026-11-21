@@ -122,7 +122,7 @@ jobs:
       matrix:
         include:
           - group: accounts
-            files: accounts/accounts accounts/profile_validation accounts/sign_ins accounts/password_sign_in_pauses accounts/email_confirmation accounts/provider_sign_ins accounts/privacy accounts/email_search accounts/private_sessions accounts/private_session_vouches
+            files: accounts/accounts accounts/profile_validation accounts/sign_ins accounts/password_sign_in_pauses accounts/email_confirmation accounts/provider_sign_ins accounts/privacy accounts/email_search accounts/private_sessions accounts/private_session_vouches accounts/sign_out
           - group: calendar
             files: events/calendar events/evergreen events/listings events/listing_concurrency events/boosts messages/comments integrations/atproto_events events/organisation_listings gatherings/gathering_routes
           - group: event_bookings
@@ -136,11 +136,11 @@ jobs:
           - group: gatherings
             files: gatherings/gatherings gatherings/members notifications
           - group: general
-            files: dadmin admin_pages_browser design images dragonfly_vips image_checks search errands record_lock sentry stats_database stats_pages organisations/activity_applications messages/markup site_pages site_routes
+            files: dadmin admin_pages_browser design images dragonfly_vips image_checks search errands record_lock sentry stats_database stats_pages organisations/activity_applications messages/markup site_pages site_routes get_writes
           - group: integrations
             files: admin_pages integrations/mcp integrations/mcp_checkout integrations/whatsapp integrations/zapier integrations/webhooks integrations/analytics_providers events/admin_reports events/my_events accounts/account_routes organisations/organisation_routes
           - group: messages
-            files: messages/messages messages/pmails messages/mailer events/feedbacks events/discussions messages/pmail_sending events/daily messages/email_templates
+            files: messages/messages messages/pmails messages/mailer events/feedbacks events/discussions messages/pmail_sending events/daily messages/email_templates unsubscribe_links
           - group: orders
             files: orders/orders orders/tokens orders/admin orders/exports bookings/resales integrations/asn_blocking payments/dandelion_contributions
           - group: organisations

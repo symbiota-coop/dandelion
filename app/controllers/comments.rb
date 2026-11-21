@@ -136,7 +136,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/comments/:id/unreact' do
+  post '/comments/:id/unreact' do
     sign_in_required!
     @comment = Comment.find(params[:id]) || not_found
     @commentable = @comment.commentable
@@ -161,7 +161,15 @@ Dandelion::App.controller do
     partial :'comments/post', locals: { post: @post }
   end
 
+  # Comment emails link here
   get '/posts/:id/unsubscribe' do
+    sign_in_required!
+    @post = Post.find(params[:id]) || not_found
+    @commentable = @post.commentable
+    confirm_by_post('Stop emails about replies to this post?', button: 'Unsubscribe', cancel_path: @post.url)
+  end
+
+  post '/posts/:id/unsubscribe' do
     sign_in_required!
     @post = Post.find(params[:id]) || not_found
     @commentable = @post.commentable
@@ -226,7 +234,7 @@ Dandelion::App.controller do
     200
   end
 
-  get '/subscriptions/:id/unsubscribe' do
+  post '/subscriptions/:id/unsubscribe' do
     sign_in_required!
     @subscription = Subscription.find(params[:id]) || not_found
     halt 403 unless @subscription.account.id == current_account.id

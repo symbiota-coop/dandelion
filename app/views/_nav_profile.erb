@@ -5,5 +5,5 @@
       ['Referrals', '/referrals'],
       ['Notifications', '/accounts/subscriptions'],
       (['Monthly contribution', 'https://billing.stripe.com/p/login/14kg1O9HD49fg2kcMM'] if current_account.stripe_subscription_id),
-      ['Sign out', '/accounts/sign_out']
+      ['Sign out', '/accounts/sign_out', { 'data-method' => 'post' }]
     ].compact, ul_class: ul_class, ul_id: (defined?(ul_id) ? ul_id : ''), li_class: '', a_class: (defined?(a_class) ? a_class : '') %>

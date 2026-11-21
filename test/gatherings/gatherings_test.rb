@@ -830,7 +830,7 @@ class GatheringsTest < ActiveSupport::TestCase
 
   test 'site admins can browse and administer every gathering without being a member, but not act as a member' do
     covers_route 'GET /g/:slug/todos'
-    covers_route 'GET /g/:slug/unsubscribe'
+    covers_route 'POST /g/:slug/unsubscribe'
     create_gathering(privacy: 'secret', listed: false)
     team = @gathering.teams.create!(name: 'Kitchen', account: @account)
     rota = @gathering.rotas.create!(name: 'Bar', account: @account)
@@ -874,7 +874,7 @@ class GatheringsTest < ActiveSupport::TestCase
     post "/g/#{@gathering.slug}/teams/new", team: { name: 'Garden' }
     assert last_response.redirect?
     refute @gathering.teams.find_by(name: 'Garden')
-    get "/g/#{@gathering.slug}/unsubscribe"
+    post "/g/#{@gathering.slug}/unsubscribe"
     assert last_response.redirect?
     refute @gathering.memberships.find_by(account: site_admin)
   end
@@ -920,19 +920,19 @@ class GatheringsTest < ActiveSupport::TestCase
   end
 
   test "unsubscribing a teamship from a team's emails clears its member's subscriptions to the team's posts, not the admin's" do
-    covers_route 'GET /g/:slug/teamships/:id/unsubscribe'
+    covers_route 'POST /g/:slug/teamships/:id/unsubscribe'
     create_gathering
     member = create_gathering_member
     team = @gathering.teams.create!(name: 'Garden', account: @account)
     team.teamships.create!(account: @account, gathering: @gathering)
     teamship = team.teamships.create!(account: member, gathering: @gathering)
-    post = team.posts.create!(subject: 'Planting', account: @account)
-    [@account, member].each { |account| post.subscriptions.find_or_create_by!(account: account) }
+    team_post = team.posts.create!(subject: 'Planting', account: @account)
+    [@account, member].each { |account| team_post.subscriptions.find_or_create_by!(account: account) }
 
     sign_in_with_rack(@account)
-    get "/g/#{@gathering.slug}/teamships/#{teamship.id}/unsubscribe"
+    post "/g/#{@gathering.slug}/teamships/#{teamship.id}/unsubscribe"
     assert teamship.reload.unsubscribed
-    refute post.subscriptions.find_by(account: member)
-    assert post.subscriptions.find_by(account: @account)
+    refute team_post.subscriptions.find_by(account: member)
+    assert team_post.subscriptions.find_by(account: @account)
   end
 end

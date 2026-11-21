@@ -208,11 +208,18 @@ Dandelion::App.controller do
     case content_type
     when :html
       erb :'organisations/followers'
-    when :csv
-      @organisation.send_followers_csv(current_account)
-      flash[:notice] = 'You will receive the CSV via email shortly.'
-      redirect back
+    when :csv # links from before the export was a POST
+      redirect "/o/#{@organisation.slug}/followers"
     end
+  end
+
+  # A POST: it emails the CSV, so a GET could send it from an <img> on any page
+  post '/o/:slug/followers/csv' do
+    @organisation = organisation_from_params
+    organisation_admins_only!
+    @organisation.send_followers_csv(current_account)
+    flash[:notice] = 'You will receive the CSV via email shortly.'
+    redirect back
   end
 
   post '/o/:slug/followers' do

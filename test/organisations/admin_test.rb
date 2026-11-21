@@ -214,6 +214,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
         ["#{path}/organisation_tiers/#{organisation_tier.id}/destroy", {}],
         ["#{path}/add_follower", { email: 'intruder@example.com' }],
         ["#{path}/followers", { csv: csv }],
+        ["#{path}/followers/csv", {}],
         ["#{path}/subscribed/#{organisationship.id}", {}],
         ["/organisationships/#{organisationship.id}/notes", { notes: 'Overwritten' }],
         ["/organisationships/#{organisationship.id}/destroy", {}],
@@ -395,7 +396,7 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
   # ═══════════════════════════════════════════════════════════════════════════
 
   test "the followers CSV goes only to the admin who asked, with each follower's email and whether they unsubscribed, and not their notes" do
-    covers_route 'GET /o/:slug/followers'
+    covers_route 'GET /o/:slug/followers', 'POST /o/:slug/followers/csv'
     create_organisation
     subscribed = add_organisation_member(@organisation)
     unsubscribed = add_organisation_member(@organisation)
@@ -405,9 +406,13 @@ class OrganisationsAdminTest < ActiveSupport::TestCase
     elsewhere = FactoryBot.create(:organisation).organisationships.create!(account: FactoryBot.create(:account)).account
 
     sign_in_with_rack(@account)
+    # The old link, a GET, which an <img> could send, only goes to the page
     get "/o/#{@organisation.slug}/followers.csv"
-    assert last_response.redirect?
+    assert_redirected_to "/o/#{@organisation.slug}/followers"
+    assert_empty queued_jobs(:send_followers_csv)
 
+    post "/o/#{@organisation.slug}/followers/csv"
+    assert last_response.redirect?
     sent = followers_csvs
     assert_equal [@account], sent.map(&:first)
     rows = CSV.parse(sent.first.last, headers: true)

@@ -54,6 +54,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
   test 'a member turns email notifications off and on from the gathering page' do
     covers_route 'GET /g/:slug/subscribe'
     covers_route 'POST /g/:slug/set_subscribe'
+    covers_route 'POST /g/:slug/unsubscribe'
     create_gathering(privacy: 'open')
     member = create_gathering_member
     membership = @gathering.memberships.find_by(account: member)
@@ -419,7 +420,7 @@ class GatheringRoutesTest < ActiveSupport::TestCase
 
   # Teams
 
-  test "a team's unsubscribe link unsubscribes the member from their own teamship, or shows the team if they're not in it" do
+  test "a team's unsubscribe link goes to the member's own teamship's, or shows the team if they're not in it" do
     covers_route 'GET /g/:slug/teams/:id/unsubscribe'
     create_gathering(privacy: 'open')
     member = create_gathering_member
@@ -431,8 +432,6 @@ class GatheringRoutesTest < ActiveSupport::TestCase
     sign_in_with_rack(member)
     get gathering_path("/teams/#{team.id}/unsubscribe")
     assert_equal "http://example.org#{gathering_path("/teamships/#{teamship.id}/unsubscribe")}", last_response.location
-    follow_redirect!
-    assert teamship.reload.unsubscribed
     refute other_teamship.reload.unsubscribed
 
     sign_in_with_rack(@account)

@@ -2,7 +2,13 @@ Dandelion::App.controller do
   get '/u/:username/unsubscribe' do
     sign_in_required!
     @account = account_from_params
-    # A GET can be triggered cross-site (e.g. an <img> in a message), so only touch an existing follow, never create one
+    confirm_by_post("Stop emails about #{@account.name}?", button: 'Unsubscribe', cancel_path: "/u/#{@account.username}")
+  end
+
+  post '/u/:username/unsubscribe' do
+    sign_in_required!
+    @account = account_from_params
+    # Only an existing follow, never a new one
     if (@follow = current_account.follows_as_follower.find_by(followee: @account))
       @follow.set(unsubscribed: true)
       flash[:notice] = "You were unsubscribed from #{@account.name}."

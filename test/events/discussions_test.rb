@@ -17,7 +17,7 @@ class EventDiscussionsTest < ActiveSupport::TestCase
   end
 
   test 'email notifications for a discussion nobody has written in yet make its post' do
-    covers_route 'GET /subscriptions/:id/unsubscribe'
+    covers_route 'POST /subscriptions/:id/unsubscribe'
     create_event(prices: [0])
     attendee = visit_discussion_as_attendee
     assert_nil @event.discussion_post
@@ -28,19 +28,6 @@ class EventDiscussionsTest < ActiveSupport::TestCase
 
     click_link 'Email notifications on'
     assert page.has_link?('Email notifications off')
-    refute @event.discussion_post.subscriptions.and(account: attendee).exists?
-  end
-
-  test 'the unsubscribe link in older discussion emails unsubscribes' do
-    covers_route 'GET /e/:slug/unsubscribe_discussion'
-    create_event(prices: [0])
-    attendee = FactoryBot.create(:account)
-    @event.tickets.create!(account: attendee, ticket_type: @event.ticket_types.first, payment_completed: true)
-    @event.discussion_post!(attendee).subscriptions.create!(account: attendee)
-
-    get "/e/#{@event.slug}", link_token: attendee.link_token
-    get "/e/#{@event.slug}/unsubscribe_discussion"
-    assert last_response.redirect?
     refute @event.discussion_post.subscriptions.and(account: attendee).exists?
   end
 

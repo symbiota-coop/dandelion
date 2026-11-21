@@ -16,7 +16,7 @@
           $(this).hide();
           $('#member-upload').show().find('input').click()
          ">Upload CSV</a>
-      <a class="btn btn-primary" href="<%= resource_path %>/followers.csv?<%= request.query_string %>">Download CSV</a>
+      <a class="btn btn-primary" data-method="post" href="<%= resource_path %>/followers/csv">Download CSV</a>
     </div>
   </div>
   <% form_tag '', class: 'mt-3', style: 'display: none', id: 'member-upload', multipart: true do %>

@@ -105,6 +105,32 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     assert @activity.activityships.find_by(account: @account)
   end
 
+  test "an admin asks for the followers and applications CSVs, which are emailed to them" do
+    covers_route 'POST /o/:organisation_slug/a/:slug/followers/csv', 'POST /o/:organisation_slug/a/:slug/applications/csv'
+    create_activity
+    sign_in(@account)
+    visit "#{@activity.path}/followers"
+    click_link 'Download CSV'
+    assert page.has_content? 'You will receive the CSV via email shortly'
+    visit "#{@activity.path}/applications"
+    click_link 'Download CSV'
+    assert page.has_content? 'You will receive the CSV via email shortly'
+    emails = emails_sent_by_jobs(/send_followers_csv|send_applications_csv/)
+    assert_equal 2, emails.length
+    emails.each { |email| assert_equal [@account.email], email.recipients }
+  end
+
+  # The links from before the exports were POSTs: a GET, which an <img> could send, only goes to the page
+  test 'a GET of the old CSV URLs emails nothing' do
+    create_activity
+    sign_in_with_rack(@account)
+    get "#{@activity.path}/followers.csv"
+    assert_redirected_to "#{@activity.path}/followers"
+    get "#{@activity.path}/applications.csv"
+    assert_redirected_to "#{@activity.path}/applications"
+    assert_empty queued_jobs(/send_followers_csv|send_applications_csv/)
+  end
+
   test 'an admin uploads a CSV of followers, who are added in the background, new accounts made for new emails' do
     covers_route 'POST /o/:organisation_slug/a/:slug/followers'
     create_activity
@@ -234,6 +260,8 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
         ["#{path}/activityships/unadmin", { account_id: @account.id }],
         ["#{path}/subscribed/#{activityship.id}", {}],
         ["#{path}/followers", { csv: csv_upload("name,email\nIntruder,intruder@example.com\n") }],
+        ["#{path}/followers/csv", {}],
+        ["#{path}/applications/csv", {}],
         ["/activityships/#{activityship.id}/destroy", {}],
         ["#{path}/destroy", {}]
       ].each do |url, params|
@@ -246,7 +274,7 @@ class OrganisationsActivityAdminTest < ActiveSupport::TestCase
     assert_equal [@account.id], @activity.admins.pluck(:id)
     assert Activityship.find(activityship.id)
     refute activityship.reload.unsubscribed?
-    assert_empty queued_jobs(:import_from_csv)
+    assert_empty queued_jobs(/import_from_csv|send_followers_csv|send_applications_csv/)
   end
 
   test 'only the admins of a locked activity find it in the activity lookup' do
