@@ -27,6 +27,8 @@ module AdminPagesHelpers
     'GET /g/:slug/teamships/:id/unsubscribe' => 'unsubscribes, then redirects',
     'GET /g/:slug/teams/:id/unsubscribe' => 'unsubscribes, then redirects',
     'GET /g/:slug/rotas/:id/create_shift' => 'books a shift',
+    # Not pages
+    'GET /event_sessions/:id' => "a session's calendar file, which refuses a locked event's to anyone but its admins",
     # Needs what can't be made here
     'GET /e/:slug/check_in' => "the QR scanner asks for a camera, which headless Chrome hasn't got",
     'GET /e/:slug/linked_image' => "shows the image an event takes from its organisation's, which bare records haven't got",
