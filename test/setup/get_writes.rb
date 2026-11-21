@@ -52,7 +52,31 @@ module GetWrites
     { collection: %w[sign_ins provider_links], params: %w[link_token sign_in_token sign_in_code], reason: 'Signing in by a link token or sign in code' },
     # OAuth providers send people back with a GET, and OmniAuth checks the state it sent
     { collection: 'accounts', fields: SIGN_IN_FIELDS, route: 'GET /auth/:provider/callback', reason: 'Signing in with a provider' },
-    { collection: %w[sign_ins provider_links], route: 'GET /auth/:provider/callback', reason: 'Signing in with a provider' }
+    { collection: %w[sign_ins provider_links], route: 'GET /auth/:provider/callback', reason: 'Signing in with a provider' },
+    # Emails a sign in code to the account's own address, rate limited (RecipientLimit), which does nothing until it's
+    # entered: a page that needs one (verification_required!), or a signed out link naming the account (sign_in_code_required!)
+    { collection: 'accounts', fields: SIGN_IN_CODE_FIELDS, route: ['GET /accounts/api_key', 'GET /accounts/delete', 'GET /accounts/password', 'GET /accounts/edit',
+                                                                   'GET /accounts/subscriptions', 'GET /accounts/sign_in_code'],
+      reason: 'Sending a sign in code to the account, when a page needs one' },
+    # Coming back from a payment provider, or the page's poll after it: the order or payment is completed only once the
+    # provider (PayPal, Open Collective, the chain) says it was paid, whoever asks, so the request can't steer it
+    { collection: %w[orders tickets donations delayed_backend_mongoid_jobs], route: 'GET /e/:slug/orders/:order_id/payment_completed',
+      reason: 'Recording a payment the provider says was made' },
+    { collection: %w[orders tickets donations delayed_backend_mongoid_jobs], route: 'GET /e/:slug', params: %w[success],
+      reason: 'Recording a payment the provider says was made, on coming back from it' },
+    { collection: %w[payments gatherings memberships notifications delayed_backend_mongoid_jobs], route: 'GET /g/:slug/payments/:payment_id',
+      reason: 'Recording a payment the chain says was made' },
+    # Stripe sends people back with a GET: the checkout session is fetched from Stripe and must be this organisation's
+    { collection: %w[organisations organisation_contributions delayed_backend_mongoid_jobs], route: 'GET /o/:slug/stripe_setup_complete',
+      reason: "Saving the card Stripe's checkout set up" },
+    { collection: 'events', fields: %w[browsable], route: 'GET /o/:slug/stripe_setup_complete',
+      reason: "Saving the card Stripe's checkout set up pays the organisation up, which lists its events (update_paid_up)" },
+    # Stripe Connect's OAuth return, a GET, which only acts on a state token signed for this account and organisation
+    { collection: 'organisations', fields: %w[stripe_connect_json stripe_account_json], route: 'GET /organisations/stripe_connect',
+      reason: "Connecting the organisation's Stripe account" },
+    { collection: 'organisationships', route: 'GET /o/:slug/stripe_connect', reason: "Connecting a member's Stripe account, following the organisation if they don't" },
+    { collection: 'accounts', fields: %w[organisation_ids_cache organisation_ids_public_cache subscribed_organisation_ids_cache unsubscribed_organisation_ids_cache],
+      route: 'GET /o/:slug/stripe_connect', reason: "Following the organisation updates the member's caches of the organisations they follow" }
   ].freeze
 
   Write = Struct.new(:test, :route, :collection, :command, :fields, :params, keyword_init: true) do
