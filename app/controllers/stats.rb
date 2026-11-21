@@ -60,10 +60,13 @@ Dandelion::App.controller do
       @rows[organisation_id][:sold] = true
     end
     @rows.select! { |_, row| row[:sold] }
+    @rows.each_value { |row| row[:value] = row[:value].exchange_to('GBP') }
+    # The 100 that sold the most are listed
+    top_ids = @rows.keys.max_by(100) { |organisation_id| @rows[organisation_id][:value].cents }
 
     @tickets_count = ticket_counts.values.sum
     @total_value = order_sums.sum(Money.new(0, 'GBP')) { |r| Money.new(r['value'] * 100, r['_id']['currency']) }.exchange_to('GBP')
-    @organisations = Organisation.and(:id.in => @rows.keys).only(:id, :name, :slug, :created_at, :stripe_customer_id, :contribution_requested_gbp_cache, :contribution_paid_gbp_cache)
+    @organisations = Organisation.and(:id.in => top_ids).only(:id, :name, :slug, :created_at, :stripe_customer_id, :contribution_requested_gbp_cache, :contribution_paid_gbp_cache)
     erb :'stats/organisations'
   end
 
@@ -89,7 +92,9 @@ Dandelion::App.controller do
 
     @donations_count = @rows.values.sum { |row| row[:donations] }
     @total = @rows.values.sum(Money.new(0, 'GBP')) { |row| row[:amount] }
-    @events = Event.unscoped.and(:id.in => @rows.keys).includes(:organisation).only(:id, :name, :slug, :start_time, :organisation_id, :deleted_at)
+    # The 100 that raised the most are listed
+    top_ids = @rows.keys.max_by(100) { |event_id| @rows[event_id][:amount].cents }
+    @events = Event.unscoped.and(:id.in => top_ids).includes(:organisation).only(:id, :name, :slug, :start_time, :organisation_id, :deleted_at)
                    .sort_by { |event| -@rows[event.id][:amount].cents }
     erb :'stats/donations'
   end

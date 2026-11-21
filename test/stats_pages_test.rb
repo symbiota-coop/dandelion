@@ -159,6 +159,29 @@ class StatsPagesTest < ActiveSupport::TestCase
     assert_equal ['Older Event', 'Bigger Event', 'Smaller Event'], all('#donations tbody td:first-child a').map(&:text)
   end
 
+  test 'Donations and Organisations list only the top 100, but count them all' do
+    covers_route 'GET /stats/donations', 'GET /stats/organisations'
+    events = (1..101).map do |i|
+      FactoryBot.create(:event, name: "Event #{i}", organisation: FactoryBot.create(:organisation, name: "Organisation #{i}"))
+    end
+    events.each_with_index { |event, i| donate_at_checkout(event, i + 1) }
+    sign_in(FactoryBot.create(:account, admin: true))
+
+    visit '/stats/donations'
+    assert page.has_content?('101 events raised')
+    assert page.has_content?('The top 100 events are listed')
+    assert_equal 100, all('#donations tbody tr').count
+    assert page.has_link?('Event 2')
+    assert page.has_no_link?('Event 1', exact: true)
+
+    visit '/stats/organisations'
+    assert page.has_content?('101 organisations sold')
+    assert page.has_content?('The top 100 organisations are listed')
+    assert_equal 100, all('#summary tbody tr').count
+    assert page.has_link?('Organisation 2')
+    assert page.has_no_link?('Organisation 1', exact: true)
+  end
+
   test 'Spring clean lists the organisations over a year old and gatherings over a month old that nobody uses, and deletes nothing' do
     covers_route 'GET /stats/spring_clean'
     old = 2.months.ago

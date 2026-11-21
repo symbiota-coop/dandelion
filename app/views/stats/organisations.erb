@@ -12,11 +12,14 @@
 <% end %>
 
 <p class="lead mt-3">
-  <%= pluralize(@organisations.count, 'organisation') %> sold
+  <%= pluralize(@rows.count, 'organisation') %> sold
   <%= pluralize(@tickets_count, 'ticket') %>
   worth
   <%= @total_value.format(no_cents: true) %>
 </p>
+<% if @rows.count > 100 %>
+  <p class="text-muted">The top 100 organisations are listed</p>
+<% end %>
 
 <div class="mt-3">
 
