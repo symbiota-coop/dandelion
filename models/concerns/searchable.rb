@@ -14,9 +14,12 @@ module Searchable
   APOSTROPHE_VARIANTS = Regexp.union(APOSTROPHES)
   APOSTROPHE_CHAR_CLASS = "[#{APOSTROPHES.map { |ch| Regexp.escape(ch) }.join}]".freeze
   RANGE_OPERATORS = %w[$gt $gte $lt $lte].freeze
-  # most_words: fuzzy matching only for words this long, at most one letter out, so "circe" isn't taken for "circle"
-  # nor a short word for most others
+  # most_words: fuzzy matching (one letter out) only for words this long, as a short word is one letter from many others
   FUZZY_WORD_LENGTH = 5
+  # most_words: a word as Atlas's standard analyzer splits them, on anything but letters, digits and apostrophes, so
+  # "circle,trees" is two words. Apostrophes at either end aren't part of it ('trees')
+  SEARCH_WORD = /(?:[[:alnum:]]|#{APOSTROPHE_CHAR_CLASS})+/
+  EDGE_APOSTROPHES = /\A#{APOSTROPHE_CHAR_CLASS}+|#{APOSTROPHE_CHAR_CLASS}+\z/
 
   class_methods do
     def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, autocomplete: autocomplete_fields, vector_weight: nil, query_vector: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil, emails: false, most_words: false)
@@ -245,10 +248,14 @@ module Searchable
       /#{Regexp.escape(text).gsub(APOSTROPHE_VARIANTS, APOSTROPHE_CHAR_CLASS)}/i
     end
 
+    def word_start_regex(word)
+      /(?<![[:alnum:]])#{search_regex(word).source}/i
+    end
+
     # Words of 4 letters or more, or if there are none, of 3. Shorter ones only score (through the whole query's
     # clauses): "the" is in most records, and as the start of a word matches "Theresa" too
     def significant_words(query)
-      words = query.split.uniq(&:downcase).group_by { |word| word.scan(/[[:alnum:]]/).length.clamp(0, 4) }
+      words = query.scan(SEARCH_WORD).map { |word| word.gsub(EDGE_APOSTROPHES, '') }.uniq(&:downcase).group_by { |word| word.scan(/[[:alnum:]]/).length.clamp(0, 4) }
       words[4] || words[3] || []
     end
 
@@ -258,12 +265,15 @@ module Searchable
       word_count <= 2 ? word_count : [word_count - 1, (word_count * 0.75).ceil].min
     end
 
-    # The regex search's version of the Atlas one: records with any of the words, then those with enough of them
+    # The regex search's version of the Atlas one: records with any of the words, then those with enough of them, each
+    # word matching at the start of a word, as Atlas's whole words and autocomplete's word starts do ("bath" isn't in
+    # "Sabbath")
     def regex_word_search(scope, words, fields)
-      candidates = scope.and('$or': words.flat_map { |word| fields.map { |field| { field => search_regex(word) } } })
+      regexes = words.map { |word| word_start_regex(word) }
+      candidates = scope.and('$or': regexes.flat_map { |regex| fields.map { |field| { field => regex } } })
       ids = candidates.pluck(:id, *fields).filter_map do |id, *values|
         text = values.flatten.compact.join(' ')
-        id if words.count { |word| text.match?(search_regex(word)) } >= required_word_count(words.length)
+        id if regexes.count { |regex| text.match?(regex) } >= required_word_count(words.length)
       end
       scope.and(:id.in => ids)
     end

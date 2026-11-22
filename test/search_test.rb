@@ -212,6 +212,26 @@ class SearchTest < ActiveSupport::TestCase
     assert_not_includes labels, 'Circle of Song'
   end
 
+  test 'the quick search splits words at punctuation, as Atlas does' do
+    create_event(name: 'Circle of Trees', prices: [0])
+    create_organisation(name: 'Circle of Song')
+
+    ['circle, trees', 'circle,trees'].each do |query|
+      labels = JSON.parse(ajax_search(query)).pluck('label')
+      assert(labels.any? { |label| label.start_with?('Circle of Trees') }, "#{query}: #{labels.inspect}")
+      assert_not_includes labels, 'Circle of Song', query
+    end
+  end
+
+  test 'the quick search matches words at the start of a word, not inside one' do
+    create_organisation(name: 'Sound Bath Collective')
+    create_organisation(name: 'Sound Sabbath')
+
+    labels = JSON.parse(ajax_search('sound bath')).pluck('label')
+    assert_includes labels, 'Sound Bath Collective'
+    assert_not_includes labels, 'Sound Sabbath'
+  end
+
   test 'the quick search finds what has all but one word of three, and not what has only one' do
     create_organisation(name: 'Oxford Psychedelic Society')
     create_organisation(name: 'Society for Humanity')
@@ -385,6 +405,9 @@ class SearchTest < ActiveSupport::TestCase
   test 'the words a search for most words counts are those of 4 letters or more, or of 3 if there are none' do
     assert_equal %w[circle Trees], Event.significant_words('the circle of Trees trees')
     assert_equal %w[zen art], Event.significant_words('a zen art')
+    assert_equal %w[circle trees], Event.significant_words('circle,trees')
+    assert_equal %w[circle trees], Event.significant_words('circle, trees')
+    assert_equal ["O'Sullivan's", 'trees'], Event.significant_words("O'Sullivan's 'trees'")
     assert_empty Event.significant_words('a of')
   end
 
