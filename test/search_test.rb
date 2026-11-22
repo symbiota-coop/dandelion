@@ -408,6 +408,7 @@ class SearchTest < ActiveSupport::TestCase
     assert_equal %w[circle trees], Event.significant_words('circle,trees')
     assert_equal %w[circle trees], Event.significant_words('circle, trees')
     assert_equal ["O'Sullivan's", 'trees'], Event.significant_words("O'Sullivan's 'trees'")
+    assert_equal %w[trees], Event.significant_words("ʼtreesʼ")
     assert_equal %w[of], Event.significant_words('a of')
     assert_empty Event.significant_words('& --')
   end

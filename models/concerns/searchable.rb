@@ -22,9 +22,11 @@ module Searchable
   REQUIRED_WORDS_SHARE = 2/3r
   # most_words: words this long or longer may match one letter out; a shorter word is one letter from too many others
   FUZZY_WORD_LENGTH = 5
+  # A letter or digit, but not an apostrophe: Ruby counts ʼ (U+02BC) as a letter
+  LETTER_OR_DIGIT = "(?:(?!#{APOSTROPHE_CHAR_CLASS})[[:alnum:]])".freeze
   # most_words: a word as Atlas's standard analyzer splits them, on anything but letters, digits and apostrophes (so
   # "circle,trees" is two words), starting and ending with a letter or digit ('trees' is trees)
-  SEARCH_WORD = /[[:alnum:]](?:(?:[[:alnum:]]|#{APOSTROPHE_CHAR_CLASS})*[[:alnum:]])?/
+  SEARCH_WORD = /#{LETTER_OR_DIGIT}(?:(?:#{LETTER_OR_DIGIT}|#{APOSTROPHE_CHAR_CLASS})*#{LETTER_OR_DIGIT})?/
 
   class_methods do
     def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, autocomplete: autocomplete_fields, vector_weight: nil, query_vector: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil, emails: false, most_words: false)
@@ -259,7 +261,7 @@ module Searchable
 
     def significant_words(query)
       words = query.scan(SEARCH_WORD).uniq(&:downcase)
-      length = ->(word) { word.scan(/[[:alnum:]]/).length }
+      length = ->(word) { word.scan(/#{LETTER_OR_DIGIT}/o).length }
       counted_length = [COUNTED_WORD_LENGTH, words.map(&length).max.to_i].min
       words.select { |word| length.(word) >= counted_length }
     end
