@@ -203,6 +203,33 @@ class SearchTest < ActiveSupport::TestCase
     assert(json_response.any? { |r| r['value'].include?('Test Gathering') })
   end
 
+  test 'the quick search finds what has both words of two, in any order, and not what has only one' do
+    create_event(name: 'Circle of Trees', prices: [0])
+    create_organisation(name: 'Circle of Song')
+
+    labels = JSON.parse(ajax_search('trees circle')).pluck('label')
+    assert(labels.any? { |label| label.start_with?('Circle of Trees') }, labels.inspect)
+    assert_not_includes labels, 'Circle of Song'
+  end
+
+  test 'the quick search finds what has all but one word of three, and not what has only one' do
+    create_organisation(name: 'Oxford Psychedelic Society')
+    create_organisation(name: 'Society for Humanity')
+
+    labels = JSON.parse(ajax_search('psychedelic society london')).pluck('label')
+    assert_includes labels, 'Oxford Psychedelic Society'
+    assert_not_includes labels, 'Society for Humanity'
+  end
+
+  test "the quick search doesn't count a 3-letter word like the when the query has longer ones" do
+    create_organisation(name: 'Circle of Trees Collective')
+    create_organisation(name: 'The Lotus Circle')
+
+    labels = JSON.parse(ajax_search('circle of the trees')).pluck('label')
+    assert_includes labels, 'Circle of Trees Collective'
+    assert_not_includes labels, 'The Lotus Circle'
+  end
+
   test 'ajax search rejects queries shorter than 3 characters' do
     assert_empty ajax_search('ab')
     # Verify boundary: 3 characters should work
@@ -331,6 +358,38 @@ class SearchTest < ActiveSupport::TestCase
     collection = CapturingCollection.new
     Account.stub(:collection, collection) { Account.search('Alek', Account.unscoped, regex_search: false, autocomplete: nil) }
     assert(should_clauses_for(collection.pipelines.first).none? { |clause| clause.key?(:autocomplete) })
+  end
+
+  test 'a search for most words requires most of its words of 4 letters or more, fuzzily only if 5 or more' do
+    collection = CapturingCollection.new
+    Event.stub(:collection, collection) { Event.search('the circle of tree dance', Event.unscoped, regex_search: false, fuzzy_text: true, most_words: true) }
+    compound = collection.pipelines.first.first.fetch(:$search).fetch(:compound)
+
+    assert_equal 0, compound[:minimumShouldMatch]
+    assert_equal [{ compound: { should: [
+      { compound: { should: [{ text: { query: 'circle', path: Event.search_fields, fuzzy: { maxEdits: 1, prefixLength: 2 } } },
+                             { autocomplete: { query: 'circle', path: 'name' } }], minimumShouldMatch: 1 } },
+      { compound: { should: [{ text: { query: 'tree', path: Event.search_fields } },
+                             { autocomplete: { query: 'tree', path: 'name' } }], minimumShouldMatch: 1 } },
+      { compound: { should: [{ text: { query: 'dance', path: Event.search_fields, fuzzy: { maxEdits: 1, prefixLength: 2 } } },
+                             { autocomplete: { query: 'dance', path: 'name' } }], minimumShouldMatch: 1 } }
+    ], minimumShouldMatch: 2 } }], compound[:must]
+
+    collection = CapturingCollection.new
+    Event.stub(:collection, collection) { Event.search('the circle of tree', Event.unscoped, regex_search: false, fuzzy_text: true) }
+    compound = collection.pipelines.first.first.fetch(:$search).fetch(:compound)
+    assert_equal 1, compound[:minimumShouldMatch]
+    assert_nil compound[:must]
+  end
+
+  test 'the words a search for most words counts are those of 4 letters or more, or of 3 if there are none' do
+    assert_equal %w[circle Trees], Event.significant_words('the circle of Trees trees')
+    assert_equal %w[zen art], Event.significant_words('a zen art')
+    assert_empty Event.significant_words('a of')
+  end
+
+  test 'a search for most words requires all of 1 or 2, all but one of 3 to 7, and three quarters of more' do
+    assert_equal [1, 2, 2, 3, 4, 5, 6, 6, 8], [1, 2, 3, 4, 5, 6, 7, 8, 10].map(&Event.method(:required_word_count))
   end
 
   test "each searchable model's autocomplete fields are among its search fields" do

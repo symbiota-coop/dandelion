@@ -45,7 +45,8 @@ Dandelion::App.helpers do
       next if model_class && config_model_class != model_class
 
       scope = config_model_class.search_scope
-      items = config_model_class.search(q, scope, limit: 5, build_records: true, phrase_boost: 1.5, fuzzy_text: true, vector_weight: 0)
+      # Most words must match (most_words), so a list of 5 per type isn't filled with records sharing one word
+      items = config_model_class.search(q, scope, limit: 5, build_records: true, phrase_boost: 1.5, fuzzy_text: true, vector_weight: 0, most_words: true)
       prefix = search_prefix(config_model_class)
       results += items.map do |item|
         {

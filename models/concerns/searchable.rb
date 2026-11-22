@@ -14,9 +14,12 @@ module Searchable
   APOSTROPHE_VARIANTS = Regexp.union(APOSTROPHES)
   APOSTROPHE_CHAR_CLASS = "[#{APOSTROPHES.map { |ch| Regexp.escape(ch) }.join}]".freeze
   RANGE_OPERATORS = %w[$gt $gte $lt $lte].freeze
+  # most_words: fuzzy matching only for words this long, at most one letter out, so "circe" isn't taken for "circle"
+  # nor a short word for most others
+  FUZZY_WORD_LENGTH = 5
 
   class_methods do
-    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, autocomplete: autocomplete_fields, vector_weight: nil, query_vector: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil, emails: false)
+    def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, autocomplete: autocomplete_fields, vector_weight: nil, query_vector: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil, emails: false, most_words: false)
       return none if query.blank?
       return none if query.length < 3 || query.length > 200
 
@@ -33,9 +36,17 @@ module Searchable
       searched_fields = emails ? search_fields : search_fields - %w[email]
       return emails ? scope.and(email: query) : none if search_fields.include?('email') && query.match?(EMAIL_REGEX)
 
+      # most_words: most of the query's words that count (significant_words) must match (required_word_count), each in
+      # any searched field or as the start of a word in an autocomplete field, so "circle of trees" doesn't find all that
+      # "of", or "circle" alone, would, while a typo in a longer query doesn't empty the list
+      words = most_words ? significant_words(query) : []
+
       if regex_search
-        pattern = Regexp.escape(query).gsub(APOSTROPHE_VARIANTS, APOSTROPHE_CHAR_CLASS)
-        results = scope.and('$or': searched_fields.map { |field| { field => /#{pattern}/i } })
+        results = if words.any?
+                    regex_word_search(scope, words, searched_fields)
+                  else
+                    scope.and('$or': searched_fields.map { |field| { field => search_regex(query) } })
+                  end
         results = results.limit(limit) if limit
         results
       else
@@ -88,15 +99,14 @@ module Searchable
           end)
         end
 
-        # Atlas $search compound spec (passed as the stage body for $search).
-        search_spec = {
-          index: to_s.underscore.pluralize,
-          compound: {
-            should: should_clauses,
-            filter: search_filters,
-            minimumShouldMatch: 1
-          }
-        }
+        # Atlas $search compound spec (passed as the stage body for $search). With words to match the should clauses
+        # only score: the words decide what matches
+        compound = { should: should_clauses, filter: search_filters, minimumShouldMatch: words.any? ? 0 : 1 }
+        if words.any?
+          word_clauses = words.map { |word| word_clause(word, searched_fields, autocomplete, fuzzy_text) }
+          compound[:must] = [{ compound: { should: word_clauses, minimumShouldMatch: required_word_count(words.length) } }]
+        end
+        search_spec = { index: to_s.underscore.pluralize, compound: compound }
 
         text_stages = [
           { '$search': search_spec },
@@ -229,6 +239,44 @@ module Searchable
 
     def atlas_search_timeout?(error)
       error.max_time_ms_expired? || error.code == MONGOT_TIMEOUT_CODE
+    end
+
+    def search_regex(text)
+      /#{Regexp.escape(text).gsub(APOSTROPHE_VARIANTS, APOSTROPHE_CHAR_CLASS)}/i
+    end
+
+    # Words of 4 letters or more, or if there are none, of 3. Shorter ones only score (through the whole query's
+    # clauses): "the" is in most records, and as the start of a word matches "Theresa" too
+    def significant_words(query)
+      words = query.split.uniq(&:downcase).group_by { |word| word.scan(/[[:alnum:]]/).length.clamp(0, 4) }
+      words[4] || words[3] || []
+    end
+
+    # All of 1 or 2 words, all but one of 3 to 7, and three quarters of more (rounded up), as Elasticsearch's minimum_should_match
+    # does: so a word most matches lack ("the") or a typo in a longer query still finds what has the rest
+    def required_word_count(word_count)
+      word_count <= 2 ? word_count : [word_count - 1, (word_count * 0.75).ceil].min
+    end
+
+    # The regex search's version of the Atlas one: records with any of the words, then those with enough of them
+    def regex_word_search(scope, words, fields)
+      candidates = scope.and('$or': words.flat_map { |word| fields.map { |field| { field => search_regex(word) } } })
+      ids = candidates.pluck(:id, *fields).filter_map do |id, *values|
+        text = values.flatten.compact.join(' ')
+        id if words.count { |word| text.match?(search_regex(word)) } >= required_word_count(words.length)
+      end
+      scope.and(:id.in => ids)
+    end
+
+    # A word matches if any searched field has it (fuzzily, if fuzzy and the word is long enough), or an autocomplete
+    # field has a word it starts
+    def word_clause(word, paths, autocomplete, fuzzy)
+      alternatives = apostrophe_variants(word).flat_map do |variant|
+        text = { query: variant, path: paths }
+        text[:fuzzy] = { maxEdits: 1, prefixLength: 2 } if fuzzy && word.length >= FUZZY_WORD_LENGTH
+        [{ text: text }] + Array(autocomplete).map { |path| { autocomplete: { query: variant, path: path } } }
+      end
+      { compound: { should: alternatives, minimumShouldMatch: 1 } }
     end
 
     def apostrophe_variants(query)
