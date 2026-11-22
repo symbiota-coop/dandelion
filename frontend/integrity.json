@@ -16,7 +16,7 @@
   "https://cdn.jsdelivr.net/npm/datatables.net-bs5@3.1.5/css/dataTables.bootstrap5.min.css": "sha384-OZKa6QSlaaq/LGR1sBFkYhC0c/nacIFh1chsblhDUxggC9Zb0XLEEMs95i1Kydnt",
   "https://cdn.jsdelivr.net/npm/datatables.net-bs5@3.1.5/js/dataTables.bootstrap5.min.js": "sha384-2JCJ65zPWIsFF9Flk2ZSwukEbtRkZygX6+sTerFFqbL7dwPDVsMf2FR3r3XDAub0",
   "https://cdn.jsdelivr.net/npm/datatables.net@3.1.5/js/dataTables.min.js": "sha384-RhzIACKRVYIyijzmm7bA1mSofISYiTQ/KsnClfUSGSHu6ZeRsTQVWL4LqPHTrJcT",
-  "https://cdn.jsdelivr.net/npm/dompurify@3.4.17/dist/purify.min.js": "sha384-P0JNneQf81HOl9VwNXK76cQ9VMD6Nfsnepxb0cCOg8+UzEdzgPHAPV4wVQrvYQSx",
+  "https://cdn.jsdelivr.net/npm/dompurify@3.4.18/dist/purify.min.js": "sha384-lkArbWjiZKuE+bzKbj1vOEF7DKYBDNvgwZMCt5OH8bdRB92zpzyNska9Q/XKPHQD",
   "https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css": "sha384-RkASv+6KfBMW9eknReJIJ6b3UnjKOKC5bOUaNgIY778NFbQ8MtWq9Lr/khUgqtTt",
   "https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js": "sha384-5JqMv4L/Xa0hfvtF06qboNdhvuYXUku9ZrhZh3bSk8VXF0A/RuSLHpLsSV9Zqhl6",
   "https://cdn.jsdelivr.net/npm/fullcalendar@7.1.5/all/global.js": "sha384-IAEKjDeCK3/9HPhmjC1YvDDk9EbeC1lVeUjvYs7Md/CFdLy4LwZms9CdSW/O6Fnn",
