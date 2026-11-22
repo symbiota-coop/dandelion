@@ -20,8 +20,9 @@ module Searchable
   # most_words: the share of the counted words that must match, rounded up (all of 1 or 2, 2 of 3, 3 of 4, 4 of 6...),
   # like Elasticsearch's minimum_should_match, so a typo in a longer query doesn't empty the list
   REQUIRED_WORDS_SHARE = 2/3r
-  # most_words: words this long or longer may match one letter out; a shorter word is one letter from too many others
-  FUZZY_WORD_LENGTH = 5
+  # most_words: a word may be one letter out for each of these lengths it reaches (as Elasticsearch's AUTO fuzziness):
+  # one from 5 letters, two from 6 ("steven" finds "stephen"). A shorter word is one letter from too many others
+  FUZZY_WORD_LENGTHS = [5, 6].freeze
   # A letter or digit, but not an apostrophe: Ruby counts ʼ (U+02BC) as a letter
   LETTER_OR_DIGIT = "(?:(?!#{APOSTROPHE_CHAR_CLASS})[[:alnum:]])".freeze
   # most_words: a word as Atlas's standard analyzer splits them, on anything but letters, digits and apostrophes (so
@@ -261,9 +262,16 @@ module Searchable
 
     def significant_words(query)
       words = query.scan(SEARCH_WORD).uniq(&:downcase)
-      length = ->(word) { word.scan(/#{LETTER_OR_DIGIT}/o).length }
-      counted_length = [COUNTED_WORD_LENGTH, words.map(&length).max.to_i].min
-      words.select { |word| length.(word) >= counted_length }
+      counted_length = [COUNTED_WORD_LENGTH, words.map { |word| letter_count(word) }.max.to_i].min
+      words.select { |word| letter_count(word) >= counted_length }
+    end
+
+    def letter_count(word)
+      word.scan(/#{LETTER_OR_DIGIT}/o).length
+    end
+
+    def fuzzy_edits(word)
+      FUZZY_WORD_LENGTHS.count { |length| letter_count(word) >= length }
     end
 
     def required_word_count(word_count)
@@ -283,12 +291,13 @@ module Searchable
       scope.and(:id.in => ids)
     end
 
-    # A word matches if any searched field has it (fuzzily, if fuzzy and the word is long enough), or an autocomplete
-    # field has a word it starts
+    # A word matches if any searched field has it (fuzzily, if fuzzy and the word is long enough: fuzzy_edits), or an
+    # autocomplete field has a word it starts
     def word_clause(word, paths, autocomplete, fuzzy)
+      edits = fuzzy ? fuzzy_edits(word) : 0
       alternatives = apostrophe_variants(word).flat_map do |variant|
         text = { query: variant, path: paths }
-        text[:fuzzy] = { maxEdits: 1, prefixLength: 2 } if fuzzy && word.length >= FUZZY_WORD_LENGTH
+        text[:fuzzy] = { maxEdits: edits, prefixLength: 2 } if edits.positive?
         [{ text: text }] + Array(autocomplete).map { |path| { autocomplete: { query: variant, path: path } } }
       end
       { compound: { should: alternatives, minimumShouldMatch: 1 } }

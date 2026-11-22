@@ -380,14 +380,14 @@ class SearchTest < ActiveSupport::TestCase
     assert(should_clauses_for(collection.pipelines.first).none? { |clause| clause.key?(:autocomplete) })
   end
 
-  test 'a search for most words requires most of its words of 4 letters or more, fuzzily only if 5 or more' do
+  test 'a search for most words requires most of its words of 4 letters or more, one letter out from 5 letters, two from 6' do
     collection = CapturingCollection.new
     Event.stub(:collection, collection) { Event.search('the circle of tree dance', Event.unscoped, regex_search: false, fuzzy_text: true, most_words: true) }
     compound = collection.pipelines.first.first.fetch(:$search).fetch(:compound)
 
     assert_equal 0, compound[:minimumShouldMatch]
     assert_equal [{ compound: { should: [
-      { compound: { should: [{ text: { query: 'circle', path: Event.search_fields, fuzzy: { maxEdits: 1, prefixLength: 2 } } },
+      { compound: { should: [{ text: { query: 'circle', path: Event.search_fields, fuzzy: { maxEdits: 2, prefixLength: 2 } } },
                              { autocomplete: { query: 'circle', path: 'name' } }], minimumShouldMatch: 1 } },
       { compound: { should: [{ text: { query: 'tree', path: Event.search_fields } },
                              { autocomplete: { query: 'tree', path: 'name' } }], minimumShouldMatch: 1 } },
@@ -411,6 +411,16 @@ class SearchTest < ActiveSupport::TestCase
     assert_equal %w[trees], Event.significant_words("ʼtreesʼ")
     assert_equal %w[of], Event.significant_words('a of')
     assert_empty Event.significant_words('& --')
+  end
+
+  test 'a search for most words lets a word be one letter out from 5 letters and two from 6, so steven finds stephen' do
+    assert_equal [0, 0, 1, 2, 2], %w[sun tree dance steven michael].map(&Event.method(:fuzzy_edits))
+
+    collection = CapturingCollection.new
+    Account.stub(:collection, collection) { Account.search('steven reid', Account.unscoped, regex_search: false, fuzzy_text: true, most_words: true) }
+    word_clauses = collection.pipelines.first.first.dig(:$search, :compound, :must, 0, :compound, :should)
+    steven = word_clauses.first.dig(:compound, :should).find { |clause| clause.key?(:text) }
+    assert_equal({ query: 'steven', path: Account.search_fields - %w[email], fuzzy: { maxEdits: 2, prefixLength: 2 } }, steven[:text])
   end
 
   test 'a search for most words requires two thirds of its words, rounded up' do
