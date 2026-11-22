@@ -30,8 +30,9 @@ Dandelion::App.controller do
   end
 
   get '/stats/organisations' do
-    @from = params[:from] ? parse_date(params[:from]) : 3.months.ago.to_date
-    @to = params[:to] ? parse_date(params[:to]) : Date.today
+    # A date that isn't one (?from=x, from[x]=1) gets the default, as a cleared one does (blanks_to_nils! makes it nil)
+    @from = parse_date(params[:from]) || 3.months.ago.to_date
+    @to = parse_date(params[:to]) || Date.today
     created_at = { '$gte' => @from.to_time(:utc), '$lt' => (@to + 1.day).to_time(:utc) }
 
     # Sums and counts by event in the database, rather than loading every order and ticket (raw aggregations skip the paranoia scope, so exclude deleted orders and tickets here)
@@ -71,8 +72,9 @@ Dandelion::App.controller do
   end
 
   get '/stats/donations' do
-    @from = params[:from] ? parse_date(params[:from]) : 3.months.ago.to_date
-    @to = params[:to] ? parse_date(params[:to]) : Date.today
+    # A date that isn't one (?from=x, from[x]=1) gets the default, as a cleared one does (blanks_to_nils! makes it nil)
+    @from = parse_date(params[:from]) || 3.months.ago.to_date
+    @to = parse_date(params[:to]) || Date.today
     created_at = { '$gte' => @from.to_time(:utc), '$lt' => (@to + 1.day).to_time(:utc) }
 
     # Donations to Dandelion made at checkout, summed by event in the database (raw aggregations skip the paranoia scope, so exclude deleted donations here)
