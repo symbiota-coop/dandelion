@@ -159,6 +159,23 @@ class StatsPagesTest < ActiveSupport::TestCase
     assert_equal ['Older Event', 'Bigger Event', 'Smaller Event'], all('#donations tbody td:first-child a').map(&:text)
   end
 
+  test "Donations and Organisations use the default dates for a date that's cleared or isn't one" do
+    covers_route 'GET /stats/donations', 'GET /stats/organisations'
+    create_event(name: 'Recent Event')
+    donate_at_checkout(@event, 5, at: 1.month.ago)
+    sign_in_with_rack(FactoryBot.create(:account, admin: true))
+    defaults = [3.months.ago.to_date, Date.today].map { |date| %(value="#{date.iso8601}") }
+
+    { '/stats/donations' => '1 event raised', '/stats/organisations' => '1 organisation sold' }.each do |path, summary|
+      ['from=', 'to=', 'from=not-a-date', 'to=not-a-date', 'from[x]=1'].each do |query|
+        get "#{path}?#{query}"
+        assert_equal 200, last_response.status, "#{path}?#{query}"
+        assert_includes last_response.body, summary
+        defaults.each { |value| assert_includes last_response.body, value, "#{path}?#{query}" }
+      end
+    end
+  end
+
   test 'Donations and Organisations list only the top 100, but count them all' do
     covers_route 'GET /stats/donations', 'GET /stats/organisations'
     events = (1..101).map do |i|
