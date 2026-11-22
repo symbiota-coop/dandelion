@@ -402,17 +402,18 @@ class SearchTest < ActiveSupport::TestCase
     assert_nil compound[:must]
   end
 
-  test 'the words a search for most words counts are those of 4 letters or more, or of 3 if there are none' do
+  test 'the words a search for most words counts are those of 4 letters or more, or if there are none, the longest' do
     assert_equal %w[circle Trees], Event.significant_words('the circle of Trees trees')
     assert_equal %w[zen art], Event.significant_words('a zen art')
     assert_equal %w[circle trees], Event.significant_words('circle,trees')
     assert_equal %w[circle trees], Event.significant_words('circle, trees')
     assert_equal ["O'Sullivan's", 'trees'], Event.significant_words("O'Sullivan's 'trees'")
-    assert_empty Event.significant_words('a of')
+    assert_equal %w[of], Event.significant_words('a of')
+    assert_empty Event.significant_words('& --')
   end
 
-  test 'a search for most words requires all of 1 or 2, all but one of 3 to 7, and three quarters of more' do
-    assert_equal [1, 2, 2, 3, 4, 5, 6, 6, 8], [1, 2, 3, 4, 5, 6, 7, 8, 10].map(&Event.method(:required_word_count))
+  test 'a search for most words requires two thirds of its words, rounded up' do
+    assert_equal [1, 2, 2, 3, 4, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7, 8, 10].map(&Event.method(:required_word_count))
   end
 
   test "each searchable model's autocomplete fields are among its search fields" do

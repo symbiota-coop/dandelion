@@ -14,12 +14,17 @@ module Searchable
   APOSTROPHE_VARIANTS = Regexp.union(APOSTROPHES)
   APOSTROPHE_CHAR_CLASS = "[#{APOSTROPHES.map { |ch| Regexp.escape(ch) }.join}]".freeze
   RANGE_OPERATORS = %w[$gt $gte $lt $lte].freeze
-  # most_words: fuzzy matching (one letter out) only for words this long, as a short word is one letter from many others
+  # most_words: the query's words count if they have this many letters or more (or, when none do, the longest count).
+  # Shorter ones only score: "the" is in most records, and as the start of a word matches "Theresa" too
+  COUNTED_WORD_LENGTH = 4
+  # most_words: the share of the counted words that must match, rounded up (all of 1 or 2, 2 of 3, 3 of 4, 4 of 6...),
+  # like Elasticsearch's minimum_should_match, so a typo in a longer query doesn't empty the list
+  REQUIRED_WORDS_SHARE = 2/3r
+  # most_words: words this long or longer may match one letter out; a shorter word is one letter from too many others
   FUZZY_WORD_LENGTH = 5
-  # most_words: a word as Atlas's standard analyzer splits them, on anything but letters, digits and apostrophes, so
-  # "circle,trees" is two words. Apostrophes at either end aren't part of it ('trees')
-  SEARCH_WORD = /(?:[[:alnum:]]|#{APOSTROPHE_CHAR_CLASS})+/
-  EDGE_APOSTROPHES = /\A#{APOSTROPHE_CHAR_CLASS}+|#{APOSTROPHE_CHAR_CLASS}+\z/
+  # most_words: a word as Atlas's standard analyzer splits them, on anything but letters, digits and apostrophes (so
+  # "circle,trees" is two words), starting and ending with a letter or digit ('trees' is trees)
+  SEARCH_WORD = /[[:alnum:]](?:(?:[[:alnum:]]|#{APOSTROPHE_CHAR_CLASS})*[[:alnum:]])?/
 
   class_methods do
     def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, autocomplete: autocomplete_fields, vector_weight: nil, query_vector: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil, emails: false, most_words: false)
@@ -252,17 +257,15 @@ module Searchable
       /(?<![[:alnum:]])#{search_regex(word).source}/i
     end
 
-    # Words of 4 letters or more, or if there are none, of 3. Shorter ones only score (through the whole query's
-    # clauses): "the" is in most records, and as the start of a word matches "Theresa" too
     def significant_words(query)
-      words = query.scan(SEARCH_WORD).map { |word| word.gsub(EDGE_APOSTROPHES, '') }.uniq(&:downcase).group_by { |word| word.scan(/[[:alnum:]]/).length.clamp(0, 4) }
-      words[4] || words[3] || []
+      words = query.scan(SEARCH_WORD).uniq(&:downcase)
+      length = ->(word) { word.scan(/[[:alnum:]]/).length }
+      counted_length = [COUNTED_WORD_LENGTH, words.map(&length).max.to_i].min
+      words.select { |word| length.(word) >= counted_length }
     end
 
-    # All of 1 or 2 words, all but one of 3 to 7, and three quarters of more (rounded up), as Elasticsearch's minimum_should_match
-    # does: so a word most matches lack ("the") or a typo in a longer query still finds what has the rest
     def required_word_count(word_count)
-      word_count <= 2 ? word_count : [word_count - 1, (word_count * 0.75).ceil].min
+      (word_count * REQUIRED_WORDS_SHARE).ceil
     end
 
     # The regex search's version of the Atlas one: records with any of the words, then those with enough of them, each
