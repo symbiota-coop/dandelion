@@ -147,8 +147,10 @@ module EventAtproto
     record
   end
 
-  def publish_to_atproto
-    client = atproto_client_for_publishing
+  # The nightly check passes its own client to the three methods below, as each AtprotoClient signs in to Bluesky
+  # (createSession), which refuses more than a few dozen sign-ins in a few minutes (429)
+  def publish_to_atproto(client: nil)
+    client ||= atproto_client_for_publishing
     return unless client
 
     record = build_atproto_record
@@ -160,10 +162,10 @@ module EventAtproto
     ErrorReporting.capture_exception(e, context: { event_id: id.to_s, action: 'publish' })
   end
 
-  def update_atproto
+  def update_atproto(client: nil)
     # If event became secret/locked, delete the ATProto record
     if secret? || locked?
-      delete_atproto_without_delay
+      delete_atproto_without_delay(client: client)
       return
     end
 
@@ -173,7 +175,7 @@ module EventAtproto
       return
     end
 
-    client = atproto_client_for_record
+    client ||= atproto_client_for_record
     return unless client
 
     record = build_atproto_record
@@ -183,10 +185,10 @@ module EventAtproto
     ErrorReporting.capture_exception(e, context: { event_id: id.to_s, action: 'update' })
   end
 
-  def delete_atproto
+  def delete_atproto(client: nil)
     return unless atproto_uri.present?
 
-    client = atproto_client_for_record
+    client ||= atproto_client_for_record
     return unless client
 
     client.delete_record(uri: atproto_uri)
@@ -330,7 +332,7 @@ module EventAtproto
           results[:orphaned] << { uri: uri, event_id: event.id.to_s, reason: 'should_be_deleted' }
           if fix
             begin
-              event.delete_atproto_without_delay
+              event.delete_atproto_without_delay(client: client)
             rescue StandardError => e
               results[:errors] << { event_id: event.id.to_s, action: 'delete_secret', error: e.message }
             end
@@ -349,7 +351,7 @@ module EventAtproto
             results[:stale] << { uri: uri, event_id: event.id.to_s, mismatches: mismatches }
             if fix
               begin
-                event.update_atproto_without_delay
+                event.update_atproto_without_delay(client: client)
               rescue StandardError => e
                 results[:errors] << { event_id: event.id.to_s, action: 'update_stale', error: e.message }
               end
@@ -371,7 +373,9 @@ module EventAtproto
         if fix
           begin
             event.set(atproto_uri: nil)
-            event.publish_to_atproto_without_delay
+            # An organisation that's connected an account since publishes under its own
+            publishing_client = client if !event.organisation&.atproto_connected? && client.did == ENV['ATPROTO_DID']
+            event.publish_to_atproto_without_delay(client: publishing_client)
           rescue StandardError => e
             results[:errors] << { event_id: event.id.to_s, action: 'republish_missing', error: e.message }
           end

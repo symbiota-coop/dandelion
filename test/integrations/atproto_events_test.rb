@@ -72,14 +72,16 @@ class IntegrationsAtprotoEventsTest < ActiveSupport::TestCase
 
   # AtprotoClient.new with an organisation's handle and app password gives that account's client, and with neither
   # (as Event#atproto_client_for_publishing and the nightly tasks call it) Dandelion's, from ATPROTO_HANDLE. Anything
-  # else is a sign-in Bluesky would refuse
+  # else is a sign-in Bluesky would refuse. Each is a sign-in, counted in @sign_ins
   def with_atproto(&)
     clients = {
       %w[organisation.test organisation-password] => organisation_client,
       %w[other.test other-password] => other_client,
       [nil, nil] => dandelion_client
     }
+    @sign_ins = 0
     new_client = lambda do |handle: nil, app_password: nil|
+      @sign_ins += 1
       clients.fetch([handle, app_password]) { raise Faraday::UnauthorizedError, 'Invalid identifier or password' }
     end
     AtprotoClient.stub(:new, new_client, &)
@@ -406,8 +408,11 @@ class IntegrationsAtprotoEventsTest < ActiveSupport::TestCase
           { 'uri' => @valid_event.atproto_uri, 'value' => @valid_event.reload.build_atproto_record }
         ]
 
+        @sign_ins = 0
         results = Event.verify_atproto_collection(fix: true)
         assert_equal({ total_remote: 4, total_local: 4, valid: 1, orphaned: 2, missing: 1, stale: 1, errors: 0 }, results[:summary])
+        # Once for the whole check, not once per record it fixes, which Bluesky refuses (429) past a few dozen
+        assert_equal 1, @sign_ins
       end
     end
 
