@@ -493,7 +493,7 @@ class SearchTest < ActiveSupport::TestCase
 
   test 'the Atlas checks page checks each searchable model, and fails them on plain MongoDB' do
     covers_route 'GET /stats/atlas'
-    assert_equal %w[Account Activity Event Gathering LocalGroup Organisation Pmail], AtlasChecks.searchable_models.map(&:name)
+    assert_equal %w[Account Activity Event EventFeedback Gathering LocalGroup Organisation Pmail], AtlasChecks.searchable_models.map(&:name)
 
     sign_in_with_rack(FactoryBot.create(:account, admin: true))
     get '/stats/atlas'
