@@ -411,6 +411,10 @@ class SearchTest < ActiveSupport::TestCase
     assert_equal %w[trees], Event.significant_words("ʼtreesʼ")
     assert_equal %w[of], Event.significant_words('a of')
     assert_empty Event.significant_words('& --')
+    # Atlas doesn't split a word at an underscore, or a full stop within it
+    assert_equal %w[damp_resonance_8], Account.significant_words('damp_resonance_8')
+    assert_equal %w[stephen.reid], Account.significant_words('stephen.reid')
+    assert_equal %w[circle trees], Event.significant_words('circle. trees.')
   end
 
   test 'a search for most words lets a word be one letter out from 5 letters and two from 6, so steven finds stephen' do
@@ -421,6 +425,40 @@ class SearchTest < ActiveSupport::TestCase
     word_clauses = collection.pipelines.first.first.dig(:$search, :compound, :must, 0, :compound, :should)
     steven = word_clauses.first.dig(:compound, :should).find { |clause| clause.key?(:text) }
     assert_equal({ query: 'steven', path: Account.search_fields - %w[email], fuzzy: { maxEdits: 2, prefixLength: 2 } }, steven[:text])
+  end
+
+  test "the quick search's Atlas pipeline searches for a username as the one token Atlas keeps it" do
+    collection = CapturingCollection.new
+    Account.stub(:collection, collection) do
+      Account.search('damp_resonance_8', Account.search_scope, regex_search: false, fuzzy_text: true, most_words: true)
+    end
+    compound = collection.pipelines.first.first.fetch(:$search).fetch(:compound)
+
+    word_clauses = compound.dig(:must, 0, :compound, :should)
+    assert_equal 1, word_clauses.length
+    alternatives = word_clauses.first.dig(:compound, :should)
+    assert_equal 'damp_resonance_8', alternatives.find { |clause| clause.key?(:text) }.dig(:text, :query)
+    assert_includes alternatives, { autocomplete: { query: 'damp_resonance_8', path: 'username' } }
+    # Still only among public accounts
+    assert_equal [['has_signed_in', true], ['hidden', false]].sort, equals_filters(compound[:filter]).sort
+  end
+
+  test 'the quick search finds a public account by its username, and not by a word in the middle of one' do
+    FactoryBot.create(:account, name: 'Morgan Taylor', username: 'damp_resonance_8', has_signed_in: true)
+    FactoryBot.create(:account, name: 'Hidden Person', username: 'damp_resonance_9', has_signed_in: true, hidden: true)
+
+    labels = JSON.parse(ajax_search('damp_resonance_8', 'accounts')).pluck('label')
+    assert_includes labels, 'Morgan Taylor'
+    assert_not_includes labels, 'Hidden Person'
+    # Atlas wouldn't find resonance in damp_resonance_8, so nor does the regex search
+    assert_not_includes JSON.parse(ajax_search('resonance', 'accounts')).pluck('label'), 'Morgan Taylor'
+  end
+
+  test 'the quick search finds a public account by a username with a full stop, and not by its second word' do
+    FactoryBot.create(:account, name: 'Morgan Taylor', username: 'stephen.reid', has_signed_in: true)
+
+    assert_includes JSON.parse(ajax_search('stephen.reid', 'accounts')).pluck('label'), 'Morgan Taylor'
+    assert_not_includes JSON.parse(ajax_search('reid', 'accounts')).pluck('label'), 'Morgan Taylor'
   end
 
   test 'a search for most words requires two thirds of its words, rounded up' do
@@ -501,6 +539,7 @@ class SearchTest < ActiveSupport::TestCase
     assert last_response.ok?, last_response.status.to_s
     AtlasChecks.searchable_models.each { |model| assert_includes last_response.body, "<th colspan=\"4\">#{model.name}</th>" }
     assert_includes last_response.body, 'Event embeddings'
+    assert_includes last_response.body, 'Quick search by a whole username'
     assert_includes last_response.body, 'Failed'
   end
 

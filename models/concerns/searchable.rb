@@ -25,9 +25,14 @@ module Searchable
   FUZZY_WORD_LENGTHS = [5, 6].freeze
   # A letter or digit, but not an apostrophe: Ruby counts ʼ (U+02BC) as a letter
   LETTER_OR_DIGIT = "(?:(?!#{APOSTROPHE_CHAR_CLASS})[[:alnum:]])".freeze
-  # most_words: a word as Atlas's standard analyzer splits them, on anything but letters, digits and apostrophes (so
-  # "circle,trees" is two words), starting and ending with a letter or digit ('trees' is trees)
-  SEARCH_WORD = /#{LETTER_OR_DIGIT}(?:(?:#{LETTER_OR_DIGIT}|#{APOSTROPHE_CHAR_CLASS})*#{LETTER_OR_DIGIT})?/
+  # A letter, digit or underscore: the standard analyzer (Unicode word breaks) doesn't split a word at an underscore, so
+  # a username like damp_resonance_8 is one token, which neither damp nor resonance matches
+  WORD_CHAR = "(?:#{LETTER_OR_DIGIT}|_)".freeze
+  # most_words: a word as Atlas's standard analyzer splits them, roughly (as AtlasChecks::SAMPLE_TOKEN): on anything but
+  # letters, digits and underscores, and apostrophes and full stops within a word (so "circle,trees" is two words, and
+  # damp_resonance_8 and the username stephen.reid one each), starting and ending with a letter, digit or underscore
+  # ('trees' is trees)
+  SEARCH_WORD = /#{WORD_CHAR}(?:(?:#{WORD_CHAR}|#{APOSTROPHE_CHAR_CLASS}|\.)*#{WORD_CHAR})?/
 
   class_methods do
     def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, autocomplete: autocomplete_fields, vector_weight: nil, query_vector: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil, emails: false, most_words: false)
@@ -257,7 +262,7 @@ module Searchable
     end
 
     def word_start_regex(word)
-      /(?<![[:alnum:]])#{search_regex(word).source}/i
+      /(?<![[:alnum:]_])(?<![[:alnum:]_]\.)#{search_regex(word).source}/i
     end
 
     def significant_words(query)
@@ -280,7 +285,7 @@ module Searchable
 
     # The regex search's version of the Atlas one: records with any of the words, then those with enough of them, each
     # word matching at the start of a word, as Atlas's whole words and autocomplete's word starts do ("bath" isn't in
-    # "Sabbath")
+    # "Sabbath", nor resonance in damp_resonance_8 or reid in stephen.reid)
     def regex_word_search(scope, words, fields)
       regexes = words.map { |word| word_start_regex(word) }
       candidates = scope.and('$or': regexes.flat_map { |regex| fields.map { |field| { field => regex } } })
