@@ -2,6 +2,7 @@ class EventFeedback
   include Mongoid::Document
   include Mongoid::Timestamps
   include CoreExtensions
+  include Searchable
 
   include Mongoid::Paranoia
 
@@ -52,6 +53,12 @@ class EventFeedback
   after_create do
     clear_event_feedback_report_stash
     notifications.create! circle: circle, type: 'left_feedback' unless anonymous || event&.secret?
+  end
+
+  # Its Atlas Search index (event_feedbacks) maps dynamically, so answers' [question, answer] pairs are searched too. The
+  # regex search outside production doesn't look inside them, so finds only responses
+  def self.search_fields
+    %w[answers response]
   end
 
   def self.rated

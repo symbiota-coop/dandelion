@@ -195,6 +195,22 @@ class EventFeedbacksTest < ActiveSupport::TestCase
     assert_equal 200, last_response.status
   end
 
+  # Outside production the search is by regex, which finds responses but not answers (EventFeedback.search_fields)
+  test 'site admins can search feedback by the organiser\'s response' do
+    covers_route 'GET /stats/feedback'
+    create_attended_event
+    create_feedback(account: @attendee).set(response: 'Sorry the heating failed')
+    create_feedback(account: FactoryBot.create(:account)).set(response: 'Thanks for coming to the drumming circle')
+    sign_in(FactoryBot.create(:account, admin: true))
+
+    visit '/stats/feedback'
+    assert page.has_field?('response', with: 'Thanks for coming to the drumming circle')
+    fill_in 'q', with: 'HEATING'
+    click_on 'Search'
+    assert page.has_field?('response', with: 'Sorry the heating failed')
+    assert page.has_no_field?('response', with: 'Thanks for coming to the drumming circle')
+  end
+
   test 'single feedback page shows the attendee email only to email viewers' do
     covers 'organisations/attendee-emails-admins-and-managers-only@10b712'
     covers_route 'GET /event_feedbacks/:id'
