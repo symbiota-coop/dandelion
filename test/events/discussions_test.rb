@@ -95,36 +95,23 @@ class EventDiscussionsTest < ActiveSupport::TestCase
 
   test 'comment mentions link to profiles and subscribe the people mentioned' do
     create_event(prices: [0])
-    mentioned = FactoryBot.create(:account, name: 'Ada Lovelace', username: 'ada.lovelace')
+    mentioned = FactoryBot.create(:account, name: 'Ada Lovelace', username: 'ada_lovelace')
     @event.tickets.create!(account: mentioned, ticket_type: @event.ticket_types.first, payment_completed: true)
     discussion = @event.discussion_post!(@account)
     comment = discussion.comments.create!(account: @account, commentable: @event,
-                                          body: "Thanks @Ada.Lovelace. Write to me@example.com, or ask @nobody_here <b>now</b>. See https://example.com/a?b=1&c=2.")
+                                          body: "Thanks @Ada_Lovelace. Write to me@example.com, or ask @nobody_here <b>now</b>. See https://example.com/a?b=1&c=2.")
 
     assert discussion.subscriptions.and(account: mentioned).exists?
     assert_equal 2, discussion.subscriptions.count
     html = comment.body_html
-    assert_includes html, '<a href="/u/ada.lovelace">Ada Lovelace</a>. Write'
+    assert_includes html, '<a href="/u/ada_lovelace">Ada Lovelace</a>. Write'
     assert_includes html, '<a href="mailto:me@example.com" target="_blank">me@example.com</a>'
     assert_includes html, '@nobody_here &lt;b&gt;now&lt;/b&gt;'
     assert_includes html, '<a href="https://example.com/a?b=1&amp;c=2" target="_blank">https://example.com/a?b=1&amp;c=2</a>.'
-    assert_includes comment.body_with_additions, %(<a href="#{ENV['BASE_URI']}/u/ada.lovelace">)
+    assert_includes comment.body_with_additions, %(<a href="#{ENV['BASE_URI']}/u/ada_lovelace">)
 
     get "/e/#{@event.slug}", link_token: @account.link_token
-    assert_includes last_response.body, '<a href="/u/ada.lovelace">Ada Lovelace</a>'
-  end
-
-  test 'a comment mention ending in a dot subscribes only the account it links to' do
-    create_event(prices: [0])
-    jo = FactoryBot.create(:account, username: 'jo')
-    jo_dot = FactoryBot.create(:account, username: 'jo.')
-    [jo, jo_dot].each { |account| @event.tickets.create!(account: account, ticket_type: @event.ticket_types.first, payment_completed: true) }
-    discussion = @event.discussion_post!(@account)
-    comment = discussion.comments.create!(account: @account, commentable: @event, body: 'Over to @jo. today')
-
-    assert discussion.subscriptions.and(account: jo_dot).exists?
-    refute discussion.subscriptions.and(account: jo).exists?
-    assert_includes comment.body_html, '<a href="/u/jo.">'
+    assert_includes last_response.body, '<a href="/u/ada_lovelace">Ada Lovelace</a>'
   end
 
   test "mentioning someone who can't see the discussion neither subscribes nor emails them" do

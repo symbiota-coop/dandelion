@@ -1,6 +1,7 @@
 require_relative '../test_config'
 
-# What the profile form refuses: usernames that look like account ids, links in a new account's bio, names with links,
+# What the profile form refuses: usernames that look like account ids or have anything but letters, digits and
+# underscores, links in a new account's bio, names with links,
 # $ or @ in them, and dates of birth that aren't in the past
 class AccountProfileValidationTest < ActiveSupport::TestCase
   include Capybara::DSL
@@ -38,10 +39,26 @@ class AccountProfileValidationTest < ActiveSupport::TestCase
     assert_profile_refused "can't look like an account id"
     assert_equal username, account.reload.username
 
-    fill_in 'Username', with: 'pat_reid.2'
+    fill_in 'Username', with: 'pat_reid_2'
     save_profile
     assert_profile_saved
-    assert_equal 'pat_reid.2', account.reload.username
+    assert_equal 'pat_reid_2', account.reload.username
+  end
+
+  test 'a username can only have letters, digits and underscores, not full stops' do
+    account = FactoryBot.create(:account)
+    username = account.username
+    edit_profile(account)
+
+    fill_in 'Username', with: 'pat.reid'
+    save_profile
+    assert_profile_refused 'is invalid'
+    assert_equal username, account.reload.username
+
+    fill_in 'Username', with: 'pat_reid'
+    save_profile
+    assert_profile_saved
+    assert_equal 'pat_reid', account.reload.username
   end
 
   test 'an account whose username already looks like an id can still save other changes' do

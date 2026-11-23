@@ -17,9 +17,8 @@ module AtlasChecks
   # wouldn't match it. Only tokens that are a SAMPLE_WORD are searched for
   SAMPLE_TOKEN = /[\p{L}\p{N}_]+(?:(?:#{Searchable::APOSTROPHE_CHAR_CLASS}|[.:])[\p{L}\p{N}_]+)*/
   AUTOCOMPLETE_PREFIX = 4
-  # A username of two long words joined by an underscore or full stop (damp_resonance_8, stephen.reid), which Atlas keeps
-  # one token
-  USERNAME_SAMPLE = /[[:alpha:]]{#{Searchable::COUNTED_WORD_LENGTH},}[_.][[:alpha:]]{#{Searchable::COUNTED_WORD_LENGTH},}/
+  # A username of two long words joined by an underscore (damp_resonance_8), which Atlas keeps one token
+  USERNAME_SAMPLE = /[[:alpha:]]{#{Searchable::COUNTED_WORD_LENGTH},}_[[:alpha:]]{#{Searchable::COUNTED_WORD_LENGTH},}/
   # Records to look through for one with such a word
   SAMPLE_SIZE = 50
 
@@ -75,7 +74,7 @@ module AtlasChecks
         end
       end
       # The quick search (most_words) of a whole username, which passes only if its words split as Atlas's do: at an
-      # underscore or full stop, they'd be words no token matches
+      # underscore, they'd be words no token matches
       if model.search_fields.include?('username')
         checks << check(group, 'Quick search by a whole username') do
           record = model.and(username: USERNAME_SAMPLE).only(:_id, :username).order('created_at desc').first

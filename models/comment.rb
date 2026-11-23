@@ -51,7 +51,7 @@ class Comment
   end
 
   # @username, not straight after a letter, dot or @, so email addresses don't count
-  MENTION_REGEX = /(?<![\w.@])@([a-z0-9_.]+)/i
+  MENTION_REGEX = /(?<![\w.@])@([a-z0-9_]+)/i
 
   # Accounts mentioned in the body, by username
   def mentioned_accounts
@@ -67,7 +67,7 @@ class Comment
       token = Regexp.last_match(1)
       next "@#{token}" unless (mentioned = mentioned_account(token))
 
-      "<a href=\"#{base_uri}/u/#{mentioned.username}\">#{ERB::Util.html_escape(mentioned.name)}</a>#{token[mentioned.username.length..]}"
+      "<a href=\"#{base_uri}/u/#{mentioned.username}\">#{ERB::Util.html_escape(mentioned.name)}</a>"
     end
     Rinku.auto_link(html, :all, 'target="_blank"').html_safe
   end
@@ -76,14 +76,12 @@ class Comment
     body ? body.scan(MENTION_REGEX).flatten.map(&:downcase) : []
   end
 
-  # Usernames can end in a dot, so '@jo.' is jo. if there's a jo., and otherwise jo at the end of a sentence
   def mentioned_account(token)
     @mention_candidates ||= begin
-      usernames = mention_tokens.flat_map { |t| [t, t.sub(/\.+\z/, '')] }.uniq
+      usernames = mention_tokens.uniq
       usernames.any? ? Account.and(:username.in => usernames).index_by(&:username) : {}
     end
-    token = token.downcase
-    @mention_candidates[token] || @mention_candidates[token.sub(/\.+\z/, '')]
+    @mention_candidates[token.downcase]
   end
 
   def body_with_additions

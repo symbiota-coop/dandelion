@@ -413,7 +413,7 @@ class SearchTest < ActiveSupport::TestCase
     assert_empty Event.significant_words('& --')
     # Atlas doesn't split a word at an underscore, or a full stop within it
     assert_equal %w[damp_resonance_8], Account.significant_words('damp_resonance_8')
-    assert_equal %w[stephen.reid], Account.significant_words('stephen.reid')
+    assert_equal %w[Mr.Smith], Event.significant_words('Mr.Smith')
     assert_equal %w[circle trees], Event.significant_words('circle. trees.')
   end
 
@@ -452,13 +452,6 @@ class SearchTest < ActiveSupport::TestCase
     assert_not_includes labels, 'Hidden Person'
     # Atlas wouldn't find resonance in damp_resonance_8, so nor does the regex search
     assert_not_includes JSON.parse(ajax_search('resonance', 'accounts')).pluck('label'), 'Morgan Taylor'
-  end
-
-  test 'the quick search finds a public account by a username with a full stop, and not by its second word' do
-    FactoryBot.create(:account, name: 'Morgan Taylor', username: 'stephen.reid', has_signed_in: true)
-
-    assert_includes JSON.parse(ajax_search('stephen.reid', 'accounts')).pluck('label'), 'Morgan Taylor'
-    assert_not_includes JSON.parse(ajax_search('reid', 'accounts')).pluck('label'), 'Morgan Taylor'
   end
 
   test 'a search for most words requires two thirds of its words, rounded up' do

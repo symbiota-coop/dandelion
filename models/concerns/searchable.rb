@@ -30,7 +30,7 @@ module Searchable
   WORD_CHAR = "(?:#{LETTER_OR_DIGIT}|_)".freeze
   # most_words: a word as Atlas's standard analyzer splits them, roughly (as AtlasChecks::SAMPLE_TOKEN): on anything but
   # letters, digits and underscores, and apostrophes and full stops within a word (so "circle,trees" is two words, and
-  # damp_resonance_8 and the username stephen.reid one each), starting and ending with a letter, digit or underscore
+  # damp_resonance_8 and Mr.Smith one each), starting and ending with a letter, digit or underscore
   # ('trees' is trees)
   SEARCH_WORD = /#{WORD_CHAR}(?:(?:#{WORD_CHAR}|#{APOSTROPHE_CHAR_CLASS}|\.)*#{WORD_CHAR})?/
 
@@ -285,7 +285,7 @@ module Searchable
 
     # The regex search's version of the Atlas one: records with any of the words, then those with enough of them, each
     # word matching at the start of a word, as Atlas's whole words and autocomplete's word starts do ("bath" isn't in
-    # "Sabbath", nor resonance in damp_resonance_8 or reid in stephen.reid)
+    # "Sabbath", nor resonance in damp_resonance_8 or Smith in Mr.Smith)
     def regex_word_search(scope, words, fields)
       regexes = words.map { |word| word_start_regex(word) }
       candidates = scope.and('$or': regexes.flat_map { |regex| fields.map { |field| { field => regex } } })
