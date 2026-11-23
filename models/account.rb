@@ -36,6 +36,12 @@ class Account
     %w[name username]
   end
 
+  # A username is one token to Atlas, so the quick search (most_words) also finds an account by its whole username, or
+  # the start of it, rather than only by most of the words in it (Searchable)
+  def self.whole_token_fields
+    %w[username]
+  end
+
   def self.search_scope
     publicly_visible
   end

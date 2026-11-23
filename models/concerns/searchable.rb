@@ -28,6 +28,9 @@ module Searchable
   # most_words: a word as Atlas's standard analyzer splits them, on anything but letters, digits and apostrophes (so
   # "circle,trees" is two words), starting and ending with a letter or digit ('trees' is trees)
   SEARCH_WORD = /#{LETTER_OR_DIGIT}(?:(?:#{LETTER_OR_DIGIT}|#{APOSTROPHE_CHAR_CLASS})*#{LETTER_OR_DIGIT})?/
+  # most_words: a query that could be a whole token field's value (a username: letters, digits, underscores and full
+  # stops, no spaces), which may also match that field whole (whole_token_clauses)
+  WHOLE_TOKEN_QUERY = /\A[\p{L}\p{N}_.]+\z/
 
   class_methods do
     def search(query, scope = all, child_scope: nil, limit: nil, build_records: false, phrase_boost: 1, fuzzy_text: false, autocomplete: autocomplete_fields, vector_weight: nil, query_vector: nil, regex_search: Padrino.env != :production, pipeline_metadata: nil, emails: false, most_words: false)
@@ -49,7 +52,8 @@ module Searchable
 
       # most_words: most of the query's words that count (significant_words) must match (required_word_count), each in
       # any searched field or as the start of a word in an autocomplete field, so "circle of trees" doesn't find all that
-      # "of", or "circle" alone, would, while a typo in a longer query doesn't empty the list
+      # "of", or "circle" alone, would, while a typo in a longer query doesn't empty the list. Or, for a query that could be
+      # a username, Atlas may match it to the whole username instead (whole_token_clauses)
       words = most_words ? significant_words(query) : []
 
       if regex_search
@@ -115,7 +119,9 @@ module Searchable
         compound = { should: should_clauses, filter: search_filters, minimumShouldMatch: words.any? ? 0 : 1 }
         if words.any?
           word_clauses = words.map { |word| word_clause(word, searched_fields, autocomplete, fuzzy_text) }
-          compound[:must] = [{ compound: { should: word_clauses, minimumShouldMatch: required_word_count(words.length) } }]
+          required_words = { compound: { should: word_clauses, minimumShouldMatch: required_word_count(words.length) } }
+          whole_token = whole_token_clauses(query, searched_fields, autocomplete)
+          compound[:must] = [whole_token.any? ? { compound: { should: [required_words] + whole_token, minimumShouldMatch: 1 } } : required_words]
         end
         search_spec = { index: to_s.underscore.pluralize, compound: compound }
 
@@ -246,6 +252,23 @@ module Searchable
     # (search's autocomplete:). None unless the model names them
     def autocomplete_fields
       []
+    end
+
+    # Fields the model's Atlas Search index keeps as one token (usernames like damp_resonance_8), which most_words can't
+    # match word by word: its words split at underscores, as the regex search does, but Atlas doesn't split the field
+    # there, so resonance matches neither a whole token nor the start of one. None unless the model names them
+    def whole_token_fields
+      []
+    end
+
+    # most_words: a query that could be a whole token field's value may match it instead of most of its words: whole
+    # (phrase, as autocomplete's edge n-grams stop at its maxGrams), or, in an autocomplete field, by its start
+    def whole_token_clauses(query, paths, autocomplete)
+      fields = whole_token_fields & paths
+      return [] if fields.empty? || !query.match?(WHOLE_TOKEN_QUERY)
+
+      [{ phrase: { query: query, path: fields } }] +
+        (fields & Array(autocomplete)).map { |path| { autocomplete: { query: query, path: path } } }
     end
 
     def atlas_search_timeout?(error)

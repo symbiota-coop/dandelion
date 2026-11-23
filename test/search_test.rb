@@ -423,6 +423,50 @@ class SearchTest < ActiveSupport::TestCase
     assert_equal({ query: 'steven', path: Account.search_fields - %w[email], fuzzy: { maxEdits: 2, prefixLength: 2 } }, steven[:text])
   end
 
+  test "the quick search's Atlas pipeline also finds a public account by its whole username, which Atlas keeps one token" do
+    collection = CapturingCollection.new
+    Account.stub(:collection, collection) do
+      Account.search('damp_resonance_8', Account.search_scope, regex_search: false, fuzzy_text: true, most_words: true)
+    end
+    compound = collection.pipelines.first.first.fetch(:$search).fetch(:compound)
+
+    # Most of its words (damp and resonance, both), or the whole query as the username, or the start of it
+    assert_equal 1, compound[:must].length
+    alternatives = compound[:must].first.fetch(:compound)
+    assert_equal 1, alternatives[:minimumShouldMatch]
+    required_words, *whole_username = alternatives[:should]
+    assert_equal 2, required_words.dig(:compound, :minimumShouldMatch)
+    assert_equal(%w[damp resonance], required_words.dig(:compound, :should).map { |clause| clause.dig(:compound, :should, 0, :text, :query) })
+    assert_equal [{ phrase: { query: 'damp_resonance_8', path: %w[username] } },
+                  { autocomplete: { query: 'damp_resonance_8', path: 'username' } }], whole_username
+    # Still only among public accounts
+    assert_equal [['has_signed_in', true], ['hidden', false]].sort, equals_filters(compound[:filter]).sort
+  end
+
+  test "the quick search's Atlas pipeline matches a query with spaces, or a model without usernames, by its words only" do
+    collection = CapturingCollection.new
+    Account.stub(:collection, collection) { Account.search('Morgan Taylor', Account.search_scope, regex_search: false, fuzzy_text: true, most_words: true) }
+    must = collection.pipelines.first.first.dig(:$search, :compound, :must)
+    assert_equal 2, must.first.dig(:compound, :minimumShouldMatch)
+    assert_equal(%w[Morgan Taylor], must.first.dig(:compound, :should).map { |clause| clause.dig(:compound, :should, 0, :text, :query) })
+
+    collection = CapturingCollection.new
+    Event.stub(:collection, collection) { Event.search('damp_resonance_8', Event.unscoped, regex_search: false, fuzzy_text: true, most_words: true) }
+    must = collection.pipelines.first.first.dig(:$search, :compound, :must)
+    assert_equal 2, must.first.dig(:compound, :minimumShouldMatch)
+    assert_equal(%w[damp resonance], must.first.dig(:compound, :should).map { |clause| clause.dig(:compound, :should, 0, :text, :query) })
+  end
+
+  test 'the quick search finds a public account by its username, whose words its name shares none of' do
+    FactoryBot.create(:account, name: 'Morgan Taylor', username: 'damp_resonance_8', has_signed_in: true)
+    FactoryBot.create(:account, name: 'Hidden Person', username: 'damp_resonance_9', has_signed_in: true, hidden: true)
+
+    labels = JSON.parse(ajax_search('damp_resonance_8', 'accounts')).pluck('label')
+    assert_includes labels, 'Morgan Taylor'
+    # damp and resonance are in the hidden account's username too
+    assert_not_includes labels, 'Hidden Person'
+  end
+
   test 'a search for most words requires two thirds of its words, rounded up' do
     assert_equal [1, 2, 2, 3, 4, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7, 8, 10].map(&Event.method(:required_word_count))
   end
@@ -493,7 +537,7 @@ class SearchTest < ActiveSupport::TestCase
 
   test 'the Atlas checks page checks each searchable model, and fails them on plain MongoDB' do
     covers_route 'GET /stats/atlas'
-    assert_equal %w[Account Activity Event Gathering LocalGroup Organisation Pmail], AtlasChecks.searchable_models.map(&:name)
+    assert_equal %w[Account Activity Event EventFeedback Gathering LocalGroup Organisation Pmail], AtlasChecks.searchable_models.map(&:name)
 
     sign_in_with_rack(FactoryBot.create(:account, admin: true))
     get '/stats/atlas'
@@ -501,6 +545,7 @@ class SearchTest < ActiveSupport::TestCase
     assert last_response.ok?, last_response.status.to_s
     AtlasChecks.searchable_models.each { |model| assert_includes last_response.body, "<th colspan=\"4\">#{model.name}</th>" }
     assert_includes last_response.body, 'Event embeddings'
+    assert_includes last_response.body, 'Quick search by a whole username'
     assert_includes last_response.body, 'Failed'
   end
 
