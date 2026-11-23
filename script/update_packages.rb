@@ -110,7 +110,7 @@ def update_frontend
   updated = []
   skipped = []
   json['dependencies'].each do |name, current|
-    registry = get_json("https://registry.npmjs.org/#{name.sub('/', '%2F')}")
+    registry = get_json("https://registry.npmjs.org/#{name.gsub('/', '%2F')}")
     times = registry['time'].to_h { |v, time| [v, Time.parse(time)] }.slice(*registry['versions'].keys)
     to = newest(name, current, times)
     next unless to
