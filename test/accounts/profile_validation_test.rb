@@ -69,6 +69,19 @@ class AccountProfileValidationTest < ActiveSupport::TestCase
     assert_equal username, account.reload.username
   end
 
+  test 'an account whose username already has a full stop can still save other changes, but not change it to another' do
+    account = FactoryBot.create(:account)
+    account.set(username: 'pat.reid')
+    account.reload.name = 'Pat Reid'
+    assert account.save
+    assert_equal 'pat.reid', account.reload.username
+
+    account.username = 'pat.reid.2'
+    refute account.save
+    assert_includes account.errors[:username], 'is invalid'
+    assert_equal 'pat.reid', account.reload.username
+  end
+
   test "a bio can't have links until the account has done something on Dandelion, as an anti-spam measure" do
     account = FactoryBot.create(:account)
     refute account.live_player?

@@ -246,6 +246,19 @@ class AccountSignInsTest < ActiveSupport::TestCase
     assert_equal crypted_password, account.reload.crypted_password
   end
 
+  test 'an account whose username has a full stop, from before usernames had none, changes its password' do
+    account = FactoryBot.create(:account)
+    account.set(username: 'pat.reid')
+    sign_in(account)
+    visit '/accounts/password'
+    fill_in 'New password', with: 'a-new-password'
+    fill_in 'Confirm new password', with: 'a-new-password'
+    click_button 'Change password'
+    assert page.has_content?('Your password was changed, and other browsers were signed out.')
+    assert account.reload.password_matches?('a-new-password')
+    assert_equal 'pat.reid', account.username
+  end
+
   # The form's minlength stops a browser sending a short one
   test 'changing the password needs it to be long enough' do
     covers_route 'POST /accounts/password'

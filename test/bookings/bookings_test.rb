@@ -541,6 +541,19 @@ class EventBookingsTest < ActiveSupport::TestCase
     assert @event.orders.find_by(account: signed_in)
   end
 
+  test 'signed in, an account whose username has a full stop, from before usernames had none, books' do
+    create_event(prices: [0])
+    signed_in = FactoryBot.create(:account)
+    signed_in.set(username: 'pat.reid')
+
+    sign_in(signed_in)
+    visit "/e/#{@event.slug}"
+    click_button 'RSVP'
+    assert page.has_content? 'Thanks for booking'
+    assert @event.orders.find_by(account: signed_in)
+    assert_equal 'pat.reid', signed_in.reload.username
+  end
+
   test "the checkout form shows why a booking was refused, and books once it's fixed" do
     create_event(prices: [0], terms_and_conditions: 'Be kind', terms_and_conditions_check_box: true)
 

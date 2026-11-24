@@ -7,7 +7,9 @@ module AccountValidation
     validates_presence_of :password, if: :password_required
     validates_length_of :password, minimum: 8, if: :password_required
 
-    validates_format_of :username, with: /\A[a-z0-9_]+\z/
+    # Checked only when it changes (including on creation), so accounts with older usernames, like ones with a full stop,
+    # still save
+    validates_format_of :username, with: /\A[a-z0-9_]+\z/, if: :username_changed?
     validates_uniqueness_of :username
     validates_http_url :website
 
