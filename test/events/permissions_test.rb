@@ -212,7 +212,7 @@ class EventPermissionsTest < ActiveSupport::TestCase
     event = FactoryBot.create(:event, organisation: org, account: org.account, last_saved_by: org.account)
     sign_in(org.account)
     visit "/e/#{event.slug}/delete"
-    fill_in 'Cancellation message (optional)', with: "Sorry, the venue flooded.\nWe'll be back in spring."
+    fill_in 'Cancellation notice for event page (optional)', with: "Sorry, the venue flooded.\nWe'll be back in spring."
     click_button 'Cancel event'
     click_button 'Yes, cancel event'
     assert page.has_content?('This event has been cancelled')
@@ -227,10 +227,10 @@ class EventPermissionsTest < ActiveSupport::TestCase
     event = FactoryBot.create(:event, organisation: org, account: org.account, last_saved_by: org.account)
     sign_in(org.account)
     visit "/e/#{event.slug}/delete"
-    assert page.has_field?('Cancellation message (optional)')
+    assert page.has_field?('Cancellation notice for event page (optional)')
     choose 'Delete event'
     assert page.has_button?('Delete event')
-    assert page.has_no_field?('Cancellation message (optional)')
+    assert page.has_no_field?('Cancellation notice for event page (optional)')
     click_button 'Delete event'
     click_button 'Yes, delete event'
     assert page.has_content?('The event was deleted')
