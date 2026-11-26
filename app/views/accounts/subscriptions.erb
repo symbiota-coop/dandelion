@@ -12,9 +12,9 @@
   <% end %>
   <style>
     .subscription-cards .card { margin-bottom: var(--space-base) }
-    /* Children start hidden, so the parent row isn't the list's last item: give rows no background or bottom border, and divide children from each other (not from the parent's toggle) with a top border */
+    /* Children start hidden, so the parent row isn't the list's last item: give rows no background or bottom border, and divide each child from the row above it with a top border */
     .subscription-cards .list-group-item { background: transparent; border-width: 0 }
-    .subscription-cards .subscription-child + .subscription-child { border-top-width: var(--bs-list-group-border-width) }
+    .subscription-cards .subscription-child { border-top-width: var(--bs-list-group-border-width) }
     .subscription-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2xs) var(--space-xs) }
     .subscription-row > [data-pagelet-url] { display: flex; flex-wrap: wrap; gap: var(--space-2xs) }
     .subscription-row .btn { --bs-btn-padding-y: .25rem; --bs-btn-padding-x: var(--space-xs); --bs-btn-font-size: var(--font-size-base); --bs-btn-border-radius: var(--bs-border-radius-sm); margin-bottom: 0 !important }
