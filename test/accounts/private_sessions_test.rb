@@ -403,6 +403,23 @@ class AccountPrivateSessionsTest < ActiveSupport::TestCase
     assert page.has_css?('h1', text: 'Thai massage')
   end
 
+  test 'private sessions are listed most vouched for first, or newest first' do
+    covers 'private_sessions/sort-by-vouches@c24d19'
+    account = practitioner
+    vouch = ->(private_session, n) { n.times { PrivateSessionVouch.create!(private_session: private_session, account: FactoryBot.create(:account)) } }
+    vouch.call(create_private_session(account, title: 'Shiatsu', created_at: 3.days.ago), 1)
+    vouch.call(create_private_session(account, title: 'Deep tissue massage', created_at: 2.days.ago), 2)
+    create_private_session(account, title: 'Guided meditation', created_at: 1.day.ago)
+    titles = -> { page.all('#private-sessions h2 > a:first-child').map(&:text) }
+
+    visit '/private_sessions'
+    assert page.has_select?('order', selected: 'Most vouches')
+    assert_equal ['Deep tissue massage', 'Shiatsu', 'Guided meditation'], titles.call
+    select 'Most recently created', from: 'order'
+    assert page.has_current_path?(/order=created_at/)
+    assert_equal ['Guided meditation', 'Deep tissue massage', 'Shiatsu'], titles.call
+  end
+
   test 'private sessions are searched by name and description, filtered by kind and in person or online, and found near a place' do
     covers 'private_sessions/search-filters@4b44bc'
     account = practitioner

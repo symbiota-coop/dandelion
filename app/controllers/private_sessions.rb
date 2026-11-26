@@ -2,7 +2,8 @@ Dandelion::App.controller do
   get '/private_sessions', provides: %i[html json] do
     # My private sessions (_scope_toggle.erb): the account's own, secret ones too
     @private_sessions = current_account && params[:my_private_sessions] ? current_account.private_sessions : PrivateSession.listed
-    @private_sessions = @private_sessions.order('created_at desc')
+    # Most vouched for first, unless sorted by newest (the Sort by select)
+    @private_sessions = params[:order] == 'created_at' ? @private_sessions.order('created_at desc') : @private_sessions.order('vouches_count desc, created_at desc')
     # ?q[x]=1 or ?tag[]=x give a hash or an array, which isn't a filter, so the list shows unfiltered rather than a 500
     if params[:q].is_a?(String)
       q = /#{Regexp.escape(params[:q])}/i

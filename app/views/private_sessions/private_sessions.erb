@@ -30,6 +30,7 @@
     <% form_tag '/private_sessions', method: 'get', class: 'submitOnChange searchForm mb-3', id: 'private-sessions-search-form' do %>
       <%= hidden_field_tag :display, value: params[:display] %>
       <%= hidden_field_tag :my_private_sessions, value: params[:my_private_sessions] %>
+      <%= hidden_field_tag :order, value: params[:order] %>
       <%# As events search has them: the fields, then Online and In person (either or, forms.js) and Search %>
       <div class="row gx-2 align-items-end">
         <div class="form-group col-12 col-sm-auto">
@@ -62,6 +63,17 @@
        ] %>
     <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
       <%= partial :view_as, locals: { view_options: view_options } %>
+      <% unless map %>
+        <div>
+          <% form_tag '/private_sessions', method: 'get', class: 'form-inline submitOnChange' do %>
+            <% view_base_params.reject { |k, _| %w[order page].include?(k) }.each do |k, v| %>
+              <%= hidden_field_tag k, value: v %>
+            <% end %>
+            <label class="me-sm-2" for="private-sessions-order">Sort by</label>
+            <%= select_tag :order, options: { 'Most vouches' => 'vouches_count', 'Most recently created' => 'created_at' }, selected: params[:order], class: 'form-select', id: 'private-sessions-order' %>
+          <% end %>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>
