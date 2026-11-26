@@ -18,7 +18,7 @@ jobs:
         persist-credentials: false
 
     - name: Create Sentry release
-      uses: getsentry/action-release@d55c8c3b7375607e972b710f12926b676d89d7d2 # v3.8.0
+      uses: getsentry/action-release@a1abafc2e9bae87dc3d436b2b8f5e68de73aa52c # v3.9.0
       env:
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
