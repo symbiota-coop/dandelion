@@ -50,8 +50,9 @@ class Comment
     end
   end
 
-  # @username, not straight after a letter, dot or @, so email addresses don't count
-  MENTION_REGEX = /(?<![\w.@])@([a-z0-9_]+)/i
+  # @username, not straight after a letter, dot or @, so email addresses don't count. Dots between its characters are
+  # part of it, so @jo.smith is never taken for jo, but a dot after it isn't, so @jo. at the end of a sentence is jo
+  MENTION_REGEX = /(?<![\w.@])@([a-z0-9_]+(?:\.[a-z0-9_]+)*)/i
 
   # Accounts mentioned in the body, by username
   def mentioned_accounts
@@ -76,12 +77,18 @@ class Comment
     body ? body.scan(MENTION_REGEX).flatten.map(&:downcase) : []
   end
 
+  # The username a mention names. Usernames can't have dots, and those that had them have had them changed to
+  # underscores, so @stephen.reid, an old handle, is stephen_reid
+  def self.mentioned_username(token)
+    token.downcase.tr('.', '_')
+  end
+
   def mentioned_account(token)
     @mention_candidates ||= begin
-      usernames = mention_tokens.uniq
+      usernames = mention_tokens.map { |t| Comment.mentioned_username(t) }.uniq
       usernames.any? ? Account.and(:username.in => usernames).index_by(&:username) : {}
     end
-    @mention_candidates[token.downcase]
+    @mention_candidates[Comment.mentioned_username(token)]
   end
 
   def body_with_additions

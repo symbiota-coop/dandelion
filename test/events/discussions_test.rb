@@ -114,6 +114,27 @@ class EventDiscussionsTest < ActiveSupport::TestCase
     assert_includes last_response.body, '<a href="/u/ada_lovelace">Ada Lovelace</a>'
   end
 
+  test 'a mention with a dot in it is the whole of it, never the account named by the part before the dot' do
+    create_event(prices: [0])
+    prefix = FactoryBot.create(:account, name: 'Stephen', username: 'stephen')
+    renamed = FactoryBot.create(:account, name: 'Stephen Reid', username: 'stephen_reid')
+    jo = FactoryBot.create(:account, name: 'Jo', username: 'jo')
+    [prefix, renamed, jo].each do |account|
+      @event.tickets.create!(account: account, ticket_type: @event.ticket_types.first, payment_completed: true)
+    end
+    discussion = @event.discussion_post!(@account)
+    comment = discussion.comments.create!(account: @account, commentable: @event,
+                                          body: 'Thanks @Stephen.Reid and @jo.smith, over to @jo.')
+
+    assert_equal %w[jo stephen_reid], comment.mentioned_accounts.keys.sort
+    assert discussion.subscriptions.and(account: renamed).exists?
+    assert discussion.subscriptions.and(account: jo).exists?
+    refute discussion.subscriptions.and(account: prefix).exists?
+    html = comment.body_html
+    assert_includes html, 'Thanks <a href="/u/stephen_reid">Stephen Reid</a> and @jo.smith, over to <a href="/u/jo">Jo</a>.'
+    refute_includes html, '/u/stephen"'
+  end
+
   test "mentioning someone who can't see the discussion neither subscribes nor emails them" do
     create_event(prices: [0])
     attendee = FactoryBot.create(:account, username: 'attendee', has_signed_in: true)
