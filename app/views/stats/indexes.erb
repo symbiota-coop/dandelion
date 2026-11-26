@@ -1,7 +1,7 @@
 <% human_size = ->(bytes) { ActiveSupport::NumberHelper.number_to_human_size(bytes) } %>
 <h2>Indexes</h2>
 <p class="text-body-secondary">
-  Every index, with how many times queries have used it since the server last restarted (<code>$indexStats</code>, counted on the node that answers). An index no query has used costs space and slows writes, but check it over a long enough time before dropping it, from the console: a unique index refuses duplicates on write, which doesn't count as a use, and those marked to keep would break queries without them. TTL indexes are used by MongoDB's TTL monitor rather than by queries, so they never count as unused.
+  Every index, with how many times queries have used it since the server last restarted (<code>$indexStats</code>, counted on the node that answers). An index no query has used costs space and slows writes, but check it over a long enough time before dropping it, from the console. Only indexes that could be dropped count as unused: not TTL indexes, which MongoDB's TTL monitor uses rather than queries, nor unique ones, which refuse duplicates on write (which doesn't count as a use), nor those marked to keep, which queries would break without.
 </p>
 
 <% form_tag '', method: 'get', class: 'submitOnChange searchForm form-inline mb-3' do %>

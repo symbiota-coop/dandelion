@@ -28,10 +28,11 @@ class StatsDatabaseTest < ActiveSupport::TestCase
     within('#collections-table tr', text: Delayed::Job.collection.name) { assert page.has_no_content? 'No model' }
   end
 
-  test 'an admin sees indexes, with unused ones flagged and TTL ones not' do
+  test 'an admin sees indexes, with unused ones flagged and TTL and unique ones not' do
     covers_route 'GET /stats/indexes'
     Mongoid.default_client[:leftover_things].indexes.create_one({ name: 1 }, name: 'leftover_name')
     Mongoid.default_client[:leftover_things].indexes.create_one({ created_at: 1 }, name: 'created_at_ttl', expire_after: 3600)
+    Mongoid.default_client[:leftover_things].indexes.create_one({ code: 1 }, name: 'code_unique', unique: true)
     sign_in(FactoryBot.create(:account, admin: true))
 
     visit '/stats/indexes'
@@ -40,11 +41,16 @@ class StatsDatabaseTest < ActiveSupport::TestCase
       assert page.has_content? 'TTL: 1 hour'
       assert page.has_no_content? 'Unused'
     end
+    within('#indexes-table tr', text: 'code_unique') do
+      assert page.has_content? 'Unique'
+      assert page.has_no_content? 'Unused'
+    end
 
     check 'Unused only'
     assert page.has_field? 'unused', checked: true
     assert page.has_content? 'leftover_name'
     assert page.has_no_content? 'created_at_ttl'
+    assert page.has_no_content? 'code_unique'
 
     uncheck 'Unused only'
     assert page.has_field? 'unused', checked: false
@@ -74,7 +80,10 @@ class StatsDatabaseTest < ActiveSupport::TestCase
     sign_in(FactoryBot.create(:account, admin: true))
 
     visit '/stats/indexes'
-    within('#indexes-table tr', text: /leftover_things\s+slug_1 /) { assert page.has_content? 'Beside a filtered index' }
+    within('#indexes-table tr', text: /leftover_things\s+slug_1\s/) do
+      assert page.has_content? 'Beside a filtered index'
+      assert page.has_no_content? 'Unused'
+    end
     within('#indexes-table tr', text: 'slug_1_unique') { assert page.has_no_content? 'Beside a filtered index' }
     within('#indexes-table tr', text: Event::HOSTS_INDEX) { assert page.has_content? 'Hinted by code' }
     assert page.has_no_button? 'Drop'

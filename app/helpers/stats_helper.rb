@@ -42,8 +42,9 @@ Dandelion::App.helpers do
   end
 
   # Every index for /stats/indexes (or a collection's), with its size and how often queries have used it since the
-  # server last started ($indexStats). TTL indexes are used by MongoDB's TTL monitor rather than by queries, so they're
-  # never unused. keep says why an index mustn't be dropped, if it mustn't
+  # server last started ($indexStats). keep says why an index mustn't be dropped, if it mustn't. unused means it could be
+  # dropped, so it's never a TTL index (used by MongoDB's TTL monitor rather than by queries), a unique one (refusing
+  # a duplicate on write doesn't count as a use) or one to keep
   def index_stats(only_collection = nil)
     db = Mongoid.default_client.database
     names = only_collection ? [only_collection] & db.collection_names : db.collection_names.reject { |name| name.start_with?('system.') }.sort
@@ -55,9 +56,10 @@ Dandelion::App.helpers do
       indexes.map do |index|
         accesses = usage[index['name']] || {}
         ttl = index['expireAfterSeconds']
+        keep = index_keep_reason(name, index, indexes)
         { collection: name, name: index['name'], key: index['key'], unique: index['unique'], partial: index['partialFilterExpression'],
-          ttl: ttl, size: sizes[index['name']] || 0, ops: accesses['ops'] || 0, since: accesses['since'],
-          unused: (accesses['ops'] || 0).zero? && index['name'] != '_id_' && ttl.nil?, keep: index_keep_reason(name, index, indexes) }
+          ttl: ttl, size: sizes[index['name']] || 0, ops: accesses['ops'] || 0, since: accesses['since'], keep: keep,
+          unused: (accesses['ops'] || 0).zero? && index['name'] != '_id_' && ttl.nil? && !index['unique'] && keep.nil? }
       end
     end
   end
