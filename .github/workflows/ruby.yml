@@ -41,7 +41,7 @@ jobs:
         persist-credentials: false
 
     - name: Install Ruby
-      uses: ruby/setup-ruby@f9c4492e86def3e644ab32a0ef185eda5b0c20d0 # v1.342.0
+      uses: ruby/setup-ruby@be3c7df29b3349ec6bcfc6b4792f1cf9f5237d18 # v1.343.0
       with:
         ruby-version: 4.0.10
         bundler-cache: true
@@ -82,7 +82,7 @@ jobs:
 
     # uvx runs the zizmor, actionlint and ShellCheck versions script/lint names, so its cache is keyed on that file
     - name: Install uv
-      uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       with:
         version: 0.13.5
         cache-dependency-glob: script/lint
@@ -192,7 +192,7 @@ jobs:
         (google-chrome --headless=new --no-first-run --disable-gpu --dump-dom 'data:text/html,<p style="font-family:sans-serif">Warm</p>' > /dev/null 2>&1 &)
 
     - name: Install Ruby
-      uses: ruby/setup-ruby@f9c4492e86def3e644ab32a0ef185eda5b0c20d0 # v1.342.0
+      uses: ruby/setup-ruby@be3c7df29b3349ec6bcfc6b4792f1cf9f5237d18 # v1.343.0
       with:
         ruby-version: 4.0.10
         bundler-cache: true
@@ -338,7 +338,7 @@ jobs:
         persist-credentials: false
 
     - name: Install Ruby
-      uses: ruby/setup-ruby@f9c4492e86def3e644ab32a0ef185eda5b0c20d0 # v1.342.0
+      uses: ruby/setup-ruby@be3c7df29b3349ec6bcfc6b4792f1cf9f5237d18 # v1.343.0
       with:
         ruby-version: 4.0.10
         bundler-cache: true

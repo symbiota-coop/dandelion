@@ -88,7 +88,7 @@ GEM
       dragonfly (~> 1.0)
       fog-aws
     drb (2.2.3)
-    email_address (0.2.9)
+    email_address (0.2.10)
       base64
       simpleidn
     erb (6.0.7)
@@ -116,7 +116,7 @@ GEM
       net-http (~> 0.5)
     faraday-retry (2.4.0)
       faraday (~> 2.0)
-    ferrum (0.20.1)
+    ferrum (0.20.2)
       addressable (~> 2.5)
       base64 (~> 0.2)
       concurrent-ruby (~> 1.1)
@@ -223,7 +223,7 @@ GEM
     money (7.1.1)
       bigdecimal
       i18n (~> 1.9)
-    mongo (2.26.1)
+    mongo (2.26.2)
       base64
       bson (>= 4.14.1, < 6.0.0)
     mongoid (9.1.2)
@@ -343,7 +343,7 @@ GEM
     qonfig (0.31.0)
       base64 (>= 0.2)
     racc (1.8.1)
-    rack (3.2.8)
+    rack (3.2.9)
     rack-attack (6.8.0)
       rack (>= 1.0, < 4)
     rack-cors (3.0.0)
